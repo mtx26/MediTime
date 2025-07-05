@@ -27,7 +27,7 @@ export const requestPermissionAndGetToken = async (uid) => {
     if (permission !== 'granted') throw new Error('Permission refusée');
 
     const token = await getToken(messaging, {
-      vapidKey: import.meta.env.VITE_FCM_SERVER_KEY,
+      vapidKey: import.meta.env.VITE_FCM_VAPID_KEY,
     });
 
     log.info('[FCM] Token reçu :', {
