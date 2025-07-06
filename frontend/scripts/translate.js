@@ -4,12 +4,10 @@ const process = require('process');
 require('dotenv').config();
 const { Translate } = require('@google-cloud/translate').v2;
 
-// 🔑 Clé API Google Translate
 const translate = new Translate({
   key: process.env.VITE_GOOGLE_TRANSLATE_API_KEY,
 });
 
-// 📦 Chargement des langues
 const { LANGUAGES } = require('../src/config/languages');
 
 const baseDir = path.join(__dirname, '..', 'src');
@@ -20,9 +18,6 @@ const args = process.argv.slice(2);
 const checkOnly = args.includes('--check-only');
 const localOnly = args.includes('--local-only');
 const forceTranslate = args.includes('--force');
-
-// 🗺️ Création du localeMap
-const localeMap = Object.fromEntries(LANGUAGES.map(lang => [lang.code, lang.locale]));
 
 // 📄 Charge JSON depuis un fichier
 function loadJSON(filePath) {
@@ -126,22 +121,26 @@ async function translateObject(obj, targetLang) {
 
       console.log(`🧩 Remplissage des clés manquantes pour ${code}...`);
       for (const fullKey of missing) {
-        const value = fullKey.split('.').reduce((obj, key) => obj?.[key], source);
-        if (typeof value === 'string') {
-          try {
-            const [translated] = await translate.translate(value, code);
-            // Insérer la traduction à la bonne profondeur
-            const keys = fullKey.split('.');
-            let ref = target;
-            while (keys.length > 1) {
-              const k = keys.shift();
-              ref[k] = ref[k] || {};
-              ref = ref[k];
-            }
-            ref[keys[0]] = translated;
-          } catch (e) {
-            console.error(`❌ Erreur de traduction pour ${fullKey} (${code}) : ${e.message}`);
+        let value = fullKey.split('.').reduce((obj, key) => obj?.[key], source);
+
+        if (typeof value !== 'string' || value.trim() === '') {
+          console.warn(`⚠️  Clé ignorée (vide ou introuvable dans fr): "${fullKey}"`);
+          continue;
+        }
+
+        try {
+          const [translated] = await translate.translate(value, code);
+          const keys = fullKey.split('.');
+          let ref = target;
+          while (keys.length > 1) {
+            const k = keys.shift();
+            ref[k] = ref[k] || {};
+            ref = ref[k];
           }
+          ref[keys[0]] = translated;
+          console.log(`✅ ${code} : "${fullKey}" → "${translated}"`);
+        } catch (e) {
+          console.error(`❌ Erreur de traduction pour ${fullKey} (${code}) : ${e.message}`);
         }
       }
 
