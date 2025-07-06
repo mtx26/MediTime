@@ -262,7 +262,7 @@ function CalendarPage({
                             <i className="bi bi-gear me-2" /> {t('settings.label')}
                           </>
                         ),
-                        onClick: () => console.log('Paramètres'),
+                        onClick: () => navigate(`/${basePath}/${calendarId}/settings`),
                       },
                       {
                         label: (

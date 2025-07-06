@@ -40,11 +40,11 @@ function Navbar({ sharedProps }) {
     calendar:
       pathParts.length === 3 &&
       pathParts[0] === 'calendar' &&
-      (pathParts[2] === 'medicines' || pathParts[2] === 'boxes' || pathParts[2] === 'pillbox'),
+      (pathParts[2] === 'medicines' || pathParts[2] === 'boxes' || pathParts[2] === 'pillbox' || pathParts[2] === 'settings'),
     sharedUserCalendar:
       pathParts.length === 3 &&
       pathParts[0] === 'shared-user-calendar' &&
-      (pathParts[2] === 'medicines' || pathParts[2] === 'boxes' || pathParts[2] === 'pillbox'),
+      (pathParts[2] === 'medicines' || pathParts[2] === 'boxes' || pathParts[2] === 'pillbox' || pathParts[2] === 'settings'),
     tokenCalendar:
       pathParts.length === 3 && pathParts[0] === 'shared-token-calendar',
   };
