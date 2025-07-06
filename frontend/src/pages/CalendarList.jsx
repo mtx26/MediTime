@@ -484,6 +484,14 @@ function SelectCalendar({
                             },
                           },
                           {
+                            label: (
+                              <>
+                                <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+                              </>
+                            ),
+                            onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
+                          },
+                          {
                             separator: true,
                           },
                           {

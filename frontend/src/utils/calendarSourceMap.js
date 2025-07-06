@@ -21,7 +21,7 @@ export const getCalendarSourceMap = (
     updateBox: sharedUserCalendars.updateSharedUserBox,
     createBox: sharedUserCalendars.createSharedUserBox,
     deleteBox: sharedUserCalendars.deleteSharedUserBox,
-    downloadCalendarPdf: null,
+    downloadCalendarPdf: personalCalendars.downloadPersonalCalendarPdf,
     deleteCalendar: null,
     decreaseStock: sharedUserCalendars.useMedicinesForSharedUserPillbox
   },

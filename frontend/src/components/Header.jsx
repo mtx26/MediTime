@@ -174,7 +174,7 @@ function Navbar({ sharedProps }) {
                   </h4>
                   {locationList.sharedUserCalendar && (
                     <div className="badge bg-info mt-2">
-                      {t('shared_by')}
+                      {t('shared_by')}{' '}
                       <HoveredUserProfile
                         user={{
                           email: calendarInfo.owner_email,
