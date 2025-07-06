@@ -9,6 +9,7 @@ const Stock = () => {
     console.log('Méthode de décompte sélectionnée :', selectedMethod);
     // Tu peux appeler ton API ici
   }, [selectedMethod]);
+  // TODO: Appeler l'API pour mettre à jour la méthode de décompte
 
   return (
     <div>

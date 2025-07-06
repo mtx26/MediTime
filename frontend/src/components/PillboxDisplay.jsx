@@ -112,11 +112,14 @@ export default function PillboxDisplay({
               setAlertType('');
               setShowConfirmation(false);
             }}
-            onConfirm={() => {
-              if (type === 'calendar') {
-                setSuccessMessage(true);
-              } else {
-                navigate(`/${basePath}/${calendarId}`);
+            onConfirm={async() => {
+              const res = await calendarSource.decreaseStock(calendarId);
+              if (!res.success) {
+                if (type === 'calendar') {
+                  setSuccessMessage(true);
+                } else {
+                  navigate(`/${basePath}/${calendarId}`);
+                }
               }
               setShowConfirmation(false);
             }}
@@ -203,6 +206,7 @@ export default function PillboxDisplay({
                         setMessage(t('confirm_calendar_completion'));
                         setAlertType('confirm-safe');
                         setShowConfirmation(true);
+                        
                       }}
                     >
                       <i className="bi bi-check-circle"></i> {t('done')}
