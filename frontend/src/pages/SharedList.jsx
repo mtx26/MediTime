@@ -291,7 +291,7 @@ function SharedList({
                         label: (
                           <>
                             {/* calendar open medicine */}
-                            <i className="bi bi-capsule"></i> {t('medicines')}
+                            <i className="bi bi-capsule"></i> {t('medicines.label')}
                           </>
                         ),
                         onClick: () => {

@@ -53,7 +53,7 @@ function Footer() {
                       to="/terms"
                       className="text-muted text-decoration-none link-hover"
                     >
-                      {t('terms')}
+                      {t('terms.label')}
                     </Link>
                   </li>
                   <li>
@@ -62,7 +62,7 @@ function Footer() {
                       to="/privacy"
                       className="text-muted text-decoration-none link-hover"
                     >
-                      {t('privacy')}
+                      {t('privacy.label')}
                     </Link>
                   </li>
                 </ul>
@@ -76,7 +76,7 @@ function Footer() {
                         to="/account"
                         className="text-muted text-decoration-none link-hover"
                       >
-                        {t('account')}
+                        {t('account.label')}
                       </Link>
                     </li>
                     <li>

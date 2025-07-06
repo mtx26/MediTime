@@ -245,11 +245,11 @@ function CalendarPage({
                 <button
                   className="btn btn-outline-secondary flex-grow-1 me-auto"
                   onClick={() => navigate(`/${basePath}/${calendarId}/boxes`)}
-                  aria-label={t('medicines')}
-                  title={t('medicines')}
+                  aria-label={t('medicines.label')}
+                  title={t('medicines.label')}
                 >
                   <i className="bi bi-capsule"></i>
-                  <span> {t('medicines')}</span>
+                  <span> {t('medicines.label')}</span>
                 </button>
 
                 {/* Bouton pour afficher le menu déroulant */}
@@ -259,7 +259,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-gear me-2" /> {t('settings')}
+                            <i className="bi bi-gear me-2" /> {t('settings.label')}
                           </>
                         ),
                         onClick: () => console.log('Paramètres'),

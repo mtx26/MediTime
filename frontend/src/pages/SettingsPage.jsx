@@ -51,7 +51,7 @@ const SettingsPage = ({ sharedProps }) => {
         <div className="col-md-3 mb-3">
           <div className="card shadow-sm rounded">
             <div className="card-body p-3">
-              <h5 className="mb-3">{t('settings')}</h5>
+              <h5 className="mb-3">{t('settings.label')}</h5>
               <div className="nav flex-column nav-pills">
                 <Link
                   className={`nav-link text-start ${activeTab === 'account' ? 'active' : ''}`}

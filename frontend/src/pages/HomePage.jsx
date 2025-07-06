@@ -161,14 +161,14 @@ function HomePage() {
             href="/privacy"
             className="text-muted text-decoration-none small me-3"
           >
-            {t('privacy')}
+            {t('privacy.label')}
           </a>
           <span className="text-muted small">|</span>
           <a
             href="/terms"
             className="text-muted   text-decoration-none small ms-3"
           >
-            {t('terms')}
+            {t('terms.label')}
           </a>
         </div>
       </section>

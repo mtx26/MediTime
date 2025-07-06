@@ -83,7 +83,7 @@ function SelectCalendar({
     if (rep.success) {
       setAlertType('success');
       setAlertMessage('✅ ' + rep.message);
-      setSelectedAlert('calendar');
+      setSelectedAlert('calendar.label');
     } else {
       setAlertType('danger');
       setAlertMessage('❌ ' + rep.error);
@@ -259,7 +259,7 @@ function SelectCalendar({
                   <div className="me-auto">
                     <h5 className="mb-1 fs-semibold">{calendarData.name}</h5>
                     <div className="text-muted small">
-                      {t('medicines')}:
+                      {t('medicines.label')}:
                       <span className="fw-semibold ms-1">
                         {calendarData.boxes_count ?? '...'}
                       </span>
@@ -298,7 +298,7 @@ function SelectCalendar({
                       {
                         label: (
                           <>
-                            <i className="bi bi-capsule"></i> {t('medicines')}
+                            <i className="bi bi-capsule"></i> {t('medicines.label')}
                           </>
                         ),
                         onClick: () => {
@@ -433,7 +433,7 @@ function SelectCalendar({
                     <div className="flex-grow-1">
                       <h5 className="mb-1 fs-semibold">{calendarData.name}</h5>
                       <div className="text-muted small">
-                        {t('medicines')}:
+                        {t('medicines.label')}:
                         <span className="fw-semibold ms-1">
                           {calendarData.boxes_count ?? '...'}
                         </span>
@@ -474,7 +474,7 @@ function SelectCalendar({
                           {
                             label: (
                               <>
-                                <i className="bi bi-capsule"></i> {t('medicines')}
+                                <i className="bi bi-capsule"></i> {t('medicines.label')}
                               </>
                             ),
                             onClick: () => {

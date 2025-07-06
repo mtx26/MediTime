@@ -167,7 +167,7 @@ function Navbar({ sharedProps }) {
                         to={`/${basePath}/${calendarInfo.id}`}
                         className="text-decoration-none text-dark"
                       >
-                        <span className="text-muted">{t('calendar')} : </span>
+                        <span className="text-muted">{t('calendar.label')} : </span>
                         <span className="fw-bold">{calendarInfo.name}</span>
                       </Link>
                     )}
@@ -364,7 +364,7 @@ function Navbar({ sharedProps }) {
                   ) : (
                     <>
                       <i className="bi bi-person-circle fs-3 me-2"></i>
-                      <span className="text-muted">{t('account')}</span>
+                      <span className="text-muted">{t('account.label')}</span>
                     </>
                   )}
                 </button>
@@ -387,7 +387,7 @@ function Navbar({ sharedProps }) {
                         </li>
                         <li>
                           <Link className="dropdown-item" to="/settings">
-                            <i className="bi bi-gear fs-5 me-2"></i> {t('settings')}
+                            <i className="bi bi-gear fs-5 me-2"></i> {t('settings.label')}
                           </Link>
                         </li>
                         <li>
@@ -443,7 +443,7 @@ function Navbar({ sharedProps }) {
             className="text-center text-dark text-decoration-none link-hover"
           >
             <i className="bi bi-calendar-event fs-4"></i>
-            <div className="small">{t('calendar')}</div>
+            <div className="small">{t('calendar.label')}</div>
           </Link>
           <Link
             to="/shared-calendars"
@@ -484,7 +484,7 @@ function Navbar({ sharedProps }) {
             ) : (
               <i className="bi bi-person-circle fs-3 me-2"></i>
             )}
-            <div className="small">{t('account')}</div>
+            <div className="small">{t('account.label')}</div>
           </Link>
         </div>
       </nav>
