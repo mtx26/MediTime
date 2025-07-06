@@ -35,20 +35,29 @@ function saveJSON(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
 }
 
-// 🔍 Trouve les clés manquantes entre deux objets récursivement
+// 🔍 Trouve les clés manquantes ou vides entre deux objets récursivement
 function findMissingKeys(source, target, prefix = '') {
   let missing = [];
 
   for (const key in source) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
-    if (!(key in target)) {
+
+    const sourceValue = source[key];
+    const targetValue = target[key];
+
+    const isMissing =
+      !(key in target) ||
+      (typeof targetValue === 'string' && targetValue.trim() === '');
+
+    if (isMissing) {
       missing.push(fullKey);
-    } else if (typeof source[key] === 'object' && source[key] !== null) {
-      if (typeof target[key] !== 'object' || target[key] === null) {
-        missing.push(fullKey);
-      } else {
-        missing = missing.concat(findMissingKeys(source[key], target[key], fullKey));
-      }
+    } else if (
+      typeof sourceValue === 'object' &&
+      sourceValue !== null &&
+      typeof targetValue === 'object' &&
+      targetValue !== null
+    ) {
+      missing = missing.concat(findMissingKeys(sourceValue, targetValue, fullKey));
     }
   }
 

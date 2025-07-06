@@ -4,6 +4,8 @@ import AlertSystem from "../components/AlertSystem";
 import HoveredUserProfile from "../components/HoveredUserProfile";
 import { formatToLocalISODate } from "../utils/dateUtils";
 import { useTranslation } from "react-i18next";
+import ActionSheet from '../components/ActionSheet';
+import { useNavigate } from "react-router-dom";
 
 const VITE_URL = import.meta.env.VITE_VITE_URL;
 
@@ -15,6 +17,7 @@ function SharedList({
   // 🔐 Contexte d'authentification
   const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
   const { t } = useTranslation();
+  const navigate = useNavigate(); // Hook pour la navigation
 
   // ⚠️ Alertes et confirmations
   const [alertType, setAlertType] = useState(""); // Type d'alerte (ex. success, error)
@@ -269,33 +272,74 @@ function SharedList({
         {Object.entries(groupedShared).map(([calendarId, data]) => (
           <div key={calendarId} className="col-12 col-md-6">
             <div className="card h-100 shadow-sm border border-2">
-              <div className="card-body position-relative">
+              <div className="card-body">
                 {/* Nom du calendrier */}
                 <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">
                   <span>{data.calendar_name}</span>
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-sm rounded-circle"
-                    onClick={() =>
-                      setSelectedModifyCalendar(
-                        selectedModifyCalendar === calendarId
-                          ? null
-                          : calendarId,
-                      )
-                    }
-                    aria-label={t("manage_link")}
-                    title={t("manage_link")}
-                  >
-                    <i
-                      className={`bi ${selectedModifyCalendar === calendarId ? "bi-x-lg" : "bi-pencil"}`}
-                    ></i>
-                  </button>
+                  <ActionSheet
+                    actions={[
+                      {
+                        label: (
+                          <>
+                            {/* calendar open  */}
+                            <i className="bi bi-eye me-2"></i> {t('open')}
+                          </>
+                        ),
+                        onClick: () => navigate(`/calendar/${calendarId}`),
+                      },
+                      {
+                        separator: true,
+                      },
+                      {
+                        label: (
+                          <>
+                            {/* calendar delete */}
+                            <i className="bi bi-trash me-2"></i> {t('delete')}
+                          </>
+                        ),
+                        onClick: () => {
+                          setAlertType("confirm-danger");
+                          setAlertMessage(t("delete_calendar_confirm"));
+                          setAlertId(calendarId);
+                          setOnConfirmAction(() => async () => {
+                            const rep = await personalCalendars.deleteCalendar(calendarId);
+                            if (rep.success) {
+                              setAlertType("success");
+                              setAlertMessage("✅ " + rep.message);
+                              setTimeout(() => {
+                                navigate("/calendars");
+                              }, 1000);
+                            } else {
+                              setAlertType("danger");
+                              setAlertMessage("❌ " + rep.error);
+                            }
+                          });
+                        },
+                        danger: true,
+                      }
+                    ]}
+                  />
                 </h5>
+                {alertId === calendarId && (
+                  <AlertSystem
+                    type={alertType}
+                    message={alertMessage}
+                    onClose={() => {
+                      setAlertMessage("");
+                      setOnConfirmAction(null);
+                      setAlertId(null);
+                    }}
+                    onConfirm={async () => {
+                      if (onConfirmAction) await onConfirmAction();
+                    }}
+                  />
+                )}
 
                 <hr className="my-3" />
 
                 {/* Liens de partage */}
                 <TokenList
+                  setAlertType={setAlertType}
                   alertId={alertId}
                   alertType={alertType}
                   alertMessage={alertMessage}
@@ -309,18 +353,13 @@ function SharedList({
                   handleToggleToken={handleToggleToken}
                   deleteTokenConfirmAction={deleteTokenConfirmAction}
                   handleCreateToken={handleCreateToken}
-                  expirationType={expirationType}
-                  setExpirationType={setExpirationType}
-                  expiresAt={expiresAt}
-                  setExpiresAt={setExpiresAt}
-                  permissions={permissions}
-                  setPermissions={setPermissions}
                   today={today}
                   VITE_URL={VITE_URL}
                   data={data}
                   calendarId={calendarId}
                   setSelectedModifyCalendar={setSelectedModifyCalendar}
                   selectedModifyCalendar={selectedModifyCalendar}
+                  tokenCalendars={tokenCalendars}
                 />
 
                 <hr className="my-3" />
@@ -351,6 +390,7 @@ function SharedList({
 }
 
 function TokenList({
+  setAlertType,
   alertId,
   alertType,
   alertMessage,
@@ -364,18 +404,13 @@ function TokenList({
   handleToggleToken,
   deleteTokenConfirmAction,
   handleCreateToken,
-  expirationType,
-  setExpirationType,
-  expiresAt,
-  setExpiresAt,
-  permissions,
-  setPermissions,
   today,
   VITE_URL,
   data,
   calendarId,
   selectedModifyCalendar,
   setSelectedModifyCalendar,
+  tokenCalendars,
 }) {
   const { t } = useTranslation();
   return (
@@ -420,6 +455,46 @@ function TokenList({
             >
               <i className="bi bi-clipboard"></i>
             </button>
+            <ActionSheet
+              actions={[
+                {
+                  label: (
+                    <>
+                      <i className="bi bi-pencil-square me-2"></i> {t('modify')}
+                    </>
+                  ),
+                  onClick: () => setSelectedModifyCalendar(calendarId),
+                },
+                {
+                  label: (
+                    <>
+                      <i className="bi bi-arrow-clockwise me-2"></i> {t('regenerate')}
+                    </>
+                  ),
+                  onClick: () => {
+                    setAlertType("confirm-danger");
+                    setAlertMessage(t("regenerate_link_confirm"));
+                    setAlertId(token.id);
+                    setOnConfirmAction(() => async () => {
+                      await tokenCalendars.deleteToken(token.id);
+                      await handleCreateToken(calendarId);
+                    });
+                  },
+                },
+                {
+                  separator: true,
+                },
+                {
+                  label: (
+                    <>
+                      <i className="bi bi-trash me-2"></i> {t('delete')}
+                    </>
+                  ),
+                  onClick: () => deleteTokenConfirmAction(token.id),
+                  danger: true,
+                },
+              ]}
+            />
           </div>
 
           {selectedModifyCalendar === calendarId && (
@@ -509,16 +584,15 @@ function TokenList({
                     <option value="edit">{t("read_write")}</option>
                   </select>
                 </div>
-
-                {/* Colonne 4 : Supprimer */}
-                <div className="col-auto d-flex justify-content-end">
+                {/* Colonne 4 : Annuler a la ligne suivante */}
+                <div className="d-flex col-12">
                   <button
-                    className="btn btn-outline-danger"
-                    onClick={() => deleteTokenConfirmAction(token.id)}
-                    aria-label={t("delete_link")}
-                    title={t("delete_link")}
+                    className="btn btn-outline-secondary"
+                    onClick={() => setSelectedModifyCalendar(null)}
+                    aria-label={t("cancel")}
+                    title={t("cancel")}
                   >
-                    <i className="bi bi-trash"></i>
+                    <i className="bi bi-x-lg"></i> {t("cancel")}
                   </button>
                 </div>
               </div>
@@ -637,15 +711,21 @@ function UserList({
                 </div>
 
                 {/* Supprimer */}
-                <div className="col-2">
-                  <button
-                    className="btn btn-outline-danger"
-                    onClick={() => deleteUserConfirmAction(calendarId, user)}
-                    aria-label={t("delete_access")}
-                    title={t("delete_access")}
-                  >
-                    <i className="bi bi-trash"></i>
-                  </button>
+                <div className="col-2 justify-content-end d-flex">
+                  <ActionSheet
+                    actions={[
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-trash me-2"></i> {t('delete')}
+                          </>
+                        ),
+                        onClick: () => deleteUserConfirmAction(calendarId, user),
+                        danger: true,
+                      },
+                    ]}
+                    buttonSize="sm"
+                  />
                 </div>
               </div>
             </div>
