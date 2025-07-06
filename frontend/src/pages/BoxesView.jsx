@@ -742,7 +742,6 @@ function BoxField({
           type={type}
           aria-label={label}
           className="form-control form-control-sm w-75"
-          defaultValue={value}
           value={value}
           onChange={onChange}
           required
