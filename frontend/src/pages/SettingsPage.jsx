@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import Security from './settings/Security';
 import Notification from './settings/Notification';
 import Account from './settings/Account';
+import Preferences from './settings/Preferences';
 import { Link, useLocation } from 'react-router-dom';
 import { handleLogout, resetPassword } from '../services/authService';
 import { UserContext } from '../contexts/UserContext';
@@ -36,6 +37,8 @@ const SettingsPage = ({ sharedProps }) => {
         return <Security {...sharedProps} />;
       case 'notifications':
         return <Notification {...sharedProps} />;
+      case 'preferences':
+        return <Preferences {...sharedProps} />;
       default:
         return <Account {...sharedProps} />;
     }

@@ -56,6 +56,7 @@ const Security = ({ sharedProps }) => {
   return (
     <div>
       <h2 className="mb-4">{t('security.title')}</h2>
+      <p className="text-muted mb-4">{t('security.instructions')}</p>
 
       <AlertSystem
         type={alertType}

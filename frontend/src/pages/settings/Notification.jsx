@@ -11,6 +11,7 @@ const Notification = () => {
   return (
     <div>
       <h2 className="mb-4">{t('notifications')}</h2>
+      <p className="text-muted mb-4">{t('notification.instructions')}</p>
 
       <div className="form-check form-switch mb-3">
         <input

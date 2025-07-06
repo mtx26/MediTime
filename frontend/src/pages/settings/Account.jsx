@@ -102,7 +102,7 @@ const Account = ({ sharedProps }) => {
   return (
     <>
       <div>
-        <h2 className="mb-3">{t('settings.account')}</h2>
+        <h2 className="mb-4">{t('settings.account')}</h2>
         <p className="text-muted mb-4">{t('account.instructions')}</p>
 
         <form className="row gap-3 align-items-center" onSubmit={handleSubmit}>
