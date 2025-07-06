@@ -121,27 +121,77 @@ async function translateObject(obj, targetLang) {
 
       console.log(`🧩 Remplissage des clés manquantes pour ${code}...`);
       for (const fullKey of missing) {
-        let value = fullKey.split('.').reduce((obj, key) => obj?.[key], source);
+        const keys = fullKey.split('.');
+        let value = keys.reduce((obj, key) => obj?.[key], source);
 
-        if (typeof value !== 'string' || value.trim() === '') {
-          console.warn(`⚠️  Clé ignorée (vide ou introuvable dans fr): "${fullKey}"`);
+        if (value === undefined || value === null) {
+          console.warn(`⚠️  Clé introuvable dans fr: "${fullKey}"`);
           continue;
         }
 
-        try {
-          const [translated] = await translate.translate(value, code);
-          const keys = fullKey.split('.');
-          let ref = target;
-          while (keys.length > 1) {
-            const k = keys.shift();
-            ref[k] = ref[k] || {};
-            ref = ref[k];
+        // Cas : objet avec une seule clé string → traduit directement
+        if (
+          typeof value === 'object' &&
+          value !== null &&
+          Object.keys(value).length === 1 &&
+          typeof Object.values(value)[0] === 'string'
+        ) {
+          const onlyKey = Object.keys(value)[0];
+          const onlyVal = value[onlyKey];
+
+          try {
+            const [translated] = await translate.translate(onlyVal, code);
+            let ref = target;
+            while (keys.length > 1) {
+              const k = keys.shift();
+              ref[k] = ref[k] || {};
+              ref = ref[k];
+            }
+            ref[keys[0]] = { [onlyKey]: translated };
+            console.log(`✅ ${code} : "${fullKey}.${onlyKey}" → "${translated}"`);
+          } catch (e) {
+            console.error(`❌ Erreur de traduction pour ${fullKey}.${onlyKey} (${code}) : ${e.message}`);
           }
-          ref[keys[0]] = translated;
-          console.log(`✅ ${code} : "${fullKey}" → "${translated}"`);
-        } catch (e) {
-          console.error(`❌ Erreur de traduction pour ${fullKey} (${code}) : ${e.message}`);
+          continue;
         }
+
+        // Cas : chaîne simple → traduit normalement
+        if (typeof value === 'string') {
+          try {
+            const [translated] = await translate.translate(value, code);
+            let ref = target;
+            while (keys.length > 1) {
+              const k = keys.shift();
+              ref[k] = ref[k] || {};
+              ref = ref[k];
+            }
+            ref[keys[0]] = translated;
+            console.log(`✅ ${code} : "${fullKey}" → "${translated}"`);
+          } catch (e) {
+            console.error(`❌ Erreur de traduction pour ${fullKey} (${code}) : ${e.message}`);
+          }
+          continue;
+        }
+
+        // Cas : objet complexe → traduction récursive
+        if (typeof value === 'object') {
+          try {
+            const translatedSubtree = await translateObject(value, code);
+            let ref = target;
+            while (keys.length > 1) {
+              const k = keys.shift();
+              ref[k] = ref[k] || {};
+              ref = ref[k];
+            }
+            ref[keys[0]] = translatedSubtree;
+            console.log(`✅ ${code} : "${fullKey}" → (sous-clés traduites)`);
+          } catch (e) {
+            console.error(`❌ Erreur de traduction récursive pour ${fullKey} (${code}) : ${e.message}`);
+          }
+          continue;
+        }
+
+        console.warn(`⚠️  Clé ignorée (type non pris en charge): "${fullKey}"`);
       }
 
       target.locale = locale;

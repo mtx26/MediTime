@@ -11,7 +11,6 @@
   "accepted": "Akzeptiert",
   "access": "Zugang",
   "account": {
-    "label": "Konto",
     "crop": {
       "title": "Beschneiden Sie das Foto",
       "use": "Dieses Bild verwenden"
@@ -22,6 +21,7 @@
     },
     "image_size_error": "Die Bildgröße darf 5 MB nicht überschreiten",
     "instructions": "Hier können Sie Ihre persönlichen Daten ändern.",
+    "label": "Konto",
     "profile_alt": "Profil",
     "save_changes": "Änderungen speichern"
   },
@@ -115,13 +115,13 @@
     "view_notice": "Siehe die Anweisungen"
   },
   "calendar": {
-    "label": "Kalender",
     "add": "Einen Kalender hinzufügen",
     "confirm_delete": "Kalender löschen?",
     "confirm_delete_shared": "Freigegebenen Kalender löschen?",
     "confirm_rename": "Kalender umbenennen?",
     "daily_view": "Tageskalender",
     "day": "Tag",
+    "label": "Kalender",
     "month": "Monat",
     "name": "Kalendername",
     "new_name": "Neuer Name",
@@ -132,6 +132,23 @@
     "weekly_view": "Kalender nach Woche"
   },
   "calendar_completed": "Kalender erfolgreich abgeschlossen!",
+  "calendar_settings": {
+    "label": "Kalendereinstellungen",
+    "sharing": {
+      "label": "Weitergabe"
+    },
+    "stock": {
+      "label": "Bestandszählung",
+      "weekly": {
+        "label": "Wöchentlich (Pillbox)",
+        "description": "Der Vorrat wird jede Woche manuell verringert, wenn Sie Ihre Pillendose auffüllen."
+      },
+      "daily": {
+        "label": "Täglich (Mitternacht)",
+        "description": "Der Bestand wird täglich automatisch reduziert."
+      }
+    }
+  },
   "calendars": "Kalender",
   "cancel": "Stornieren",
   "choose_date": "Wählen Sie ein Datum",
@@ -189,8 +206,8 @@
   "logout": "Ausloggen",
   "manage_link": "Verwalten des Links",
   "medicines": {
-    "label": "Drogen",
     "back_to_calendar": "Zurück zum Kalender",
+    "label": "Drogen",
     "list_empty": "❌ Für diesen Zeitplan wurden noch keine Medikamente hinzugefügt.",
     "list_title": "Liste der Medikamente"
   },
@@ -358,8 +375,8 @@
   },
   "send_invitation": "Senden einer Einladung",
   "settings": {
-    "label": "Einstellungen",
     "account": "Mein Konto",
+    "label": "Einstellungen",
     "language": "Anwendungssprache",
     "language_note": "Die ausgewählte Sprache gilt für die gesamte Benutzeroberfläche.",
     "preferences": "Einstellungen",

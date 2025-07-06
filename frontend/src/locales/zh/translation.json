@@ -11,7 +11,6 @@
   "accepted": "公认",
   "access": "使用权",
   "account": {
-    "label": "帐户",
     "crop": {
       "title": "裁剪照片",
       "use": "使用此图像"
@@ -22,6 +21,7 @@
     },
     "image_size_error": "图片大小不得超过 5MB",
     "instructions": "您可以在这里更改您的个人信息。",
+    "label": "帐户",
     "profile_alt": "轮廓",
     "save_changes": "保存更改"
   },
@@ -115,13 +115,13 @@
     "view_notice": "查看说明"
   },
   "calendar": {
-    "label": "日历",
     "add": "添加日历",
     "confirm_delete": "删除日历？",
     "confirm_delete_shared": "删除共享日历？",
     "confirm_rename": "重命名日历？",
     "daily_view": "日历",
     "day": "天",
+    "label": "日历",
     "month": "月",
     "name": "日历名称",
     "new_name": "新名称",
@@ -132,6 +132,23 @@
     "weekly_view": "按周日历"
   },
   "calendar_completed": "行事历成功完成！",
+  "calendar_settings": {
+    "label": "日历设置",
+    "sharing": {
+      "label": "共享"
+    },
+    "stock": {
+      "label": "库存数量",
+      "weekly": {
+        "label": "每周（药盒）",
+        "description": "当您重新填充药盒时，库存将每周手动减少。"
+      },
+      "daily": {
+        "label": "每日（午夜）",
+        "description": "库存每天都会自动减少。"
+      }
+    }
+  },
   "calendars": "日历",
   "cancel": "取消",
   "choose_date": "选择日期",
@@ -189,8 +206,8 @@
   "logout": "登出",
   "manage_link": "管理链接",
   "medicines": {
-    "label": "药物",
     "back_to_calendar": "返回日历",
+    "label": "药物",
     "list_empty": "❌ 此计划尚未添加任何药物。",
     "list_title": "药品清单"
   },
@@ -358,8 +375,8 @@
   },
   "send_invitation": "发送邀请",
   "settings": {
-    "label": "设置",
     "account": "我的账户",
+    "label": "设置",
     "language": "应用程序语言",
     "language_note": "所选语言将应用于整个界面。",
     "preferences": "偏好设置",

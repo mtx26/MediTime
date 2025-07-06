@@ -11,7 +11,6 @@
   "accepted": "Aceptado",
   "access": "Acceso",
   "account": {
-    "label": "Cuenta",
     "crop": {
       "title": "Recortar la foto",
       "use": "Utilice esta imagen"
@@ -22,6 +21,7 @@
     },
     "image_size_error": "El tamaño de la imagen no debe exceder los 5 MB",
     "instructions": "Puede cambiar su información personal aquí.",
+    "label": "Cuenta",
     "profile_alt": "Perfil",
     "save_changes": "Guardar cambios"
   },
@@ -115,13 +115,13 @@
     "view_notice": "Vea las instrucciones"
   },
   "calendar": {
-    "label": "Calendario",
     "add": "Agregar un calendario",
     "confirm_delete": "¿Borrar el calendario?",
     "confirm_delete_shared": "¿Eliminar calendario compartido?",
     "confirm_rename": "¿Cambiar el nombre del calendario?",
     "daily_view": "Calendario diario",
     "day": "Día",
+    "label": "Calendario",
     "month": "Mes",
     "name": "Nombre del calendario",
     "new_name": "Nuevo nombre",
@@ -132,6 +132,23 @@
     "weekly_view": "Calendario por semana"
   },
   "calendar_completed": "¡Calendario completado exitosamente!",
+  "calendar_settings": {
+    "label": "Configuración del calendario",
+    "sharing": {
+      "label": "Intercambio"
+    },
+    "stock": {
+      "label": "Recuento de existencias",
+      "weekly": {
+        "label": "Semanal (Pastillero)",
+        "description": "El stock se reducirá manualmente cada semana cuando rellenes tu pastillero."
+      },
+      "daily": {
+        "label": "Diariamente (Medianoche)",
+        "description": "El stock se reducirá automáticamente cada día."
+      }
+    }
+  },
   "calendars": "Calendarios",
   "cancel": "Cancelar",
   "choose_date": "Elige una fecha",
@@ -189,8 +206,8 @@
   "logout": "Cerrar sesión",
   "manage_link": "Administrar el enlace",
   "medicines": {
-    "label": "Drogas",
     "back_to_calendar": "Volver al calendario",
+    "label": "Drogas",
     "list_empty": "❌ Aún no se han agregado medicamentos para este cronograma.",
     "list_title": "Lista de medicamentos"
   },
@@ -358,8 +375,8 @@
   },
   "send_invitation": "Enviar una invitación",
   "settings": {
-    "label": "Ajustes",
     "account": "Mi cuenta",
+    "label": "Ajustes",
     "language": "Idioma de la aplicación",
     "language_note": "El idioma seleccionado se aplicará a toda la interfaz.",
     "preferences": "Preferencias",

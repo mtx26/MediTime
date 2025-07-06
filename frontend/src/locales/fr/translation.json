@@ -11,7 +11,6 @@
   "accepted": "Accepté",
   "access": "Accès",
   "account": {
-    "label": "Compte",
     "crop": {
       "title": "Recadrer la photo",
       "use": "Utiliser cette image"
@@ -22,6 +21,7 @@
     },
     "image_size_error": "La taille de l'image ne doit pas dépasser 5MB",
     "instructions": "Vous pouvez modifier vos informations personnelles ici.",
+    "label": "Compte",
     "profile_alt": "Profil",
     "save_changes": "Enregistrer les modifications"
   },
@@ -115,13 +115,13 @@
     "view_notice": "Voir la notice"
   },
   "calendar": {
-    "label": "Calendrier",
     "add": "Ajouter un calendrier",
     "confirm_delete": "Supprimer le calendrier ?",
     "confirm_delete_shared": "Supprimer le calendrier partagé ?",
     "confirm_rename": "Renommer le calendrier ?",
     "daily_view": "Calendrier journalier",
     "day": "Jour",
+    "label": "Calendrier",
     "month": "Mois",
     "name": "Nom du calendrier",
     "new_name": "Nouveau nom",
@@ -132,6 +132,23 @@
     "weekly_view": "Calendrier par semaine"
   },
   "calendar_completed": "Calendrier complété avec succès !",
+  "calendar_settings": {
+    "label": "Paramètres du calendrier",
+    "stock": {
+      "label": "Décompte du stock",
+      "weekly": {
+        "label": "Hebdomadaire (Pillulier)",
+        "description": "Le stock sera diminué manuellement chaque semaine lorsque vous remplirez votre pillulier."
+      },
+      "daily": {
+        "label": "Quotidien (Minuit)",
+        "description": "Le stock sera diminué automatiquement chaque jour à minuit."
+      }
+    },
+    "sharing": {
+      "label": "Partage"
+    }
+  },
   "calendars": "Calendriers",
   "cancel": "Annuler",
   "choose_date": "Choisir une date",
@@ -189,8 +206,8 @@
   "logout": "Déconnexion",
   "manage_link": "Gérer le lien",
   "medicines": {
-    "label": "Médicaments",
     "back_to_calendar": "Retour au calendrier",
+    "label": "Médicaments",
     "list_empty": "❌ Aucun médicament n’a encore été ajouté pour ce calendrier.",
     "list_title": "Liste des médicaments"
   },
@@ -358,8 +375,8 @@
   },
   "send_invitation": "Envoyer une invitation",
   "settings": {
-    "label": "Paramètres",
     "account": "Mon compte",
+    "label": "Paramètres",
     "language": "Langue de l'application",
     "language_note": "La langue sélectionnée s’appliquera à toute l’interface.",
     "preferences": "Préférences",

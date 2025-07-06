@@ -11,7 +11,6 @@
   "accepted": "Accepted",
   "access": "Access",
   "account": {
-    "label": "Account",
     "crop": {
       "title": "Crop the photo",
       "use": "Use this image"
@@ -22,6 +21,7 @@
     },
     "image_size_error": "Image size must not exceed 5MB",
     "instructions": "You can change your personal information here.",
+    "label": "Account",
     "profile_alt": "Profile",
     "save_changes": "Save changes"
   },
@@ -115,13 +115,13 @@
     "view_notice": "See the instructions"
   },
   "calendar": {
-    "label": "Calendar",
     "add": "Add a calendar",
     "confirm_delete": "Delete the calendar?",
     "confirm_delete_shared": "Delete shared calendar?",
     "confirm_rename": "Rename the calendar?",
     "daily_view": "Daily calendar",
     "day": "Day",
+    "label": "Calendar",
     "month": "Month",
     "name": "Calendar Name",
     "new_name": "New name",
@@ -132,6 +132,23 @@
     "weekly_view": "Calendar by week"
   },
   "calendar_completed": "Calendar successfully completed!",
+  "calendar_settings": {
+    "label": "Calendar Settings",
+    "sharing": {
+      "label": "Sharing"
+    },
+    "stock": {
+      "label": "Stock count",
+      "weekly": {
+        "label": "Weekly (Pillbox)",
+        "description": "The stock will be manually decreased each week when you refill your pill box."
+      },
+      "daily": {
+        "label": "Daily (Midnight)",
+        "description": "The stock will be decreased automatically every day."
+      }
+    }
+  },
   "calendars": "Calendars",
   "cancel": "Cancel",
   "choose_date": "Choose a date",
@@ -189,8 +206,8 @@
   "logout": "Logout",
   "manage_link": "Manage the link",
   "medicines": {
-    "label": "Drugs",
     "back_to_calendar": "Back to calendar",
+    "label": "Drugs",
     "list_empty": "❌ No medications have been added for this schedule yet.",
     "list_title": "List of medicines"
   },
@@ -358,8 +375,8 @@
   },
   "send_invitation": "Send an invitation",
   "settings": {
-    "label": "Settings",
     "account": "My account",
+    "label": "Settings",
     "language": "Application language",
     "language_note": "The selected language will apply to the entire interface.",
     "preferences": "Preferences",

@@ -451,5 +451,22 @@
     "desc": "Perché l'assistenza sanitaria non lascia spazio all'improvvisazione. MediTime ti offre una soluzione chiara, intuitiva e sicura per monitorare i tuoi trattamenti e quelli dei tuoi cari, giorno dopo giorno.",
     "title": "Perché scegliere MediTime?"
   },
-  "yes": "SÌ"
+  "yes": "SÌ",
+  "calendar_settings": {
+    "label": "Impostazioni del calendario",
+    "stock": {
+      "label": "Conteggio delle scorte",
+      "weekly": {
+        "label": "Settimanale (Pillbox)",
+        "description": "La scorta verrà diminuita manualmente ogni settimana quando rifornirai il tuo portapillole."
+      },
+      "daily": {
+        "label": "Giornaliero (mezzanotte)",
+        "description": "Le scorte verranno automaticamente diminuite ogni giorno a mezzanotte."
+      }
+    },
+    "sharing": {
+      "label": "Condivisione"
+    }
+  }
 }
