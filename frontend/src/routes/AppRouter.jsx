@@ -26,6 +26,7 @@ import PrivacyPage from '../pages/PrivacyPage';
 import TermsPage from '../pages/TermsPage';
 
 import AuthCallback from '../pages/AuthCallback';
+import CalendarSettingsPage from '../pages/CalendarSettingsPage';
 
 function PrivateRoute({ element }) {
   const { userInfo } = useContext(UserContext);
@@ -155,6 +156,19 @@ function AppRoutes({ sharedProps }) {
               element={
                 <RouteWithLoader
                   element={<PillboxPage {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
+        <Route
+          path="settings"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<CalendarSettingsPage {...sharedProps} />}
                   isLoading={sharedProps.loadingStates.isInitialLoading}
                 />
               }

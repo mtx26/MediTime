@@ -151,7 +151,6 @@ function SelectCalendar({
       </div>
     );
   }
-
   return (
     <div className="container align-items-center d-flex flex-column gap-3">
       {/* Modal pour partager un calendrier */}
