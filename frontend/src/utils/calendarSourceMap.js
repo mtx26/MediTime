@@ -1,3 +1,5 @@
+import { update } from "lodash";
+
 export const getCalendarSourceMap = (
   personalCalendars,
   sharedUserCalendars,
@@ -12,7 +14,8 @@ export const getCalendarSourceMap = (
     deleteBox: personalCalendars.deletePersonalBox,
     downloadCalendarPdf: personalCalendars.downloadPersonalCalendarPdf,
     deleteCalendar: personalCalendars.deleteCalendar,
-    decreaseStock: personalCalendars.useMedicinesForPersonalPillbox
+    decreaseStock: personalCalendars.useMedicinesForPersonalPillbox,
+    updateStockDecrementMethod: personalCalendars.updatePersonalStockDecrementMethod,
   },
   sharedUser: {
     fetchSchedule: sharedUserCalendars.fetchSharedUserCalendarSchedule,
@@ -23,7 +26,8 @@ export const getCalendarSourceMap = (
     deleteBox: sharedUserCalendars.deleteSharedUserBox,
     downloadCalendarPdf: personalCalendars.downloadPersonalCalendarPdf,
     deleteCalendar: null,
-    decreaseStock: sharedUserCalendars.useMedicinesForSharedUserPillbox
+    decreaseStock: sharedUserCalendars.useMedicinesForSharedUserPillbox,
+    updateStockDecrementMethod: null,
   },
   token: {
     fetchSchedule: tokenCalendars.fetchTokenCalendarSchedule,
@@ -35,6 +39,7 @@ export const getCalendarSourceMap = (
     deleteBox: null,
     downloadCalendarPdf: null,
     deleteCalendar: null,
-    decreaseStock: null
+    decreaseStock: null,
+    updateStockDecrementMethod: null,
   },
 });

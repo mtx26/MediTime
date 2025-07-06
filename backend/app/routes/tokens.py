@@ -5,7 +5,7 @@ from . import api
 import time
 from flask import request, g
 from app.db.connection import get_connection
-from app.services.calendar_service import generate_calendar_schedule
+from app.services.calendar import generate_calendar_schedule
 from app.services.verifications import verify_calendar, verify_token_owner, verify_token
 
 ERROR_UNAUTHORIZED_ACCESS = "accès refusé"

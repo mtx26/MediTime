@@ -4,9 +4,18 @@ import { useTranslation } from 'react-i18next';
 import Stock from './calendar-settings/Stock';
 // import Sharing from './calendar-settings/Sharing';
 
-const CalendarSettingsPage = ({ sharedProps }) => {
+function CalendarSettingsPage({
+  personalCalendars,
+  sharedUserCalendars,
+  tokenCalendars
+}) {
   const { t } = useTranslation();
   const location = useLocation();
+  const sharedProps = {
+    personalCalendars,
+    sharedUserCalendars,
+    tokenCalendars
+  };
 
   const getInitialTab = () => {
     const params = new URLSearchParams(location.search);

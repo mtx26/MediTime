@@ -2,7 +2,7 @@ from app.utils.validators import require_auth
 from datetime import datetime, timezone
 from . import api
 from app.services.verifications import verify_calendar_share
-from app.services.calendar_service import generate_calendar_schedule
+from app.services.calendar import generate_calendar_schedule
 from flask import request, g
 import time
 from app.services.user import fetch_user

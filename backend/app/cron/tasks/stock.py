@@ -65,7 +65,7 @@ def decrease_stock():
                 # recup les calendar avec stock_decrement_mode = auto
                 cursor.execute("""
                     SELECT * FROM calendars
-                    WHERE stock_decrement_mode = 'auto'
+                    WHERE stock_decrement_mode = 'weekly_pillbox'
                 """)
                 calendars = cursor.fetchall()
 

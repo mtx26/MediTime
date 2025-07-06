@@ -3,7 +3,7 @@ from app.utils.validators import require_auth
 from datetime import datetime, timezone
 from flask import request, g, Response
 from app.db.connection import get_connection
-from app.services.calendar_service import generate_calendar_schedule
+from app.services.calendar import generate_calendar_schedule, uptate_stock_decrement_method
 from app.services.verifications import verify_calendar
 import time
 from app.utils.response import success_response, error_response, warning_response
@@ -357,4 +357,51 @@ def download_pdf_calendar(calendar_id):
             status_code=500,
             origin="PDF_DOWNLOAD",
             error=str(e)
+        )
+    
+@api.route("/calendars/<calendar_id>/stock-decrement-method", methods=["POST"])
+@require_auth
+def update_personnal_stock_decrement_method(calendar_id):
+    try:
+        t_0 = time.time()
+        uid = g.uid
+        method = request.json.get("method")
+
+        if not method:
+            return warning_response(
+                message="method manquant", 
+                code="STOCK_DECREMENT_METHOD_UPDATE_ERROR", 
+                status_code=400, 
+                uid=uid, 
+                origin="STOCK_DECREMENT_METHOD_UPDATE", 
+                log_extra={"calendar_id": calendar_id}
+            )
+
+        if not verify_calendar(calendar_id, uid):
+            return warning_response(
+                message="accès refusé", 
+                code="ACCESS_DENIED", 
+                status_code=400, 
+                uid=uid, 
+                origin="STOCK_DECREMENT_METHOD_UPDATE", 
+                log_extra={"calendar_id": calendar_id}
+            )
+        uptate_stock_decrement_method(calendar_id, method)
+        t_1 = time.time()
+        return success_response(
+            message="methode de diminution de stock mise à jour", 
+            code="STOCK_DECREMENT_METHOD_UPDATE_SUCCESS",
+            uid=uid,
+            origin="STOCK_DECREMENT_METHOD_UPDATE",
+            log_extra={"calendar_id": calendar_id, "method": method, "time": t_1 - t_0}
+        )
+    except Exception as e:
+        return error_response(
+            message="erreur lors de la mise à jour de la méthode de diminution de stock", 
+            code="STOCK_DECREMENT_METHOD_UPDATE_ERROR", 
+            status_code=500, 
+            uid=uid, 
+            origin="STOCK_DECREMENT_METHOD_UPDATE", 
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
         )

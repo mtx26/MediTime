@@ -1,15 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { getCalendarSourceMap } from '../../utils/calendarSourceMap';
 
-const Stock = () => {
+const Stock = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();
   const [selectedMethod, setSelectedMethod] = useState('weekly_pillbox');
+  const params = useParams();
+  const location = useLocation();
 
-  useEffect(() => {
-    console.log('Méthode de décompte sélectionnée :', selectedMethod);
-    // Tu peux appeler ton API ici
-  }, [selectedMethod]);
-  // TODO: Appeler l'API pour mettre à jour la méthode de décompte
+  let calendarType = 'personal';
+  let calendarId = params.calendarId;
+  let basePath = 'calendar';
+
+  if (location.pathname.startsWith('/shared-user-calendar')) {
+    calendarType = 'sharedUser';
+    calendarId = params.calendarId;
+    basePath = 'shared-user-calendar';
+  }
+
+  const calendarSource = getCalendarSourceMap(
+    personalCalendars,
+    sharedUserCalendars,
+    tokenCalendars
+  )[calendarType];
+  
+
+  const modifyStockDecrementMethod = async (method) => {
+    await calendarSource.updateStockDecrementMethod(calendarId, method);
+    setSelectedMethod(method);
+  };
+
+    
 
   return (
     <div>
@@ -23,7 +45,7 @@ const Stock = () => {
           id="weeklyPillbox"
           value="weekly_pillbox"
           checked={selectedMethod === 'weekly_pillbox'}
-          onChange={() => setSelectedMethod('weekly_pillbox')}
+          onChange={() => modifyStockDecrementMethod('weekly_pillbox')}
         />
         <label className="form-check-label" htmlFor="weeklyPillbox">
           <strong>{t('calendar_settings.stock.weekly.label')}</strong>
@@ -40,7 +62,7 @@ const Stock = () => {
           id="dailyMidnight"
           value="daily_midnight"
           checked={selectedMethod === 'daily_midnight'}
-          onChange={() => setSelectedMethod('daily_midnight')}
+          onChange={() => modifyStockDecrementMethod('daily_midnight')}
         />
         <label className="form-check-label" htmlFor="dailyMidnight">
           <strong>{t('calendar_settings.stock.daily.label')}</strong>

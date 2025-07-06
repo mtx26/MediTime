@@ -1,9 +1,6 @@
 from datetime import timedelta
-import re
-from this import d
-
 from psycopg2.sql import NULL
-from app.services.calendar_service import is_medication_due
+from app.services.calendar import is_medication_due
 
 def process_box_decrement(cursor, id_box, qty, start_date):
     """

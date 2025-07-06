@@ -17,7 +17,7 @@ def use_pillulier(calendar_id, start_date):
 
                 mode = row.get("stock_decrement_mode")
 
-                if mode != "manual":
+                if mode != "daily_midnight":
                     return True
 
                 cursor.execute("""

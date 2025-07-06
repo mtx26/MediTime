@@ -2,7 +2,7 @@ from . import api
 from app.utils.validators import require_auth
 from app.utils.response import success_response, error_response, warning_response
 from app.services.user import fetch_user
-from app.services.calendar_service import fetch_medicine_name
+from app.services.calendar import fetch_medicine_name
 from app.db.connection import get_connection
 from flask import request, g
 import time

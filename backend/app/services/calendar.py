@@ -199,4 +199,19 @@ def fetch_medicine_name(medication_id):
             cursor.execute("SELECT name FROM medicine_boxes WHERE id = %s", (medication_id,))
             result = cursor.fetchone() or {}
             return result.get("name", "unknown")
+        
+
+def uptate_stock_decrement_method(calendar_id, method):
+    """
+    Met à jour la méthode de diminution de stock pour un calendrier.
+    """
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                UPDATE calendars
+                SET stock_decrement_mode = %s
+                WHERE id = %s
+            """, (method, calendar_id,))
+            conn.commit()
+        
     

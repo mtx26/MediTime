@@ -1,4 +1,4 @@
-from .calendar_service import *
+from .calendar import *
 from .medicines import *
 from .user import *
 from .pdf import *

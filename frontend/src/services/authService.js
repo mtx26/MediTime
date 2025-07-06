@@ -74,7 +74,6 @@ export const TwitterHandleLogin = async () => {
   }
 };
 
-/*TODO: FacebookHandleLogin*/
 /**
  * Connexion avec Facebook
  */

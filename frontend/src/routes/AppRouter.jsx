@@ -190,51 +190,51 @@ function AppRoutes({ sharedProps }) {
         }
       />
       <Route path="/shared-user-calendar/:calendarId">
-      <Route
-        index
-        element={
-          <PrivateRoute
-            element={
-              <RouteWithLoader
-                element={<CalendarView {...sharedProps} />}
-                isLoading={sharedProps.loadingStates.isInitialLoading}
-              />
-            }
-          />
-        }
-      />
-      <Route
-        path="boxes"
-        element={
-          <PrivateRoute
-            element={
-              <RouteWithLoader
-                element={<BoxesView {...sharedProps} />}
-                isLoading={sharedProps.loadingStates.isInitialLoading}
-              />
-            }
-          />
-        }
-      />
-      <Route
-        path="pillbox"
-        element={
-          <PrivateRoute
-            element={
-              <RouteWithLoader
-                element={<PillboxPage {...sharedProps} />}
-                isLoading={sharedProps.loadingStates.isInitialLoading}
-              />
-            }
-          />
-        }
-      />
-    </Route>
-    <Route path="/shared-token-calendar/:sharedToken">
-      <Route index element={<CalendarView {...sharedProps} />} />
-      <Route path="boxes" element={<MedicinesList {...sharedProps} />} />
-      <Route path="pillbox" element={<PillboxPage {...sharedProps} />} />
-    </Route>
+        <Route
+          index
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<CalendarView {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
+        <Route
+          path="boxes"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<BoxesView {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
+        <Route
+          path="pillbox"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<PillboxPage {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
+      </Route>
+      <Route path="/shared-token-calendar/:sharedToken">
+        <Route index element={<CalendarView {...sharedProps} />} />
+        <Route path="boxes" element={<MedicinesList {...sharedProps} />} />
+        <Route path="pillbox" element={<PillboxPage {...sharedProps} />} />
+      </Route>
 
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/terms" element={<TermsPage />} />

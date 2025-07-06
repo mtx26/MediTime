@@ -82,7 +82,6 @@ function App() {
     });
   }, []);
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Fonction pour obtenir le calendrier lier au calendarId
   const fetchPersonalCalendarSchedule = useCallback(async (calendarId, startDate = null) => {
@@ -121,9 +120,7 @@ function App() {
       };
     }
   }, []);
-  
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Fonction pour modifier la boîte d'un calendrier personnel
   const updatePersonalBox = useCallback(async (calendarId, boxId, box) => {
@@ -198,6 +195,18 @@ function App() {
     });
   }, []);
   
+  
+  const updatePersonalStockDecrementMethod = useCallback(async (calendarId, method) => {
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/stock-decrement-method`,
+      method: 'POST',
+      body: { method },
+      origin: 'STOCK_DECREMENT_METHOD_UPDATE',
+      uid,
+      analyticsEvent: 'update_stock_decrement_method',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -530,6 +539,7 @@ function App() {
       deletePersonalBox,
       downloadPersonalCalendarPdf,
       useMedicinesForPersonalPillbox,
+      updatePersonalStockDecrementMethod,
     },
 
     sharedUserCalendars: {
