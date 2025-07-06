@@ -458,7 +458,7 @@ function SelectCalendar({
                       </div>
                     </div>
 
-                    <div className="btn-group btn-group">
+                    <div className='gap-2 d-flex flex-wrap justify-content-center'>
                       <button
                         className="btn btn-outline-success"
                         title={t('open')}
@@ -469,16 +469,35 @@ function SelectCalendar({
                       >
                         {t('open')}
                       </button>
-                      <button
-                        className="btn btn-outline-danger"
-                        title={t('delete')}
-                        aria-label={t('delete')}
-                        onClick={() =>
-                          handleDeleteSharedCalendarClick(calendarData.id)
-                        }
-                      >
-                        <i className="bi bi-trash3"></i>
-                      </button>
+                      <ActionSheet
+                        actions={[
+                          {
+                            label: (
+                              <>
+                                <i className="bi bi-capsule"></i> {t('medicines')}
+                              </>
+                            ),
+                            onClick: () => {
+                              navigate(
+                                `/shared-user-calendar/${calendarData.id}/boxes`
+                              );
+                            },
+                          },
+                          {
+                            separator: true,
+                          },
+                          {
+                            label: (
+                              <>
+                                <i className="bi bi-trash3"></i> {t('delete')}
+                              </>
+                            ),
+                            onClick: () =>
+                              handleDeleteSharedCalendarClick(calendarData.id),
+                            danger: true,
+                          },
+                        ]}
+                      />
                     </div>
                   </div>
                 </div>
