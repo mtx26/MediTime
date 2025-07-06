@@ -296,6 +296,24 @@ function SelectCalendar({
                         onClick: () => setRenameMode(calendarData.id)
                       },
                       {
+                        label: (
+                          <>
+                            <i className="bi bi-capsule"></i> {t('medicines')}
+                          </>
+                        ),
+                        onClick: () => {
+                          navigate(`/calendar/${calendarData.id}/boxes`);
+                        },
+                      },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+                          </>
+                        ),
+                        onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
+                      },
+                      {
                         separator: true,
                       },
                       {
