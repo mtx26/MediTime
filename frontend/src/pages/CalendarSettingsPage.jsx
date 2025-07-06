@@ -57,6 +57,7 @@ function CalendarSettingsPage({
                   <i className="bi bi-capsule me-2"></i>
                   {t('calendar_settings.stock.label')}
                 </Link>
+                {/*}
                 <Link
                   className={`nav-link text-start ${activeTab === 'sharing' ? 'active' : ''}`}
                   to={`${basePath}?tab=sharing`}
@@ -64,6 +65,7 @@ function CalendarSettingsPage({
                   <i className="bi bi-share me-2"></i>
                   {t('calendar_settings.sharing.label')}
                 </Link>
+                */}
               </div>
             </div>
           </div>
