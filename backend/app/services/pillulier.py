@@ -1,5 +1,5 @@
 from app.db.connection import get_connection
-from app.services.process_box_decrement import process_box_decrement
+from app.services.stock import process_box_decrement, check_low_stock_and_notify
 
 def use_pillulier(calendar_id, start_date):
     """
@@ -36,6 +36,9 @@ def use_pillulier(calendar_id, start_date):
                     conn.commit()
                 else:
                     return None
+
+        # Vérifie les stocks faibles et envoie des notifications    
+        check_low_stock_and_notify()
 
         return True
 

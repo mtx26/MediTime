@@ -67,7 +67,6 @@ def send_fcm_notification(tokens, title, body, json_body):
                 "status_code": response.status_code,
                 "token": token,
                 "title": title,
-                "body": body
             }
         )
         try:

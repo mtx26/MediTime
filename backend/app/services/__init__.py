@@ -5,4 +5,4 @@ from .pdf import *
 from .notifications import *
 from .pillulier import *
 from .verifications import *
-from .process_box_decrement import *
+from .stock import *
