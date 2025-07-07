@@ -91,5 +91,3 @@ def decrease_stock():
 
     except Exception as e:
         log_backend.error(f"Erreur lors de la diminution des stocks: {e}", {"origin": "CRON", "code": "STOCK_DECREASE_ERROR", "error": str(e)})
-
-decrease_stock()
