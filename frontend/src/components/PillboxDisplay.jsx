@@ -114,7 +114,7 @@ export default function PillboxDisplay({
             }}
             onConfirm={async() => {
               const res = await calendarSource.decreaseStock(calendarId);
-              if (!res.success) {
+              if (res.success) {
                 if (type === 'calendar') {
                   setSuccessMessage(true);
                 } else {

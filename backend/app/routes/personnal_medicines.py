@@ -201,11 +201,20 @@ def handle_use_pillulier(calendar_id):
         result = use_pillulier(calendar_id, start_date)
 
         t_1 = time.time()
-        if not result:
+        if result == False:
             return warning_response(
                 message="aucun médicament à utiliser",
                 code="NO_MEDICATION_TO_USE",
                 status_code=404,
+                uid=uid,
+                origin="USE_PILLULIER_MEDICATION",
+                log_extra={"calendar_id": calendar_id}
+            )
+        elif result is None:
+            return warning_response(
+                message="mode de décompte non supporté",
+                code="UNSUPPORTED_DECREMENT_MODE",
+                status_code=400,
                 uid=uid,
                 origin="USE_PILLULIER_MEDICATION",
                 log_extra={"calendar_id": calendar_id}

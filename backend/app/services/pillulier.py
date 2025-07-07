@@ -14,28 +14,29 @@ def use_pillulier(calendar_id, start_date):
 
                 if not row:
                     return False
-
                 mode = row.get("stock_decrement_mode")
 
-                if mode != "daily_midnight":
-                    return True
+                if mode == "weekly_pillbox":
 
-                cursor.execute("""
-                    SELECT id, stock_quantity FROM medicine_boxes
-                    WHERE calendar_id = %s AND box_capacity > 0
-                """, (calendar_id,))
-                results = cursor.fetchall()
+                    cursor.execute("""
+                        SELECT id, stock_quantity FROM medicine_boxes
+                        WHERE calendar_id = %s AND box_capacity > 0
+                    """, (calendar_id,))
+                    results = cursor.fetchall()
 
-                if not results:
-                    return True
+                    if not results:
+                        return True
 
-                for result in results:
-                    id_box = result.get("id")
-                    qty = result.get("stock_quantity")
+                    for result in results:
+                        id_box = result.get("id")
+                        qty = result.get("stock_quantity")
+                        print(f"Decrementing box {id_box} with quantity {qty}")
 
-                    process_box_decrement(cursor, id_box, qty, start_date)
+                        process_box_decrement(cursor, id_box, qty, start_date)
 
-                conn.commit()
+                    conn.commit()
+                else:
+                    return None
 
         return True
 
