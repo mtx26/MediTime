@@ -18,11 +18,11 @@ def use_pillulier(calendar_id, start_date):
 
                 if mode == "weekly_pillbox":
 
-                cursor.execute("""
-                    SELECT id, stock_quantity FROM medicine_boxes
-                    WHERE calendar_id = %s
-                """, (calendar_id,))
-                results = cursor.fetchall()
+                    cursor.execute("""
+                        SELECT id, stock_quantity FROM medicine_boxes
+                        WHERE calendar_id = %s
+                    """, (calendar_id,))
+                    results = cursor.fetchall()
 
                     if not results:
                         return True
