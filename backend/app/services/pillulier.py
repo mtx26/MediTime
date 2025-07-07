@@ -30,7 +30,6 @@ def use_pillulier(calendar_id, start_date):
                     for result in results:
                         id_box = result.get("id")
                         qty = result.get("stock_quantity")
-                        print(f"Decrementing box {id_box} with quantity {qty}")
 
                         process_box_decrement(cursor, id_box, qty, start_date, days=7)
 
