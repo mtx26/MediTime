@@ -113,3 +113,86 @@ def check_low_stock_and_notify():
             {"origin": "CRON", "code": "STOCK_CHECK_ERROR", "error": str(e)},
         )
 
+def check_low_stock_and_notify_for_calendar(calendar_id: int):
+    """
+    Vérifie les stocks faibles pour un calendrier spécifique et envoie des notifications.
+    
+    Args:
+        calendar_id: ID du calendrier à vérifier.
+    """
+    log_backend.info(
+        "🔍 Vérification des stocks faibles pour le calendrier",
+        {"origin": "CRON", "code": "STOCK_CHECK_CALENDAR_INIT", "calendar_id": calendar_id},
+    )
+
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT m.id, m.name, m.stock_quantity, m.stock_alert_threshold, c.owner_uid
+                    FROM medicine_boxes m
+                    JOIN calendars c ON m.calendar_id = c.id
+                    WHERE m.calendar_id = %s AND m.stock_quantity <= m.stock_alert_threshold AND m.stock_alert_threshold > 0
+                    """,
+                    (calendar_id,)
+                )
+
+                results = cursor.fetchall()
+
+        if not results:
+            log_backend.info(
+                "Aucun stock faible trouvé pour le calendrier",
+                {"origin": "CRON", "code": "STOCK_CHECK_CALENDAR_EMPTY", "calendar_id": calendar_id},
+            )
+            return
+
+        grouped: dict[str, list[dict]] = defaultdict(list)
+        for result in results:
+            link = urljoin(Config.FRONTEND_URL or "", f"/medication/{result.get('id')}")
+            uid = result.get("owner_uid")
+
+            grouped[uid].append(
+                {
+                    "link": link,
+                    "medication_id": result.get("id"),
+                    "medication_qty": result.get("stock_quantity"),
+                    "calendar_id": calendar_id,
+                    "sender_uid": Config.SYSTEM_UID,
+                }
+            )
+
+        for uid, notifs in grouped.items():
+            try:
+                notify_and_record(uid=uid, json_body=notifs, notif_type="low_stock")
+                log_backend.info(
+                    "✅ Notifications de stock faible envoyées pour le calendrier",
+                    {
+                        "origin": "CRON",
+                        "code": "STOCK_CHECK_CALENDAR_SUCCESS",
+                        "uid": uid,
+                        "calendar_id": calendar_id,
+                        "count": len(notifs),
+                    },
+                )
+            except Exception as e:
+                log_backend.error(
+                    "Erreur envoi notifications stock faible pour le calendrier",
+                    {
+                        "origin": "CRON",
+                        "code": "STOCK_CHECK_CALENDAR_ERROR",
+                        "uid": uid,
+                        "calendar_id": calendar_id,
+                        "error": str(e),
+                    }
+                )
+    except Exception as e:
+        log_backend.error(
+            "Erreur lors de la vérification des stocks pour le calendrier",
+            {
+                "origin": "CRON", 
+                "code": "STOCK_CHECK_CALENDAR_ERROR", 
+                "calendar_id": calendar_id, 
+                "error": str(e)
+            }
+        )

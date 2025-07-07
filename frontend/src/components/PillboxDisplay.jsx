@@ -113,13 +113,12 @@ export default function PillboxDisplay({
               setShowConfirmation(false);
             }}
             onConfirm={async() => {
-              const res = await calendarSource.decreaseStock(calendarId);
-              if (res.success) {
-                if (type === 'calendar') {
-                  setSuccessMessage(true);
-                } else {
-                  navigate(`/${basePath}/${calendarId}`);
-                }
+              if (type === 'calendar') {
+                await calendarSource.decreaseStock(calendarId);
+                setSuccessMessage(true);
+              } else if (type === 'pillbox') {
+                calendarSource.decreaseStock(calendarId);
+                navigate(`/${basePath}/${calendarId}`);
               }
               setShowConfirmation(false);
             }}
