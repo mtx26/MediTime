@@ -3,9 +3,9 @@ import json
 from app.auth.fcm import send_fcm_notification
 from app.db.connection import get_connection
 from app.services.calendar import fetch_calendar, fetch_medicine_name
-from app.utils.logger import log_backend
-from app.services.user import fetch_user
 from app.services.messaging import send_email, send_sms
+from app.services.user import fetch_user
+from app.utils.logger import log_backend
 from app.config import Config
 import traceback
 
@@ -17,110 +17,194 @@ def fetch_calendar_name(calendar_id):
     calendar = fetch_calendar(calendar_id)
     return calendar.get("name") if calendar else "unknown"
 
-def send_push_notification(uid, json_body, notif_type):
+
+def enrich_notification(notification: dict) -> dict:
+    """Add calendar and sender names to the notification."""
+    try:
+        calendar_id = notification.get("calendar_id")
+        sender_uid = notification.get("sender_uid")
+
+        notification["calendar_name"] = (
+            fetch_calendar_name(calendar_id) if calendar_id else None
+        )
+        notification["sender_name"] = fetch_user_name(sender_uid)
+    except Exception as e:
+        log_backend.error(
+            "Erreur enrich_notification",
+            {
+                "origin": "NOTIFICATIONS",
+                "code": "ENRICH_ERROR",
+                "notification": notification,
+                "error": str(e),
+                "trace": traceback.format_exc(),
+            },
+        )
+    return notification
+
+
+def build_notification_text(notif_type: str, data: dict) -> tuple[str, str]:
+    """Return title/subject and body for a notification."""
+    match notif_type:
+        case "calendar_invitation":
+            title = "Nouvelle invitation à un calendrier"
+            body = (
+                f"{data.get('sender_name')} vous invite à rejoindre le calendrier « {data.get('calendar_name')} »."
+            )
+        case "calendar_invitation_accepted":
+            title = "Invitation acceptée"
+            body = (
+                f"{data.get('sender_name')} a accepté votre invitation pour rejoindre le calendrier « {data.get('calendar_name')} »."
+            )
+        case "calendar_invitation_rejected":
+            title = "Invitation refusée"
+            body = (
+                f"{data.get('sender_name')} a refusé votre invitation pour rejoindre le calendrier « {data.get('calendar_name')} »."
+            )
+        case "calendar_shared_deleted_by_owner":
+            title = "Partage annulé"
+            body = (
+                f"{data.get('sender_name')} a arrêté de partager le calendrier « {data.get('calendar_name')} » avec vous."
+            )
+        case "calendar_shared_deleted_by_receiver":
+            title = "Partage retiré"
+            body = (
+                f"{data.get('sender_name')} a retiré le calendrier « {data.get('calendar_name')} »."
+            )
+        case "low_stock":
+            if data.get("medications"):
+                meds = ", ".join(data["medications"])
+                title = "Stock faible"
+                body = f"Médicaments concernés : {meds}."
+            else:
+                name = fetch_medicine_name(data.get("medication_id"))
+                qty = data.get("medication_qty") or 0
+                title = "Stock faible"
+                body = f"Le médicament « {name} » est presque épuisé ({qty} restants)."
+        case _:
+            count = data.get("notification_count")
+            if count and count > 1:
+                title = "Nouvelles notifications"
+                body = f"Vous avez {count} nouvelles notifications."
+            else:
+                title = "Nouvelle notification"
+                body = "Vous avez reçu une nouvelle notification dans MediTime."
+
+    return title, body
+
+
+def save_notifications(uid: str, notif_type: str, notifications: list[dict]):
+    """Persist notifications individually to the database."""
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                for notif in notifications:
+                    cursor.execute(
+                        """
+                        INSERT INTO notifications (user_id, type, read, timestamp, sender_uid, content)
+                        VALUES (%s, %s, %s, NOW(), %s, %s::jsonb)
+                        """,
+                        (uid, notif_type, False, notif.get("sender_uid"), json.dumps(notif)),
+                    )
+                conn.commit()
+    except Exception as e:
+        log_backend.error(
+            "Erreur save_notifications",
+            {
+                "origin": "NOTIFICATIONS",
+                "code": "SAVE_ERROR",
+                "uid": uid,
+                "error": str(e),
+                "trace": traceback.format_exc(),
+            },
+        )
+
+
+def send_grouped_notifications(uid: str, notifications: list[dict], notif_type: str) -> None:
+    """Send push/email/SMS once for all notifications."""
+    try:
+        user = fetch_user(uid)
+        email_enabled = user.get("email_enabled")
+        push_enabled = user.get("push_enabled")
+        sms_enabled = user.get("sms_enabled")
+
+        payload = notifications[0].copy()
+        if len(notifications) > 1:
+            if notif_type == "low_stock":
+                payload["medications"] = [
+                    f"{fetch_medicine_name(n.get('medication_id'))} ({n.get('medication_qty') or 0})"
+                    for n in notifications
+                ]
+            else:
+                payload["notification_count"] = len(notifications)
+
+        if push_enabled:
+            send_push_notification(uid, payload, notif_type)
+        if email_enabled:
+            send_email_notification(user, payload, notif_type)
+        if sms_enabled:
+            send_sms_notification(user, payload, notif_type)
+    except Exception as e:
+        log_backend.error(
+            "Erreur send_grouped_notifications",
+            {
+                "origin": "NOTIFICATIONS",
+                "code": "SEND_ERROR",
+                "uid": uid,
+                "error": str(e),
+                "trace": traceback.format_exc(),
+            },
+        )
+
+def send_push_notification(uid: str, payload: dict, notif_type: str) -> None:
+    """Send an FCM notification."""
+    title, body = build_notification_text(notif_type, payload)
+
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            # 1. Chercher le token FCM
             cursor.execute("SELECT token FROM fcm_tokens WHERE uid = %s", (uid,))
             tokens = [r["token"] for r in cursor.fetchall()]
 
-            match notif_type:
-                case "calendar_invitation":
-                    title = "Nouvelle invitation à un calendrier"
-                    body = f"{json_body.get('sender_name')} vous invite à rejoindre le calendrier « {json_body.get('calendar_name') } »."
-                case "calendar_invitation_accepted":
-                    title = "Invitation acceptée"
-                    body = f"{json_body.get('sender_name')} a accepté votre invitation pour rejoindre le calendrier « {json_body.get('calendar_name') } »."
-                case "calendar_invitation_rejected":
-                    title = "Invitation refusée"
-                    body = f"{json_body.get('sender_name')} a refusé votre invitation pour rejoindre le calendrier « {json_body.get('calendar_name') } »."
-                case "calendar_shared_deleted_by_owner":
-                    title = "Partage annulé"
-                    body = f"{json_body.get('sender_name')} a arrêté de partager le calendrier « {json_body.get('calendar_name') } » avec vous."
-                case "calendar_shared_deleted_by_receiver":
-                    title = "Partage retiré"
-                    body = f"{json_body.get('sender_name')} a retiré le calendrier « {json_body.get('calendar_name') } »."
-                case "low_stock":
-                    name = fetch_medicine_name(json_body.get("medication_id"))
-                    qty = json_body.get("medication_qty") or 0
-                    title = "Stock faible"
-                    body = f"Le médicament « {name} » est presque épuisé ({qty} restants)."
-                case _:
-                    title = "Nouvelle notification"
-                    body = "Vous avez reçu une nouvelle notification dans MediTime."
-
-            # 2. Envoyer la notif (si token trouvé)
-            if tokens:
-                send_fcm_notification(tokens, title, body, json_body)
-            else:
-                log_backend.warning(
-                    f"Aucun token FCM trouvé pour l'utilisateur {uid}", 
-                    {
-                        "origin": "NOTIFICATIONS", 
-                        "code": "NO_FCM_TOKEN", 
-                        "uid": uid,
-                    }
-                )
-
-def send_email_notification(uid, json_body, notif_type):
-    user = fetch_user(uid)
-    email = user.get("email") if user else None
-
-    subject, plain_body, html_content = generate_email_content(notif_type, json_body)
-
-    if email:
-        send_email(
-            to=email,
-            subject=subject,
-            html_content=html_content,
-            plain=plain_body    
-        )
-
-def send_sms_notification(uid, json_body, notif_type):
-    user = fetch_user(uid)
-    phone = user.get("phone") if user else None
-
-    subject, plain_body, html_content = generate_email_content(notif_type, json_body)
-
-    if phone:
-        send_sms(phone, plain_body)
+    if tokens:
+        send_fcm_notification(tokens, title, body, payload)
     else:
         log_backend.warning(
-            f"Aucun numéro de téléphone trouvé pour l'utilisateur {uid}", 
-            {
-                "origin": "NOTIFICATIONS", 
-                "code": "NO_PHONE_NUMBER", 
-                "uid": uid,
-            }
-        )   
+            f"Aucun token FCM trouvé pour l'utilisateur {uid}",
+            {"origin": "NOTIFICATIONS", "code": "NO_FCM_TOKEN", "uid": uid},
+        )
 
-def generate_email_content(notif_type, json_body):
+def send_email_notification(user: dict, payload: dict, notif_type: str) -> None:
+    email = user.get("email")
+    if not email:
+        log_backend.warning(
+            f"Aucun email trouvé pour l'utilisateur {user.get('id')}",
+            {"origin": "NOTIFICATIONS", "code": "NO_EMAIL", "uid": user.get('id')},
+        )
+        return
+
+    subject, plain_body, html_content = generate_email_content(notif_type, payload)
+
+    send_email(to=email, subject=subject, html_content=html_content, plain=plain_body)
+
+def send_sms_notification(user: dict, payload: dict, notif_type: str) -> None:
+    phone = user.get("phone")
+    if not phone:
+        log_backend.warning(
+            f"Aucun numéro de téléphone trouvé pour l'utilisateur {user.get('id')}",
+            {
+                "origin": "NOTIFICATIONS",
+                "code": "NO_PHONE_NUMBER",
+                "uid": user.get('id'),
+            },
+        )
+        return
+
+    plain_body = build_notification_text(notif_type, payload)[1]
+    send_sms(phone, plain_body)
+
+def generate_email_content(notif_type: str, json_body: dict) -> tuple[str, str, str]:
     base_link = f"https://{Config.FRONTEND_URL}/notifications"
 
-    match notif_type:
-        case "calendar_invitation":
-            subject = "Nouvelle invitation à un calendrier"
-            body = f"{json_body.get('sender_name')} vous invite à rejoindre le calendrier « {json_body.get('calendar_name') } »."
-        case "calendar_invitation_accepted":
-            subject = "Invitation acceptée"
-            body = f"{json_body.get('sender_name')} a accepté votre invitation pour rejoindre le calendrier « {json_body.get('calendar_name') } »."
-        case "calendar_invitation_rejected":
-            subject = "Invitation refusée"
-            body = f"{json_body.get('sender_name')} a refusé votre invitation pour rejoindre le calendrier « {json_body.get('calendar_name') } »."
-        case "calendar_shared_deleted_by_owner":
-            subject = "Partage annulé"
-            body = f"{json_body.get('sender_name')} a arrêté de partager le calendrier « {json_body.get('calendar_name') } » avec vous."
-        case "calendar_shared_deleted_by_receiver":
-            subject = "Partage retiré"
-            body = f"{json_body.get('sender_name')} a retiré le calendrier « {json_body.get('calendar_name') } »."
-        case "low_stock":
-            name = fetch_medicine_name(json_body.get("medication_id"))
-            qty = json_body.get("medication_qty") or 0
-            subject = "Stock faible"
-            body = f"Le médicament « {name} » est presque épuisé ({qty} restants)."
-        case _:
-            subject = "Nouvelle notification"
-            body = "Vous avez reçu une nouvelle notification dans MediTime."
+    subject, body = build_notification_text(notif_type, json_body)
 
     html_content = f"""
         <p style="font-size: 16px; color: #555;">{body}</p>
@@ -139,48 +223,24 @@ def generate_email_content(notif_type, json_body):
 
 
 
-def notify_and_record(uid, json_body, notif_type):
+def notify_and_record(uid: str, json_body, notif_type: str) -> None:
+    """Handle single or multiple notifications for a user."""
     try:
-        user_settings = fetch_user(uid)
-        email_enabled = user_settings.get("email_enabled")
-        push_enabled = user_settings.get("push_enabled")
-        sms_enabled = user_settings.get("sms_enabled")
-        
-        calendar_id = json_body.get("calendar_id")
-        sender_uid = json_body.get("sender_uid")
-        
-        if calendar_id:
-            calendar_name = fetch_calendar_name(calendar_id)
-        else:
-            calendar_name = None
-        json_body["calendar_name"] = calendar_name
+        notifications = json_body if isinstance(json_body, list) else [json_body]
 
-    
-        sender_name = fetch_user_name(sender_uid)
-        json_body["sender_name"] = sender_name
+        enriched = [enrich_notification(n) for n in notifications]
 
-        if push_enabled:
-            send_push_notification(uid, json_body, notif_type)
-        if email_enabled:
-            send_email_notification(uid, json_body, notif_type)
-        if sms_enabled:
-            send_sms_notification(uid, json_body, notif_type)
-        
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("""
-                    INSERT INTO notifications (user_id, type, read, timestamp, sender_uid, content)
-                    VALUES (%s, %s, %s, NOW(), %s, %s::jsonb)
-                """, (uid, notif_type, False, sender_uid, json.dumps(json_body)))
-                conn.commit()
+        save_notifications(uid, notif_type, enriched)
+        send_grouped_notifications(uid, enriched, notif_type)
 
     except Exception as e:
         log_backend.error(
-            f"Erreur notify_and_record : {e}", 
+            "Erreur notify_and_record",
             {
-                "origin": "NOTIFICATIONS", 
-                "code": "NOTIFICATION_ERROR", 
+                "origin": "NOTIFICATIONS",
+                "code": "NOTIFICATION_ERROR",
+                "uid": uid,
                 "error": str(e),
-                "trace": traceback.format_exc()
-            }
+                "trace": traceback.format_exc(),
+            },
         )
