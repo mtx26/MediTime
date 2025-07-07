@@ -16,6 +16,7 @@ export const getCalendarSourceMap = (
     deleteCalendar: personalCalendars.deleteCalendar,
     decreaseStock: personalCalendars.useMedicinesForPersonalPillbox,
     updateStockDecrementMethod: personalCalendars.updatePersonalStockDecrementMethod,
+    restockBox: personalCalendars.personalRestockBox,
   },
   sharedUser: {
     fetchSchedule: sharedUserCalendars.fetchSharedUserCalendarSchedule,
@@ -28,6 +29,7 @@ export const getCalendarSourceMap = (
     deleteCalendar: null,
     decreaseStock: sharedUserCalendars.useMedicinesForSharedUserPillbox,
     updateStockDecrementMethod: null,
+    restockBox: sharedUserCalendars.sharedUserRestockBox,
   },
   token: {
     fetchSchedule: tokenCalendars.fetchTokenCalendarSchedule,
@@ -41,5 +43,6 @@ export const getCalendarSourceMap = (
     deleteCalendar: null,
     decreaseStock: null,
     updateStockDecrementMethod: null,
+    restockBox: null,
   },
 });

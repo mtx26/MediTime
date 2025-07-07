@@ -208,6 +208,18 @@ function App() {
     });
   }, []);
 
+
+  const personalRestockBox = useCallback(async (calendarId, boxId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/boxes/${boxId}/restock`,
+      method: 'POST',
+      origin: 'BOX_RESTOCK',
+      uid,
+      analyticsEvent: 'restock_personal_box',
+      analyticsData: { calendarId, boxId, uid },
+    });
+  }, []);
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Fonction pour recupérer un calendrier partagé par un token
@@ -517,6 +529,17 @@ function App() {
     });
   }, []);
 
+  const sharedUserRestockBox = useCallback(async (calendarId, boxId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/boxes/${boxId}/restock`,
+      method: 'POST',
+      origin: 'SHARED_BOX_RESTOCK',
+      uid,
+      analyticsEvent: 'restock_shared_user_box',
+      analyticsData: { calendarId, boxId, uid },
+    });
+  }, []);
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   const downloadPersonalCalendarPdf = useCallback(async (calendarId) => {
@@ -540,6 +563,7 @@ function App() {
       downloadPersonalCalendarPdf,
       useMedicinesForPersonalPillbox,
       updatePersonalStockDecrementMethod,
+      personalRestockBox,
     },
 
     sharedUserCalendars: {
@@ -556,6 +580,7 @@ function App() {
       createSharedUserBox,
       deleteSharedUserBox,
       useMedicinesForSharedUserPillbox,
+      sharedUserRestockBox,
     },
 
     tokenCalendars: {

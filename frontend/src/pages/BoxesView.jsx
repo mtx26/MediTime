@@ -75,15 +75,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   };
 
   const restockBox = async (boxId) => {
-    const box = {
-      name: boxes.find((box) => box.id === boxId).name,
-      dose: boxes.find((box) => box.id === boxId).dose,
-      box_capacity: boxes.find((box) => box.id === boxId).box_capacity,
-      stock_alert_threshold: boxes.find((box) => box.id === boxId).stock_alert_threshold,
-      stock_quantity: boxes.find((box) => box.id === boxId).box_capacity,
-      conditions: boxes.find((box) => box.id === boxId).conditions,
-    };
-    const res = await calendarSource.updateBox(calendarId, boxId, box);
+    const res = await calendarSource.restockBox(calendarId, boxId);
     if (res.success) {
       setAlertMessage('✅ ' + res.message);
       setAlertType('success');

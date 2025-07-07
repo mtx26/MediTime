@@ -115,3 +115,18 @@ def get_medicines_for_calendar(calendar_id):
                 grouped[name]["conditions"].append(condition)
 
             return grouped
+        
+def restock_box(box_id, calendar_id):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE medicine_boxes 
+                    SET stock_quantity = stock_quantity + box_capacity 
+                    WHERE id = %s AND calendar_id = %s
+                """, (box_id, calendar_id))
+                conn.commit()
+        return True
+    except Exception as e:
+        return False
+

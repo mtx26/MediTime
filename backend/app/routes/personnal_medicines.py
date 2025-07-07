@@ -3,7 +3,7 @@ from app.utils.validators import require_auth
 import time
 from . import api
 from app.services.verifications import verify_calendar
-from app.services.medicines import update_box, create_box, delete_box, get_boxes
+from app.services.medicines import update_box, create_box, delete_box, get_boxes, restock_box
 from app.utils.response import success_response, error_response, warning_response
 from app.services.pillulier import use_pillulier
 from datetime import datetime, timezone
@@ -235,4 +235,51 @@ def handle_use_pillulier(calendar_id):
             origin="USE_PILLULIER_MEDICATION",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
+        )
+    
+@api.route("/calendars/<calendar_id>/boxes/<box_id>/restock", methods=["POST"])
+@require_auth
+def handle_restock_box(calendar_id, box_id):
+    try:
+        t_0 = time.time()
+        uid = g.uid
+
+        if not verify_calendar(calendar_id, uid):
+            return warning_response(
+                message=ERROR_UNAUTHORIZED_ACCESS,
+                code="UNAUTHORIZED_ACCESS",
+                status_code=404,
+                uid=uid,
+                origin="RESTOCK_MEDICINE_BOX",
+                log_extra={"calendar_id": calendar_id, "box_id": box_id}
+            )
+
+        if not restock_box(box_id, calendar_id):
+            return warning_response(
+                message="boite de médicaments non trouvée",
+                code="MEDICINE_BOX_NOT_FOUND",
+                status_code=404,
+                uid=uid,
+                origin="RESTOCK_MEDICINE_BOX",
+                log_extra={"calendar_id": calendar_id, "box_id": box_id}
+            )
+        t_1 = time.time()
+
+        return success_response(
+            message="boite de médicaments réapprovisionnée",
+            code="MEDICINE_BOX_RESTOCKED",
+            uid=uid,
+            origin="RESTOCK_MEDICINE_BOX",
+            data={"box_id": box_id},
+            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "box_id": box_id}
+        )
+    except Exception as e:
+        return error_response(
+            message="erreur lors du réapprovisionnement de la boite de médicaments",
+            code="RESTOCK_MEDICINE_BOX_ERROR",
+            status_code=500,
+            uid=uid,
+            origin="RESTOCK_MEDICINE_BOX",
+            error=str(e),
+            log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
