@@ -99,7 +99,7 @@ def decrease_stock():
                     for result in results:
                         id_box = result.get("id")
                         qty = result.get("stock_quantity")
-                        process_box_decrement(cursor, id_box, qty, current_date)
+                        process_box_decrement(cursor, id_box, qty, current_date, days=1)
 
             conn.commit()
             
@@ -108,5 +108,3 @@ def decrease_stock():
 
     except Exception as e:
         log_backend.error(f"Erreur lors de la diminution des stocks: {e}", {"origin": "CRON", "code": "STOCK_DECREASE_ERROR", "error": str(e)})
-
-decrease_stock()
