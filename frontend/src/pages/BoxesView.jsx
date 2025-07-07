@@ -79,8 +79,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       name: boxes.find((box) => box.id === boxId).name,
       dose: boxes.find((box) => box.id === boxId).dose,
       box_capacity: boxes.find((box) => box.id === boxId).box_capacity,
-      stock_alert_threshold: boxes.find((box) => box.id === boxId)
-        .stock_alert_threshold,
+      stock_alert_threshold: boxes.find((box) => box.id === boxId).stock_alert_threshold,
       stock_quantity: boxes.find((box) => box.id === boxId).box_capacity,
       conditions: boxes.find((box) => box.id === boxId).conditions,
     };
