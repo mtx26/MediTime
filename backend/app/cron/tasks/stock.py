@@ -26,11 +26,12 @@ def check_low_stock_and_notify():
 
                 results = cursor.fetchall()
 
-        grouped: dict[str, list[dict]] = defaultdict(list)
+        grouped: dict[tuple[str, int], list[dict]] = defaultdict(list)
         for result in results:
             link = urljoin(Config.FRONTEND_URL or "", f"/medication/{result.get('id')}")
+            key = (result.get("owner_uid"), result.get("calendar_id"))
 
-            grouped[result.get("owner_uid")].append(
+            grouped[key].append(
                 {
                     "link": link,
                     "medication_id": result.get("id"),
@@ -40,17 +41,29 @@ def check_low_stock_and_notify():
                 }
             )
 
-        for uid, notifs in grouped.items():
+        for (uid, calendar_id), notifs in grouped.items():
             try:
                 notify_and_record(uid=uid, json_body=notifs, notif_type="low_stock")
                 log_backend.info(
                     "✅ Notifications de stock faible envoyées",
-                    {"origin": "CRON", "code": "STOCK_CHECK_SUCCESS", "uid": uid, "count": len(notifs)},
+                    {
+                        "origin": "CRON",
+                        "code": "STOCK_CHECK_SUCCESS",
+                        "uid": uid,
+                        "calendar_id": calendar_id,
+                        "count": len(notifs),
+                    },
                 )
             except Exception as e:
                 log_backend.error(
                     "Erreur envoi notifications stock faible",
-                    {"origin": "CRON", "code": "STOCK_CHECK_ERROR", "uid": uid, "error": str(e)},
+                    {
+                        "origin": "CRON",
+                        "code": "STOCK_CHECK_ERROR",
+                        "uid": uid,
+                        "calendar_id": calendar_id,
+                        "error": str(e),
+                    },
                 )
 
         log_backend.info("✅ Fin de la vérification des stocks", {"origin": "CRON", "code": "STOCK_CHECK_SUCCESS"})

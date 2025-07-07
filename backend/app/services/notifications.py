@@ -72,9 +72,10 @@ def build_notification_text(notif_type: str, data: dict) -> tuple[str, str]:
             )
         case "low_stock":
             if data.get("medications"):
-                meds = ", ".join(data["medications"])
                 title = "Stock faible"
-                body = f"Médicaments concernés : {meds}."
+                calendar = data.get("calendar_name") or "ce calendrier"
+                meds = "\n".join(f"- {m}" for m in data["medications"])
+                body = f"Calendrier « {calendar} » :\n{meds}"
             else:
                 name = fetch_medicine_name(data.get("medication_id"))
                 qty = data.get("medication_qty") or 0
@@ -207,7 +208,7 @@ def generate_email_content(notif_type: str, json_body: dict) -> tuple[str, str, 
     subject, body = build_notification_text(notif_type, json_body)
 
     html_content = f"""
-        <p style="font-size: 16px; color: #555;">{body}</p>
+        <p style="font-size: 16px; color: #555; white-space: pre-line;">{body}</p>
         <div style="margin: 32px 0;">
             <a href="{base_link}" style="background-color: #007bff; color: white; text-decoration: none; padding: 12px 20px; border-radius: 4px; display: inline-block;">
             Voir mes notifications
