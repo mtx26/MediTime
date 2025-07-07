@@ -35,8 +35,8 @@ def process_box_decrement(cursor, id_box, qty, start_date, days=7):
 
         total_tablets += total_tablets_day
 
-    if total_tablets_week > 0:
-        new_qty = qty - total_tablets_week
+    if total_tablets > 0:
+        new_qty = qty - total_tablets
         print(new_qty, id_box)
         cursor.execute(
             "UPDATE medicine_boxes SET stock_quantity = %s WHERE id = %s",
