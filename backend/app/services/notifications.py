@@ -8,6 +8,7 @@ from app.services.user import fetch_user
 from app.utils.logger import log_backend
 from app.config import Config
 import traceback
+import re
 
 def fetch_user_name(uid):
     user = fetch_user(uid)
@@ -44,54 +45,104 @@ def enrich_notification(notification: dict) -> dict:
 
 def build_notification_text(notif_type: str, data: dict) -> tuple[str, str]:
     """Return title/subject and body for a notification."""
+    def format_medication_list(med_lines: list[str]) -> str:
+        """Generate a styled HTML table from a list of 'Nom (valeur)'."""
+        rows = ""
+        for line in med_lines:
+            match = re.search(r"^(.*)\s*\(([-+]?[\d.]+)\)$", line)
+            if not match:
+                continue
+            name, val = match.groups()
+            val = float(val)
+            color = "red" if val <= 0 else "orange"
+            rows += f"""
+                <tr>
+                    <td style="padding: 4px 8px;">{name}</td>
+                    <td style="padding: 4px 8px; color: {color}; font-weight: bold;">{val:+g}</td>
+                </tr>
+            """
+        return f"""
+            <table style="border-collapse: collapse; margin-top: 8px;">
+                <thead>
+                    <tr>
+                        <th align="left" style="padding: 4px 8px;">Médicament</th>
+                        <th align="left" style="padding: 4px 8px;">Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows}
+                </tbody>
+            </table>
+        """
+
     match notif_type:
         case "calendar_invitation":
-            title = "Nouvelle invitation à un calendrier"
+            title = "📆 Nouvelle invitation à un calendrier"
             body = (
-                f"{data.get('sender_name')} vous invite à rejoindre le calendrier « {data.get('calendar_name')} »."
+                f"<b>{data.get('sender_name')}</b> vous invite à rejoindre le calendrier "
+                f"« <b>{data.get('calendar_name')}</b> »."
             )
+
         case "calendar_invitation_accepted":
-            title = "Invitation acceptée"
+            title = "✅ Invitation acceptée"
             body = (
-                f"{data.get('sender_name')} a accepté votre invitation pour rejoindre le calendrier « {data.get('calendar_name')} »."
+                f"<b>{data.get('sender_name')}</b> a accepté votre invitation pour le calendrier "
+                f"« <b>{data.get('calendar_name')}</b> »."
             )
+
         case "calendar_invitation_rejected":
-            title = "Invitation refusée"
+            title = "❌ Invitation refusée"
             body = (
-                f"{data.get('sender_name')} a refusé votre invitation pour rejoindre le calendrier « {data.get('calendar_name')} »."
+                f"<b>{data.get('sender_name')}</b> a refusé votre invitation pour le calendrier "
+                f"« <b>{data.get('calendar_name')}</b> »."
             )
+
         case "calendar_shared_deleted_by_owner":
-            title = "Partage annulé"
+            title = "🔒 Partage annulé"
             body = (
-                f"{data.get('sender_name')} a arrêté de partager le calendrier « {data.get('calendar_name')} » avec vous."
+                f"<b>{data.get('sender_name')}</b> a arrêté de partager le calendrier "
+                f"« <b>{data.get('calendar_name')}</b> » avec vous."
             )
+
         case "calendar_shared_deleted_by_receiver":
-            title = "Partage retiré"
+            title = "📤 Partage retiré"
             body = (
-                f"{data.get('sender_name')} a retiré le calendrier « {data.get('calendar_name')} »."
+                f"<b>{data.get('sender_name')}</b> a retiré le calendrier "
+                f"« <b>{data.get('calendar_name')}</b> » de votre compte."
             )
+
         case "low_stock":
+            calendar = data.get("calendar_name") or "ce calendrier"
+            title = f"⚠️ Stock faible – calendrier « {calendar} »"
+
             if data.get("medications"):
-                title = "Stock faible"
-                calendar = data.get("calendar_name") or "ce calendrier"
-                meds = "\n".join(f"- {m}" for m in data["medications"])
-                body = f"Calendrier « {calendar} » :\n{meds}"
+                med_lines = data["medications"]
+                body = f"<p>Certains médicaments du calendrier <b>« {calendar} »</b> sont en stock critique :</p>"
+                body += format_medication_list(med_lines)
             else:
                 name = fetch_medicine_name(data.get("medication_id"))
                 qty = data.get("medication_qty") or 0
-                title = "Stock faible"
-                body = f"Le médicament « {name} » est presque épuisé ({qty} restants)."
+
+                if qty == 0:
+                    stock_text = f"<span style='color:red;font-weight:bold;'>épuisé</span>"
+                else:
+                    plural = "s" if qty != 1 else ""
+                    stock_text = (
+                        f"<span style='color:orange;font-weight:bold;'>{qty} restant{plural}</span>"
+                    )
+
+                body = f"Le médicament <b>« {name} »</b> est {stock_text}."
+
         case _:
             count = data.get("notification_count")
             if count and count > 1:
-                title = "Nouvelles notifications"
-                body = f"Vous avez {count} nouvelles notifications."
+                title = "🔔 Nouvelles notifications"
+                body = f"Vous avez <b>{count}</b> nouvelles notifications dans MediTime."
             else:
-                title = "Nouvelle notification"
+                title = "🔔 Nouvelle notification"
                 body = "Vous avez reçu une nouvelle notification dans MediTime."
 
     return title, body
-
 
 def save_notifications(uid: str, notif_type: str, notifications: list[dict]):
     """Persist notifications individually to the database."""

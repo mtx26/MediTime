@@ -22,7 +22,7 @@ def use_pillulier(calendar_id, start_date):
 
                 cursor.execute("""
                     SELECT id, stock_quantity FROM medicine_boxes
-                    WHERE calendar_id = %s AND box_capacity > 0
+                    WHERE calendar_id = %s
                 """, (calendar_id,))
                 results = cursor.fetchall()
 

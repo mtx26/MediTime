@@ -24,11 +24,13 @@ def process_box_decrement(cursor, id_box, qty, start_date):
             condition.get("tablet_count") for condition in conditions
             if is_medication_due(condition, day) and condition.get("tablet_count") is not None
         )
+        print(f"Day {day}: Total tablets = {total_tablets_day}")
 
         total_tablets_week += total_tablets_day
 
     if total_tablets_week > 0:
-        new_qty = max(0, qty - total_tablets_week)
+        new_qty = qty - total_tablets_week
+        print(new_qty, id_box)
         cursor.execute(
             "UPDATE medicine_boxes SET stock_quantity = %s WHERE id = %s",
             (new_qty, id_box)
