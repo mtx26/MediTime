@@ -262,19 +262,12 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-gear me-2" /> {t('settings.label')}
-                          </>
-                        ),
-                        onClick: () => navigate(`/${basePath}/${calendarId}/settings`),
-                      },
-                      {
-                        label: (
-                          <>
                             <i className="bi bi-box-arrow-up me-2" /> {t('share')}
                           </>
                         ),
                         onClick: handleShareCalendarClick,
                       },
+                      { separator: true },
                       {
                         label: (
                           <>
@@ -291,9 +284,16 @@ function CalendarPage({
                         ),
                         onClick: () => navigate(`/${basePath}/${calendarId}/stock-alerts`),
                       },
+                      { separator: true },
                       {
-                        separator: true,
+                        label: (
+                          <>
+                            <i className="bi bi-gear me-2" /> {t('settings.label')}
+                          </>
+                        ),
+                        onClick: () => navigate(`/${basePath}/${calendarId}/settings`),
                       },
+                      { separator: true },
                       {
                         label: (
                           <>
@@ -301,8 +301,7 @@ function CalendarPage({
                           </>
                         ),
                         onClick: async () => {
-                          // TODO: Ajouter une confirmation avant de supprimer le calendrier
-                          const rep = await personalCalendars.deleteCalendar(calendarId)
+                          const rep = await personalCalendars.deleteCalendar(calendarId);
                           if (rep.success) {
                             navigate('/calendars');
                           } else {
@@ -321,19 +320,30 @@ function CalendarPage({
                       {
                         label: (
                           <>
+                            <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+                          </>
+                        ),
+                        onClick: () => calendarSource.downloadCalendarPdf(calendarId),
+                      },
+                      { separator: true },
+                      {
+                        label: (
+                          <>
                             <i className="bi bi-gear me-2" /> {t('settings.label')}
                           </>
                         ),
                         onClick: () => navigate(`/${basePath}/${calendarId}/settings`),
                       },
+                      { separator: true },
                       {
                         label: (
                           <>
-                            <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+                            <i className="bi bi-trash3 me-2"></i> {t('delete')}
                           </>
                         ),
-                        onClick: () => calendarSource.downloadCalendarPdf(calendarId),
-                      }
+                        onClick: () => sharedUserCalendars.deleteSharedCalendar(calendarId),
+                        danger: true,
+                      },
                     ]}
                   />
                 )}

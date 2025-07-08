@@ -335,9 +335,7 @@ function BoxCard({
                   ),
                   onClick: () => openNotice(box.id),
                 },
-                {
-                  separator: true,
-                },
+                { separator: true },
                 {
                   label: (
                     <>

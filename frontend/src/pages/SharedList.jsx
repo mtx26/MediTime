@@ -281,8 +281,7 @@ function SharedList({
                       {
                         label: (
                           <>
-                            {/* calendar open  */}
-                            <i className="bi bi-eye"></i> {t('open')}
+                            <i className="bi bi-eye me-2"></i> {t('open')}
                           </>
                         ),
                         onClick: () => navigate(`/calendar/${calendarId}`),
@@ -290,22 +289,18 @@ function SharedList({
                       {
                         label: (
                           <>
-                            {/* calendar open medicine */}
-                            <i className="bi bi-capsule"></i> {t('medicines.label')}
+                            <i className="bi bi-capsule me-2"></i> {t('medicines.label')}
                           </>
                         ),
                         onClick: () => {
                           navigate(`/calendar/${calendarId}/boxes`);
                         },
                       },
-                      {
-                        separator: true,
-                      },
+                      { separator: true },
                       {
                         label: (
                           <>
-                            {/* calendar delete */}
-                            <i className="bi bi-trash"></i> {t('delete')}
+                            <i className="bi bi-trash me-2"></i> {t('delete')}
                           </>
                         ),
                         onClick: () => {
@@ -327,7 +322,7 @@ function SharedList({
                           });
                         },
                         danger: true,
-                      }
+                      },
                     ]}
                   />
                 </h5>
@@ -471,7 +466,7 @@ function TokenList({
                 {
                   label: (
                     <>
-                      <i className="bi bi-pencil-square"></i> {t('modify')}
+                      <i className="bi bi-pencil-square me-2"></i> {t('modify')}
                     </>
                   ),
                   onClick: () => setSelectedModifyCalendar(calendarId),
@@ -479,7 +474,7 @@ function TokenList({
                 {
                   label: (
                     <>
-                      <i className="bi bi-arrow-clockwise"></i> {t('regenerate')}
+                      <i className="bi bi-arrow-clockwise me-2"></i> {t('regenerate')}
                     </>
                   ),
                   onClick: () => {
@@ -492,13 +487,11 @@ function TokenList({
                     });
                   },
                 },
-                {
-                  separator: true,
-                },
+                { separator: true },
                 {
                   label: (
                     <>
-                      <i className="bi bi-trash"></i> {t('delete')}
+                      <i className="bi bi-trash me-2"></i> {t('delete')}
                     </>
                   ),
                   onClick: () => deleteTokenConfirmAction(token.id),
@@ -506,6 +499,7 @@ function TokenList({
                 },
               ]}
             />
+
           </div>
 
           {selectedModifyCalendar === calendarId && (

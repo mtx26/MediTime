@@ -281,33 +281,33 @@ function SelectCalendar({
                       {
                         label: (
                           <>
-                            <i className="bi bi-box-arrow-up"></i> {t('share')}
+                            <i className="bi bi-pencil me-2"></i> {t('rename')}
                           </>
                         ),
-                        onClick: () => handleShareCalendarClick(calendarData)
+                        onClick: () => setRenameMode(calendarData.id),
+                      },
+                      { separator: true },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-box-arrow-up me-2"></i> {t('share')}
+                          </>
+                        ),
+                        onClick: () => handleShareCalendarClick(calendarData),
+                      },
+                      { separator: true },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-capsule me-2"></i> {t('medicines.label')}
+                          </>
+                        ),
+                        onClick: () => navigate(`/calendar/${calendarData.id}/boxes`),
                       },
                       {
                         label: (
                           <>
-                            <i className="bi bi-pencil"></i> {t('rename')}
-                          </>
-                        ),
-                        onClick: () => setRenameMode(calendarData.id)
-                      },
-                      {
-                        label: (
-                          <>
-                            <i className="bi bi-capsule"></i> {t('medicines.label')}
-                          </>
-                        ),
-                        onClick: () => {
-                          navigate(`/calendar/${calendarData.id}/boxes`);
-                        },
-                      },
-                      {
-                        label: (
-                          <>
-                            <i className="bi bi-download" /> {t('boxes.export_pdf')}
+                            <i className="bi bi-download me-2"></i> {t('boxes.export_pdf')}
                           </>
                         ),
                         onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
@@ -315,26 +315,25 @@ function SelectCalendar({
                       {
                         label: (
                           <>
-                            <i className="bi bi-gear"></i> {t('settings.label')}
-                          </>
-                        ),
-                        onClick: () => navigate(`/calendar/${calendarData.id}/settings`),
-                      },
-                      {
-                        label: (
-                          <>
-                            <i className="bi bi-exclamation-triangle-fill"></i> {t('stock')}
+                            <i className="bi bi-exclamation-triangle-fill me-2"></i> {t('stock')}
                           </>
                         ),
                         onClick: () => navigate(`/calendar/${calendarData.id}/stock-alerts`),
                       },
-                      {
-                        separator: true,
-                      },
+                      { separator: true },
                       {
                         label: (
                           <>
-                            <i className="bi bi-trash"></i> {t('delete')}
+                            <i className="bi bi-gear me-2"></i> {t('settings.label')}
+                          </>
+                        ),
+                        onClick: () => navigate(`/calendar/${calendarData.id}/settings`),
+                      },
+                      { separator: true },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-trash me-2"></i> {t('delete')}
                           </>
                         ),
                         onClick: () => handleDeleteCalendarClick(calendarData.id),
@@ -342,6 +341,7 @@ function SelectCalendar({
                       },
                     ]}
                   />
+
                 </div>
                 {/* afficher la form si on est en mode renommage */}
                 {renameMode === calendarData.id && (
@@ -489,19 +489,17 @@ function SelectCalendar({
                           {
                             label: (
                               <>
-                                <i className="bi bi-capsule"></i> {t('medicines.label')}
+                                <i className="bi bi-capsule me-2"></i> {t('medicines.label')}
                               </>
                             ),
                             onClick: () => {
-                              navigate(
-                                `/shared-user-calendar/${calendarData.id}/boxes`
-                              );
+                              navigate(`/shared-user-calendar/${calendarData.id}/boxes`);
                             },
                           },
                           {
                             label: (
                               <>
-                                <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+                                <i className="bi bi-download me-2"></i> {t('boxes.export_pdf')}
                               </>
                             ),
                             onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
@@ -509,36 +507,32 @@ function SelectCalendar({
                           {
                             label: (
                               <>
-                                <i className="bi bi-gear"></i> {t('settings.label')}
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i> {t('stock')}
                               </>
                             ),
-                            onClick: () =>
-                              navigate(
-                                `/shared-user-calendar/${calendarData.id}/settings`
-                              ),
+                            onClick: () => {
+                              navigate(`/shared-user-calendar/${calendarData.id}/stock-alerts`);
+                            },
                           },
+                          { separator: true },
                           {
                             label: (
                               <>
-                                <i className="bi bi-exclamation-triangle-fill"></i> {t('stock')}
+                                <i className="bi bi-gear me-2"></i> {t('settings.label')}
                               </>
                             ),
-                            onClick: () =>
-                              navigate(
-                                `/shared-user-calendar/${calendarData.id}/stock-alerts`
-                              ),
+                            onClick: () => {
+                              navigate(`/shared-user-calendar/${calendarData.id}/settings`);
+                            },
                           },
-                          {
-                            separator: true,
-                          },
+                          { separator: true },
                           {
                             label: (
                               <>
-                                <i className="bi bi-trash3"></i> {t('delete')}
+                                <i className="bi bi-trash3 me-2"></i> {t('delete')}
                               </>
                             ),
-                            onClick: () =>
-                              handleDeleteSharedCalendarClick(calendarData.id),
+                            onClick: () => handleDeleteSharedCalendarClick(calendarData.id),
                             danger: true,
                           },
                         ]}
