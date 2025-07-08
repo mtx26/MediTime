@@ -17,6 +17,7 @@ import CalendarView from '../pages/CalendarView';
 import PillboxPage from '../pages/pillbox';
 import CalendarList from '../pages/CalendarList';
 import SharedList from '../pages/SharedList';
+import StockAlertsPage from '../pages/StockAlertsPage';
 
 import MedicinesList from '../pages/MedicinesList';
 import BoxesView from '../pages/BoxesView';
@@ -175,6 +176,19 @@ function AppRoutes({ sharedProps }) {
             />
           }
         />
+        <Route
+          path="stock-alerts"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<StockAlertsPage {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
       </Route>
       <Route
         path="/calendars"
@@ -223,6 +237,19 @@ function AppRoutes({ sharedProps }) {
               element={
                 <RouteWithLoader
                   element={<PillboxPage {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
+        <Route
+          path="stock-alerts"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<StockAlertsPage {...sharedProps} />}
                   isLoading={sharedProps.loadingStates.isInitialLoading}
                 />
               }

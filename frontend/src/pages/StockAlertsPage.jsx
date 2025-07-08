@@ -1,0 +1,128 @@
+import React, { useState } from "react";
+import { getCalendarSourceMap } from '../utils/calendarSourceMap';
+import { useParams, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useRealtimeBoxesSwitcher } from '../hooks/useRealtimeBoxesSwitcher';
+
+function StockAlertsPage({
+  personalCalendars,
+  sharedUserCalendars,
+  tokenCalendars,
+}) {
+  const params = useParams();
+  const location = useLocation();
+  const { t } = useTranslation();
+
+  const [boxes, setBoxes] = useState([]);
+  const [loadingBoxes, setLoadingBoxes] = useState(true);
+
+  let calendarType = 'personal';
+  let calendarId = params.calendarId;
+  let basePath = 'calendar';
+
+  if (location.pathname.startsWith('/shared-user-calendar')) {
+    calendarType = 'sharedUser';
+    calendarId = params.calendarId;
+    basePath = 'shared-user-calendar';
+  } else if (location.pathname.startsWith('/shared-token-calendar')) {
+    calendarType = 'token';
+    calendarId = params.sharedToken;
+    basePath = 'shared-token-calendar';
+  }
+
+  const calendarSource = getCalendarSourceMap(
+    personalCalendars,
+    sharedUserCalendars,
+    tokenCalendars
+  )[calendarType];
+
+  // Hook en temps réel
+  useRealtimeBoxesSwitcher(calendarType, calendarId, setBoxes, setLoadingBoxes);
+
+  // On filtre les boîtes qui sont en stock faible
+  const alerts = boxes.filter(
+    (box) =>
+      box.stock_alert_threshold > 0 &&
+      box.stock_quantity <= box.stock_alert_threshold
+  );
+
+  const restockBox = (calendarId, boxId) => {
+    calendarSource.restockBox(calendarId, boxId)
+  };
+
+
+  if (loadingBoxes === undefined) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: '60vh' }}
+      >
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">{t('loading_medicines')}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadingBoxes === false) {
+    return (
+      <div className="alert alert-danger text-center mt-5" role="alert">
+        {t('invalid_or_expired_link')}
+      </div>
+    );
+  }
+
+  return (
+    <div className="container py-4">
+      <h2 className="mb-4 text-danger">
+        <i className="bi bi-exclamation-triangle-fill me-2"></i>
+        {t('stock_alerts', 'Médicaments en rupture')}
+      </h2>
+
+      {alerts.length === 0 ? (
+        <div className="alert alert-success" role="alert">
+          {t('no_low_stock', 'Aucun médicament n’est en stock critique.')}
+        </div>
+      ) : (
+        <div className="row g-3">
+          {alerts.map((med) => (
+            <div key={med.id} className="col-12 col-md-6 col-lg-4">
+              <div className={`card shadow-sm h-100 ${med.stock_quantity <= 0 ? 'border-danger' : 'border-warning'}`}>
+                <div className="card-body d-flex flex-column justify-content-between">
+                  <div>
+                    <h5 className="card-title mb-2">{med.name}</h5>
+                    <p className="card-text text-muted mb-2">
+                      Stock actuel : {med.stock_quantity} / Seuil : {med.stock_alert_threshold}
+                    </p>
+                    <span
+                      className={`badge ${
+                        med.stock_quantity <= 0 ? 'bg-danger' : 'bg-warning text-dark'
+                      }`}
+                    >
+                      {med.stock_quantity <= 0
+                        ? t('critical_stock', 'Rupture de stock')
+                        : t('low_stock', 'Stock faible')}
+                    </span>
+                  </div>
+                  <div className="mt-3">
+                    <button
+                      className="btn btn-outline-success w-100"
+                      onClick={() => restockBox(calendarId, med.id)}
+                      aria-label={t('boxes.restock')}
+                      title={t('boxes.restock')}
+                    >
+                      <i className="bi bi-plus-circle me-1"></i>
+                      {t('boxes.restock', 'Réapprovisionner')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default StockAlertsPage;
