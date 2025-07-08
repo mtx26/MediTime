@@ -37,7 +37,7 @@ const Stock = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
     <div>
       <h5 className="mb-4">{t('calendar_settings.stock.label')}</h5>
 
-      <div className="form-check mb-3">
+      <div className="form-check mb-3" style={{ cursor: 'pointer' }}>
         <input
           className="form-check-input"
           type="radio"
@@ -46,15 +46,16 @@ const Stock = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
           value="weekly_pillbox"
           checked={selectedMethod === 'weekly_pillbox'}
           onChange={() => modifyStockDecrementMethod('weekly_pillbox')}
+          style={{ cursor: 'pointer' }}
         />
-        <label className="form-check-label" htmlFor="weeklyPillbox">
+        <label className="form-check-label" htmlFor="weeklyPillbox" style={{ cursor: 'pointer' }}>
           <strong>{t('calendar_settings.stock.weekly.label')}</strong>
           <br />
           <small className="text-muted">{t('calendar_settings.stock.weekly.description')}</small>
         </label>
       </div>
 
-      <div className="form-check">
+      <div className="form-check" style={{ cursor: 'pointer' }}>
         <input
           className="form-check-input"
           type="radio"
@@ -63,8 +64,9 @@ const Stock = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
           value="daily_midnight"
           checked={selectedMethod === 'daily_midnight'}
           onChange={() => modifyStockDecrementMethod('daily_midnight')}
+          style={{ cursor: 'pointer' }}
         />
-        <label className="form-check-label" htmlFor="dailyMidnight">
+        <label className="form-check-label" htmlFor="dailyMidnight" style={{ cursor: 'pointer' }}>
           <strong>{t('calendar_settings.stock.daily.label')}</strong>
           <br />
           <small className="text-muted">{t('calendar_settings.stock.daily.description')}</small>
