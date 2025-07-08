@@ -28,6 +28,7 @@
   "accounts": "账户",
   "activation": "激活",
   "activation_toggle_aria": "启用或禁用链接",
+  "actual_stock": "现有库存",
   "add": "添加",
   "admin": "行政",
   "app": {
@@ -138,14 +139,14 @@
       "label": "共享"
     },
     "stock": {
+      "daily": {
+        "description": "库存每天都会自动减少。",
+        "label": "每日（午夜）"
+      },
       "label": "库存数量",
       "weekly": {
-        "label": "每周（药盒）",
-        "description": "当您重新填充药盒时，库存将每周手动减少。"
-      },
-      "daily": {
-        "label": "每日（午夜）",
-        "description": "库存每天都会自动减少。"
+        "description": "当您重新填充药盒时，库存将每周手动减少。",
+        "label": "每周（药盒）"
       }
     }
   },
@@ -158,6 +159,7 @@
   "copy_link": "复制链接",
   "copy_link_error": "复制链接时出错。",
   "create_share_link": "创建共享链接",
+  "critical_stock": "股票破裂",
   "cta": {
     "button": "我创建了我的帐户",
     "desc": "免费创建您的帐户并简化全家人的医疗管理。",
@@ -204,6 +206,7 @@
   "locale": "zh-CN",
   "login": "登录",
   "logout": "登出",
+  "low_stock": "库存不足",
   "manage_link": "管理链接",
   "medicines": {
     "back_to_calendar": "返回日历",
@@ -231,6 +234,7 @@
   "no_calendar_found": "未找到日历",
   "no_calendar_found_cta": "您可以从主页创建日历。",
   "no_events_today": "这天没有活动。",
+  "no_low_stock": "暂无紧急库存药品。",
   "no_medicines": "没有可显示的药物。",
   "no_notifications": "没有新通知",
   "no_personal_calendars": "您没有个人日历。",
@@ -392,6 +396,10 @@
   "shared_calendars": "共享日历",
   "shared_link_label": "共享日历链接",
   "shared_users": "共享用户",
+  "stock": "库存",
+  "stock_alert": "库存警报",
+  "stock_alert_tooltip": "查看关键库存药物",
+  "stock_alerts": "缺货药品",
   "terms": {
     "label": "使用条款",
     "last_update": "最后更新：2025年6月9日",
@@ -457,6 +465,7 @@
     "quote": "我每周都会给妈妈补充药盒，但有了 MediTime，一切都变得简单多了。我可以一眼看到她所有的用药清单，我和她都能收到提醒。我们轻松多了。",
     "title": "他们信任我们"
   },
+  "threshold": "临界点",
   "user": "用户",
   "verify_email": {
     "instructions": "向您的电子邮件地址发送新的验证链接。",

@@ -28,6 +28,7 @@
   "accounts": "Konten",
   "activation": "Aktivierung",
   "activation_toggle_aria": "Aktivieren oder Deaktivieren des Links",
+  "actual_stock": "Aktueller Bestand",
   "add": "Hinzufügen",
   "admin": "Administrator",
   "app": {
@@ -138,14 +139,14 @@
       "label": "Weitergabe"
     },
     "stock": {
+      "daily": {
+        "description": "Der Bestand wird täglich automatisch reduziert.",
+        "label": "Täglich (Mitternacht)"
+      },
       "label": "Bestandszählung",
       "weekly": {
-        "label": "Wöchentlich (Pillbox)",
-        "description": "Der Vorrat wird jede Woche manuell verringert, wenn Sie Ihre Pillendose auffüllen."
-      },
-      "daily": {
-        "label": "Täglich (Mitternacht)",
-        "description": "Der Bestand wird täglich automatisch reduziert."
+        "description": "Der Vorrat wird jede Woche manuell verringert, wenn Sie Ihre Pillendose auffüllen.",
+        "label": "Wöchentlich (Pillbox)"
       }
     }
   },
@@ -158,6 +159,7 @@
   "copy_link": "Link kopieren",
   "copy_link_error": "Fehler beim Kopieren des Links.",
   "create_share_link": "Erstellen eines Freigabelinks",
+  "critical_stock": "Aktienbruch",
   "cta": {
     "button": "Ich erstelle mein Konto",
     "desc": "Erstellen Sie kostenlos Ihr Konto und vereinfachen Sie die medizinische Verwaltung für die ganze Familie.",
@@ -204,6 +206,7 @@
   "locale": "de-DE",
   "login": "Login",
   "logout": "Ausloggen",
+  "low_stock": "Geringer Lagerbestand",
   "manage_link": "Verwalten des Links",
   "medicines": {
     "back_to_calendar": "Zurück zum Kalender",
@@ -231,6 +234,7 @@
   "no_calendar_found": "Kein Kalender gefunden",
   "no_calendar_found_cta": "Sie können von der Startseite aus einen Kalender erstellen.",
   "no_events_today": "Keine Veranstaltungen an diesem Tag.",
+  "no_low_stock": "Es sind keine Medikamente im kritischen Bestand vorhanden.",
   "no_medicines": "Keine Medikamente anzuzeigen.",
   "no_notifications": "Keine neuen Benachrichtigungen",
   "no_personal_calendars": "Sie haben keinen persönlichen Kalender.",
@@ -392,6 +396,10 @@
   "shared_calendars": "Freigegebene Kalender",
   "shared_link_label": "Link zum freigegebenen Kalender",
   "shared_users": "Gemeinsam genutzte Benutzer",
+  "stock": "Aktie",
+  "stock_alert": "Lageralarm",
+  "stock_alert_tooltip": "Wichtige Medikamente auf Lager ansehen",
+  "stock_alerts": "Nicht vorrätige Medikamente",
   "terms": {
     "label": "Nutzungsbedingungen",
     "last_update": "Zuletzt aktualisiert: 9. Juni 2025",
@@ -457,6 +465,7 @@
     "quote": "Ich fülle die Pillendose meiner Mutter immer noch jede Woche auf, aber mit MediTime ist es viel einfacher geworden. Ich sehe ihre gesamte Medikamentenliste auf einen Blick, erhalte Erinnerungen und sie auch. Wir sind viel entspannter.",
     "title": "Sie vertrauen uns"
   },
+  "threshold": "Schwelle",
   "user": "Benutzer",
   "verify_email": {
     "instructions": "Senden Sie einen neuen Bestätigungslink an Ihre E-Mail-Adresse.",

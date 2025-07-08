@@ -76,12 +76,12 @@ function StockAlertsPage({
     <div className="container py-4">
       <h2 className="mb-4 text-danger">
         <i className="bi bi-exclamation-triangle-fill me-2"></i>
-        {t('stock_alerts', 'Médicaments en rupture')}
+        {t('stock_alerts')}
       </h2>
 
       {alerts.length === 0 ? (
         <div className="alert alert-success" role="alert">
-          {t('no_low_stock', 'Aucun médicament n’est en stock critique.')}
+          {t('no_low_stock')}
         </div>
       ) : (
         <div className="row g-3">
@@ -92,7 +92,7 @@ function StockAlertsPage({
                   <div>
                     <h5 className="card-title mb-2">{med.name}</h5>
                     <p className="card-text text-muted mb-2">
-                      Stock actuel : {med.stock_quantity} / Seuil : {med.stock_alert_threshold}
+                      {t('actual_stock')} : {med.stock_quantity} / {t('threshold')} : {med.stock_alert_threshold}
                     </p>
                     <span
                       className={`badge ${
@@ -100,8 +100,8 @@ function StockAlertsPage({
                       }`}
                     >
                       {med.stock_quantity <= 0
-                        ? t('critical_stock', 'Rupture de stock')
-                        : t('low_stock', 'Stock faible')}
+                        ? t('critical_stock')
+                        : t('low_stock')}
                     </span>
                   </div>
                   <div className="mt-3">
@@ -112,7 +112,7 @@ function StockAlertsPage({
                       title={t('boxes.restock')}
                     >
                       <i className="bi bi-plus-circle me-1"></i>
-                      {t('boxes.restock', 'Réapprovisionner')}
+                      {t('boxes.restock')}
                     </button>
                   </div>
                 </div>

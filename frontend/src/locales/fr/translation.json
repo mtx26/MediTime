@@ -28,6 +28,7 @@
   "accounts": "Comptes",
   "activation": "Activation",
   "activation_toggle_aria": "Activer ou désactiver le lien",
+  "actual_stock": "Stock actuel",
   "add": "Ajouter",
   "admin": "Admin",
   "app": {
@@ -134,19 +135,19 @@
   "calendar_completed": "Calendrier complété avec succès !",
   "calendar_settings": {
     "label": "Paramètres du calendrier",
-    "stock": {
-      "label": "Décompte du stock",
-      "weekly": {
-        "label": "Hebdomadaire (Pillulier)",
-        "description": "Le stock sera diminué manuellement chaque semaine lorsque vous remplirez votre pillulier."
-      },
-      "daily": {
-        "label": "Quotidien (Minuit)",
-        "description": "Le stock sera diminué automatiquement chaque jour à minuit."
-      }
-    },
     "sharing": {
       "label": "Partage"
+    },
+    "stock": {
+      "daily": {
+        "description": "Le stock sera diminué automatiquement chaque jour à minuit.",
+        "label": "Quotidien (Minuit)"
+      },
+      "label": "Décompte du stock",
+      "weekly": {
+        "description": "Le stock sera diminué manuellement chaque semaine lorsque vous remplirez votre pillulier.",
+        "label": "Hebdomadaire (Pillulier)"
+      }
     }
   },
   "calendars": "Calendriers",
@@ -158,6 +159,7 @@
   "copy_link": "Copier le lien",
   "copy_link_error": "Erreur lors de la copie du lien.",
   "create_share_link": "Créer un lien de partage",
+  "critical_stock": "Rupture de stock",
   "cta": {
     "button": "Je crée mon compte",
     "desc": "Créez votre compte gratuitement et simplifiez la gestion médicale de toute la famille.",
@@ -204,6 +206,7 @@
   "locale": "fr-FR",
   "login": "Connexion",
   "logout": "Déconnexion",
+  "low_stock": "Stock faible",
   "manage_link": "Gérer le lien",
   "medicines": {
     "back_to_calendar": "Retour au calendrier",
@@ -231,6 +234,7 @@
   "no_calendar_found": "Aucun calendrier trouvé",
   "no_calendar_found_cta": "Vous pouvez créer un calendrier depuis la page d’accueil.",
   "no_events_today": "Aucun événement ce jour-là.",
+  "no_low_stock": "Aucun médicament n’est en stock critique.",
   "no_medicines": "Aucun médicament à afficher.",
   "no_notifications": "Aucune nouvelle notification",
   "no_personal_calendars": "Vous n'avez pas de calendrier personnel.",
@@ -392,6 +396,10 @@
   "shared_calendars": "Calendriers partagés",
   "shared_link_label": "Lien du calendrier partagé",
   "shared_users": "Utilisateurs partagés",
+  "stock": "Stock",
+  "stock_alert": "Alerte de stock",
+  "stock_alert_tooltip": "Voir les médicaments à stock critique",
+  "stock_alerts": "Médicaments en rupture",
   "terms": {
     "label": "Conditions d'utilisation",
     "last_update": "Dernière mise à jour : 9 juin 2025",
@@ -457,6 +465,7 @@
     "quote": "Je continue à remplir le pilulier de ma maman chaque semaine, mais avec MediTime, c’est devenu beaucoup plus simple. Je vois tout son traitement en un coup d’œil, je reçois des rappels, et elle aussi. On est bien plus sereins.",
     "title": "Ils nous font confiance"
   },
+  "threshold": "Seuil",
   "user": "Utilisateur",
   "verify_email": {
     "instructions": "Envoyez un nouveau lien de vérification à votre adresse email.",

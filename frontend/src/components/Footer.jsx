@@ -141,7 +141,7 @@ function Footer() {
           {/* Logo + copyright */}
           <div className="col-md-4 text-md-end text-center">
             <div className="fw-bold text-primary fs-5">
-              <i className="bi bi-capsule me-2"></i> MediTime
+              <i className="bi bi-capsule me-2"></i> {t('app.title')}
             </div>
             <div className="text-muted small">
               © {currentYear} — {t('rights_reserved')}

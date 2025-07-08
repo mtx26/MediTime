@@ -286,7 +286,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-exclamation-triangle me-2" /> {t('stock', 'Stock')}
+                            <i className="bi bi-exclamation-triangle me-2" /> {t('stock')}
                           </>
                         ),
                         onClick: () => navigate(`/${basePath}/${calendarId}/stock-alerts`),
@@ -345,11 +345,11 @@ function CalendarPage({
                   role="button"
                   onClick={() => navigate(`/${basePath}/${calendarId}/stock-alerts`)}
                   style={{ cursor: 'pointer' }}
-                  title={t('stock_alert_tooltip', 'Voir les médicaments à stock critique')}
+                  title={t('stock_alert_tooltip')}
                 >
                   <div className="d-flex align-items-center">
                     <i className="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
-                    <span className="fw-semibold">{t('stock_alert', 'Alerte de stock')}</span>
+                    <span className="fw-semibold">{t('stock_alert')}</span>
                   </div>
                   <i className="bi bi-chevron-right ms-2"></i>
                 </div>

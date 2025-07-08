@@ -11,7 +11,6 @@
   "accepted": "Accettato",
   "access": "Accesso",
   "account": {
-    "label": "Account",
     "crop": {
       "title": "Ritaglia la foto",
       "use": "Usa questa immagine"
@@ -22,12 +21,14 @@
     },
     "image_size_error": "La dimensione dell'immagine non deve superare i 5 MB",
     "instructions": "Puoi modificare i tuoi dati personali qui.",
+    "label": "Account",
     "profile_alt": "Profilo",
     "save_changes": "Salva le modifiche"
   },
   "accounts": "Conti",
   "activation": "Attivazione",
   "activation_toggle_aria": "Abilitare o disabilitare il collegamento",
+  "actual_stock": "Scorte attuali",
   "add": "Aggiungere",
   "admin": "Amministratore",
   "app": {
@@ -115,13 +116,13 @@
     "view_notice": "Vedi le istruzioni"
   },
   "calendar": {
-    "label": "Calendario",
     "add": "Aggiungi un calendario",
     "confirm_delete": "Eliminare il calendario?",
     "confirm_delete_shared": "Eliminare il calendario condiviso?",
     "confirm_rename": "Rinominare il calendario?",
     "daily_view": "Calendario giornaliero",
     "day": "Giorno",
+    "label": "Calendario",
     "month": "Mese",
     "name": "Nome del calendario",
     "new_name": "Nuovo nome",
@@ -132,6 +133,23 @@
     "weekly_view": "Calendario per settimana"
   },
   "calendar_completed": "Calendario completato con successo!",
+  "calendar_settings": {
+    "label": "Impostazioni del calendario",
+    "sharing": {
+      "label": "Condivisione"
+    },
+    "stock": {
+      "daily": {
+        "description": "Le scorte verranno automaticamente diminuite ogni giorno a mezzanotte.",
+        "label": "Giornaliero (mezzanotte)"
+      },
+      "label": "Conteggio delle scorte",
+      "weekly": {
+        "description": "La scorta verrà diminuita manualmente ogni settimana quando rifornirai il tuo portapillole.",
+        "label": "Settimanale (Pillbox)"
+      }
+    }
+  },
   "calendars": "Calendari",
   "cancel": "Cancellare",
   "choose_date": "Scegli una data",
@@ -141,6 +159,7 @@
   "copy_link": "Copia il collegamento",
   "copy_link_error": "Errore durante la copia del collegamento.",
   "create_share_link": "Crea un collegamento di condivisione",
+  "critical_stock": "Rottura di stock",
   "cta": {
     "button": "creo il mio account",
     "desc": "Crea gratuitamente il tuo account e semplifica la gestione medica per tutta la famiglia.",
@@ -187,10 +206,11 @@
   "locale": "it-IT",
   "login": "Login",
   "logout": "Esci",
+  "low_stock": "Scorte basse",
   "manage_link": "Gestisci il collegamento",
   "medicines": {
-    "label": "Droghe",
     "back_to_calendar": "Torna al calendario",
+    "label": "Droghe",
     "list_empty": "❌ Non sono ancora stati aggiunti farmaci per questo programma.",
     "list_title": "Elenco dei medicinali"
   },
@@ -214,6 +234,7 @@
   "no_calendar_found": "Nessun calendario trovato",
   "no_calendar_found_cta": "È possibile creare un calendario dalla home page.",
   "no_events_today": "Nessun evento in questo giorno.",
+  "no_low_stock": "Non vi è alcun farmaco in stock critico.",
   "no_medicines": "Nessun farmaco da visualizzare.",
   "no_notifications": "Nessuna nuova notifica",
   "no_personal_calendars": "Non hai un calendario personale.",
@@ -358,8 +379,8 @@
   },
   "send_invitation": "Invia un invito",
   "settings": {
-    "label": "Impostazioni",
     "account": "Il mio conto",
+    "label": "Impostazioni",
     "language": "Lingua dell'applicazione",
     "language_note": "La lingua selezionata verrà applicata all'intera interfaccia.",
     "preferences": "Preferenze",
@@ -375,6 +396,10 @@
   "shared_calendars": "Calendari condivisi",
   "shared_link_label": "Collegamento al calendario condiviso",
   "shared_users": "Utenti condivisi",
+  "stock": "Azione",
+  "stock_alert": "Avviso di borsa",
+  "stock_alert_tooltip": "Vedi i farmaci di scorta critici",
+  "stock_alerts": "Farmaci esauriti",
   "terms": {
     "label": "Termini di utilizzo",
     "last_update": "Ultimo aggiornamento: 9 giugno 2025",
@@ -440,6 +465,7 @@
     "quote": "Continuo a riempire il portapillole di mia madre ogni settimana, ma con MediTime è diventato molto più semplice. Posso vedere l'elenco completo dei suoi farmaci a colpo d'occhio, ricevo promemoria e anche lei. Siamo molto più rilassati.",
     "title": "Si fidano di noi"
   },
+  "threshold": "Soglia",
   "user": "Utente",
   "verify_email": {
     "instructions": "Invia un nuovo link di verifica al tuo indirizzo email.",
@@ -451,22 +477,5 @@
     "desc": "Perché l'assistenza sanitaria non lascia spazio all'improvvisazione. MediTime ti offre una soluzione chiara, intuitiva e sicura per monitorare i tuoi trattamenti e quelli dei tuoi cari, giorno dopo giorno.",
     "title": "Perché scegliere MediTime?"
   },
-  "yes": "SÌ",
-  "calendar_settings": {
-    "label": "Impostazioni del calendario",
-    "stock": {
-      "label": "Conteggio delle scorte",
-      "weekly": {
-        "label": "Settimanale (Pillbox)",
-        "description": "La scorta verrà diminuita manualmente ogni settimana quando rifornirai il tuo portapillole."
-      },
-      "daily": {
-        "label": "Giornaliero (mezzanotte)",
-        "description": "Le scorte verranno automaticamente diminuite ogni giorno a mezzanotte."
-      }
-    },
-    "sharing": {
-      "label": "Condivisione"
-    }
-  }
+  "yes": "SÌ"
 }

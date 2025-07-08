@@ -28,6 +28,7 @@
   "accounts": "Accounts",
   "activation": "Activation",
   "activation_toggle_aria": "Enable or disable the link",
+  "actual_stock": "Current stock",
   "add": "Add",
   "admin": "Admin",
   "app": {
@@ -138,14 +139,14 @@
       "label": "Sharing"
     },
     "stock": {
+      "daily": {
+        "description": "The stock will be decreased automatically every day.",
+        "label": "Daily (Midnight)"
+      },
       "label": "Stock count",
       "weekly": {
-        "label": "Weekly (Pillbox)",
-        "description": "The stock will be manually decreased each week when you refill your pill box."
-      },
-      "daily": {
-        "label": "Daily (Midnight)",
-        "description": "The stock will be decreased automatically every day."
+        "description": "The stock will be manually decreased each week when you refill your pill box.",
+        "label": "Weekly (Pillbox)"
       }
     }
   },
@@ -158,6 +159,7 @@
   "copy_link": "Copy link",
   "copy_link_error": "Error copying link.",
   "create_share_link": "Create a sharing link",
+  "critical_stock": "Rupture de stock",
   "cta": {
     "button": "I create my account",
     "desc": "Create your account for free and simplify medical management for the whole family.",
@@ -204,6 +206,7 @@
   "locale": "en-US",
   "login": "Login",
   "logout": "Logout",
+  "low_stock": "Low stock",
   "manage_link": "Manage the link",
   "medicines": {
     "back_to_calendar": "Back to calendar",
@@ -231,6 +234,7 @@
   "no_calendar_found": "No calendar found",
   "no_calendar_found_cta": "You can create a calendar from the home page.",
   "no_events_today": "No events on this day.",
+  "no_low_stock": "No medication is in critical stock.",
   "no_medicines": "No medication to display.",
   "no_notifications": "No new notifications",
   "no_personal_calendars": "You don't have a personal calendar.",
@@ -392,6 +396,10 @@
   "shared_calendars": "Shared calendars",
   "shared_link_label": "Shared calendar link",
   "shared_users": "Shared users",
+  "stock": "Stock",
+  "stock_alert": "Stock alert",
+  "stock_alert_tooltip": "See critical stock medications",
+  "stock_alerts": "Out of stock drugs",
   "terms": {
     "label": "Terms of Use",
     "last_update": "Last updated: June 9, 2025",
@@ -457,6 +465,7 @@
     "quote": "I still refill my mom's pill box every week, but with MediTime, it's become much simpler. I can see her entire medication list at a glance, I receive reminders, and so does she. We're much more relaxed.",
     "title": "They trust us"
   },
+  "threshold": "Threshold",
   "user": "User",
   "verify_email": {
     "instructions": "Send a new verification link to your email address.",

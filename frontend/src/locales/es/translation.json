@@ -28,6 +28,7 @@
   "accounts": "Cuentas",
   "activation": "Activación",
   "activation_toggle_aria": "Habilitar o deshabilitar el enlace",
+  "actual_stock": "Stock actual",
   "add": "Agregar",
   "admin": "Administración",
   "app": {
@@ -138,14 +139,14 @@
       "label": "Intercambio"
     },
     "stock": {
+      "daily": {
+        "description": "El stock se reducirá automáticamente cada día.",
+        "label": "Diariamente (Medianoche)"
+      },
       "label": "Recuento de existencias",
       "weekly": {
-        "label": "Semanal (Pastillero)",
-        "description": "El stock se reducirá manualmente cada semana cuando rellenes tu pastillero."
-      },
-      "daily": {
-        "label": "Diariamente (Medianoche)",
-        "description": "El stock se reducirá automáticamente cada día."
+        "description": "El stock se reducirá manualmente cada semana cuando rellenes tu pastillero.",
+        "label": "Semanal (Pastillero)"
       }
     }
   },
@@ -158,6 +159,7 @@
   "copy_link": "Copiar enlace",
   "copy_link_error": "Error al copiar el enlace.",
   "create_share_link": "Crear un enlace para compartir",
+  "critical_stock": "Ruptura de existencias",
   "cta": {
     "button": "Creo mi cuenta",
     "desc": "Crea tu cuenta gratis y simplifica la gestión médica para toda la familia.",
@@ -204,6 +206,7 @@
   "locale": "es-ES",
   "login": "Acceso",
   "logout": "Cerrar sesión",
+  "low_stock": "Stock bajo",
   "manage_link": "Administrar el enlace",
   "medicines": {
     "back_to_calendar": "Volver al calendario",
@@ -231,6 +234,7 @@
   "no_calendar_found": "No se encontró ningún calendario",
   "no_calendar_found_cta": "Puedes crear un calendario desde la página de inicio.",
   "no_events_today": "No hay eventos este día.",
+  "no_low_stock": "No hay medicamentos en stock crítico.",
   "no_medicines": "No hay medicamentos para mostrar.",
   "no_notifications": "No hay nuevas notificaciones",
   "no_personal_calendars": "No tienes un calendario personal.",
@@ -392,6 +396,10 @@
   "shared_calendars": "Calendarios compartidos",
   "shared_link_label": "Enlace de calendario compartido",
   "shared_users": "Usuarios compartidos",
+  "stock": "Existencias",
+  "stock_alert": "Alerta de stock",
+  "stock_alert_tooltip": "Ver medicamentos de stock crítico",
+  "stock_alerts": "Medicamentos agotados",
   "terms": {
     "label": "Condiciones de uso",
     "last_update": "Última actualización: 9 de junio de 2025",
@@ -457,6 +465,7 @@
     "quote": "Todavía le renuevo el pastillero a mi mamá cada semana, pero con MediTime, es mucho más sencillo. Puedo ver toda su lista de medicamentos de un vistazo, recibo recordatorios, y ella también. Estamos mucho más tranquilos.",
     "title": "Ellos confían en nosotros"
   },
+  "threshold": "Límite",
   "user": "Usuario",
   "verify_email": {
     "instructions": "Envíe un nuevo enlace de verificación a su dirección de correo electrónico.",

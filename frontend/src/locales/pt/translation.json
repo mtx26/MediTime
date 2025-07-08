@@ -11,7 +11,6 @@
   "accepted": "Aceito",
   "access": "Acesso",
   "account": {
-    "label": "Conta",
     "crop": {
       "title": "Cortar a foto",
       "use": "Use esta imagem"
@@ -22,12 +21,14 @@
     },
     "image_size_error": "O tamanho da imagem não deve exceder 5 MB",
     "instructions": "Você pode alterar suas informações pessoais aqui.",
+    "label": "Conta",
     "profile_alt": "Perfil",
     "save_changes": "Salvar alterações"
   },
   "accounts": "Contas",
   "activation": "Ativação",
   "activation_toggle_aria": "Habilitar ou desabilitar o link",
+  "actual_stock": "Estoque atual",
   "add": "Adicionar",
   "admin": "Administrador",
   "app": {
@@ -115,13 +116,13 @@
     "view_notice": "Veja as instruções"
   },
   "calendar": {
-    "label": "Calendário",
     "add": "Adicionar um calendário",
     "confirm_delete": "Excluir o calendário?",
     "confirm_delete_shared": "Excluir calendário compartilhado?",
     "confirm_rename": "Renomear o calendário?",
     "daily_view": "Calendário diário",
     "day": "Dia",
+    "label": "Calendário",
     "month": "Mês",
     "name": "Nome do calendário",
     "new_name": "Novo nome",
@@ -132,6 +133,23 @@
     "weekly_view": "Calendário por semana"
   },
   "calendar_completed": "Calendário concluído com sucesso!",
+  "calendar_settings": {
+    "label": "Configurações do calendário",
+    "sharing": {
+      "label": "Compartilhamento"
+    },
+    "stock": {
+      "daily": {
+        "description": "O estoque será diminuído automaticamente todos os dias à meia-noite.",
+        "label": "Diariamente (meia-noite)"
+      },
+      "label": "Contagem de estoque",
+      "weekly": {
+        "description": "O estoque será diminuído manualmente a cada semana quando você reabastecer sua caixa de comprimidos.",
+        "label": "Semanal (Caixa de comprimidos)"
+      }
+    }
+  },
   "calendars": "Calendários",
   "cancel": "Cancelar",
   "choose_date": "Escolha uma data",
@@ -141,6 +159,7 @@
   "copy_link": "Copiar link",
   "copy_link_error": "Erro ao copiar link.",
   "create_share_link": "Criar um link de compartilhamento",
+  "critical_stock": "Ruptura de estoque",
   "cta": {
     "button": "Eu crio minha conta",
     "desc": "Crie sua conta gratuitamente e simplifique o gerenciamento médico de toda a família.",
@@ -187,10 +206,11 @@
   "locale": "pt-BR",
   "login": "Conecte-se",
   "logout": "Sair",
+  "low_stock": "Estoque baixo",
   "manage_link": "Gerenciar o link",
   "medicines": {
-    "label": "Drogas",
     "back_to_calendar": "Voltar ao calendário",
+    "label": "Drogas",
     "list_empty": "❌ Nenhum medicamento foi adicionado para esta programação ainda.",
     "list_title": "Lista de medicamentos"
   },
@@ -214,6 +234,7 @@
   "no_calendar_found": "Nenhum calendário encontrado",
   "no_calendar_found_cta": "Você pode criar um calendário na página inicial.",
   "no_events_today": "Não há eventos neste dia.",
+  "no_low_stock": "Não há medicamentos em estoque crítico.",
   "no_medicines": "Nenhum medicamento para exibir.",
   "no_notifications": "Nenhuma nova notificação",
   "no_personal_calendars": "Você não tem um calendário pessoal.",
@@ -358,8 +379,8 @@
   },
   "send_invitation": "Enviar um convite",
   "settings": {
-    "label": "Configurações",
     "account": "Minha conta",
+    "label": "Configurações",
     "language": "Idioma do aplicativo",
     "language_note": "O idioma selecionado será aplicado a toda a interface.",
     "preferences": "Preferências",
@@ -375,6 +396,10 @@
   "shared_calendars": "Calendários compartilhados",
   "shared_link_label": "Link de calendário compartilhado",
   "shared_users": "Usuários compartilhados",
+  "stock": "Estoque",
+  "stock_alert": "Alerta de estoque",
+  "stock_alert_tooltip": "Veja medicamentos de estoque essenciais",
+  "stock_alerts": "Medicamentos fora de estoque",
   "terms": {
     "label": "Termos de Uso",
     "last_update": "Última atualização: 9 de junho de 2025",
@@ -440,6 +465,7 @@
     "quote": "Eu ainda encho a caixa de remédios da minha mãe toda semana, mas com o MediTime ficou muito mais simples. Consigo ver a lista completa de medicamentos dela de uma só vez, recebo lembretes, e ela também. Estamos muito mais tranquilos.",
     "title": "Eles confiam em nós"
   },
+  "threshold": "Limite",
   "user": "Usuário",
   "verify_email": {
     "instructions": "Envie um novo link de verificação para seu endereço de e-mail.",
@@ -451,22 +477,5 @@
     "desc": "Porque a saúde não deixa espaço para improvisação. O MediTime oferece uma solução clara, intuitiva e segura para acompanhar seus tratamentos e os de seus entes queridos, dia após dia.",
     "title": "Por que escolher o MediTime?"
   },
-  "yes": "Sim",
-  "calendar_settings": {
-    "label": "Configurações do calendário",
-    "stock": {
-      "label": "Contagem de estoque",
-      "weekly": {
-        "label": "Semanal (Caixa de comprimidos)",
-        "description": "O estoque será diminuído manualmente a cada semana quando você reabastecer sua caixa de comprimidos."
-      },
-      "daily": {
-        "label": "Diariamente (meia-noite)",
-        "description": "O estoque será diminuído automaticamente todos os dias à meia-noite."
-      }
-    },
-    "sharing": {
-      "label": "Compartilhamento"
-    }
-  }
+  "yes": "Sim"
 }

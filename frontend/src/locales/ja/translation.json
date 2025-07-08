@@ -11,7 +11,6 @@
   "accepted": "承認済み",
   "access": "アクセス",
   "account": {
-    "label": "アカウント",
     "crop": {
       "title": "写真を切り抜く",
       "use": "この画像を使用する"
@@ -22,12 +21,14 @@
     },
     "image_size_error": "画像サイズは5MBを超えてはいけません",
     "instructions": "ここで個人情報を変更できます。",
+    "label": "アカウント",
     "profile_alt": "プロフィール",
     "save_changes": "変更を保存"
   },
   "accounts": "アカウント",
   "activation": "アクティベーション",
   "activation_toggle_aria": "リンクを有効または無効にする",
+  "actual_stock": "現在の在庫",
   "add": "追加",
   "admin": "管理者",
   "app": {
@@ -115,13 +116,13 @@
     "view_notice": "説明書をご覧ください"
   },
   "calendar": {
-    "label": "カレンダー",
     "add": "カレンダーを追加する",
     "confirm_delete": "カレンダーを削除しますか?",
     "confirm_delete_shared": "共有カレンダーを削除しますか?",
     "confirm_rename": "カレンダーの名前を変更しますか?",
     "daily_view": "日めくりカレンダー",
     "day": "日",
+    "label": "カレンダー",
     "month": "月",
     "name": "カレンダー名",
     "new_name": "新しい名前",
@@ -132,6 +133,23 @@
     "weekly_view": "週ごとのカレンダー"
   },
   "calendar_completed": "カレンダーが無事完成しました！",
+  "calendar_settings": {
+    "label": "カレンダー設定",
+    "sharing": {
+      "label": "共有"
+    },
+    "stock": {
+      "daily": {
+        "description": "毎日深夜に自動的に在庫が減ります。",
+        "label": "毎日（深夜）"
+      },
+      "label": "在庫数",
+      "weekly": {
+        "description": "毎週薬箱を補充すると、在庫は手動で減らされます。",
+        "label": "週刊（ピルボックス）"
+      }
+    }
+  },
   "calendars": "カレンダー",
   "cancel": "キャンセル",
   "choose_date": "日付を選択",
@@ -141,6 +159,7 @@
   "copy_link": "リンクをコピー",
   "copy_link_error": "リンクのコピー中にエラーが発生しました。",
   "create_share_link": "共有リンクを作成する",
+  "critical_stock": "破裂した株式",
   "cta": {
     "button": "アカウントを作成します",
     "desc": "無料でアカウントを作成し、家族全員の医療管理を簡素化しましょう。",
@@ -187,10 +206,11 @@
   "locale": "ja-JP",
   "login": "ログイン",
   "logout": "ログアウト",
+  "low_stock": "在庫が少ない",
   "manage_link": "リンクを管理する",
   "medicines": {
-    "label": "薬物",
     "back_to_calendar": "カレンダーに戻る",
+    "label": "薬物",
     "list_empty": "❌ このスケジュールにはまだ薬が追加されていません。",
     "list_title": "医薬品リスト"
   },
@@ -214,6 +234,7 @@
   "no_calendar_found": "カレンダーが見つかりません",
   "no_calendar_found_cta": "ホームページからカレンダーを作成できます。",
   "no_events_today": "この日はイベントはありません。",
+  "no_low_stock": "医薬品の在庫が不足しています。",
   "no_medicines": "表示する薬剤はありません。",
   "no_notifications": "新しい通知はありません",
   "no_personal_calendars": "個人用カレンダーがありません。",
@@ -358,8 +379,8 @@
   },
   "send_invitation": "招待状を送る",
   "settings": {
-    "label": "設定",
     "account": "私のアカウント",
+    "label": "設定",
     "language": "アプリケーション言語",
     "language_note": "選択した言語はインターフェース全体に適用されます。",
     "preferences": "設定",
@@ -375,6 +396,10 @@
   "shared_calendars": "共有カレンダー",
   "shared_link_label": "共有カレンダーのリンク",
   "shared_users": "共有ユーザー",
+  "stock": "ストック",
+  "stock_alert": "株価アラート",
+  "stock_alert_tooltip": "重要な在庫医薬品を見る",
+  "stock_alerts": "在庫切れの薬",
   "terms": {
     "label": "利用規約",
     "last_update": "最終更新日: 2025年6月9日",
@@ -440,6 +465,7 @@
     "quote": "母の薬箱は今でも毎週補充していますが、MediTimeのおかげでずっと楽になりました。薬のリストが一目でわかるし、リマインダーも届きますし、母もリマインダーを受け取れます。おかげで、ずっと楽になりました。",
     "title": "彼らは私たちを信頼している"
   },
+  "threshold": "しきい値",
   "user": "ユーザー",
   "verify_email": {
     "instructions": "新しい確認リンクをあなたのメールアドレスに送信します。",
@@ -451,22 +477,5 @@
     "desc": "医療には即興の余地はありません。MediTimeは、あなたとあなたの大切な人の治療を日々記録するための、明確で直感的、そして安全なソリューションを提供します。",
     "title": "MediTimeを選ぶ理由"
   },
-  "yes": "はい",
-  "calendar_settings": {
-    "label": "カレンダー設定",
-    "stock": {
-      "label": "在庫数",
-      "weekly": {
-        "label": "週刊（ピルボックス）",
-        "description": "毎週薬箱を補充すると、在庫は手動で減らされます。"
-      },
-      "daily": {
-        "label": "毎日（深夜）",
-        "description": "毎日深夜に自動的に在庫が減ります。"
-      }
-    },
-    "sharing": {
-      "label": "共有"
-    }
-  }
+  "yes": "はい"
 }

@@ -307,7 +307,7 @@ function SelectCalendar({
                       {
                         label: (
                           <>
-                            <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+                            <i className="bi bi-download" /> {t('boxes.export_pdf')}
                           </>
                         ),
                         onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
@@ -323,7 +323,7 @@ function SelectCalendar({
                       {
                         label: (
                           <>
-                            <i className="bi bi-exclamation-triangle-fill"></i> {t('stock_alert', 'Alerte de stock')}
+                            <i className="bi bi-exclamation-triangle-fill"></i> {t('stock')}
                           </>
                         ),
                         onClick: () => navigate(`/calendar/${calendarData.id}/stock-alerts`),
@@ -520,7 +520,7 @@ function SelectCalendar({
                           {
                             label: (
                               <>
-                                <i className="bi bi-exclamation-triangle-fill"></i> {t('stock_alert', 'Alerte de stock')}
+                                <i className="bi bi-exclamation-triangle-fill"></i> {t('stock')}
                               </>
                             ),
                             onClick: () =>
