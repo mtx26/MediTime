@@ -244,6 +244,19 @@ function AppRoutes({ sharedProps }) {
           }
         />
         <Route
+          path="settings"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<CalendarSettingsPage {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
+        <Route
           path="stock-alerts"
           element={
             <PrivateRoute

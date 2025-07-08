@@ -9,8 +9,7 @@ import time
 from app.utils.response import success_response, error_response, warning_response
 from app.utils.logger import log_backend
 from app.services.pdf import generate_medicine_conditions_pdf
-from app.utils.validators import decode_token
-import base64
+from app.services.stock import check_if_stock_is_low
 
 ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"
 
@@ -266,6 +265,8 @@ def handle_calendar_schedule(calendar_id):
 
         schedule, table, calendar_name = generate_calendar_schedule(calendar_id, start_date)
 
+        if_low_stock = check_if_stock_is_low(calendar_id)
+
         t_1 = time.time()
 
         return success_response(
@@ -273,7 +274,7 @@ def handle_calendar_schedule(calendar_id):
             code="CALENDAR_GENERATE_SUCCESS", 
             uid=owner_uid, 
             origin="CALENDAR_GENERATE", 
-            data={"schedule": schedule, "table": table, "calendar_name": calendar_name},
+            data={"schedule": schedule, "table": table, "calendar_name": calendar_name, "if_low_stock": if_low_stock},
             log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
         )
 

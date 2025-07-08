@@ -313,6 +313,22 @@ function SelectCalendar({
                         onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
                       },
                       {
+                        label: (
+                          <>
+                            <i className="bi bi-gear"></i> {t('settings.label')}
+                          </>
+                        ),
+                        onClick: () => navigate(`/calendar/${calendarData.id}/settings`),
+                      },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-exclamation-triangle-fill"></i> {t('stock_alert', 'Alerte de stock')}
+                          </>
+                        ),
+                        onClick: () => navigate(`/calendar/${calendarData.id}/stock-alerts`),
+                      },
+                      {
                         separator: true,
                       },
                       {
@@ -489,6 +505,28 @@ function SelectCalendar({
                               </>
                             ),
                             onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
+                          },
+                          {
+                            label: (
+                              <>
+                                <i className="bi bi-gear"></i> {t('settings.label')}
+                              </>
+                            ),
+                            onClick: () =>
+                              navigate(
+                                `/shared-user-calendar/${calendarData.id}/settings`
+                              ),
+                          },
+                          {
+                            label: (
+                              <>
+                                <i className="bi bi-exclamation-triangle-fill"></i> {t('stock_alert', 'Alerte de stock')}
+                              </>
+                            ),
+                            onClick: () =>
+                              navigate(
+                                `/shared-user-calendar/${calendarData.id}/stock-alerts`
+                              ),
                           },
                           {
                             separator: true,

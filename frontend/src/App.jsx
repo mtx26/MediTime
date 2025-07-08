@@ -108,6 +108,7 @@ function App() {
         schedule: result.schedule ?? [],
         calendarName: result.calendar_name ?? '',
         table: result.table ?? {},
+        ifLowStock: result.if_low_stock ?? false,
       };
     } else {
       return {
@@ -437,6 +438,7 @@ function App() {
           schedule: response.schedule,
           calendarName: response.calendar_name,
           table: response.table,
+          ifLowStock: response.if_low_stock ?? false,
         };
       }
   

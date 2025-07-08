@@ -196,3 +196,26 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
                 "error": str(e)
             }
         )
+
+def check_if_stock_is_low(calendar_id: int) -> bool:
+    """
+    Vérifie si le stock d'un calendrier est faible.
+    
+    Args:
+        calendar_id: ID du calendrier à vérifier.
+    
+    Returns:
+        bool: True si le stock est faible, False sinon.
+    """
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT COUNT(*) FROM medicine_boxes
+                WHERE calendar_id = %s AND stock_quantity <= stock_alert_threshold AND stock_alert_threshold > 0
+                """,
+                (calendar_id,)
+            )
+            count_row = cursor.fetchone()
+            count = count_row.get("count", 0)
+            return count > 0

@@ -12,6 +12,8 @@ from app.services.notifications import notify_and_record
 import json
 from app.config import Config
 from urllib.parse import urljoin
+from app.services.stock import check_if_stock_is_low
+
 
 ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"
 ERROR_UNAUTHORIZED_ACCESS = "accès refusé"
@@ -218,6 +220,8 @@ def handle_user_shared_calendar_schedule(calendar_id):
 
         schedule, table, calendar_name = generate_calendar_schedule(calendar_id, start_date)
 
+        if_low_stock = check_if_stock_is_low(calendar_id)
+
         t_1 = time.time()
             
         return success_response(
@@ -225,7 +229,7 @@ def handle_user_shared_calendar_schedule(calendar_id):
             code="SHARED_CALENDARS_LOAD_SUCCESS", 
             uid=uid, 
             origin="SHARED_CALENDARS_LOAD",
-            data={"schedule": schedule, "table": table, "calendar_name": calendar_name},
+            data={"schedule": schedule, "table": table, "calendar_name": calendar_name, "if_low_stock": if_low_stock},
             log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
         )
 

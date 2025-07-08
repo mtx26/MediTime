@@ -41,6 +41,7 @@ function CalendarPage({
   const [calendarEvents, setCalendarEvents] = useState([]); // Événements du calendrier
   const [calendarTable, setCalendarTable] = useState([]); // Événements du calendrier
   const [calendarName, setCalendarName] = useState(''); // Nom du calendrier
+  const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
   const [alertType, setAlertType] = useState(''); // Type d'alerte
   const [alertMessage, setAlertMessage] = useState(''); // Message d'alerte
   const [existingShareToken, setExistingShareToken] = useState(null); // Token existant
@@ -152,6 +153,9 @@ function CalendarPage({
         }
         if (!isEqual(rep.calendarName, calendarName)) {
           setCalendarName(rep.calendarName);
+        }
+        if (rep.ifLowStock !== undefined && rep.ifLowStock !== isLowStock) {
+          setIsLowStock(rep.ifLowStock);
         }
         setLoading(!rep.success);
       }
@@ -272,6 +276,22 @@ function CalendarPage({
                         onClick: handleShareCalendarClick,
                       },
                       {
+                        label: (
+                          <>
+                            <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+                          </>
+                        ),
+                        onClick: () => calendarSource.downloadCalendarPdf(calendarId),
+                      },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-exclamation-triangle me-2" /> {t('stock', 'Stock')}
+                          </>
+                        ),
+                        onClick: () => navigate(`/${basePath}/${calendarId}/stock-alerts`),
+                      },
+                      {
                         separator: true,
                       },
                       {
@@ -281,7 +301,8 @@ function CalendarPage({
                           </>
                         ),
                         onClick: async () => {
-                          const rep = await calendarSource.deleteCalendar(calendarId)
+                          // TODO: Ajouter une confirmation avant de supprimer le calendrier
+                          const rep = await personalCalendars.deleteCalendar(calendarId)
                           if (rep.success) {
                             navigate('/calendars');
                           } else {
@@ -294,7 +315,46 @@ function CalendarPage({
                     ]}
                   />
                 )}
+                {calendarType === 'sharedUser' && (
+                  <ActionSheet
+                    actions={[
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-gear me-2" /> {t('settings.label')}
+                          </>
+                        ),
+                        onClick: () => navigate(`/${basePath}/${calendarId}/settings`),
+                      },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+                          </>
+                        ),
+                        onClick: () => calendarSource.downloadCalendarPdf(calendarId),
+                      }
+                    ]}
+                  />
+                )}
               </div>
+              {/* Affichage alert stock */}
+              {isLowStock && (
+                <div
+                  className="alert alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow-sm"
+                  role="button"
+                  onClick={() => navigate(`/${basePath}/${calendarId}/stock-alerts`)}
+                  style={{ cursor: 'pointer' }}
+                  title={t('stock_alert_tooltip', 'Voir les médicaments à stock critique')}
+                >
+                  <div className="d-flex align-items-center">
+                    <i className="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                    <span className="fw-semibold">{t('stock_alert', 'Alerte de stock')}</span>
+                  </div>
+                  <i className="bi bi-chevron-right ms-2"></i>
+                </div>
+              )}
+
             </div>
 
             {/* Bouton pour naviguer vers la semaine suivante ou precedente */}
