@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getCalendarSourceMap } from '../../utils/calendarSourceMap';
 
-const Stock = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
+const Stock = ({ personalCalendars }) => {
   const { t } = useTranslation();
-  const [selectedMethod, setSelectedMethod] = useState('weekly_pillbox');
+  const [selectedMethod, setSelectedMethod] = useState('');
   const params = useParams();
   const location = useLocation();
+  const [loading, setLoading] = useState(undefined);
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
@@ -19,18 +19,45 @@ const Stock = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
     basePath = 'shared-user-calendar';
   }
 
-  const calendarSource = getCalendarSourceMap(
-    personalCalendars,
-    sharedUserCalendars,
-    tokenCalendars
-  )[calendarType];
-  
-
   const modifyStockDecrementMethod = async (method) => {
-    await calendarSource.updateStockDecrementMethod(calendarId, method);
+    await personalCalendars.updatePersonalStockDecrementMethod(calendarId, method);
     setSelectedMethod(method);
   };
 
+  useEffect(() => {
+    const initialize = async () => {
+      setLoading(undefined);
+      const rep = await personalCalendars.fetchPersonalStockDecrementMethod(calendarId);
+      if (rep.success) {
+        setSelectedMethod(rep.method);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+    }
+    initialize();
+
+  } , [calendarId, personalCalendars.fetchPersonalStockDecrementMethod, selectedMethod]);
+
+  if (loading === undefined && calendarId) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+      >
+        <div className="spinner-border text-primary">
+          <span className="visually-hidden">{t('loading_calendar')}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading === true && calendarId) {
+    return (
+      <div className="alert alert-danger text-center mt-5" role="alert">
+        ❌ {t('invalid_or_expired_link')}
+      </div>
+    );
+  }
     
 
   return (

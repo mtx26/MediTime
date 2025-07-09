@@ -9,10 +9,10 @@ def decrease_stock():
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                # recup les calendar avec stock_decrement_mode = auto
+                # recup les calendar avec stock_decrement_method = auto
                 cursor.execute("""
                     SELECT * FROM calendars
-                    WHERE stock_decrement_mode = 'weekly_pillbox'
+                    WHERE stock_decrement_method = 'weekly_pillbox'
                 """)
                 calendars = cursor.fetchall()
 

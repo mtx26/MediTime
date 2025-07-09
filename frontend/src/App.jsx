@@ -195,6 +195,17 @@ function App() {
       analyticsData: { calendarId, uid },
     });
   }, []);
+
+  const fetchPersonalStockDecrementMethod = useCallback(async (calendarId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/stock-decrement-method`,
+      method: 'GET',
+      origin: 'STOCK_DECREMENT_METHOD_FETCH',
+      uid,
+      analyticsEvent: 'fetch_stock_decrement_method',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
   
   
   const updatePersonalStockDecrementMethod = useCallback(async (calendarId, method) => {
@@ -564,6 +575,7 @@ function App() {
       deletePersonalBox,
       downloadPersonalCalendarPdf,
       useMedicinesForPersonalPillbox,
+      fetchPersonalStockDecrementMethod,
       updatePersonalStockDecrementMethod,
       personalRestockBox,
     },

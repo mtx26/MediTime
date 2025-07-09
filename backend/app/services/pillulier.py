@@ -9,14 +9,14 @@ def use_pillulier(calendar_id, start_date):
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT stock_decrement_mode FROM calendars WHERE id = %s", (calendar_id,))
+                cursor.execute("SELECT stock_decrement_method FROM calendars WHERE id = %s", (calendar_id,))
                 row = cursor.fetchone()
 
                 if not row:
                     return False
-                mode = row.get("stock_decrement_mode")
+                method = row.get("stock_decrement_method")
 
-                if mode == "weekly_pillbox":
+                if method == "weekly_pillbox":
 
                     cursor.execute("""
                         SELECT id, stock_quantity FROM medicine_boxes

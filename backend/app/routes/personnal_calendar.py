@@ -359,6 +359,56 @@ def download_pdf_calendar(calendar_id):
             origin="PDF_DOWNLOAD",
             error=str(e)
         )
+
+@api.route("/calendars/<calendar_id>/stock-decrement-method", methods=["GET"])
+@require_auth
+def get_personnal_stock_decrement_method(calendar_id):
+    try:
+        t_0 = time.time()
+        uid = g.uid
+        if not verify_calendar(calendar_id, uid):
+            return warning_response(
+                message="accès refusé", 
+                code="ACCESS_DENIED",
+                status_code=400,
+                uid=uid,
+                origin="STOCK_DECREMENT_METHOD_FETCH",
+                log_extra={"calendar_id": calendar_id}
+            )
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT stock_decrement_method FROM calendars WHERE id = %s", (calendar_id,))
+                result = cursor.fetchone()
+                if result is None:
+                    return warning_response(
+                        message=ERROR_CALENDAR_NOT_FOUND,
+                        code="STOCK_DECREMENT_METHOD_FETCH_ERROR",
+                        status_code=404,
+                        uid=uid,
+                        origin="STOCK_DECREMENT_METHOD_FETCH",
+                        log_extra={"calendar_id": calendar_id}
+                    )
+                method = result.get("stock_decrement_method")
+        t_1 = time.time()
+        return success_response(
+            message="méthode de diminution de stock récupérée",
+            code="STOCK_DECREMENT_METHOD_FETCH_SUCCESS",
+            uid=uid,
+            origin="STOCK_DECREMENT_METHOD_FETCH",
+            data={"method": method},
+            log_extra={"calendar_id": calendar_id, "method": method, "time": t_1 - t_0}
+        )
+    except Exception as e:
+        return error_response(
+            message="erreur lors de la récupération de la méthode de diminution de stock",
+            code="STOCK_DECREMENT_METHOD_FETCH_ERROR",
+            status_code=500,
+            uid=uid,
+            origin="STOCK_DECREMENT_METHOD_FETCH",
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
+
     
 @api.route("/calendars/<calendar_id>/stock-decrement-method", methods=["POST"])
 @require_auth

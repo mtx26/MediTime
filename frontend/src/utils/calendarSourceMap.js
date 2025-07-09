@@ -15,7 +15,6 @@ export const getCalendarSourceMap = (
     downloadCalendarPdf: personalCalendars.downloadPersonalCalendarPdf,
     deleteCalendar: personalCalendars.deleteCalendar,
     decreaseStock: personalCalendars.useMedicinesForPersonalPillbox,
-    updateStockDecrementMethod: personalCalendars.updatePersonalStockDecrementMethod,
     restockBox: personalCalendars.personalRestockBox,
   },
   sharedUser: {
@@ -28,7 +27,6 @@ export const getCalendarSourceMap = (
     downloadCalendarPdf: personalCalendars.downloadPersonalCalendarPdf,
     deleteCalendar: null,
     decreaseStock: sharedUserCalendars.useMedicinesForSharedUserPillbox,
-    updateStockDecrementMethod: null,
     restockBox: sharedUserCalendars.sharedUserRestockBox,
   },
   token: {
@@ -42,7 +40,6 @@ export const getCalendarSourceMap = (
     downloadCalendarPdf: null,
     deleteCalendar: null,
     decreaseStock: null,
-    updateStockDecrementMethod: null,
     restockBox: null,
   },
 });

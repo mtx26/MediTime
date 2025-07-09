@@ -209,7 +209,7 @@ def uptate_stock_decrement_method(calendar_id, method):
         with conn.cursor() as cursor:
             cursor.execute("""
                 UPDATE calendars
-                SET stock_decrement_mode = %s
+                SET stock_decrement_method = %s
                 WHERE id = %s
             """, (method, calendar_id,))
             conn.commit()
