@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Stock from './calendar-settings/Stock';
+import Notification from './calendar-settings/Notification.jsx';
 // import Sharing from './calendar-settings/Sharing';
 
 function CalendarSettingsPage({
@@ -11,11 +12,27 @@ function CalendarSettingsPage({
 }) {
   const { t } = useTranslation();
   const location = useLocation();
+  const params = useParams();
+
   const sharedProps = {
     personalCalendars,
     sharedUserCalendars,
     tokenCalendars
   };
+
+  let calendarType = 'personal';
+  let calendarId = params.calendarId;
+  let basePath = 'calendar';
+
+  if (location.pathname.startsWith('/shared-user-calendar')) {
+    calendarType = 'sharedUser';
+    calendarId = params.calendarId;
+    basePath = 'shared-user-calendar';
+  } else if (location.pathname.startsWith('/shared-token-calendar')) {
+    calendarType = 'token';
+    calendarId = params.sharedToken;
+    basePath = 'shared-token-calendar';
+  }
 
   const getInitialTab = () => {
     const params = new URLSearchParams(location.search);
@@ -32,15 +49,14 @@ function CalendarSettingsPage({
     switch (activeTab) {
       case 'stock':
         return <Stock {...sharedProps} />;
+      case 'notifications':
+        return <Notification {...sharedProps} />;
       // case 'sharing':
       //   return <Sharing {...sharedProps} />;
       default:
         return <Stock {...sharedProps} />;
     }
   };
-
-  // 🔁 basePath dynamique basé sur l'URL actuelle
-  const basePath = location.pathname.split('?')[0]; // garde tout avant ? (donc /calendar/.../settings ou /shared-user-calendar/.../settings)
 
   return (
     <div className="container mt-4">
@@ -50,17 +66,30 @@ function CalendarSettingsPage({
             <div className="card-body p-3">
               <h5 className="mb-3">{t('calendar_settings.label')}</h5>
               <div className="nav flex-column nav-pills">
-                <Link
-                  className={`nav-link text-start ${activeTab === 'stock' ? 'active' : ''}`}
-                  to={`${basePath}?tab=stock`}
-                >
-                  <i className="bi bi-capsule me-2"></i>
-                  {t('calendar_settings.stock.label')}
-                </Link>
-                {/*}
+                {(calendarType === 'personal' || calendarType === 'sharedUser') && (
+                  <>
+                    <Link
+                      className={`nav-link text-start ${activeTab === 'stock' ? 'active' : ''}`}
+                      to={`/${basePath}/${calendarId}/settings?tab=stock`}
+                    >
+                      <i className="bi bi-capsule me-2"></i>
+                      {t('calendar_settings.stock.label')}
+                    </Link>
+
+                    <Link
+                      className={`nav-link text-start ${activeTab === 'notifications' ? 'active' : ''}`}
+                      to={`/${basePath}/${calendarId}/settings?tab=notifications`}
+                    >
+                      <i className="bi bi-bell me-2"></i>
+                      {t('calendar_settings.notifications.label')}
+                    </Link>
+                  </>
+                )}
+
+                {/* 
                 <Link
                   className={`nav-link text-start ${activeTab === 'sharing' ? 'active' : ''}`}
-                  to={`${basePath}?tab=sharing`}
+                  to={`/${basePath}/${calendarId}/settings?tab=sharing`}
                 >
                   <i className="bi bi-share me-2"></i>
                   {t('calendar_settings.sharing.label')}
@@ -79,6 +108,6 @@ function CalendarSettingsPage({
       </div>
     </div>
   );
-};
+}
 
 export default CalendarSettingsPage;
