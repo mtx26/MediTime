@@ -92,7 +92,7 @@ function StockAlertsPage({
                   <div>
                     <h5 className="card-title mb-2">{med.name}</h5>
                     <p className="card-text text-muted mb-2">
-                      {t('actual_stock')} : {med.stock_quantity} / {t('threshold')} : {med.stock_alert_threshold}
+                      {t('actual_stock')} : {med.stock_quantity} / {t('boxes.alert_threshold')} : {med.stock_alert_threshold}
                     </p>
                     <span
                       className={`badge ${
