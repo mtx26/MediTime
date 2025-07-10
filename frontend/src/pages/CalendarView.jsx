@@ -156,6 +156,7 @@ function CalendarPage({
         }
         if (rep.ifLowStock !== undefined && rep.ifLowStock !== isLowStock) {
           setIsLowStock(rep.ifLowStock);
+          // TODO: Hook pour alerte stock faible en temps réel
         }
         setLoading(!rep.success);
       }
