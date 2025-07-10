@@ -108,6 +108,12 @@
         "high": "高库存",
         "low": "库存不足",
         "out": "缺货"
+      },
+      "alerts": {
+        "title": "🔔 库存警报：",
+        "line": "{{name}} ({{dose}} mg) — {{count}} 单位库存",
+        "line_plural": "{{name}} ({{dose}} mg) — 库存有 {{count}} 件",
+        "line_negative": "{{name}} ({{dose}} 毫克) — {{count}} 单位（缺货）"
       }
     },
     "tablet": "压缩",

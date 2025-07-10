@@ -108,6 +108,12 @@
         "high": "Elevato stock",
         "low": "Scorte basse",
         "out": "Esaurito"
+      },
+      "alerts": {
+        "title": "🔔 Avvisi sulle azioni:",
+        "line": "{{name}} ({{dose}} mg) — {{count}} unità in magazzino",
+        "line_plural": "{{name}} ({{dose}} mg) — {{count}} unità in magazzino",
+        "line_negative": "{{name}} ({{dose}} mg) — {{count}} unità (esaurito)"
       }
     },
     "tablet": "compresso",

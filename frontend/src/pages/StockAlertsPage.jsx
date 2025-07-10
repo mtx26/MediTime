@@ -49,7 +49,28 @@ function StockAlertsPage({
   };
 
   const sendStockAlertsSMS = () => {
-    const message = alerts.map(box => `Alerte de stock pour ${box.name} : ${box.stock_quantity} / ${box.stock_alert_threshold}`).join('\n');
+  const title = t('boxes.stock.alerts.title');
+  const message =
+    title +
+    '\n' +
+    alerts
+      .map(box => {
+        if (box.stock_quantity < 0) {
+          return t('boxes.stock.alerts.line_negative', {
+            name: box.name,
+            dose: box.dose,
+            count: box.stock_quantity
+          });
+        }
+        return t('boxes.stock.alerts.line', {
+          name: box.name,
+          dose: box.dose,
+          count: box.stock_quantity
+        });
+      })
+      .join('\n');
+
+
     const encodedMessage = encodeURIComponent(message);
     console.log(`sms:?&body=${encodedMessage}`);
     window.location.href = `sms:?&body=${encodedMessage}`;

@@ -108,6 +108,12 @@
         "high": "Alto stock",
         "low": "Stock bajo",
         "out": "Agotado"
+      },
+      "alerts": {
+        "title": "🔔 Alertas de stock:",
+        "line": "{{name}} ({{dose}} mg) — {{count}} unidad en stock",
+        "line_plural": "{{nombre}} ({{dosis}} mg) — {{cantidad}} unidades en stock",
+        "line_negative": "{{nombre}} ({{dosis}} mg) — {{cantidad}} unidades (agotado)"
       }
     },
     "tablet": "comprimido",

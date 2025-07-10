@@ -108,6 +108,12 @@
         "high": "Alto estoque",
         "low": "Estoque baixo",
         "out": "Fora de estoque"
+      },
+      "alerts": {
+        "title": "🔔 Alertas de ações:",
+        "line": "{{name}} ({{dose}} mg) — {{count}} unidade em estoque",
+        "line_plural": "{{name}} ({{dose}} mg) — {{count}} unidades em estoque",
+        "line_negative": "{{name}} ({{dose}} mg) — {{count}} unidades (fora de estoque)"
       }
     },
     "tablet": "comprimido",
