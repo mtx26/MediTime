@@ -8,7 +8,6 @@ from app.services.user import fetch_user
 from app.utils.logger import log_backend
 from app.config import Config
 import traceback
-import re
 
 def fetch_user_name(uid):
     user = fetch_user(uid)
@@ -45,15 +44,11 @@ def enrich_notification(notification: dict) -> dict:
 
 def build_notification_text(notif_type: str, data: dict) -> tuple[str, str]:
     """Return title/subject and body for a notification."""
-    def format_medication_list(med_lines: list[str]) -> str:
-        """Generate a styled HTML table from a list of 'Nom (valeur)'."""
+    def format_medication_list(meds: list[dict]) -> str:
         rows = ""
-        for line in med_lines:
-            match = re.search(r"^(.*)\s*\(([-+]?[\d.]+)\)$", line)
-            if not match:
-                continue
-            name, val = match.groups()
-            val = float(val)
+        for med in meds:
+            name = med["name"]
+            val = float(med["qty"])
             color = "red" if val <= 0 else "orange"
             rows += f"""
                 <tr>
@@ -182,7 +177,10 @@ def send_grouped_notifications(uid: str, notifications: list[dict], notif_type: 
         payload = notifications[0].copy()
         if notif_type == "low_stock":
             payload["medications"] = [
-                f"{fetch_medicine_name(n.get('medication_id'))} ({n.get('medication_qty') or 0})"
+                {
+                    "name": fetch_medicine_name(n.get("medication_id")),
+                    "qty": n.get("medication_qty") or 0
+                }
                 for n in notifications
             ]
         elif len(notifications) > 1:
