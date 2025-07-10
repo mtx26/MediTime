@@ -19,16 +19,13 @@ function StockAlertsPage({
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
-  let basePath = 'calendar';
 
   if (location.pathname.startsWith('/shared-user-calendar')) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
-    basePath = 'shared-user-calendar';
   } else if (location.pathname.startsWith('/shared-token-calendar')) {
     calendarType = 'token';
     calendarId = params.sharedToken;
-    basePath = 'shared-token-calendar';
   }
 
   const calendarSource = getCalendarSourceMap(
