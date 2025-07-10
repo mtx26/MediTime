@@ -136,9 +136,9 @@
   "calendar_settings": {
     "label": "日历设置",
     "notifications": {
-      "disabled": "",
-      "enabled": "",
-      "label": ""
+      "disabled": "已禁用通知",
+      "enabled": "已启用通知",
+      "label": "通知"
     },
     "sharing": {
       "label": "共享"
@@ -207,7 +207,7 @@
   "loading_calendars": "正在加载日历...",
   "loading_medicines": "正在加载药物...",
   "loading_notifications": "正在加载通知...",
-  "loading_settings": "",
+  "loading_settings": "正在加载设置...",
   "loading_share": "正在加载分享...",
   "locale": "zh-CN",
   "login": "登录",

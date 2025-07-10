@@ -136,9 +136,9 @@
   "calendar_settings": {
     "label": "Impostazioni del calendario",
     "notifications": {
-      "disabled": "",
-      "enabled": "",
-      "label": ""
+      "disabled": "Notifiche disabilitate",
+      "enabled": "Notifiche abilitate",
+      "label": "Notifiche"
     },
     "sharing": {
       "label": "Condivisione"
@@ -207,7 +207,7 @@
   "loading_calendars": "Caricamento calendari...",
   "loading_medicines": "Caricamento farmaci in corso...",
   "loading_notifications": "Caricamento notifiche in corso...",
-  "loading_settings": "",
+  "loading_settings": "Caricamento delle impostazioni...",
   "loading_share": "Caricamento condivisione...",
   "locale": "it-IT",
   "login": "Login",

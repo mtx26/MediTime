@@ -136,9 +136,9 @@
   "calendar_settings": {
     "label": "カレンダー設定",
     "notifications": {
-      "disabled": "",
-      "enabled": "",
-      "label": ""
+      "disabled": "通知が無効になっています",
+      "enabled": "通知が有効",
+      "label": "通知"
     },
     "sharing": {
       "label": "共有"
@@ -207,7 +207,7 @@
   "loading_calendars": "カレンダーを読み込んでいます...",
   "loading_medicines": "薬を読み込んでいます...",
   "loading_notifications": "通知を読み込んでいます...",
-  "loading_settings": "",
+  "loading_settings": "設定を読み込んでいます...",
   "loading_share": "共有を読み込んでいます...",
   "locale": "ja-JP",
   "login": "ログイン",

@@ -136,9 +136,9 @@
   "calendar_settings": {
     "label": "Настройки календаря",
     "notifications": {
-      "disabled": "",
-      "enabled": "",
-      "label": ""
+      "disabled": "Уведомления отключены",
+      "enabled": "Уведомления включены",
+      "label": "Уведомления"
     },
     "sharing": {
       "label": "Поделиться"
@@ -207,7 +207,7 @@
   "loading_calendars": "Загрузка календарей...",
   "loading_medicines": "Загрузка лекарств...",
   "loading_notifications": "Загрузка уведомлений...",
-  "loading_settings": "",
+  "loading_settings": "Загрузка настроек...",
   "loading_share": "Загрузка акции...",
   "locale": "ru-RU",
   "login": "Авторизоваться",

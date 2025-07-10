@@ -136,9 +136,9 @@
   "calendar_settings": {
     "label": "Calendar Settings",
     "notifications": {
-      "disabled": "",
-      "enabled": "",
-      "label": ""
+      "disabled": "Notifications disabled",
+      "enabled": "Notifications enabled",
+      "label": "Notifications"
     },
     "sharing": {
       "label": "Sharing"
@@ -207,7 +207,7 @@
   "loading_calendars": "Loading calendars...",
   "loading_medicines": "Loading medications...",
   "loading_notifications": "Loading notifications...",
-  "loading_settings": "",
+  "loading_settings": "Loading settings...",
   "loading_share": "Loading share...",
   "locale": "en-US",
   "login": "Login",
