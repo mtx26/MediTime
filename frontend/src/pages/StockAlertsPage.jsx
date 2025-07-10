@@ -72,7 +72,6 @@ function StockAlertsPage({
 
 
     const encodedMessage = encodeURIComponent(message);
-    console.log(`sms:?&body=${encodedMessage}`);
     window.location.href = `sms:?&body=${encodedMessage}`;
   };
 
@@ -100,7 +99,7 @@ function StockAlertsPage({
   return (
     <div className="container py-4">
       <div className="mb-4 d-flex justify-content-between align-items-center">
-        <h2 className="mb-4 text-danger">
+        <h2 className="text-danger">
           <i className="bi bi-exclamation-triangle-fill me-2"></i>
           {t('stock_alerts')}
         </h2>
@@ -113,7 +112,7 @@ function StockAlertsPage({
                 </>
               ),
               onClick: () => sendStockAlertsSMS(),
-            }
+            } 
           ]}
         />
 
