@@ -135,6 +135,11 @@
   "calendar_completed": "カレンダーが無事完成しました！",
   "calendar_settings": {
     "label": "カレンダー設定",
+    "notifications": {
+      "disabled": "",
+      "enabled": "",
+      "label": ""
+    },
     "sharing": {
       "label": "共有"
     },
@@ -202,6 +207,7 @@
   "loading_calendars": "カレンダーを読み込んでいます...",
   "loading_medicines": "薬を読み込んでいます...",
   "loading_notifications": "通知を読み込んでいます...",
+  "loading_settings": "",
   "loading_share": "共有を読み込んでいます...",
   "locale": "ja-JP",
   "login": "ログイン",

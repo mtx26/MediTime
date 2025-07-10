@@ -135,6 +135,11 @@
   "calendar_completed": "Calendrier complété avec succès !",
   "calendar_settings": {
     "label": "Paramètres du calendrier",
+    "notifications": {
+      "disabled": "Notifications désactivées",
+      "enabled": "Notifications activées",
+      "label": "Notifications"
+    },
     "sharing": {
       "label": "Partage"
     },
@@ -202,6 +207,7 @@
   "loading_calendars": "Chargement des calendriers...",
   "loading_medicines": "Chargement des médicaments...",
   "loading_notifications": "Chargement des notifications...",
+  "loading_settings": "Chargement des paramètres...",
   "loading_share": "Chargement du partage...",
   "locale": "fr-FR",
   "login": "Connexion",

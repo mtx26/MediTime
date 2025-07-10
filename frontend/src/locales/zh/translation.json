@@ -135,6 +135,11 @@
   "calendar_completed": "行事历成功完成！",
   "calendar_settings": {
     "label": "日历设置",
+    "notifications": {
+      "disabled": "",
+      "enabled": "",
+      "label": ""
+    },
     "sharing": {
       "label": "共享"
     },
@@ -202,6 +207,7 @@
   "loading_calendars": "正在加载日历...",
   "loading_medicines": "正在加载药物...",
   "loading_notifications": "正在加载通知...",
+  "loading_settings": "",
   "loading_share": "正在加载分享...",
   "locale": "zh-CN",
   "login": "登录",

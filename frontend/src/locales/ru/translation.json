@@ -135,6 +135,11 @@
   "calendar_completed": "Календарь успешно завершен!",
   "calendar_settings": {
     "label": "Настройки календаря",
+    "notifications": {
+      "disabled": "",
+      "enabled": "",
+      "label": ""
+    },
     "sharing": {
       "label": "Поделиться"
     },
@@ -202,6 +207,7 @@
   "loading_calendars": "Загрузка календарей...",
   "loading_medicines": "Загрузка лекарств...",
   "loading_notifications": "Загрузка уведомлений...",
+  "loading_settings": "",
   "loading_share": "Загрузка акции...",
   "locale": "ru-RU",
   "login": "Авторизоваться",

@@ -232,6 +232,17 @@ function App() {
     });
   }, []);
 
+  const fetchPersonalNotificationsEnabled = useCallback(async (calendarId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/notifications`,
+      method: 'GET',
+      origin: 'NOTIFICATIONS_ENABLED_FETCH',
+      uid,
+      analyticsEvent: 'fetch_personal_notifications_enabled',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Fonction pour recupérer un calendrier partagé par un token
@@ -553,6 +564,30 @@ function App() {
     });
   }, []);
 
+  const fetchSharedUserNotificationsEnabled = useCallback(async (calendarId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/notifications`,
+      method: 'GET',
+      origin: 'SHARED_USER_NOTIFICATIONS_ENABLED_FETCH',
+      uid,
+      analyticsEvent: 'fetch_shared_user_notifications_enabled',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
+
+  const updateSharedUserNotificationsEnabled = useCallback(async (calendarId, enabled) => {
+    return await performApiCall({
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/notifications`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: { "notifications-enabled": enabled },
+      origin: 'SHARED_USER_NOTIFICATIONS_ENABLED_UPDATE',
+      uid,
+      analyticsEvent: 'update_shared_user_notifications_enabled',
+      analyticsData: { calendarId, uid, enabled },
+    });
+  }, []);
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   const downloadPersonalCalendarPdf = useCallback(async (calendarId) => {
@@ -578,6 +613,7 @@ function App() {
       fetchPersonalStockDecrementMethod,
       updatePersonalStockDecrementMethod,
       personalRestockBox,
+      fetchPersonalNotificationsEnabled,
     },
 
     sharedUserCalendars: {
@@ -595,6 +631,8 @@ function App() {
       deleteSharedUserBox,
       useMedicinesForSharedUserPillbox,
       sharedUserRestockBox,
+      fetchSharedUserNotificationsEnabled,
+      updateSharedUserNotificationsEnabled,
     },
 
     tokenCalendars: {

@@ -16,7 +16,9 @@ export const getCalendarSourceMap = (
     deleteCalendar: personalCalendars.deleteCalendar,
     decreaseStock: personalCalendars.useMedicinesForPersonalPillbox,
     restockBox: personalCalendars.personalRestockBox,
-  },
+    fetchNotificationsEnabled: null, // TODO: notification pour calendars
+    updateNotificationsEnabled: null,
+    },
   sharedUser: {
     fetchSchedule: sharedUserCalendars.fetchSharedUserCalendarSchedule,
     calendarsData: sharedUserCalendars.sharedCalendarsData,
@@ -28,6 +30,8 @@ export const getCalendarSourceMap = (
     deleteCalendar: null,
     decreaseStock: sharedUserCalendars.useMedicinesForSharedUserPillbox,
     restockBox: sharedUserCalendars.sharedUserRestockBox,
+    fetchNotificationsEnabled: sharedUserCalendars.fetchSharedUserNotificationsEnabled,
+    updateNotificationsEnabled: sharedUserCalendars.updateSharedUserNotificationsEnabled,
   },
   token: {
     fetchSchedule: tokenCalendars.fetchTokenCalendarSchedule,
@@ -41,5 +45,7 @@ export const getCalendarSourceMap = (
     deleteCalendar: null,
     decreaseStock: null,
     restockBox: null,
+    fetchNotificationsEnabled: null,
+    updateNotificationsEnabled: null,
   },
 });

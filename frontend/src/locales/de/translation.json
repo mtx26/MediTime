@@ -135,6 +135,11 @@
   "calendar_completed": "Kalender erfolgreich abgeschlossen!",
   "calendar_settings": {
     "label": "Kalendereinstellungen",
+    "notifications": {
+      "disabled": "",
+      "enabled": "",
+      "label": ""
+    },
     "sharing": {
       "label": "Weitergabe"
     },
@@ -202,6 +207,7 @@
   "loading_calendars": "Kalender werden geladen...",
   "loading_medicines": "Medikamente werden geladen …",
   "loading_notifications": "Benachrichtigungen werden geladen …",
+  "loading_settings": "",
   "loading_share": "Teilen wird geladen...",
   "locale": "de-DE",
   "login": "Login",

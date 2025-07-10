@@ -20,8 +20,10 @@ const Stock = ({ personalCalendars }) => {
   }
 
   const modifyStockDecrementMethod = async (method) => {
-    await personalCalendars.updatePersonalStockDecrementMethod(calendarId, method);
-    setSelectedMethod(method);
+    const rep = await personalCalendars.updatePersonalStockDecrementMethod(calendarId, method);
+    if (rep.success) {
+      setSelectedMethod(method);
+    }
   };
 
   useEffect(() => {
@@ -51,13 +53,7 @@ const Stock = ({ personalCalendars }) => {
     );
   }
 
-  if (loading === true && calendarId) {
-    return (
-      <div className="alert alert-danger text-center mt-5" role="alert">
-        ❌ {t('invalid_or_expired_link')}
-      </div>
-    );
-  }
+  if (loading && calendarId) return null;
     
 
   return (

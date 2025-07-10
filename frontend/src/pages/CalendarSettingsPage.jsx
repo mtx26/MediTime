@@ -36,7 +36,19 @@ function CalendarSettingsPage({
 
   const getInitialTab = () => {
     const params = new URLSearchParams(location.search);
-    return params.get('tab') || 'stock';
+    const tab = params.get('tab');
+
+    if (tab) return tab;
+
+    // Valeur par défaut selon le type de calendrier
+    switch (calendarType) {
+      case 'personal':
+        return 'stock';
+      case 'sharedUser':
+        return 'notifications';
+      default:
+        return null;
+    }
   };
 
   const [activeTab, setActiveTab] = useState(getInitialTab());
@@ -48,13 +60,25 @@ function CalendarSettingsPage({
   const renderTab = () => {
     switch (activeTab) {
       case 'stock':
-        return <Stock {...sharedProps} />;
+        if (calendarType === 'personal') {
+          return <Stock {...sharedProps} />;
+        }
+        break;
       case 'notifications':
-        return <Notification {...sharedProps} />;
+        if (calendarType === 'sharedUser') {
+          return <Notification {...sharedProps} />;
+        }
+        break;
       // case 'sharing':
       //   return <Sharing {...sharedProps} />;
       default:
-        return <Stock {...sharedProps} />;
+        if (calendarType === 'personal') {
+          return <Stock {...sharedProps} />;
+        }
+        if (calendarType === 'sharedUser') {
+          return <Notification {...sharedProps} />;
+        }
+        return null;
     }
   };
 
@@ -66,7 +90,8 @@ function CalendarSettingsPage({
             <div className="card-body p-3">
               <h5 className="mb-3">{t('calendar_settings.label')}</h5>
               <div className="nav flex-column nav-pills">
-                {(calendarType === 'personal' || calendarType === 'sharedUser') && (
+
+                {calendarType === 'personal' && (
                   <>
                     <Link
                       className={`nav-link text-start ${activeTab === 'stock' ? 'active' : ''}`}
@@ -75,7 +100,11 @@ function CalendarSettingsPage({
                       <i className="bi bi-capsule me-2"></i>
                       {t('calendar_settings.stock.label')}
                     </Link>
+                  </>
+                )}
 
+                {calendarType === 'sharedUser' && (
+                  <>
                     <Link
                       className={`nav-link text-start ${activeTab === 'notifications' ? 'active' : ''}`}
                       to={`/${basePath}/${calendarId}/settings?tab=notifications`}

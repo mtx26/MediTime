@@ -135,6 +135,11 @@
   "calendar_completed": "¡Calendario completado exitosamente!",
   "calendar_settings": {
     "label": "Configuración del calendario",
+    "notifications": {
+      "disabled": "",
+      "enabled": "",
+      "label": ""
+    },
     "sharing": {
       "label": "Intercambio"
     },
@@ -202,6 +207,7 @@
   "loading_calendars": "Cargando calendarios...",
   "loading_medicines": "Cargando medicamentos...",
   "loading_notifications": "Cargando notificaciones...",
+  "loading_settings": "",
   "loading_share": "Cargando compartir...",
   "locale": "es-ES",
   "login": "Acceso",

@@ -488,3 +488,100 @@ def handle_shared_users(calendar_id):
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
+
+@api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["GET"])
+@require_auth
+def handle_shared_user_notifications(calendar_id):
+    try:
+        t_0 = time.time()
+        uid = g.uid
+        if not verify_calendar_share(calendar_id, uid):
+            return warning_response(
+                message=ERROR_UNAUTHORIZED_ACCESS,
+                code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
+                status_code=403,
+                uid=uid,
+                origin="SHARED_CALENDARS_NOTIFICATIONS",
+                log_extra={"calendar_id": calendar_id}
+            )
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT notifications_enabled FROM shared_calendars WHERE calendar_id = %s", (calendar_id,))
+                calendar = cursor.fetchone()
+                if not calendar:
+                    return warning_response(
+                        message="calendrier partagé non trouvé",
+                        code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
+                        status_code=404,
+                        uid=uid,
+                        origin="SHARED_CALENDARS_NOTIFICATIONS",
+                        log_extra={"calendar_id": calendar_id}
+                    )
+                notifications_enabled = calendar.get("notifications_enabled", False)
+        t_1 = time.time()
+        return success_response(
+            message="notifications récupérées",
+            code="SHARED_CALENDARS_NOTIFICATIONS_SUCCESS",
+            uid=uid,
+            origin="SHARED_CALENDARS_NOTIFICATIONS",
+            data={"notifications-enabled": notifications_enabled},
+            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+        )
+    except Exception as e:
+        return error_response(
+            message="erreur lors de la récupération des notifications",
+            code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
+            status_code=500,
+            uid=uid,
+            origin="SHARED_CALENDARS_NOTIFICATIONS",
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
+
+@api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["PUT"])
+@require_auth
+def handle_shared_user_notifications_update(calendar_id):
+    try:
+        t_0 = time.time()
+        uid = g.uid
+        if not verify_calendar_share(calendar_id, uid):
+            return warning_response(
+                message=ERROR_UNAUTHORIZED_ACCESS,
+                code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
+                status_code=403,
+                uid=uid,
+                origin="SHARED_CALENDARS_NOTIFICATIONS",
+                log_extra={"calendar_id": calendar_id}
+            )
+        data = request.get_json()
+        if not data or "notifications-enabled" not in data:
+            return warning_response(
+                message="Données manquantes",
+                code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
+                status_code=400,
+                uid=uid,
+                origin="SHARED_CALENDARS_NOTIFICATIONS",
+                log_extra={"calendar_id": calendar_id}
+            )
+        notifications_enabled = data["notifications-enabled"]
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("UPDATE shared_calendars SET notifications_enabled = %s WHERE calendar_id = %s", (notifications_enabled, calendar_id))
+        t_1 = time.time()
+        return success_response(
+            message="Notifications mises à jour",
+            code="SHARED_CALENDARS_NOTIFICATIONS_SUCCESS",
+            uid=uid,
+            origin="SHARED_CALENDARS_NOTIFICATIONS",
+            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+        )
+    except Exception as e:
+        return error_response(
+            message="Erreur lors de la mise à jour des notifications",
+            code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
+            status_code=500,
+            uid=uid,
+            origin="SHARED_CALENDARS_NOTIFICATIONS",
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
