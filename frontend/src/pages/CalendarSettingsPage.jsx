@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Stock from './calendar-settings/Stock';
-import Notification from './calendar-settings/Notification.jsx';
+import Notifications from './calendar-settings/Notifications.jsx';
 // import Sharing from './calendar-settings/Sharing';
 
 function CalendarSettingsPage({
