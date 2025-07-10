@@ -177,7 +177,6 @@ function Auth() {
                 } else {
                   const error = await registerWithEmail(email, password, name);
                   if (error) {
-                    console.log(error.message);
                     setAlertMessage('❌ ' + getSupabaseErrorMessage(error.message));
                     setAlertType('danger');
                   } else {

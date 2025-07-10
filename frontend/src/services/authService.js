@@ -6,7 +6,6 @@ import { log } from '../utils/logger';
  */
 export const GoogleHandleLogin = async () => {
   try {
-    console.log(window.location.origin);
     await supabase.auth.signInWithOAuth({ 
       provider: 'google',
       options: {
