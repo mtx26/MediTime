@@ -10,7 +10,7 @@ def send_email(to, subject, html_content, plain=None):
             <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 24px;">
                 <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                     <div style="background-color: #007bff; padding: 16px; text-align: center;">
-                        <img src="https://meditime-app.com/icons/logo_white.png" alt="MediTime Logo" style="height: 100px;" />
+                        <img src="https://meditime-app.com/icons/logo_white.png" alt="MediTime Logo" style="max-height: 100px; height: auto; width: auto; display: inline-block;" />
                     </div>
                     <div style="padding: 24px;">
                         <h2 style="color: #333;">{subject}</h2>
@@ -18,6 +18,7 @@ def send_email(to, subject, html_content, plain=None):
                     </div>
                 </div>
             </div>
+
             """
         msg = EmailMessage()
         msg["Subject"] = subject

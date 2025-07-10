@@ -54,6 +54,7 @@ def check_low_stock_and_notify():
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
+                # Médicaments en stock faible
                 cursor.execute(
                     """
                     SELECT m.id, m.name, m.stock_quantity, m.stock_alert_threshold, c.owner_uid, m.calendar_id
@@ -62,24 +63,51 @@ def check_low_stock_and_notify():
                     WHERE m.stock_quantity <= m.stock_alert_threshold AND m.stock_alert_threshold > 0
                     """
                 )
-
                 results = cursor.fetchall()
 
+                # Si aucun résultat, inutile d'aller plus loin
+                if not results:
+                    log_backend.info("✅ Aucun stock faible détecté", {"origin": "CRON", "code": "STOCK_CHECK_EMPTY"})
+                    return
+
+                # Extraire tous les calendar_id
+                calendar_ids = tuple({row["calendar_id"] for row in results})
+
+                # Récupérer tous les utilisateurs partagés avec notifications activées
+                cursor.execute(
+                    """
+                    SELECT calendar_id, receiver_uid
+                    FROM shared_calendars
+                    WHERE notifications_enabled = TRUE AND calendar_id IN %s
+                    """,
+                    (calendar_ids,)
+                )
+                shared_by_calendar = defaultdict(list)
+                for row in cursor.fetchall():
+                    shared_by_calendar[row["calendar_id"]].append(row["receiver_uid"])
+
+        # Construction des notifications
         grouped: dict[tuple[str, int], list[dict]] = defaultdict(list)
+
         for result in results:
-            link = urljoin(Config.FRONTEND_URL or "", f"/medication/{result.get('id')}")
-            key = (result.get("owner_uid"), result.get("calendar_id"))
+            calendar_id = result["calendar_id"]
+            link = urljoin(Config.FRONTEND_URL or "", f"/medication/{result['id']}")
+            notif = {
+                "link": link,
+                "medication_id": result["id"],
+                "medication_qty": result["stock_quantity"],
+                "calendar_id": calendar_id,
+                "sender_uid": Config.SYSTEM_UID,
+            }
 
-            grouped[key].append(
-                {
-                    "link": link,
-                    "medication_id": result.get("id"),
-                    "medication_qty": result.get("stock_quantity"),
-                    "calendar_id": result.get("calendar_id"),
-                    "sender_uid": Config.SYSTEM_UID,
-                }
-            )
+            # Propriétaire
+            grouped[(result["owner_uid"], calendar_id)].append(notif)
 
+            # Partagés avec notifications activées
+            for shared_uid in shared_by_calendar.get(calendar_id, []):
+                grouped[(shared_uid, calendar_id)].append(notif)
+
+        # Envoi
         for (uid, calendar_id), notifs in grouped.items():
             try:
                 notify_and_record(uid=uid, json_body=notifs, notif_type="low_stock")
@@ -105,12 +133,12 @@ def check_low_stock_and_notify():
                     },
                 )
 
-        log_backend.info("✅ Fin de la vérification des stocks", {"origin": "CRON", "code": "STOCK_CHECK_SUCCESS"})
+        log_backend.info("✅ Fin de la vérification des stocks", {"origin": "CRON", "code": "STOCK_CHECK_DONE"})
 
     except Exception as e:
         log_backend.error(
             "Erreur lors de la vérification des stocks",
-            {"origin": "CRON", "code": "STOCK_CHECK_ERROR", "error": str(e)},
+            {"origin": "CRON", "code": "STOCK_CHECK_FATAL", "error": str(e)},
         )
 
 def check_low_stock_and_notify_for_calendar(calendar_id: int):
@@ -137,8 +165,18 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
                     """,
                     (calendar_id,)
                 )
-
                 results = cursor.fetchall()
+
+                # Récupération des utilisateurs partagés
+                cursor.execute(
+                    """
+                    SELECT receiver_uid
+                    FROM shared_calendars
+                    WHERE calendar_id = %s AND notifications_enabled = TRUE
+                    """,
+                    (calendar_id,)
+                )
+                shared_uids = {row["receiver_uid"] for row in cursor.fetchall()}
 
         if not results:
             log_backend.info(
@@ -149,18 +187,25 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
 
         grouped: dict[str, list[dict]] = defaultdict(list)
         for result in results:
-            link = urljoin(Config.FRONTEND_URL or "", f"/medication/{result.get('id')}")
-            uid = result.get("owner_uid")
+            med_id = result.get("id")
+            link = urljoin(Config.FRONTEND_URL or "", f"/medication/{med_id}")
+            uid_owner = result.get("owner_uid")
 
-            grouped[uid].append(
-                {
-                    "link": link,
-                    "medication_id": result.get("id"),
-                    "medication_qty": result.get("stock_quantity"),
-                    "calendar_id": calendar_id,
-                    "sender_uid": Config.SYSTEM_UID,
-                }
-            )
+            notif = {
+                "link": link,
+                "medication_id": med_id,
+                "medication_qty": result.get("stock_quantity"),
+                "calendar_id": calendar_id,
+                "sender_uid": Config.SYSTEM_UID,
+            }
+
+            # Notifier le propriétaire
+            grouped[uid_owner].append(notif)
+
+            # Notifier chaque utilisateur partagé
+            for shared_uid in shared_uids:
+                grouped[shared_uid].append(notif)
+
 
         for uid, notifs in grouped.items():
             try:
