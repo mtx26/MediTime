@@ -351,11 +351,10 @@ function CalendarPage({
               </div>
               {/* Affichage alert stock */}
               {isLowStock && (
-                <div
+                <button
+                  type="button"
                   className="alert alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow-sm"
-                  role="button"
                   onClick={() => navigate(`/${basePath}/${calendarId}/stock-alerts`)}
-                  style={{ cursor: 'pointer' }}
                   title={t('stock_alert_tooltip')}
                 >
                   <div className="d-flex align-items-center">
@@ -363,7 +362,7 @@ function CalendarPage({
                     <span className="fw-semibold">{t('stock_alert')}</span>
                   </div>
                   <i className="bi bi-chevron-right ms-2"></i>
-                </div>
+                </button>
               )}
 
             </div>
