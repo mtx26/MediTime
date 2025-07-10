@@ -31,7 +31,6 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars 
       setLoading(undefined);
       const rep = await calendarSource.fetchNotificationsEnabled(calendarId);
       if (rep.success) {
-        console.log("Notification setting fetched:", rep);
         setEnabled(rep["notifications-enabled"]);
         setLoading(false);
       } else {

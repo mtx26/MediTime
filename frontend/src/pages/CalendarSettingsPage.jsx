@@ -66,7 +66,7 @@ function CalendarSettingsPage({
         break;
       case 'notifications':
         if (calendarType === 'sharedUser') {
-          return <Notification {...sharedProps} />;
+          return <Notifications {...sharedProps} />;
         }
         break;
       // case 'sharing':
@@ -74,9 +74,8 @@ function CalendarSettingsPage({
       default:
         if (calendarType === 'personal') {
           return <Stock {...sharedProps} />;
-        }
-        if (calendarType === 'sharedUser') {
-          return <Notification {...sharedProps} />;
+        } else if (calendarType === 'sharedUser') {
+          return <Notifications {...sharedProps} />;
         }
         return null;
     }
