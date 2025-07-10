@@ -384,6 +384,7 @@
     "update_password": "パスワードを更新する"
   },
   "send_invitation": "招待状を送る",
+  "send_sms": "SMSで送信",
   "settings": {
     "account": "私のアカウント",
     "label": "設定",

@@ -384,6 +384,7 @@
     "update_password": "更新密码"
   },
   "send_invitation": "发送邀请",
+  "send_sms": "通过短信发送",
   "settings": {
     "account": "我的账户",
     "label": "设置",

@@ -384,6 +384,7 @@
     "update_password": "Обновить пароль"
   },
   "send_invitation": "Отправить приглашение",
+  "send_sms": "Отправить по СМС",
   "settings": {
     "account": "Мой счет",
     "label": "Настройки",

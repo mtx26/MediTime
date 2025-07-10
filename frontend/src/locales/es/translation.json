@@ -384,6 +384,7 @@
     "update_password": "Actualizar contraseña"
   },
   "send_invitation": "Enviar una invitación",
+  "send_sms": "Enviar por SMS",
   "settings": {
     "account": "Mi cuenta",
     "label": "Ajustes",

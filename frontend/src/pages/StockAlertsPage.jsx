@@ -3,6 +3,7 @@ import { getCalendarSourceMap } from '../utils/calendarSourceMap';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useRealtimeBoxesSwitcher } from '../hooks/useRealtimeBoxesSwitcher';
+import ActionSheet from '../components/ActionSheet';
 
 function StockAlertsPage({
   personalCalendars,
@@ -50,6 +51,12 @@ function StockAlertsPage({
     calendarSource.restockBox(calendarId, boxId)
   };
 
+  const sendStockAlertsSMS = () => {
+    const message = alerts.map(box => `Alerte de stock pour ${box.name} : ${box.stock_quantity} / ${box.stock_alert_threshold}`).join('\n');
+    const encodedMessage = encodeURIComponent(message);
+    console.log(`sms:?&body=${encodedMessage}`);
+    window.location.href = `sms:?&body=${encodedMessage}`;
+  };
 
   if (loadingBoxes === undefined) {
     return (
@@ -74,10 +81,26 @@ function StockAlertsPage({
 
   return (
     <div className="container py-4">
-      <h2 className="mb-4 text-danger">
-        <i className="bi bi-exclamation-triangle-fill me-2"></i>
-        {t('stock_alerts')}
-      </h2>
+      <div className="mb-4 d-flex justify-content-between align-items-center">
+        <h2 className="mb-4 text-danger">
+          <i className="bi bi-exclamation-triangle-fill me-2"></i>
+          {t('stock_alerts')}
+        </h2>
+        <ActionSheet
+          actions={[
+            {
+              label: (
+                <>
+                  <i className="bi bi-pencil me-2"></i> {t('send_sms')}
+                </>
+              ),
+              onClick: () => sendStockAlertsSMS(),
+            }
+          ]}
+        />
+
+      </div>
+
 
       {alerts.length === 0 ? (
         <div className="alert alert-success" role="alert">
