@@ -3,7 +3,7 @@
 from flask import Flask
 from app.config.config import Config
 from app.routes import register_routes
-from app.auth.firebase import init_firebase
+from app.auth.google_services import init_firebase
 from flask_cors import CORS
 from app.cron import start_cron
 
