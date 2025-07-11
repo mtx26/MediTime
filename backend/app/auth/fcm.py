@@ -1,11 +1,11 @@
-import json
 import traceback
 import requests
 from google.auth.transport.requests import Request
-from google.oauth2 import service_account
 from urllib.parse import urljoin
 from app.config import Config
 from app.utils.logger import log_backend
+from app.auth.google_services import get_google_credentials
+
 
 GOOGLE_APPLICATION_CREDENTIALS = Config.GOOGLE_APPLICATION_CREDENTIALS
 frontend_url = Config.FRONTEND_URL
@@ -13,19 +13,19 @@ frontend_url = Config.FRONTEND_URL
 SCOPES = ["https://www.googleapis.com/auth/firebase.messaging"]
 
 def get_fcm_access_token():
+    credentials_obj, project_id = get_google_credentials(SCOPES)
+    if credentials_obj is None:
+        return None, None
+
     try:
-        service_account_info = json.loads(GOOGLE_APPLICATION_CREDENTIALS or "{}")
-        credentials_obj = service_account.Credentials.from_service_account_info(
-            service_account_info, scopes=SCOPES
-        )
         credentials_obj.refresh(Request())
-        return credentials_obj.token, credentials_obj.project_id
+        return credentials_obj.token, project_id
     except Exception as e:
         log_backend.error(
-            f"Erreur get_fcm_access_token : {e}", 
+            f"Erreur lors du refresh du token FCM : {e}",
             {
-                "origin": "FCM", 
-                "code": "FCM_ACCESS_TOKEN_ERROR", 
+                "origin": "FCM",
+                "code": "FCM_TOKEN_REFRESH_ERROR",
                 "error": traceback.format_exc()
             }
         )
