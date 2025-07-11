@@ -11,6 +11,6 @@ pyfcm==2.0.8
 schedule==1.2.2
 pyjwt==2.10.1
 cryptography==45.0.5
-twilio==9.6.3
+twilio==9.6.5
 reportlab==4.4.2
 google-cloud-aiplatform==1.103.0
