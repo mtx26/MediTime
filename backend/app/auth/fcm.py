@@ -7,14 +7,14 @@ from urllib.parse import urljoin
 from app.config import Config
 from app.utils.logger import log_backend
 
-firebase_credentials = Config.FIREBASE_CREDENTIALS
+GOOGLE_APPLICATION_CREDENTIALS = Config.GOOGLE_APPLICATION_CREDENTIALS
 frontend_url = Config.FRONTEND_URL
 
 SCOPES = ["https://www.googleapis.com/auth/firebase.messaging"]
 
 def get_fcm_access_token():
     try:
-        service_account_info = json.loads(firebase_credentials or "{}")
+        service_account_info = json.loads(GOOGLE_APPLICATION_CREDENTIALS or "{}")
         credentials_obj = service_account.Credentials.from_service_account_info(
             service_account_info, scopes=SCOPES
         )

@@ -7,22 +7,22 @@ from app.config.config import Config
 
 def init_firebase():
     if not firebase_admin._apps:
-        service_account_raw = Config.FIREBASE_CREDENTIALS
+        service_account_raw = Config.GOOGLE_APPLICATION_CREDENTIALS
 
         if not service_account_raw:
             logger.error("Aucune clé de service Firebase trouvée dans .env", {
                 "origin": "FIREBASE_INIT"
             })
-            raise RuntimeError("FIREBASE_CREDENTIALS manquant")
+            raise RuntimeError("GOOGLE_APPLICATION_CREDENTIALS manquant")
 
         try:
             service_account_dict = json.loads(service_account_raw)
         except json.JSONDecodeError as e:
-            logger.error("Erreur JSON dans FIREBASE_CREDENTIALS", {
+            logger.error("Erreur JSON dans GOOGLE_APPLICATION_CREDENTIALS", {
                 "origin": "FIREBASE_INIT",
                 "error": str(e)
             })
-            raise RuntimeError("FIREBASE_CREDENTIALS invalide")
+            raise RuntimeError("GOOGLE_APPLICATION_CREDENTIALS invalide")
 
         cred = credentials.Certificate(service_account_dict)
         firebase_admin.initialize_app(cred)
