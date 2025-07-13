@@ -104,8 +104,13 @@ Rules:
 
 
 def strip_json_markdown(raw):
-    if isinstance(raw, str) and raw.strip().startswith("```json"):
-        return re.sub(r"^```json\s*|\s*```$", "", raw.strip(), flags=re.DOTALL)
+    if isinstance(raw, str):
+        text = raw.strip()
+        if text.startswith("```json"):
+            text = re.sub(r"^```json\s*", "", text)
+        if text.endswith("```"):
+            text = re.sub(r"\s*```$", "", text)
+        return text
     return raw
 
 
