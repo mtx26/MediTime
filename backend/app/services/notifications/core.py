@@ -3,7 +3,7 @@ import json
 from app.auth.fcm import send_fcm_notification
 from app.db.connection import get_connection
 from app.services.calendar import fetch_calendar, fetch_medicine_name
-from app.services.messaging import send_email, send_sms
+from app.services.notifications.messaging import send_email, send_sms
 from app.services.user import fetch_user
 from app.utils.logging import log_backend
 from app.config import Config
