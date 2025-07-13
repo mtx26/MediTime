@@ -5,19 +5,19 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useTranslation } from 'react-i18next';
-import { UserContext } from '../contexts/UserContext';
-import { formatToLocalISODate, getMondayFromDate } from '../utils/dateUtils';
-import { getCalendarSourceMap } from '../utils/calendarSourceMap';
-import ShareCalendarModal from '../components/ShareCalendarModal';
-import AlertSystem from '../components/AlertSystem';
+import { UserContext } from '../../contexts/UserContext';
+import { formatToLocalISODate, getMondayFromDate } from '../../utils/calendar/dateUtils';
+import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
+import ShareCalendarModal from '../../components/calendar/ShareCalendarModal';
+import AlertSystem from '../../components/common/AlertSystem';
 import isEqual from 'lodash/isEqual';
 import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import 'bootstrap/dist/css/bootstrap.css';
-import DateModal from '../components/DateModal';
-import WeekCalendarSelector from '../components/WeekCalendarSelector';
-import WeeklyEventContent from '../components/WeeklyEventContent';
-import PillboxDisplay from '../components/PillboxDisplay';
-import ActionSheet from '../components/ActionSheet';
+import DateModal from '../../components/calendar/DateModal';
+import WeekCalendarSelector from '../../components/calendar/WeekCalendarSelector';
+import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
+import PillboxDisplay from '../../components/calendar/PillboxDisplay';
+import ActionSheet from '../../components/common/ActionSheet';
 
 function CalendarPage({
   personalCalendars,
@@ -353,7 +353,7 @@ function CalendarPage({
               {isLowStock && (
                 <button
                   type="button"
-                  className="alert alert-warning d-flex align-items-center justify-content-between w-100 px-3 py-2 shadow-sm"
+                  className="alert alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow-sm"
                   onClick={() => navigate(`/${basePath}/${calendarId}/stock-alerts`)}
                   title={t('stock_alert_tooltip')}
                 >
