@@ -80,14 +80,16 @@ def handle_create_calendar():
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("INSERT INTO calendars (owner_uid, name) VALUES (%s, %s)", (uid, calendar_name))
+                cursor.execute("INSERT INTO calendars (owner_uid, name) VALUES (%s, %s) RETURNING id", (uid, calendar_name))
+                calendar_id = cursor.fetchone().get("id")
                 conn.commit()
         t_1 = time.time()
         return success_response(
             message="calendrier créé", 
             code="CALENDAR_CREATE", 
             uid=uid, 
-            origin="CALENDAR_CREATE", 
+            origin="CALENDAR_CREATE",
+            data={"calendarId": calendar_id, "calendarName": calendar_name},
             log_extra={"calendar_name": calendar_name, "time": t_1 - t_0}
         )
 

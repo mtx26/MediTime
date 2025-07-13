@@ -104,16 +104,16 @@
     "save": "Save",
     "start_typing": "Start typing...",
     "stock": {
+      "alerts": {
+        "line": "{{name}} ({{dose}} mg) — {{count}} unit in stock",
+        "line_negative": "{{name}} ({{dose}} mg) — {{count}} units (out of stock)",
+        "line_plural": "{{name}} ({{dose}} mg) — {{count}} units in stock",
+        "title": "🔔 Stock alerts:"
+      },
       "badge": {
         "high": "High stock",
         "low": "Low stock",
         "out": "Out of stock"
-      },
-      "alerts": {
-        "title": "🔔 Stock alerts:",
-        "line": "{{name}} ({{dose}} mg) — {{count}} unit in stock",
-        "line_plural": "{{name}} ({{dose}} mg) — {{count}} units in stock",
-        "line_negative": "{{name}} ({{dose}} mg) — {{count}} units (out of stock)"
       }
     },
     "tablet": "compressed",
@@ -128,6 +128,9 @@
     "confirm_rename": "Rename the calendar?",
     "daily_view": "Daily calendar",
     "day": "Day",
+    "import_type": "Add mode",
+    "import_type_file": "Importing a file",
+    "import_type_manual": "Manuel",
     "label": "Calendar",
     "month": "Month",
     "name": "Calendar Name",

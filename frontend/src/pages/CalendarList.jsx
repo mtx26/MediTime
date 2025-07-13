@@ -16,9 +16,11 @@ function SelectCalendar({
   const { t } = useTranslation();
 
   // 📅 Gestion des calendriers
+  const [importType, setImportType] = useState('manual');
   const [newCalendarName, setNewCalendarName] = useState(''); // État pour le nom du nouveau calendrier
   const [renameValues, setRenameValues] = useState({}); // État pour les valeurs de renommage de calendrier
   const [renameMode, setRenameMode] = useState(null); // État pour le mode de renommage
+  
 
   // ⚠️ Alertes et confirmations
   const [alertType, setAlertType] = useState(''); // État pour le type d'alerte
@@ -45,6 +47,8 @@ function SelectCalendar({
       setAlertMessage('✅ ' + rep.message);
       setAlertType('success');
       setSelectedAlert('header');
+      // Redirection vers le calendrier créé
+      navigate('/calendar/' + rep.calendarId + "/boxes");
     } else {
       setAlertMessage('❌ ' + rep.error);
       setAlertType('danger');
@@ -192,29 +196,53 @@ function SelectCalendar({
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleAddCalendarClick();
+            if (importType === 'manual') {
+              handleAddCalendarClick();
+            } else if (importType === 'file') {
+              navigate('/import-calendar?name=' + encodeURIComponent(newCalendarName));
+            }
           }}
         >
-          <div className="input-group mb-2 shadow-sm">
-            <input
-              id="newCalendarName"
-              aria-label={t('calendar.name')}
-              type="text"
-              className="form-control"
-              placeholder={t('calendar.name')}
-              required
-              value={newCalendarName}
-              onChange={(e) => setNewCalendarName(e.target.value)} // Mise à jour du nom du nouveau calendrier
-            />
-            <button
-              type="submit"
-              className="btn btn-primary"
-              aria-label={t('calendar.add')}
-              title={t('calendar.add')}
-            >
-              <i className="bi bi-plus-lg"></i>
-              <span> {t('add')}</span>
-            </button>
+          <div className="row g-2 align-items-center mb-4">
+            <div className="col-md-6">
+              <input
+                id="newCalendarName"
+                aria-label={t('calendar.name')}
+                title={t('calendar.name')}
+                type="text"
+                className="form-control"
+                placeholder={t('calendar.name')}
+                required
+                value={newCalendarName}
+                onChange={(e) => setNewCalendarName(e.target.value)}
+              />
+            </div>
+
+            <div className="col-md-4">
+              <select
+                className="form-select"
+                aria-label={t('calendar.import_type')}
+                title={t('calendar.import_type')}
+                id="importType"
+                onChange={(e) => setImportType(e.target.value)}
+                value={importType}
+              >
+                <option value="manual">{t('calendar.import_type_manual')}</option>
+                <option value="file">{t('calendar.import_type_file')}</option>
+              </select>
+            </div>
+
+            <div className="col-md-2">
+              <button
+                type="submit"
+                className="btn btn-primary w-100"
+                aria-label={t('calendar.add')}
+                title={t('calendar.add')}
+              >
+                <i className="bi bi-plus-lg"></i>
+                <span> {t('add')}</span>
+              </button>
+            </div>
           </div>
         </form>
 

@@ -104,16 +104,16 @@
     "save": "Speichern",
     "start_typing": "Beginnen Sie mit der Eingabe...",
     "stock": {
+      "alerts": {
+        "line": "{{name}} ({{dose}} mg) — {{count}} Einheit auf Lager",
+        "line_negative": "{{name}} ({{dose}} mg) – {{count}} Einheiten (Vorrat überschritten)",
+        "line_plural": "{{name}} ({{dose}} mg) — {{count}} Einheiten auf Lager",
+        "title": "🔔 Lagerbenachrichtigungen:"
+      },
       "badge": {
         "high": "Hoher Lagerbestand",
         "low": "Geringer Lagerbestand",
         "out": "Produkt nicht vorrätig"
-      },
-      "alerts": {
-        "title": "🔔 Lagerbenachrichtigungen:",
-        "line": "{{name}} ({{dose}} mg) — {{count}} Einheit auf Lager",
-        "line_plural": "{{name}} ({{dose}} mg) — {{count}} Einheiten auf Lager",
-        "line_negative": "{{name}} ({{dose}} mg) – {{count}} Einheiten (Vorrat überschritten)"
       }
     },
     "tablet": "komprimiert",
@@ -128,6 +128,9 @@
     "confirm_rename": "Kalender umbenennen?",
     "daily_view": "Tageskalender",
     "day": "Tag",
+    "import_type": "Add-Modus",
+    "import_type_file": "Importieren einer Datei",
+    "import_type_manual": "Manuel",
     "label": "Kalender",
     "month": "Monat",
     "name": "Kalendername",

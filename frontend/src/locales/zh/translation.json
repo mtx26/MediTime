@@ -104,16 +104,16 @@
     "save": "节省",
     "start_typing": "开始输入...",
     "stock": {
+      "alerts": {
+        "line": "{{name}} ({{dose}} mg) — {{count}} 单位库存",
+        "line_negative": "{{name}} ({{dose}} 毫克) — {{count}} 单位（缺货）",
+        "line_plural": "{{name}} ({{dose}} mg) — 库存有 {{count}} 件",
+        "title": "🔔 库存警报："
+      },
       "badge": {
         "high": "高库存",
         "low": "库存不足",
         "out": "缺货"
-      },
-      "alerts": {
-        "title": "🔔 库存警报：",
-        "line": "{{name}} ({{dose}} mg) — {{count}} 单位库存",
-        "line_plural": "{{name}} ({{dose}} mg) — 库存有 {{count}} 件",
-        "line_negative": "{{name}} ({{dose}} 毫克) — {{count}} 单位（缺货）"
       }
     },
     "tablet": "压缩",
@@ -128,6 +128,9 @@
     "confirm_rename": "重命名日历？",
     "daily_view": "日历",
     "day": "天",
+    "import_type": "添加模式",
+    "import_type_file": "导入文件",
+    "import_type_manual": "曼努埃尔",
     "label": "日历",
     "month": "月",
     "name": "日历名称",

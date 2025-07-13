@@ -104,16 +104,16 @@
     "save": "保存",
     "start_typing": "入力を開始してください...",
     "stock": {
+      "alerts": {
+        "line": "{{name}} ({{dose}} mg) — 在庫数 {{count}} 個",
+        "line_negative": "{{name}} ({{dose}} mg) — {{count}} 個 (在庫切れ)",
+        "line_plural": "{{name}} ({{dose}} mg) — 在庫数 {{count}} 個",
+        "title": "🔔 株価アラート:"
+      },
       "badge": {
         "high": "在庫が多い",
         "low": "在庫が少ない",
         "out": "在庫切れ"
-      },
-      "alerts": {
-        "title": "🔔 株価アラート:",
-        "line": "{{name}} ({{dose}} mg) — 在庫数 {{count}} 個",
-        "line_plural": "{{name}} ({{dose}} mg) — 在庫数 {{count}} 個",
-        "line_negative": "{{name}} ({{dose}} mg) — {{count}} 個 (在庫切れ)"
       }
     },
     "tablet": "圧縮された",
@@ -128,6 +128,9 @@
     "confirm_rename": "カレンダーの名前を変更しますか?",
     "daily_view": "日めくりカレンダー",
     "day": "日",
+    "import_type": "追加モード",
+    "import_type_file": "ファイルのインポート",
+    "import_type_manual": "マヌエル",
     "label": "カレンダー",
     "month": "月",
     "name": "カレンダー名",

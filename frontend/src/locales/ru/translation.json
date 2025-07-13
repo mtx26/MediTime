@@ -104,16 +104,16 @@
     "save": "Сохранять",
     "start_typing": "Начните печатать...",
     "stock": {
+      "alerts": {
+        "line": "{{name}} ({{dose}} мг) — {{count}} единица в наличии",
+        "line_negative": "{{name}} ({{dose}} мг) — {{count}} единиц (нет в наличии)",
+        "line_plural": "{{name}} ({{dose}} мг) — {{count}} единиц в наличии",
+        "title": "🔔 Оповещения о ценах:"
+      },
       "badge": {
         "high": "Высокий запас",
         "low": "Низкий запас",
         "out": "Распродано"
-      },
-      "alerts": {
-        "title": "🔔 Оповещения о ценах:",
-        "line": "{{name}} ({{dose}} мг) — {{count}} единица в наличии",
-        "line_plural": "{{name}} ({{dose}} мг) — {{count}} единиц в наличии",
-        "line_negative": "{{name}} ({{dose}} мг) — {{count}} единиц (нет в наличии)"
       }
     },
     "tablet": "сжатый",
@@ -128,6 +128,9 @@
     "confirm_rename": "Переименовать календарь?",
     "daily_view": "Ежедневный календарь",
     "day": "День",
+    "import_type": "Добавить режим",
+    "import_type_file": "Импорт файла",
+    "import_type_manual": "Мануэль",
     "label": "Календарь",
     "month": "Месяц",
     "name": "Имя календаря",

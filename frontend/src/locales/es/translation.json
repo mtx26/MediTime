@@ -104,16 +104,16 @@
     "save": "Ahorrar",
     "start_typing": "Empieza a escribir...",
     "stock": {
+      "alerts": {
+        "line": "{{name}} ({{dose}} mg) — {{count}} unidad en stock",
+        "line_negative": "{{nombre}} ({{dosis}} mg) — {{cantidad}} unidades (agotado)",
+        "line_plural": "{{nombre}} ({{dosis}} mg) — {{cantidad}} unidades en stock",
+        "title": "🔔 Alertas de stock:"
+      },
       "badge": {
         "high": "Alto stock",
         "low": "Stock bajo",
         "out": "Agotado"
-      },
-      "alerts": {
-        "title": "🔔 Alertas de stock:",
-        "line": "{{name}} ({{dose}} mg) — {{count}} unidad en stock",
-        "line_plural": "{{nombre}} ({{dosis}} mg) — {{cantidad}} unidades en stock",
-        "line_negative": "{{nombre}} ({{dosis}} mg) — {{cantidad}} unidades (agotado)"
       }
     },
     "tablet": "comprimido",
@@ -128,6 +128,9 @@
     "confirm_rename": "¿Cambiar el nombre del calendario?",
     "daily_view": "Calendario diario",
     "day": "Día",
+    "import_type": "Añadir modo",
+    "import_type_file": "Importar un archivo",
+    "import_type_manual": "Manuel",
     "label": "Calendario",
     "month": "Mes",
     "name": "Nombre del calendario",
