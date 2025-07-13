@@ -15,6 +15,7 @@ from .invitations import *
 from .notifications import *
 from .user import *
 from .pdf import *
+from .gemini import *
 
 
 def register_routes(app):

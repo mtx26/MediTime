@@ -73,7 +73,9 @@ Rules:
             raw_output = response.candidates[0].content.parts[0].text
         else:
             log_backend.warning("Gemini response structure unexpected", {"origin": "GEMINI_ANALYZE"})
-            return {"error": "Gemini returned unexpected response structure"}
+            return {
+                "error": "Gemini returned unexpected response structure"
+            }
 
         cleaned = strip_json_markdown(raw_output)
 
@@ -88,7 +90,6 @@ Rules:
             })
             return {
                 "error": "Gemini response was not valid JSON",
-                "raw_output": raw_output
             }
 
     except Exception as e:
@@ -98,8 +99,7 @@ Rules:
             "error": str(e)
         })
         return {
-            "error": "Document analysis failed",
-            "message": str(e)
+            "error": "An error occurred while analyzing the medical document"
         }
 
 
