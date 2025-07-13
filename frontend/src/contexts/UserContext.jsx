@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { log } from '../utils/logger';
 
@@ -11,6 +11,13 @@ export const UserProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(
     () => JSON.parse(localStorage.getItem('userInfo')) || null
   );
+  const tokenRef = useRef(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      tokenRef.current = session?.access_token || null;
+    });
+  }, []);
 
   const reloadUser = useCallback(
     async (displayName, photoURL, emailEnabled, pushEnabled) => {
@@ -24,11 +31,12 @@ export const UserProvider = ({ children }) => {
 
       const body = {
         uid: user.id,
-        display_name: displayName || null,
+        display_name: displayName ?? userInfo?.displayName ?? null,
         email: user.email || null,
-        photo_url: photoURL || null,
-        email_enabled: emailEnabled ?? true,
-        push_enabled: pushEnabled ?? true,
+        photo_url: photoURL ?? userInfo?.photoURL ?? null,
+        email_enabled:
+          emailEnabled ?? userInfo?.emailEnabled ?? true,
+        push_enabled: pushEnabled ?? userInfo?.pushEnabled ?? true,
       };
 
       const sameAsBefore =
@@ -88,11 +96,20 @@ export const UserProvider = ({ children }) => {
       (event, session) => {
         log.info('[UserContext] AuthStateChange', { event });
 
-        if (['SIGNED_IN', 'TOKEN_REFRESHED'].includes(event) && session) {
+        if (event === 'SIGNED_IN' && session) {
+          tokenRef.current = session.access_token;
           reloadUser();
+        } else if (event === 'TOKEN_REFRESHED' && session) {
+          if (tokenRef.current !== session.access_token) {
+            tokenRef.current = session.access_token;
+            reloadUser();
+          } else {
+            log.info('[UserContext] Token identique, skip reloadUser');
+          }
         } else if (event === 'SIGNED_OUT') {
           setUserInfo(null);
           localStorage.removeItem('userInfo');
+          tokenRef.current = null;
         }
       }
     );
