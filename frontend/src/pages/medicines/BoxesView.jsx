@@ -6,7 +6,6 @@ import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { v4 as uuidv4 } from 'uuid';
 import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
 import ActionSheet from '../../components/common/ActionSheet';
-import openNotice from '../../utils/notifications/openNotice';
 import { useTranslation } from 'react-i18next';
 
 function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
@@ -299,6 +298,11 @@ function BoxCard({
     morning: t('morning'),
     noon: t('noon'),
     evening: t('evening'),
+  };
+
+  const openNotice = (box_id) => {
+    const url = `${import.meta.env.VITE_API_URL}/api/proxy/pdf?box_id=${box_id}`;
+    window.open(url, '_blank');
   };
 
   return (
