@@ -1,7 +1,7 @@
 from . import api
 from flask import request, g
-from app.utils.validators import require_auth
-from app.utils.response import success_response, error_response, warning_response
+from app.utils.auth import require_auth
+from app.utils.responses import success_response, error_response, warning_response
 from app.vertex.gemini import analyze_medical_document
 import time
 

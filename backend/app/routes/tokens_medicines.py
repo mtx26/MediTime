@@ -1,8 +1,8 @@
 from . import api
 import time
 from app.db.connection import get_connection
-from app.services.verifications import verify_token
-from app.utils.response import success_response, error_response, warning_response
+from app.services.calendar import verify_token
+from app.utils.responses import success_response, error_response, warning_response
 
 
 # Route pour obtenir les médicaments d’un token public

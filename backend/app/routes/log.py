@@ -1,6 +1,6 @@
 from flask import request
 from . import api
-from app.utils.logger import frontend_logger
+from app.utils.logging import frontend_logger
 
 @api.route("/log", methods=["POST"])
 def log_handler():

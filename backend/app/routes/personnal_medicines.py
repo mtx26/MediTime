@@ -1,11 +1,11 @@
 from flask import request, g
-from app.utils.validators import require_auth
+from app.utils.auth import require_auth
 import time
 from . import api
-from app.services.verifications import verify_calendar
-from app.services.medicines import update_box, create_box, delete_box, get_boxes, restock_box
-from app.utils.response import success_response, error_response, warning_response
-from app.services.pillulier import use_pillulier
+from app.services.calendar import verify_calendar
+from app.services.medication import update_box, create_box, delete_box, get_boxes, restock_box
+from app.utils.responses import success_response, error_response, warning_response
+from app.services.medication import use_pillulier
 from datetime import datetime, timezone
 
 ERROR_UNAUTHORIZED_ACCESS = "accès refusé"

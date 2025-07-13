@@ -1,8 +1,8 @@
 from flask import request, g
-from app.utils.response import success_response, error_response, warning_response
-from app.utils.validators import require_auth
+from app.utils.responses import success_response, error_response, warning_response
+from app.utils.auth import require_auth
 from app.db.connection import get_connection
-from app.services.verifications import verify_calendar
+from app.services.calendar import verify_calendar
 from app.services.user import fetch_user
 from app.services.notifications import notify_and_record
 import time
