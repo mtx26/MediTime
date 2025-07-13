@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useCallback, useRef } from 'react';
-import { supabase } from '../services/supabaseClient';
+import { supabase } from '../services/supabase/supabaseClient';
 import { log } from '../utils/logger';
 
 const API_URL = import.meta.env.VITE_API_URL;

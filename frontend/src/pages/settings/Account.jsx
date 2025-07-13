@@ -1,10 +1,10 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '../../services/supabaseClient';
+import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import Cropper from 'react-easy-crop';
-import getCroppedImg from '../../utils/cropImage';
+import getCroppedImg from '../../utils/files/cropImage';
 
 const API_URL = import.meta.env.VITE_API_URL;
 

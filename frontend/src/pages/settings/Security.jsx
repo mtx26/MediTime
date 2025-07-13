@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { updateUserPassword } from '../../services/authService';
+import { updateUserPassword } from '../../services/auth/authService';
 import { UserContext } from '../../contexts/UserContext';
-import AlertSystem from '../../components/AlertSystem';
-import { supabase } from '../../services/supabaseClient';
+import AlertSystem from '../../components/common/AlertSystem';
+import { supabase } from '../../services/supabase/supabaseClient';
 import { useTranslation } from 'react-i18next';
 
 const Security = ({ sharedProps }) => {

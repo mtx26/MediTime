@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import LanguageSelector from '../../components/LanguageSelector';
+import LanguageSelector from '../../components/common/LanguageSelector';
 
 export default function Preferences() {
   const { t } = useTranslation();
