@@ -2,9 +2,9 @@ from flask import request, Response
 import requests
 from app.db.connection import get_connection
 from . import api
-from app.utils.response import error_response
+from app.utils.responses import error_response
 import time
-from app.utils.logger import log_backend
+from app.utils.logging import log_backend
 import traceback
 
 @api.route("/proxy/pdf", methods=["GET"])

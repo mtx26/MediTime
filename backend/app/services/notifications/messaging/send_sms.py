@@ -1,6 +1,6 @@
 from twilio.rest import Client
 from app.config import Config
-from app.utils.logger import log_backend
+from app.utils.logging import log_backend
 
 
 def send_sms(to_number, message_body):

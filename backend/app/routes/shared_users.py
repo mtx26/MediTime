@@ -1,18 +1,18 @@
-from app.utils.validators import require_auth
+from app.utils.auth import require_auth
 from datetime import datetime, timezone
 from . import api
-from app.services.verifications import verify_calendar_share
+from app.services.calendar import verify_calendar_share
 from app.services.calendar import generate_calendar_schedule
 from flask import request, g
 import time
 from app.services.user import fetch_user
-from app.utils.response import success_response, error_response, warning_response
+from app.utils.responses import success_response, error_response, warning_response
 from app.db.connection import get_connection
 from app.services.notifications import notify_and_record
 import json
 from app.config import Config
 from urllib.parse import urljoin
-from app.services.stock import check_if_stock_is_low
+from app.services.medication import check_if_stock_is_low
 
 
 ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"

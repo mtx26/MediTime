@@ -1,15 +1,15 @@
 from . import api
-from app.utils.validators import require_auth
+from app.utils.auth import require_auth
 from datetime import datetime, timezone
 from flask import request, g, Response
 from app.db.connection import get_connection
 from app.services.calendar import generate_calendar_schedule, uptate_stock_decrement_method
-from app.services.verifications import verify_calendar
+from app.services.calendar import verify_calendar
 import time
-from app.utils.response import success_response, error_response, warning_response
-from app.utils.logger import log_backend
-from app.services.pdf import generate_medicine_conditions_pdf
-from app.services.stock import check_if_stock_is_low
+from app.utils.responses import success_response, error_response, warning_response
+from app.utils.logging import log_backend
+from app.services.documents import generate_medicine_conditions_pdf
+from app.services.medication import check_if_stock_is_low
 
 ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"
 

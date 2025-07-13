@@ -1,5 +1,5 @@
 from app.db.connection import get_connection
-from app.utils.logger import log_backend as logger
+from app.utils.logging import log_backend as logger
 from datetime import datetime, timezone
 
 def verify_calendar_share(calendar_id : str, receiver_uid : str) -> bool:

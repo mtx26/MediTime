@@ -1,5 +1,5 @@
 from datetime import timedelta, date
-from app.utils.logger import log_backend as logger
+from app.utils.logging import log_backend as logger
 from app.db.connection import get_connection
 
 def generate_calendar_schedule(calendar_id, start_date):

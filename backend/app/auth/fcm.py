@@ -3,7 +3,7 @@ import requests
 from google.auth.transport.requests import Request
 from urllib.parse import urljoin
 from app.config import Config
-from app.utils.logger import log_backend
+from app.utils.logging import log_backend
 from app.auth.google_services import get_google_credentials
 
 
