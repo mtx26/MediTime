@@ -1,5 +1,5 @@
 from app.db.connection import get_connection
-from app.utils.logo_upload import upload_logo
+from app.utils.upload import upload_logo
 
 def fetch_user(uid):
     with get_connection() as conn:

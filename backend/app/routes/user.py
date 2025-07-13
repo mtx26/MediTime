@@ -1,10 +1,10 @@
 from . import api
 from flask import request, g
-from app.utils.validators import require_auth
-from app.utils.response import success_response, error_response
+from app.utils.auth import require_auth
+from app.utils.responses import success_response, error_response
 from app.services.user import fetch_user, update_existing_user, insert_new_user
 import time
-from app.utils.logo_upload import upload_logo
+from app.utils.upload import upload_logo
 from app.db.connection import get_connection
 
 @api.route("/user/sync", methods=["POST"])

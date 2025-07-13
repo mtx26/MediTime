@@ -2,7 +2,7 @@ from functools import wraps
 from flask import request, jsonify, g
 import jwt
 from app.config.config import Config
-from app.utils.logger import log_backend as logger
+from app.utils.logging import log_backend as logger
 
 
 def decode_token(token):

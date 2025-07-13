@@ -8,7 +8,7 @@ from google.oauth2 import service_account
 from google.cloud import aiplatform
 
 from app.config.config import Config
-from app.utils.logger import log_backend
+from app.utils.logging import log_backend
 
 
 def init_firebase():

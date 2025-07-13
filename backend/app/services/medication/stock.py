@@ -2,7 +2,7 @@ from datetime import timedelta
 from app.services.calendar import is_medication_due
 from app.db.connection import get_connection
 from app.services.notifications import notify_and_record
-from app.utils.logger import log_backend
+from app.utils.logging import log_backend
 from app.config import Config
 from urllib.parse import urljoin
 from collections import defaultdict

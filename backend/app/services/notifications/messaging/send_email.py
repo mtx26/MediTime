@@ -1,7 +1,7 @@
 import smtplib
 from email.message import EmailMessage
 from email.utils import formataddr
-from app.utils.logger import log_backend
+from app.utils.logging import log_backend
 from app.config import Config
 
 def send_email(to, subject, html_content, plain=None):

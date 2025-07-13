@@ -2,7 +2,7 @@ import schedule
 import time
 from threading import Thread
 from app.cron.tasks.stock import decrease_stock
-from app.utils.logger import log_backend
+from app.utils.logging import log_backend
 
 def run_scheduler():
     # toute les semaines le lundi a 00:00

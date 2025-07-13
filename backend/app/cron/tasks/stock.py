@@ -1,7 +1,7 @@
 # app/cron/tasks/stock.py
 from app.db.connection import get_connection
-from app.utils.logger import log_backend
-from app.services.stock import check_low_stock_and_notify, process_box_decrement
+from app.utils.logging import log_backend
+from app.services.medication import check_low_stock_and_notify, process_box_decrement
 from datetime import datetime, timezone
 
 # diminuer le stock de tous les médicaments

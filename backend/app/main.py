@@ -2,7 +2,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from app.config.config import Config
-from app.utils.logger import log_backend as logger
+from app.utils.logging import log_backend as logger
 import os
 from app.db.connection import get_connection
 from app import create_app

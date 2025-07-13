@@ -5,7 +5,7 @@ import io
 from PIL import Image as PILImage
 import pillow_heif
 from vertexai.preview.generative_models import GenerativeModel, Image as VertexImage
-from app.utils.logger import log_backend
+from app.utils.logging import log_backend
 
 # Enregistre le support HEIF (.heic)
 pillow_heif.register_heif_opener()
