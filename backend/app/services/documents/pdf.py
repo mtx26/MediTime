@@ -7,18 +7,7 @@ from app.services.medication import get_medicines_for_calendar
 moment_map = {
     "morning": "matin",
     "noon": "midi",
-    "evening": "soir"
-}
-
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet
-from io import BytesIO
-
-moment_map = {
-    "morning": "matin",
-    "noon": "midi",
-    "evening": "soir"
+    "evening": "soir",
 }
 
 def generate_medicine_conditions_pdf(calendar_id):
