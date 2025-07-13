@@ -21,6 +21,11 @@
     <loc>https://meditime-app.com/reset-password</loc>
     <priority>0.5</priority>
   </url>
+  
+  <url>
+    <loc>https://meditime-app.com/reset-password-confirm</loc>
+    <priority>0.5</priority>
+  </url>
 
   <url>
     <loc>https://meditime-app.com/verify-email</loc>
