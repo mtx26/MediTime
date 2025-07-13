@@ -1,6 +1,6 @@
-import { getToken } from './tokenUtils.js';
-import { analyticsPromise } from './firebase';
-import { log } from '../utils/logger';
+import { getToken } from '../supabase/tokenUtils.js';
+import { analyticsPromise } from '../firebase/firebase';
+import { log } from '../../utils/logger';
 import { logEvent } from 'firebase/analytics';
 
 export async function performApiCall({

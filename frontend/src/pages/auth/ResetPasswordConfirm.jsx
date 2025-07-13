@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../services/supabaseClient';
+import { supabase } from '../../services/supabase/supabaseClient';
 import AlertSystem from '../../components/common/AlertSystem';
 import { log } from '../../utils/logger';
 import { useTranslation } from 'react-i18next';

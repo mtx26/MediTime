@@ -8,9 +8,9 @@ import {
   TwitterHandleLogin,
   DiscordHandleLogin,
   FacebookHandleLogin
-} from '../../services/authService';
+} from '../../services/auth/authService';
 import AlertSystem from '../../components/common/AlertSystem';
-import { getSupabaseErrorMessage } from '../../utils/SupabaseErrorMessage';
+import { getSupabaseErrorMessage } from '../../utils/supabase/SupabaseErrorMessage';
 import { log } from '../../utils/logger';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { supabase } from '../../services/supabaseClient';
+import { supabase } from '../../services/supabase/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
 import AlertSystem from '../../components/common/AlertSystem';
 import { log } from '../../utils/logger';
-import { getSupabaseErrorMessage } from '../../utils/SupabaseErrorMessage';
+import { getSupabaseErrorMessage } from '../../utils/supabase/SupabaseErrorMessage';
 import { useTranslation } from 'react-i18next';
 
 function VerifyEmail() {

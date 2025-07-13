@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { resetPassword } from '../../services/authService';
+import { resetPassword } from '../../services/auth/authService';
 import AlertSystem from '../../components/common/AlertSystem';
 import { useTranslation } from 'react-i18next';
 

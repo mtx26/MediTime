@@ -1,5 +1,5 @@
-import { supabase } from '../services/supabaseClient';
-import { log } from '../utils/logger';
+import { supabase } from '../supabase/supabaseClient';
+import { log } from '../../utils/logger';
 
 /**
  * Connexion avec Google

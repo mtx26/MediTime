@@ -5,12 +5,12 @@ import Navbar from './components/common/Header';
 import Footer from './components/common/Footer';
 import AppRoutes from './routes/AppRouter';
 import { log } from './utils/logger';
-import { requestPermissionAndGetToken } from './services/firebase';
+import { requestPermissionAndGetToken } from './services/firebase/firebase';
 import { UserContext } from './contexts/UserContext';
-import { formatToLocalISODate } from './utils/dateUtils';
+import { formatToLocalISODate } from './utils/calendar/dateUtils';
 import RealtimeManager from './components/realtime/RealtimeManager';
-import { getToken } from './services/tokenUtils';
-import { performApiCall } from './services/apiUtils';
+import { getToken } from './services/supabase/tokenUtils';
+import { performApiCall } from './services/api/apiUtils';
 import { useTranslation } from 'react-i18next';
 
 const API_URL = import.meta.env.VITE_API_URL;

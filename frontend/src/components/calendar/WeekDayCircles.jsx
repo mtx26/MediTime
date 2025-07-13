@@ -2,7 +2,7 @@ import {
   getWeekDaysISOStrings,
   getMondayFromDate,
   formatToLocalISODate,
-} from '../../utils/dateUtils';
+} from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
 
 export default function WeekDayCircles({ selectedDate, onSelectDate }) {

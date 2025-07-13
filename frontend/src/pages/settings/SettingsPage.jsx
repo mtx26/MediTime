@@ -4,7 +4,7 @@ import Notification from './Notification';
 import Account from './Account';
 import Preferences from './Preferences';
 import { Link, useLocation } from 'react-router-dom';
-import { handleLogout, resetPassword } from '../../services/authService';
+import { handleLogout, resetPassword } from '../../services/auth/authService';
 import { UserContext } from '../../contexts/UserContext';
 import AlertSystem from '../../components/common/AlertSystem';
 import { useTranslation } from 'react-i18next';

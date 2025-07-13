@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';
 import AlertSystem from '../../components/common/AlertSystem';
-import { getCalendarSourceMap } from '../../utils/calendarSourceMap';
+import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { v4 as uuidv4 } from 'uuid';
-import { fetchSuggestions } from '../../utils/fetchSuggestions';
+import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
 import ActionSheet from '../../components/common/ActionSheet';
-import openNotice from '../../utils/openNotice';
+import openNotice from '../../utils/notifications/openNotice';
 import { useTranslation } from 'react-i18next';
 
 function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {

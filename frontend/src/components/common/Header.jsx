@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
-import { handleLogout } from '../../services/authService';
+import { handleLogout } from '../../services/auth/authService';
 import { useNavigate } from 'react-router-dom';
 import HoveredUserProfile from './HoveredUserProfile';
 import NotificationLine from './NotificationLine';

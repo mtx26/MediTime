@@ -1,7 +1,7 @@
 import React from 'react';
 import ArrowControls from './ArrowControls';
 import WeekDayCircles from './WeekDayCircles';
-import { getMondayFromDate, getWeekDaysISOStrings } from '../../utils/dateUtils';
+import { getMondayFromDate, getWeekDaysISOStrings } from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 

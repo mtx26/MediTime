@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import { log } from '../utils/logger';
+import { log } from '../../utils/logger';
 
 // 🔐 Configuration Firebase
 const firebaseConfig = {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getCalendarSourceMap } from '../../../utils/calendarSourceMap';
+import { getCalendarSourceMap } from '../../../utils/calendar/calendarSourceMap';
 
 const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();

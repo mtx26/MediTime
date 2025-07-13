@@ -1,7 +1,7 @@
 // src/pages/AuthCallback.jsx
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../services/supabaseClient';
+import { supabase } from '../../services/supabase/supabaseClient';
 import { getGlobalReloadUser } from '../../contexts/UserContext';
 import { log } from '../../utils/logger';
 import { useTranslation } from 'react-i18next';

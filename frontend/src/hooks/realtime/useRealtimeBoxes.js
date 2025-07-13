@@ -1,8 +1,8 @@
 import { useEffect, useRef, useContext } from 'react';
-import { supabase } from '../../services/supabaseClient';
+import { supabase } from '../../services/supabase/supabaseClient';
 import { UserContext } from '../../contexts/UserContext';
 import { log } from '../../utils/logger';
-import { analyticsPromise } from '../../services/firebase';
+import { analyticsPromise } from '../../services/firebase/firebase';
 import { logEvent } from 'firebase/analytics';
 
 const API_URL = import.meta.env.VITE_API_URL;

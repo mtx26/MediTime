@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useState, useCallback } from "react";
 import { UserContext } from "../../contexts/UserContext";
 import AlertSystem from "../../components/common/AlertSystem";
 import HoveredUserProfile from "../../components/common/HoveredUserProfile";
-import { formatToLocalISODate } from "../../utils/dateUtils";
+import { formatToLocalISODate } from "../../utils/calendar/dateUtils";
 import { useTranslation } from "react-i18next";
 import ActionSheet from '../../components/common/ActionSheet';
 import { useNavigate } from "react-router-dom";

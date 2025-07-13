@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
-import { getCalendarSourceMap } from '../../utils/calendarSourceMap';
+import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import isEqual from 'lodash/isEqual';
 import { useTranslation } from 'react-i18next';
 import AlertSystem from '../common/AlertSystem';

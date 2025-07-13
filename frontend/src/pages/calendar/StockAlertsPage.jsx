@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getCalendarSourceMap } from '../../utils/calendarSourceMap';
+import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';

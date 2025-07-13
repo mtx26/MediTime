@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef } from 'react';
 import { UserContext } from '../../contexts/UserContext';
-import { analyticsPromise } from '../../services/firebase';
-import { supabase } from '../../services/supabaseClient';
+import { analyticsPromise } from '../../services/firebase/firebase';
+import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import { logEvent } from 'firebase/analytics';
 

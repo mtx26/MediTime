@@ -5,7 +5,7 @@ import {
   getWeekDaysISOStrings,
   getMondayFromDate,
   formatToLocalISODate,
-} from '../../utils/dateUtils';
+} from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
