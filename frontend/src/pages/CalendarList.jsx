@@ -482,7 +482,6 @@ function SelectCalendar({
                         </span>
                       </div>
                       <div className="text-muted small d-flex align-items-center ">
-                        {t('owner')}:
                         <HoveredUserProfile
                           user={{
                             email: calendarData.owner_email,
@@ -491,7 +490,7 @@ function SelectCalendar({
                           }}
                           trigger={
                             <span
-                              className="fw-semibold ms-1 position-relative"
+                              className="fw-semibold position-relative"
                               style={{ cursor: 'pointer' }}
                             >
                               {calendarData.owner_name}
