@@ -1,14 +1,14 @@
 // App.js
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import Navbar from './components/Header';
-import Footer from './components/Footer';
+import Navbar from './components/common/Header';
+import Footer from './components/common/Footer';
 import AppRoutes from './routes/AppRouter';
 import { log } from './utils/logger';
 import { requestPermissionAndGetToken } from './services/firebase';
 import { UserContext } from './contexts/UserContext';
 import { formatToLocalISODate } from './utils/dateUtils';
-import RealtimeManager from './components/RealtimeManager';
+import RealtimeManager from './components/realtime/RealtimeManager';
 import { getToken } from './services/tokenUtils';
 import { performApiCall } from './services/apiUtils';
 import { useTranslation } from 'react-i18next';

@@ -3,32 +3,32 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 import { UserContext } from '../contexts/UserContext';
 
-import HomePage from '../pages/HomePage';
+import HomePage from '../pages/general/HomePage';
 
-import Auth from '../pages/Auth';
-import ResetPassword from '../pages/ResetPassword';
-import ResetPasswordConfirm from '../pages/ResetPasswordConfirm';
-import VerifyEmail from '../pages/VerifyEmail';
+import Auth from '../pages/auth/Auth';
+import ResetPassword from '../pages/auth/ResetPassword';
+import ResetPasswordConfirm from '../pages/auth/ResetPasswordConfirm';
+import VerifyEmail from '../pages/auth/VerifyEmail';
 
-import NotificationsPage from '../pages/NotificationsPage';
-import SettingsPage from '../pages/SettingsPage';
-import ImportCalendarPage from '../pages/ImportCalendarPage';
+import NotificationsPage from '../pages/notifications/NotificationsPage';
+import SettingsPage from '../pages/settings/SettingsPage';
+import ImportCalendarPage from '../pages/calendar/ImportCalendarPage';
 
-import CalendarView from '../pages/CalendarView';
-import PillboxPage from '../pages/pillbox';
-import CalendarList from '../pages/CalendarList';
-import SharedList from '../pages/SharedList';
-import StockAlertsPage from '../pages/StockAlertsPage';
+import CalendarView from '../pages/calendar/CalendarView';
+import PillboxPage from '../pages/calendar/Pillbox';
+import CalendarList from '../pages/calendar/CalendarList';
+import SharedList from '../pages/share/SharedList';
+import StockAlertsPage from '../pages/calendar/StockAlertsPage';
 
-import MedicinesList from '../pages/MedicinesList';
-import BoxesView from '../pages/BoxesView';
-import NotFound from '../pages/NotFound';
+import MedicinesList from '../pages/medicines/MedicinesList';
+import BoxesView from '../pages/medicines/BoxesView';
+import NotFound from '../pages/general/NotFound';
 
-import PrivacyPage from '../pages/PrivacyPage';
-import TermsPage from '../pages/TermsPage';
+import PrivacyPage from '../pages/general/PrivacyPage';
+import TermsPage from '../pages/general/TermsPage';
 
-import AuthCallback from '../pages/AuthCallback';
-import CalendarSettingsPage from '../pages/CalendarSettingsPage';
+import AuthCallback from '../pages/auth/AuthCallback';
+import CalendarSettingsPage from '../pages/calendar/CalendarSettingsPage';
 
 function PrivateRoute({ element }) {
   const { userInfo } = useContext(UserContext);

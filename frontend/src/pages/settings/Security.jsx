@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { updateUserPassword } from '../../services/authService';
 import { UserContext } from '../../contexts/UserContext';
-import AlertSystem from '../../components/AlertSystem';
+import AlertSystem from '../../components/common/AlertSystem';
 import { supabase } from '../../services/supabaseClient';
 import { useTranslation } from 'react-i18next';
 
