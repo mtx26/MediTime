@@ -107,9 +107,9 @@ def strip_json_markdown(raw):
     if isinstance(raw, str):
         text = raw.strip()
         if text.startswith("```json"):
-            text = re.sub(r"^```json\s*", "", text)
+            text = text[len("```json"):].lstrip()
         if text.endswith("```"):
-            text = re.sub(r"\s*```$", "", text)
+            text = text[:-3].rstrip()
         return text
     return raw
 

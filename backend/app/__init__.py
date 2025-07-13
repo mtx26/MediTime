@@ -4,6 +4,7 @@ from flask import Flask
 from app.config.config import Config
 from app.routes import register_routes
 from app.auth.google_services import init_firebase, init_vertex_ai
+# from app.vertex import test_analyze_medical_document
 from flask_cors import CORS
 from app.cron import start_cron
 
