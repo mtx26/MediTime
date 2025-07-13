@@ -12,6 +12,7 @@ import VerifyEmail from '../pages/VerifyEmail';
 
 import NotificationsPage from '../pages/NotificationsPage';
 import SettingsPage from '../pages/SettingsPage';
+import ImportCalendarPage from '../pages/ImportCalendarPage';
 
 import CalendarView from '../pages/CalendarView';
 import PillboxPage from '../pages/pillbox';
@@ -120,6 +121,14 @@ function AppRoutes({ sharedProps }) {
                 isLoading={sharedProps.loadingStates.isInitialLoading}
               />
             }
+          />
+        }
+      />
+      <Route
+        path="/import-calendar"
+        element={
+          <PrivateRoute
+            element={<ImportCalendarPage {...sharedProps} />}
           />
         }
       />
