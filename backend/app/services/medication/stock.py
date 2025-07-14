@@ -49,7 +49,7 @@ def process_box_decrement(cursor, id_box, qty, start_date, days=7):
 
 # Vérifie les stocks faibles et envoie des notifications
 def check_low_stock_and_notify():
-    log_backend.info("🔍 Vérification des stocks faibles", {"origin": "CRON", "code": "STOCK_CHECK_INIT"})
+    log_backend.info("🔍 Vérification des stocks faibles", {"origin": "STOCK", "code": "STOCK_CHECK_INIT"})
 
     try:
         with get_connection() as conn:
@@ -67,7 +67,7 @@ def check_low_stock_and_notify():
 
                 # Si aucun résultat, inutile d'aller plus loin
                 if not results:
-                    log_backend.info("✅ Aucun stock faible détecté", {"origin": "CRON", "code": "STOCK_CHECK_EMPTY"})
+                    log_backend.info("✅ Aucun stock faible détecté", {"origin": "STOCK", "code": "STOCK_CHECK_EMPTY"})
                     return
 
                 # Extraire tous les calendar_id
@@ -114,7 +114,7 @@ def check_low_stock_and_notify():
                 log_backend.info(
                     "✅ Notifications de stock faible envoyées",
                     {
-                        "origin": "CRON",
+                        "origin": "STOCK",
                         "code": "STOCK_CHECK_SUCCESS",
                         "uid": uid,
                         "calendar_id": calendar_id,
@@ -125,7 +125,7 @@ def check_low_stock_and_notify():
                 log_backend.error(
                     "Erreur envoi notifications stock faible",
                     {
-                        "origin": "CRON",
+                        "origin": "STOCK",
                         "code": "STOCK_CHECK_ERROR",
                         "uid": uid,
                         "calendar_id": calendar_id,
@@ -133,12 +133,12 @@ def check_low_stock_and_notify():
                     },
                 )
 
-        log_backend.info("✅ Fin de la vérification des stocks", {"origin": "CRON", "code": "STOCK_CHECK_DONE"})
+        log_backend.info("✅ Fin de la vérification des stocks", {"origin": "STOCK", "code": "STOCK_CHECK_DONE"})
 
     except Exception as e:
         log_backend.error(
             "Erreur lors de la vérification des stocks",
-            {"origin": "CRON", "code": "STOCK_CHECK_FATAL", "error": str(e)},
+            {"origin": "STOCK", "code": "STOCK_CHECK_FATAL", "error": str(e)},
         )
 
 def check_low_stock_and_notify_for_calendar(calendar_id: int):
@@ -150,7 +150,7 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
     """
     log_backend.info(
         "🔍 Vérification des stocks faibles pour le calendrier",
-        {"origin": "CRON", "code": "STOCK_CHECK_CALENDAR_INIT", "calendar_id": calendar_id},
+        {"origin": "STOCK", "code": "STOCK_CHECK_CALENDAR_INIT", "calendar_id": calendar_id},
     )
 
     try:
@@ -181,7 +181,7 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
         if not results:
             log_backend.info(
                 "Aucun stock faible trouvé pour le calendrier",
-                {"origin": "CRON", "code": "STOCK_CHECK_CALENDAR_EMPTY", "calendar_id": calendar_id},
+                {"origin": "STOCK", "code": "STOCK_CHECK_CALENDAR_EMPTY", "calendar_id": calendar_id},
             )
             return
 
@@ -213,7 +213,7 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
                 log_backend.info(
                     "✅ Notifications de stock faible envoyées pour le calendrier",
                     {
-                        "origin": "CRON",
+                        "origin": "STOCK",
                         "code": "STOCK_CHECK_CALENDAR_SUCCESS",
                         "uid": uid,
                         "calendar_id": calendar_id,
@@ -224,7 +224,7 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
                 log_backend.error(
                     "Erreur envoi notifications stock faible pour le calendrier",
                     {
-                        "origin": "CRON",
+                        "origin": "STOCK",
                         "code": "STOCK_CHECK_CALENDAR_ERROR",
                         "uid": uid,
                         "calendar_id": calendar_id,
@@ -235,7 +235,7 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
         log_backend.error(
             "Erreur lors de la vérification des stocks pour le calendrier",
             {
-                "origin": "CRON", 
+                "origin": "STOCK", 
                 "code": "STOCK_CHECK_CALENDAR_ERROR", 
                 "calendar_id": calendar_id, 
                 "error": str(e)
