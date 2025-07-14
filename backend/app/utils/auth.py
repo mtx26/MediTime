@@ -18,15 +18,25 @@ def decode_token(token):
             options={"verify_aud": False}
         )
     except jwt.ExpiredSignatureError:
-        logger.warning("Token expiré", {"origin": "TOKEN_ERROR", "uid": "unknown"})
+        logger.warning(
+            "token expiré",
+            {"origin": "AUTH", "code": "TOKEN_EXPIRED", "uid": "unknown"},
+        )
     except jwt.InvalidTokenError:
-        logger.warning("Token invalide", {"origin": "TOKEN_ERROR", "uid": "unknown"})
+        logger.warning(
+            "token invalide",
+            {"origin": "AUTH", "code": "TOKEN_INVALID", "uid": "unknown"},
+        )
     except Exception as e:
-        logger.warning("Erreur lors de la vérification du token", {
-            "origin": "TOKEN_ERROR",
-            "uid": "unknown",
-            "error": str(e)
-        })
+        logger.warning(
+            "erreur vérification token",
+            {
+                "origin": "AUTH",
+                "code": "TOKEN_CHECK_ERROR",
+                "uid": "unknown",
+                "error": str(e),
+            },
+        )
     return None
 
 

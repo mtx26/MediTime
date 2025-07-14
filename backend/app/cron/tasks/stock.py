@@ -34,7 +34,13 @@ def decrease_stock():
                     check_low_stock_and_notify_for_calendar(calendar_id)
 
             conn.commit()
-        log_backend.info("✅ Fin de la diminution des stocks", {"origin": "CRON", "code": "STOCK_DECREASE_SUCCESS"})
+        log_backend.info(
+            "diminution des stocks terminée",
+            {"origin": "CRON", "code": "STOCK_DECREASE_SUCCESS"},
+        )
 
     except Exception as e:
-        log_backend.error(f"Erreur lors de la diminution des stocks: {e}", {"origin": "CRON", "code": "STOCK_DECREASE_ERROR", "error": str(e)})
+        log_backend.error(
+            "erreur diminution des stocks",
+            {"origin": "CRON", "code": "STOCK_DECREASE_ERROR", "error": str(e)},
+        )

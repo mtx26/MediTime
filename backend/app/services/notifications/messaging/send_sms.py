@@ -11,8 +11,14 @@ def send_sms(to_number, message_body):
             messaging_service_sid=Config.TWILIO_MESSAGING_SERVICE_SID,
             body=message_body
         )
-        log_backend.info(f"SMS sent to {to_number} with message '{message_body}'", {"origin": "SMS", "code": "SMS_SENT"})
+        log_backend.info(
+            "sms envoyé",
+            {"origin": "SMS", "code": "SMS_SENT", "to": to_number},
+        )
     except Exception as e:
-        log_backend.error(f"Error sending SMS to {to_number}: {e}", {"origin": "SMS", "code": "SMS_ERROR"})
+        log_backend.error(
+            "erreur envoi SMS",
+            {"origin": "SMS", "code": "SMS_ERROR", "to": to_number, "error": str(e)},
+        )
         return {"success": False, "error": str(e)}
     return {"success": True, "sid": message.sid, "status": message.status}

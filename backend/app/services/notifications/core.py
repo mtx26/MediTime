@@ -30,7 +30,7 @@ def enrich_notification(notification: dict) -> dict:
         notification["sender_name"] = fetch_user_name(sender_uid)
     except Exception as e:
         log_backend.error(
-            "Erreur enrich_notification",
+            "erreur enrich_notification",
             {
                 "origin": "NOTIFICATIONS",
                 "code": "ENRICH_ERROR",
@@ -155,7 +155,7 @@ def save_notifications(uid: str, notif_type: str, notifications: list[dict]):
                 conn.commit()
     except Exception as e:
         log_backend.error(
-            "Erreur save_notifications",
+            "erreur save_notifications",
             {
                 "origin": "NOTIFICATIONS",
                 "code": "SAVE_ERROR",
@@ -194,7 +194,7 @@ def send_grouped_notifications(uid: str, notifications: list[dict], notif_type: 
             send_sms_notification(user, payload, notif_type)
     except Exception as e:
         log_backend.error(
-            "Erreur send_grouped_notifications",
+            "erreur send_grouped_notifications",
             {
                 "origin": "NOTIFICATIONS",
                 "code": "SEND_ERROR",
@@ -217,7 +217,7 @@ def send_push_notification(uid: str, payload: dict, notif_type: str) -> None:
         send_fcm_notification(tokens, title, body, payload)
     else:
         log_backend.warning(
-            f"Aucun token FCM trouvé pour l'utilisateur {uid}",
+            "token FCM introuvable",
             {"origin": "NOTIFICATIONS", "code": "NO_FCM_TOKEN", "uid": uid},
         )
 
@@ -225,7 +225,7 @@ def send_email_notification(user: dict, payload: dict, notif_type: str) -> None:
     email = user.get("email")
     if not email:
         log_backend.warning(
-            f"Aucun email trouvé pour l'utilisateur {user.get('id')}",
+            "email introuvable",
             {"origin": "NOTIFICATIONS", "code": "NO_EMAIL", "uid": user.get('id')},
         )
         return
@@ -238,7 +238,7 @@ def send_sms_notification(user: dict, payload: dict, notif_type: str) -> None:
     phone = user.get("phone")
     if not phone:
         log_backend.warning(
-            f"Aucun numéro de téléphone trouvé pour l'utilisateur {user.get('id')}",
+            "numéro de téléphone introuvable",
             {
                 "origin": "NOTIFICATIONS",
                 "code": "NO_PHONE_NUMBER",
@@ -284,7 +284,7 @@ def notify_and_record(uid: str, json_body, notif_type: str) -> None:
 
     except Exception as e:
         log_backend.error(
-            "Erreur notify_and_record",
+            "erreur notify_and_record",
             {
                 "origin": "NOTIFICATIONS",
                 "code": "NOTIFICATION_ERROR",

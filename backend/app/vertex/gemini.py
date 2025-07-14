@@ -72,7 +72,10 @@ Rules:
         if response.candidates and response.candidates[0].content.parts:
             raw_output = response.candidates[0].content.parts[0].text
         else:
-            log_backend.warning("Gemini response structure unexpected", {"origin": "GEMINI_ANALYZE"})
+            log_backend.warning(
+                "structure de réponse gemini inattendue",
+                {"origin": "GEMINI_ANALYZE", "code": "GEMINI_BAD_STRUCTURE"},
+            )
             return {
                 "error": "Gemini returned unexpected response structure"
             }
@@ -83,21 +86,28 @@ Rules:
             data = json.loads(cleaned)
             return data
         except json.JSONDecodeError as json_error:
-            log_backend.warning("Gemini returned non-JSON output", {
-                "origin": "GEMINI_ANALYZE",
-                "raw_output": raw_output,
-                "error": str(json_error)
-            })
+            log_backend.warning(
+                "réponse gemini non JSON",
+                {
+                    "origin": "GEMINI_ANALYZE",
+                    "code": "GEMINI_NOT_JSON",
+                    "raw_output": raw_output,
+                    "error": str(json_error),
+                },
+            )
             return {
                 "error": "Gemini response was not valid JSON",
             }
 
     except Exception as e:
-        log_backend.exception("Error during Gemini analysis", {
-            "origin": "GEMINI_ANALYZE",
-            "code": "GEMINI_ERROR",
-            "error": str(e)
-        })
+        log_backend.exception(
+            "erreur analyse gemini",
+            {
+                "origin": "GEMINI_ANALYZE",
+                "code": "GEMINI_ERROR",
+                "error": str(e),
+            },
+        )
         return {
             "error": "An error occurred while analyzing the medical document"
         }

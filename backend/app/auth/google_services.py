@@ -15,30 +15,35 @@ def init_firebase():
     """Initialise Firebase Admin SDK à partir du JSON dans l'env."""
     try:
         if firebase_admin._apps:
-            log_backend.info("Firebase déjà initialisé", {"origin": "FIREBASE_INIT"})
+            log_backend.info(
+                "firebase déjà initialisé",
+                {"origin": "FIREBASE_INIT", "code": "FIREBASE_INIT_ALREADY"},
+            )
             return
 
         service_account_raw = Config.GOOGLE_APPLICATION_CREDENTIALS
 
         if not service_account_raw:
-            log_backend.error("Aucune clé de service Firebase trouvée dans .env", {
-                "origin": "FIREBASE_INIT"
-            })
+            log_backend.error(
+                "clé de service firebase manquante",
+                {"origin": "FIREBASE_INIT", "code": "FIREBASE_INIT_MISSING"},
+            )
             raise RuntimeError("GOOGLE_APPLICATION_CREDENTIALS manquant")
 
         service_account_dict = json.loads(service_account_raw)
         
         cred = credentials.Certificate(service_account_dict)
         firebase_admin.initialize_app(cred)
-        log_backend.info("Firebase initialisé avec succès", {
-            "origin": "FIREBASE_INIT"
-        })
+        log_backend.info(
+            "firebase initialisé",
+            {"origin": "FIREBASE_INIT", "code": "FIREBASE_INIT_SUCCESS"},
+        )
         
     except Exception as e:
-        log_backend.error("Erreur lors de l'initialisation de Firebase", {
-            "origin": "FIREBASE_INIT",
-            "error": str(e)
-        })
+        log_backend.error(
+            "erreur initialisation firebase",
+            {"origin": "FIREBASE_INIT", "code": "FIREBASE_INIT_ERROR", "error": str(e)},
+        )
         raise RuntimeError("Initialisation Firebase échouée")
 
 
@@ -59,18 +64,21 @@ def init_vertex_ai():
             credentials=credentials
         )
 
-        log_backend.info("Vertex AI initialisé avec succès", {
-            "origin": "VERTEX_INIT",
-            "project": project_id,
-            "location": location
-        })
+        log_backend.info(
+            "vertex ai initialisé",
+            {
+                "origin": "VERTEX_INIT",
+                "code": "VERTEX_INIT_SUCCESS",
+                "project": project_id,
+                "location": location,
+            },
+        )
 
     except Exception as e:
-        log_backend.error("Erreur lors de l'initialisation de Vertex AI", {
-            "origin": "VERTEX_INIT",
-            "code": "VERTEX_INIT_ERROR",
-            "error": str(e)
-        })
+        log_backend.error(
+            "erreur initialisation vertex ai",
+            {"origin": "VERTEX_INIT", "code": "VERTEX_INIT_ERROR", "error": str(e)},
+        )
         raise RuntimeError("Initialisation Vertex AI échouée")
 
 
@@ -89,11 +97,11 @@ def get_google_credentials(scopes):
 
     except Exception as e:
         log_backend.error(
-            f"Erreur get_google_credentials : {e}",
+            "erreur get_google_credentials",
             {
                 "origin": "AUTH",
                 "code": "GOOGLE_CREDENTIALS_ERROR",
-                "error": traceback.format_exc()
-            }
+                "error": traceback.format_exc(),
+            },
         )
         return None, None

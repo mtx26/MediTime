@@ -31,6 +31,12 @@ def send_email(to, subject, html_content, plain=None):
             server.starttls()
             server.login(Config.NOTIFICATION_EMAIL_ADDRESS or "", Config.NOTIFICATION_EMAIL_PASSWORD or "")
             server.send_message(msg)
-        log_backend.info(f"Email sent to {to} with subject '{subject}'", {"origin": "EMAIL", "code": "EMAIL_SENT"})
+        log_backend.info(
+            "email envoyé",
+            {"origin": "EMAIL", "code": "EMAIL_SENT", "to": to, "subject": subject},
+        )
     except Exception as e:
-        log_backend.error(f"Error sending email: {e}", {"origin": "EMAIL", "code": "EMAIL_ERROR", "error": str(e)})
+        log_backend.error(
+            "erreur envoi email",
+            {"origin": "EMAIL", "code": "EMAIL_ERROR", "error": str(e)},
+        )

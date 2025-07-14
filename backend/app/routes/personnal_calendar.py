@@ -338,12 +338,15 @@ def download_pdf_calendar(calendar_id):
         t_1 = time.time()
 
         # Log facultatif
-        log_backend.info("PDF généré avec succès", {
-            "origin": "PDF_DOWNLOAD",
-            "uid": "unknown",
-            "code": "PDF_DOWNLOAD_SUCCESS",
-            "time": round(t_1 - t_0, 3),
-        })
+        log_backend.info(
+            "pdf généré",
+            {
+                "origin": "PDF_DOWNLOAD",
+                "code": "PDF_DOWNLOAD_SUCCESS",
+                "uid": "unknown",
+                "time": round(t_1 - t_0, 3),
+            },
+        )
 
         return Response(
             pdf_buffer.getvalue(),

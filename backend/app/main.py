@@ -18,7 +18,7 @@ if __name__ == "__main__":
         print("✔ Flask ready to run")
     else:
         app.run(host="0.0.0.0", port=port)
-        logger.info("Lancement de l'application Flask en local", {
-            "origin": "FLASK_START",
-            "port": port
-        })
+        logger.info(
+            "application flask démarrée",
+            {"origin": "FLASK_START", "code": "FLASK_START_LOCAL", "port": port},
+        )

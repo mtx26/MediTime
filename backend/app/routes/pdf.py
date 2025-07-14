@@ -56,7 +56,15 @@ def proxy_pdf():
 
         t_1 = time.time()
 
-        log_backend.info(f"PDF downloaded in {t_1 - t_0} seconds", {"origin": "PDF_PROXY", "code": "PDF_DOWNLOADED", "url": url_result["url_notice_fr"]})
+        log_backend.info(
+            "pdf téléchargé",
+            {
+                "origin": "PDF_PROXY",
+                "code": "PDF_DOWNLOADED",
+                "url": url_result["url_notice_fr"],
+                "time": t_1 - t_0,
+            },
+        )
 
         return Response(
             r.content,
@@ -64,9 +72,12 @@ def proxy_pdf():
             headers={"Content-Disposition": "inline; filename=notice.pdf", "Content-Type": "application/pdf"}
         )
     except Exception as e:
-        log_backend.error(f"Error downloading PDF: {e}", {
-            "origin": "PDF_PROXY", 
-            "code": "PDF_DOWNLOAD_ERROR", 
-            "error": traceback.format_exc(),
-        })
+        log_backend.error(
+            "erreur téléchargement pdf",
+            {
+                "origin": "PDF_PROXY",
+                "code": "PDF_DOWNLOAD_ERROR",
+                "error": traceback.format_exc(),
+            },
+        )
         return f"Erreur lors du téléchargement : {e}", 500

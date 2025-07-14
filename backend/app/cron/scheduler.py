@@ -12,7 +12,10 @@ def run_scheduler():
     # toute les 10 secondes
     #schedule.every(10).seconds.do(decrease_stock)
 
-    log_backend.info("⏳ [CRON] Test : cron toutes les jours initialisé")
+    log_backend.info(
+        "cron démarré",
+        {"origin": "CRON", "code": "CRON_START"},
+    )
 
     while True:
         schedule.run_pending()

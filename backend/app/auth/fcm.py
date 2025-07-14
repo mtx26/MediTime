@@ -22,12 +22,12 @@ def get_fcm_access_token():
         return credentials_obj.token, project_id
     except Exception as e:
         log_backend.error(
-            f"Erreur lors du refresh du token FCM : {e}",
+            "erreur refresh token FCM",
             {
                 "origin": "FCM",
                 "code": "FCM_TOKEN_REFRESH_ERROR",
-                "error": traceback.format_exc()
-            }
+                "error": traceback.format_exc(),
+            },
         )
         return None, None
 
@@ -60,25 +60,25 @@ def send_fcm_notification(tokens, title, body, json_body):
 
         response = requests.post(url, headers=headers, json=payload)
         log_backend.info(
-            f"send_fcm_notification : {response.status_code}", 
+            "envoi notification FCM",
             {
-                "origin": "FCM", 
-                "code": "FCM_SEND_NOTIFICATION", 
+                "origin": "FCM",
+                "code": "FCM_SEND_NOTIFICATION",
                 "status_code": response.status_code,
                 "token": token,
                 "title": title,
-            }
+            },
         )
         try:
             data = response.json()
         except Exception as e:
             log_backend.error(
-                f"Erreur send_fcm_notification : {e}", 
+                "erreur envoi FCM",
                 {
-                    "origin": "FCM", 
-                    "code": "FCM_ERROR", 
-                    "error": traceback.format_exc()
-                }
+                    "origin": "FCM",
+                    "code": "FCM_ERROR",
+                    "error": traceback.format_exc(),
+                },
             )
             data = response.text
 

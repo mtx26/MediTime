@@ -14,22 +14,30 @@ def verify_calendar_share(calendar_id : str, receiver_uid : str) -> bool:
                 cursor.execute("SELECT * FROM shared_calendars WHERE calendar_id = %s AND receiver_uid = %s", (calendar_id, receiver_uid,))
                 shared_calendar = cursor.fetchone()
                 if not shared_calendar:
-                    logger.warning("accès refusé", {
-                        "origin": "SHARED_VERIFY",
-                        "uid": receiver_uid,
-                        "calendar_id": calendar_id,
-                    })
+                    logger.warning(
+                        "accès calendrier refusé",
+                        {
+                            "origin": "SHARED_VERIFY",
+                            "code": "SHARED_VERIFY_DENIED",
+                            "uid": receiver_uid,
+                            "calendar_id": calendar_id,
+                        },
+                    )
                     return False
                 
                 return True
 
     except Exception as e:
-        logger.error("erreur lors de la vérification de l'accès au calendrier partagé", {
-            "origin": "SHARED_VERIFY_ERROR",
-            "uid": receiver_uid,
-            "calendar_id": calendar_id, 
-            "error": str(e)
-        })
+        logger.error(
+            "erreur vérification accès calendrier partagé",
+            {
+                "origin": "SHARED_VERIFY",
+                "code": "SHARED_VERIFY_ERROR",
+                "uid": receiver_uid,
+                "calendar_id": calendar_id,
+                "error": str(e),
+            },
+        )
         return False
 
 def verify_calendar(calendar_id : str, uid : str) -> bool:
@@ -44,12 +52,16 @@ def verify_calendar(calendar_id : str, uid : str) -> bool:
                 return True
 
     except Exception as e:
-        logger.error("erreur lors de la vérification de l'accès au calendrier", {
-            "origin": "CALENDAR_VERIFY_ERROR",
-            "uid": uid,
-            "calendar_id": calendar_id,
-            "error": str(e)
-        })
+        logger.error(
+            "erreur vérification accès calendrier",
+            {
+                "origin": "CALENDAR_VERIFY",
+                "code": "CALENDAR_VERIFY_ERROR",
+                "uid": uid,
+                "calendar_id": calendar_id,
+                "error": str(e),
+            },
+        )
         return False
 
 def verify_token(token : str) -> bool:
@@ -84,11 +96,15 @@ def verify_token(token : str) -> bool:
                 return calendar_id
 
     except Exception as e:
-        logger.error("erreur lors de la vérification du token", {
-            "origin": "TOKEN_VERIFY_ERROR",
-            "token": token,
-            "error": str(e)
-        })
+        logger.error(
+            "erreur vérification token",
+            {
+                "origin": "TOKEN_VERIFY",
+                "code": "TOKEN_VERIFY_ERROR",
+                "token": token,
+                "error": str(e),
+            },
+        )
         return False
 
 def verify_token_owner(token : str, uid : str) -> bool:
@@ -106,10 +122,14 @@ def verify_token_owner(token : str, uid : str) -> bool:
                 return True
 
     except Exception as e:
-        logger.error("erreur lors de la vérification de la propriété du token", {
-            "origin": "TOKEN_OWNER_VERIFY_ERROR",
-            "token": token,
-            "uid": uid,
-            "error": str(e)
-        })
+        logger.error(
+            "erreur vérification propriété token",
+            {
+                "origin": "TOKEN_OWNER_VERIFY",
+                "code": "TOKEN_OWNER_VERIFY_ERROR",
+                "token": token,
+                "uid": uid,
+                "error": str(e),
+            },
+        )
         return False

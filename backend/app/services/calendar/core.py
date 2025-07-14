@@ -30,10 +30,15 @@ def generate_calendar_schedule(calendar_id, start_date):
                     return [], [], None
 
     except Exception as e:
-        logger.error("erreur lors de la génération du calendrier", {
-            "origin": "CALENDAR_GENERATE_ERROR",
-            "error": str(e)
-        })
+        logger.error(
+            "erreur génération calendrier",
+            {
+                "origin": "CALENDAR_GENERATE",
+                "code": "CALENDAR_GENERATE_ERROR",
+                "calendar_id": calendar_id,
+                "error": str(e),
+            },
+        )
         return [], [], None
 
 
@@ -53,10 +58,14 @@ def is_medication_due(med, current_date):
 
         return delta_days % med["interval_days"] == 0
     except Exception as e:
-        logger.error(f"erreur lors de la vérification de la date de prise du médicament: {e}", {
-            "origin": "MEDICATION_DUE_ERROR",
-            "error": str(e)
-        })
+        logger.error(
+            "erreur vérification date de prise médicament",
+            {
+                "origin": "CALENDAR_GENERATE",
+                "code": "MEDICATION_DUE_ERROR",
+                "error": str(e),
+            },
+        )
         return False
 
 
