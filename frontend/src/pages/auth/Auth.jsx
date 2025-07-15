@@ -180,9 +180,6 @@ function Auth() {
                     setAlertMessage('❌ ' + getSupabaseErrorMessage(error.message));
                     setAlertType('danger');
                   } else {
-                    setDuration(5000);
-                    setAlertMessage(t('auth.verification_sent'));
-                    setAlertType('success');
                     log.info('Inscription réussie', {
                       id: 'REGISTER-SUCCESS',
                       origin: 'Auth.jsx',

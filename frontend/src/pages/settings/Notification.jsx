@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
 import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
+import { updateUserInfo } from '../../services/auth/authService';
 
 const Notification = () => {
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
-
-  const reloadUser = getGlobalReloadUser();
+  const uid = userInfo?.uid ?? null;
 
   return (
     <div>
@@ -20,12 +20,10 @@ const Notification = () => {
           id="emailNotificationToggle"
           checked={userInfo?.emailEnabled}
           onChange={() => {
-            reloadUser(
-              null,
-              null,
-              !userInfo?.emailEnabled,
-              userInfo?.pushEnabled
-            );
+            updateUserInfo({
+              email_enabled: !userInfo?.emailEnabled,
+              uid
+            })
           }}
         />
         <label className="form-check-label" htmlFor="emailNotificationToggle">
@@ -40,12 +38,9 @@ const Notification = () => {
           id="pushNotificationToggle"
           checked={userInfo?.pushEnabled}
           onChange={() => {
-            reloadUser(
-              null,
-              null,
-              userInfo?.emailEnabled,
-              !userInfo?.pushEnabled
-            );
+            updateUserInfo({
+              push_enabled: !userInfo?.pushEnabled
+            })
           }}
         />
         <label className="form-check-label" htmlFor="pushNotificationToggle">

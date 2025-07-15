@@ -37,18 +37,22 @@ function VerifyEmail() {
 
     if (user) {
       try {
-        await supabase.auth.sendEmailVerification();
+        await supabase.auth.sendEmailVerification({
+          options: {
+            redirectTo: window.location.origin + '/auth/callback',
+          },
+        });
         setAlertMessage(t('auth.verification_sent'));
         setAlertType('success');
         log.info('Email de vérification envoyé', {
-          id: 'EMAIL_VERIFICATION_SENT',
-          origin: 'VerifyEmail.jsx',
-          user,
+          code: 'EMAIL_VERIFICATION_SENT',
+          origin: 'VerifyEmail',
+          uid: user.id,
         });
       } catch (error) {
         log.error("Erreur d'envoi du mail de vérification", {
-          id: 'EMAIL_VERIFICATION_ERROR',
-          origin: 'VerifyEmail.jsx',
+          uid: user.id,
+          origin: 'EMAIL_VERIFICATION_ERROR',
           error,
         });
         setAlertMessage('❌ ' + getSupabaseErrorMessage(error.code));

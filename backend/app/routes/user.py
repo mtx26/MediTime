@@ -7,68 +7,85 @@ import time
 from app.utils.upload import upload_logo
 from app.db.connection import get_connection
 
-@api.route("/user/sync", methods=["POST"])
+@api.route("/user/sync", methods=["GET"])
 @require_auth
-def handle_user_sync():
-    uid = None
+def get_user_info():
+    uid = g.uid
     try:
-        t_0 = time.time()
-        uid = g.uid
-
-        try:
-            user_data = request.get_json()
-        except Exception:
+        user = fetch_user(uid)
+        if not user:
             return error_response(
-                message="erreur lors de la récupération des données de l'utilisateur",
-                code="USER_SYNC_ERROR",
-                status_code=400,
+                message="utilisateur introuvable",
+                code="USER_NOT_FOUND",
+                status_code=404,
                 uid=uid,
-                origin="USER_SYNC",
-                error="Invalid JSON body"
+                origin="USER_SYNC_GET"
             )
 
+        return success_response(
+            message="informations utilisateur récupérées",
+            code="USER_SYNC_SUCCESS",
+            uid=uid,
+            origin="USER_SYNC_GET",
+            data={**user}
+        )
+    except Exception as e:
+        return error_response(
+            message="erreur lors de la récupération des données utilisateur",
+            code="USER_SYNC_ERROR",
+            status_code=500,
+            uid=uid,
+            origin="USER_SYNC_GET",
+            error=str(e),
+        )
+    
+
+@api.route("/user/update", methods=["POST"])
+@require_auth
+def update_user_info():
+    uid = g.uid
+    try:
+        user_data = request.get_json()
         if not user_data:
             return error_response(
-                message="erreur lors de la récupération des données de l'utilisateur",
-                code="USER_SYNC_ERROR",
+                message="aucune donnée reçue",
+                code="USER_UPDATE_ERROR",
                 status_code=400,
                 uid=uid,
-                origin="USER_SYNC"
+                origin="USER_UPDATE"
             )
 
-        display_name = user_data.get("display_name") or None
-        email = user_data.get("email") or None
-        photo_url = user_data.get("photo_url") or None
-        email_enabled = user_data.get("email_enabled") or None
-        push_enabled = user_data.get("push_enabled") or None
+        display_name = user_data.get("display_name", None)
+        email = user_data.get("email", None)
+        photo_url = user_data.get("photo_url", None)
+        email_enabled = user_data.get("email_enabled", None)
+        push_enabled = user_data.get("push_enabled", None)
 
         user_db = fetch_user(uid)
-        t_1 = time.time()
-        
+
         if user_db:
             updated_user = update_existing_user(uid, user_db, display_name, email, photo_url, email_enabled, push_enabled)
         else:
             updated_user = insert_new_user(uid, display_name, email, photo_url, email_enabled, push_enabled)
-        
-        t_2 = time.time()
 
         return success_response(
-            message="données de l'utilisateur mises à jour",
-            code="USER_SYNC_SUCCESS",
+            message="données utilisateur mises à jour",
+            code="USER_UPDATE_SUCCESS",
             uid=uid,
-            origin="USER_SYNC",
-            data={"uid": uid, **updated_user, "time": t_2 - t_0, "time_update": t_2 - t_1}
+            origin="USER_UPDATE",
+            data={**updated_user}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la mise à jour des données de l'utilisateur",
-            code="USER_SYNC_ERROR",
+            message="erreur lors de la mise à jour",
+            code="USER_UPDATE_ERROR",
             status_code=500,
             uid=uid,
-            origin="USER_SYNC",
+            origin="USER_UPDATE",
             error=str(e),
         )
+
 
 @api.route("/user/photo", methods=["POST"])
 @require_auth

@@ -5,18 +5,19 @@ import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '../../utils/files/cropImage';
+import { updateUserInfo } from '../../services/auth/authService';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const Account = ({ sharedProps }) => {
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
-  const reloadUser = getGlobalReloadUser();
+  const uid = userInfo?.uid ?? null;
 
   const [displayName, setDisplayName] = useState(userInfo?.displayName || '');
   const [showOverlay, setShowOverlay] = useState(false);
   const [previewURL, setPreviewURL] = useState(
-    userInfo?.photoURL ||
+    userInfo?.photoUrl ||
       'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg'
   );
   const [photoFile, setPhotoFile] = useState(null);
@@ -30,6 +31,8 @@ const Account = ({ sharedProps }) => {
   useEffect(() => {
     if (displayName !== userInfo?.displayName) {
       setIsModified(true);
+    } else {
+      setIsModified(false);
     }
   }, [displayName, userInfo?.displayName]);
 
@@ -47,6 +50,10 @@ const Account = ({ sharedProps }) => {
       body: formData,
     });
     const data = await response.json();
+
+    const reloadUser = getGlobalReloadUser();
+    reloadUser();
+    
     log.info(data.message, {
       origin: 'PHOTO_UPLOAD_SUCCESS',
       uid: userInfo.uid,
@@ -66,7 +73,12 @@ const Account = ({ sharedProps }) => {
     if (photoFile) {
       await uploadPhoto(photoFile);
     }
-    reloadUser(displayName);
+    if (displayName !== userInfo?.displayName) {
+      const rep = await updateUserInfo({
+        display_name: displayName,
+        uid
+      });
+    }
     setIsModified(false);
     setPhotoFile(null);
   };
@@ -157,7 +169,7 @@ const Account = ({ sharedProps }) => {
                 className="btn btn-outline-danger"
                 onClick={() => {
                   setDisplayName(userInfo?.displayName);
-                  setPreviewURL(userInfo?.photoURL);
+                  setPreviewURL(userInfo?.photoUrl);
                   setIsModified(false);
                 }}
               >

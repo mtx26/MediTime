@@ -1,5 +1,39 @@
+import { useContext } from 'react';
 import { supabase } from '../supabase/supabaseClient';
 import { log } from '../../utils/logger';
+import { performApiCall } from '../../services/api/apiUtils';
+import { getGlobalReloadUser } from '../../contexts/UserContext';
+
+// URL de l'API
+const API_URL = import.meta.env.VITE_API_URL;
+
+export async function updateUserInfo({ display_name, email, photo_url, email_enabled, push_enabled, uid }) {
+  
+  const body = {
+    display_name: display_name ?? null,
+    email: email ?? null,
+    photo_url: photo_url ?? null,
+    email_enabled: email_enabled ?? null,
+    push_enabled: push_enabled ?? null,
+  };
+
+  const response = await performApiCall({
+    url: `${API_URL}/api/user/update`,
+    method: 'POST',
+    body,
+    origin: 'USER_UPDATE',
+    uid,
+    analyticsEvent: 'update_user_info',
+    analyticsData: { uid },
+  });
+
+  if (response.success) {
+    const reloadUser = getGlobalReloadUser();
+    reloadUser();
+  }
+
+  return response;
+}
 
 /**
  * Connexion avec Google
@@ -131,10 +165,6 @@ export const registerWithEmail = async (email, password, name) => {
       password,
       options: {
         redirectTo: window.location.origin + '/auth/callback',
-        data: {
-          name,
-          avatar_url: null,
-        },
       },
     });
     if (error) {

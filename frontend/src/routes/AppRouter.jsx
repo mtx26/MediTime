@@ -36,9 +36,12 @@ function PrivateRoute({ element }) {
   if (!userInfo) {
     return <Navigate to="/" />;
   }
+  /*}
   if (!userInfo.emailVerified) {
-    return <Navigate to="/verify-email" />;
-  }
+    if (userInfo.provider === 'email') {
+      return <Navigate to="/verify-email" />;
+    }
+  }*/
   return element;
 }
 

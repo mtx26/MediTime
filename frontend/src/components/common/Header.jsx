@@ -347,7 +347,7 @@ function Navbar({ sharedProps }) {
                     <>
                       <img
                         src={
-                          userInfo.photoURL ||
+                          userInfo.photoUrl ||
                           'https://www.w3schools.com/howto/img_avatar.png'
                         }
                         alt="Profil"
@@ -472,7 +472,7 @@ function Navbar({ sharedProps }) {
             {userInfo ? (
               <img
                 src={
-                  userInfo?.photoURL ||
+                  userInfo?.photoUrl ||
                   'https://www.w3schools.com/howto/img_avatar.png'
                 }
                 alt="Profil"
