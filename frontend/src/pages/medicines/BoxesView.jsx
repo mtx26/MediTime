@@ -829,6 +829,7 @@ function InputDropdown({
           defaultValue={name}
           onChange={(e) => {
             onChangeName(e.target.value);
+            setShowDropdown(true)
           }}
           onClick={() => setTimeout(() => setShowDropdown(true), 300)}
           onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
