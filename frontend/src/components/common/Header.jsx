@@ -429,35 +429,31 @@ function Navbar({ sharedProps }) {
         </div>
       </nav>
 
-      <nav className="navbar fixed-bottom bg-white shadow-sm py-2 border-top d-lg-none">
-        <div className="container-fluid d-flex justify-content-around mb-2">
+      <nav className="navbar fixed-bottom bg-white shadow-sm py-2 border-top border-2 d-lg-none">
+        <div className="container-fluid d-flex justify-content-around mb-1">
           <Link
             to="/"
             className="text-center text-dark text-decoration-none link-hover"
           >
-            <i className="bi bi-house fs-4"></i>
-            <div className="small">{t('home')}</div>
+            <i className="bi bi-house fs-1"></i>
           </Link>
           <Link
             to="/calendars"
             className="text-center text-dark text-decoration-none link-hover"
           >
-            <i className="bi bi-calendar-event fs-4"></i>
-            <div className="small">{t('calendar.label')}</div>
+            <i className="bi bi-calendar-event fs-1"></i>
           </Link>
           <Link
             to="/shared-calendars"
             className="text-center text-dark text-decoration-none link-hover"
           >
-            <i className="bi bi-people fs-4"></i>
-            <div className="small">{t('shared')}</div>
+            <i className="bi bi-people fs-1"></i>
           </Link>
           <Link
             to="/notifications"
             className="text-center text-dark text-decoration-none link-hover position-relative"
           >
-            <i className="bi bi-bell fs-4"></i>
-            <div className="small">{t('notifications')}</div>
+            <i className="bi bi-bell fs-1"></i>
             {notificationsData !== null &&
               notificationsData.filter((notif) => !notif.read).length > 0 && (
                 <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger fs-7">
@@ -476,15 +472,14 @@ function Navbar({ sharedProps }) {
                   'https://www.w3schools.com/howto/img_avatar.png'
                 }
                 alt="Profil"
-                className="rounded-circle me-2"
-                width="32"
-                height="32"
+                className="rounded-circle"
+                width="38"
+                height="38"
                 referrerPolicy="no-referrer"
               />
             ) : (
-              <i className="bi bi-person-circle fs-3 me-2"></i>
+              <i className="bi bi-person-circle fs-1"></i>
             )}
-            <div className="small">{t('account.label')}</div>
           </Link>
         </div>
       </nav>
