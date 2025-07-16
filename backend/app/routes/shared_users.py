@@ -70,6 +70,8 @@ def handle_shared_calendars():
                     boxes_count = cursor.fetchone()
                     boxes_count = boxes_count.get("count", 0) if boxes_count else 0
 
+                    if_low_stock = check_if_stock_is_low(calendar["id"])
+
                     calendar_name = calendar.get("name")
 
                     # Récupère les infos de l'owner
@@ -101,7 +103,8 @@ def handle_shared_calendars():
                         "owner_photo_url": owner_photo_url,
                         "owner_email": owner_email,
                         "access": access,
-                        "boxes_count": boxes_count
+                        "boxesCount": boxes_count,
+                        "ifLowStock": if_low_stock
                     })
 
                 t_2 = time.time()

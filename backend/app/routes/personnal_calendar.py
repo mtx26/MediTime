@@ -36,8 +36,10 @@ def handle_calendars():
                 for calendar in calendars:
                     cursor.execute("SELECT COUNT(*) FROM medicine_boxes WHERE calendar_id = %s", (calendar["id"],))
                     boxes_count = cursor.fetchone()
-                    calendar["boxes_count"] = boxes_count.get("count", 0) if boxes_count else 0
+                    calendar["boxesCount"] = boxes_count.get("count", 0) if boxes_count else 0
 
+                    if_low_stock = check_if_stock_is_low(calendar["id"])
+                    calendar["ifLowStock"] = if_low_stock
 
         t_1 = time.time()
         return success_response(

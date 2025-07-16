@@ -443,7 +443,12 @@ function BoxCard({
         {(!selectedModifyBox || selectedModifyBox !== box.id) && (
           <div className="d-flex mb-2 align-items-center w-100 gap-2">
             <StockBadge box={box} />
-            <ConditionUnlessBadge conditions={box.conditions} />
+            <ConditionUnlessBadge 
+              conditions={box.conditions} 
+              boxId={box.id} 
+              setSelectedDropBox={setSelectedDropBox}
+              setSelectedModifyBox={setSelectedModifyBox}
+            />
           </div> 
         )}
 
@@ -777,16 +782,24 @@ function StockBadge({ box }) {
   );
 }
 
-function ConditionUnlessBadge({ conditions }) {
+function ConditionUnlessBadge({ conditions, boxId, setSelectedDropBox, setSelectedModifyBox }) {
   const { t } = useTranslation();
 
   const hasNoConditions =
     Object.values(conditions || {}).filter((c) => c !== undefined).length === 0;
 
   return hasNoConditions ? (
-    <span className="badge bg-warning">
-      <i className="bi bi-info-circle" /> {t('boxes.condition.none')}
-    </span>
+    <button 
+      className='btn p-0' 
+      onClick={() => {
+        setSelectedDropBox((prev) => ({ ...prev, [boxId]: true }));
+        setSelectedModifyBox(boxId)
+      }}
+    >
+      <span className="badge bg-warning">
+        <i className="bi bi-info-circle" /> {t('boxes.condition.none')}
+      </span>
+    </button>
   ) : null;
 }
 

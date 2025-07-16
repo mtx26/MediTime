@@ -284,13 +284,22 @@ function SelectCalendar({
                 <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
                   {/* Partie gauche : Nom + nombre */}
                   <div className="me-auto">
-                    <h5 className="mb-1 fs-semibold">{calendarData.name}</h5>
-                    <div className="text-muted small">
-                      {t('medicines.label')}:
-                      <span className="fw-semibold ms-1">
-                        {calendarData.boxes_count ?? '...'}
-                      </span>
+                    <div>
+                      <h5 className="mb-1 fs-semibold">{calendarData.name}</h5>
+                      <div className="text-muted small">
+                        {t('medicines.label')}:
+                        <span className="fw-semibold ms-1">
+                          {calendarData.boxesCount ?? '...'}
+                        </span>
+                      </div>
                     </div>
+                    {calendarData.ifLowStock && (
+                      <button className="btn p-0" onClick={() => navigate(`/calendar/${calendarData.id}/stock-alerts`)}>
+                        <span className="badge bg-warning d-flex align-items-center gap-1">
+                          <i className='bi bi-exclamation-triangle-fill'></i>{t('stock_alert')}
+                        </span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Bouton Ouvrir */}
@@ -472,13 +481,13 @@ function SelectCalendar({
                     />
                   )}
 
-                  <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-2">
+                  <div className="d-flex justify-content-between align-items-center gap-2 mb-2">
                     <div className="flex-grow-1">
                       <h5 className="mb-1 fs-semibold">{calendarData.name}</h5>
                       <div className="text-muted small">
                         {t('medicines.label')}:
                         <span className="fw-semibold ms-1">
-                          {calendarData.boxes_count ?? '...'}
+                          {calendarData.boxesCount ?? '...'}
                         </span>
                       </div>
                       <div className="text-muted small d-flex align-items-center ">
@@ -500,71 +509,69 @@ function SelectCalendar({
                       </div>
                     </div>
 
-                    <div className='gap-2 d-flex flex-wrap justify-content-center'>
-                      <button
-                        className="btn btn-outline-success"
-                        title={t('open')}
-                        aria-label={t('open')}
-                        onClick={() =>
-                          navigate('/shared-user-calendar/' + calendarData.id)
-                        }
-                      >
-                        {t('open')}
-                      </button>
-                      <ActionSheet
-                        actions={[
-                          {
-                            label: (
-                              <>
-                                <i className="bi bi-capsule me-2"></i> {t('medicines.label')}
-                              </>
-                            ),
-                            onClick: () => {
-                              navigate(`/shared-user-calendar/${calendarData.id}/boxes`);
-                            },
+                    <button
+                      className="btn btn-outline-success"
+                      title={t('open')}
+                      aria-label={t('open')}
+                      onClick={() =>
+                        navigate('/shared-user-calendar/' + calendarData.id)
+                      }
+                    >
+                      {t('open')}
+                    </button>
+                    <ActionSheet
+                      actions={[
+                        {
+                          label: (
+                            <>
+                              <i className="bi bi-capsule me-2"></i> {t('medicines.label')}
+                            </>
+                          ),
+                          onClick: () => {
+                            navigate(`/shared-user-calendar/${calendarData.id}/boxes`);
                           },
-                          {
-                            label: (
-                              <>
-                                <i className="bi bi-download me-2"></i> {t('boxes.export_pdf')}
-                              </>
-                            ),
-                            onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
+                        },
+                        {
+                          label: (
+                            <>
+                              <i className="bi bi-download me-2"></i> {t('boxes.export_pdf')}
+                            </>
+                          ),
+                          onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
+                        },
+                        {
+                          label: (
+                            <>
+                              <i className="bi bi-exclamation-triangle-fill me-2"></i> {t('stock')}
+                            </>
+                          ),
+                          onClick: () => {
+                            navigate(`/shared-user-calendar/${calendarData.id}/stock-alerts`);
                           },
-                          {
-                            label: (
-                              <>
-                                <i className="bi bi-exclamation-triangle-fill me-2"></i> {t('stock')}
-                              </>
-                            ),
-                            onClick: () => {
-                              navigate(`/shared-user-calendar/${calendarData.id}/stock-alerts`);
-                            },
+                        },
+                        { separator: true },
+                        {
+                          label: (
+                            <>
+                              <i className="bi bi-gear me-2"></i> {t('settings.label')}
+                            </>
+                          ),
+                          onClick: () => {
+                            navigate(`/shared-user-calendar/${calendarData.id}/settings`);
                           },
-                          { separator: true },
-                          {
-                            label: (
-                              <>
-                                <i className="bi bi-gear me-2"></i> {t('settings.label')}
-                              </>
-                            ),
-                            onClick: () => {
-                              navigate(`/shared-user-calendar/${calendarData.id}/settings`);
-                            },
-                          },
-                          { separator: true },
-                          {
-                            label: (
-                              <>
-                                <i className="bi bi-trash3 me-2"></i> {t('delete')}
-                              </>
-                            ),
-                            onClick: () => handleDeleteSharedCalendarClick(calendarData.id),
-                            danger: true,
-                          },
-                        ]}
-                      />
-                    </div>
+                        },
+                        { separator: true },
+                        {
+                          label: (
+                            <>
+                              <i className="bi bi-trash3 me-2"></i> {t('delete')}
+                            </>
+                          ),
+                          onClick: () => handleDeleteSharedCalendarClick(calendarData.id),
+                          danger: true,
+                        },
+                      ]}
+                    />
                   </div>
                 </div>
               )

@@ -353,7 +353,7 @@ function CalendarPage({
               {isLowStock && (
                 <button
                   type="button"
-                  className="alert alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow-sm"
+                  className="alert w-100 alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow-sm"
                   onClick={() => navigate(`/${basePath}/${calendarId}/stock-alerts`)}
                   title={t('stock_alert_tooltip')}
                 >
