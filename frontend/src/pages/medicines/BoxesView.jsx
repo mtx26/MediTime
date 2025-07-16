@@ -441,9 +441,10 @@ function BoxCard({
         </div>
 
         {(!selectedModifyBox || selectedModifyBox !== box.id) && (
-          <div className="d-flex mb-2 align-items-center w-100">
+          <div className="d-flex mb-2 align-items-center w-100 gap-2">
             <StockBadge box={box} />
-          </div>  
+            <ConditionUnlessBadge conditions={box.conditions} />
+          </div> 
         )}
 
         <div className="mt-4 mb-2">
@@ -774,6 +775,19 @@ function StockBadge({ box }) {
       <i className="bi bi-check-circle" /> {t('boxes.stock.badge.high')}
     </span>
   );
+}
+
+function ConditionUnlessBadge({ conditions }) {
+  const { t } = useTranslation();
+
+  const hasNoConditions =
+    Object.values(conditions || {}).filter((c) => c !== undefined).length === 0;
+
+  return hasNoConditions ? (
+    <span className="badge bg-warning">
+      <i className="bi bi-info-circle" /> {t('boxes.condition.none')}
+    </span>
+  ) : null;
 }
 
 function InputDropdown({
