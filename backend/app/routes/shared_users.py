@@ -70,7 +70,7 @@ def handle_shared_calendars():
                     boxes_count = cursor.fetchone()
                     boxes_count = boxes_count.get("count", 0) if boxes_count else 0
 
-                    if_low_stock = check_if_stock_is_low(calendar["id"])
+                    if_low_stock = check_if_stock_is_low(calendar_id)
 
                     calendar_name = calendar.get("name")
 

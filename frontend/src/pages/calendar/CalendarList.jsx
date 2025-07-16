@@ -284,14 +284,12 @@ function SelectCalendar({
                 <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
                   {/* Partie gauche : Nom + nombre */}
                   <div className="me-auto">
-                    <div>
-                      <h5 className="mb-1 fs-semibold">{calendarData.name}</h5>
-                      <div className="text-muted small">
-                        {t('medicines.label')}:
-                        <span className="fw-semibold ms-1">
-                          {calendarData.boxesCount ?? '...'}
-                        </span>
-                      </div>
+                    <h5 className="mb-1 fs-semibold">{calendarData.name}</h5>
+                    <div className="text-muted small">
+                      {t('medicines.label')}:
+                      <span className="fw-semibold ms-1">
+                        {calendarData.boxesCount ?? '...'}
+                      </span>
                     </div>
                     {calendarData.ifLowStock && (
                       <button className="btn p-0" onClick={() => navigate(`/calendar/${calendarData.id}/stock-alerts`)}>
@@ -507,6 +505,13 @@ function SelectCalendar({
                           }
                         />
                       </div>
+                      {calendarData.ifLowStock && (
+                        <button className="btn p-0" onClick={() => navigate(`/shared-user-calendar/${calendarData.id}/stock-alerts`)}>
+                          <span className="badge bg-warning d-flex align-items-center gap-1">
+                            <i className='bi bi-exclamation-triangle-fill'></i>{t('stock_alert')}
+                          </span>
+                        </button>
+                      )}
                     </div>
 
                     <button
