@@ -49,7 +49,7 @@ const SettingsPage = ({ sharedProps }) => {
       <div className="row">
         {/* 🧭 Onglets verticaux Bootstrap */}
         <div className="col-md-3 mb-3">
-          <div className="card shadow-sm rounded">
+          <div className="card shadow rounded">
             <div className="card-body p-3">
               <h5 className="mb-3">{t('settings.label')}</h5>
               <div className="nav flex-column nav-pills">
@@ -107,7 +107,7 @@ const SettingsPage = ({ sharedProps }) => {
 
         {/* 📄 Contenu de l'onglet actif */}
         <div className="col-md-9">
-          <div className="card shadow-sm rounded p-4 bg-white">
+          <div className="card shadow rounded p-4 bg-white">
             {renderTab()}
           </div>
         </div>

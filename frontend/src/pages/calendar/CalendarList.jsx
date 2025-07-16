@@ -264,7 +264,7 @@ function SelectCalendar({
         {/* Liste des calendriers */}
         {Array.isArray(personalCalendars.calendarsData) &&
         personalCalendars.calendarsData.length > 0 ? (
-          <div className="list-group shadow-sm">
+          <div className="list-group shadow">
             {personalCalendars.calendarsData.map((calendarData, index) => (
               <div key={index} className="list-group-item">
                 {selectedAlert === 'calendar' + calendarData.id && (
@@ -459,7 +459,7 @@ function SelectCalendar({
         {/* Liste des calendriers partagés */}
         {Array.isArray(sharedUserCalendars.sharedCalendarsData) &&
         sharedUserCalendars.sharedCalendarsData.length > 0 ? (
-          <div className="list-group shadow-sm">
+          <div className="list-group shadow">
             {sharedUserCalendars.sharedCalendarsData.map(
               (calendarData, index) => (
                 <div key={index} className="list-group-item">

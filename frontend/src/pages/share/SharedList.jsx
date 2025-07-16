@@ -271,7 +271,7 @@ function SharedList({
       <div className="row g-4">
         {Object.entries(groupedShared).map(([calendarId, data]) => (
           <div key={calendarId} className="col-12 col-md-6">
-            <div className="card h-100 shadow-sm border border-2">
+            <div className="card h-100 shadow border border-2">
               <div className="card-body">
                 {/* Nom du calendrier */}
                 <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">

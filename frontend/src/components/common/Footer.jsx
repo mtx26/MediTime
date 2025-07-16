@@ -125,7 +125,7 @@ function Footer() {
                   <li>
                     <i className="bi bi-github me-2 text-primary"></i>
                     <a
-                      href="https://github.com/mtx26/medic"
+                      href="https://github.com/mtx26/MediTime"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-muted text-decoration-none link-hover"

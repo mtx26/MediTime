@@ -81,7 +81,7 @@ export default function PillboxDisplay({
 
   if (loading === undefined) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '60vh' }}>
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '40vh' }}>
         <div className="spinner-border text-primary">
           <span className="visually-hidden">{t('loading_calendar')}</span>
         </div>
@@ -154,7 +154,7 @@ export default function PillboxDisplay({
                     <div key={day} className="col">
                       <div className="d-flex flex-column h-100">
                         <h6 className="mb-2">{t(day)}</h6>
-                        <div className="border rounded bg-light p-2 flex-grow-1 d-flex align-items-center justify-content-center">
+                        <div className="shadow-sm border rounded bg-light p-2 flex-grow-1 d-flex align-items-center justify-content-center">
                           {orderedMeds[selectedMedIndex].cells[day] !== undefined && (
                             <div className="w-100 ratio ratio-1x1">
                               <img

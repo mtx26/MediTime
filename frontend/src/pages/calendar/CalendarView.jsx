@@ -353,7 +353,7 @@ function CalendarPage({
               {isLowStock && (
                 <button
                   type="button"
-                  className="alert w-100 alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow-sm"
+                  className="alert w-100 alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow"
                   onClick={() => navigate(`/${basePath}/${calendarId}/stock-alerts`)}
                   title={t('stock_alert_tooltip')}
                 >
@@ -375,10 +375,12 @@ function CalendarPage({
                 <h4 className="mb-3 fw-bold">
                   <i className="bi bi-calendar-date"></i> {t('calendar.reference_week')}
                 </h4>
-                <WeekCalendarSelector
-                  selectedDate={startDate}
-                  onWeekSelect={onWeekSelect}
-                />
+                <div className='shadow'>
+                  <WeekCalendarSelector
+                    selectedDate={startDate}
+                    onWeekSelect={onWeekSelect}
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -407,16 +409,18 @@ function CalendarPage({
                 <h4 className="mb-3 fw-bold">
                   <i className="bi bi-capsule"></i> {t('pillbox.title')}
                 </h4>
-                <PillboxDisplay
-                  type="calendar"
-                  selectedDate={startDate}
-                  calendarType={calendarType}
-                  calendarId={calendarId}
-                  basePath={basePath}
-                  personalCalendars={personalCalendars}
-                  sharedUserCalendars={sharedUserCalendars}
-                  tokenCalendars={tokenCalendars}
-                />
+                <div className='border rounded pb-3 shadow'>
+                  <PillboxDisplay
+                    type="calendar"
+                    selectedDate={startDate}
+                    calendarType={calendarType}
+                    calendarId={calendarId}
+                    basePath={basePath}
+                    personalCalendars={personalCalendars}
+                    sharedUserCalendars={sharedUserCalendars}
+                    tokenCalendars={tokenCalendars}
+                  />
+                </div>
               </div>
             </>
           )}
@@ -505,11 +509,11 @@ function CalendarPage({
             <h4 className="mb-3 fw-bold">
               <i className="bi bi-calendar-week"></i> {t('calendar.weekly_view')}
             </h4>
-            <div className="alert alert-info mt-4 mb-4" role="alert">
+            <div className="alert alert-info mt-4 mb-4 shadow" role="alert">
               <i className="bi bi-pin-angle-fill"></i>
               <span>{' '}{t('calendar.weekly_help')}</span>
             </div>
-            <div className="card shadow-sm">
+            <div className="card shadow">
               <div className="card-body">
                 <FullCalendar
                   ref={calendarRef}
@@ -558,7 +562,7 @@ function CalendarPage({
               <i className="bi bi-calendar-week"></i> {t('calendar.daily_view')}
             </h4>
 
-            <div className="card shadow-sm">
+            <div className="card shadow">
               <div className="card-body">
                 <WeeklyEventContent
                   ifModal={false}

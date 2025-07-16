@@ -258,7 +258,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
               aria-label={t('boxes.add_box')}
               title={t('boxes.add_box')}
             >
-              <div className="card h-100 shadow-sm border border-success">
+              <div className="card h-100 shadow border border-success">
                 <div className="card-body d-flex flex-column justify-content-center align-items-center">
                   <i className="bi bi-plus-circle text-success fs-1"></i>
                 </div>
@@ -307,7 +307,7 @@ function BoxCard({
 
   return (
     <div
-      className={`card h-100 shadow-sm border ${
+      className={`card h-100 shadow border ${
         box.box_capacity === 0
           ? ''
           : box.stock_quantity <= 0
