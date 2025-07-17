@@ -123,6 +123,7 @@
   },
   "calendar": {
     "add": "Добавить календарь",
+    "add_calendar": "Добавить календарь",
     "confirm_delete": "Удалить календарь?",
     "confirm_delete_shared": "Удалить общий календарь?",
     "confirm_rename": "Переименовать календарь?",

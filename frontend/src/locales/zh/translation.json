@@ -123,6 +123,7 @@
   },
   "calendar": {
     "add": "添加日历",
+    "add_calendar": "添加日历",
     "confirm_delete": "删除日历？",
     "confirm_delete_shared": "删除共享日历？",
     "confirm_rename": "重命名日历？",

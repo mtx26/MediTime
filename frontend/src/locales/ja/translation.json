@@ -123,6 +123,7 @@
   },
   "calendar": {
     "add": "カレンダーを追加する",
+    "add_calendar": "カレンダーを追加する",
     "confirm_delete": "カレンダーを削除しますか?",
     "confirm_delete_shared": "共有カレンダーを削除しますか?",
     "confirm_rename": "カレンダーの名前を変更しますか?",
