@@ -12,6 +12,6 @@ pyjwt==2.10.1
 cryptography==45.0.5
 twilio==9.6.3
 reportlab==4.4.2
-google-cloud-aiplatform==1.103.0
+google-cloud-aiplatform==1.105.0
 pillow-heif==1.0.0
 pillow==11.3.0
