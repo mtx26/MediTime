@@ -124,11 +124,14 @@
   "calendar": {
     "add": "カレンダーを追加する",
     "add_calendar": "カレンダーを追加する",
+    "choose_image": "画像を選択",
     "confirm_delete": "カレンダーを削除しますか?",
     "confirm_delete_shared": "共有カレンダーを削除しますか?",
     "confirm_rename": "カレンダーの名前を変更しますか?",
     "daily_view": "日めくりカレンダー",
     "day": "日",
+    "drag_and_drop": "画像をここにドラッグするかクリックして選択してください",
+    "import_calendar": "カレンダー「{{name}}」をインポートします",
     "import_type": "追加モード",
     "import_type_file": "ファイルのインポート",
     "import_type_manual": "マヌエル",
@@ -483,6 +486,9 @@
     "title": "彼らは私たちを信頼している"
   },
   "threshold": "しきい値",
+  "title": {
+    "delete_file": "ファイルを削除する"
+  },
   "user": "ユーザー",
   "verify_email": {
     "instructions": "新しい確認リンクをあなたのメールアドレスに送信します。",

@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function ImportCalendarPage() {
   const location = useLocation();
+  const { t } = useTranslation();
   const params = new URLSearchParams(location.search);
   const calendarName = params.get('name') || '';
 
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null); // <-- ref ici
 
   useEffect(() => {
@@ -23,7 +24,6 @@ export default function ImportCalendarPage() {
 
   const handleDrop = (e) => {
     e.preventDefault();
-    setDragOver(false);
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile && droppedFile.type.startsWith('image/')) {
       setFile(droppedFile);
@@ -49,14 +49,14 @@ export default function ImportCalendarPage() {
   };
 
   return (
-    <div className="container my-5">
-      <h4 className="mb-4 fw-bold text-center">
+    <div className={`container card p-0 shadow border-secondary`} style={{ maxWidth: '800px' }}>
+      <h4 className="mb-4 fw-bold text-center card-header">
         <i className="bi bi-file-earmark-plus me-2"></i>
-        Importer le calendrier "<span>{calendarName}</span>"
+        {t('calendar.import_calendar', { name: calendarName })}
       </h4>
 
       <div
-        className={`border rounded p-5 text-center mx-auto ${dragOver ? 'bg-light border-primary' : 'border-secondary'} border-2 border-dashed`}
+        className={`rounded p-3 text-center mx-auto`}
         style={{ maxWidth: '600px' }}
         onDragOver={(e) => {
           e.preventDefault();
@@ -65,7 +65,7 @@ export default function ImportCalendarPage() {
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
       >
-        <p className="mb-3 text-muted">Glissez une image ici ou cliquez pour la sélectionner</p>
+        <p className="mb-3 text-muted">{t('calendar.drag_and_drop')}</p>
 
         <input
           type="file"
@@ -76,7 +76,7 @@ export default function ImportCalendarPage() {
           onChange={handleFileChange}
         />
         <label htmlFor="fileUpload" className="btn btn-outline-primary">
-          Choisir une image
+          {t('calendar.choose_image')}
         </label>
 
         {file && (
@@ -87,8 +87,8 @@ export default function ImportCalendarPage() {
                 <button
                   className="btn p-0 border-0 bg-transparent text-danger"
                   onClick={handleReset}
-                  aria-label="Supprimer le fichier"
-                  title="Supprimer le fichier"
+                  aria-label={t('title.delete_file')}
+                  title={t('title.delete_file')}
                 >
                   <i className="bi bi-x-circle fs-5"></i>
                 </button>
@@ -103,8 +103,16 @@ export default function ImportCalendarPage() {
               )}
             </div>
             <div className="text-center mt-4">
-              <button className="btn btn-primary px-4">
-                Suivant <i className="bi bi-arrow-right ms-2"></i>
+              <button 
+                className="btn btn-primary px-4"
+                onClick={() => {
+                  // Handle next button click
+                }}
+                aria-label={t('next')}
+                title={t('next')}
+              >
+                {t('next')}
+                <i className="bi bi-arrow-right ms-2"></i>
               </button>
             </div>
           </>

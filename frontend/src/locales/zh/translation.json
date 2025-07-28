@@ -124,11 +124,14 @@
   "calendar": {
     "add": "添加日历",
     "add_calendar": "添加日历",
+    "choose_image": "选择图像",
     "confirm_delete": "删除日历？",
     "confirm_delete_shared": "删除共享日历？",
     "confirm_rename": "重命名日历？",
     "daily_view": "日历",
     "day": "天",
+    "drag_and_drop": "将图像拖到此处或单击以选择它",
+    "import_calendar": "导入日历“{{name}}”",
     "import_type": "添加模式",
     "import_type_file": "导入文件",
     "import_type_manual": "曼努埃尔",
@@ -483,6 +486,9 @@
     "title": "他们信任我们"
   },
   "threshold": "临界点",
+  "title": {
+    "delete_file": "删除文件"
+  },
   "user": "用户",
   "verify_email": {
     "instructions": "向您的电子邮件地址发送新的验证链接。",

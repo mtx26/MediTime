@@ -124,11 +124,14 @@
   "calendar": {
     "add": "Add a calendar",
     "add_calendar": "Add a calendar",
+    "choose_image": "Choose an image",
     "confirm_delete": "Delete the calendar?",
     "confirm_delete_shared": "Delete shared calendar?",
     "confirm_rename": "Rename the calendar?",
     "daily_view": "Daily calendar",
     "day": "Day",
+    "drag_and_drop": "Drag an image here or click to select it",
+    "import_calendar": "Import the calendar \"{{name}}\"",
     "import_type": "Add mode",
     "import_type_file": "Importing a file",
     "import_type_manual": "Manuel",
@@ -483,6 +486,9 @@
     "title": "They trust us"
   },
   "threshold": "Threshold",
+  "title": {
+    "delete_file": "Delete the file"
+  },
   "user": "User",
   "verify_email": {
     "instructions": "Send a new verification link to your email address.",

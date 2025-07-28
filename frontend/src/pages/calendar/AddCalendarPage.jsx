@@ -26,14 +26,14 @@ function AddCalendarPage({ personalCalendars }) {
   };
 
   return (
-    <div className="container my-5" style={{ maxWidth: '800px' }}>
-      <h4 className="mb-4 fw-bold text-center">
+    <div className="container card shadow p-0 border-secondary" style={{ maxWidth: '800px' }}>
+      <h4 className="mb-4 fw-bold text-center card-header">
         <i className="bi bi-calendar-plus me-2"></i>
         {t('calendar.add_calendar')}
       </h4>
 
       <form onSubmit={handleSubmit}>
-        <div className="row g-2 align-items-center mb-4">
+        <div className="row g-2 align-items-center mb-4 card-body">
           <div className="col-md-6">
             <input
               id="newCalendarName"

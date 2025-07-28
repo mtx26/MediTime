@@ -124,11 +124,14 @@
   "calendar": {
     "add": "Aggiungi un calendario",
     "add_calendar": "Aggiungi un calendario",
+    "choose_image": "Scegli un'immagine",
     "confirm_delete": "Eliminare il calendario?",
     "confirm_delete_shared": "Eliminare il calendario condiviso?",
     "confirm_rename": "Rinominare il calendario?",
     "daily_view": "Calendario giornaliero",
     "day": "Giorno",
+    "drag_and_drop": "Trascina un'immagine qui o fai clic per selezionarla",
+    "import_calendar": "Importa il calendario \"{{name}}\"",
     "import_type": "Aggiungi modalità",
     "import_type_file": "Importazione di un file",
     "import_type_manual": "Manuel",
@@ -483,6 +486,9 @@
     "title": "Si fidano di noi"
   },
   "threshold": "Soglia",
+  "title": {
+    "delete_file": "Elimina il file"
+  },
   "user": "Utente",
   "verify_email": {
     "instructions": "Invia un nuovo link di verifica al tuo indirizzo email.",

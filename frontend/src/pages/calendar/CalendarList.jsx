@@ -173,11 +173,6 @@ function SelectCalendar({
           />
         )}
 
-        {/* Champ pour ajouter un nouveau calendrier */}
-        <button className="btn btn-primary w-100" onClick={() => navigate('/add-calendar')}>
-          <i className="bi bi-calendar-plus me-2"></i> {t('calendar.add_calendar')}
-        </button>
-
         {selectedAlert === 'calendar' && (
           <AlertSystem
             type={alertType}
@@ -194,8 +189,7 @@ function SelectCalendar({
         )}
 
         {/* Liste des calendriers */}
-        {Array.isArray(personalCalendars.calendarsData) &&
-        personalCalendars.calendarsData.length > 0 ? (
+        {(Array.isArray(personalCalendars.calendarsData) && personalCalendars.calendarsData.length > 0) && (
           <div className="list-group shadow">
             {personalCalendars.calendarsData.map((calendarData, index) => (
               <div key={index} className="list-group-item">
@@ -360,11 +354,12 @@ function SelectCalendar({
               </div>
             ))}
           </div>
-        ) : (
-          <div className="alert alert-warning">
-            {t('no_personal_calendars')}
-          </div>
         )}
+        
+        {/* Champ pour ajouter un nouveau calendrier */}
+        <button className="btn btn-primary w-100 shadow" onClick={() => navigate('/add-calendar')}>
+          <i className="bi bi-calendar-plus me-2"></i> {t('calendar.add_calendar')}
+        </button>
       </div>
 
       <div className="w-100" style={{ maxWidth: '800px' }}>
