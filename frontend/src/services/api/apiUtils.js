@@ -6,6 +6,7 @@ import { logEvent } from 'firebase/analytics';
 export async function performApiCall({
   url,
   method = 'GET',
+  headers = null,
   body = null,
   origin,
   uid = null,
@@ -14,10 +15,12 @@ export async function performApiCall({
 }) {
   try {
     const token = await getToken();
-    const headers = {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    };
+    if (headers === null) {
+      headers = {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+    }
 
     const res = await fetch(url, {
       method,

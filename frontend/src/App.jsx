@@ -480,7 +480,6 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/boxes/${boxId}`,
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: box,
       origin: 'SHARED_BOX_UPDATE',
       uid,
@@ -502,7 +501,6 @@ function App() {
       const result = await performApiCall({
         url: `${API_URL}/api/shared/users/calendars/${calendarId}/boxes`,
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: {
           name,
           box_capacity: boxCapacity,
@@ -579,7 +577,6 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/notifications`,
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: { "notifications-enabled": enabled },
       origin: 'SHARED_USER_NOTIFICATIONS_ENABLED_UPDATE',
       uid,
@@ -589,6 +586,28 @@ function App() {
   }, []);
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  const analyzeImage = useCallback(async (file) => {
+    const fileToBase64 = (file) => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]); // on retire le préfixe data:
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const base64 = await fileToBase64(file);
+
+    return await performApiCall({
+      url: `${API_URL}/api/documents/analyze`,
+      method: 'POST',
+      body: { image: base64 },
+      origin: 'SHARED_USER_IMAGE_ANALYZE',
+      uid,
+      analyticsEvent: 'analyze_shared_user_image',
+      analyticsData: { uid },
+    });
+  }, []);
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   const downloadPersonalCalendarPdf = useCallback(async (calendarId) => {
     const url = `${API_URL}/api/calendars/${calendarId}/pdf`;
@@ -614,6 +633,7 @@ function App() {
       updatePersonalStockDecrementMethod,
       personalRestockBox,
       fetchPersonalNotificationsEnabled,
+      analyzeImage,
     },
 
     sharedUserCalendars: {

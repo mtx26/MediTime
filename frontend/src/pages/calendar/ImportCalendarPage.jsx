@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-export default function ImportCalendarPage() {
+export default function ImportCalendarPage({ personalCalendars }) {
   const location = useLocation();
   const { t } = useTranslation();
   const params = new URLSearchParams(location.search);
@@ -105,8 +105,9 @@ export default function ImportCalendarPage() {
             <div className="text-center mt-4">
               <button 
                 className="btn btn-primary px-4"
-                onClick={() => {
-                  // Handle next button click
+                onClick={async () => {
+                  const rep = await personalCalendars.analyzeImage(file);
+                  console.log(rep.analysis);
                 }}
                 aria-label={t('next')}
                 title={t('next')}

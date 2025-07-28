@@ -12,7 +12,7 @@ def handle_analyze_medical_document():
         t_0 = time.time()
         uid = g.uid
 
-        base64_image = request.json.get("base64Image")
+        base64_image = request.json.get("image")
 
         if not base64_image:
             return warning_response(
