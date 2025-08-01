@@ -49,8 +49,8 @@ export default function ImportCalendarPage({ personalCalendars }) {
   };
 
   return (
-    <div className={`container card p-0 shadow border-secondary`} style={{ maxWidth: '800px' }}>
-      <h4 className="mb-4 fw-bold text-center card-header">
+    <div className={`container card p-0 shadow`} style={{ maxWidth: '600px' }}>
+      <h4 className="mb-4 fw-bold text-center mt-4">
         <i className="bi bi-file-earmark-plus me-2"></i>
         {t('calendar.import_calendar', { name: calendarName })}
       </h4>

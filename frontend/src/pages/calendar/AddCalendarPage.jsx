@@ -26,8 +26,8 @@ function AddCalendarPage({ personalCalendars }) {
   };
 
   return (
-    <div className="container card shadow p-0 border-secondary" style={{ maxWidth: '800px' }}>
-      <h4 className="mb-4 fw-bold text-center card-header">
+    <div className="container card shadow p-0" style={{ maxWidth: '800px' }}>
+      <h4 className="mb-4 fw-bold text-center mt-4">
         <i className="bi bi-calendar-plus me-2"></i>
         {t('calendar.add_calendar')}
       </h4>
