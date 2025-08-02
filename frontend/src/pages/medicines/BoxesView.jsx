@@ -562,6 +562,7 @@ function BoxCard({
                             className="form-control form-control-sm"
                             title={t('boxes.condition.start_date')}
                             aria-label={t('boxes.condition.start_date')}
+                            disabled={condition.interval_days === 1}
                             defaultValue={
                               condition.start_date
                                 ? new Date(condition.start_date)

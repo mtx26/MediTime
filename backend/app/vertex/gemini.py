@@ -40,7 +40,7 @@ Here is the required format:
   "medicine_boxes": [
     {
       "name": "Medication name only (do NOT include dosage)",
-      "dose": "Dosage per unit, with unit (e.g. '40 mg', '500 µg'), or null if not specified",
+      "dose": "Dosage per unit, without unit (e.g. '40', '500'), or null if not specified",
       "conditions": [
         {
           "time_of_day": "morning" | "noon" | "evening",
@@ -55,7 +55,7 @@ Here is the required format:
 
 Rules:
 - "name" must never include the dosage.
-- "dose" must be a string with the quantity and unit (e.g. "40 mg"), or null if not specified. Do not use "N/A".
+- "dose" must be a string with the quantity but without unit (e.g. "40", "500"), or null if not specified. Do not use "N/A".
 - "start_date" must be in "YYYY-MM-DD" format or null if unknown.
 - Return valid JSON only. Do NOT wrap in Markdown (no ```json).
 - Every field must be present in every item.

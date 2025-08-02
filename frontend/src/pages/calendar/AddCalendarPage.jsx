@@ -21,7 +21,7 @@ function AddCalendarPage({ personalCalendars }) {
         alert('❌ ' + rep.error);
       }
     } else if (importType === 'file') {
-      navigate('/import-calendar?name=' + encodeURIComponent(newCalendarName));
+      navigate('/add-calendar/import?name=' + encodeURIComponent(newCalendarName));
     }
   };
 

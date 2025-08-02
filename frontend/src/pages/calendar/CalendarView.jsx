@@ -356,6 +356,7 @@ function CalendarPage({
                   className="alert w-100 alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow"
                   onClick={() => navigate(`/${basePath}/${calendarId}/stock-alerts`)}
                   title={t('stock_alert_tooltip')}
+                  aria-label={t('stock_alert')}
                 >
                   <div className="d-flex align-items-center">
                     <i className="bi bi-exclamation-triangle-fill me-2 fs-5"></i>

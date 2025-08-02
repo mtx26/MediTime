@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import AlertSystem from '../../components/common/AlertSystem';
 
 export default function ImportCalendarPage({ personalCalendars }) {
   const location = useLocation();
@@ -11,6 +12,11 @@ export default function ImportCalendarPage({ personalCalendars }) {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const fileInputRef = useRef(null); // <-- ref ici
+
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (file) {
@@ -102,12 +108,33 @@ export default function ImportCalendarPage({ personalCalendars }) {
                 />
               )}
             </div>
+            <AlertSystem
+              type={alertType}
+              message={alertMessage}
+              onClose={() => setAlertMessage(null)}
+            />
             <div className="text-center mt-4">
               <button 
                 className="btn btn-primary px-4"
                 onClick={async () => {
                   const rep = await personalCalendars.analyzeImage(file);
-                  console.log(rep.analysis);
+                  if (rep.success) {
+                    if (rep.medicines) {
+                      if (rep.medicines.length === 0) {
+                        setAlertMessage(t('calendar.no_medicines_found'));
+                        setAlertType('info');
+                      }
+                      navigate('/add-calendar/review', {
+                        state: { importedMedicines: rep.medicines },
+                      });
+                    } else {
+                      setAlertMessage(t('calendar.image_analysis_error'));
+                      setAlertType('danger');
+                    }
+                  } else {
+                    setAlertMessage(t('calendar.image_analysis_error'));
+                    setAlertType('danger');
+                  }
                 }}
                 aria-label={t('next')}
                 title={t('next')}

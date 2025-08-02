@@ -42,7 +42,7 @@ def handle_analyze_medical_document():
             code="DOCUMENT_ANALYZE_SUCCESS",
             uid=uid,
             origin="DOCUMENT_ANALYZE",
-            data={"analysis": analysis_result},
+            data={"medicines": analysis_result},
             log_extra={"time": round(t_1 - t_0, 3)}
         )
 
