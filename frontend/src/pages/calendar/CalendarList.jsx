@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AlertSystem from '../../components/common/AlertSystem';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
@@ -9,8 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 function SelectCalendar({
   personalCalendars,
-  sharedUserCalendars,
-  tokenCalendars,
+  sharedUserCalendars
 }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
