@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../contexts/UserContext';
 import { formatToLocalISODate, getMondayFromDate } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
-import ShareCalendarModal from '../../components/calendar/ShareCalendarModal';
 import AlertSystem from '../../components/common/AlertSystem';
 import isEqual from 'lodash/isEqual';
 import bootstrap5Plugin from '@fullcalendar/bootstrap5';
@@ -44,14 +43,10 @@ function CalendarPage({
   const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
   const [alertType, setAlertType] = useState(''); // Type d'alerte
   const [alertMessage, setAlertMessage] = useState(''); // Message d'alerte
-  const [existingShareToken, setExistingShareToken] = useState(null); // Token existant
-  const [sharedUsersData, setSharedUsersData] = useState([]); // Utilisateurs partageant le calendrier
 
   // 🔄 Références et chargement
   const dateModalRef = useRef(null);
-  const shareModalRef = useRef(null); // Référence vers le modal (pour gestion focus/fermeture)
   const [loading, setLoading] = useState(undefined); // État de chargement du calendrier
-  const [loadingShare, setLoadingShare] = useState(false); // État de chargement du partage du calendrier
 
   const [startDate, setStartDate] = useState(getMondayFromDate(new Date()));
 
@@ -99,26 +94,6 @@ function CalendarPage({
     const clickedDate = info.dateStr;
     setSelectedDate(clickedDate);
     dateModalRef.current?.open();
-  };
-
-  // Fonction pour partager le calendrier
-  const handleShareCalendarClick = async () => {
-    setLoadingShare(true);
-    setExistingShareToken(null);
-    setSharedUsersData([]);
-    shareModalRef.current?.open();
-    const token = await tokenCalendars.tokensList.find(
-      (t) =>
-        t.calendar_id === calendarId &&
-        !t.revoked &&
-        t.owner_uid === userInfo.uid
-    );
-    const rep = await sharedUserCalendars.fetchSharedUsers(calendarId);
-    if (rep.success) {
-      setSharedUsersData(rep.users);
-    }
-    setExistingShareToken(token || null);
-    setLoadingShare(false);
   };
 
   // Fonction pour naviguer vers la date suivante ou precedente
@@ -214,21 +189,6 @@ function CalendarPage({
 
   return (
     <>
-      {calendarType === 'personal' && (
-        // Modal pour partager un calendrier
-        <ShareCalendarModal
-          ref={shareModalRef}
-          loading={loadingShare}
-          calendarId={calendarId}
-          calendarName={calendarName}
-          existingShareToken={existingShareToken}
-          sharedUsersData={sharedUsersData}
-          tokenCalendars={tokenCalendars}
-          sharedUserCalendars={sharedUserCalendars}
-          setAlertType={setAlertType}
-          setAlertMessage={setAlertMessage}
-        />
-      )}
 
       <div className="container mt-2">
         <div className="row justify-content-center">
@@ -266,7 +226,7 @@ function CalendarPage({
                             <i className="bi bi-box-arrow-up me-2" /> {t('share')}
                           </>
                         ),
-                        onClick: handleShareCalendarClick,
+                        onClick: () => navigate(`/shared-calendars?calendar=${calendarId}`),
                       },
                       { separator: true },
                       {

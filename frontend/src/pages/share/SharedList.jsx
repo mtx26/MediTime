@@ -1,11 +1,12 @@
 import React, { useEffect, useContext, useState, useCallback } from "react";
+import PropTypes from "prop-types";
 import { UserContext } from "../../contexts/UserContext";
 import AlertSystem from "../../components/common/AlertSystem";
 import HoveredUserProfile from "../../components/common/HoveredUserProfile";
 import { formatToLocalISODate } from "../../utils/calendar/dateUtils";
 import { useTranslation } from "react-i18next";
 import ActionSheet from '../../components/common/ActionSheet';
-import { useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 const VITE_URL = import.meta.env.VITE_VITE_URL;
 
@@ -17,6 +18,8 @@ function SharedList({
   // 🔐 Contexte d'authentification
   const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const calendarFromURL = searchParams.get('calendar');
   const navigate = useNavigate(); // Hook pour la navigation
 
   // ⚠️ Alertes et confirmations
@@ -35,6 +38,7 @@ function SharedList({
   const [expirationType, setExpirationType] = useState({});
   const [emailsToInvite, setEmailsToInvite] = useState({}); // E-mails à inviter au partage
   const [selectedModifyCalendar, setSelectedModifyCalendar] = useState(null); // Calendrier sélectionné pour modification
+  const [selectedCalendarId, setSelectedCalendarId] = useState(null);
 
   // 📅 Date du jour
   const today = formatToLocalISODate(new Date()); // Date du jour au format 'YYYY-MM-DD'
@@ -236,6 +240,19 @@ function SharedList({
     }
   }, [userInfo, personalCalendars.calendarsData]);
 
+  useEffect(() => {
+    const existsInList = personalCalendars.calendarsData?.some(c => c.id === calendarFromURL);
+
+    if (calendarFromURL && existsInList) {
+      setSelectedCalendarId(calendarFromURL);
+    } else if (personalCalendars.calendarsData?.length > 0) {
+      const first = personalCalendars.calendarsData[0].id;
+      setSelectedCalendarId(first);
+      setSearchParams({ calendar: first });
+    }
+  }, [personalCalendars.calendarsData, calendarFromURL]);
+
+
   if (loadingGroupedShared) {
     return (
       <div
@@ -263,133 +280,172 @@ function SharedList({
 
   return (
     <div className="container py-4">
+      <div className="mb-2 pb-2">
+        <div
+          className="d-flex flex-nowrap gap-2 p-1 overflow-auto"
+          style={{ scrollBehavior: 'smooth' }}
+        >
+          {personalCalendars.calendarsData.map((calendar) => (
+            <button
+              key={calendar.id}
+              className={`btn rounded-pill px-3 py-1 fw-semibold shadow-sm text-nowrap ${
+                selectedCalendarId === calendar.id ? 'btn-primary' : 'btn-outline-primary'
+              }`}
+              onClick={() => {
+                setSelectedCalendarId(calendar.id);
+                setSearchParams({ calendar: calendar.id });
+              }}
+              title={calendar.name}
+            >
+              {calendar.name.length > 20 ? calendar.name.slice(0, 17) + '…' : calendar.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <h2 className="mb-4 fw-bold">
         <i className="bi bi-people-fill me-2"></i>
         {t("shared_calendar_management")}
       </h2>
 
       <div className="row g-4">
-        {Object.entries(groupedShared).map(([calendarId, data]) => (
-          <div key={calendarId} className="col-12 col-md-6">
-            <div className="card h-100 shadow border border-2">
-              <div className="card-body">
-                {/* Nom du calendrier */}
-                <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">
-                  <span>{data.calendar_name}</span>
-                  <ActionSheet
-                    actions={[
-                      {
-                        label: (
-                          <>
-                            <i className="bi bi-eye me-2"></i> {t('open')}
-                          </>
-                        ),
-                        onClick: () => navigate(`/calendar/${calendarId}`),
-                      },
-                      {
-                        label: (
-                          <>
-                            <i className="bi bi-capsule me-2"></i> {t('medicines.label')}
-                          </>
-                        ),
-                        onClick: () => {
-                          navigate(`/calendar/${calendarId}/boxes`);
-                        },
-                      },
-                      { separator: true },
-                      {
-                        label: (
-                          <>
-                            <i className="bi bi-trash me-2"></i> {t('delete')}
-                          </>
-                        ),
-                        onClick: () => {
-                          setAlertType("confirm-danger");
-                          setAlertMessage(t("delete_calendar_confirm"));
-                          setAlertId(calendarId);
-                          setOnConfirmAction(() => async () => {
-                            const rep = await personalCalendars.deleteCalendar(calendarId);
-                            if (rep.success) {
-                              setAlertType("success");
-                              setAlertMessage("✅ " + rep.message);
-                              setTimeout(() => {
-                                navigate("/calendars");
-                              }, 1000);
-                            } else {
-                              setAlertType("danger");
-                              setAlertMessage("❌ " + rep.error);
-                            }
-                          });
-                        },
-                        danger: true,
-                      },
-                    ]}
-                  />
-                </h5>
-                {alertId === calendarId && (
-                  <AlertSystem
-                    type={alertType}
-                    message={alertMessage}
-                    onClose={() => {
-                      setAlertMessage("");
-                      setOnConfirmAction(null);
-                      setAlertId(null);
-                    }}
-                    onConfirm={async () => {
-                      if (onConfirmAction) await onConfirmAction();
-                    }}
-                  />
-                )}
+        {Object.entries(groupedShared)
+          .filter(([calendarId]) => calendarId === selectedCalendarId)
+          .map(([calendarId, data]) => (
+            <CalendarCard
+              key={calendarId}
+              calendarId={calendarId}
+              data={data}
+              alertId={alertId}
+              alertType={alertType}
+              alertMessage={alertMessage}
+              onConfirmAction={onConfirmAction}
+              setAlertType={setAlertType}
+              setAlertMessage={setAlertMessage}
+              setOnConfirmAction={setOnConfirmAction}
+              setAlertId={setAlertId}
+              handleCopyLink={handleCopyLink}
+              handleUpdateTokenExpiration={handleUpdateTokenExpiration}
+              handleUpdateTokenPermissions={handleUpdateTokenPermissions}
+              handleToggleToken={handleToggleToken}
+              deleteTokenConfirmAction={deleteTokenConfirmAction}
+              handleCreateToken={handleCreateToken}
+              today={today}
+              VITE_URL={VITE_URL}
+              selectedModifyCalendar={selectedModifyCalendar}
+              setSelectedModifyCalendar={setSelectedModifyCalendar}
+              tokenCalendars={tokenCalendars}
+              handleSendInvitation={handleSendInvitation}
+              deleteUserConfirmAction={deleteUserConfirmAction}
+              emailsToInvite={emailsToInvite}
+              setEmailsToInvite={setEmailsToInvite}
+              navigate={navigate}
+              personalCalendars={personalCalendars}
+            />
+          ))}
+      </div>
+    </div>
+  );
+}
 
-                <hr className="my-3" />
+const calendarActions = (
+  calendarId,
+  navigate,
+  personalCalendars,
+  t,
+  setAlertType,
+  setAlertMessage,
+  setAlertId,
+  setOnConfirmAction,
+) => [
+  {
+    label: (
+      <>
+        <i className="bi bi-eye me-2"></i> {t("open")}
+      </>
+    ),
+    onClick: () => navigate(`/calendar/${calendarId}`),
+  },
+  {
+    label: (
+      <>
+        <i className="bi bi-capsule me-2"></i> {t("medicines.label")}
+      </>
+    ),
+    onClick: () => navigate(`/calendar/${calendarId}/boxes`),
+  },
+  { separator: true },
+  {
+    label: (
+      <>
+        <i className="bi bi-trash me-2"></i> {t("delete")}
+      </>
+    ),
+    onClick: () => {
+      setAlertType("confirm-danger");
+      setAlertMessage(t("delete_calendar_confirm"));
+      setAlertId(calendarId);
+      setOnConfirmAction(() => async () => {
+        const rep = await personalCalendars.deleteCalendar(calendarId);
+        if (rep.success) {
+          setAlertType("success");
+          setAlertMessage("✅ " + rep.message);
+          setTimeout(() => {
+            navigate("/calendars");
+          }, 1000);
+        } else {
+          setAlertType("danger");
+          setAlertMessage("❌ " + rep.error);
+        }
+      });
+    },
+    danger: true,
+  },
+];
 
-                {/* Liens de partage */}
-                <TokenList
-                  setAlertType={setAlertType}
-                  alertId={alertId}
-                  alertType={alertType}
-                  alertMessage={alertMessage}
-                  onConfirmAction={onConfirmAction}
-                  setAlertMessage={setAlertMessage}
-                  setOnConfirmAction={setOnConfirmAction}
-                  setAlertId={setAlertId}
-                  handleCopyLink={handleCopyLink}
-                  handleUpdateTokenExpiration={handleUpdateTokenExpiration}
-                  handleUpdateTokenPermissions={handleUpdateTokenPermissions}
-                  handleToggleToken={handleToggleToken}
-                  deleteTokenConfirmAction={deleteTokenConfirmAction}
-                  handleCreateToken={handleCreateToken}
-                  today={today}
-                  VITE_URL={VITE_URL}
-                  data={data}
-                  calendarId={calendarId}
-                  setSelectedModifyCalendar={setSelectedModifyCalendar}
-                  selectedModifyCalendar={selectedModifyCalendar}
-                  tokenCalendars={tokenCalendars}
-                />
-
-                <hr className="my-3" />
-
-                {/* Utilisateurs partagés */}
-                <UserList
-                  alertId={alertId}
-                  alertType={alertType}
-                  alertMessage={alertMessage}
-                  onConfirmAction={onConfirmAction}
-                  setAlertMessage={setAlertMessage}
-                  setOnConfirmAction={setOnConfirmAction}
-                  setAlertId={setAlertId}
-                  handleSendInvitation={handleSendInvitation}
-                  deleteUserConfirmAction={deleteUserConfirmAction}
-                  data={data}
-                  calendarId={calendarId}
-                  emailsToInvite={emailsToInvite}
-                  setEmailsToInvite={setEmailsToInvite}
-                />
-              </div>
-            </div>
-          </div>
-        ))}
+function CalendarCard({
+  calendarId, data, alertId, alertType, alertMessage, onConfirmAction,
+  setAlertType, setAlertMessage, setOnConfirmAction, setAlertId,
+  handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions,
+  handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today,
+  VITE_URL, selectedModifyCalendar, setSelectedModifyCalendar, tokenCalendars,
+  handleSendInvitation, deleteUserConfirmAction, emailsToInvite,
+  setEmailsToInvite, navigate, personalCalendars,
+}) {
+  const { t } = useTranslation();
+  const alertHandlers = { alertId, alertType, alertMessage, onConfirmAction, setAlertMessage, setOnConfirmAction, setAlertId };
+  const tokenProps = { ...alertHandlers, setAlertType, handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions, handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyCalendar, setSelectedModifyCalendar, tokenCalendars };
+  const userProps = { ...alertHandlers, handleSendInvitation, deleteUserConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
+  return (
+    <div className="card h-100 shadow border border-2">
+      <div className="card-body">
+        <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">
+          <span>{data.calendar_name}</span>
+          <ActionSheet
+            actions={calendarActions({
+              calendarId,
+              navigate,
+              personalCalendars,
+              t,
+              setAlertType,
+              setAlertMessage,
+              setAlertId,
+              setOnConfirmAction,
+            })}
+          />
+        </h5>
+        {alertId === calendarId && (
+          <AlertSystem
+            type={alertType}
+            message={alertMessage}
+            onClose={() => { setAlertMessage(""); setOnConfirmAction(null); setAlertId(null); }}
+            onConfirm={async () => { if (onConfirmAction) await onConfirmAction(); }}
+          />
+        )}
+        <hr className="my-3" />
+        <TokenList {...tokenProps} />
+        <hr className="my-3" />
+        <UserList {...userProps} />
       </div>
     </div>
   );
@@ -801,5 +857,126 @@ function UserList({
     </ul>
   );
 }
+
+SharedList.propTypes = {
+  tokenCalendars: PropTypes.shape({
+    updateTokenExpiration: PropTypes.func.isRequired,
+    updateTokenPermissions: PropTypes.func.isRequired,
+    updateRevokeToken: PropTypes.func.isRequired,
+    deleteToken: PropTypes.func.isRequired,
+    createToken: PropTypes.func.isRequired,
+    tokensList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  }).isRequired,
+  personalCalendars: PropTypes.shape({
+    calendarsData: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string,
+      }),
+    ).isRequired,
+    deleteCalendar: PropTypes.func,
+  }).isRequired,
+  sharedUserCalendars: PropTypes.shape({
+    fetchSharedUsers: PropTypes.func.isRequired,
+    deleteSharedUser: PropTypes.func.isRequired,
+    sendInvitation: PropTypes.func.isRequired,
+  }).isRequired,
+};
+
+CalendarCard.propTypes = {
+  calendarId: PropTypes.string.isRequired,
+  data: PropTypes.shape({
+    tokens: PropTypes.array,
+    users: PropTypes.array,
+    calendar_name: PropTypes.string,
+  }).isRequired,
+  alertId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  alertType: PropTypes.string,
+  alertMessage: PropTypes.string,
+  onConfirmAction: PropTypes.func,
+  setAlertType: PropTypes.func.isRequired,
+  setAlertMessage: PropTypes.func.isRequired,
+  setOnConfirmAction: PropTypes.func.isRequired,
+  setAlertId: PropTypes.func.isRequired,
+  handleCopyLink: PropTypes.func.isRequired,
+  handleUpdateTokenExpiration: PropTypes.func.isRequired,
+  handleUpdateTokenPermissions: PropTypes.func.isRequired,
+  handleToggleToken: PropTypes.func.isRequired,
+  deleteTokenConfirmAction: PropTypes.func.isRequired,
+  handleCreateToken: PropTypes.func.isRequired,
+  today: PropTypes.string.isRequired,
+  VITE_URL: PropTypes.string.isRequired,
+  selectedModifyCalendar: PropTypes.string,
+  setSelectedModifyCalendar: PropTypes.func.isRequired,
+  tokenCalendars: PropTypes.object.isRequired,
+  handleSendInvitation: PropTypes.func.isRequired,
+  deleteUserConfirmAction: PropTypes.func.isRequired,
+  emailsToInvite: PropTypes.object.isRequired,
+  setEmailsToInvite: PropTypes.func.isRequired,
+  navigate: PropTypes.func.isRequired,
+  personalCalendars: PropTypes.object.isRequired,
+};
+
+TokenList.propTypes = {
+  setAlertType: PropTypes.func.isRequired,
+  alertId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  alertType: PropTypes.string,
+  alertMessage: PropTypes.string,
+  onConfirmAction: PropTypes.func,
+  setAlertMessage: PropTypes.func.isRequired,
+  setOnConfirmAction: PropTypes.func.isRequired,
+  setAlertId: PropTypes.func.isRequired,
+  handleCopyLink: PropTypes.func.isRequired,
+  handleUpdateTokenExpiration: PropTypes.func.isRequired,
+  handleUpdateTokenPermissions: PropTypes.func.isRequired,
+  handleToggleToken: PropTypes.func.isRequired,
+  deleteTokenConfirmAction: PropTypes.func.isRequired,
+  handleCreateToken: PropTypes.func.isRequired,
+  today: PropTypes.string.isRequired,
+  VITE_URL: PropTypes.string.isRequired,
+  data: PropTypes.shape({
+    tokens: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string,
+        revoked: PropTypes.bool,
+        expires_at: PropTypes.string,
+      }),
+    ),
+    calendar_name: PropTypes.string,
+  }).isRequired,
+  calendarId: PropTypes.string.isRequired,
+  selectedModifyCalendar: PropTypes.string,
+  setSelectedModifyCalendar: PropTypes.func.isRequired,
+  tokenCalendars: PropTypes.shape({
+    tokensList: PropTypes.array,
+  }).isRequired,
+};
+
+UserList.propTypes = {
+  alertId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  alertType: PropTypes.string,
+  alertMessage: PropTypes.string,
+  onConfirmAction: PropTypes.func,
+  setAlertMessage: PropTypes.func.isRequired,
+  setOnConfirmAction: PropTypes.func.isRequired,
+  setAlertId: PropTypes.func.isRequired,
+  handleSendInvitation: PropTypes.func.isRequired,
+  deleteUserConfirmAction: PropTypes.func.isRequired,
+  data: PropTypes.shape({
+    users: PropTypes.arrayOf(
+      PropTypes.shape({
+        receiver_uid: PropTypes.string,
+        receiver_photo_url: PropTypes.string,
+        receiver_name: PropTypes.string,
+        receiver_email: PropTypes.string,
+        accepted: PropTypes.bool,
+      }),
+    ),
+    calendar_name: PropTypes.string,
+  }).isRequired,
+  calendarId: PropTypes.string.isRequired,
+  emailsToInvite: PropTypes.object.isRequired,
+  setEmailsToInvite: PropTypes.func.isRequired,
+};
 
 export default SharedList;
