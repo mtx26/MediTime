@@ -348,7 +348,7 @@ function SharedList({
   );
 }
 
-const calendarActions = ({
+const calendarActions = (
   calendarId,
   navigate,
   personalCalendars,
@@ -357,56 +357,51 @@ const calendarActions = ({
   setAlertMessage,
   setAlertId,
   setOnConfirmAction,
-}) => {
-  const confirmDelete = () => {
-    setAlertType("confirm-danger");
-    setAlertMessage(t("delete_calendar_confirm"));
-    setAlertId(calendarId);
-    const handleDelete = async () => {
-      const rep = await personalCalendars.deleteCalendar(calendarId);
-      if (rep.success) {
-        setAlertType("success");
-        setAlertMessage("✅ " + rep.message);
-        setTimeout(() => {
-          navigate("/calendars");
-        }, 1000);
-      } else {
-        setAlertType("danger");
-        setAlertMessage("❌ " + rep.error);
-      }
-    };
-    setOnConfirmAction(() => handleDelete);
-  };
-
-  return [
-    {
-      label: (
-        <>
-          <i className="bi bi-eye me-2"></i> {t("open")}
-        </>
-      ),
-      onClick: () => navigate(`/calendar/${calendarId}`),
+) => [
+  {
+    label: (
+      <>
+        <i className="bi bi-eye me-2"></i> {t("open")}
+      </>
+    ),
+    onClick: () => navigate(`/calendar/${calendarId}`),
+  },
+  {
+    label: (
+      <>
+        <i className="bi bi-capsule me-2"></i> {t("medicines.label")}
+      </>
+    ),
+    onClick: () => navigate(`/calendar/${calendarId}/boxes`),
+  },
+  { separator: true },
+  {
+    label: (
+      <>
+        <i className="bi bi-trash me-2"></i> {t("delete")}
+      </>
+    ),
+    onClick: () => {
+      setAlertType("confirm-danger");
+      setAlertMessage(t("delete_calendar_confirm"));
+      setAlertId(calendarId);
+      setOnConfirmAction(() => async () => {
+        const rep = await personalCalendars.deleteCalendar(calendarId);
+        if (rep.success) {
+          setAlertType("success");
+          setAlertMessage("✅ " + rep.message);
+          setTimeout(() => {
+            navigate("/calendars");
+          }, 1000);
+        } else {
+          setAlertType("danger");
+          setAlertMessage("❌ " + rep.error);
+        }
+      });
     },
-    {
-      label: (
-        <>
-          <i className="bi bi-capsule me-2"></i> {t("medicines.label")}
-        </>
-      ),
-      onClick: () => navigate(`/calendar/${calendarId}/boxes`),
-    },
-    { separator: true },
-    {
-      label: (
-        <>
-          <i className="bi bi-trash me-2"></i> {t("delete")}
-        </>
-      ),
-      onClick: confirmDelete,
-      danger: true,
-    },
-  ];
-};
+    danger: true,
+  },
+];
 
 function CalendarCard({
   calendarId, data, alertId, alertType, alertMessage, onConfirmAction,
