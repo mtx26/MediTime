@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../contexts/UserContext';
 import { formatToLocalISODate, getMondayFromDate } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
-import ShareCalendarModal from '../../components/calendar/ShareCalendarModal';
 import AlertSystem from '../../components/common/AlertSystem';
 import isEqual from 'lodash/isEqual';
 import bootstrap5Plugin from '@fullcalendar/bootstrap5';
