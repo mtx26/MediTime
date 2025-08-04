@@ -5,7 +5,7 @@ import HoveredUserProfile from "../../components/common/HoveredUserProfile";
 import { formatToLocalISODate } from "../../utils/calendar/dateUtils";
 import { useTranslation } from "react-i18next";
 import ActionSheet from '../../components/common/ActionSheet';
-import { useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 const VITE_URL = import.meta.env.VITE_VITE_URL;
 
@@ -17,6 +17,8 @@ function SharedList({
   // 🔐 Contexte d'authentification
   const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const calendarFromURL = searchParams.get('calendar');
   const navigate = useNavigate(); // Hook pour la navigation
 
   // ⚠️ Alertes et confirmations
@@ -238,10 +240,17 @@ function SharedList({
   }, [userInfo, personalCalendars.calendarsData]);
 
   useEffect(() => {
-    if (!selectedCalendarId && personalCalendars.calendarsData?.length > 0) {
-      setSelectedCalendarId(personalCalendars.calendarsData[0].id);
+    const existsInList = personalCalendars.calendarsData?.some(c => c.id === calendarFromURL);
+
+    if (calendarFromURL && existsInList) {
+      setSelectedCalendarId(calendarFromURL);
+    } else if (personalCalendars.calendarsData?.length > 0) {
+      const first = personalCalendars.calendarsData[0].id;
+      setSelectedCalendarId(first);
+      setSearchParams({ calendar: first });
     }
-  }, [personalCalendars.calendarsData, selectedCalendarId]);
+  }, [personalCalendars.calendarsData, calendarFromURL]);
+
 
   if (loadingGroupedShared) {
     return (
@@ -281,7 +290,10 @@ function SharedList({
               className={`btn rounded-pill px-3 py-1 fw-semibold shadow-sm text-nowrap ${
                 selectedCalendarId === calendar.id ? 'btn-primary' : 'btn-outline-primary'
               }`}
-              onClick={() => setSelectedCalendarId(calendar.id)}
+              onClick={() => {
+                setSelectedCalendarId(calendar.id);
+                setSearchParams({ calendar: calendar.id });
+              }}
               title={calendar.name}
             >
               {calendar.name.length > 20 ? calendar.name.slice(0, 17) + '…' : calendar.name}
