@@ -353,13 +353,15 @@ function SelectCalendar({
                 )}
               </div>
             ))}
+
+            <button
+              className="text-center btn btn-outline-primary rounded-0 rounded-bottom"
+              onClick={() => navigate('/add-calendar')}
+            >
+              <i className="bi bi-calendar-plus me-2"></i> {t('calendar.add_calendar')}
+            </button>
           </div>
         )}
-        
-        {/* Champ pour ajouter un nouveau calendrier */}
-        <button className="btn btn-primary w-100 shadow" onClick={() => navigate('/add-calendar')}>
-          <i className="bi bi-calendar-plus me-2"></i> {t('calendar.add_calendar')}
-        </button>
       </div>
 
       <div className="w-100" style={{ maxWidth: '800px' }}>
