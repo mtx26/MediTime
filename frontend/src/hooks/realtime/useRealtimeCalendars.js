@@ -1,9 +1,10 @@
-import { useEffect, useContext, useRef } from 'react';
+import { useContext, useCallback } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import { UserContext } from '../../contexts/UserContext';
 import { analyticsPromise } from '../../services/firebase/firebase';
 import { logEvent } from 'firebase/analytics';
+import { useSupabaseRealtime } from './useSupabaseRealtime';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -100,56 +101,31 @@ const fetchSharedCalendars = async (
 
 export const useRealtimeCalendars = (setCalendarsData, setLoadingStates) => {
   const { userInfo } = useContext(UserContext);
-  const channelRef = useRef(null);
+  const uid = userInfo?.uid;
 
-  useEffect(() => {
-    if (!userInfo || !setCalendarsData) return;
-
+  const fetchData = useCallback(() => {
+    if (!uid) return;
     setLoadingStates((prev) => ({ ...prev, calendars: true }));
-    fetchCalendars(userInfo.uid, setCalendarsData, setLoadingStates);
+    return fetchCalendars(uid, setCalendarsData, setLoadingStates);
+  }, [uid, setCalendarsData, setLoadingStates]);
 
-    const channel = supabase
-      .channel('calendars-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'calendars',
-          filter: `owner_uid=eq.${userInfo.uid}`,
-        },
-        () => fetchCalendars(userInfo.uid, setCalendarsData, setLoadingStates)
-      )
-      .subscribe();
-
-    const deleteChannel = supabase
-      .channel('calendars-delete-watch')
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'calendars',
-        },
-        () => fetchCalendars(userInfo.uid, setCalendarsData, setLoadingStates)
-      )
-      .subscribe();
-
-    channelRef.current = { channel, deleteChannel };
-
-    return () => {
-      try {
-        channel.unsubscribe();
-        deleteChannel.unsubscribe();
-        channelRef.current = null;
-      } catch (err) {
-        log.error('Erreur lors de la désinscription des canaux Supabase', {
-          error: err,
-          origin: 'REALTIME_CALENDARS_CLEANUP_ERROR',
-        });
-      }
-    };
-  }, [userInfo, setCalendarsData, setLoadingStates]);
+  useSupabaseRealtime({
+    enabled: !!uid && !!setCalendarsData,
+    fetchData,
+    channels: [
+      {
+        channelName: 'calendars-realtime',
+        table: 'calendars',
+        filter: `owner_uid=eq.${uid}`,
+      },
+      {
+        channelName: 'calendars-delete-watch',
+        event: 'DELETE',
+        table: 'calendars',
+      },
+    ],
+    deps: [uid],
+  });
 };
 
 export const useRealtimeSharedCalendars = (
@@ -157,68 +133,29 @@ export const useRealtimeSharedCalendars = (
   setLoadingStates
 ) => {
   const { userInfo } = useContext(UserContext);
-  const channelRef = useRef(null);
+  const uid = userInfo?.uid;
 
-  useEffect(() => {
-    if (!userInfo || !setSharedCalendarsData) return;
-
+  const fetchData = useCallback(() => {
+    if (!uid) return;
     setLoadingStates((prev) => ({ ...prev, sharedCalendars: true }));
-    fetchSharedCalendars(
-      userInfo.uid,
-      setSharedCalendarsData,
-      setLoadingStates
-    );
+    return fetchSharedCalendars(uid, setSharedCalendarsData, setLoadingStates);
+  }, [uid, setSharedCalendarsData, setLoadingStates]);
 
-    const channel = supabase
-      .channel('shared-calendars-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'shared_calendars',
-          filter: `receiver_uid=eq.${userInfo.uid}`,
-        },
-        () =>
-          fetchSharedCalendars(
-            userInfo.uid,
-            setSharedCalendarsData,
-            setLoadingStates
-          )
-      )
-      .subscribe();
-
-    const deleteChannel = supabase
-      .channel('shared-calendars-delete-watch')
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'shared_calendars',
-        },
-        () =>
-          fetchSharedCalendars(
-            userInfo.uid,
-            setSharedCalendarsData,
-            setLoadingStates
-          )
-      )
-      .subscribe();
-
-    channelRef.current = { channel, deleteChannel };
-
-    return () => {
-      try {
-        channel.unsubscribe();
-        deleteChannel.unsubscribe();
-        channelRef.current = null;
-      } catch (err) {
-        log.error('Erreur lors de la désinscription des canaux Supabase', {
-          error: err,
-          origin: 'REALTIME_SHARED_CALENDARS_CLEANUP_ERROR',
-        });
-      }
-    };
-  }, [userInfo, setSharedCalendarsData, setLoadingStates]);
+  useSupabaseRealtime({
+    enabled: !!uid && !!setSharedCalendarsData,
+    fetchData,
+    channels: [
+      {
+        channelName: 'shared-calendars-realtime',
+        table: 'shared_calendars',
+        filter: `receiver_uid=eq.${uid}`,
+      },
+      {
+        channelName: 'shared-calendars-delete-watch',
+        event: 'DELETE',
+        table: 'shared_calendars',
+      },
+    ],
+    deps: [uid],
+  });
 };
