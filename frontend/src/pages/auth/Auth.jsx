@@ -7,7 +7,8 @@ import {
   GithubHandleLogin,
   TwitterHandleLogin,
   DiscordHandleLogin,
-  FacebookHandleLogin
+  FacebookHandleLogin,
+  MicrosoftHandleLogin
 } from '../../services/auth/authService';
 import AlertSystem from '../../components/common/AlertSystem';
 import { getSupabaseErrorMessage } from '../../utils/supabase/SupabaseErrorMessage';
@@ -146,6 +147,19 @@ function Auth() {
                   </button>
                 </div>
                 <span>{t('auth.provider.facebook')}</span>
+              </div>
+              <div className="d-flex flex-column align-items-center">
+                <div className="px-2">
+                  <button
+                    className="btn btn-outline-dark rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
+                    onClick={MicrosoftHandleLogin}
+                    aria-label={t('auth.with_microsoft')}
+                    title={t('auth.with_microsoft')}
+                  >
+                    <i className="bi bi-microsoft fs-4"></i>
+                  </button>
+                </div>
+                <span>{t('auth.provider.microsoft')}</span>
               </div>
             </div>
             <p className="text-center mt-3 mb-0 text-muted">{t('auth.or_with_email')}</p>

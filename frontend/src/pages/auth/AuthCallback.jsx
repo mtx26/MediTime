@@ -14,6 +14,8 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleRedirect = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
+      console.log(session);
+      console.log(error);
 
       if (error || !session?.user) {
         log.error(t('auth_callback.session_error'), error?.message, {
