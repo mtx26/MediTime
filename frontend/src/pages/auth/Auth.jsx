@@ -7,7 +7,8 @@ import {
   GithubHandleLogin,
   TwitterHandleLogin,
   DiscordHandleLogin,
-  FacebookHandleLogin
+  FacebookHandleLogin,
+  MicrosoftHandleLogin
 } from '../../services/auth/authService';
 import AlertSystem from '../../components/common/AlertSystem';
 import { getSupabaseErrorMessage } from '../../utils/supabase/SupabaseErrorMessage';

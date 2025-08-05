@@ -155,6 +155,30 @@ export const DiscordHandleLogin = async () => {
   }
 };
 
+/**
+ * Connexion avec Microsoft
+ */
+export const MicrosoftHandleLogin = async () => {
+  try {
+    await supabase.auth.signInWithOAuth({
+      provider: 'azure',
+      options: {
+        redirectTo: window.location.origin + '/auth/callback',
+        queryParams: {
+          prompt: 'select_account',
+          access_type: 'offline',
+        },
+        flowType: 'redirect',
+      },
+    });
+  } catch (err) {
+    log.error(err.message || 'Erreur lors de la connexion avec Microsoft', err, {
+      origin: 'MICROSOFT_HANDLE_LOGIN',
+      uid: null,
+    });
+  }
+};
+
   /**
  * Inscription avec email et mot de passe
  */
