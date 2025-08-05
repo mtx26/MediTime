@@ -348,7 +348,7 @@ function SharedList({
   );
 }
 
-const calendarActions = (
+const calendarActions = ({
   calendarId,
   navigate,
   personalCalendars,
@@ -356,8 +356,8 @@ const calendarActions = (
   setAlertMessage,
   setAlertId,
   setOnConfirmAction,
-) => {
-  const { t } = useTranslation();
+  t,
+}) => {
 
   return [
     {
@@ -433,6 +433,7 @@ function CalendarCard({
               setAlertMessage,
               setAlertId,
               setOnConfirmAction,
+              t,
             })}
           />
         </h5>
