@@ -1,5 +1,6 @@
 import React, { useEffect, useContext, useState, useCallback } from "react";
 import { UserContext } from "../../contexts/UserContext";
+import PropTypes from "prop-types";
 import AlertSystem from "../../components/common/AlertSystem";
 import HoveredUserProfile from "../../components/common/HoveredUserProfile";
 import { formatToLocalISODate } from "../../utils/calendar/dateUtils";
@@ -858,5 +859,126 @@ function UserList({
     </ul>
   );
 }
+
+SharedList.propTypes = {
+  tokenCalendars: PropTypes.shape({
+    updateTokenExpiration: PropTypes.func.isRequired,
+    updateTokenPermissions: PropTypes.func.isRequired,
+    updateRevokeToken: PropTypes.func.isRequired,
+    deleteToken: PropTypes.func.isRequired,
+    createToken: PropTypes.func.isRequired,
+    tokensList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  }).isRequired,
+  personalCalendars: PropTypes.shape({
+    calendarsData: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string,
+      }),
+    ).isRequired,
+    deleteCalendar: PropTypes.func,
+  }).isRequired,
+  sharedUserCalendars: PropTypes.shape({
+    fetchSharedUsers: PropTypes.func.isRequired,
+    deleteSharedUser: PropTypes.func.isRequired,
+    sendInvitation: PropTypes.func.isRequired,
+  }).isRequired,
+};
+
+CalendarCard.propTypes = {
+  calendarId: PropTypes.string.isRequired,
+  data: PropTypes.shape({
+    tokens: PropTypes.array,
+    users: PropTypes.array,
+    calendar_name: PropTypes.string,
+  }).isRequired,
+  alertId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  alertType: PropTypes.string,
+  alertMessage: PropTypes.string,
+  onConfirmAction: PropTypes.func,
+  setAlertType: PropTypes.func.isRequired,
+  setAlertMessage: PropTypes.func.isRequired,
+  setOnConfirmAction: PropTypes.func.isRequired,
+  setAlertId: PropTypes.func.isRequired,
+  handleCopyLink: PropTypes.func.isRequired,
+  handleUpdateTokenExpiration: PropTypes.func.isRequired,
+  handleUpdateTokenPermissions: PropTypes.func.isRequired,
+  handleToggleToken: PropTypes.func.isRequired,
+  deleteTokenConfirmAction: PropTypes.func.isRequired,
+  handleCreateToken: PropTypes.func.isRequired,
+  today: PropTypes.string.isRequired,
+  VITE_URL: PropTypes.string.isRequired,
+  selectedModifyCalendar: PropTypes.string,
+  setSelectedModifyCalendar: PropTypes.func.isRequired,
+  tokenCalendars: PropTypes.object.isRequired,
+  handleSendInvitation: PropTypes.func.isRequired,
+  deleteUserConfirmAction: PropTypes.func.isRequired,
+  emailsToInvite: PropTypes.object.isRequired,
+  setEmailsToInvite: PropTypes.func.isRequired,
+  navigate: PropTypes.func.isRequired,
+  personalCalendars: PropTypes.object.isRequired,
+};
+
+TokenList.propTypes = {
+  setAlertType: PropTypes.func.isRequired,
+  alertId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  alertType: PropTypes.string,
+  alertMessage: PropTypes.string,
+  onConfirmAction: PropTypes.func,
+  setAlertMessage: PropTypes.func.isRequired,
+  setOnConfirmAction: PropTypes.func.isRequired,
+  setAlertId: PropTypes.func.isRequired,
+  handleCopyLink: PropTypes.func.isRequired,
+  handleUpdateTokenExpiration: PropTypes.func.isRequired,
+  handleUpdateTokenPermissions: PropTypes.func.isRequired,
+  handleToggleToken: PropTypes.func.isRequired,
+  deleteTokenConfirmAction: PropTypes.func.isRequired,
+  handleCreateToken: PropTypes.func.isRequired,
+  today: PropTypes.string.isRequired,
+  VITE_URL: PropTypes.string.isRequired,
+  data: PropTypes.shape({
+    tokens: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string,
+        revoked: PropTypes.bool,
+        expires_at: PropTypes.string,
+      }),
+    ),
+    calendar_name: PropTypes.string,
+  }).isRequired,
+  calendarId: PropTypes.string.isRequired,
+  selectedModifyCalendar: PropTypes.string,
+  setSelectedModifyCalendar: PropTypes.func.isRequired,
+  tokenCalendars: PropTypes.shape({
+    tokensList: PropTypes.array,
+  }).isRequired,
+};
+
+UserList.propTypes = {
+  alertId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  alertType: PropTypes.string,
+  alertMessage: PropTypes.string,
+  onConfirmAction: PropTypes.func,
+  setAlertMessage: PropTypes.func.isRequired,
+  setOnConfirmAction: PropTypes.func.isRequired,
+  setAlertId: PropTypes.func.isRequired,
+  handleSendInvitation: PropTypes.func.isRequired,
+  deleteUserConfirmAction: PropTypes.func.isRequired,
+  data: PropTypes.shape({
+    users: PropTypes.arrayOf(
+      PropTypes.shape({
+        receiver_uid: PropTypes.string,
+        receiver_photo_url: PropTypes.string,
+        receiver_name: PropTypes.string,
+        receiver_email: PropTypes.string,
+        accepted: PropTypes.bool,
+      }),
+    ),
+    calendar_name: PropTypes.string,
+  }).isRequired,
+  calendarId: PropTypes.string.isRequired,
+  emailsToInvite: PropTypes.object.isRequired,
+  setEmailsToInvite: PropTypes.func.isRequired,
+};
 
 export default SharedList;
