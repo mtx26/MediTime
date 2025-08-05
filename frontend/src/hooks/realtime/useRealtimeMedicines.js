@@ -78,7 +78,7 @@ export const useRealtimeTokenMedicines = (
 
   const fetchData = useCallback(() => {
     if (!token) return;
-    return fetchTokenMedicines(token, setMedicinesData, setLoadingMedicines);
+    fetchTokenMedicines(token, setMedicinesData, setLoadingMedicines);
   }, [token, setMedicinesData, setLoadingMedicines]);
 
   useSupabaseRealtime({

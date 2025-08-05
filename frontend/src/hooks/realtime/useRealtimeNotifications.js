@@ -68,7 +68,7 @@ export const useRealtimeNotifications = (
   const fetchData = useCallback(() => {
     if (!uid) return;
     setLoadingStates((prev) => ({ ...prev, notifications: true }));
-    return fetchNotifications(uid, setNotificationsData, setLoadingStates);
+    fetchNotifications(uid, setNotificationsData, setLoadingStates);
   }, [uid, setNotificationsData, setLoadingStates]);
 
   useSupabaseRealtime({

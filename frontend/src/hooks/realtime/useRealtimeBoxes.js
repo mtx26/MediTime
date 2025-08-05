@@ -100,7 +100,7 @@ const useRealtimeBoxes = (
 
   const fetchData = useCallback(() => {
     if (!uid || !calendarId) return;
-    return fetchBoxes({ uid, calendarId, setBoxes, setLoadingBoxes, sourceType });
+    fetchBoxes({ uid, calendarId, setBoxes, setLoadingBoxes, sourceType });
   }, [uid, calendarId, setBoxes, setLoadingBoxes, sourceType]);
 
   const baseChannel =

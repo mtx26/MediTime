@@ -44,6 +44,5 @@ export const useSupabaseRealtime = ({
       });
       channelRef.current = [];
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, ...deps]);
 };
