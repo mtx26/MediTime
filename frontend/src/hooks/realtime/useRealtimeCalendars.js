@@ -106,7 +106,7 @@ export const useRealtimeCalendars = (setCalendarsData, setLoadingStates) => {
   const fetchData = useCallback(() => {
     if (!uid) return;
     setLoadingStates((prev) => ({ ...prev, calendars: true }));
-    return fetchCalendars(uid, setCalendarsData, setLoadingStates);
+    fetchCalendars(uid, setCalendarsData, setLoadingStates);
   }, [uid, setCalendarsData, setLoadingStates]);
 
   useSupabaseRealtime({
@@ -138,7 +138,7 @@ export const useRealtimeSharedCalendars = (
   const fetchData = useCallback(() => {
     if (!uid) return;
     setLoadingStates((prev) => ({ ...prev, sharedCalendars: true }));
-    return fetchSharedCalendars(uid, setSharedCalendarsData, setLoadingStates);
+    fetchSharedCalendars(uid, setSharedCalendarsData, setLoadingStates);
   }, [uid, setSharedCalendarsData, setLoadingStates]);
 
   useSupabaseRealtime({
