@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState, useCallback } from "react";
-import PropTypes from "prop-types";
 import { UserContext } from "../../contexts/UserContext";
+import PropTypes from "prop-types";
 import AlertSystem from "../../components/common/AlertSystem";
 import HoveredUserProfile from "../../components/common/HoveredUserProfile";
 import { formatToLocalISODate } from "../../utils/calendar/dateUtils";
@@ -335,6 +335,7 @@ function SharedList({
 }
 
 const calendarActions = ({
+const calendarActions = ({
   calendarId,
   navigate,
   personalCalendars,
@@ -418,6 +419,7 @@ function CalendarCard({
               setAlertMessage,
               setAlertId,
               setOnConfirmAction,
+              t,
               t,
             })}
           />
