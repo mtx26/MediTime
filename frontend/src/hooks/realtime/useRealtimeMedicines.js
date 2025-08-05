@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { analyticsPromise } from '../../services/firebase/firebase';
 import { log } from '../../utils/logger';
 import { logEvent } from 'firebase/analytics';
 import { supabase } from '../../services/supabase/supabaseClient';
+import { useSupabaseRealtime } from './useSupabaseRealtime';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -47,7 +48,7 @@ export const useRealtimeTokenMedicines = (
   setMedicinesData,
   setLoadingMedicines
 ) => {
-  const channelRef = useRef(null);
+  const [calendarId, setCalendarId] = useState(null);
 
   useEffect(() => {
     if (!token) return;
@@ -58,29 +59,11 @@ export const useRealtimeTokenMedicines = (
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
 
-        const { calendar_id } = data;
-        if (!calendar_id) {
+        if (!data.calendar_id) {
           throw new Error('calendar_id manquant dans le token');
         }
 
-        await fetchTokenMedicines(token, setMedicinesData, setLoadingMedicines);
-
-        const realtimeChannel = supabase
-          .channel(`token-meds-${calendar_id}`)
-          .on(
-            'postgres_changes',
-            {
-              event: '*',
-              schema: 'public',
-              table: 'medicines',
-              filter: `calendar_id=eq.${calendar_id}`,
-            },
-            () =>
-              fetchTokenMedicines(token, setMedicinesData, setLoadingMedicines)
-          )
-          .subscribe();
-
-        channelRef.current = realtimeChannel;
+        setCalendarId(data.calendar_id);
       } catch (err) {
         setLoadingMedicines(false);
         log.error(err.message, err, {
@@ -91,17 +74,23 @@ export const useRealtimeTokenMedicines = (
     };
 
     initListener();
+  }, [token, setLoadingMedicines]);
 
-    return () => {
-      try {
-        channelRef.current?.unsubscribe();
-        channelRef.current = null;
-      } catch (err) {
-        log.error('Erreur lors du nettoyage du canal Supabase token', err, {
-          origin: 'REALTIME_TOKEN_CLEANUP_ERROR',
-          token,
-        });
-      }
-    };
-  }, [token]);
+  const fetchData = useCallback(() => {
+    if (!token) return;
+    fetchTokenMedicines(token, setMedicinesData, setLoadingMedicines);
+  }, [token, setMedicinesData, setLoadingMedicines]);
+
+  useSupabaseRealtime({
+    enabled: !!calendarId && !!token,
+    fetchData,
+    channels: [
+      {
+        channelName: `token-meds-${calendarId}`,
+        table: 'medicines',
+        filter: `calendar_id=eq.${calendarId}`,
+      },
+    ],
+    deps: [token, calendarId],
+  });
 };

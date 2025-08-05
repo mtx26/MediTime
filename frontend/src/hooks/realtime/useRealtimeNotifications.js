@@ -1,9 +1,10 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useCallback } from 'react';
 import { UserContext } from '../../contexts/UserContext';
 import { analyticsPromise } from '../../services/firebase/firebase';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import { logEvent } from 'firebase/analytics';
+import { useSupabaseRealtime } from './useSupabaseRealtime';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -62,42 +63,24 @@ export const useRealtimeNotifications = (
   setLoadingStates
 ) => {
   const { userInfo } = useContext(UserContext);
-  const channelRef = useRef(null);
+  const uid = userInfo?.uid;
 
-  useEffect(() => {
-    if (!userInfo || !setNotificationsData) return;
-
-    const uid = userInfo.uid;
+  const fetchData = useCallback(() => {
+    if (!uid) return;
     setLoadingStates((prev) => ({ ...prev, notifications: true }));
     fetchNotifications(uid, setNotificationsData, setLoadingStates);
+  }, [uid, setNotificationsData, setLoadingStates]);
 
-    const channel = supabase
-      .channel(`notifications-${uid}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${uid}`,
-        },
-        () => {
-          fetchNotifications(uid, setNotificationsData, setLoadingStates);
-        }
-      )
-      .subscribe();
-
-    channelRef.current = channel;
-
-    return () => {
-      try {
-        channelRef.current?.unsubscribe();
-        channelRef.current = null;
-      } catch (err) {
-        log.error('Erreur lors de la désinscription du canal Supabase', err, {
-          origin: 'REALTIME_NOTIFICATIONS_UNSUBSCRIBE_ERROR',
-        });
-      }
-    };
-  }, [userInfo, setNotificationsData, setLoadingStates]);
+  useSupabaseRealtime({
+    enabled: !!uid && !!setNotificationsData,
+    fetchData,
+    channels: [
+      {
+        channelName: `notifications-${uid}`,
+        table: 'notifications',
+        filter: `user_id=eq.${uid}`,
+      },
+    ],
+    deps: [uid],
+  });
 };
