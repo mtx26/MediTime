@@ -335,7 +335,6 @@ function SharedList({
 }
 
 const calendarActions = ({
-const calendarActions = ({
   calendarId,
   navigate,
   personalCalendars,
