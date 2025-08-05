@@ -401,96 +401,85 @@ def handle_delete_user_shared_user(calendar_id, receiver_uid):
         )
 
 
-# Route pour récupérer les utilisateurs ayant accès à un calendrier
-@api.route("/shared/users/users/<calendar_id>", methods=["GET"])
+@api.route("/shared/grouped", methods=["GET"])
 @require_auth
-def handle_shared_users(calendar_id):
+def handle_grouped_shared():
     try:
         t_0 = time.time()
-        owner_uid = g.uid
+        uid = g.uid
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute(SELECT_SHARED_CALENDAR, (calendar_id,))
-                calendar = cursor.fetchone()
-                if not calendar:
-                    return warning_response(
-                        message=ERROR_CALENDAR_NOT_FOUND,
-                        code="SHARED_USERS_LOAD_ERROR",
-                        status_code=404,
-                        uid=owner_uid,
-                        origin="SHARED_USERS_LOAD"
-                    )
+                # Étape 1 : récupérer tous les calendriers personnels
+                cursor.execute("SELECT id, name FROM calendars WHERE owner_uid = %s", (uid,))
+                calendars = cursor.fetchall()
+                calendar_ids = [cal["id"] for cal in calendars]
 
-                cursor.execute("SELECT * FROM shared_calendars WHERE calendar_id = %s", (calendar_id,))
+                grouped = {
+                    cal["id"]: {
+                        "calendar_name": cal["name"],
+                        "users": [],
+                        "tokens": []
+                    }
+                    for cal in calendars
+                }
+
+                # Étape 2 : récupérer les utilisateurs partagés
+                cursor.execute("SELECT * FROM shared_calendars WHERE calendar_id = ANY(%s::uuid[])", (calendar_ids,))
                 shared_users = cursor.fetchall()
-                t_1 = time.time()
-                if not shared_users:
-                    return success_response(
-                        message="utilisateurs partagés récupérés",
-                        code="SHARED_USERS_LOAD_SUCCESS",
-                        uid=owner_uid,
-                        origin="SHARED_USERS_LOAD",
-                        data={"users": []},
-                        log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
-                    )
 
-                shared_users_list = []
-                for shared_user in shared_users:
-
-                    receiver_uid = shared_user.get("receiver_uid")
-                    access = shared_user.get("access", "read")
-                    accepted = shared_user.get("accepted", False)
-
-                    receiver = fetch_user(receiver_uid)
-                    if not receiver:
-                        return warning_response(
-                            message="utilisateur partagé non trouvé",
-                            code="SHARED_USERS_LOAD_ERROR",
-                            status_code=404,
-                            uid=owner_uid,
-                            origin="SHARED_USERS_LOAD"
-                        )
-                    receiver_photo_url = receiver.get("photo_url")
-                    receiver_name = receiver.get("display_name")
-                    receiver_email = receiver.get("email")
-
-                    if not receiver_photo_url:
-                        receiver_photo_url = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg"
+                for shared in shared_users:
+                    calendar_id = shared["calendar_id"]
+                    receiver_uid = shared["receiver_uid"]
 
                     if not verify_calendar_share(calendar_id, receiver_uid):
                         continue
 
-                    shared_users_list.append({
+                    receiver = fetch_user(receiver_uid)
+                    if not receiver:
+                        continue
+
+                    user_info = {
                         "receiver_uid": receiver_uid,
-                        "access": access,
-                        "accepted": accepted,
-                        "receiver_photo_url": receiver_photo_url,
-                        "receiver_name": receiver_name,
-                        "receiver_email": receiver_email
-                    })
+                        "access": shared.get("access", "read"),
+                        "accepted": shared.get("accepted", False),
+                        "receiver_photo_url": receiver.get("photo_url") or "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg",
+                        "receiver_name": receiver.get("display_name"),
+                        "receiver_email": receiver.get("email")
+                    }
 
-                t_2 = time.time()
+                    if calendar_id in grouped:
+                        grouped[calendar_id]["users"].append(user_info)
 
+                # Étape 3 : récupérer les tokens partagés
+                cursor.execute("SELECT * FROM shared_tokens WHERE calendar_id = ANY(%s::uuid[])", (calendar_ids,))
+                tokens = cursor.fetchall()
+
+                for token in tokens:
+                    cal_id = token["calendar_id"]
+                    if cal_id in grouped:
+                        grouped[cal_id]["tokens"].append(token)
+
+        t_1 = time.time()
         return success_response(
-            message="utilisateurs partagés récupérés", 
-            code="SHARED_USERS_LOAD_SUCCESS", 
-            uid=owner_uid, 
-            origin="SHARED_USERS_LOAD",
-            data={"users": shared_users_list},
-            log_extra={"calendar_id": calendar_id, "time": t_2 - t_0}
+            message="Données partagées groupées récupérées",
+            code="SHARED_GROUPED_LOAD_SUCCESS",
+            uid=uid,
+            origin="SHARED_GROUPED_LOAD",
+            data={"grouped": grouped},
+            log_extra={"calendar_count": len(grouped), "time": t_1 - t_0}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération des utilisateurs partagés",
-            code="SHARED_USERS_ERROR", 
-            status_code=500, 
-            uid=owner_uid, 
-            origin="SHARED_USERS_LOAD",
-            error=str(e),
-            log_extra={"calendar_id": calendar_id}
+            message="Erreur lors du groupement des données partagées",
+            code="SHARED_GROUPED_LOAD_ERROR",
+            status_code=500,
+            uid=g.uid,
+            origin="SHARED_GROUPED_LOAD",
+            error=str(e)
         )
+
 
 @api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["GET"])
 @require_auth

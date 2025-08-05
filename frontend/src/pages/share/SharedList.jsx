@@ -188,34 +188,20 @@ function SharedList({
 
   // 🔄 Fonction pour mettre à jour les données groupées
   const setGroupedSharedFunction = useCallback(async () => {
-    const grouped = {};
+    setLoadingGroupedShared(true);
+    const rep = await sharedUserCalendars.fetchGroupedSharedCalendars();
 
-    for (const calendar of personalCalendars.calendarsData) {
-      grouped[calendar.id] = {
-        tokens: [],
-        users: [],
-        calendar_name: calendar.name,
-      };
-
-      const rep = await sharedUserCalendars.fetchSharedUsers(calendar.id);
-      if (rep.success) {
-        grouped[calendar.id].users = rep.users;
-      }
+    if (rep.success) {
+      setGroupedShared(rep.grouped);
+    } else {
+      setGroupedShared({});
+      setAlertType("danger");
+      setAlertMessage(rep.message);
     }
 
-    for (const token of tokenCalendars.tokensList) {
-      if (grouped[token.calendar_id]) {
-        grouped[token.calendar_id].tokens.push(token);
-      }
-    }
-
-    setGroupedShared(grouped);
     setLoadingGroupedShared(false);
-  }, [
-    personalCalendars.calendarsData,
-    sharedUserCalendars,
-    tokenCalendars.tokensList,
-  ]);
+  }, [sharedUserCalendars, t]);
+
 
   // 🔄 Chargement des données groupées
   useEffect(() => {
@@ -348,60 +334,62 @@ function SharedList({
   );
 }
 
-const calendarActions = (
+const calendarActions = ({
   calendarId,
   navigate,
   personalCalendars,
-  t,
   setAlertType,
   setAlertMessage,
   setAlertId,
   setOnConfirmAction,
-) => [
-  {
-    label: (
-      <>
-        <i className="bi bi-eye me-2"></i> {t("open")}
-      </>
-    ),
-    onClick: () => navigate(`/calendar/${calendarId}`),
-  },
-  {
-    label: (
-      <>
-        <i className="bi bi-capsule me-2"></i> {t("medicines.label")}
-      </>
-    ),
-    onClick: () => navigate(`/calendar/${calendarId}/boxes`),
-  },
-  { separator: true },
-  {
-    label: (
-      <>
-        <i className="bi bi-trash me-2"></i> {t("delete")}
-      </>
-    ),
-    onClick: () => {
-      setAlertType("confirm-danger");
-      setAlertMessage(t("delete_calendar_confirm"));
-      setAlertId(calendarId);
-      setOnConfirmAction(() => async () => {
-        const rep = await personalCalendars.deleteCalendar(calendarId);
-        if (rep.success) {
-          setAlertType("success");
-          setAlertMessage("✅ " + rep.message);
-          setTimeout(() => {
-            navigate("/calendars");
-          }, 1000);
-        } else {
-          setAlertType("danger");
-          setAlertMessage("❌ " + rep.error);
-        }
-      });
+  t,
+}) => {
+  return [
+    {
+      label: (
+        <>
+          <i className="bi bi-eye me-2"></i> {t("open")}
+        </>
+      ),
+      onClick: () => navigate(`/calendar/${calendarId}`),
     },
-    danger: true,
-  },
-];
+    {
+      label: (
+        <>
+          <i className="bi bi-capsule me-2"></i> {t("medicines.label")}
+        </>
+      ),
+      onClick: () => navigate(`/calendar/${calendarId}/boxes`),
+    },
+    { separator: true },
+    {
+      label: (
+        <>
+          <i className="bi bi-trash me-2"></i> {t("delete")}
+        </>
+      ),
+      onClick: () => {
+        setAlertType("confirm-danger");
+        setAlertMessage(t("delete_calendar_confirm"));
+        setAlertId(calendarId);
+        setOnConfirmAction(() => async () => {
+          const rep = await personalCalendars.deleteCalendar(calendarId);
+          if (rep.success) {
+            setAlertType("success");
+            setAlertMessage("✅ " + rep.message);
+            setTimeout(() => {
+              navigate("/calendars");
+            }, 1000);
+          } else {
+            setAlertType("danger");
+            setAlertMessage("❌ " + rep.error);
+          }
+        });
+      },
+      danger: true,
+    },
+  ];
+};
 
 function CalendarCard({
   calendarId, data, alertId, alertType, alertMessage, onConfirmAction,
@@ -426,11 +414,11 @@ function CalendarCard({
               calendarId,
               navigate,
               personalCalendars,
-              t,
               setAlertType,
               setAlertMessage,
               setAlertId,
               setOnConfirmAction,
+              t,
             })}
           />
         </h5>
