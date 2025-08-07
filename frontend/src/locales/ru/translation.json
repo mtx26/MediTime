@@ -412,7 +412,7 @@
   "shared": "Поделился",
   "shared_by": "Календарь предоставлен",
   "shared_by_token": "Календарь, общий по токену",
-  "shared_calendar": "Поделиться {{имя}}",
+  "shared_calendar": "Поделиться {{name}}",
   "shared_calendar_management": "Управление общими календарями",
   "shared_calendars": "Общие календари",
   "shared_link_label": "Ссылка на общий календарь",
