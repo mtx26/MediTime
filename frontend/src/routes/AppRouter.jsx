@@ -36,7 +36,7 @@ function PrivateRoute({ element }) {
   const { userInfo } = useContext(UserContext);
 
   if (!userInfo) {
-    return <Navigate to="/" />;
+    return <Navigate to="/home" />;
   }
   /*}
   if (!userInfo.emailVerified) {
@@ -310,8 +310,9 @@ function AppRoutes({ sharedProps }) {
 
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/terms" element={<TermsPage />} />
-      <Route path="/" element={<HomePage />} />
+      <Route path="/home" element={<HomePage />} />
       <Route path="*" element={<NotFound />} />
+      <Route path="/" element={userInfo ? <Navigate to="/calendars" /> : <Navigate to="/home" />} />
 
       <Route path="/auth/callback" element={<AuthCallback />} />
     </Routes>
