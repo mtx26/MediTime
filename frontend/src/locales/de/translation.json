@@ -412,6 +412,7 @@
   "shared": "Geteilt",
   "shared_by": "Kalender geteilt von",
   "shared_by_token": "Kalender, der über ein Token freigegeben wird",
+  "shared_calendar": "{{name}} teilen",
   "shared_calendar_management": "Gemeinsam genutzte Kalender verwalten",
   "shared_calendars": "Freigegebene Kalender",
   "shared_link_label": "Link zum freigegebenen Kalender",

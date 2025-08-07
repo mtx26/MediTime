@@ -412,6 +412,7 @@
   "shared": "共享",
   "shared_by": "日历共享者",
   "shared_by_token": "通过令牌共享的日历",
+  "shared_calendar": "分享 {{name}}",
   "shared_calendar_management": "管理共享日历",
   "shared_calendars": "共享日历",
   "shared_link_label": "共享日历链接",

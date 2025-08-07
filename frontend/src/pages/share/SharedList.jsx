@@ -39,7 +39,7 @@ function SharedList({
   const [permissions, setPermissions] = useState({}); // Permissions associées aux partages
   const [expirationType, setExpirationType] = useState({});
   const [emailsToInvite, setEmailsToInvite] = useState({}); // E-mails à inviter au partage
-  const [selectedModifyCalendar, setSelectedModifyCalendar] = useState(null); // Calendrier sélectionné pour modification
+  const [selectedModifyToken, setSelectedModifyToken] = useState(null); // Token sélectionné pour modification
   const [selectedCalendarId, setSelectedCalendarId] = useState(null);
 
   // 📅 Date du jour
@@ -85,7 +85,7 @@ function SharedList({
       setAlertMessage("❌ " + rep.error);
     }
     setAlertId(tokenId);
-    setSelectedModifyCalendar(null);
+    setSelectedModifyToken(null);
   };
 
   // 🔄 Activation/désactivation du lien
@@ -99,7 +99,7 @@ function SharedList({
       setAlertMessage("❌ " + rep.error);
     }
     setAlertId(tokenId);
-    setSelectedModifyCalendar(null);
+    setSelectedModifyToken(null);
   };
 
   const deleteTokenConfirmAction = (tokenId) => {
@@ -120,7 +120,7 @@ function SharedList({
       setAlertMessage("❌ " + rep.error);
     }
     setAlertId(tokenId);
-    setSelectedModifyCalendar(null);
+    setSelectedModifyToken(null);
   };
 
   const deleteUserConfirmAction = (calendarId, user) => {
@@ -188,7 +188,7 @@ function SharedList({
     }
   };
 
-  // 🔄 Fonction pour mettre à jour les données groupées
+  // 🔄 Fonction pour mettre à jour les info de partage
   const setGroupedSharedFunction = useCallback(async () => {
     setLoadingGroupedShared(true);
     const rep = await sharedUserCalendars.fetchGroupedSharedCalendars();
@@ -291,11 +291,6 @@ function SharedList({
         </div>
       </div>
 
-      <h2 className="mb-4 fw-bold">
-        <i className="bi bi-people-fill me-2"></i>
-        {t("shared_calendar_management")}
-      </h2>
-
       <div className="row g-4">
         {Object.entries(groupedShared)
           .filter(([calendarId]) => calendarId === selectedCalendarId)
@@ -320,8 +315,8 @@ function SharedList({
               handleCreateToken={handleCreateToken}
               today={today}
               VITE_URL={VITE_URL}
-              selectedModifyCalendar={selectedModifyCalendar}
-              setSelectedModifyCalendar={setSelectedModifyCalendar}
+              selectedModifyToken={selectedModifyToken}
+              setSelectedModifyToken={setSelectedModifyToken}
               tokenCalendars={tokenCalendars}
               handleSendInvitation={handleSendInvitation}
               deleteUserConfirmAction={deleteUserConfirmAction}
@@ -398,32 +393,35 @@ function CalendarCard({
   setAlertType, setAlertMessage, setOnConfirmAction, setAlertId,
   handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions,
   handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today,
-  VITE_URL, selectedModifyCalendar, setSelectedModifyCalendar, tokenCalendars,
+  VITE_URL, selectedModifyToken, setSelectedModifyToken, tokenCalendars,
   handleSendInvitation, deleteUserConfirmAction, emailsToInvite,
   setEmailsToInvite, navigate, personalCalendars,
 }) {
   const { t } = useTranslation();
   const alertHandlers = { alertId, alertType, alertMessage, onConfirmAction, setAlertMessage, setOnConfirmAction, setAlertId };
-  const tokenProps = { ...alertHandlers, setAlertType, handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions, handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyCalendar, setSelectedModifyCalendar, tokenCalendars };
+  const tokenProps = { ...alertHandlers, setAlertType, handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions, handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyToken, setSelectedModifyToken, tokenCalendars };
   const userProps = { ...alertHandlers, handleSendInvitation, deleteUserConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
   return (
-    <div className="card h-100 shadow border border-2">
+    <div>
       <div className="card-body">
-        <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">
-          <span>{data.calendar_name}</span>
-          <ActionSheet
-            actions={calendarActions({
-              calendarId,
-              navigate,
-              personalCalendars,
-              setAlertType,
-              setAlertMessage,
-              setAlertId,
-              setOnConfirmAction,
-              t,
-            })}
-          />
-        </h5>
+          <h2 className="mb-4 fw-bold justify-content-between d-flex align-items-center">
+            <span>
+              <i className="bi bi-people-fill me-2"></i>
+              {t("shared_calendar", { name: data.calendar_name })}
+            </span>
+            <ActionSheet
+              actions={calendarActions({
+                calendarId,
+                navigate,
+                personalCalendars,
+                setAlertType,
+                setAlertMessage,
+                setAlertId,
+                setOnConfirmAction,
+                t,
+              })}
+            />
+          </h2>
         {alertId === calendarId && (
           <AlertSystem
             type={alertType}
@@ -432,9 +430,7 @@ function CalendarCard({
             onConfirm={async () => { if (onConfirmAction) await onConfirmAction(); }}
           />
         )}
-        <hr className="my-3" />
         <TokenList {...tokenProps} />
-        <hr className="my-3" />
         <UserList {...userProps} />
       </div>
     </div>
@@ -460,198 +456,207 @@ function TokenList({
   VITE_URL,
   data,
   calendarId,
-  selectedModifyCalendar,
-  setSelectedModifyCalendar,
+  selectedModifyToken,
+  setSelectedModifyToken,
   tokenCalendars,
 }) {
   const { t } = useTranslation();
   return (
-    <ul className="list-group">
-      <h6 className="">{t("public_links")}:</h6>
+    <>
       {(data.tokens || []).map((token) => (
-        <div key={token.id}>
-          {/* Alert */}
-          {alertId === token.id && (
-            <AlertSystem
-              type={alertType}
-              message={alertMessage}
-              onClose={() => {
-                setAlertMessage("");
-                setOnConfirmAction(null);
-                setAlertId(null);
-              }}
-              onConfirm={async () => {
-                if (onConfirmAction) await onConfirmAction();
-              }}
-            />
-          )}
-
-          {/* TODO: racourcir le lien */}
-          {/* Lien */}
-          <div className="input-group col-md-6 mb-2">
-            <input
-              id={"tokenLink" + token.id}
-              type="text"
-              className={`form-control border-2 border-${token.revoked ? "danger" : "success"}`}
-              aria-label={t("shared_link_label")}
-              title={t("shared_link_label")}
-              value={`${VITE_URL}/shared-token-calendar/${token.id}`}
-              readOnly
-            />
-            <button
-              className={`btn btn-outline-${token.revoked ? "danger" : "success"}`}
-              onClick={() => handleCopyLink(token)}
-              aria-label={t("copy_link")}
-              title={t("copy_link")}
-              disabled={token.revoked}
-            >
-              <i className="bi bi-clipboard"></i>
-            </button>
-            <ActionSheet
-              actions={[
-                {
-                  label: (
-                    <>
-                      <i className="bi bi-pencil-square me-2"></i> {t('modify')}
-                    </>
-                  ),
-                  onClick: () => setSelectedModifyCalendar(calendarId),
-                },
-                {
-                  label: (
-                    <>
-                      <i className="bi bi-arrow-clockwise me-2"></i> {t('regenerate')}
-                    </>
-                  ),
-                  onClick: () => {
-                    setAlertType("confirm-danger");
-                    setAlertMessage(t("regenerate_link_confirm"));
-                    setAlertId(token.id);
-                    setOnConfirmAction(() => async () => {
-                      await tokenCalendars.deleteToken(token.id);
-                      await handleCreateToken(calendarId);
-                    });
-                  },
-                },
-                { separator: true },
-                {
-                  label: (
-                    <>
-                      <i className="bi bi-trash me-2"></i> {t('delete')}
-                    </>
-                  ),
-                  onClick: () => deleteTokenConfirmAction(token.id),
-                  danger: true,
-                },
-              ]}
-            />
-
-          </div>
-
-          {selectedModifyCalendar === calendarId && (
-            <li className="list-group-item py-3 px-3">
-              <div className="row align-items-center gy-3 gx-4">
-                {/* Colonne 1 : Switch */}
-                <div className="col-auto d-flex align-items-center gap-2">
-                  <label
-                    htmlFor={`switchToken-${token.id}`}
-                    className="form-label mb-0 fw-semibold"
-                  >
-                    {t("activation")}:
-                  </label>
-                  <div className="form-check form-switch m-0">
-                    <input
-                      className={`form-check-input ${token.revoked ? "" : "bg-success"}`}
-                      type="checkbox"
-                      role="switch"
-                      id={`switchToken-${token.id}`}
-                      checked={!token.revoked}
-                      onChange={() => handleToggleToken(token.id)}
-                      aria-label={t("activation_toggle_aria")}
-                      title={
-                        token.revoked ? t("reactivate_link") : t("revoke_link")
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* Colonne 2 : Expiration */}
-                <div className="col-auto d-flex align-items-center flex-wrap gap-2">
-                  <label
-                    htmlFor={`tokenExpiration${token.id}`}
-                    className="form-label mb-0 fw-semibold"
-                  >
-                    {t("expiration")}:
-                  </label>
-                  <select
-                    id={`tokenExpiration${token.id}`}
-                    className="form-select w-auto"
-                    value={token.expires_at === null ? "" : "date"}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      handleUpdateTokenExpiration(
-                        token.id,
-                        value === "" ? null : today,
-                      );
-                    }}
-                  >
-                    <option value="">{t("never")}</option>
-                    <option value="date">{t("date")}</option>
-                  </select>
-                  {token.expires_at && (
-                    <input
-                      type="date"
-                      className="form-control w-auto"
-                      style={{ minWidth: "130px" }}
-                      value={formatToLocalISODate(token.expires_at)}
-                      onChange={(e) =>
-                        handleUpdateTokenExpiration(
-                          token.id,
-                          formatToLocalISODate(e.target.value),
-                        )
-                      }
-                      min={formatToLocalISODate(today)}
-                    />
-                  )}
-                </div>
-
-                {/* Colonne 3 : Permissions */}
-                <div className="col-auto d-flex align-items-center gap-2">
-                  <label
-                    htmlFor={`tokenPermissions${token.id}`}
-                    className="form-label mb-0 fw-semibold"
-                  >
-                    {t("access")}:
-                  </label>
-                  <select
-                    id={`tokenPermissions${token.id}`}
-                    className="form-select w-auto"
-                    value={token.permissions}
-                    onChange={(e) =>
-                      handleUpdateTokenPermissions(token.id, e.target.value)
-                    }
-                  >
-                    <option value="read">{t("read_only")}</option>
-                    <option value="edit">{t("read_write")}</option>
-                  </select>
-                </div>
-                {/* Colonne 4 : Annuler a la ligne suivante */}
-                <div className="d-flex col-12">
-                  <button
-                    className="btn btn-outline-secondary"
-                    onClick={() => setSelectedModifyCalendar(null)}
-                    aria-label={t("cancel")}
-                    title={t("cancel")}
-                  >
-                    <i className="bi bi-x-lg"></i> {t("cancel")}
-                  </button>
-                </div>
+        <div className="card p-3 mb-3" key={token.id}>
+          <ul className="list-group">
+            <h5 className="mb-3 d-flex justify-content-between align-items-center">
+              <div>
+                <i className="bi bi-link-45deg me-2"></i>
+                {t("public_links")} :
               </div>
-            </li>
-          )}
+              <ActionSheet
+                actions={[
+                  {
+                    label: (
+                      <>
+                        <i className="bi bi-pencil-square me-2"></i> {t('modify')}
+                      </>
+                    ),
+                    onClick: () => setSelectedModifyToken(token.id),
+                  },
+                  {
+                    label: (
+                      <>
+                        <i className="bi bi-arrow-clockwise me-2"></i> {t('regenerate')}
+                      </>
+                    ),
+                    onClick: () => {
+                      console.log("Regenerate link for calendar:", calendarId);
+                      setAlertType("confirm-danger");
+                      setAlertMessage(t("regenerate_link_confirm"));
+                      setAlertId(token.id);
+                      setOnConfirmAction(() => async () => {
+                        await tokenCalendars.deleteToken(token.id);
+                        await handleCreateToken(calendarId);
+                      });
+                    },
+                  },
+                  { separator: true },
+                  {
+                    label: (
+                      <>
+                        <i className="bi bi-trash me-2"></i> {t('delete')}
+                      </>
+                    ),
+                    onClick: () => deleteTokenConfirmAction(token.id),
+                    danger: true,
+                  },
+                ]}
+                buttonSize="sm"
+              />
+            </h5>
+            <div key={token.id}>
+              {/* Alert */}
+              {alertId === token.id && (
+                <AlertSystem
+                  type={alertType}
+                  message={alertMessage}
+                  onClose={() => {
+                    setAlertMessage("");
+                    setOnConfirmAction(null);
+                    setAlertId(null);
+                  }}
+                  onConfirm={async () => {
+                    if (onConfirmAction) await onConfirmAction();
+                  }}
+                />
+              )}
+
+              {/* TODO: racourcir le lien */}
+              {/* Lien */}
+              <div className="input-group col-md-6 mb-2">
+                <input
+                  id={"tokenLink" + token.id}
+                  type="text"
+                  className={`form-control border-2 border-${token.revoked ? "danger" : "success"}`}
+                  aria-label={t("shared_link_label")}
+                  title={t("shared_link_label")}
+                  value={`${VITE_URL}/shared-token-calendar/${token.id}`}
+                  readOnly
+                />
+                <button
+                  className={`btn btn-outline-${token.revoked ? "danger" : "success"}`}
+                  onClick={() => handleCopyLink(token)}
+                  aria-label={t("copy_link")}
+                  title={t("copy_link")}
+                  disabled={token.revoked}
+                >
+                  <i className="bi bi-clipboard"></i>
+                </button>
+              </div>
+
+              {selectedModifyToken === token.id && (
+                <li className="list-group-item py-3 px-3">
+                  <div className="row align-items-center gy-3 gx-4">
+                    {/* Colonne 1 : Switch */}
+                    <div className="col-auto d-flex align-items-center gap-2">
+                      <label
+                        htmlFor={`switchToken-${token.id}`}
+                        className="form-label mb-0 fw-semibold"
+                      >
+                        {t("activation")}:
+                      </label>
+                      <div className="form-check form-switch m-0">
+                        <input
+                          className={`form-check-input ${token.revoked ? "" : "bg-success"}`}
+                          type="checkbox"
+                          role="switch"
+                          id={`switchToken-${token.id}`}
+                          checked={!token.revoked}
+                          onChange={() => handleToggleToken(token.id)}
+                          aria-label={t("activation_toggle_aria")}
+                          title={
+                            token.revoked ? t("reactivate_link") : t("revoke_link")
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    {/* Colonne 2 : Expiration */}
+                    <div className="col-auto d-flex align-items-center flex-wrap gap-2">
+                      <label
+                        htmlFor={`tokenExpiration${token.id}`}
+                        className="form-label mb-0 fw-semibold"
+                      >
+                        {t("expiration")}:
+                      </label>
+                      <select
+                        id={`tokenExpiration${token.id}`}
+                        className="form-select w-auto"
+                        value={token.expires_at === null ? "" : "date"}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          handleUpdateTokenExpiration(
+                            token.id,
+                            value === "" ? null : today,
+                          );
+                        }}
+                      >
+                        <option value="">{t("never")}</option>
+                        <option value="date">{t("date")}</option>
+                      </select>
+                      {token.expires_at && (
+                        <input
+                          type="date"
+                          className="form-control w-auto"
+                          style={{ minWidth: "130px" }}
+                          value={formatToLocalISODate(token.expires_at)}
+                          onChange={(e) =>
+                            handleUpdateTokenExpiration(
+                              token.id,
+                              formatToLocalISODate(e.target.value),
+                            )
+                          }
+                          min={formatToLocalISODate(today)}
+                        />
+                      )}
+                    </div>
+
+                    {/* Colonne 3 : Permissions */}
+                    <div className="col-auto d-flex align-items-center gap-2">
+                      <label
+                        htmlFor={`tokenPermissions${token.id}`}
+                        className="form-label mb-0 fw-semibold"
+                      >
+                        {t("access")}:
+                      </label>
+                      <select
+                        id={`tokenPermissions${token.id}`}
+                        className="form-select w-auto"
+                        value={token.permissions}
+                        onChange={(e) =>
+                          handleUpdateTokenPermissions(token.id, e.target.value)
+                        }
+                      >
+                        <option value="read">{t("read_only")}</option>
+                        <option value="edit">{t("read_write")}</option>
+                      </select>
+                    </div>
+                    {/* Colonne 4 : Annuler a la ligne suivante */}
+                    <div className="d-flex col-12">
+                      <button
+                        className="btn btn-outline-secondary"
+                        onClick={() => setSelectedModifyToken(null)}
+                        aria-label={t("cancel")}
+                        title={t("cancel")}
+                      >
+                        <i className="bi bi-x-lg"></i> {t("cancel")}
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              )}
+            </div>
+          </ul>
         </div>
       ))}
-
       {/* Ajouter un nouveau lien de partage */}
       {data.tokens.length === 0 && (
         <div>
@@ -681,7 +686,7 @@ function TokenList({
           </button>
         </div>
       )}
-    </ul>
+    </>
   );
 }
 
@@ -702,11 +707,96 @@ function UserList({
 }) {
   const { t } = useTranslation();
   return (
-    <ul className="list-group">
-      <h6>{t("shared_users")}:</h6>
-      {(data.users || []).map((user) => (
-        <div key={user.receiver_uid + "-" + calendarId}>
-          {alertId === user.receiver_uid + "-" + calendarId && (
+    <div className="card p-3 mb-3">
+      <ul className="list-group">
+        <h5>
+          <i className="bi bi-person"></i>
+          {t("shared_users")}:
+        </h5>
+        {(data.users || []).map((user) => (
+          <div key={user.receiver_uid + "-" + calendarId}>
+            {alertId === user.receiver_uid + "-" + calendarId && (
+              <AlertSystem
+                type={alertType}
+                message={alertMessage}
+                onClose={() => {
+                  setAlertMessage("");
+                  setOnConfirmAction(null);
+                  setAlertId(null);
+                }}
+                onConfirm={() => {
+                  if (onConfirmAction) onConfirmAction();
+                }}
+              />
+            )}
+            <li
+              key={user.receiver_uid + "-" + calendarId}
+              className="list-group-item"
+            >
+              <div className="row align-items-center">
+                <div className="col-md-12 d-flex align-items-center">
+                  <div className="col-6">
+                    <HoveredUserProfile
+                      user={{
+                        photo_url: user.receiver_photo_url,
+                        display_name: user.receiver_name,
+                        email: user.receiver_email,
+                      }}
+                      trigger={
+                        <div className="d-flex align-items-center gap-2">
+                          <div>
+                            <img
+                              src={user.receiver_photo_url}
+                              alt={t("profile")}
+                              className="rounded-circle"
+                              style={{ width: "40px", height: "40px" }}
+                            />
+                          </div>
+
+                          <div>
+                            <strong>{user.receiver_name}</strong>
+                          </div>
+                        </div>
+                      }
+                    />
+                  </div>
+
+                  {/* Statut */}
+                  <div className="col-4 d-flex align-items-center justify-content-center">
+                    <span
+                      className={`badge rounded-pill ${user.accepted ? "bg-success" : "bg-warning text-dark"}`}
+                    >
+                      {user.accepted ? t("accepted") : t("pending")}
+                    </span>
+                  </div>
+
+                  {/* Supprimer */}
+                  <div className="col-2 justify-content-end d-flex">
+                    <ActionSheet
+                      actions={[
+                        {
+                          label: (
+                            <>
+                              <i className="bi bi-trash"></i> {t('delete')}
+                            </>
+                          ),
+                          onClick: () => deleteUserConfirmAction(calendarId, user),
+                          danger: true,
+                        },
+                      ]}
+                      buttonSize="sm"
+                    />
+                  </div>
+                </div>
+              </div>
+            </li>
+          </div>
+        ))}
+
+        {/* Ajouter un utilisateur */}
+        <div>
+          {/* Alert */}
+          {alertId === "addUser-" + calendarId && (
             <AlertSystem
               type={alertType}
               message={alertMessage}
@@ -720,131 +810,51 @@ function UserList({
               }}
             />
           )}
-          <li
-            key={user.receiver_uid + "-" + calendarId}
-            className="list-group-item"
-          >
-            <div className="row align-items-center">
-              <div className="col-md-12 d-flex align-items-center">
-                <div className="col-6">
-                  <HoveredUserProfile
-                    user={{
-                      photo_url: user.receiver_photo_url,
-                      display_name: user.receiver_name,
-                      email: user.receiver_email,
+
+          <div className="row align-items-center mt-2">
+            <div className="col-md-12">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendInvitation(calendarId);
+                }}
+              >
+                <div className="input-group ">
+                  <input
+                    id={"emailToInvite" + calendarId}
+                    type="email"
+                    className={`form-control`}
+                    placeholder={t("recipient_email")}
+                    aria-label={t("recipient_email")}
+                    onChange={(e) =>
+                      setEmailsToInvite((prev) => ({
+                        ...prev,
+                        [calendarId]: e.target.value,
+                      }))
+                    }
+                    value={emailsToInvite[calendarId] ?? ""}
+                    required
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSendInvitation(calendarId);
+                      }
                     }}
-                    trigger={
-                      <div className="d-flex align-items-center gap-2">
-                        <div>
-                          <img
-                            src={user.receiver_photo_url}
-                            alt={t("profile")}
-                            className="rounded-circle"
-                            style={{ width: "40px", height: "40px" }}
-                          />
-                        </div>
-
-                        <div>
-                          <strong>{user.receiver_name}</strong>
-                        </div>
-                      </div>
-                    }
                   />
-                </div>
-
-                {/* Statut */}
-                <div className="col-4 d-flex align-items-center justify-content-center">
-                  <span
-                    className={`badge rounded-pill ${user.accepted ? "bg-success" : "bg-warning text-dark"}`}
+                  <button
+                    className={`btn btn-primary`}
+                    aria-label={t("send_invitation")}
+                    title={t("send_invitation")}
+                    type="submit"
                   >
-                    {user.accepted ? t("accepted") : t("pending")}
-                  </span>
+                    <i className="bi bi-envelope-paper"></i>
+                  </button>
                 </div>
-
-                {/* Supprimer */}
-                <div className="col-2 justify-content-end d-flex">
-                  <ActionSheet
-                    actions={[
-                      {
-                        label: (
-                          <>
-                            <i className="bi bi-trash"></i> {t('delete')}
-                          </>
-                        ),
-                        onClick: () => deleteUserConfirmAction(calendarId, user),
-                        danger: true,
-                      },
-                    ]}
-                    buttonSize="sm"
-                  />
-                </div>
-              </div>
+              </form>
             </div>
-          </li>
-        </div>
-      ))}
-
-      {/* Ajouter un utilisateur */}
-      <div>
-        {/* Alert */}
-        {alertId === "addUser-" + calendarId && (
-          <AlertSystem
-            type={alertType}
-            message={alertMessage}
-            onClose={() => {
-              setAlertMessage("");
-              setOnConfirmAction(null);
-              setAlertId(null);
-            }}
-            onConfirm={() => {
-              if (onConfirmAction) onConfirmAction();
-            }}
-          />
-        )}
-
-        <div className="row align-items-center mt-2">
-          <div className="col-md-12">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSendInvitation(calendarId);
-              }}
-            >
-              <div className="input-group ">
-                <input
-                  id={"emailToInvite" + calendarId}
-                  type="email"
-                  className={`form-control`}
-                  placeholder={t("recipient_email")}
-                  aria-label={t("recipient_email")}
-                  onChange={(e) =>
-                    setEmailsToInvite((prev) => ({
-                      ...prev,
-                      [calendarId]: e.target.value,
-                    }))
-                  }
-                  value={emailsToInvite[calendarId] ?? ""}
-                  required
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSendInvitation(calendarId);
-                    }
-                  }}
-                />
-                <button
-                  className={`btn btn-primary`}
-                  aria-label={t("send_invitation")}
-                  title={t("send_invitation")}
-                  type="submit"
-                >
-                  <i className="bi bi-envelope-paper"></i>
-                </button>
-              </div>
-            </form>
           </div>
         </div>
-      </div>
-    </ul>
+      </ul>
+    </div>
   );
 }
 
@@ -896,8 +906,8 @@ CalendarCard.propTypes = {
   handleCreateToken: PropTypes.func.isRequired,
   today: PropTypes.string.isRequired,
   VITE_URL: PropTypes.string.isRequired,
-  selectedModifyCalendar: PropTypes.string,
-  setSelectedModifyCalendar: PropTypes.func.isRequired,
+  selectedModifyToken: PropTypes.string,
+  setSelectedModifyToken: PropTypes.func.isRequired,
   tokenCalendars: PropTypes.object.isRequired,
   handleSendInvitation: PropTypes.func.isRequired,
   deleteUserConfirmAction: PropTypes.func.isRequired,
@@ -935,8 +945,8 @@ TokenList.propTypes = {
     calendar_name: PropTypes.string,
   }).isRequired,
   calendarId: PropTypes.string.isRequired,
-  selectedModifyCalendar: PropTypes.string,
-  setSelectedModifyCalendar: PropTypes.func.isRequired,
+  selectedModifyToken: PropTypes.string,
+  setSelectedModifyToken: PropTypes.func.isRequired,
   tokenCalendars: PropTypes.shape({
     tokensList: PropTypes.array,
   }).isRequired,

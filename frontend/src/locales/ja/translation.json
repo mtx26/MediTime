@@ -412,6 +412,7 @@
   "shared": "共有",
   "shared_by": "カレンダーを共有",
   "shared_by_token": "トークンで共有されたカレンダー",
+  "shared_calendar": "{{name}}を共有しています",
   "shared_calendar_management": "共有カレンダーの管理",
   "shared_calendars": "共有カレンダー",
   "shared_link_label": "共有カレンダーのリンク",

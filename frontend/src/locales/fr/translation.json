@@ -412,6 +412,7 @@
   "shared": "Partagés",
   "shared_by": "Calendrier partagé par",
   "shared_by_token": "Calendrier partagé par un token",
+  "shared_calendar": "Partage de {{name}}",
   "shared_calendar_management": "Gestion des calendriers partagés",
   "shared_calendars": "Calendriers partagés",
   "shared_link_label": "Lien du calendrier partagé",
