@@ -430,12 +430,6 @@ function Navbar({ sharedProps }) {
       <nav className="navbar fixed-bottom bg-white shadow-sm py-2 border-top border-2 d-lg-none">
         <div className="container-fluid d-flex justify-content-around mb-3">
           <Link
-            to="/home"
-            className="text-center text-dark text-decoration-none link-hover"
-          >
-            <i className="bi bi-house fs-1"></i>
-          </Link>
-          <Link
             to="/calendars"
             className="text-center text-dark text-decoration-none link-hover"
           >
