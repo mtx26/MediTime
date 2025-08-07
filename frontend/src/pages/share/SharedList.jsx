@@ -659,7 +659,11 @@ function TokenList({
       ))}
       {/* Ajouter un nouveau lien de partage */}
       {data.tokens.length === 0 && (
-        <div>
+        <div className="card p-3 mb-3">
+          <h5 className="mb-3 d-flex align-items-center">
+            <i className="bi bi-link-45deg me-2"></i>
+            {t("public_links")} :
+          </h5>
           {/* Alert */}
           {alertId === "newLink-" + calendarId && (
             <AlertSystem
