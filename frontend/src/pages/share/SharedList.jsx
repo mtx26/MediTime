@@ -421,7 +421,6 @@ function CalendarCard({
               setAlertId,
               setOnConfirmAction,
               t,
-              t,
             })}
           />
         </h5>
