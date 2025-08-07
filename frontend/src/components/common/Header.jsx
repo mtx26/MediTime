@@ -286,8 +286,6 @@ function Navbar({ sharedProps }) {
                     className="dropdown-menu dropdown-menu-end p-2 show"
                     style={{
                       minWidth: '500px',
-                      maxHeight: '450px',
-                      overflowY: 'auto',
                       right: '0',
                       left: 'auto',
                     }}
