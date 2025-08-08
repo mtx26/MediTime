@@ -48,7 +48,11 @@ function CalendarPage({
   const dateModalRef = useRef(null);
   const [loading, setLoading] = useState(undefined); // État de chargement du calendrier
 
-  const [startDate, setStartDate] = useState(getMondayFromDate(new Date()));
+  const [startDate, setStartDate] = useState(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + 7); // semaine suivante
+    return getMondayFromDate(date);
+  });
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
