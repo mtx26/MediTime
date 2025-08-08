@@ -1,16 +1,14 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AlertSystem from '../../components/common/AlertSystem';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
-import ShareCalendarModal from '../../components/calendar/ShareCalendarModal';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 
 
 function SelectCalendar({
   personalCalendars,
-  sharedUserCalendars,
-  tokenCalendars,
+  sharedUserCalendars
 }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -25,18 +23,6 @@ function SelectCalendar({
   const [alertMessage, setAlertMessage] = useState(''); // État pour le message d'alerte
   const [onConfirmAction, setOnConfirmAction] = useState(null); // État pour l'action à confirmer
   const [selectedAlert, setSelectedAlert] = useState(null); // État pour l'alerte sélectionnée
-
-  // 🔗 Partage de calendrier (par lien ou utilisateur)
-  const shareModalRef = useRef(null);
-  const [calendarNameToShare, setCalendarNameToShare] = useState(''); // État pour le calendrier à partager
-  const [calendarIdToShare, setCalendarIdToShare] = useState(''); // État pour le calendrier à partager
-  const [existingShareToken, setExistingShareToken] = useState(null); // État pour un jeton de partage déjà existant
-
-  // 👥 Partage ciblé par utilisateur
-  const [sharedUsersData, setSharedUsersData] = useState([]); // État pour les données des utilisateurs ayant accès
-
-  // 🔄 Partage de calendrier
-  const [loadingShare, setLoadingShare] = useState(false); // État de chargement du partage du calendrier
 
   const renameConfirmAction = async (calendarId) => {
     const rep = await personalCalendars.renameCalendar(
@@ -83,25 +69,6 @@ function SelectCalendar({
     setOnConfirmAction(() => () => deleteConfirmAction(calendarId));
   };
 
-  // 🔗 Partager un calendrier
-  const handleShareCalendarClick = async (calendarData) => {
-    setLoadingShare(true);
-    setCalendarNameToShare(calendarData.name); // On retient quel calendrier partager
-    setCalendarIdToShare(calendarData.id);
-    setSharedUsersData([]);
-    setExistingShareToken(null);
-    shareModalRef.current?.open();
-    const token = await tokenCalendars.tokensList.find(
-      (t) => t.calendar_id === calendarData.id
-    );
-    const rep = await sharedUserCalendars.fetchSharedUsers(calendarData.id);
-    if (rep.success) {
-      setSharedUsersData(rep.users);
-    }
-    setExistingShareToken(token || null);
-    setLoadingShare(false);
-  };
-
   const deleteSharedCalendarConfirmAction = async (calendarId) => {
     const rep = await sharedUserCalendars.deleteSharedCalendar(calendarId);
     if (rep.success) {
@@ -138,21 +105,6 @@ function SelectCalendar({
   }
   return (
     <div className="container align-items-center d-flex flex-column gap-3">
-      {/* Modal pour partager un calendrier */}
-      <ShareCalendarModal
-        ref={shareModalRef}
-        loading={loadingShare}
-        calendarId={calendarIdToShare}
-        calendarName={calendarNameToShare}
-        existingShareToken={existingShareToken}
-        sharedUsersData={sharedUsersData}
-        tokenCalendars={tokenCalendars}
-        sharedUserCalendars={sharedUserCalendars}
-        setAlertType={setAlertType}
-        setAlertMessage={setAlertMessage}
-        setSelectedAlert={setSelectedAlert}
-        alertCategory="calendar"
-      />
 
       <div className="w-100" style={{ maxWidth: '800px' }}>
         <h4 className="mb-3 fw-bold">
@@ -254,7 +206,7 @@ function SelectCalendar({
                             <i className="bi bi-box-arrow-up me-2"></i> {t('share')}
                           </>
                         ),
-                        onClick: () => handleShareCalendarClick(calendarData),
+                        onClick: () => navigate(`/shared-calendars?calendar=${calendarData.id}`),
                       },
                       { separator: true },
                       {
@@ -353,13 +305,15 @@ function SelectCalendar({
                 )}
               </div>
             ))}
+
+            <button
+              className="text-center btn btn-outline-primary rounded-0 rounded-bottom"
+              onClick={() => navigate('/add-calendar')}
+            >
+              <i className="bi bi-calendar-plus me-2"></i> {t('calendar.add_calendar')}
+            </button>
           </div>
         )}
-        
-        {/* Champ pour ajouter un nouveau calendrier */}
-        <button className="btn btn-primary w-100 shadow" onClick={() => navigate('/add-calendar')}>
-          <i className="bi bi-calendar-plus me-2"></i> {t('calendar.add_calendar')}
-        </button>
       </div>
 
       <div className="w-100" style={{ maxWidth: '800px' }}>

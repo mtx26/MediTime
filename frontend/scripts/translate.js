@@ -30,6 +30,18 @@ function saveJSON(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
 }
 
+// 🔒 Protège les placeholders pour éviter leur traduction
+const RE_PROTECT = /{{([^{}]*)}}/g;
+const RE_RESTORE = /__NP__([^_]*)___/g;
+
+function protectPlaceholders(str) {
+  return str.replace(RE_PROTECT, (_, inner) => `__NP__${inner}___`);
+}
+
+function restorePlaceholders(str) {
+  return str.replace(RE_RESTORE, '{{$1}}');
+}
+
 // 🔍 Trouve les clés manquantes ou vides entre deux objets récursivement
 function findMissingKeys(source, target, prefix = '') {
   let missing = [];
@@ -67,7 +79,9 @@ async function translateObject(obj, targetLang) {
     const value = obj[key];
     if (typeof value === 'string') {
       try {
-        const [translated] = await translate.translate(value, targetLang);
+        const protectedValue = protectPlaceholders(value);
+        const [translatedRaw] = await translate.translate(protectedValue, targetLang);
+        const translated = restorePlaceholders(translatedRaw);
         result[key] = translated;
       } catch (e) {
         console.error(`❌ Erreur de traduction (${targetLang}) :`, value, e.message);
@@ -158,7 +172,11 @@ async function translateObject(obj, targetLang) {
         // Cas : chaîne simple → traduit normalement
         if (typeof value === 'string') {
           try {
-            const [translated] = await translate.translate(value, code);
+            const protectedValue = protectPlaceholders(value);
+            const [translatedRaw] = await translate.translate(protectedValue, code);
+            const translated = restorePlaceholders(translatedRaw);
+            console.log(`✅ "${value}" → "${protectedValue}" → "${translated}"`);
+            
             let ref = target;
             while (keys.length > 1) {
               const k = keys.shift();

@@ -1,9 +1,10 @@
-import { useEffect, useRef, useContext } from 'react';
+import { useEffect, useContext, useCallback } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { UserContext } from '../../contexts/UserContext';
 import { log } from '../../utils/logger';
 import { analyticsPromise } from '../../services/firebase/firebase';
 import { logEvent } from 'firebase/analytics';
+import { useSupabaseRealtime } from './useSupabaseRealtime';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -88,66 +89,42 @@ const useRealtimeBoxes = (
   setLoadingBoxes
 ) => {
   const { userInfo } = useContext(UserContext);
-  const channelRef = useRef(null);
 
   useEffect(() => {
     if (!userInfo || !calendarId) {
       setLoadingBoxes(undefined);
-      return;
     }
+  }, [userInfo, calendarId, setLoadingBoxes]);
 
-    const uid = userInfo.uid;
+  const uid = userInfo?.uid;
+
+  const fetchData = useCallback(() => {
+    if (!uid || !calendarId) return;
     fetchBoxes({ uid, calendarId, setBoxes, setLoadingBoxes, sourceType });
+  }, [uid, calendarId, setBoxes, setLoadingBoxes, sourceType]);
 
-    const baseChannel =
-      sourceType === 'personal' ? 'personal-meds' : 'shared-meds';
-    const deleteChannel =
-      sourceType === 'personal' ? 'delete-personal-meds' : 'delete-shared-meds';
+  const baseChannel =
+    sourceType === 'personal' ? 'personal-meds' : 'shared-meds';
+  const deleteChannel =
+    sourceType === 'personal' ? 'delete-personal-meds' : 'delete-shared-meds';
 
-    const channel = supabase
-      .channel(`${baseChannel}-${calendarId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'medicine_boxes',
-          filter: `calendar_id=eq.${calendarId}`,
-        },
-        () =>
-          fetchBoxes({ uid, calendarId, setBoxes, setLoadingBoxes, sourceType })
-      )
-      .subscribe();
-
-    const deletion = supabase
-      .channel(`${deleteChannel}-${calendarId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'medicine_boxes',
-        },
-        () =>
-          fetchBoxes({ uid, calendarId, setBoxes, setLoadingBoxes, sourceType })
-      )
-      .subscribe();
-
-    channelRef.current = { channel, deletion };
-
-    return () => {
-      try {
-        channel.unsubscribe();
-        deletion.unsubscribe();
-        channelRef.current = null;
-      } catch (err) {
-        log.error('Erreur lors de la désinscription des canaux Supabase', {
-          error: err,
-          origin: 'REALTIME_MEDICINE_BOXES_CLEANUP_ERROR',
-        });
-      }
-    };
-  }, [userInfo, calendarId, sourceType]);
+  useSupabaseRealtime({
+    enabled: !!uid && !!calendarId,
+    fetchData,
+    channels: [
+      {
+        channelName: `${baseChannel}-${calendarId}`,
+        table: 'medicine_boxes',
+        filter: `calendar_id=eq.${calendarId}`,
+      },
+      {
+        channelName: `${deleteChannel}-${calendarId}`,
+        event: 'DELETE',
+        table: 'medicine_boxes',
+      },
+    ],
+    deps: [uid, calendarId, sourceType],
+  });
 };
 
 export const useRealtimePersonalBoxes = (

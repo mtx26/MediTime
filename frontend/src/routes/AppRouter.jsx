@@ -14,6 +14,7 @@ import NotificationsPage from '../pages/notifications/NotificationsPage';
 import SettingsPage from '../pages/settings/SettingsPage';
 import AddCalendarPage from '../pages/calendar/AddCalendarPage';
 import ImportCalendarPage from '../pages/calendar/ImportCalendarPage';
+import MedicineReview from '../pages/calendar/MedicineReview';
 
 import CalendarView from '../pages/calendar/CalendarView';
 import PillboxPage from '../pages/calendar/Pillbox';
@@ -35,7 +36,7 @@ function PrivateRoute({ element }) {
   const { userInfo } = useContext(UserContext);
 
   if (!userInfo) {
-    return <Navigate to="/" />;
+    return <Navigate to="/home" />;
   }
   /*}
   if (!userInfo.emailVerified) {
@@ -128,22 +129,32 @@ function AppRoutes({ sharedProps }) {
           />
         }
       />
-      <Route
-        path="/add-calendar"
-        element={
-          <PrivateRoute
-            element={<AddCalendarPage {...sharedProps} />}
-          />
-        }
-      />
-      <Route
-        path="/import-calendar"
-        element={
-          <PrivateRoute
-            element={<ImportCalendarPage {...sharedProps} />}
-          />
-        }
-      />
+      <Route path="/add-calendar">
+        <Route
+          index
+          element={
+            <PrivateRoute
+              element={<AddCalendarPage {...sharedProps} />}
+            />
+          }
+        />
+        <Route
+          path="import"
+          element={
+            <PrivateRoute
+              element={<ImportCalendarPage {...sharedProps} />}
+            />
+          }
+        />
+        <Route
+          path="review"
+          element={
+            <PrivateRoute
+              element={<MedicineReview {...sharedProps} />}
+            />
+          }
+        />
+      </Route>
       <Route path="/calendar/:calendarId">
         <Route
           index
@@ -299,8 +310,9 @@ function AppRoutes({ sharedProps }) {
 
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/terms" element={<TermsPage />} />
-      <Route path="/" element={<HomePage />} />
+      <Route path="/home" element={<HomePage />} />
       <Route path="*" element={<NotFound />} />
+      <Route path="/" element={userInfo ? <Navigate to="/calendars" /> : <Navigate to="/home" />} />
 
       <Route path="/auth/callback" element={<AuthCallback />} />
     </Routes>

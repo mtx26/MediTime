@@ -32,7 +32,7 @@ function Footer() {
                   <li>
                     <i className="bi bi-house me-2 text-primary"></i>
                     <Link
-                      to="/"
+                      to="/home"
                       className="text-muted text-decoration-none link-hover"
                     >
                       {t('home')}
@@ -139,14 +139,19 @@ function Footer() {
           </div>
 
           {/* Logo + copyright */}
-          <div className="col-md-4 text-md-end text-center">
-            <div className="fw-bold text-primary fs-5">
-              <i className="bi bi-capsule me-2"></i> {t('app.title')}
+          <Link 
+            className='col-md-4 text-decoration-none link-hover'
+            to="/"
+          >
+            <div className="text-md-end text-center">
+              <div className="fw-bold text-primary fs-5">
+                <i className="bi bi-capsule me-2"></i> {t('app.title')}
+              </div>
+              <div className="text-muted small">
+                © {currentYear} — {t('rights_reserved')}
+              </div>
             </div>
-            <div className="text-muted small">
-              © {currentYear} — {t('rights_reserved')}
-            </div>
-          </div>
+          </Link>
         </div>
       </div>
 

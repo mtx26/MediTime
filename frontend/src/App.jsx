@@ -410,22 +410,17 @@ function App() {
   
 
   // Fonction pour récupérer les différentes utilisateurs ayant accès à un calendrier
-  const fetchSharedUsers = useCallback(async (calendarId) => {
-    const result = await performApiCall({
-      url: `${API_URL}/api/shared/users/users/${calendarId}`,
+  const fetchGroupedSharedCalendars = useCallback(async () => {
+    return await performApiCall({
+      url: `${API_URL}/api/shared/grouped`,
       method: 'GET',
       origin: 'SHARED_USERS_FETCH',
       uid,
       analyticsEvent: 'fetch_shared_users',
-      analyticsData: { calendarId, uid },
+      analyticsData: { uid },
     });
-  
-    return {
-      ...result,
-      users: result.users ?? [],
-    };
   }, []);
-  
+    
 
   // Fonction pour supprimer un utilisateur partagé pour le owner
   const deleteSharedUser = useCallback(async (calendarId, userId) => {
@@ -638,7 +633,7 @@ function App() {
 
     sharedUserCalendars: {
       fetchSharedUserCalendarSchedule,
-      fetchSharedUsers,
+      fetchGroupedSharedCalendars,
       sendInvitation,
       acceptInvitation,
       rejectInvitation,
