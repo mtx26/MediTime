@@ -324,24 +324,19 @@ export const loginWithMagicLink = async (email) => {
  * Invitation d'un utilisateur par email
  */
 export const inviteUserByEmail = async (email) => {
-  try {
-    const { error } = await supabase.auth.admin.inviteUserByEmail(email, {
-      redirectTo: window.location.origin + '/auth/callback',
-    });
-    if (error) {
-      log.error("Erreur lors de l'invitation de l'utilisateur", error.message, {
-        origin: 'INVITE_USER_BY_EMAIL',
-        uid: null,
-      });
-      return error;
-    }
-    return null;
-  } catch (error) {
-    log.error("Erreur lors de l'invitation de l'utilisateur", error.message, {
-      origin: 'INVITE_USER_BY_EMAIL',
-      uid: null,
-    });
+  const response = await performApiCall({
+    url: `${API_URL}/api/auth/invite`,
+    method: 'POST',
+    body: { email },
+    origin: 'INVITE_USER_BY_EMAIL',
+    uid: null,
+  });
+
+  if (!response.success) {
+    return { error: response.error, code: response.code };
   }
+
+  return null;
 };
 
 /**
