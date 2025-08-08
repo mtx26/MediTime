@@ -11,7 +11,6 @@ import {
   MicrosoftHandleLogin
 } from '../../services/auth/authService';
 import AlertSystem from '../../components/common/AlertSystem';
-import { getSupabaseErrorMessage } from '../../utils/supabase/SupabaseErrorMessage';
 import { log } from '../../utils/logger';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -181,7 +180,7 @@ function Auth() {
                 if (activeTab === 'login') {
                   const error = await loginWithEmail(email, password);
                   if (error) {
-                    setAlertMessage('❌ ' + getSupabaseErrorMessage(error.message));
+                    setAlertMessage('❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`));
                     setAlertType('danger');
                   } else {
                     log.info('Connexion réussie', {
@@ -193,7 +192,7 @@ function Auth() {
                 } else {
                   const error = await registerWithEmail(email, password, name);
                   if (error) {
-                    setAlertMessage('❌ ' + getSupabaseErrorMessage(error.message));
+                    setAlertMessage('❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`));
                     setAlertType('danger');
                   } else {
                     log.info('Inscription réussie', {
