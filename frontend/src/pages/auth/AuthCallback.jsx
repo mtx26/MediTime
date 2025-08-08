@@ -13,13 +13,17 @@ const AuthCallback = () => {
 
   useEffect(() => {
     const handleRedirect = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      console.log(session);
-      console.log(error);
+      const hash = new URLSearchParams(window.location.hash.substring(1));
+      const type = hash.get('type');
+
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
 
       if (error || !session?.user) {
         log.error(t('auth_callback.session_error'), error?.message, {
-          origin: "CALLBACK_ERROR",
+          origin: 'CALLBACK_ERROR',
           uid: null,
         });
         return navigate('/login');
@@ -29,11 +33,24 @@ const AuthCallback = () => {
       reloadUser();
 
       log.info(t('auth_callback.success'), {
-        origin: "CALLBACK_SUCCESS",
+        origin: 'CALLBACK_SUCCESS',
         uid: user.id,
+        type,
       });
 
-      navigate('/'); // redirection vers ta page principale
+      switch (type) {
+        case 'recovery':
+        case 'invite':
+          return navigate('/reset-password-confirm');
+        case 'email_change':
+          return navigate('/settings/account');
+        case 'reauthentication':
+          return navigate('/settings/security');
+        case 'magiclink':
+        case 'signup':
+        default:
+          return navigate('/');
+      }
     };
 
     handleRedirect();

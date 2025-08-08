@@ -15,49 +15,26 @@ export default function ResetPasswordConfirm() {
   const { t } = useTranslation();
 
   useEffect(() => {
-    const initSession = async () => {
-      const hash = new URLSearchParams(window.location.hash.substring(1));
-      const access_token = hash.get('access_token');
-      const refresh_token = hash.get('refresh_token');
-  
-      if (!access_token || !refresh_token) {
-        log.error("Token manquant dans l'URL", null, {
-          origin: 'RESET_PASSWORD_CONFIRM',
-        });
-        setAlertType('danger');
-        setAlertMessage(t('reset_password_confirm.invalid_link'));
-        return;
-      }
-  
-      const { error } = await supabase.auth.setSession({ access_token, refresh_token });
-  
-      if (error) {
-        log.error("Erreur lors du setSession", error.message, {
-          origin: 'RESET_PASSWORD_CONFIRM',
-        });
-        setAlertType('danger');
-        setAlertMessage(t('reset_password_confirm.invalid_session'));
-        return;
-      }
-  
+    const checkSession = async () => {
       const {
         data: { session },
+        error,
       } = await supabase.auth.getSession();
-  
-      if (!session || !session.user) {
+
+      if (error || !session?.user) {
         setAlertType('danger');
         setAlertMessage(t('reset_password_confirm.invalid_session'));
         return;
       }
-  
+
       setSessionReady(true);
-      log.info("Session rétablie avec succès", {
+      log.info('Session rétablie avec succès', {
         origin: 'RESET_PASSWORD_CONFIRM',
         uid: session.user.id,
       });
     };
-  
-    initSession();
+
+    checkSession();
   }, []);
   
 

@@ -242,7 +242,7 @@ export const loginWithEmail = async (email, password) => {
 export const resetPassword = async (email) => {
   try {
     await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/reset-password-confirm',
+      redirectTo: window.location.origin + '/auth/callback',
     });
   } catch (error) {
     log.error(
@@ -288,6 +288,100 @@ export const updateUserPassword = async (newPassword) => {
   } catch (error) {
     log.error('Erreur lors de la mise à jour du mot de passe', error.message, {
       origin: 'UPDATE_USER_PASSWORD',
+      uid: null,
+    });
+  }
+};
+
+/**
+ * Connexion via Magic Link (OTP)
+ */
+export const loginWithMagicLink = async (email) => {
+  try {
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: window.location.origin + '/auth/callback',
+      },
+    });
+    if (error) {
+      log.error('Erreur lors de la connexion par magic link :', error.message, {
+        origin: 'LOGIN_WITH_MAGIC_LINK',
+        uid: null,
+      });
+      return error;
+    }
+    return null;
+  } catch (error) {
+    log.error('Erreur lors de la connexion par magic link :', error.message, {
+      origin: 'LOGIN_WITH_MAGIC_LINK',
+      uid: null,
+    });
+  }
+};
+
+/**
+ * Invitation d'un utilisateur par email
+ */
+export const inviteUserByEmail = async (email) => {
+  try {
+    const { error } = await supabase.auth.admin.inviteUserByEmail(email, {
+      redirectTo: window.location.origin + '/auth/callback',
+    });
+    if (error) {
+      log.error("Erreur lors de l'invitation de l'utilisateur", error.message, {
+        origin: 'INVITE_USER_BY_EMAIL',
+        uid: null,
+      });
+      return error;
+    }
+    return null;
+  } catch (error) {
+    log.error("Erreur lors de l'invitation de l'utilisateur", error.message, {
+      origin: 'INVITE_USER_BY_EMAIL',
+      uid: null,
+    });
+  }
+};
+
+/**
+ * Mise à jour de l'email utilisateur
+ */
+export const updateUserEmail = async (newEmail) => {
+  try {
+    const { error } = await supabase.auth.updateUser({
+      email: newEmail,
+      options: {
+        emailRedirectTo: window.location.origin + '/auth/callback',
+      },
+    });
+    if (error) {
+      log.error("Erreur lors du changement d'email", error.message, {
+        origin: 'UPDATE_USER_EMAIL',
+        uid: null,
+      });
+      return error;
+    }
+    return null;
+  } catch (error) {
+    log.error("Erreur lors du changement d'email", error.message, {
+      origin: 'UPDATE_USER_EMAIL',
+      uid: null,
+    });
+  }
+};
+
+/**
+ * Réauthentification de l'utilisateur
+ */
+export const reauthenticateUser = async () => {
+  try {
+    await supabase.auth.reauthenticate({
+      redirectTo: window.location.origin + '/auth/callback',
+    });
+  } catch (error) {
+    log.error('Erreur lors de la réauthentification', error.message, {
+      origin: 'REAUTHENTICATE_USER',
       uid: null,
     });
   }
