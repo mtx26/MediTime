@@ -65,7 +65,9 @@
     "with_facebook": "Login with Facebook",
     "with_github": "Connecting with Github",
     "with_google": "Sign in with Google",
-    "with_twitter": "Connect with Twitter"
+    "with_twitter": "Connect with Twitter",
+    "send_magic_link": "Send magic link",
+    "magic_link_sent": "📩 A magic sign-in link has been sent to your email."
   },
   "auth_callback": {
     "loading": "Connecting...",

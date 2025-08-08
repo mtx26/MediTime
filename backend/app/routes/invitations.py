@@ -3,12 +3,13 @@ from app.utils.responses import success_response, error_response, warning_respon
 from app.utils.auth import require_auth
 from app.db.connection import get_connection
 from app.services.calendar import verify_calendar
-from app.services.user import fetch_user
+from app.services.user import insert_new_user
 from app.services.notifications import notify_and_record
 import time
 from . import api
 from urllib.parse import urljoin
 from app.config import Config
+import requests
 
 
 
@@ -21,48 +22,66 @@ def handle_send_invitation(calendar_id):
         owner_uid = g.uid
 
         receiver_email = request.get_json(force=True).get("email")
+        receiver_uid = None
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT * FROM users WHERE email = %s", (receiver_email,))
                 receiver_user = cursor.fetchone()
-                receiver_uid = receiver_user.get("id")
+                if receiver_user:
+                    receiver_uid = receiver_user.get("id")
+
+        if not receiver_uid:
+            url = f"{Config.SUPABASE_PROJECT_URL}/auth/v1/admin/invite"
+            headers = {
+                "apikey": Config.SUPABASE_SERVICE_ROLE_KEY or "",
+                "Authorization": f"Bearer {Config.SUPABASE_SERVICE_ROLE_KEY}",
+                "Content-Type": "application/json",
+            }
+            payload = {
+                "email": receiver_email,
+                "redirect_to": f"{Config.FRONTEND_URL}/auth/callback",
+            }
+            res = requests.post(url, json=payload, headers=headers, timeout=10)
+            if res.status_code >= 400:
+                error_message = res.json().get("msg", res.text)
+                return error_response(
+                    message="erreur lors de l'envoi de l'invitation",
+                    code="INVITE_USER_ERROR",
+                    status_code=res.status_code,
+                    uid=owner_uid,
+                    origin="INVITATION_SEND",
+                    error=error_message,
+                    log_extra={"calendar_id": calendar_id, "email": receiver_email},
+                )
+            receiver_uid = res.json().get("user", {}).get("id")
+            insert_new_user(receiver_uid, receiver_email, receiver_email, None)
 
         if not verify_calendar(calendar_id, owner_uid):
             return warning_response(
-                message="calendrier non trouvé", 
-                code="CALENDAR_NOT_FOUND", 
-                status_code=404, 
-                uid=owner_uid, 
+                message="calendrier non trouvé",
+                code="CALENDAR_NOT_FOUND",
+                status_code=404,
+                uid=owner_uid,
                 origin="INVITATION_SEND",
-                log_extra={"calendar_id": calendar_id}
-            )      
-        # Verif si soit même
+                log_extra={"calendar_id": calendar_id},
+            )
+
         if owner_uid == receiver_uid:
             return warning_response(
-                message="invitation à soi-même", 
-                code="SELF_INVITATION_ERROR", 
-                status_code=400, 
-                uid=owner_uid, 
+                message="invitation à soi-même",
+                code="SELF_INVITATION_ERROR",
+                status_code=400,
+                uid=owner_uid,
                 origin="INVITATION_SEND",
-                log_extra={"calendar_id": calendar_id}
+                log_extra={"calendar_id": calendar_id},
             )
 
-        # Vérifier si l'utilisateur existe 
-        user = fetch_user(receiver_uid)
-
-        if not user:
-            return warning_response(
-                message="utilisateur non trouvé", 
-                code="USER_NOT_FOUND", 
-                status_code=404, 
-                uid=owner_uid, 
-                origin="INVITATION_SEND",
-                log_extra={"calendar_id": calendar_id}
-            )
         with get_connection() as conn:
-            with conn.cursor() as cursor:  
-                # Vérifier si l'utilisateur a déjà été invité
-                cursor.execute("SELECT * FROM shared_calendars WHERE receiver_uid = %s AND calendar_id = %s", (receiver_uid, calendar_id))
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM shared_calendars WHERE receiver_uid = %s AND calendar_id = %s",
+                    (receiver_uid, calendar_id),
+                )
                 shared_calendar = cursor.fetchone()
                 if shared_calendar:
                     return warning_response(
@@ -71,41 +90,33 @@ def handle_send_invitation(calendar_id):
                         status_code=400,
                         uid=owner_uid,
                         origin="INVITATION_SEND",
-                        log_extra={"calendar_id": calendar_id}
+                        log_extra={"calendar_id": calendar_id},
                     )
-                
+
                 link = urljoin(Config.FRONTEND_URL or "", "/notifications")
 
-                # Créer une notif pour l'utilisateur receveur
                 notify_and_record(
                     uid=receiver_uid,
-                    json_body={
-                        "calendar_id": calendar_id,
-                        "link": link,
-                        "sender_uid": owner_uid
-                    },
+                    json_body={"calendar_id": calendar_id, "link": link, "sender_uid": owner_uid},
                     notif_type="calendar_invitation",
                 )
 
-
-
-                # Sauvegarder l'invitation dans la collection "shared_calendars" dans le calendrier de l'utilisateur owner
                 cursor.execute(
                     """
                     INSERT INTO shared_calendars (receiver_uid, calendar_id, accepted, access)
                     VALUES (%s, %s, %s, %s)
                     """,
-                    (receiver_uid, calendar_id, False, "edit")
+                    (receiver_uid, calendar_id, False, "edit"),
                 )
 
                 t_1 = time.time()
 
         return success_response(
-            message="invitation envoyée", 
-            code="INVITATION_SEND_SUCCESS", 
-            uid=owner_uid, 
+            message="invitation envoyée",
+            code="INVITATION_SEND_SUCCESS",
+            uid=owner_uid,
             origin="INVITATION_SEND",
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0},
         )
 
     except Exception as e:

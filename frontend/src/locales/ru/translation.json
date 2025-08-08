@@ -65,7 +65,9 @@
     "with_facebook": "Войти через Facebook",
     "with_github": "Подключение к Github",
     "with_google": "Войти через Google",
-    "with_twitter": "Подключиться к Twitter"
+    "with_twitter": "Подключиться к Twitter",
+    "send_magic_link": "Отправить магическую ссылку",
+    "magic_link_sent": "📩 Магическая ссылка для входа отправлена на вашу почту."
   },
   "auth_callback": {
     "loading": "Подключение...",

@@ -65,7 +65,9 @@
     "with_facebook": "Entrar com o Facebook",
     "with_github": "Conectando com o Github",
     "with_google": "Entrar com o Google",
-    "with_twitter": "Conecte-se com o Twitter"
+    "with_twitter": "Conecte-se com o Twitter",
+    "send_magic_link": "Enviar link mágico",
+    "magic_link_sent": "📩 Um link mágico de acesso foi enviado para o seu e-mail."
   },
   "auth_callback": {
     "loading": "Conectando...",

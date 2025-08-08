@@ -65,7 +65,9 @@
     "with_facebook": "Connexion avec Facebook",
     "with_github": "Connexion avec Github",
     "with_google": "Connexion avec Google",
-    "with_twitter": "Connexion avec Twitter"
+    "with_twitter": "Connexion avec Twitter",
+    "send_magic_link": "Envoyer un lien magique",
+    "magic_link_sent": "📩 Un lien de connexion magique vous a été envoyé."
   },
   "auth_callback": {
     "loading": "Connexion en cours...",

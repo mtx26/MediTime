@@ -65,7 +65,9 @@
     "with_facebook": "使用 Facebook 登录",
     "with_github": "与 Github 连接",
     "with_google": "使用 Google 登录",
-    "with_twitter": "与 Twitter 建立联系"
+    "with_twitter": "与 Twitter 建立联系",
+    "send_magic_link": "发送魔术链接",
+    "magic_link_sent": "📩 登录魔术链接已发送到您的邮箱。"
   },
   "auth_callback": {
     "loading": "正在连接...",

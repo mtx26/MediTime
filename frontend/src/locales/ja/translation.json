@@ -65,7 +65,9 @@
     "with_facebook": "Facebookでログイン",
     "with_github": "Githubとの接続",
     "with_google": "Googleでログイン",
-    "with_twitter": "Twitterでつながる"
+    "with_twitter": "Twitterでつながる",
+    "send_magic_link": "マジックリンクを送信",
+    "magic_link_sent": "📩 マジックリンクをメールに送信しました。"
   },
   "auth_callback": {
     "loading": "接続中...",

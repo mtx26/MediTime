@@ -8,7 +8,8 @@ import {
   TwitterHandleLogin,
   DiscordHandleLogin,
   FacebookHandleLogin,
-  MicrosoftHandleLogin
+  MicrosoftHandleLogin,
+  loginWithMagicLink
 } from '../../services/auth/authService';
 import AlertSystem from '../../components/common/AlertSystem';
 import { getSupabaseErrorMessage } from '../../utils/supabase/SupabaseErrorMessage';
@@ -328,6 +329,26 @@ function Auth() {
             >
               {activeTab === 'login' ? t('auth.login') : t('auth.register')}
             </button>
+            {activeTab === 'login' && (
+              <button
+                type="button"
+                className="btn btn-outline-secondary w-100 mt-2"
+                onClick={async () => {
+                  const error = await loginWithMagicLink(email);
+                  if (error) {
+                    setAlertMessage('❌ ' + getSupabaseErrorMessage(error.message));
+                    setAlertType('danger');
+                  } else {
+                    setAlertMessage(t('auth.magic_link_sent'));
+                    setAlertType('success');
+                  }
+                }}
+                aria-label={t('auth.send_magic_link')}
+                title={t('auth.send_magic_link')}
+              >
+                {t('auth.send_magic_link')}
+              </button>
+            )}
           </form>
         </div>
       </div>

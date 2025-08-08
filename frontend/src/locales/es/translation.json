@@ -65,7 +65,9 @@
     "with_facebook": "Iniciar sesión con Facebook",
     "with_github": "Conectando con Github",
     "with_google": "Iniciar sesión con Google",
-    "with_twitter": "Conectarse con Twitter"
+    "with_twitter": "Conectarse con Twitter",
+    "send_magic_link": "Enviar enlace mágico",
+    "magic_link_sent": "📩 Se ha enviado un enlace mágico de inicio de sesión a tu correo electrónico."
   },
   "auth_callback": {
     "loading": "Conectando...",

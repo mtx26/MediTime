@@ -65,7 +65,9 @@
     "with_facebook": "Mit Facebook anmelden",
     "with_github": "Verbindung mit Github",
     "with_google": "Mit Google anmelden",
-    "with_twitter": "Verbinden Sie sich mit Twitter"
+    "with_twitter": "Verbinden Sie sich mit Twitter",
+    "send_magic_link": "Magischen Link senden",
+    "magic_link_sent": "📩 Ein magischer Anmeldelink wurde an deine E-Mail-Adresse gesendet."
   },
   "auth_callback": {
     "loading": "Verbinden...",
