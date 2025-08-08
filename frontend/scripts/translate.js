@@ -31,13 +31,15 @@ function saveJSON(filePath, data) {
 }
 
 // 🔒 Protège les placeholders pour éviter leur traduction
+const RE_PROTECT = /{{([^{}]*)}}/g;
+const RE_RESTORE = /__NP__([^_]*)___/g;
+
 function protectPlaceholders(str) {
-  return str.replace(/{{(.*?)}}/g, '__NP__$1___');
+  return str.replace(RE_PROTECT, (_, inner) => `__NP__${inner}___`);
 }
 
-// 🔄 Restaure les placeholders protégés
 function restorePlaceholders(str) {
-  return str.replace(/__NP__(.*?)___/g, '{{$1}}');
+  return str.replace(RE_RESTORE, '{{$1}}');
 }
 
 // 🔍 Trouve les clés manquantes ou vides entre deux objets récursivement
