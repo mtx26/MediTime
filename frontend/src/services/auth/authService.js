@@ -7,10 +7,14 @@ import { getGlobalReloadUser } from '../../contexts/UserContext';
 // URL de l'API
 const API_URL = import.meta.env.VITE_API_URL;
 
-const buildCallbackUrl = (redirect) =>
-  window.location.origin +
-  '/auth/callback' +
-  (redirect ? `?redirect=${encodeURIComponent(redirect)}` : '');
+function buildCallbackUrl(redirect) {
+  console.log('Building callback URL with redirect:', redirect);
+  return (
+    window.location.origin +
+    '/auth/callback' +
+    (redirect ? `?redirect=${encodeURIComponent(redirect)}` : '')
+  );
+}
 
 export async function updateUserInfo({ display_name, email, photo_url, email_enabled, push_enabled, uid }) {
   
@@ -45,6 +49,7 @@ export async function updateUserInfo({ display_name, email, photo_url, email_ena
  */
 export const GoogleHandleLogin = async (redirect) => {
   try {
+    console.log(redirect)
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {

@@ -34,15 +34,17 @@ function Auth() {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const [redirect, setRedirect] = useState(() =>
-    getValidRedirect(new URLSearchParams(window.location.search).get('redirect'))
-  );
+  const [redirect, setRedirect] = useState();
   useEffect(() => {
     setActiveTab(location.pathname === '/register' ? 'register' : 'login');
     setRedirect(
-      getValidRedirect(new URLSearchParams(location.search).get('redirect'))
+      new URLSearchParams(location.search).get('redirect')
     );
   }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    console.log(redirect);
+  }, [redirect]);
 
   const switchTab = (tab) => {
     if (tab !== activeTab) setActiveTab(tab);
