@@ -34,10 +34,15 @@ function Auth() {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const redirect = getValidRedirect(new URLSearchParams(location.search).get('redirect'));
+  const [redirect, setRedirect] = useState(() =>
+    getValidRedirect(new URLSearchParams(window.location.search).get('redirect'))
+  );
   useEffect(() => {
     setActiveTab(location.pathname === '/register' ? 'register' : 'login');
-  }, [location.pathname]);
+    setRedirect(
+      getValidRedirect(new URLSearchParams(location.search).get('redirect'))
+    );
+  }, [location.pathname, location.search]);
 
   const switchTab = (tab) => {
     if (tab !== activeTab) setActiveTab(tab);
@@ -180,7 +185,7 @@ function Auth() {
               e.preventDefault();
               try {
                 if (activeTab === 'login') {
-                  const error = await loginWithEmail(email, password);
+                  const error = await loginWithEmail(email, password, redirect);
                   if (error) {
                     setAlertMessage('❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`));
                     setAlertType('danger');

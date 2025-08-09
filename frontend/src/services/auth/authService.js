@@ -216,13 +216,13 @@ export const registerWithEmail = async (email, password, name, redirect) => {
 /**
  * Connexion avec email et mot de passe
  */
-export const loginWithEmail = async (email, password) => {
+export const loginWithEmail = async (email, password, redirect) => {
   try {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
       options: {
-        redirectTo: window.location.origin + '/auth/callback',
+        redirectTo: buildCallbackUrl(redirect),
       },
     });
     if (error) {
