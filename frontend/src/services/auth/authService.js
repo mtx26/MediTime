@@ -7,6 +7,15 @@ import { getGlobalReloadUser } from '../../contexts/UserContext';
 // URL de l'API
 const API_URL = import.meta.env.VITE_API_URL;
 
+function buildCallbackUrl(redirect) {
+  console.log('Building callback URL with redirect:', redirect);
+  return (
+    window.location.origin +
+    '/auth/callback' +
+    (redirect ? `?redirect=${encodeURIComponent(redirect)}` : '')
+  );
+}
+
 export async function updateUserInfo({ display_name, email, photo_url, email_enabled, push_enabled, uid }) {
   
   const body = {
@@ -38,12 +47,13 @@ export async function updateUserInfo({ display_name, email, photo_url, email_ena
 /**
  * Connexion avec Google
  */
-export const GoogleHandleLogin = async () => {
+export const GoogleHandleLogin = async (redirect) => {
   try {
-    await supabase.auth.signInWithOAuth({ 
+    console.log(redirect)
+    await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/auth/callback',
+        redirectTo: buildCallbackUrl(redirect),
         queryParams: {
           prompt: 'select_account',
           access_type: 'offline',
@@ -62,12 +72,12 @@ export const GoogleHandleLogin = async () => {
 /**
  * Connexion avec Github
  */
-export const GithubHandleLogin = async () => {
+export const GithubHandleLogin = async (redirect) => {
   try {
     await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: window.location.origin + '/auth/callback',
+        redirectTo: buildCallbackUrl(redirect),
         queryParams: {
           prompt: 'select_account',
           access_type: 'offline',
@@ -86,12 +96,12 @@ export const GithubHandleLogin = async () => {
 /**
  * Connexion avec Twitter
  */
-export const TwitterHandleLogin = async () => {
+export const TwitterHandleLogin = async (redirect) => {
   try {
     await supabase.auth.signInWithOAuth({
       provider: 'twitter',
       options: {
-        redirectTo: window.location.origin + '/auth/callback',
+        redirectTo: buildCallbackUrl(redirect),
         queryParams: {
           prompt: 'select_account',
           access_type: 'offline',
@@ -110,12 +120,12 @@ export const TwitterHandleLogin = async () => {
 /**
  * Connexion avec Facebook
  */
-export const FacebookHandleLogin = async () => {
+export const FacebookHandleLogin = async (redirect) => {
   try {
     await supabase.auth.signInWithOAuth({
       provider: 'facebook',
       options: {
-        redirectTo: window.location.origin + '/auth/callback',
+        redirectTo: buildCallbackUrl(redirect),
         queryParams: {
           prompt: 'select_account',
           access_type: 'offline',
@@ -134,12 +144,12 @@ export const FacebookHandleLogin = async () => {
 /**
  * Connexion avec Discord
  */
-export const DiscordHandleLogin = async () => {
+export const DiscordHandleLogin = async (redirect) => {
   try {
     await supabase.auth.signInWithOAuth({
       provider: 'discord',
       options: {
-        redirectTo: window.location.origin + '/auth/callback',
+        redirectTo: buildCallbackUrl(redirect),
         queryParams: {
           prompt: 'select_account',
           access_type: 'offline',
@@ -158,12 +168,12 @@ export const DiscordHandleLogin = async () => {
 /**
  * Connexion avec Microsoft
  */
-export const MicrosoftHandleLogin = async () => {
+export const MicrosoftHandleLogin = async (redirect) => {
   try {
     await supabase.auth.signInWithOAuth({
       provider: 'azure',
       options: {
-        redirectTo: window.location.origin + '/auth/callback',
+        redirectTo: buildCallbackUrl(redirect),
         queryParams: {
           prompt: 'select_account',
           access_type: 'offline',
@@ -182,13 +192,13 @@ export const MicrosoftHandleLogin = async () => {
   /**
  * Inscription avec email et mot de passe
  */
-export const registerWithEmail = async (email, password, name) => {
+export const registerWithEmail = async (email, password, name, redirect) => {
   try {
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        redirectTo: window.location.origin + '/auth/callback',
+        emailRedirectTo: buildCallbackUrl(redirect),
       },
     });
     if (error) {
@@ -211,13 +221,13 @@ export const registerWithEmail = async (email, password, name) => {
 /**
  * Connexion avec email et mot de passe
  */
-export const loginWithEmail = async (email, password) => {
+export const loginWithEmail = async (email, password, redirect) => {
   try {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
       options: {
-        redirectTo: window.location.origin + '/auth/callback',
+        redirectTo: buildCallbackUrl(redirect),
       },
     });
     if (error) {
@@ -296,12 +306,12 @@ export const updateUserPassword = async (newPassword) => {
 /**
  * Connexion via Magic Link (OTP)
  */
-export const loginWithMagicLink = async (email) => {
+export const loginWithMagicLink = async (email, redirect) => {
   try {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: window.location.origin + '/auth/callback',
+        emailRedirectTo: buildCallbackUrl(redirect),
       },
     });
     if (error) {

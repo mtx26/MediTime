@@ -15,6 +15,7 @@ import { log } from '../../utils/logger';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../contexts/UserContext';
+import { getValidRedirect } from '../../utils/redirect';
 
 function Auth() {
   const { userInfo } = useContext(UserContext);
@@ -33,9 +34,17 @@ function Auth() {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const [redirect, setRedirect] = useState();
   useEffect(() => {
     setActiveTab(location.pathname === '/register' ? 'register' : 'login');
-  }, [location.pathname]);
+    setRedirect(
+      getValidRedirect(new URLSearchParams(location.search).get('redirect'))
+    );
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    console.log(redirect);
+  }, [redirect]);
 
   const switchTab = (tab) => {
     if (tab !== activeTab) setActiveTab(tab);
@@ -86,7 +95,7 @@ function Auth() {
                 <div className="px-2">
                   <button
                     className="btn btn-outline-danger rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
-                    onClick={GoogleHandleLogin}
+                    onClick={() => GoogleHandleLogin(redirect)}
                     aria-label={t('auth.with_google')}
                     title={t('auth.with_google')}
                   >
@@ -99,7 +108,7 @@ function Auth() {
                 <div className="px-2">
                   <button
                     className="btn btn-outline-secondary rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
-                    onClick={GithubHandleLogin}
+                    onClick={() => GithubHandleLogin(redirect)}
                     aria-label={t('auth.with_github')}
                     title={t('auth.with_github')}
                   >
@@ -112,7 +121,7 @@ function Auth() {
                 <div className="px-2">
                   <button
                     className="btn btn-outline-primary rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
-                    onClick={DiscordHandleLogin}
+                    onClick={() => DiscordHandleLogin(redirect)}
                     aria-label={t('auth.with_discord')}
                     title={t('auth.with_discord')}
                   >
@@ -125,7 +134,7 @@ function Auth() {
                 <div className="px-2">
                   <button
                     className="btn btn-outline-info rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
-                    onClick={TwitterHandleLogin}
+                    onClick={() => TwitterHandleLogin(redirect)}
                     aria-label={t('auth.with_twitter')}
                     title={t('auth.with_twitter')}
                   >
@@ -138,7 +147,7 @@ function Auth() {
                 <div className="px-2">
                   <button
                     className="btn btn-outline-primary rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
-                    onClick={FacebookHandleLogin}
+                    onClick={() => FacebookHandleLogin(redirect)}
                     aria-label={t('auth.with_facebook')}
                     title={t('auth.with_facebook')}
                   >
@@ -152,7 +161,7 @@ function Auth() {
                 <div className="px-2">
                   <button
                     className="btn btn-outline-dark rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
-                    onClick={MicrosoftHandleLogin}
+                    onClick={() => MicrosoftHandleLogin(redirect)}
                     aria-label={t('auth.with_microsoft')}
                     title={t('auth.with_microsoft')}
                   >
@@ -178,7 +187,7 @@ function Auth() {
               e.preventDefault();
               try {
                 if (activeTab === 'login') {
-                  const error = await loginWithEmail(email, password);
+                  const error = await loginWithEmail(email, password, redirect);
                   if (error) {
                     setAlertMessage('❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`));
                     setAlertType('danger');
@@ -188,9 +197,12 @@ function Auth() {
                       origin: 'Auth.jsx',
                       user: userInfo.uid,
                     });
+                    if (redirect) {
+                      navigate(redirect, { replace: true });
+                    }
                   }
                 } else {
-                  const error = await registerWithEmail(email, password, name);
+                  const error = await registerWithEmail(email, password, name, redirect);
                   if (error) {
                     setAlertMessage('❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`));
                     setAlertType('danger');
