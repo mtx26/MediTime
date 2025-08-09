@@ -5,6 +5,7 @@ import { supabase } from '../../services/supabase/supabaseClient';
 import { getGlobalReloadUser } from '../../contexts/UserContext';
 import { log } from '../../utils/logger';
 import { useTranslation } from 'react-i18next';
+import { getValidRedirect } from '../../utils/redirect';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -13,7 +14,9 @@ const AuthCallback = () => {
 
   useEffect(() => {
     const handleRedirect = async () => {
+      const search = new URLSearchParams(window.location.search);
       const hash = new URLSearchParams(window.location.hash.substring(1));
+      const redirect = getValidRedirect(search.get('redirect'));
       const type = hash.get('type');
 
       const {
@@ -26,7 +29,7 @@ const AuthCallback = () => {
           origin: 'CALLBACK_ERROR',
           uid: null,
         });
-        return navigate('/login');
+        return navigate('/login', { replace: true });
       }
 
       const user = session.user;
@@ -36,25 +39,30 @@ const AuthCallback = () => {
         origin: 'CALLBACK_SUCCESS',
         uid: user.id,
         type,
+        redirect,
       });
+
+      if (redirect) {
+        return navigate(redirect, { replace: true });
+      }
 
       switch (type) {
         case 'recovery':
         case 'invite':
-          return navigate('/reset-password-confirm');
+          return navigate('/reset-password-confirm', { replace: true });
         case 'email_change':
-          return navigate('/settings/account');
+          return navigate('/settings/account', { replace: true });
         case 'reauthentication':
-          return navigate('/settings/security');
+          return navigate('/settings/security', { replace: true });
         case 'magiclink':
         case 'signup':
         default:
-          return navigate('/');
+          return navigate('/', { replace: true });
       }
     };
 
     handleRedirect();
-  }, [navigate, reloadUser]);
+  }, [navigate, reloadUser, t]);
 
   return <p>{t('auth_callback.loading')}</p>;
 };
