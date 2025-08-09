@@ -17,6 +17,18 @@ const AuthCallback = () => {
   const redirectRef = useRef(null);
   const typeRef = useRef(null);
 
+  const redirectMap = {
+    recovery: '/reset-password-confirm',
+    invite: '/reset-password-confirm',
+    email_change: '/settings/account',
+    reauthentication: '/settings/security',
+    magiclink: '/calendars',
+    signup: '/calendars',
+  };
+
+  const getRedirectPath = (type) => redirectMap[type] || '/calendars';
+
+
   // 1) Vérifie la session et lance le reloadUser
   useEffect(() => {
     const handleRedirect = async () => {
@@ -64,19 +76,7 @@ const AuthCallback = () => {
       return;
     }
 
-    switch (type) {
-      case 'recovery':
-      case 'invite':
-        navigate('/reset-password-confirm', { replace: true }); break;
-      case 'email_change':
-        navigate('/settings/account', { replace: true }); break;
-      case 'reauthentication':
-        navigate('/settings/security', { replace: true }); break;
-      case 'magiclink':
-      case 'signup':
-      default:
-        navigate('/calendars', { replace: true }); break;
-    }
+    navigate(getRedirectPath(type), { replace: true });
   }, [userInfo, navigate]);
 
   return <p>{t('auth_callback.loading')}</p>;

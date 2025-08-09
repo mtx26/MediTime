@@ -38,7 +38,7 @@ function Auth() {
   useEffect(() => {
     setActiveTab(location.pathname === '/register' ? 'register' : 'login');
     setRedirect(
-      new URLSearchParams(location.search).get('redirect')
+      getValidRedirect(new URLSearchParams(location.search).get('redirect'))
     );
   }, [location.pathname, location.search]);
 
