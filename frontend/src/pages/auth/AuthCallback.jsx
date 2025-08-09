@@ -17,16 +17,17 @@ const AuthCallback = () => {
   const redirectRef = useRef(null);
   const typeRef = useRef(null);
 
-  const redirectMap = {
-    recovery: '/reset-password-confirm',
-    invite: '/reset-password-confirm',
-    email_change: '/settings/account',
-    reauthentication: '/settings/security',
-    magiclink: '/calendars',
-    signup: '/calendars',
-  };
+  const redirectMap = new Map([
+    ['recovery', '/reset-password-confirm'],
+    ['invite', '/reset-password-confirm'],
+    ['email_change', '/settings/account'],
+    ['reauthentication', '/settings/security'],
+    ['magiclink', '/calendars'],
+    ['signup', '/calendars'],
+  ]);
 
-  const getRedirectPath = (type) => redirectMap[type] || '/calendars';
+  const getRedirectPath = (rawType) =>
+    redirectMap.get(String(rawType)) || '/calendars';
 
 
   // 1) Vérifie la session et lance le reloadUser
