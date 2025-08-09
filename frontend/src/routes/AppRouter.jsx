@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import { UserContext } from '../contexts/UserContext';
 
@@ -32,18 +32,26 @@ import TermsPage from '../pages/general/TermsPage';
 import AuthCallback from '../pages/auth/AuthCallback';
 import CalendarSettingsPage from '../pages/calendar/CalendarSettingsPage';
 
+function buildFullPath(loc) {
+  const path = loc.pathname || '/';
+  const qs = loc.search || '';
+  const hash = loc.hash || '';
+  return `${path}${qs}${hash}`;
+}
+
 function PrivateRoute({ element }) {
   const { userInfo } = useContext(UserContext);
+  const location = useLocation();
 
   if (!userInfo) {
-    return <Navigate to="/home" />;
+    const full = buildFullPath(location);
+    return (
+      <Navigate
+        to={`/login?redirect=${encodeURIComponent(full)}`}
+        replace
+      />
+    );
   }
-  /*}
-  if (!userInfo.emailVerified) {
-    if (userInfo.provider === 'email') {
-      return <Navigate to="/verify-email" />;
-    }
-  }*/
   return element;
 }
 
