@@ -119,13 +119,13 @@ def handle_send_invitation(calendar_id):
 
                 # Créer une notif pour l'utilisateur receveur
                 notify_and_record(
-                    uid=receiver_uid,
-                    json_body={
+                    user_id=receiver_uid,
+                    body_or_list={
                         "calendar_id": calendar_id,
                         "link": link,
                         "sender_uid": owner_uid
                     },
-                    notif_type="calendar_invitation",
+                    notification_type="calendar_invitation",
                 )
 
 
@@ -205,13 +205,13 @@ def handle_accept_invitation(notification_id):
 
                 # Créer une notif pour l'utilisateur expéditeur
                 notify_and_record(
-                    uid=sender_uid,
-                    json_body={
+                    user_id=sender_uid,
+                    body_or_list={
                         "link": link,
                         "calendar_id": calendar_id,
                         "sender_uid": receiver_uid
                     },
-                    notif_type="calendar_invitation_accepted",
+                    notification_type="calendar_invitation_accepted",
                 )
 
                 t_1 = time.time()
@@ -281,13 +281,13 @@ def handle_reject_invitation(notification_id):
                 )
                 # Créer une notif pour l'utilisateur expéditeur
                 notify_and_record(
-                    uid=owner_uid,
-                    json_body={
+                    user_id=owner_uid,
+                    body_or_list={
                         "link": link,
                         "calendar_id": calendar_id,
                         "sender_uid": receiver_uid
                     },
-                    notif_type="calendar_invitation_rejected",
+                    notification_type="calendar_invitation_rejected",
                 )
 
 
