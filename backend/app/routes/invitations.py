@@ -54,8 +54,8 @@ def handle_send_invitation(calendar_id):
 
                     email_address_direct(
                         to_email=receiver_email,
-                        notif_type="calendar_invitation_registration",
-                        payload={
+                        notification_type="calendar_invitation_registration",
+                        context={
                             "link": link,
                             "sender_uid": owner_uid,
                             "calendar_id": calendar_id,
