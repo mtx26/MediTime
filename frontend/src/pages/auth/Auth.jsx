@@ -41,11 +41,7 @@ function Auth() {
       getValidRedirect(new URLSearchParams(location.search).get('redirect'))
     );
   }, [location.pathname, location.search]);
-
-  useEffect(() => {
-    console.log(redirect);
-  }, [redirect]);
-
+  
   const switchTab = (tab) => {
     if (tab !== activeTab) setActiveTab(tab);
   };
