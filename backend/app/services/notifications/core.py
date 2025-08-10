@@ -10,6 +10,7 @@ from app.services.notifications.messaging import send_email, send_sms
 from app.services.user import fetch_user
 from app.utils.logging import log_backend
 from app.config import Config
+from html import escape
 
 # ========= Constantes =========
 ORIGIN = "NOTIFICATIONS"
@@ -52,107 +53,94 @@ def enrich_notification(notification: NotificationDict) -> NotificationDict:
         )
     return notification
 
+def _h(text: Any) -> str:
+    """Escape sûr pour tout contenu inséré dans le HTML."""
+    return escape("" if text is None else str(text))
+
+def _p(html_inner: str) -> str:
+    return f"<p style='margin:4px 0'>{html_inner}</p>"
 
 # ========= Construction des contenus =========
 def _format_medication_list(medications: List[NotificationDict]) -> str:
-    rows = "".join(
-        f"""
-        <tr>
-            <td style="padding:4px 8px;">{m.get('name')}</td>
-            <td style="padding:4px 8px; color: {'red' if float(m.get('qty', 0)) <= 0 else 'orange'}; font-weight:bold;">
-                {float(m.get('qty', 0)):+g}
-            </td>
-        </tr>
-        """
-        for m in medications
-    )
-    return f"""
-        <table style="border-collapse:collapse; margin-top:8px;">
-            <thead>
-                <tr>
-                    <th align="left" style="padding:4px 8px;">Médicament</th>
-                    <th align="left" style="padding:4px 8px;">Stock</th>
-                </tr>
-            </thead>
-            <tbody>{rows}</tbody>
-        </table>
-    """
-
+    """Liste de médicaments avec emoji et badge de stock."""
+    if not medications:
+        return ""
+    lis = []
+    for m in medications:
+        name = _h(m.get("name"))
+        try:
+            qty = float(m.get("qty", 0))
+        except Exception:
+            qty = 0.0
+        if qty <= 0:
+            badge = "<span style='color:red;font-weight:bold;'>épuisé</span>"
+        else:
+            suffix = "s" if int(qty) != 1 else ""
+            badge = f"<span style='color:orange;font-weight:bold;'>{int(qty)} restant{suffix}</span>"
+        lis.append(f"<li>💊 <b>{name}</b> — {badge}</li>")
+    return "<ul style='margin:8px 0; padding-left:20px;'>" + "".join(lis) + "</ul>"
 
 def build_notification_text(notification_type: str, context: NotificationDict) -> Tuple[str, str, str]:
-    """
-    Retourne (title, body_html, cta_label) pour push/SMS/e-mail.
-    - title: utilisé pour push et sujet d’e-mail (avec préfixe côté e-mail)
-    - body_html: HTML concis (SMS utilisera un extrait sans formatage si besoin)
-    - cta_label: texte du bouton (email) ou deep-link
-    """
+    sender = _h(context.get("sender_name") or "un utilisateur")
+    cal = _h(context.get("calendar_name") or "ce calendrier")
+
     match notification_type:
         case "calendar_invitation":
-            return (
-                "📆 Nouvelle invitation à un calendrier",
-                f"<b>{context.get('sender_name')}</b> vous invite à rejoindre le calendrier « <b>{context.get('calendar_name')}</b> ».",
-                "Accepter l'invitation",
-            )
+            title = "📆 Nouvelle invitation à un calendrier"
+            body = _p(f"<b>{sender}</b> vous invite à rejoindre le calendrier « <b>{cal}</b> ».")
+            return (title, body, "Accepter l'invitation")
 
         case "calendar_invitation_registration":
-            return (
-                "📆 Invitation à s'inscrire",
-                f"<b>{context.get('sender_name')}</b> vous invite à vous inscrire pour le calendrier « <b>{context.get('calendar_name')}</b> ».",
-                "S'inscrire et accepter l'invitation",
-            )
+            title = "📆 Invitation à s'inscrire"
+            body = _p(f"<b>{sender}</b> vous invite à vous inscrire pour le calendrier « <b>{cal}</b> ».")
+            return (title, body, "S'inscrire et accepter l'invitation")
 
         case "calendar_invitation_accepted":
-            return (
-                "✅ Invitation acceptée",
-                f"<b>{context.get('sender_name')}</b> a accepté votre invitation pour « <b>{context.get('calendar_name')}</b> ».",
-                "Voir le calendrier",
-            )
+            title = "✅ Invitation acceptée"
+            body = _p(f"<b>{sender}</b> a accepté votre invitation pour « <b>{cal}</b> ».")
+            return (title, body, "Voir le calendrier")
 
         case "calendar_invitation_rejected":
-            return (
-                "❌ Invitation refusée",
-                f"<b>{context.get('sender_name')}</b> a refusé votre invitation pour « <b>{context.get('calendar_name')}</b> ».",
-                "Voir le calendrier",
-            )
+            title = "❌ Invitation refusée"
+            body = _p(f"<b>{sender}</b> a refusé votre invitation pour « <b>{cal}</b> ».")
+            return (title, body, "Voir le calendrier")
 
         case "calendar_shared_deleted_by_owner":
-            return (
-                "🔒 Partage annulé",
-                f"<b>{context.get('sender_name')}</b> a arrêté de partager « <b>{context.get('calendar_name')}</b> » avec vous.",
-                "Voir le calendrier",
-            )
+            title = "🔒 Partage annulé"
+            body = _p(f"<b>{sender}</b> a arrêté de partager « <b>{cal}</b> » avec vous.")
+            return (title, body, "Voir le calendrier")
 
         case "calendar_shared_deleted_by_receiver":
-            return (
-                "📤 Partage retiré",
-                f"<b>{context.get('sender_name')}</b> a retiré le calendrier « <b>{context.get('calendar_name')}</b> » de votre compte.",
-                "Voir le calendrier",
-            )
+            title = "📤 Partage retiré"
+            body = _p(f"<b>{sender}</b> a retiré le calendrier « <b>{cal}</b> » de votre compte.")
+            return (title, body, "Voir le calendrier")
 
         case "low_stock":
-            calendar_name = context.get("calendar_name") or "ce calendrier"
-            title = f"⚠️ Stock faible – calendrier « {calendar_name} »"
-
+            title = f"⚠️ Stock faible – calendrier « {cal} »"
             if context.get("medications"):
-                body_html = f"<p>Certains médicaments du calendrier <b>« {calendar_name} »</b> sont en stock critique :</p>"
-                body_html += _format_medication_list(context["medications"])
-                return (title, body_html, "Voir le calendrier")
+                body = _p(f"Certains médicaments du calendrier <b>« {cal} »</b> sont en stock critique :") \
+                       + _format_medication_list(context["medications"])
+                return (title, body, "Voir le calendrier")
 
-            med_name = fetch_medicine_name(context.get("medication_id"))
+            med_name = _h(fetch_medicine_name(context.get("medication_id")))
             qty = context.get("medication_qty") or 0
             if qty == 0:
                 stock_txt = "<span style='color:red;font-weight:bold;'>épuisé</span>"
             else:
                 stock_txt = f"<span style='color:orange;font-weight:bold;'>{qty} restant{'s' if qty != 1 else ''}</span>"
-
-            return (title, f"Le médicament <b>« {med_name} »</b> est {stock_txt}.", "Voir le calendrier")
+            body = _p(f"Le médicament <b>« {med_name} »</b> est {stock_txt}.")
+            return (title, body, "Voir le calendrier")
 
         case _:
             count = context.get("notification_count")
             if count and count > 1:
-                return ("🔔 Nouvelles notifications", f"Vous avez <b>{count}</b> nouvelles notifications dans MediTime.", "Voir les notifications")
-            return ("🔔 Nouvelle notification", "Vous avez reçu une nouvelle notification dans MediTime.", "Voir les notifications")
+                title = "🔔 Nouvelles notifications"
+                body = _p(f"Vous avez <b>{count}</b> nouvelles notifications dans MediTime.")
+                return (title, body, "Voir les notifications")
 
+            title = "🔔 Nouvelle notification"
+            body = _p("Vous avez reçu une nouvelle notification dans MediTime.")
+            return (title, body, "Voir les notifications")
 
 def generate_email_content(notification_type: str, context: NotificationDict) -> Tuple[str, str, str]:
     title, body_html, cta_label = build_notification_text(notification_type, context)
