@@ -1,7 +1,7 @@
 from app.utils.responses import success_response, error_response, warning_response
 from app.utils.auth import require_auth
 from datetime import datetime, timezone
-from . import api
+from .. import api
 import time
 from flask import request, g
 from app.db.connection import get_connection

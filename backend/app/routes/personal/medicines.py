@@ -1,7 +1,7 @@
 from flask import request, g
 from app.utils.auth import require_auth
 import time
-from . import api
+from .. import api
 from app.services.calendar import verify_calendar
 from app.services.medication import update_box, create_box, delete_box, get_boxes, restock_box
 from app.utils.responses import success_response, error_response, warning_response

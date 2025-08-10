@@ -1,4 +1,4 @@
-from . import api
+from .. import api
 import time
 from app.db.connection import get_connection
 from app.services.calendar import verify_token
