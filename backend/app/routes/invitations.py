@@ -9,7 +9,7 @@ import time
 from . import api
 from urllib.parse import urljoin
 from app.config import Config
-from app.services.notifications.messaging import send_email
+from app.services.notifications import email_address_direct
 
 
 
@@ -50,16 +50,16 @@ def handle_send_invitation(calendar_id):
                     print(token_raw)
                     token = token_raw.get("token")
 
-                    link = f"{Config.FRONTEND_URL}/accept-invite?token={token}&type=invitation"
+                    link = f"{Config.FRONTEND_URL}/accept-invite?token={token}&type=registration"
 
-                    send_email(
-                        to=receiver_email,
-                        subject="Invitation à rejoindre un calendrier",
-                        html_content="""
-                            <a href=\""""+ link + """\">Accepter l'invitation</a>
-                            <p>Vous avez été invité à rejoindre un calendrier. Cliquez sur le lien pour accepter l'invitation : """ + link + """</p>
-                        """,
-                        plain="Vous avez été invité à rejoindre un calendrier. Cliquez sur le lien pour accepter l'invitation : " + link
+                    email_address_direct(
+                        to_email=receiver_email,
+                        notif_type="calendar_invitation_registration",
+                        payload={
+                            "link": link,
+                            "sender_uid": owner_uid,
+                            "calendar_id": calendar_id,
+                        }
                     )
 
                     return success_response(
@@ -115,7 +115,7 @@ def handle_send_invitation(calendar_id):
                 )
                 token = cursor.fetchone().get("token")
 
-                link = urljoin(Config.FRONTEND_URL or "", f"/accept-invite?token={token}&type=share")
+                link = urljoin(Config.FRONTEND_URL or "", f"/accept-invite?token={token}&type=invitation")
 
                 # Créer une notif pour l'utilisateur receveur
                 notify_and_record(
