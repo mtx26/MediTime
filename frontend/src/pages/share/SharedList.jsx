@@ -492,7 +492,6 @@ function TokenList({
                       </>
                     ),
                     onClick: () => {
-                      console.log("Regenerate link for calendar:", calendarId);
                       setAlertType("confirm-danger");
                       setAlertMessage(t("regenerate_link_confirm"));
                       setAlertId(token.id);
