@@ -26,6 +26,8 @@ export default function RealtimeManager({
     '/account',
     '/settings',
     '/shared-calendars',
+    '/accept-invite',
+    '/add-calendar',
   ];
 
   const isRealtimeEnabled = enabledRoutes.some((route) =>
