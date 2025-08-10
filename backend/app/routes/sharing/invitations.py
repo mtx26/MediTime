@@ -6,12 +6,15 @@ from app.services.calendar import verify_calendar
 from app.services.user import fetch_user
 from app.services.notifications import notify_and_record
 import time
-from . import api
+from .. import api
 from urllib.parse import urljoin
 from app.config import Config
 from app.services.notifications import email_address_direct
 
 
+
+# Messages d'erreur communs
+ERROR_UNAUTHORIZED_ACCESS = "accès refusé"
 
 # Route pour envoyer une invitation à un utilisateur pour un partage de calendrier
 @api.route("/invitations/send/<calendar_id>", methods=["POST"])
@@ -311,12 +314,76 @@ def handle_reject_invitation(notification_id):
 
     except Exception as e:
         return error_response(
-            message="erreur lors du rejet de l'invitation", 
-            code="INVITATION_REJECT_ERROR", 
-            status_code=500, 
-            uid=receiver_uid, 
+            message="erreur lors du rejet de l'invitation",
+            code="INVITATION_REJECT_ERROR",
+            status_code=500,
+            uid=receiver_uid,
             origin="INVITATION_REJECT",
             error=str(e),
             log_extra={"notification_id": notification_id}
+        )
+
+
+# fonction pour supprimer une invitation de calendrier partagé pour un user sans compte
+@api.route("/invitations/<calendar_id>", methods=["DELETE"])
+@require_auth
+def delete_shared_calendar_invitation(calendar_id):
+    try:
+        t_0 = time.time()
+        owner_uid = g.uid
+
+        if not verify_calendar(calendar_id, owner_uid):
+            return warning_response(
+                message=ERROR_UNAUTHORIZED_ACCESS,
+                code="UNAUTHORIZED_ACCESS",
+                status_code=404,
+                uid=owner_uid,
+                origin="GET_MEDICINE_BOXES",
+                log_extra={"calendar_id": calendar_id}
+            )
+
+        data = request.get_json(force=True)
+        token = data.get("token") if data else None
+        receiver_email = data.get("email") if data else None
+
+        if not token:
+            return error_response(
+                message="Token de l'utilisateur requis",
+                code="MISSING_TOKEN",
+                status_code=400,
+                uid=g.uid,
+                origin="DELETE_SHARED_CALENDAR_INVITATION"
+            )
+
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("DELETE FROM invitations WHERE token = %s AND calendar_id = %s", (token, calendar_id))
+                cursor.connection.commit()
+
+                email_address_direct(
+                    to_email=receiver_email,
+                    notification_type="calendar_invitation_registration_deleted",
+                    context={
+                        "sender_uid": owner_uid,
+                        "calendar_id": calendar_id,
+                    }
+                )
+                t_1 = time.time()
+
+        return success_response(
+            message="Invitation de calendrier supprimée",
+            code="SHARED_CALENDAR_INVITATION_DELETE_SUCCESS",
+            uid=receiver_email,
+            origin="DELETE_SHARED_CALENDAR_INVITATION",
+            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+        )
+    except Exception as e:
+        return error_response(
+            message="Erreur lors de la récupération des données partagées",
+            code="SHARED_GROUPED_LOAD_ERROR",
+            status_code=500,
+            uid=owner_uid,
+            origin="GET_SHARED_GROUPED",
+            error=str(e)
         )
 

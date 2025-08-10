@@ -1,6 +1,6 @@
 from flask import request, g
 from app.utils.auth import require_auth
-from . import api
+from .. import api
 from app.utils.responses import success_response, error_response, warning_response
 from app.services.calendar import verify_calendar_share
 from app.services.medication import get_boxes, update_box, create_box, delete_box, restock_box

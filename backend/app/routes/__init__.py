@@ -7,15 +7,12 @@ from .status import *
 from .log import *
 from .personnal_calendar import *
 from .personnal_medicines import *
-from .shared_users import *
-from .shared_users_medicines import *
 from .tokens import *
 from .tokens_medicines import *
-from .invitations import *
-from .notifications import *
 from .user import *
 from .pdf import *
 from .gemini import *
+from .sharing import *
 
 
 def register_routes(app):
