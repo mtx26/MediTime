@@ -186,7 +186,7 @@ def handle_accept_invitation(notification_id):
                 
                 calendar_id = notification.get("content").get("calendar_id")
                 sender_uid = notification.get("sender_uid")
-                link = urljoin(Config.FRONTEND_URL or "", f"/calendar/{calendar_id}")
+                link = urljoin(Config.FRONTEND_URL or "", f"/shared-calendars?calendar={calendar_id}")
                 # Dire que l'utilisateur receveur a accepté l'invitation
                 cursor.execute(
                     """
@@ -271,7 +271,7 @@ def handle_reject_invitation(notification_id):
 
                 calendar_id = notification.get("content").get("calendar_id")
                 owner_uid = notification.get("sender_uid")
-                link = urljoin(Config.FRONTEND_URL or "", f"/calendar/{calendar_id}")
+                link = urljoin(Config.FRONTEND_URL or "", f"/shared-calendars?calendar={calendar_id}")
                 # Supprimer la notif
                 cursor.execute(
                     """
