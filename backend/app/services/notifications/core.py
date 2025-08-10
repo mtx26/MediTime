@@ -86,14 +86,19 @@ def build_notification_text(notification_type: str, context: NotificationDict) -
 
     match notification_type:
         case "calendar_invitation":
-            title = "📆 Nouvelle invitation à un calendrier"
+            title = "📆 Invitation à un calendrier"
             body = _p(f"<b>{sender}</b> vous invite à rejoindre le calendrier « <b>{cal}</b> ».")
             return (title, body, "Accepter l'invitation")
 
         case "calendar_invitation_registration":
-            title = "📆 Invitation à s'inscrire"
-            body = _p(f"<b>{sender}</b> vous invite à vous inscrire pour le calendrier « <b>{cal}</b> ».")
+            title = "📆 Invitation à un calendrier"
+            body = _p(f"<b>{sender}</b> vous invite à vous inscrire pour accéder au calendrier « <b>{cal}</b> ».")
             return (title, body, "S'inscrire et accepter l'invitation")
+        
+        case "calendar_invitation_registration_deleted":
+            title = "📆 Invitation au calendrier annulée"
+            body = _p(f"<b>{sender}</b> a annulé votre invitation à vous inscrire pour accéder au calendrier « <b>{cal}</b> ».")
+            return (title, body, "s'inscrire")
 
         case "calendar_invitation_accepted":
             title = "✅ Invitation acceptée"
@@ -108,11 +113,11 @@ def build_notification_text(notification_type: str, context: NotificationDict) -
         case "calendar_shared_deleted_by_owner":
             title = "🔒 Partage annulé"
             body = _p(f"<b>{sender}</b> a arrêté de partager « <b>{cal}</b> » avec vous.")
-            return (title, body, "Voir le calendrier")
+            return (title, body, "Ouvrir le site")
 
         case "calendar_shared_deleted_by_receiver":
             title = "📤 Partage retiré"
-            body = _p(f"<b>{sender}</b> a retiré le calendrier « <b>{cal}</b> » de votre compte.")
+            body = _p(f"<b>{sender}</b> a retiré le calendrier « <b>{cal}</b> » de son compte.")
             return (title, body, "Voir le calendrier")
 
         case "low_stock":

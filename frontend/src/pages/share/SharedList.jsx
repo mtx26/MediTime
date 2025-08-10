@@ -150,6 +150,29 @@ function SharedList({
     }
   };
 
+  const deleteInvitationConfirmAction = (calendarId, receiverEmail, token) => {
+    setAlertType("confirm-danger");
+    setAlertMessage(t("delete_link_confirm"));
+    setAlertId(token + "-" + calendarId);
+    setOnConfirmAction(() => () => handleDeleteInvitation(calendarId, receiverEmail, token));
+  };
+
+  const handleDeleteInvitation = async (calendarId, receiverEmail, token) => {
+    const rep = await sharedUserCalendars.deleteInvitation(calendarId, receiverEmail, token);
+    if (rep.success) {
+      setAlertType("success");
+      setAlertMessage("✅ " + rep.message);
+      setAlertId(token + "-" + calendarId);
+      setTimeout(async () => {
+        await setGroupedSharedFunction();
+      }, 1000);
+    } else {
+      setAlertType("danger");
+      setAlertMessage("❌ " + rep.error);
+      setAlertId(receiverEmail + "-" + calendarId);
+    }
+  };
+
   // 📄 Envoi d'une invitation
   const handleSendInvitation = async (calendarId) => {
     const email = emailsToInvite[calendarId];
@@ -324,6 +347,7 @@ function SharedList({
               tokenCalendars={tokenCalendars}
               handleSendInvitation={handleSendInvitation}
               deleteUserConfirmAction={deleteUserConfirmAction}
+              deleteInvitationConfirmAction={deleteInvitationConfirmAction}
               emailsToInvite={emailsToInvite}
               setEmailsToInvite={setEmailsToInvite}
               navigate={navigate}
@@ -398,13 +422,13 @@ function CalendarCard({
   handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions,
   handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today,
   VITE_URL, selectedModifyToken, setSelectedModifyToken, tokenCalendars,
-  handleSendInvitation, deleteUserConfirmAction, emailsToInvite,
-  setEmailsToInvite, navigate, personalCalendars,
+  handleSendInvitation, deleteUserConfirmAction, deleteInvitationConfirmAction,
+  emailsToInvite, setEmailsToInvite, navigate, personalCalendars,
 }) {
   const { t } = useTranslation();
   const alertHandlers = { alertId, alertType, alertMessage, onConfirmAction, setAlertMessage, setOnConfirmAction, setAlertId };
   const tokenProps = { ...alertHandlers, setAlertType, handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions, handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyToken, setSelectedModifyToken, tokenCalendars };
-  const userProps = { ...alertHandlers, handleSendInvitation, deleteUserConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
+  const userProps = { ...alertHandlers, handleSendInvitation, deleteUserConfirmAction, deleteInvitationConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
   return (
     <div>
       <div className="card-body">
@@ -707,6 +731,7 @@ function UserList({
   setAlertId,
   handleSendInvitation,
   deleteUserConfirmAction,
+  deleteInvitationConfirmAction,
   data,
   calendarId,
   emailsToInvite,
@@ -822,9 +847,23 @@ function UserList({
           return (
             <li
               className="list-group-item"
-              key={displayEmail + "-" + calendarId}
+              key={invitation.token + "-" + calendarId}
             >
-              <div className="row align-items-center col-md-12 d-flex">   
+              {alertId === invitation.token + "-" + calendarId && (
+                <AlertSystem
+                  type={alertType}
+                  message={alertMessage}
+                  onClose={() => {
+                    setAlertMessage("");
+                    setOnConfirmAction(null);
+                    setAlertId(null);
+                  }}
+                  onConfirm={() => {
+                    if (onConfirmAction) onConfirmAction();
+                  }}
+                />
+              )}
+              <div className="row align-items-center col-md-12 d-flex">
                 {/* Colonne gauche : image + infos */}
                 <div className="col-8 d-flex align-items-center gap-2 p-0">
                   <img
@@ -858,7 +897,7 @@ function UserList({
                             <i className="bi bi-trash"></i> {t("delete")}
                           </>
                         ),
-                        onClick: () => deleteUserConfirmAction(calendarId, invitation),
+                        onClick: () => deleteInvitationConfirmAction(calendarId, invitation.invited_email, invitation.token),
                         danger: true,
                       },
                     ]}

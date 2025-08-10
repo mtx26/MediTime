@@ -433,7 +433,21 @@ function App() {
       analyticsData: { calendarId, userId, uid },
     });
   }, []);
-  
+
+  const deleteInvitation = useCallback(async (calendar_id, receiver_email, token) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/${calendar_id}`,
+      method: 'DELETE',
+      origin: 'INVITATION_DELETE',
+      body: {
+        email: receiver_email,
+        token: token
+      },
+      uid,
+      analyticsEvent: 'delete_invitation',
+      analyticsData: { calendar_id, uid },
+    });
+  }, []);
 
   // Fonction pour recup le calendrier partagé par un utilisateur
   const fetchSharedUserCalendarSchedule = useCallback(
@@ -639,6 +653,7 @@ function App() {
       rejectInvitation,
       deleteSharedUser,
       deleteSharedCalendar,
+      deleteInvitation,
       sharedCalendarsData,
       setSharedCalendarsData,
       updateSharedUserBox,
