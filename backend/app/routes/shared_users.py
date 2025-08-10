@@ -419,6 +419,7 @@ def handle_grouped_shared():
                     cal["id"]: {
                         "calendar_name": cal["name"],
                         "users": [],
+                        "invitation": [],
                         "tokens": []
                     }
                     for cal in calendars
@@ -459,6 +460,14 @@ def handle_grouped_shared():
                     cal_id = token["calendar_id"]
                     if cal_id in grouped:
                         grouped[cal_id]["tokens"].append(token)
+
+                cursor.execute("SELECT * FROM invitations WHERE calendar_id = ANY(%s::uuid[])", (calendar_ids,))
+                invitations = cursor.fetchall()
+
+                for invitation in invitations:
+                    cal_id = invitation["calendar_id"]
+                    if cal_id in grouped:
+                        grouped[cal_id]["invitation"].append(invitation)
 
         t_1 = time.time()
         return success_response(

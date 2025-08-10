@@ -217,6 +217,10 @@ function SharedList({
     setGroupedSharedFunction,
   ]);
 
+  useEffect(() => {
+    console.log(groupedShared)
+  }, [groupedShared]);
+
   // 🔄 Initialisation des permissions et des dates d'expiration
   useEffect(() => {
     if (userInfo && personalCalendars.calendarsData) {
@@ -717,8 +721,9 @@ function UserList({
           <i className="bi bi-person"></i>
           {t("shared_users")}:
         </h5>
+        {/* Liste des utilisateurs partagés */}
         {(data.users || []).map((user) => (
-          <div key={user.receiver_uid + "-" + calendarId}>
+          <li className="list-group-item" key={user.receiver_uid + "-" + calendarId}>
             {alertId === user.receiver_uid + "-" + calendarId && (
               <AlertSystem
                 type={alertType}
@@ -733,69 +738,140 @@ function UserList({
                 }}
               />
             )}
+            <div className="row align-items-center col-md-12 d-flex">
+              <div className="col-8 d-flex align-items-center gap-2 p-0">
+                <HoveredUserProfile
+                  user={{
+                    photo_url: user.receiver_photo_url,
+                    display_name: user.receiver_name,
+                    email: user.receiver_email,
+                  }}
+                  trigger={
+                    <div className="d-flex align-items-center gap-2">
+                      <div>
+                        <img
+                          src={user.receiver_photo_url}
+                          alt={t("profile")}
+                          className="rounded-circle"
+                          style={{ width: "40px", height: "40px" }}
+                        />
+                      </div>
+
+                      <div>
+                        <strong>{user.receiver_name}</strong>
+                      </div>
+                    </div>
+                  }
+                />
+              </div>
+
+              {/* Statut */}
+              <div className="col-2 d-flex align-items-center justify-content-center">
+                <span
+                  className={`badge rounded-pill ${user.accepted ? "bg-success" : "bg-warning text-dark"}`}
+                >
+                  {user.accepted ? t("accepted") : t("pending")}
+                </span>
+              </div>
+
+              {/* Supprimer */}
+              <div className="col-2 justify-content-end d-flex p-0">
+                <ActionSheet
+                  actions={[
+                    {
+                      label: (
+                        <>
+                          <i className="bi bi-trash"></i> {t('delete')}
+                        </>
+                      ),
+                      onClick: () => deleteUserConfirmAction(calendarId, user),
+                      danger: true,
+                    },
+                  ]}
+                  buttonSize="sm"
+                />
+              </div>
+            </div>
+          </li>
+        ))}
+        {/* Liste des utilisateurs invités */}
+        {(data.invitation || []).map((invitation) => {
+          const isExpired = invitation.expires_at && new Date(invitation.expires_at) < new Date();
+
+          let badgeClass = "bg-warning text-dark";
+          let badgeText = t("pending");
+
+          if (isExpired) {
+            badgeClass = "bg-danger";
+            badgeText = t("expired");
+          } else if (invitation.accepted) {
+            badgeClass = "bg-success";
+            badgeText = t("accepted");
+          }
+
+          const displayName = invitation.receiver_name || invitation.invited_email || t("unknown_user");
+          const displayEmail = invitation.receiver_email || invitation.invited_email || "";
+
+          const avatarUrl =
+            invitation.receiver_photo_url ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`;
+
+          const expiresDate = invitation.expires_at
+            ? new Date(invitation.expires_at).toLocaleDateString()
+            : t("no_expiration");
+
+          return (
             <li
-              key={user.receiver_uid + "-" + calendarId}
               className="list-group-item"
+              key={displayEmail + "-" + calendarId}
             >
-              <div className="row align-items-center">
-                <div className="col-md-12 d-flex align-items-center">
-                  <div className="col-6">
-                    <HoveredUserProfile
-                      user={{
-                        photo_url: user.receiver_photo_url,
-                        display_name: user.receiver_name,
-                        email: user.receiver_email,
-                      }}
-                      trigger={
-                        <div className="d-flex align-items-center gap-2">
-                          <div>
-                            <img
-                              src={user.receiver_photo_url}
-                              alt={t("profile")}
-                              className="rounded-circle"
-                              style={{ width: "40px", height: "40px" }}
-                            />
-                          </div>
-
-                          <div>
-                            <strong>{user.receiver_name}</strong>
-                          </div>
-                        </div>
-                      }
-                    />
+              <div className="row align-items-center col-md-12 d-flex">   
+                {/* Colonne gauche : image + infos */}
+                <div className="col-8 d-flex align-items-center gap-2 p-0">
+                  <img
+                    src={avatarUrl}
+                    alt={t("profile")}
+                    className="rounded-circle"
+                    style={{ width: "40px", height: "40px" }}
+                  />
+                  <div>
+                    <strong>{displayName}</strong>
+                    <div className="text-muted" style={{ fontSize: "0.85rem" }}>
+                      {t("expires_at")}: {expiresDate}
+                    </div>
                   </div>
+                </div>
 
-                  {/* Statut */}
-                  <div className="col-4 d-flex align-items-center justify-content-center">
-                    <span
-                      className={`badge rounded-pill ${user.accepted ? "bg-success" : "bg-warning text-dark"}`}
-                    >
-                      {user.accepted ? t("accepted") : t("pending")}
-                    </span>
-                  </div>
+                {/* Colonne statut */}
+                <div className="col-2 d-flex align-items-center justify-content-center">
+                  <span className={`badge rounded-pill ${badgeClass}`}>
+                    {badgeText}
+                  </span>
+                </div>
 
-                  {/* Supprimer */}
-                  <div className="col-2 justify-content-end d-flex">
-                    <ActionSheet
-                      actions={[
-                        {
-                          label: (
-                            <>
-                              <i className="bi bi-trash"></i> {t('delete')}
-                            </>
-                          ),
-                          onClick: () => deleteUserConfirmAction(calendarId, user),
-                          danger: true,
-                        },
-                      ]}
-                      buttonSize="sm"
-                    />
-                  </div>
+                {/* Colonne actions */}
+                <div className="col-2 d-flex justify-content-end p-0">
+                  <ActionSheet
+                    actions={[
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-trash"></i> {t("delete")}
+                          </>
+                        ),
+                        onClick: () => deleteUserConfirmAction(calendarId, invitation),
+                        danger: true,
+                      },
+                    ]}
+                    buttonSize="sm"
+                  />
                 </div>
               </div>
             </li>
-          </div>
-        ))}
+          );
+        })}
+
+
 
         {/* Ajouter un utilisateur */}
         <div>
