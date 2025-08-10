@@ -9,6 +9,7 @@ import time
 from . import api
 from urllib.parse import urljoin
 from app.config import Config
+from app.services.notifications.messaging import send_email
 
 
 
@@ -21,11 +22,6 @@ def handle_send_invitation(calendar_id):
         owner_uid = g.uid
 
         receiver_email = request.get_json(force=True).get("email")
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM users WHERE email = %s", (receiver_email,))
-                receiver_user = cursor.fetchone()
-                receiver_uid = receiver_user.get("id")
 
         if not verify_calendar(calendar_id, owner_uid):
             return warning_response(
@@ -35,7 +31,47 @@ def handle_send_invitation(calendar_id):
                 uid=owner_uid, 
                 origin="INVITATION_SEND",
                 log_extra={"calendar_id": calendar_id}
-            )      
+            )
+        
+        owner = fetch_user(owner_uid)
+
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT * FROM users WHERE email = %s", (receiver_email,))
+                receiver_user = cursor.fetchone()
+
+                if not receiver_user:
+                    cursor.execute("""
+                        INSERT INTO invitations (calendar_id, invited_email)
+                        VALUES (%s, %s)
+                        RETURNING token
+                    """, (calendar_id, receiver_email))
+                    token_raw = cursor.fetchone()
+                    print(token_raw)
+                    token = token_raw.get("token")
+
+                    link = f"{Config.FRONTEND_URL}/accept-invite?token={token}&type=invitation"
+
+                    send_email(
+                        to=receiver_email,
+                        subject="Invitation à rejoindre un calendrier",
+                        html_content="""
+                            <a href=\""""+ link + """\">Accepter l'invitation</a>
+                            <p>Vous avez été invité à rejoindre un calendrier. Cliquez sur le lien pour accepter l'invitation : """ + link + """</p>
+                        """,
+                        plain="Vous avez été invité à rejoindre un calendrier. Cliquez sur le lien pour accepter l'invitation : " + link
+                    )
+
+                    return success_response(
+                        message="invitation envoyée",
+                        code="INVITATION_SEND_SUCCESS",
+                        uid=owner_uid,
+                        origin="INVITATION_SEND",
+                        log_extra={"calendar_id": calendar_id}
+                    )
+
+                receiver_uid = receiver_user.get("id")
+
         # Verif si soit même
         if owner_uid == receiver_uid:
             return warning_response(
@@ -47,23 +83,17 @@ def handle_send_invitation(calendar_id):
                 log_extra={"calendar_id": calendar_id}
             )
 
-        # Vérifier si l'utilisateur existe 
-        user = fetch_user(receiver_uid)
-
-        if not user:
-            return warning_response(
-                message="utilisateur non trouvé", 
-                code="USER_NOT_FOUND", 
-                status_code=404, 
-                uid=owner_uid, 
-                origin="INVITATION_SEND",
-                log_extra={"calendar_id": calendar_id}
-            )
         with get_connection() as conn:
             with conn.cursor() as cursor:  
                 # Vérifier si l'utilisateur a déjà été invité
-                cursor.execute("SELECT * FROM shared_calendars WHERE receiver_uid = %s AND calendar_id = %s", (receiver_uid, calendar_id))
+                cursor.execute("""
+                    SELECT * 
+                    FROM shared_calendars 
+                    WHERE receiver_uid = %s AND calendar_id = %s
+                """, (receiver_uid, calendar_id))
+
                 shared_calendar = cursor.fetchone()
+
                 if shared_calendar:
                     return warning_response(
                         message="utilisateur déjà invité",
@@ -74,7 +104,18 @@ def handle_send_invitation(calendar_id):
                         log_extra={"calendar_id": calendar_id}
                     )
                 
-                link = urljoin(Config.FRONTEND_URL or "", "/notifications")
+                # Sauvegarder l'invitation dans la collection "shared_calendars" dans le calendrier de l'utilisateur owner
+                cursor.execute(
+                    """
+                    INSERT INTO shared_calendars (receiver_uid, calendar_id, accepted, access)
+                    VALUES (%s, %s, %s, %s)
+                    RETURNING token
+                    """,
+                    (receiver_uid, calendar_id, False, "edit")
+                )
+                token = cursor.fetchone().get("token")
+
+                link = urljoin(Config.FRONTEND_URL or "", f"/accept-invite?token={token}&type=share")
 
                 # Créer une notif pour l'utilisateur receveur
                 notify_and_record(
@@ -87,16 +128,6 @@ def handle_send_invitation(calendar_id):
                     notif_type="calendar_invitation",
                 )
 
-
-
-                # Sauvegarder l'invitation dans la collection "shared_calendars" dans le calendrier de l'utilisateur owner
-                cursor.execute(
-                    """
-                    INSERT INTO shared_calendars (receiver_uid, calendar_id, accepted, access)
-                    VALUES (%s, %s, %s, %s)
-                    """,
-                    (receiver_uid, calendar_id, False, "edit")
-                )
 
                 t_1 = time.time()
 
