@@ -67,12 +67,12 @@ CREATE TABLE IF NOT EXISTS "public"."invitations" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "calendar_id" "uuid" NOT NULL,
     "invited_email" "text",
-    "role" "text" DEFAULT 'read'::"text" NOT NULL,
+    "role" "text" DEFAULT 'write'::"text" NOT NULL,
     "token" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "expires_at" timestamp with time zone DEFAULT ("now"() + '14 days'::interval) NOT NULL,
     "redeemed_at" timestamp with time zone,
     "redeemed_by" "uuid",
-    "status" "text" NOT NULL,
+    "status" "text" DEFAULT 'pending'::"text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     CONSTRAINT "invitations_role_check" CHECK (("role" = ANY (ARRAY['read'::"text", 'write'::"text", 'admin'::"text"]))),
     CONSTRAINT "invitations_status_check" CHECK (("status" = ANY (ARRAY['pending'::"text", 'accepted'::"text", 'revoked'::"text"])))
@@ -158,7 +158,8 @@ CREATE TABLE IF NOT EXISTS "public"."shared_calendars" (
     "access" "text" DEFAULT 'edit'::"text" NOT NULL,
     "accepted" boolean DEFAULT false NOT NULL,
     "accepted_at" timestamp with time zone,
-    "notifications_enabled" boolean DEFAULT true NOT NULL
+    "notifications_enabled" boolean DEFAULT true NOT NULL,
+    "token" "uuid" DEFAULT "gen_random_uuid"()
 );
 
 
@@ -237,6 +238,11 @@ ALTER TABLE ONLY "public"."medicine_boxes"
 
 ALTER TABLE ONLY "public"."notifications"
     ADD CONSTRAINT "notifications_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."shared_calendars"
+    ADD CONSTRAINT "shared_calendars_token_key" UNIQUE ("token");
 
 
 
