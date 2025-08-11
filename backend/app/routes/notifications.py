@@ -90,7 +90,7 @@ def handle_notifications():
                         "notification_id": notif.get("id"),
                         "notification_type": notif.get("type"),
                         "read": notif.get("read"),
-                        "timestamp": notif.get("timestamp"),
+                        "timestamp": notif.get("created_at"),
                         "calendar_id": calendar_id,
                         "calendar_name": calendar_name,
                         "sender_name": sender_name,

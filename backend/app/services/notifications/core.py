@@ -147,8 +147,8 @@ def save_notifications(uid: str, notif_type: str, notifications: list[dict]):
                 for notif in notifications:
                     cursor.execute(
                         """
-                        INSERT INTO notifications (user_id, type, read, timestamp, sender_uid, content)
-                        VALUES (%s, %s, %s, NOW(), %s, %s::jsonb)
+                        INSERT INTO notifications (user_id, type, read, sender_uid, content)
+                        VALUES (%s, %s, %s, %s, %s::jsonb)
                         """,
                         (uid, notif_type, False, notif.get("sender_uid"), json.dumps(notif)),
                     )
