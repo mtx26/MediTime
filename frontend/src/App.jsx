@@ -344,7 +344,7 @@ function App() {
   // Fonction pour envoyer une invitation à un utilisateur
   const sendInvitation = useCallback(async (email, calendarId) => {
     return await performApiCall({
-      url: `${API_URL}/api/invitations/send/${calendarId}`,
+      url: `${API_URL}/api/invitations/${calendarId}`,
       method: 'POST',
       body: { email },
       origin: 'INVITATION_SEND',
@@ -353,12 +353,26 @@ function App() {
       analyticsData: { email, calendarId, uid },
     });
   }, []);
+
+  /// login
+
+  // Fonction pour supprimer un utilisateur partagé pour le owner
+  const deleteLoginInvitation = useCallback(async (calendarId, userId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/login/${calendarId}/${userId}`,
+      method: 'DELETE',
+      origin: 'SHARED_USER_DELETE',
+      uid,
+      analyticsEvent: 'delete_shared_user',
+      analyticsData: { calendarId, userId, uid },
+    });
+  }, []);
   
 
   // Fonction pour accepter une invitation
-  const acceptInvitation = useCallback(async (notificationId) => {
+  const acceptLoginInvitation = useCallback(async (notificationId) => {
     return await performApiCall({
-      url: `${API_URL}/api/invitations/accept/${notificationId}`,
+      url: `${API_URL}/api/invitations/login/accept/${notificationId}`,
       method: 'POST',
       origin: 'INVITATION_ACCEPT',
       uid,
@@ -369,9 +383,9 @@ function App() {
   
 
   // Fonction pour rejeter une invitation
-  const rejectInvitation = useCallback(async (notificationId) => {
+  const rejectLoginInvitation = useCallback(async (notificationId) => {
     return await performApiCall({
-      url: `${API_URL}/api/invitations/reject/${notificationId}`,
+      url: `${API_URL}/api/invitations/login/reject/${notificationId}`,
       method: 'POST',
       origin: 'INVITATION_REJECT',
       uid,
@@ -379,6 +393,25 @@ function App() {
       analyticsData: { notificationId, uid },
     });
   }, []);
+
+  /// Registration
+
+  const deleteRegistrationInvitation = useCallback(async (calendar_id, receiver_email, token) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/registration/${calendar_id}`,
+      method: 'DELETE',
+      origin: 'INVITATION_DELETE',
+      body: {
+        email: receiver_email,
+        token: token
+      },
+      uid,
+      analyticsEvent: 'delete_invitation',
+      analyticsData: { calendar_id, uid },
+    });
+  }, []);
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
 
   // Fonction pour marquer une notification comme lue
@@ -420,34 +453,9 @@ function App() {
       analyticsData: { uid },
     });
   }, []);
-    
+  
 
-  // Fonction pour supprimer un utilisateur partagé pour le owner
-  const deleteSharedUser = useCallback(async (calendarId, userId) => {
-    return await performApiCall({
-      url: `${API_URL}/api/shared/users/${calendarId}/${userId}`,
-      method: 'DELETE',
-      origin: 'SHARED_USER_DELETE',
-      uid,
-      analyticsEvent: 'delete_shared_user',
-      analyticsData: { calendarId, userId, uid },
-    });
-  }, []);
-
-  const deleteInvitation = useCallback(async (calendar_id, receiver_email, token) => {
-    return await performApiCall({
-      url: `${API_URL}/api/invitations/${calendar_id}`,
-      method: 'DELETE',
-      origin: 'INVITATION_DELETE',
-      body: {
-        email: receiver_email,
-        token: token
-      },
-      uid,
-      analyticsEvent: 'delete_invitation',
-      analyticsData: { calendar_id, uid },
-    });
-  }, []);
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Fonction pour recup le calendrier partagé par un utilisateur
   const fetchSharedUserCalendarSchedule = useCallback(
@@ -649,11 +657,11 @@ function App() {
       fetchSharedUserCalendarSchedule,
       fetchGroupedSharedCalendars,
       sendInvitation,
-      acceptInvitation,
-      rejectInvitation,
-      deleteSharedUser,
+      acceptLoginInvitation,
+      rejectLoginInvitation,
+      deleteLoginInvitation,
+      deleteRegistrationInvitation,
       deleteSharedCalendar,
-      deleteInvitation,
       sharedCalendarsData,
       setSharedCalendarsData,
       updateSharedUserBox,

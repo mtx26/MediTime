@@ -54,8 +54,8 @@ function NotificationsPage({ notifications, sharedUserCalendars }) {
               key={notif.notification_id}
               notif={notif}
               onRead={notifications.readNotification}
-              onAccept={sharedUserCalendars.acceptInvitation}
-              onReject={sharedUserCalendars.rejectInvitation}
+              onAccept={sharedUserCalendars.acceptLoginInvitation}
+              onReject={sharedUserCalendars.rejectLoginInvitation}
               navigate={navigate}
             />
           ))}

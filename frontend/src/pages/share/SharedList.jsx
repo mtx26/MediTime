@@ -123,16 +123,16 @@ function SharedList({
     setSelectedModifyToken(null);
   };
 
-  const deleteUserConfirmAction = (calendarId, user) => {
+  const deleteLoginInvitationConfirmAction = (calendarId, user) => {
     setAlertType("confirm-danger");
     setAlertMessage(t("delete_access_confirm"));
     setAlertId(user.receiver_uid + "-" + calendarId);
-    setOnConfirmAction(() => () => handleDeleteUser(calendarId, user));
+    setOnConfirmAction(() => () => handleDeleteLoginInvitation(calendarId, user));
   };
 
   // 🔄 Suppression de l'utilisateur
-  const handleDeleteUser = async (calendarId, user) => {
-    const rep = await sharedUserCalendars.deleteSharedUser(
+  const handleDeleteLoginInvitation = async (calendarId, user) => {
+    const rep = await sharedUserCalendars.deleteLoginInvitation(
       calendarId,
       user.receiver_uid,
     );
@@ -150,15 +150,15 @@ function SharedList({
     }
   };
 
-  const deleteInvitationConfirmAction = (calendarId, receiverEmail, token) => {
+  const deleteRegistrationInvitationConfirmAction = (calendarId, receiverEmail, token) => {
     setAlertType("confirm-danger");
     setAlertMessage(t("delete_link_confirm"));
     setAlertId(token + "-" + calendarId);
-    setOnConfirmAction(() => () => handleDeleteInvitation(calendarId, receiverEmail, token));
+    setOnConfirmAction(() => () => handledeleteRegistrationInvitation(calendarId, receiverEmail, token));
   };
 
-  const handleDeleteInvitation = async (calendarId, receiverEmail, token) => {
-    const rep = await sharedUserCalendars.deleteInvitation(calendarId, receiverEmail, token);
+  const handledeleteRegistrationInvitation = async (calendarId, receiverEmail, token) => {
+    const rep = await sharedUserCalendars.deleteRegistrationInvitation(calendarId, receiverEmail, token);
     if (rep.success) {
       setAlertType("success");
       setAlertMessage("✅ " + rep.message);
@@ -346,8 +346,8 @@ function SharedList({
               setSelectedModifyToken={setSelectedModifyToken}
               tokenCalendars={tokenCalendars}
               handleSendInvitation={handleSendInvitation}
-              deleteUserConfirmAction={deleteUserConfirmAction}
-              deleteInvitationConfirmAction={deleteInvitationConfirmAction}
+              deleteLoginInvitationConfirmAction={deleteLoginInvitationConfirmAction}
+              deleteRegistrationInvitationConfirmAction={deleteRegistrationInvitationConfirmAction}
               emailsToInvite={emailsToInvite}
               setEmailsToInvite={setEmailsToInvite}
               navigate={navigate}
@@ -422,13 +422,13 @@ function CalendarCard({
   handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions,
   handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today,
   VITE_URL, selectedModifyToken, setSelectedModifyToken, tokenCalendars,
-  handleSendInvitation, deleteUserConfirmAction, deleteInvitationConfirmAction,
+  handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction,
   emailsToInvite, setEmailsToInvite, navigate, personalCalendars,
 }) {
   const { t } = useTranslation();
   const alertHandlers = { alertId, alertType, alertMessage, onConfirmAction, setAlertMessage, setOnConfirmAction, setAlertId };
   const tokenProps = { ...alertHandlers, setAlertType, handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions, handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyToken, setSelectedModifyToken, tokenCalendars };
-  const userProps = { ...alertHandlers, handleSendInvitation, deleteUserConfirmAction, deleteInvitationConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
+  const userProps = { ...alertHandlers, handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
   return (
     <div>
       <div className="card-body">
@@ -730,8 +730,8 @@ function UserList({
   setOnConfirmAction,
   setAlertId,
   handleSendInvitation,
-  deleteUserConfirmAction,
-  deleteInvitationConfirmAction,
+  deleteLoginInvitationConfirmAction,
+  deleteRegistrationInvitationConfirmAction,
   data,
   calendarId,
   emailsToInvite,
@@ -808,7 +808,7 @@ function UserList({
                           <i className="bi bi-trash"></i> {t('delete')}
                         </>
                       ),
-                      onClick: () => deleteUserConfirmAction(calendarId, user),
+                      onClick: () => deleteLoginInvitationConfirmAction(calendarId, user),
                       danger: true,
                     },
                   ]}
@@ -897,7 +897,7 @@ function UserList({
                             <i className="bi bi-trash"></i> {t("delete")}
                           </>
                         ),
-                        onClick: () => deleteInvitationConfirmAction(calendarId, invitation.invited_email, invitation.token),
+                        onClick: () => deleteRegistrationInvitationConfirmAction(calendarId, invitation.invited_email, invitation.token),
                         danger: true,
                       },
                     ]}
@@ -996,7 +996,7 @@ SharedList.propTypes = {
   }).isRequired,
   sharedUserCalendars: PropTypes.shape({
     fetchSharedUsers: PropTypes.func.isRequired,
-    deleteSharedUser: PropTypes.func.isRequired,
+    deleteLoginInvitation: PropTypes.func.isRequired,
     sendInvitation: PropTypes.func.isRequired,
   }).isRequired,
 };
@@ -1028,7 +1028,7 @@ CalendarCard.propTypes = {
   setSelectedModifyToken: PropTypes.func.isRequired,
   tokenCalendars: PropTypes.object.isRequired,
   handleSendInvitation: PropTypes.func.isRequired,
-  deleteUserConfirmAction: PropTypes.func.isRequired,
+  deleteLoginInvitationConfirmAction: PropTypes.func.isRequired,
   emailsToInvite: PropTypes.object.isRequired,
   setEmailsToInvite: PropTypes.func.isRequired,
   navigate: PropTypes.func.isRequired,
@@ -1079,7 +1079,7 @@ UserList.propTypes = {
   setOnConfirmAction: PropTypes.func.isRequired,
   setAlertId: PropTypes.func.isRequired,
   handleSendInvitation: PropTypes.func.isRequired,
-  deleteUserConfirmAction: PropTypes.func.isRequired,
+  deleteLoginInvitationConfirmAction: PropTypes.func.isRequired,
   data: PropTypes.shape({
     users: PropTypes.arrayOf(
       PropTypes.shape({
