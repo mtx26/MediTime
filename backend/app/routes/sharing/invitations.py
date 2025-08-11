@@ -10,6 +10,7 @@ from .. import api
 from urllib.parse import urljoin
 from app.config import Config
 from app.services.notifications import email_address_direct
+from psycopg2 import sql
 
 
 
@@ -325,13 +326,29 @@ def handle_reject_invitation(notification_id):
 
 
 # fonction pour supprimer une invitation de calendrier partagé pour un user sans compte
+def _parse_invitation_payload():
+    data = request.get_json(force=True) or {}
+    return data.get("token"), data.get("email")
+
+
+def _remove_invitation(cursor, calendar_id, token, owner_uid, receiver_email):
+    cursor.execute(
+        sql.SQL("DELETE FROM invitations WHERE token = %s AND calendar_id = %s"),
+        (token, calendar_id),
+    )
+    email_address_direct(
+        to_email=receiver_email,
+        notification_type="calendar_invitation_registration_deleted",
+        context={"sender_uid": owner_uid, "calendar_id": calendar_id},
+    )
+
+
 @api.route("/invitations/<calendar_id>", methods=["DELETE"])
 @require_auth
 def delete_shared_calendar_invitation(calendar_id):
     try:
         t_0 = time.time()
         owner_uid = g.uid
-
         if not verify_calendar(calendar_id, owner_uid):
             return warning_response(
                 message=ERROR_UNAUTHORIZED_ACCESS,
@@ -339,43 +356,30 @@ def delete_shared_calendar_invitation(calendar_id):
                 status_code=404,
                 uid=owner_uid,
                 origin="GET_MEDICINE_BOXES",
-                log_extra={"calendar_id": calendar_id}
+                log_extra={"calendar_id": calendar_id},
             )
 
-        data = request.get_json(force=True)
-        token = data.get("token") if data else None
-        receiver_email = data.get("email") if data else None
-
+        token, receiver_email = _parse_invitation_payload()
         if not token:
             return error_response(
                 message="Token de l'utilisateur requis",
                 code="MISSING_TOKEN",
                 status_code=400,
-                uid=g.uid,
-                origin="DELETE_SHARED_CALENDAR_INVITATION"
+                uid=owner_uid,
+                origin="DELETE_SHARED_CALENDAR_INVITATION",
             )
 
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("DELETE FROM invitations WHERE token = %s AND calendar_id = %s", (token, calendar_id))
-                cursor.connection.commit()
-
-                email_address_direct(
-                    to_email=receiver_email,
-                    notification_type="calendar_invitation_registration_deleted",
-                    context={
-                        "sender_uid": owner_uid,
-                        "calendar_id": calendar_id,
-                    }
-                )
-                t_1 = time.time()
+        with get_connection() as conn, conn.cursor() as cursor:
+            _remove_invitation(cursor, calendar_id, token, owner_uid, receiver_email)
+            conn.commit()
+            t_1 = time.time()
 
         return success_response(
             message="Invitation de calendrier supprimée",
             code="SHARED_CALENDAR_INVITATION_DELETE_SUCCESS",
             uid=receiver_email,
             origin="DELETE_SHARED_CALENDAR_INVITATION",
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0},
         )
     except Exception as e:
         return error_response(
@@ -384,6 +388,6 @@ def delete_shared_calendar_invitation(calendar_id):
             status_code=500,
             uid=owner_uid,
             origin="GET_SHARED_GROUPED",
-            error=str(e)
+            error=str(e),
         )
 

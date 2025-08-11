@@ -1,13 +1,9 @@
 from . import invitations, notifications, users, medicines, grouped
-from .invitations import *
-from .notifications import *
-from .users import *
-from .medicines import *
-from .grouped import *
+
+# Ensure submodules are imported for side effects (route registration)
+_SHARING_ROUTES = [invitations, notifications, users, medicines, grouped]
 
 __all__ = []
-__all__ += invitations.__all__ if hasattr(invitations, '__all__') else []
-__all__ += notifications.__all__ if hasattr(notifications, '__all__') else []
-__all__ += users.__all__ if hasattr(users, '__all__') else []
-__all__ += medicines.__all__ if hasattr(medicines, '__all__') else []
-__all__ += grouped.__all__ if hasattr(grouped, '__all__') else []
+for module in _SHARING_ROUTES:
+    if hasattr(module, "__all__"):
+        __all__ += module.__all__

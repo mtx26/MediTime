@@ -7,6 +7,7 @@ from app.db.connection import get_connection
 from flask import request, g
 import time
 from app.config import Config
+from psycopg2 import sql
 
 frontend_url = Config.FRONTEND_URL or ""
 
@@ -291,7 +292,9 @@ def handle_shared_user_notifications_update(calendar_id):
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    "UPDATE shared_calendars SET notifications_enabled = %s WHERE calendar_id = %s",
+                    sql.SQL(
+                        "UPDATE shared_calendars SET notifications_enabled = %s WHERE calendar_id = %s"
+                    ),
                     (notifications_enabled, calendar_id),
                 )
         t_1 = time.time()
