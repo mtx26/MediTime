@@ -36,6 +36,19 @@ $$;
 
 ALTER FUNCTION "public"."set_redeemed_at"() OWNER TO "postgres";
 
+
+CREATE OR REPLACE FUNCTION "public"."touch_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  NEW.updated_at := now();
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."touch_updated_at"() OWNER TO "postgres";
+
 SET default_tablespace = '';
 
 SET default_table_access_method = "heap";
@@ -45,8 +58,9 @@ CREATE TABLE IF NOT EXISTS "public"."calendars" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "owner_uid" "uuid" NOT NULL,
     "name" "text" NOT NULL,
-    "last_updated" timestamp with time zone,
     "stock_decrement_method" "text" DEFAULT 'weekly_pillbox'::"text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
     CONSTRAINT "calendars_stock_decrement_mode_check" CHECK (("stock_decrement_method" = ANY (ARRAY['weekly_pillbox'::"text", 'daily_midnight'::"text"])))
 );
 
@@ -56,7 +70,9 @@ ALTER TABLE "public"."calendars" OWNER TO "postgres";
 
 CREATE TABLE IF NOT EXISTS "public"."fcm_tokens" (
     "uid" "uuid" NOT NULL,
-    "token" "text" NOT NULL
+    "token" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"()
 );
 
 
@@ -74,6 +90,7 @@ CREATE TABLE IF NOT EXISTS "public"."invitations" (
     "redeemed_by" "uuid",
     "status" "text" DEFAULT 'pending'::"text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"(),
     CONSTRAINT "invitations_role_check" CHECK (("role" = ANY (ARRAY['read'::"text", 'write'::"text", 'admin'::"text"]))),
     CONSTRAINT "invitations_status_check" CHECK (("status" = ANY (ARRAY['pending'::"text", 'accepted'::"text", 'revoked'::"text"])))
 );
@@ -99,7 +116,9 @@ CREATE TABLE IF NOT EXISTS "public"."medicaments_afmps" (
     "url summary rmp nl" "text",
     "url summary rmp de" "text",
     "date de dernière publication rcp/notice" "date",
-    "date de dernière approbation rcp/notice" "date"
+    "date de dernière approbation rcp/notice" "date",
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"()
 );
 
 
@@ -144,7 +163,9 @@ CREATE TABLE IF NOT EXISTS "public"."notifications" (
     "content" "jsonb",
     "read" boolean DEFAULT false NOT NULL,
     "timestamp" timestamp with time zone DEFAULT "now"(),
-    "sender_uid" "uuid" NOT NULL
+    "sender_uid" "uuid" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"()
 );
 
 
@@ -159,7 +180,9 @@ CREATE TABLE IF NOT EXISTS "public"."shared_calendars" (
     "accepted" boolean DEFAULT false NOT NULL,
     "accepted_at" timestamp with time zone,
     "notifications_enabled" boolean DEFAULT true NOT NULL,
-    "token" "uuid" DEFAULT "gen_random_uuid"()
+    "token" "uuid" DEFAULT "gen_random_uuid"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"()
 );
 
 
@@ -172,7 +195,9 @@ CREATE TABLE IF NOT EXISTS "public"."shared_tokens" (
     "expires_at" timestamp without time zone,
     "permissions" "text" DEFAULT 'read'::"text" NOT NULL,
     "revoked" boolean DEFAULT false NOT NULL,
-    "owner_uid" "uuid" NOT NULL
+    "owner_uid" "uuid" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"()
 );
 
 
@@ -189,7 +214,8 @@ CREATE TABLE IF NOT EXISTS "public"."users" (
     "email_enabled" boolean DEFAULT true,
     "push_enabled" boolean DEFAULT true,
     "sms_enabled" boolean DEFAULT false NOT NULL,
-    "phone" "text"
+    "phone" "text",
+    "updated_at" timestamp with time zone DEFAULT "now"()
 );
 
 
@@ -268,6 +294,46 @@ CREATE OR REPLACE TRIGGER "trg_set_redeemed_at" BEFORE UPDATE ON "public"."invit
 
 
 
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_calendars" BEFORE UPDATE ON "public"."calendars" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_fcm_tokens" BEFORE UPDATE ON "public"."fcm_tokens" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_invitations" BEFORE UPDATE ON "public"."invitations" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_medicaments_afmps" BEFORE UPDATE ON "public"."medicaments_afmps" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_medicine_box_conditions" BEFORE UPDATE ON "public"."medicine_box_conditions" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_medicine_boxes" BEFORE UPDATE ON "public"."medicine_boxes" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_notifications" BEFORE UPDATE ON "public"."notifications" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_shared_calendars" BEFORE UPDATE ON "public"."shared_calendars" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_shared_tokens" BEFORE UPDATE ON "public"."shared_tokens" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_users" BEFORE UPDATE ON "public"."users" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
 ALTER TABLE ONLY "public"."shared_calendars"
     ADD CONSTRAINT "calendar_shared_users_calendar_id_fkey" FOREIGN KEY ("calendar_id") REFERENCES "public"."calendars"("id") ON DELETE CASCADE;
 
@@ -343,6 +409,12 @@ GRANT USAGE ON SCHEMA "public" TO "service_role";
 GRANT ALL ON FUNCTION "public"."set_redeemed_at"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_redeemed_at"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."set_redeemed_at"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."touch_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."touch_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."touch_updated_at"() TO "service_role";
 
 
 
