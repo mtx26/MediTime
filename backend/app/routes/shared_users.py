@@ -136,9 +136,17 @@ def handle_delete_user_shared_calendar(calendar_id):
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute(SELECT_SHARED_CALENDAR, (calendar_id,))
-                calendar = cursor.fetchone()
-                if not calendar:
+                cursor.execute("""
+                    DELETE FROM shared_calendars sc
+                    USING calendars c
+                    WHERE sc.calendar_id = c.id
+                      AND sc.receiver_uid = %s
+                      AND sc.calendar_id = %s
+                    RETURNING c.owner_uid
+                """, (receiver_uid, calendar_id))
+                result = cursor.fetchone()
+
+                if not result:
                     return warning_response(
                         message=ERROR_CALENDAR_NOT_FOUND,
                         code="SHARED_CALENDARS_DELETE_ERROR",
@@ -148,8 +156,7 @@ def handle_delete_user_shared_calendar(calendar_id):
                         log_extra={"calendar_id": calendar_id}
                     )
 
-                owner_uid = calendar.get("owner_uid")
-                cursor.execute("DELETE FROM shared_calendars WHERE receiver_uid = %s AND calendar_id = %s", (receiver_uid, calendar_id))
+                owner_uid = result.get("owner_uid")
                 link = urljoin(Config.FRONTEND_URL or "", "/calendars")
 
                 notify_and_record(
@@ -163,9 +170,9 @@ def handle_delete_user_shared_calendar(calendar_id):
                 )
 
         return success_response(
-            message="calendrier partagé supprimé", 
-            code="SHARED_CALENDARS_DELETE_SUCCESS", 
-            uid=receiver_uid, 
+            message="calendrier partagé supprimé",
+            code="SHARED_CALENDARS_DELETE_SUCCESS",
+            uid=receiver_uid,
             origin="SHARED_CALENDARS_DELETE",
             log_extra={"calendar_id": calendar_id}
         )
@@ -173,9 +180,9 @@ def handle_delete_user_shared_calendar(calendar_id):
     except Exception as e:
         return error_response(
             message="erreur lors de la suppression du calendrier partagé",
-            code="SHARED_CALENDARS_DELETE_ERROR", 
-            status_code=500, 
-            uid=receiver_uid, 
+            code="SHARED_CALENDARS_DELETE_ERROR",
+            status_code=500,
+            uid=receiver_uid,
             origin="SHARED_CALENDARS_DELETE",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
