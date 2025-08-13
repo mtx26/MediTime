@@ -110,7 +110,7 @@ def check_low_stock_and_notify():
         # Envoi
         for (uid, calendar_id), notifs in grouped.items():
             try:
-                notify_and_record(uid=uid, json_body=notifs, notif_type="low_stock")
+                notify_and_record(user_id=uid, body_or_list=notifs, notification_type="low_stock")
                 log_backend.info(
                     "✅ Notifications de stock faible envoyées",
                     {
@@ -209,7 +209,7 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
 
         for uid, notifs in grouped.items():
             try:
-                notify_and_record(uid=uid, json_body=notifs, notif_type="low_stock")
+                notify_and_record(user_id=uid, body_or_list=notifs, notification_type="low_stock")
                 log_backend.info(
                     "✅ Notifications de stock faible envoyées pour le calendrier",
                     {

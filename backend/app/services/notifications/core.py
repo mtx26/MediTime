@@ -1,5 +1,8 @@
 # app/services/notifications.py
 import json
+import traceback
+from typing import List, Tuple, Dict, Any
+
 from app.auth.fcm import send_fcm_notification
 from app.db.connection import get_connection
 from app.services.calendar import fetch_calendar, fetch_medicine_name
@@ -7,32 +10,41 @@ from app.services.notifications.messaging import send_email, send_sms
 from app.services.user import fetch_user
 from app.utils.logging import log_backend
 from app.config import Config
-import traceback
+from html import escape
 
-def fetch_user_name(uid):
-    user = fetch_user(uid)
+# ========= Constantes =========
+ORIGIN = "NOTIFICATIONS"
+DEFAULT_CHANNELS: Tuple[str, ...] = ("push", "email", "web")
+
+# ========= Types =========
+NotificationDict = Dict[str, Any]
+
+
+# ========= Helpers de données =========
+def fetch_user_name(user_id: str | None) -> str:
+    if not user_id:
+        return "un utilisateur"
+    user = fetch_user(user_id)
     return user.get("display_name") if user else "un utilisateur"
 
-def fetch_calendar_name(calendar_id):
+
+def fetch_calendar_name(calendar_id: str | None) -> str | None:
+    if not calendar_id:
+        return None
     calendar = fetch_calendar(calendar_id)
     return calendar.get("name") if calendar else "unknown"
 
 
-def enrich_notification(notification: dict) -> dict:
-    """Add calendar and sender names to the notification."""
+def enrich_notification(notification: NotificationDict) -> NotificationDict:
+    """Ajoute les noms du calendrier et de l’expéditeur au payload."""
     try:
-        calendar_id = notification.get("calendar_id")
-        sender_uid = notification.get("sender_uid")
-
-        notification["calendar_name"] = (
-            fetch_calendar_name(calendar_id) if calendar_id else None
-        )
-        notification["sender_name"] = fetch_user_name(sender_uid)
+        notification["calendar_name"] = fetch_calendar_name(notification.get("calendar_id"))
+        notification["sender_name"] = fetch_user_name(notification.get("sender_uid"))
     except Exception as e:
         log_backend.error(
             "Erreur enrich_notification",
             {
-                "origin": "NOTIFICATIONS",
+                "origin": ORIGIN,
                 "code": "ENRICH_ERROR",
                 "notification": notification,
                 "error": str(e),
@@ -41,254 +53,273 @@ def enrich_notification(notification: dict) -> dict:
         )
     return notification
 
+def _h(text: Any) -> str:
+    """Escape sûr pour tout contenu inséré dans le HTML."""
+    return escape("" if text is None else str(text))
 
-def build_notification_text(notif_type: str, data: dict) -> tuple[str, str]:
-    """Return title/subject and body for a notification."""
-    def format_medication_list(meds: list[dict]) -> str:
-        rows = ""
-        for med in meds:
-            name = med["name"]
-            val = float(med["qty"])
-            color = "red" if val <= 0 else "orange"
-            rows += f"""
-                <tr>
-                    <td style="padding: 4px 8px;">{name}</td>
-                    <td style="padding: 4px 8px; color: {color}; font-weight: bold;">{val:+g}</td>
-                </tr>
-            """
-        return f"""
-            <table style="border-collapse: collapse; margin-top: 8px;">
-                <thead>
-                    <tr>
-                        <th align="left" style="padding: 4px 8px;">Médicament</th>
-                        <th align="left" style="padding: 4px 8px;">Stock</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows}
-                </tbody>
-            </table>
-        """
+def _p(html_inner: str) -> str:
+    return f"<p style='margin:4px 0'>{html_inner}</p>"
 
-    match notif_type:
+# ========= Construction des contenus =========
+def _format_medication_list(medications: List[NotificationDict]) -> str:
+    """Liste de médicaments avec emoji et badge de stock."""
+    if not medications:
+        return ""
+    lis = []
+    for m in medications:
+        name = _h(m.get("name"))
+        try:
+            qty = float(m.get("qty", 0))
+        except Exception:
+            qty = 0.0
+        if qty <= 0:
+            badge = "<span style='color:red;font-weight:bold;'>épuisé</span>"
+        else:
+            suffix = "s" if int(qty) != 1 else ""
+            badge = f"<span style='color:orange;font-weight:bold;'>{int(qty)} restant{suffix}</span>"
+        lis.append(f"<li>💊 <b>{name}</b> — {badge}</li>")
+    return "<ul style='margin:8px 0; padding-left:20px;'>" + "".join(lis) + "</ul>"
+
+def build_notification_text(notification_type: str, context: NotificationDict) -> Tuple[str, str, str]:
+    sender = _h(context.get("sender_name") or "un utilisateur")
+    cal = _h(context.get("calendar_name") or "ce calendrier")
+
+    match notification_type:
         case "calendar_invitation":
-            title = "📆 Nouvelle invitation à un calendrier"
-            body = (
-                f"<b>{data.get('sender_name')}</b> vous invite à rejoindre le calendrier "
-                f"« <b>{data.get('calendar_name')}</b> »."
-            )
+            title = "📆 Invitation à un calendrier"
+            body = _p(f"<b>{sender}</b> vous invite à rejoindre le calendrier « <b>{cal}</b> ».")
+            return (title, body, "Accepter l'invitation")
+
+        case "calendar_invitation_registration":
+            title = "📆 Invitation à un calendrier"
+            body = _p(f"<b>{sender}</b> vous invite à vous inscrire pour accéder au calendrier « <b>{cal}</b> ».")
+            return (title, body, "S'inscrire et accepter l'invitation")
+        
+        case "calendar_invitation_registration_deleted":
+            title = "📆 Invitation au calendrier annulée"
+            body = _p(f"<b>{sender}</b> a annulé votre invitation à vous inscrire pour accéder au calendrier « <b>{cal}</b> ».")
+            return (title, body, "s'inscrire")
 
         case "calendar_invitation_accepted":
             title = "✅ Invitation acceptée"
-            body = (
-                f"<b>{data.get('sender_name')}</b> a accepté votre invitation pour le calendrier "
-                f"« <b>{data.get('calendar_name')}</b> »."
-            )
+            body = _p(f"<b>{sender}</b> a accepté votre invitation pour « <b>{cal}</b> ».")
+            return (title, body, "Voir le calendrier")
 
         case "calendar_invitation_rejected":
             title = "❌ Invitation refusée"
-            body = (
-                f"<b>{data.get('sender_name')}</b> a refusé votre invitation pour le calendrier "
-                f"« <b>{data.get('calendar_name')}</b> »."
-            )
+            body = _p(f"<b>{sender}</b> a refusé votre invitation pour « <b>{cal}</b> ».")
+            return (title, body, "Voir le calendrier")
 
         case "calendar_shared_deleted_by_owner":
             title = "🔒 Partage annulé"
-            body = (
-                f"<b>{data.get('sender_name')}</b> a arrêté de partager le calendrier "
-                f"« <b>{data.get('calendar_name')}</b> » avec vous."
-            )
+            body = _p(f"<b>{sender}</b> a arrêté de partager « <b>{cal}</b> » avec vous.")
+            return (title, body, "Ouvrir le site")
 
         case "calendar_shared_deleted_by_receiver":
             title = "📤 Partage retiré"
-            body = (
-                f"<b>{data.get('sender_name')}</b> a retiré le calendrier "
-                f"« <b>{data.get('calendar_name')}</b> » de votre compte."
-            )
+            body = _p(f"<b>{sender}</b> a retiré le calendrier « <b>{cal}</b> » de son compte.")
+            return (title, body, "Voir le calendrier")
 
         case "low_stock":
-            calendar = data.get("calendar_name") or "ce calendrier"
-            title = f"⚠️ Stock faible – calendrier « {calendar} »"
+            title = f"⚠️ Stock faible – calendrier « {cal} »"
+            if context.get("medications"):
+                body = _p(f"Certains médicaments du calendrier <b>« {cal} »</b> sont en stock critique :") \
+                       + _format_medication_list(context["medications"])
+                return (title, body, "Voir le calendrier")
 
-            if data.get("medications"):
-                med_lines = data["medications"]
-                body = f"<p>Certains médicaments du calendrier <b>« {calendar} »</b> sont en stock critique :</p>"
-                body += format_medication_list(med_lines)
+            med_name = _h(fetch_medicine_name(context.get("medication_id")))
+            qty = context.get("medication_qty") or 0
+            if qty == 0:
+                stock_txt = "<span style='color:red;font-weight:bold;'>épuisé</span>"
             else:
-                name = fetch_medicine_name(data.get("medication_id"))
-                qty = data.get("medication_qty") or 0
-
-                if qty == 0:
-                    stock_text = f"<span style='color:red;font-weight:bold;'>épuisé</span>"
-                else:
-                    plural = "s" if qty != 1 else ""
-                    stock_text = (
-                        f"<span style='color:orange;font-weight:bold;'>{qty} restant{plural}</span>"
-                    )
-
-                body = f"Le médicament <b>« {name} »</b> a {stock_text}."
+                stock_txt = f"<span style='color:orange;font-weight:bold;'>{qty} restant{'s' if qty != 1 else ''}</span>"
+            body = _p(f"Le médicament <b>« {med_name} »</b> est {stock_txt}.")
+            return (title, body, "Voir le calendrier")
 
         case _:
-            count = data.get("notification_count")
+            count = context.get("notification_count")
             if count and count > 1:
                 title = "🔔 Nouvelles notifications"
-                body = f"Vous avez <b>{count}</b> nouvelles notifications dans MediTime."
-            else:
-                title = "🔔 Nouvelle notification"
-                body = "Vous avez reçu une nouvelle notification dans MediTime."
+                body = _p(f"Vous avez <b>{count}</b> nouvelles notifications dans MediTime.")
+                return (title, body, "Voir les notifications")
 
-    return title, body
+            title = "🔔 Nouvelle notification"
+            body = _p("Vous avez reçu une nouvelle notification dans MediTime.")
+            return (title, body, "Voir les notifications")
 
-def save_notifications(uid: str, notif_type: str, notifications: list[dict]):
-    """Persist notifications individually to the database."""
+def generate_email_content(notification_type: str, context: NotificationDict) -> Tuple[str, str, str]:
+    title, body_html, cta_label = build_notification_text(notification_type, context)
+    link = f"{Config.FRONTEND_URL}{context.get('link') or f'/notifications'}"
+    html = f"""
+        <p style="font-size:16px;color:#555;white-space:pre-line;">{body_html}</p>
+        <div style="margin:32px 0;">
+            <a href="{link}" style="background-color:#007bff;color:#fff;text-decoration:none;padding:12px 20px;border-radius:4px;display:inline-block;">
+                {cta_label or "Voir mes notifications"}
+            </a>
+        </div>
+        <p style="font-size:13px;color:#999;">
+            Si le bouton ne fonctionne pas, copiez-collez ce lien :
+            <a href="{link}" style="color:#007bff;">{link}</a>
+        </p>
+    """
+    # Sujet unifié
+    return f"MediTime – {title}", body_html, html
+
+
+# ========= Persistance Web =========
+def save_notifications(user_id: str, notification_type: str, items: List[NotificationDict]) -> None:
+    """Enregistre chaque notification côté web (historique)."""
     try:
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                for notif in notifications:
-                    cursor.execute(
-                        """
-                        INSERT INTO notifications (user_id, type, read, sender_uid, content)
-                        VALUES (%s, %s, %s, %s, %s::jsonb)
-                        """,
-                        (uid, notif_type, False, notif.get("sender_uid"), json.dumps(notif)),
+        with get_connection() as conn, conn.cursor() as cur:
+            for item in items:
+                title, body_html, _ = build_notification_text(notification_type, item)
+                content = {**item, "title": title, "body": body_html}
+                shared_calendar_id = item.get("shared_calendar_id") or None
+                print(shared_calendar_id)
+                cur.execute(
+                    """
+                    INSERT INTO notifications (
+                        user_id, type, read, timestamp, sender_uid, content, shared_calendar_id
                     )
-                conn.commit()
+                    VALUES (%s, %s, %s, NOW(), %s, %s::jsonb, %s)
+                    """,
+                    (
+                        user_id,
+                        notification_type,
+                        False,
+                        item.get("sender_uid"),
+                        json.dumps(content),
+                        shared_calendar_id
+                    ),
+                )
+            conn.commit()
     except Exception as e:
         log_backend.error(
             "Erreur save_notifications",
-            {
-                "origin": "NOTIFICATIONS",
-                "code": "SAVE_ERROR",
-                "uid": uid,
-                "error": str(e),
-                "trace": traceback.format_exc(),
-            },
+            {"origin": ORIGIN, "code": "SAVE_ERROR", "uid": user_id, "error": str(e), "trace": traceback.format_exc()},
         )
 
 
-def send_grouped_notifications(uid: str, notifications: list[dict], notif_type: str) -> None:
-    """Send push/email/SMS once for all notifications."""
+# ========= Envois par canal =========
+def _get_fcm_tokens(user_id: str) -> List[str]:
+    with get_connection() as conn, conn.cursor() as cur:
+        cur.execute("SELECT token FROM fcm_tokens WHERE uid = %s", (user_id,))
+        return [r["token"] for r in cur.fetchall()]
+
+
+def send_push_notification(user_id: str, context: NotificationDict, notification_type: str) -> None:
+    title, body_html, _ = build_notification_text(notification_type, context)
+    tokens = _get_fcm_tokens(user_id)
+    if tokens:
+        # Pour push, on passe le body en texte court (sans HTML)
+        plain_body = _html_to_plain(body_html)
+        send_fcm_notification(tokens, title, plain_body, context)
+    else:
+        log_backend.warning("Aucun token FCM trouvé", {"origin": ORIGIN, "code": "NO_FCM_TOKEN", "uid": user_id})
+
+
+def send_email_notification(user: NotificationDict, context: NotificationDict, notification_type: str) -> None:
+    email = user.get("email")
+    if not email:
+        log_backend.warning("Aucun email pour l'utilisateur", {"origin": ORIGIN, "code": "NO_EMAIL", "uid": user.get("id")})
+        return
+    subject, plain_body, html_content = generate_email_content(notification_type, context)
+    send_email(to=email, subject=subject, html_content=html_content, plain=_html_to_plain(plain_body))
+
+
+def send_sms_notification(user: NotificationDict, context: NotificationDict, notification_type: str) -> None:
+    phone = user.get("phone")
+    if not phone:
+        log_backend.warning("Aucun numéro de téléphone", {"origin": ORIGIN, "code": "NO_PHONE_NUMBER", "uid": user.get("id")})
+        return
+    # SMS = version texte courte
+    title, body_html, _ = build_notification_text(notification_type, context)
+    plain = f"{title} — {_html_to_plain(body_html)}"
+    send_sms(phone, plain)
+
+
+def _html_to_plain(html: str) -> str:
+    """Ultra simple: enlève les balises basiques pour du texte push/SMS."""
+    return (
+        html.replace("<b>", "")
+        .replace("</b>", "")
+        .replace("<p>", "")
+        .replace("</p>", " ")
+        .replace("<span style='color:red;font-weight:bold;'>", "")
+        .replace("<span style='color:orange;font-weight:bold;'>", "")
+        .replace("</span>", "")
+        .replace("&nbsp;", " ")
+        .strip()
+    )
+
+
+# ========= Orchestration =========
+def send_grouped_notifications(user_id: str, items: List[NotificationDict], notification_type: str, channels: List[str]) -> None:
+    """
+    Envoie push/email/SMS une seule fois (groupé) et enregistre côté web si demandé.
+    """
     try:
-        user = fetch_user(uid)
+        user = fetch_user(user_id) or {}
         email_enabled = user.get("email_enabled")
         push_enabled = user.get("push_enabled")
         sms_enabled = user.get("sms_enabled")
 
-        payload = notifications[0].copy()
-        if notif_type == "low_stock":
-            payload["medications"] = [
-                {
-                    "name": fetch_medicine_name(n.get("medication_id")),
-                    "qty": n.get("medication_qty") or 0
-                }
-                for n in notifications
+        # Charge utile groupée
+        context = items[0].copy()
+        if notification_type == "low_stock":
+            context["medications"] = [
+                {"name": fetch_medicine_name(n.get("medication_id")), "qty": n.get("medication_qty") or 0} for n in items
             ]
-        elif len(notifications) > 1:
-            payload["notification_count"] = len(notifications)
+        elif len(items) > 1:
+            context["notification_count"] = len(items)
 
-        if push_enabled:
-            send_push_notification(uid, payload, notif_type)
-        if email_enabled:
-            send_email_notification(user, payload, notif_type)
-        if sms_enabled:
-            send_sms_notification(user, payload, notif_type)
+        if "web" in channels:
+            save_notifications(user_id, notification_type, items)
+        if push_enabled and "push" in channels:
+            send_push_notification(user_id, context, notification_type)
+        if email_enabled and "email" in channels:
+            send_email_notification(user, context, notification_type)
+        if sms_enabled and "sms" in channels:
+            send_sms_notification(user, context, notification_type)
+
     except Exception as e:
         log_backend.error(
             "Erreur send_grouped_notifications",
-            {
-                "origin": "NOTIFICATIONS",
-                "code": "SEND_ERROR",
-                "uid": uid,
-                "error": str(e),
-                "trace": traceback.format_exc(),
-            },
+            {"origin": ORIGIN, "code": "SEND_ERROR", "uid": user_id, "error": str(e), "trace": traceback.format_exc()},
         )
 
-def send_push_notification(uid: str, payload: dict, notif_type: str) -> None:
-    """Send an FCM notification."""
-    title, body = build_notification_text(notif_type, payload)
 
-    with get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT token FROM fcm_tokens WHERE uid = %s", (uid,))
-            tokens = [r["token"] for r in cursor.fetchall()]
-
-    if tokens:
-        send_fcm_notification(tokens, title, body, payload)
-    else:
-        log_backend.warning(
-            f"Aucun token FCM trouvé pour l'utilisateur {uid}",
-            {"origin": "NOTIFICATIONS", "code": "NO_FCM_TOKEN", "uid": uid},
-        )
-
-def send_email_notification(user: dict, payload: dict, notif_type: str) -> None:
-    email = user.get("email")
-    if not email:
-        log_backend.warning(
-            f"Aucun email trouvé pour l'utilisateur {user.get('id')}",
-            {"origin": "NOTIFICATIONS", "code": "NO_EMAIL", "uid": user.get('id')},
-        )
-        return
-
-    subject, plain_body, html_content = generate_email_content(notif_type, payload)
-
-    send_email(to=email, subject=subject, html_content=html_content, plain=plain_body)
-
-def send_sms_notification(user: dict, payload: dict, notif_type: str) -> None:
-    phone = user.get("phone")
-    if not phone:
-        log_backend.warning(
-            f"Aucun numéro de téléphone trouvé pour l'utilisateur {user.get('id')}",
-            {
-                "origin": "NOTIFICATIONS",
-                "code": "NO_PHONE_NUMBER",
-                "uid": user.get('id'),
-            },
-        )
-        return
-
-    plain_body = build_notification_text(notif_type, payload)[1]
-    send_sms(phone, plain_body)
-
-def generate_email_content(notif_type: str, json_body: dict) -> tuple[str, str, str]:
-    base_link = f"https://{Config.FRONTEND_URL}/notifications"
-
-    subject, body = build_notification_text(notif_type, json_body)
-
-    html_content = f"""
-        <p style="font-size: 16px; color: #555; white-space: pre-line;">{body}</p>
-        <div style="margin: 32px 0;">
-            <a href="{base_link}" style="background-color: #007bff; color: white; text-decoration: none; padding: 12px 20px; border-radius: 4px; display: inline-block;">
-            Voir mes notifications
-            </a>
-        </div>
-        <p style="font-size: 13px; color: #999;">Si le bouton ne fonctionne pas, copiez-collez ce lien dans votre navigateur :<br/>
-            <a href="{base_link}" style="color: #007bff;">{base_link}</a>
-        </p>
-    """
-
-    return f"MediTime - {subject}", body, html_content
-
-
-
-
-def notify_and_record(uid: str, json_body, notif_type: str) -> None:
-    """Handle single or multiple notifications for a user."""
+def notify_and_record(user_id: str, body_or_list: NotificationDict | List[NotificationDict], notification_type: str, channels: List[str] = list(DEFAULT_CHANNELS)) -> None:
+    """Gère 1..n notifications pour un utilisateur + enregistrement Web par défaut."""
     try:
-        notifications = json_body if isinstance(json_body, list) else [json_body]
-
-        enriched = [enrich_notification(n) for n in notifications]
-
-        save_notifications(uid, notif_type, enriched)
-        send_grouped_notifications(uid, enriched, notif_type)
-
+        items = body_or_list if isinstance(body_or_list, list) else [body_or_list]
+        enriched_items = [enrich_notification(n) for n in items]
+        send_grouped_notifications(user_id, enriched_items, notification_type, list(channels))
     except Exception as e:
         log_backend.error(
             "Erreur notify_and_record",
+            {"origin": ORIGIN, "code": "NOTIFICATION_ERROR", "uid": user_id, "error": str(e), "trace": traceback.format_exc()},
+        )
+
+
+# ========= E-mail direct (hors préférences utilisateur) =========
+def email_address_direct(to_email: str, notification_type: str, context: NotificationDict) -> None:
+    """
+    Envoie un e-mail à une adresse arbitraire en réutilisant les templates standard.
+    Pas d’enregistrement en base, pas de push/SMS.
+    """
+    try:
+        enriched_context = enrich_notification(context.copy())
+        subject, plain_body, html_content = generate_email_content(notification_type, enriched_context)
+        send_email(to=to_email, subject=subject, html_content=html_content, plain=_html_to_plain(plain_body))
+    except Exception as e:
+        log_backend.error(
+            "Erreur email_address_direct",
             {
-                "origin": "NOTIFICATIONS",
-                "code": "NOTIFICATION_ERROR",
-                "uid": uid,
+                "origin": ORIGIN,
+                "code": "DIRECT_EMAIL_ERROR",
+                "to": to_email,
+                "notif_type": notification_type,
                 "error": str(e),
                 "trace": traceback.format_exc(),
             },

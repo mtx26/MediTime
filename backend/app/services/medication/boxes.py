@@ -24,13 +24,13 @@ def get_boxes(calendar_id):
         return []
     return boxes
 
-def update_box(box_id, calendar_id, data):
-    name = data.get("name")
-    dose = data.get("dose")
-    box_capacity = data.get("box_capacity")
-    stock_alert_threshold = data.get("stock_alert_threshold")
-    stock_quantity = data.get("stock_quantity")
-    conditions = data.get("conditions", [])
+def update_box(box_id, calendar_id, box):
+    name = box.get("name")
+    dose = box.get("dose")
+    box_capacity = box.get("box_capacity")
+    stock_alert_threshold = box.get("stock_alert_threshold")
+    stock_quantity = box.get("stock_quantity")
+    conditions = box.get("conditions", [])
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
@@ -49,12 +49,12 @@ def update_box(box_id, calendar_id, data):
                     """, (condition.get("id"), box_id, condition.get("tablet_count"), condition.get("interval_days"), condition.get("start_date"), condition.get("time_of_day")))
             conn.commit()
 
-def create_box(calendar_id, data):
-    name = data.get("name", "nouvelle boite")
-    box_capacity = data.get("box_capacity", 0)
-    stock_alert_threshold = data.get("stock_alert_threshold", 10)
-    stock_quantity = data.get("stock_quantity", 0)
-    dose = data.get("dose", 0)
+def create_box(calendar_id, box):
+    name = box.get("name", "nouvelle boite")
+    box_capacity = box.get("box_capacity", 0)
+    stock_alert_threshold = box.get("stock_alert_threshold", 10)
+    stock_quantity = box.get("stock_quantity", 0)
+    dose = box.get("dose", 0)
 
     with get_connection() as conn:
         with conn.cursor() as cursor:

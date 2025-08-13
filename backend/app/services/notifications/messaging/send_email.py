@@ -15,6 +15,18 @@ def send_email(to, subject, html_content, plain=None):
                     <div style="padding: 24px;">
                         <h2 style="color: #333;">{subject}</h2>
                         {html_content}
+                        
+                        
+                        <!-- Pied de page -->
+                        <div style="margin-top: 30px; font-size: 12px; color: #888; text-align: center; border-top: 1px solid #eee; padding-top: 16px;">
+                            <a href="https://meditime-app.com/privacy" style="color: #888; text-decoration: none; margin: 0 8px;">
+                                Confidentialité
+                            </a>
+                            |
+                            <a href="https://meditime-app.com/terms" style="color: #888; text-decoration: none; margin: 0 8px;">
+                                Conditions d'utilisation
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

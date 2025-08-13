@@ -54,9 +54,8 @@ function App() {
   // Fonction pour supprimer un calendrier
   const deleteCalendar = useCallback(async (calendarId) => {
     return await performApiCall({
-      url: `${API_URL}/api/calendars`,
+      url: `${API_URL}/api/calendars/${calendarId}`,
       method: 'DELETE',
-      body: { calendarId },
       origin: 'CALENDAR_DELETE',
       uid,
       analyticsEvent: 'delete_calendar',
@@ -68,9 +67,9 @@ function App() {
   // Fonction pour renommer un calendrier
   const renameCalendar = useCallback(async (calendarId, newCalendarName) => {
     return await performApiCall({
-      url: `${API_URL}/api/calendars`,
+      url: `${API_URL}/api/calendars/${calendarId}`,
       method: 'PUT',
-      body: { calendarId, newCalendarName },
+      body: { newCalendarName },
       origin: 'CALENDAR_RENAME',
       uid,
       analyticsEvent: 'rename_calendar',
@@ -88,7 +87,7 @@ function App() {
     const start = startDate || formatToLocalISODate(new Date());
 
     const result = await performApiCall({
-      url: `${API_URL}/api/calendars/${calendarId}/schedule?startTime=${start}`,
+      url: `${API_URL}/api/calendars/${calendarId}/schedule?startDate=${start}`,
       method: 'GET',
       origin: 'CALENDAR_FETCH',
       uid,
@@ -96,7 +95,7 @@ function App() {
       analyticsData: {
         calendarId,
         uid,
-        startTime: start,
+        startDate: start,
       },
     });
 
@@ -128,7 +127,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/boxes/${boxId}`,
       method: 'PUT',
-      body: box,
+      body: { box },
       origin: 'BOX_UPDATE',
       uid,
       analyticsEvent: 'update_personal_box',
@@ -142,11 +141,13 @@ function App() {
     const result = await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/boxes`,
       method: 'POST',
-      body: {
-        name,
-        box_capacity: boxCapacity,
-        stock_alert_threshold: stockAlertThreshold,
-        stock_quantity: stockQuantity,
+      body: { 
+        box: {
+          name,
+          box_capacity: boxCapacity,
+          stock_alert_threshold: stockAlertThreshold,
+          stock_quantity: stockQuantity,
+        }
       },
       origin: 'BOX_CREATE',
       uid,
@@ -185,14 +186,15 @@ function App() {
 
   // fonction pour diminuer le stock du pillulier
   const useMedicinesForPersonalPillbox   = useCallback(async (calendarId, startDate = null) => {
-    const startTime = startDate || formatToLocalISODate(new Date());
+    const start = startDate || formatToLocalISODate(new Date());
     return await performApiCall({
-      url: `${API_URL}/api/calendars/${calendarId}/pilluliers/used?startTime=${startTime}`,
+      url: `${API_URL}/api/calendars/${calendarId}/pilluliers/used`,
       method: 'POST',
+      body: { startDate: start },
       origin: 'PILLULIER_USE_MEDICATION',
       uid,
       analyticsEvent: 'use_pillulier_medication',
-      analyticsData: { calendarId, uid },
+      analyticsData: { calendarId, uid, startDate: start },
     });
   }, []);
 
@@ -250,7 +252,7 @@ function App() {
     const start = startDate || formatToLocalISODate(new Date());
 
     const result = await performApiCall({
-      url: `${API_URL}/api/tokens/${token}/schedule?startTime=${start}`,
+      url: `${API_URL}/api/tokens/${token}/schedule?startDate=${start}`,
       method: 'GET',
       origin: 'SHARED_CALENDAR_FETCH',
       analyticsEvent: 'fetch_token_calendar_schedule',
@@ -344,7 +346,7 @@ function App() {
   // Fonction pour envoyer une invitation à un utilisateur
   const sendInvitation = useCallback(async (email, calendarId) => {
     return await performApiCall({
-      url: `${API_URL}/api/invitations/send/${calendarId}`,
+      url: `${API_URL}/api/invitations/${calendarId}`,
       method: 'POST',
       body: { email },
       origin: 'INVITATION_SEND',
@@ -353,32 +355,106 @@ function App() {
       analyticsData: { email, calendarId, uid },
     });
   }, []);
+
+  /// login
+
+  // Fonction pour récupérer une invitation
+  const getLoginInvitation = useCallback(async (token) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/login/${token}`,
+      method: 'GET',
+      origin: 'INVITATION_GET',
+      uid,
+      analyticsEvent: 'get_invitation',
+      analyticsData: { token, uid },
+    });
+  }, []);
+
+  // Fonction pour supprimer un utilisateur partagé pour le owner
+  const deleteLoginInvitation = useCallback(async (token) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/login/${token}`,
+      method: 'DELETE',
+      origin: 'SHARED_USER_DELETE',
+      uid,
+      analyticsEvent: 'delete_shared_user',
+      analyticsData: { token, uid },
+    });
+  }, []);
   
 
   // Fonction pour accepter une invitation
-  const acceptInvitation = useCallback(async (notificationId) => {
+  const acceptLoginInvitation = useCallback(async (token) => {
     return await performApiCall({
-      url: `${API_URL}/api/invitations/accept/${notificationId}`,
+      url: `${API_URL}/api/invitations/login/accept/${token}`,
       method: 'POST',
       origin: 'INVITATION_ACCEPT',
       uid,
       analyticsEvent: 'accept_invitation',
-      analyticsData: { notificationId, uid },
+      analyticsData: { token, uid },
     });
   }, []);
   
 
   // Fonction pour rejeter une invitation
-  const rejectInvitation = useCallback(async (notificationId) => {
+  const rejectLoginInvitation = useCallback(async (token) => {
     return await performApiCall({
-      url: `${API_URL}/api/invitations/reject/${notificationId}`,
+      url: `${API_URL}/api/invitations/login/reject/${token}`,
       method: 'POST',
       origin: 'INVITATION_REJECT',
       uid,
       analyticsEvent: 'reject_invitation',
-      analyticsData: { notificationId, uid },
+      analyticsData: { token, uid },
     });
   }, []);
+
+  /// Registration
+
+  const getRegistrationInvitation = useCallback(async (token) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/registration/${token}`,
+      method: 'GET',
+      origin: 'INVITATION_GET',
+      uid,
+      analyticsEvent: 'get_invitation',
+      analyticsData: { token, uid },
+    });
+  }, []);
+
+  const deleteRegistrationInvitation = useCallback(async (token) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/registration/${token}`,
+      method: 'DELETE',
+      origin: 'INVITATION_DELETE',
+      uid,
+      analyticsEvent: 'delete_invitation',
+      analyticsData: { token, uid },
+    });
+  }, []);
+
+  const acceptRegistrationInvitation = useCallback(async (token) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/registration/accept/${token}`,
+      method: 'POST',
+      origin: 'INVITATION_ACCEPT',
+      uid,
+      analyticsEvent: 'accept_invitation',
+      analyticsData: { token, uid },
+    });
+  }, []);
+
+  const rejectRegistrationInvitation = useCallback(async (token) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/registration/reject/${token}`,
+      method: 'POST',
+      origin: 'INVITATION_REJECT',
+      uid,
+      analyticsEvent: 'reject_invitation',
+      analyticsData: { token, uid },
+    });
+  }, []);
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
 
   // Fonction pour marquer une notification comme lue
@@ -420,33 +496,22 @@ function App() {
       analyticsData: { uid },
     });
   }, []);
-    
-
-  // Fonction pour supprimer un utilisateur partagé pour le owner
-  const deleteSharedUser = useCallback(async (calendarId, userId) => {
-    return await performApiCall({
-      url: `${API_URL}/api/shared/users/${calendarId}/${userId}`,
-      method: 'DELETE',
-      origin: 'SHARED_USER_DELETE',
-      uid,
-      analyticsEvent: 'delete_shared_user',
-      analyticsData: { calendarId, userId, uid },
-    });
-  }, []);
   
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Fonction pour recup le calendrier partagé par un utilisateur
   const fetchSharedUserCalendarSchedule = useCallback(
     async (calendarId, startDate = null) => {
-      const startTime = startDate || formatToLocalISODate(new Date());
+      const start = startDate || formatToLocalISODate(new Date());
   
       const response = await performApiCall({
-        url: `${API_URL}/api/shared/users/calendars/${calendarId}/schedule?startTime=${startTime}`,
+        url: `${API_URL}/api/shared/users/calendars/${calendarId}/schedule?startDate=${start}`,
         method: 'GET',
         origin: 'SHARED_USER_CALENDAR_FETCH',
         uid,
         analyticsEvent: 'fetch_shared_user_calendar_schedule',
-        analyticsData: { calendarId, uid, startTime },
+        analyticsData: { calendarId, uid, startDate: start },
       });
   
       if (response.success) {
@@ -475,7 +540,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/boxes/${boxId}`,
       method: 'PUT',
-      body: box,
+      body: { box },
       origin: 'SHARED_BOX_UPDATE',
       uid,
       analyticsEvent: 'update_shared_user_box',
@@ -497,10 +562,12 @@ function App() {
         url: `${API_URL}/api/shared/users/calendars/${calendarId}/boxes`,
         method: 'POST',
         body: {
-          name,
-          box_capacity: boxCapacity,
-          stock_alert_threshold: stockAlertThreshold,
-          stock_quantity: stockQuantity,
+          box: {
+            name,
+            box_capacity: boxCapacity,
+            stock_alert_threshold: stockAlertThreshold,
+            stock_quantity: stockQuantity,
+          },
         },
         origin: 'SHARED_BOX_CREATE',
         uid,
@@ -535,14 +602,15 @@ function App() {
 
   // Fonction pour diminuer le stock du pillulier
   const useMedicinesForSharedUserPillbox = useCallback(async (calendarId, startDate = null) => {
-    const startTime = startDate || formatToLocalISODate(new Date());
+    const start = startDate || formatToLocalISODate(new Date());
     return await performApiCall({
-      url: `${API_URL}/api/shared/users/calendars/${calendarId}/pilluliers/used?startTime=${startTime}`,
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/pilluliers/used`,
       method: 'POST',
+      body: { startDate: start },
       origin: 'SHARED_USER_PILLULIER_USE_MEDICATION',
       uid,
       analyticsEvent: 'use_shared_user_pillulier_medication',
-      analyticsData: { calendarId, startTime },
+      analyticsData: { calendarId, startDate: start },
     });
   }, []);
 
@@ -635,9 +703,14 @@ function App() {
       fetchSharedUserCalendarSchedule,
       fetchGroupedSharedCalendars,
       sendInvitation,
-      acceptInvitation,
-      rejectInvitation,
-      deleteSharedUser,
+      getLoginInvitation,
+      acceptLoginInvitation,
+      rejectLoginInvitation,
+      deleteLoginInvitation,
+      getRegistrationInvitation,
+      acceptRegistrationInvitation,
+      rejectRegistrationInvitation,
+      deleteRegistrationInvitation,
       deleteSharedCalendar,
       sharedCalendarsData,
       setSharedCalendarsData,

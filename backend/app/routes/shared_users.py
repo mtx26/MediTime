@@ -1,18 +1,16 @@
 from app.utils.auth import require_auth
 from datetime import datetime, timezone
 from . import api
-from app.services.calendar import verify_calendar_share
-from app.services.calendar import generate_calendar_schedule
+from app.services.calendar import verify_calendar_share, generate_calendar_schedule
 from flask import request, g
-import time
 from app.services.user import fetch_user
 from app.utils.responses import success_response, error_response, warning_response
 from app.db.connection import get_connection
 from app.services.notifications import notify_and_record
-import json
 from app.config import Config
 from urllib.parse import urljoin
 from app.services.medication import check_if_stock_is_low
+from app.utils.measure import measure_time
 
 
 ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"
@@ -23,17 +21,16 @@ SELECT_SHARED_CALENDAR = "SELECT * FROM calendars WHERE id = %s"
 
 # Route pour récupérer les calendriers partagés
 @api.route("/shared/users/calendars", methods=["GET"])
+@measure_time()
 @require_auth
 def handle_shared_calendars():
     try:
-        t_0 = time.time()
         uid = g.uid
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT * FROM shared_calendars WHERE receiver_uid = %s AND accepted = true", (uid,))
                 shared_users = cursor.fetchall()
-                t_1 = time.time()
 
                 if not shared_users:
                     return success_response(
@@ -41,8 +38,7 @@ def handle_shared_calendars():
                         code="SHARED_CALENDARS_LOAD_EMPTY", 
                         uid=uid,
                         origin="SHARED_CALENDARS_LOAD",
-                        data={"calendars": []},
-                        log_extra={"time": t_1 - t_0}
+                        data={"calendars": []}
                     )
 
                 calendars_list = []
@@ -107,15 +103,12 @@ def handle_shared_calendars():
                         "ifLowStock": if_low_stock
                     })
 
-                t_2 = time.time()
-
                 return success_response(
                     message=SUCCESS_SHARED_CALENDARS_LOAD, 
                     code="SHARED_CALENDARS_LOAD_SUCCESS", 
                     uid=uid, 
                     origin="SHARED_CALENDARS_LOAD",
-                    data={"calendars": calendars_list},
-                    log_extra={"time": t_2 - t_0}
+                    data={"calendars": calendars_list}
                 )
 
     except Exception as e:
@@ -130,22 +123,13 @@ def handle_shared_calendars():
 
 # Route pour récupérer les informations d'un calendrier partagé
 @api.route("/shared/users/calendars/<calendar_id>", methods=["GET"])
+@measure_time()
 @require_auth
+@verify_calendar_share
 def handle_user_shared_calendar(calendar_id):
     try:
-        t_0 = time.time()
-        receiver_uid = g.uid
+        uid = g.uid
 
-        if not verify_calendar_share(calendar_id, receiver_uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="SHARED_CALENDARS_LOAD_ERROR",
-                status_code=403,
-                uid=receiver_uid,
-                origin="SHARED_CALENDARS_LOAD",
-                log_extra={"calendar_id": calendar_id}
-            )
-        
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(SELECT_SHARED_CALENDAR, (calendar_id,))
@@ -155,7 +139,7 @@ def handle_user_shared_calendar(calendar_id):
                         message=ERROR_CALENDAR_NOT_FOUND,
                         code="SHARED_CALENDARS_LOAD_ERROR",
                         status_code=404,
-                        uid=receiver_uid,
+                        uid=uid,
                         origin="SHARED_CALENDARS_LOAD",
                         log_extra={"calendar_id": calendar_id}
                     )
@@ -170,20 +154,19 @@ def handle_user_shared_calendar(calendar_id):
                         message=ERROR_CALENDAR_NOT_FOUND,
                         code="SHARED_CALENDARS_LOAD_ERROR",
                         status_code=404,
-                        uid=receiver_uid,
+                        uid=uid,
                         origin="SHARED_CALENDARS_LOAD",
                         log_extra={"calendar_id": calendar_id}
                     )
                 access = shared_user.get("access", "read")
-                t_2 = time.time()
 
         return success_response(
             message=SUCCESS_SHARED_CALENDARS_LOAD,
             code="SHARED_CALENDARS_LOAD_SUCCESS",
-            uid=receiver_uid,
+            uid=uid,
             origin="SHARED_CALENDARS_LOAD",
             data={"calendar_id": calendar_id, "calendar_name": calendar_name, "access": access, "owner_uid": owner_uid},
-            log_extra={"calendar_id": calendar_id, "time": t_2 - t_0}
+            log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
@@ -191,31 +174,22 @@ def handle_user_shared_calendar(calendar_id):
             message="erreur lors de la récupération du calendrier partagé",
             code="SHARED_CALENDARS_ERROR",
             status_code=500,
-            uid=receiver_uid,
+            uid=uid,
             origin="SHARED_CALENDARS_LOAD",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
 
-# Route pour générer un calendrier partagé
 @api.route("/shared/users/calendars/<calendar_id>/schedule", methods=["GET"])
+@measure_time()
 @require_auth
+@verify_calendar_share
 def handle_user_shared_calendar_schedule(calendar_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
-        if not verify_calendar_share(calendar_id, uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="SHARED_CALENDARS_LOAD_ERROR",
-                status_code=403,
-                uid=uid,
-                origin="SHARED_CALENDARS_LOAD",
-                log_extra={"calendar_id": calendar_id}
-            )
+        start_date = request.args.get("startDate")
 
-        start_date = request.args.get("startTime")
         if not start_date:
             start_date = datetime.now(timezone.utc).date()
         else:
@@ -225,15 +199,13 @@ def handle_user_shared_calendar_schedule(calendar_id):
 
         if_low_stock = check_if_stock_is_low(calendar_id)
 
-        t_1 = time.time()
-            
         return success_response(
             message=SUCCESS_SHARED_CALENDARS_LOAD, 
             code="SHARED_CALENDARS_LOAD_SUCCESS", 
             uid=uid, 
             origin="SHARED_CALENDARS_LOAD",
             data={"schedule": schedule, "table": table, "calendar_name": calendar_name, "if_low_stock": if_low_stock},
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+            log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
@@ -250,22 +222,12 @@ def handle_user_shared_calendar_schedule(calendar_id):
 
 # Route pour supprimer un calendrier partagé pour le receiver
 @api.route("/shared/users/calendars/<calendar_id>", methods=["DELETE"])
+@measure_time()
 @require_auth
+@verify_calendar_share
 def handle_delete_user_shared_calendar(calendar_id):
     try:
-        t_0 = time.time()
         receiver_uid = g.uid
-
-        if not verify_calendar_share(calendar_id, receiver_uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS, 
-                code="SHARED_CALENDARS_DELETE_ERROR", 
-                status_code=403, 
-                uid=receiver_uid, 
-                origin="SHARED_CALENDARS_DELETE",
-                log_extra={"calendar_id": calendar_id}
-            )
-        
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -286,22 +248,21 @@ def handle_delete_user_shared_calendar(calendar_id):
                 link = urljoin(Config.FRONTEND_URL or "", "/calendars")
 
                 notify_and_record(
-                    uid=owner_uid,
-                    json_body={
+                    user_id=owner_uid,
+                    body_or_list={
                         "link": link,
                         "calendar_id": calendar_id,
                         "sender_uid": receiver_uid
                     },
-                    notif_type="calendar_shared_deleted_by_receiver",
+                    notification_type="calendar_shared_deleted_by_receiver",
                 )
-                t_1 = time.time()
 
         return success_response(
             message="calendrier partagé supprimé", 
             code="SHARED_CALENDARS_DELETE_SUCCESS", 
             uid=receiver_uid, 
             origin="SHARED_CALENDARS_DELETE",
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+            log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
@@ -316,186 +277,107 @@ def handle_delete_user_shared_calendar(calendar_id):
         )
 
 
-# Route pour supprimer un utilisateur partagé pour le owner
-@api.route("/shared/users/<calendar_id>/<receiver_uid>", methods=["DELETE"])
-@require_auth
-def handle_delete_user_shared_user(calendar_id, receiver_uid):
-    try:
-        t_0 = time.time()
-        owner_uid = g.uid
-
-        if owner_uid == receiver_uid:
-            return warning_response(
-                message="impossible de supprimer soi-même", 
-                code="SHARED_USERS_DELETE_ERROR", 
-                status_code=400, 
-                uid=owner_uid, 
-                origin="SHARED_USERS_DELETE",
-                log_extra={"calendar_id": calendar_id, "receiver_uid": receiver_uid}
-            )
-
-        if not verify_calendar_share(calendar_id, receiver_uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="SHARED_USERS_DELETE_ERROR",
-                status_code=403,
-                uid=owner_uid,
-                origin="SHARED_USERS_DELETE",
-                log_extra={"calendar_id": calendar_id, "receiver_uid": receiver_uid}
-            )
-
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-
-                cursor.execute("DELETE FROM shared_calendars WHERE receiver_uid = %s AND calendar_id = %s", (receiver_uid, calendar_id))
-                row = cursor.rowcount
-                if row == 0:
-                    return warning_response(
-                        message=ERROR_CALENDAR_NOT_FOUND,
-                        code="SHARED_USERS_DELETE_ERROR",
-                        status_code=404,
-                        uid=owner_uid,
-                        origin="SHARED_USERS_DELETE",
-                        log_extra={"calendar_id": calendar_id, "receiver_uid": receiver_uid}
-                    )
-
-                cursor.execute(
-                    "DELETE FROM notifications WHERE user_id = %s AND type = %s AND content = %s::jsonb AND sender_uid = %s",
-                    (
-                        receiver_uid,
-                        "calendar_invitation",
-                        json.dumps({"calendar_id": calendar_id}),
-                        owner_uid
-                    )
-                )       
-                link = urljoin(Config.FRONTEND_URL or "", f"/calendar/{calendar_id}")
-
-                notify_and_record(
-                    uid=receiver_uid,
-                    json_body={
-                        "link": link,
-                        "calendar_id": calendar_id,
-                        "sender_uid": owner_uid
-                    },
-                    notif_type="calendar_shared_deleted_by_owner",
-                )
-                t_1 = time.time()
-
-        return success_response(
-            message="utilisateur partagé supprimé", 
-            code="SHARED_USERS_DELETE_SUCCESS", 
-            uid=receiver_uid, 
-            origin="SHARED_USERS_DELETE",
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
-        )
-
-    except Exception as e:
-        return error_response(
-            message="erreur lors de la suppression de l'utilisateur partagé",
-            code="SHARED_USERS_DELETE_ERROR", 
-            status_code=500, 
-            uid=receiver_uid, 
-            origin="SHARED_USERS_DELETE",
-            error=str(e),
-            log_extra={"calendar_id": calendar_id}
-        )
-
-
 @api.route("/shared/grouped", methods=["GET"])
+@measure_time()
 @require_auth
 def handle_grouped_shared():
+    uid = g.uid
+
+    sql = """
+    SELECT
+      c.id   AS calendar_id,
+      c.name AS calendar_name,
+
+      -- USERS (shared_calendars x users)
+      COALESCE(
+        (
+          SELECT jsonb_agg(
+                   jsonb_build_object(
+                     'receiver_uid', sc.receiver_uid,
+                     'access', sc.access,
+                     'accepted', sc.accepted,
+                     'token', sc.token,
+                     'receiver_photo_url', COALESCE(u.photo_url, 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg'),
+                     'receiver_name', u.display_name,
+                     'receiver_email', u.email
+                   )
+                   ORDER BY u.display_name NULLS LAST
+                 )
+          FROM shared_calendars sc
+          JOIN users u ON u.id = sc.receiver_uid
+          WHERE sc.calendar_id = c.id
+        ),
+        '[]'::jsonb
+      ) AS users,
+
+        -- TOKENS
+        COALESCE(
+        (
+            SELECT jsonb_agg(to_jsonb(st) ORDER BY st.created_at)
+            FROM shared_tokens st
+            WHERE st.calendar_id = c.id
+        ),
+        '[]'::jsonb
+        ) AS tokens,
+
+      -- INVITATIONS
+      COALESCE(
+        (
+          SELECT jsonb_agg( (to_jsonb(i) - 'id') ORDER BY i.created_at )
+          FROM invitations i
+          WHERE i.calendar_id = c.id
+        ),
+        '[]'::jsonb
+      ) AS invitations
+
+    FROM calendars c
+    WHERE c.owner_uid = %s
+    ORDER BY c.name;
+    """
+
     try:
-        t_0 = time.time()
-        uid = g.uid
+        with get_connection() as conn, conn.cursor() as cursor:
+            cursor.execute(sql, (uid,))
+            rows = cursor.fetchall()
 
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                # Étape 1 : récupérer tous les calendriers personnels
-                cursor.execute("SELECT id, name FROM calendars WHERE owner_uid = %s", (uid,))
-                calendars = cursor.fetchall()
-                calendar_ids = [cal["id"] for cal in calendars]
+        grouped = {
+            row["calendar_id"]: {
+                "calendar_name": row["calendar_name"],
+                "users": row["users"],            # jsonb list
+                "tokens": row["tokens"],          # jsonb list
+                "invitation": row["invitations"], # garde ta clé existante
+            }
+            for row in rows
+        }
 
-                grouped = {
-                    cal["id"]: {
-                        "calendar_name": cal["name"],
-                        "users": [],
-                        "tokens": []
-                    }
-                    for cal in calendars
-                }
-
-                # Étape 2 : récupérer les utilisateurs partagés
-                cursor.execute("SELECT * FROM shared_calendars WHERE calendar_id = ANY(%s::uuid[])", (calendar_ids,))
-                shared_users = cursor.fetchall()
-
-                for shared in shared_users:
-                    calendar_id = shared["calendar_id"]
-                    receiver_uid = shared["receiver_uid"]
-
-                    if not verify_calendar_share(calendar_id, receiver_uid):
-                        continue
-
-                    receiver = fetch_user(receiver_uid)
-                    if not receiver:
-                        continue
-
-                    user_info = {
-                        "receiver_uid": receiver_uid,
-                        "access": shared.get("access", "read"),
-                        "accepted": shared.get("accepted", False),
-                        "receiver_photo_url": receiver.get("photo_url") or "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg",
-                        "receiver_name": receiver.get("display_name"),
-                        "receiver_email": receiver.get("email")
-                    }
-
-                    if calendar_id in grouped:
-                        grouped[calendar_id]["users"].append(user_info)
-
-                # Étape 3 : récupérer les tokens partagés
-                cursor.execute("SELECT * FROM shared_tokens WHERE calendar_id = ANY(%s::uuid[])", (calendar_ids,))
-                tokens = cursor.fetchall()
-
-                for token in tokens:
-                    cal_id = token["calendar_id"]
-                    if cal_id in grouped:
-                        grouped[cal_id]["tokens"].append(token)
-
-        t_1 = time.time()
         return success_response(
             message="Données partagées groupées récupérées",
             code="SHARED_GROUPED_LOAD_SUCCESS",
             uid=uid,
             origin="SHARED_GROUPED_LOAD",
             data={"grouped": grouped},
-            log_extra={"calendar_count": len(grouped), "time": t_1 - t_0}
+            log_extra={"calendar_count": len(grouped)}
         )
 
     except Exception as e:
         return error_response(
-            message="Erreur lors du groupement des données partagées",
+            message="Erreur lors du chargement des données partagées groupées",
             code="SHARED_GROUPED_LOAD_ERROR",
-            status_code=500,
-            uid=g.uid,
+            uid=uid,
             origin="SHARED_GROUPED_LOAD",
             error=str(e)
         )
 
 
+
 @api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["GET"])
+@measure_time()
 @require_auth
+@verify_calendar_share
 def handle_shared_user_notifications(calendar_id):
     try:
-        t_0 = time.time()
         uid = g.uid
-        if not verify_calendar_share(calendar_id, uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
-                status_code=403,
-                uid=uid,
-                origin="SHARED_CALENDARS_NOTIFICATIONS",
-                log_extra={"calendar_id": calendar_id}
-            )
+        
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT notifications_enabled FROM shared_calendars WHERE calendar_id = %s", (calendar_id,))
@@ -510,14 +392,14 @@ def handle_shared_user_notifications(calendar_id):
                         log_extra={"calendar_id": calendar_id}
                     )
                 notifications_enabled = calendar.get("notifications_enabled", False)
-        t_1 = time.time()
+
         return success_response(
             message="notifications récupérées",
             code="SHARED_CALENDARS_NOTIFICATIONS_SUCCESS",
             uid=uid,
             origin="SHARED_CALENDARS_NOTIFICATIONS",
             data={"notifications-enabled": notifications_enabled},
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+            log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
         return error_response(
@@ -531,22 +413,17 @@ def handle_shared_user_notifications(calendar_id):
         )
 
 @api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["PUT"])
+@measure_time()
 @require_auth
+@verify_calendar_share
 def handle_shared_user_notifications_update(calendar_id):
     try:
-        t_0 = time.time()
         uid = g.uid
-        if not verify_calendar_share(calendar_id, uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
-                status_code=403,
-                uid=uid,
-                origin="SHARED_CALENDARS_NOTIFICATIONS",
-                log_extra={"calendar_id": calendar_id}
-            )
-        data = request.get_json()
-        if not data or "notifications-enabled" not in data:
+
+        payload = request.get_json(force=True)
+        notifications_enabled = payload.get("notifications-enabled")
+
+        if not notifications_enabled:
             return warning_response(
                 message="Données manquantes",
                 code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
@@ -555,17 +432,16 @@ def handle_shared_user_notifications_update(calendar_id):
                 origin="SHARED_CALENDARS_NOTIFICATIONS",
                 log_extra={"calendar_id": calendar_id}
             )
-        notifications_enabled = data["notifications-enabled"]
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("UPDATE shared_calendars SET notifications_enabled = %s WHERE calendar_id = %s", (notifications_enabled, calendar_id))
-        t_1 = time.time()
+
         return success_response(
             message="Notifications mises à jour",
             code="SHARED_CALENDARS_NOTIFICATIONS_SUCCESS",
             uid=uid,
             origin="SHARED_CALENDARS_NOTIFICATIONS",
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+            log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
         return error_response(

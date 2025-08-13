@@ -4,40 +4,28 @@ from . import api
 from app.utils.responses import success_response, error_response, warning_response
 from app.services.calendar import verify_calendar_share
 from app.services.medication import get_boxes, update_box, create_box, delete_box, restock_box
-import time
 from app.services.medication import use_pillulier
 from datetime import datetime, timezone
-
-ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"
+from app.utils.measure import measure_time
 
 # Route pour récupérer les boites de médicaments d'un calendrier
 @api.route("/shared/users/calendars/<calendar_id>/boxes", methods=["GET"])
+@measure_time()
 @require_auth
+@verify_calendar_share
 def handle_shared_boxes(calendar_id):
     try:
-        t_0 = time.time()
-        receiver_uid = g.uid
-
-        if not verify_calendar_share(calendar_id, receiver_uid):
-            return warning_response(
-                message=ERROR_CALENDAR_NOT_FOUND,
-                code="SHARED_USER_CALENDAR_BOXES_LOAD_ERROR",
-                status_code=404,
-                uid=receiver_uid,
-                origin="SHARED_USER_CALENDAR_BOXES_LOAD",
-                log_extra={"calendar_id": calendar_id}
-            )
+        uid = g.uid
 
         boxes = get_boxes(calendar_id)
-        t_1 = time.time()
 
         return success_response(
             message="boites de médicaments récupérées",
             code="MEDICINE_BOXES_FETCHED",
-            uid=receiver_uid,
+            uid=uid,
             origin="GET_MEDICINE_BOXES",
             data={"boxes": boxes},
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "boxes_count": len(boxes)}
+            log_extra={"calendar_id": calendar_id, "boxes_count": len(boxes)}
         )
 
     except Exception as e:
@@ -45,7 +33,7 @@ def handle_shared_boxes(calendar_id):
             message="erreur lors de la récupération des boites de médicaments",
             code="GET_MEDICINE_BOXES_ERROR",
             status_code=500,
-            uid=receiver_uid,
+            uid=uid,
             origin="GET_MEDICINE_BOXES",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -54,14 +42,17 @@ def handle_shared_boxes(calendar_id):
 
 # Route pour modifier une boite de médicaments
 @api.route("/shared/users/calendars/<calendar_id>/boxes/<box_id>", methods=["PUT"])
+@measure_time()
 @require_auth
+@verify_calendar_share
 def handle_update_shared_box(calendar_id, box_id):
     try:
-        t_0 = time.time()
         uid = g.uid
-        data = request.get_json()
 
-        if not data or not verify_calendar_share(calendar_id, uid):
+        payload = request.get_json(force=True)
+        box = payload.get("box")
+
+        if not box:
             return warning_response(
                 message="champs requis manquants",
                 code="MISSING_REQUIRED_FIELDS",
@@ -71,15 +62,14 @@ def handle_update_shared_box(calendar_id, box_id):
                 log_extra={"calendar_id": calendar_id, "box_id": box_id}
             )
 
-        update_box(box_id, calendar_id, data)
+        update_box(box_id, calendar_id, box)
 
-        t_1 = time.time()
         return success_response(
             message="boite de médicaments modifiée",
             code="MEDICINE_BOX_UPDATED",
             uid=uid,
             origin="UPDATE_MEDICINE_BOX",
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "box_id": box_id}
+            log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
     except Exception as e:
@@ -95,15 +85,17 @@ def handle_update_shared_box(calendar_id, box_id):
 
 # Route pour créer une boite de médicaments
 @api.route("/shared/users/calendars/<calendar_id>/boxes", methods=["POST"])
+@measure_time()
 @require_auth
+@verify_calendar_share
 def handle_create_shared_box(calendar_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
-        data = request.get_json()
+        payload = request.get_json(force=True)
+        box = payload.get("box")
 
-        if not data or not verify_calendar_share(calendar_id, uid):
+        if not box:
             return warning_response(
                 message="champs requis manquants",
                 code="MISSING_REQUIRED_FIELDS",
@@ -113,8 +105,7 @@ def handle_create_shared_box(calendar_id):
                 log_extra={"calendar_id": calendar_id}
             )
 
-        box_id = create_box(calendar_id, data)
-        t_1 = time.time()
+        box_id = create_box(calendar_id, box)
 
         return success_response(
             message="boite de médicaments créée",
@@ -122,7 +113,7 @@ def handle_create_shared_box(calendar_id):
             uid=uid,
             origin="CREATE_MEDICINE_BOX",
             data={"box_id": box_id},
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id}
+            log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
@@ -138,21 +129,21 @@ def handle_create_shared_box(calendar_id):
 
 # Route pour supprimer une boite de médicaments
 @api.route("/shared/users/calendars/<calendar_id>/boxes/<box_id>", methods=["DELETE"])
+@measure_time()
 @require_auth
+@verify_calendar_share
 def handle_delete_shared_box(calendar_id, box_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         delete_box(box_id, calendar_id)
-        t_1 = time.time()
 
         return success_response(
             message="boite de médicaments supprimée",
             code="MEDICINE_BOX_DELETED",
             uid=uid,
             origin="DELETE_MEDICINE_BOX",
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "box_id": box_id}
+            log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
     except Exception as e:
@@ -166,31 +157,23 @@ def handle_delete_shared_box(calendar_id, box_id):
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
-@api.route("/shared/users/calendars/<calendarId>/pilluliers/used", methods=["POST"])
+@api.route("/shared/users/calendars/<calendar_id>/pilluliers/used", methods=["POST"])
+@measure_time()
 @require_auth
-def handle_use_shared_users_pillulier(calendarId):
-    try:   
-        t_0 = time.time()
+@verify_calendar_share
+def handle_use_shared_users_pillulier(calendar_id):
+    try:
         uid = g.uid
 
-        start_date = request.args.get("startTime")
+        payload = request.get_json(force=True)
+        start_date = payload.get("startDate")
+
         if not start_date:
             start_date = datetime.now(timezone.utc).date()
         else:
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
-
-        if not verify_calendar_share(calendarId, uid):
-            return warning_response(
-                message="calendrier non trouvé",
-                code="SHARED_USER_CALENDAR_NOT_FOUND",
-                status_code=404,
-                uid=uid,
-                origin="SHARED_USER_USE_PILLULIER",
-                log_extra={"calendar_id": calendarId}
-            )
-        
-        result = use_pillulier(calendarId, start_date)
+        result = use_pillulier(calendar_id, start_date)
         if not result:
             return warning_response(
                 message="erreur lors de l'utilisation du pilulier",
@@ -198,17 +181,16 @@ def handle_use_shared_users_pillulier(calendarId):
                 status_code=500,
                 uid=uid,
                 origin="SHARED_USER_USE_PILLULIER",
-                log_extra={"calendar_id": calendarId}
+                log_extra={"calendar_id": calendar_id}
             )
-        t_1 = time.time()
         return success_response(
             message="pilulier utilisé avec succès",
             code="PILLULIER_USED",
             uid=uid,
             origin="SHARED_USER_USE_PILLULIER",
-            log_extra={"time": t_1 - t_0, "calendar_id": calendarId}
+            log_extra={"calendar_id": calendar_id}
         )
-    except Exception as e:  
+    except Exception as e:
         return error_response(
             message="erreur lors de l'utilisation du pilulier",
             code="USE_PILLULIER_ERROR",
@@ -216,27 +198,18 @@ def handle_use_shared_users_pillulier(calendarId):
             uid=uid,
             origin="SHARED_USER_USE_PILLULIER",
             error=str(e),
-            log_extra={"calendar_id": calendarId}
+            log_extra={"calendar_id": calendar_id}
         )
         
 
 @api.route("/shared/users/calendars/<calendar_id>/boxes/<box_id>/restock", methods=["POST"])
+@measure_time()
 @require_auth
+@verify_calendar_share
 def handle_shared_user_restock_box(calendar_id, box_id):
     try:
         uid = g.uid
-        t_0 = time.time()
 
-        if not verify_calendar_share(calendar_id, uid):
-            return warning_response(
-                message="calendrier non trouvé",
-                code="SHARED_USER_CALENDAR_NOT_FOUND",
-                status_code=404,
-                uid=uid,
-                origin="RESTOCK_MEDICINE_BOX",
-                log_extra={"calendar_id": calendar_id, "box_id": box_id}
-            )
-        
         if not restock_box(box_id, calendar_id):
             return warning_response(
                 message="boite de médicaments non trouvée",
@@ -246,14 +219,14 @@ def handle_shared_user_restock_box(calendar_id, box_id):
                 origin="RESTOCK_MEDICINE_BOX",
                 log_extra={"calendar_id": calendar_id, "box_id": box_id}
             )
-        t_1 = time.time()
+
         return success_response(
             message="boite de médicaments réapprovisionnée",
             code="MEDICINE_BOX_RESTOCKED",
             uid=uid,
             origin="RESTOCK_MEDICINE_BOX",
             data={"box_id": box_id},
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "box_id": box_id}
+            log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
     except Exception as e:
         return error_response(

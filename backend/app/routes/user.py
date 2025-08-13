@@ -3,11 +3,13 @@ from flask import request, g
 from app.utils.auth import require_auth
 from app.utils.responses import success_response, error_response
 from app.services.user import fetch_user, update_existing_user, insert_new_user
-import time
 from app.utils.upload import upload_logo
 from app.db.connection import get_connection
+from app.utils.measure import measure_time
+
 
 @api.route("/user/sync", methods=["GET"])
+@measure_time()
 @require_auth
 def get_user_info():
     uid = g.uid
@@ -41,12 +43,13 @@ def get_user_info():
     
 
 @api.route("/user/update", methods=["POST"])
+@measure_time()
 @require_auth
 def update_user_info():
     uid = g.uid
     try:
-        user_data = request.get_json()
-        if not user_data:
+        payload = request.get_json(force=True)
+        if not payload:
             return error_response(
                 message="aucune donnée reçue",
                 code="USER_UPDATE_ERROR",
@@ -55,11 +58,11 @@ def update_user_info():
                 origin="USER_UPDATE"
             )
 
-        display_name = user_data.get("display_name", None)
-        email = user_data.get("email", None)
-        photo_url = user_data.get("photo_url", None)
-        email_enabled = user_data.get("email_enabled", None)
-        push_enabled = user_data.get("push_enabled", None)
+        display_name = payload.get("display_name", None)
+        email = payload.get("email", None)
+        photo_url = payload.get("photo_url", None)
+        email_enabled = payload.get("email_enabled", None)
+        push_enabled = payload.get("push_enabled", None)
 
         user_db = fetch_user(uid)
 
@@ -88,11 +91,11 @@ def update_user_info():
 
 
 @api.route("/user/photo", methods=["POST"])
+@measure_time()
 @require_auth
 def handle_user_photo():
     uid = None
     try:
-        t_0 = time.time()
         uid = g.uid
 
         photo = request.files.get("photo")
@@ -119,7 +122,7 @@ def handle_user_photo():
             code="USER_PHOTO_SUCCESS",
             uid=uid,
             origin="USER_PHOTO",
-            data={"uid": uid, "photo_url": photo_url, "time": time.time() - t_0}
+            data={"uid": uid, "photo_url": photo_url}
         )
     except Exception as e:
         return error_response(

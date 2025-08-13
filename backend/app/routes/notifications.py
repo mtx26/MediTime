@@ -5,18 +5,15 @@ from app.services.user import fetch_user
 from app.services.calendar import fetch_medicine_name
 from app.db.connection import get_connection
 from flask import request, g
-import time
-from app.auth.fcm import send_fcm_notification
 from app.config import Config
-from urllib.parse import urljoin
-from app.services.notifications import notify_and_record
+from app.utils.measure import measure_time
 
 frontend_url = Config.FRONTEND_URL or ""
 
 
 DEFAULT_PHOTO = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg"
 
-def safely_get_calendar_name(calendar_id):
+def get_calendar_name(calendar_id):
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("SELECT * FROM calendars WHERE id = %s", (calendar_id,))
@@ -31,84 +28,56 @@ def get_user_info(uid):
     user = fetch_user(uid)
     return user.get("display_name"), user.get("email"), user.get("photo_url")
 
-# Route pour récupérer toutes les notifications
+# Route pour récupérer toutes les notifications (enrichies côté SQL)
 @api.route("/notifications", methods=["GET"])
+@measure_time()
 @require_auth
 def handle_notifications():
+    uid = g.uid
+    DEFAULT_PHOTO = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg"
+
+    sql = """
+    SELECT
+      n.id                                   AS notification_id,
+      n.type                                 AS notification_type,
+      n.read                                 AS read,
+      n.timestamp                            AS timestamp,
+
+      -- Champs tirés du JSONB "content"
+      (n.content->>'calendar_id')::uuid      AS calendar_id,
+      n.content->>'link'                     AS link,
+      n.content->>'medication_qty'           AS medication_qty,
+
+      -- Enrichissements par jointures
+      c.name                                 AS calendar_name,
+      u.display_name                         AS sender_name,
+      u.email                                AS sender_email,
+      COALESCE(u.photo_url, %s)              AS sender_photo_url,
+      mb.name                                AS medication_name
+
+    FROM notifications n
+    LEFT JOIN calendars      c  ON c.id  = NULLIF(n.content->>'calendar_id','')::uuid
+    LEFT JOIN users          u  ON u.id  = n.sender_uid
+    LEFT JOIN medicine_boxes mb ON mb.id = NULLIF(n.content->>'medication_id','')::uuid
+
+    WHERE n.user_id = %s
+      AND (n.content ? 'calendar_id')          -- même comportement que ton `if not calendar_id: continue`
+
+    ORDER BY n.timestamp DESC, n.created_at DESC;
+    """
+
     try:
-        t_0 = time.time()
-        uid = g.uid
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM notifications WHERE user_id = %s", (uid,))
-                notifications_data = cursor.fetchall()
+        with get_connection() as conn, conn.cursor() as cursor:
+            cursor.execute(sql, (DEFAULT_PHOTO, uid))
+            rows = cursor.fetchall()
 
-                if notifications_data is None:
-                    return success_response(
-                        message="aucune notification trouvée",
-                        code="NOTIFICATIONS_FETCH_SUCCESS",
-                        uid=uid,
-                        origin="NOTIFICATIONS_FETCH",
-                        data={"notifications": []}
-                    )
-
-                calendar_name_cache = {}
-                sender_info_cache = {}
-                medication_name_cache = {}
-                notifications = []
-                t_1 = time.time()
-
-                for notif in notifications_data:
-                    json_body = notif.get("content") or {}
-                    sender_uid = notif.get("sender_uid")
-                    calendar_id = json_body.get("calendar_id")
-                    link = json_body.get("link") if json_body.get("link") else None
-                    medication_id = json_body.get("medication_id") if json_body.get("medication_id") else None
-                    medication_qty = json_body.get("medication_qty") if json_body.get("medication_qty") else None
-
-                    if not calendar_id:
-                        continue
-
-                    if medication_id:
-                        if medication_id not in medication_name_cache:
-                            medication_name_cache[medication_id] = fetch_medicine_name(medication_id)
-                        medication_name = medication_name_cache[medication_id]
-                    else:
-                        medication_name = None
-
-                    # Cache calendar name
-                    if calendar_id not in calendar_name_cache:
-                        calendar_name_cache[calendar_id] = safely_get_calendar_name(calendar_id)
-                    calendar_name = calendar_name_cache[calendar_id]
-
-                    # Cache sender info
-                    if sender_uid not in sender_info_cache:
-                        sender_info_cache[sender_uid] = get_user_info(sender_uid)
-                    sender_name, sender_email, sender_photo_url = sender_info_cache[sender_uid]
-
-                    notifications.append({
-                        "notification_id": notif.get("id"),
-                        "notification_type": notif.get("type"),
-                        "read": notif.get("read"),
-                        "timestamp": notif.get("created_at"),
-                        "calendar_id": calendar_id,
-                        "calendar_name": calendar_name,
-                        "sender_name": sender_name,
-                        "sender_email": sender_email,
-                        "sender_photo_url": sender_photo_url or DEFAULT_PHOTO,
-                        "link" : link,
-                        "medication_name": medication_name,
-                        "medication_qty": medication_qty,
-                    })
-                t_2 = time.time()
-
+        # Pas d'appends: on renvoie les lignes enrichies directement
         return success_response(
             message="notifications récupérées",
             code="NOTIFICATIONS_FETCH_SUCCESS",
             uid=uid,
             origin="NOTIFICATIONS_FETCH",
-            data={"notifications": notifications},
-            log_extra={"time": t_2 - t_0, "time_append": t_2 - t_1}
+            data={"notifications": rows}
         )
 
     except Exception as e:
@@ -123,10 +92,10 @@ def handle_notifications():
 
 # Route pour marquer une notification comme lue
 @api.route("/notifications/<notification_id>", methods=["POST"])
+@measure_time()
 @require_auth
 def handle_read_notification(notification_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         with get_connection() as conn:
@@ -145,14 +114,13 @@ def handle_read_notification(notification_id):
 
                 cursor.execute("UPDATE notifications SET read = TRUE WHERE id = %s AND user_id = %s", (notification_id, uid))
                 conn.commit()
-                t_1 = time.time()
 
         return success_response(
             message="notification marquée comme lue", 
             code="NOTIFICATION_READ_SUCCESS", 
             uid=uid, 
             origin="NOTIFICATION_READ",
-            log_extra={"notification_id": notification_id, "time": t_1 - t_0}
+            log_extra={"notification_id": notification_id}
         )
 
     except Exception as e:
@@ -167,6 +135,7 @@ def handle_read_notification(notification_id):
 
 # Route pour enregistrer un token FCM
 @api.route("/notifications/register-token", methods=["POST"])
+@measure_time()
 @require_auth
 def register_token():
     data = request.json
@@ -207,85 +176,3 @@ def register_token():
             origin="FCM_REGISTER",
             error=str(e)
         )
-
-@api.route("/notifications/send", methods=["POST"])
-@require_auth
-def send_notification():
-    data = request.json
-    uid = g.uid
-    title = data.get("title") or ""
-    body = data.get("body") or ""
-    json_body = data.get("json_body") or {}
-    json_body["link"] = urljoin(frontend_url, "/notifications")
-
-    if not uid or not title or not body:
-        return error_response(
-            message="données manquantes", 
-            code="MISSING_DATA", 
-            status_code=400, 
-            origin="FCM_SEND"
-        )
-
-    try:
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("SELECT token FROM fcm_tokens WHERE uid = %s", (uid,))
-                results = cursor.fetchall()
-                if not results:
-                    return error_response(
-                        message="aucun token trouvé", 
-                        code="NO_TOKEN", 
-                        status_code=404, 
-                        uid=uid, 
-                        origin="FCM_SEND"
-                    )
-                tokens = [result.get("token") for result in results]
-                status_code, result_data = send_fcm_notification(tokens=tokens, title=title, body=body, json_body=json_body)
-
-
-        if status_code == 200:
-            return success_response(
-                message="notification envoyée", 
-                code="NOTIFICATION_SENT", 
-                uid=uid, 
-                origin="FCM_SEND",
-                log_extra={"response": result_data}
-            )
-        else:
-            return error_response(
-                message="erreur lors de l'envoi de la notification", 
-                code="FCM_V1_ERROR", 
-                status_code=status_code, 
-                uid=uid, 
-                origin="FCM_SEND",
-                error=result_data
-            )
-
-    except Exception as e:
-        return error_response(
-            message="erreur lors de l'envoi de la notification", 
-            code="SEND_ERROR", 
-            status_code=500, 
-            uid=uid, 
-            origin="FCM_SEND", 
-            error=str(e)
-        )
-
-#test notification
-@api.route("/notifications/test", methods=["POST"])
-def test_notification():
-    data = request.json
-    uid = data.get("uid")
-    json_body = {
-        "link": urljoin(frontend_url, "/notifications"),
-        "sender_uid": uid
-    }
-    notify_and_record(uid, json_body, "test")
-
-    return success_response(
-        message="notification envoyée", 
-        code="NOTIFICATION_SENT", 
-        uid=uid, 
-        origin="FCM_SEND",
-        log_extra={"response": "test"}
-    )

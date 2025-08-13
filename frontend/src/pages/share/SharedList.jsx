@@ -123,30 +123,50 @@ function SharedList({
     setSelectedModifyToken(null);
   };
 
-  const deleteUserConfirmAction = (calendarId, user) => {
+  const deleteLoginInvitationConfirmAction = (token) => {
     setAlertType("confirm-danger");
     setAlertMessage(t("delete_access_confirm"));
-    setAlertId(user.receiver_uid + "-" + calendarId);
-    setOnConfirmAction(() => () => handleDeleteUser(calendarId, user));
+    setAlertId(token);
+    setOnConfirmAction(() => () => handleDeleteLoginInvitation(token));
   };
 
   // 🔄 Suppression de l'utilisateur
-  const handleDeleteUser = async (calendarId, user) => {
-    const rep = await sharedUserCalendars.deleteSharedUser(
-      calendarId,
-      user.receiver_uid,
-    );
+  const handleDeleteLoginInvitation = async (token) => {
+    const rep = await sharedUserCalendars.deleteLoginInvitation(token);
     if (rep.success) {
       setAlertType("success");
       setAlertMessage("✅ " + rep.message);
-      setAlertId(user.receiver_uid + "-" + calendarId);
+      setAlertId(token);
       setTimeout(async () => {
         await setGroupedSharedFunction();
       }, 1000);
     } else {
       setAlertType("danger");
       setAlertMessage("❌ " + rep.error);
-      setAlertId(user.receiver_uid + "-" + calendarId);
+      setAlertId(token);
+    }
+  };
+
+  const deleteRegistrationInvitationConfirmAction = (token) => {
+    setAlertType("confirm-danger");
+    setAlertMessage(t("delete_link_confirm"));
+    setAlertId(token);
+    setOnConfirmAction(() => () => handledeleteRegistrationInvitation(token));
+  };
+
+  const handledeleteRegistrationInvitation = async (token) => {
+    const rep = await sharedUserCalendars.deleteRegistrationInvitation(token);
+    if (rep.success) {
+      setAlertType("success");
+      setAlertMessage("✅ " + rep.message);
+      setAlertId(token);
+      setTimeout(async () => {
+        await setGroupedSharedFunction();
+      }, 1000);
+    } else {
+      setAlertType("danger");
+      setAlertMessage("❌ " + rep.error);
+      setAlertId(token);
     }
   };
 
@@ -217,6 +237,10 @@ function SharedList({
     setGroupedSharedFunction,
   ]);
 
+  useEffect(() => {
+    console.log(groupedShared)
+  }, [groupedShared]);
+
   // 🔄 Initialisation des permissions et des dates d'expiration
   useEffect(() => {
     if (userInfo && personalCalendars.calendarsData) {
@@ -256,7 +280,7 @@ function SharedList({
 
   if (
     personalCalendars.calendarsData &&
-    personalCalendars.calendarsData.length === 0
+    personalCalendars.calendarsData?.length === 0
   ) {
     return (
       <div className="container mt-4 text-center">
@@ -273,7 +297,7 @@ function SharedList({
           className="d-flex flex-nowrap gap-2 p-1 overflow-auto"
           style={{ scrollBehavior: 'smooth' }}
         >
-          {personalCalendars.calendarsData.map((calendar) => (
+          {(personalCalendars?.calendarsData || []).map((calendar) => (
             <button
               key={calendar.id}
               className={`btn rounded-pill px-3 py-1 fw-semibold shadow-sm text-nowrap ${
@@ -319,7 +343,8 @@ function SharedList({
               setSelectedModifyToken={setSelectedModifyToken}
               tokenCalendars={tokenCalendars}
               handleSendInvitation={handleSendInvitation}
-              deleteUserConfirmAction={deleteUserConfirmAction}
+              deleteLoginInvitationConfirmAction={deleteLoginInvitationConfirmAction}
+              deleteRegistrationInvitationConfirmAction={deleteRegistrationInvitationConfirmAction}
               emailsToInvite={emailsToInvite}
               setEmailsToInvite={setEmailsToInvite}
               navigate={navigate}
@@ -394,13 +419,13 @@ function CalendarCard({
   handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions,
   handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today,
   VITE_URL, selectedModifyToken, setSelectedModifyToken, tokenCalendars,
-  handleSendInvitation, deleteUserConfirmAction, emailsToInvite,
-  setEmailsToInvite, navigate, personalCalendars,
+  handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction,
+  emailsToInvite, setEmailsToInvite, navigate, personalCalendars,
 }) {
   const { t } = useTranslation();
   const alertHandlers = { alertId, alertType, alertMessage, onConfirmAction, setAlertMessage, setOnConfirmAction, setAlertId };
   const tokenProps = { ...alertHandlers, setAlertType, handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions, handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyToken, setSelectedModifyToken, tokenCalendars };
-  const userProps = { ...alertHandlers, handleSendInvitation, deleteUserConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
+  const userProps = { ...alertHandlers, handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
   return (
     <div>
       <div className="card-body">
@@ -488,7 +513,6 @@ function TokenList({
                       </>
                     ),
                     onClick: () => {
-                      console.log("Regenerate link for calendar:", calendarId);
                       setAlertType("confirm-danger");
                       setAlertMessage(t("regenerate_link_confirm"));
                       setAlertId(token.id);
@@ -703,7 +727,8 @@ function UserList({
   setOnConfirmAction,
   setAlertId,
   handleSendInvitation,
-  deleteUserConfirmAction,
+  deleteLoginInvitationConfirmAction,
+  deleteRegistrationInvitationConfirmAction,
   data,
   calendarId,
   emailsToInvite,
@@ -717,9 +742,10 @@ function UserList({
           <i className="bi bi-person"></i>
           {t("shared_users")}:
         </h5>
+        {/* Liste des utilisateurs partagés */}
         {(data.users || []).map((user) => (
-          <div key={user.receiver_uid + "-" + calendarId}>
-            {alertId === user.receiver_uid + "-" + calendarId && (
+          <li className="list-group-item" key={user.token}>
+            {alertId === user.token && (
               <AlertSystem
                 type={alertType}
                 message={alertMessage}
@@ -733,69 +759,135 @@ function UserList({
                 }}
               />
             )}
+            <div className="row align-items-center col-md-12 d-flex">
+              <div className="col-8 d-flex align-items-center gap-2 p-0">
+                <HoveredUserProfile
+                  user={{
+                    photo_url: user.receiver_photo_url,
+                    display_name: user.receiver_name,
+                    email: user.receiver_email,
+                  }}
+                  trigger={
+                    <div className="d-flex align-items-center gap-2">
+                      <div>
+                        <img
+                          src={user.receiver_photo_url}
+                          alt={t("profile")}
+                          className="rounded-circle"
+                          style={{ width: "40px", height: "40px" }}
+                        />
+                      </div>
+
+                      <div>
+                        <strong>{user.receiver_name}</strong>
+                      </div>
+                    </div>
+                  }
+                />
+              </div>
+
+              {/* Statut */}
+              <div className="col-2 d-flex align-items-center justify-content-center">
+                <span
+                  className={`badge rounded-pill ${user.accepted ? "bg-success" : "bg-warning text-dark"}`}
+                >
+                  {user.accepted ? t("accepted") : t("pending")}
+                </span>
+              </div>
+
+              {/* Supprimer */}
+              <div className="col-2 justify-content-end d-flex p-0">
+                <ActionSheet
+                  actions={[
+                    {
+                      label: (
+                        <>
+                          <i className="bi bi-trash"></i> {t('delete')}
+                        </>
+                      ),
+                      onClick: () => deleteLoginInvitationConfirmAction(user.token),
+                      danger: true,
+                    },
+                  ]}
+                  buttonSize="sm"
+                />
+              </div>
+            </div>
+          </li>
+        ))}
+        {/* Liste des utilisateurs invités */}
+        {(data.invitation || []).map((invitation) => {
+
+          const displayName = invitation.invited_email || t("unknown_user");
+
+          const avatarUrl =
+            invitation.receiver_photo_url ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`;
+
+
+          return (
             <li
-              key={user.receiver_uid + "-" + calendarId}
               className="list-group-item"
+              key={invitation.token}
             >
-              <div className="row align-items-center">
-                <div className="col-md-12 d-flex align-items-center">
-                  <div className="col-6">
-                    <HoveredUserProfile
-                      user={{
-                        photo_url: user.receiver_photo_url,
-                        display_name: user.receiver_name,
-                        email: user.receiver_email,
-                      }}
-                      trigger={
-                        <div className="d-flex align-items-center gap-2">
-                          <div>
-                            <img
-                              src={user.receiver_photo_url}
-                              alt={t("profile")}
-                              className="rounded-circle"
-                              style={{ width: "40px", height: "40px" }}
-                            />
-                          </div>
-
-                          <div>
-                            <strong>{user.receiver_name}</strong>
-                          </div>
-                        </div>
-                      }
-                    />
+              {alertId === invitation.token && (
+                <AlertSystem
+                  type={alertType}
+                  message={alertMessage}
+                  onClose={() => {
+                    setAlertMessage("");
+                    setOnConfirmAction(null);
+                    setAlertId(null);
+                  }}
+                  onConfirm={() => {
+                    if (onConfirmAction) onConfirmAction();
+                  }}
+                />
+              )}
+              <div className="row align-items-center col-md-12 d-flex">
+                {/* Colonne gauche : image + infos */}
+                <div className="col-8 d-flex align-items-center gap-2 p-0">
+                  <img
+                    src={avatarUrl}
+                    alt={t("profile")}
+                    className="rounded-circle"
+                    style={{ width: "40px", height: "40px" }}
+                  />
+                  <div>
+                    <strong>{displayName}</strong>
                   </div>
+                </div>
 
-                  {/* Statut */}
-                  <div className="col-4 d-flex align-items-center justify-content-center">
-                    <span
-                      className={`badge rounded-pill ${user.accepted ? "bg-success" : "bg-warning text-dark"}`}
-                    >
-                      {user.accepted ? t("accepted") : t("pending")}
-                    </span>
-                  </div>
+                {/* Colonne statut */}
+                <div className="col-2 d-flex align-items-center justify-content-center">
+                  <span className={`badge rounded-pill bg-warning text-dark`}>
+                    {t("pending")}
+                  </span>
+                </div>
 
-                  {/* Supprimer */}
-                  <div className="col-2 justify-content-end d-flex">
-                    <ActionSheet
-                      actions={[
-                        {
-                          label: (
-                            <>
-                              <i className="bi bi-trash"></i> {t('delete')}
-                            </>
-                          ),
-                          onClick: () => deleteUserConfirmAction(calendarId, user),
-                          danger: true,
-                        },
-                      ]}
-                      buttonSize="sm"
-                    />
-                  </div>
+                {/* Colonne actions */}
+                <div className="col-2 d-flex justify-content-end p-0">
+                  <ActionSheet
+                    actions={[
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-trash"></i> {t("delete")}
+                          </>
+                        ),
+                        onClick: () => deleteRegistrationInvitationConfirmAction(invitation.token),
+                        danger: true,
+                      },
+                    ]}
+                    buttonSize="sm"
+                  />
                 </div>
               </div>
             </li>
-          </div>
-        ))}
+          );
+        })}
+
+
 
         {/* Ajouter un utilisateur */}
         <div>
@@ -882,7 +974,7 @@ SharedList.propTypes = {
   }).isRequired,
   sharedUserCalendars: PropTypes.shape({
     fetchSharedUsers: PropTypes.func.isRequired,
-    deleteSharedUser: PropTypes.func.isRequired,
+    deleteLoginInvitation: PropTypes.func.isRequired,
     sendInvitation: PropTypes.func.isRequired,
   }).isRequired,
 };
@@ -914,7 +1006,7 @@ CalendarCard.propTypes = {
   setSelectedModifyToken: PropTypes.func.isRequired,
   tokenCalendars: PropTypes.object.isRequired,
   handleSendInvitation: PropTypes.func.isRequired,
-  deleteUserConfirmAction: PropTypes.func.isRequired,
+  deleteLoginInvitationConfirmAction: PropTypes.func.isRequired,
   emailsToInvite: PropTypes.object.isRequired,
   setEmailsToInvite: PropTypes.func.isRequired,
   navigate: PropTypes.func.isRequired,
@@ -965,7 +1057,7 @@ UserList.propTypes = {
   setOnConfirmAction: PropTypes.func.isRequired,
   setAlertId: PropTypes.func.isRequired,
   handleSendInvitation: PropTypes.func.isRequired,
-  deleteUserConfirmAction: PropTypes.func.isRequired,
+  deleteLoginInvitationConfirmAction: PropTypes.func.isRequired,
   data: PropTypes.shape({
     users: PropTypes.arrayOf(
       PropTypes.shape({
