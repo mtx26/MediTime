@@ -181,66 +181,98 @@ def handle_rename_calendar(calendar_id):
     try:
         uid = g.uid
         payload = request.get_json(force=True)
-
         new_calendar_name = payload.get("newCalendarName")
 
         if not new_calendar_name:
             return warning_response(
                 message="nom de calendrier manquant",
-                code="CALENDAR_RENAME_ERROR", 
-                status_code=400, 
-                uid=uid, 
-                origin="CALENDAR_RENAME", 
+                code="CALENDAR_RENAME_ERROR",
+                status_code=400,
+                uid=uid,
+                origin="CALENDAR_RENAME",
                 log_extra={"calendar_id": calendar_id, "new_calendar_name": new_calendar_name}
             )
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT name FROM calendars WHERE id = %s", (calendar_id,))
-                result = cursor.fetchone()
-
-                if result is None:
-                    return warning_response(
-                        message=ERROR_CALENDAR_NOT_FOUND, 
-                        code="CALENDAR_RENAME_ERROR", 
-                        status_code=404, 
-                        uid=uid, 
-                        origin="CALENDAR_RENAME", 
-                        log_extra={"calendar_id": calendar_id, "new_calendar_name": new_calendar_name})
-
-                old_name = result['name']
-
-                if new_calendar_name == old_name:
-                    return warning_response(
-                        message="le nom de calendrier est déjà le même", 
-                        code="CALENDAR_RENAME_ERROR", 
-                        status_code=400, 
-                        uid=uid, 
-                        origin="CALENDAR_RENAME", 
-                        log_extra={"calendar_id": calendar_id, "old_calendar_name": old_name, "new_calendar_name": new_calendar_name}
-                    )
                 cursor.execute(
-                    "UPDATE calendars SET name = %s WHERE id = %s",
-                    (new_calendar_name, calendar_id)
+                    """
+                    WITH old AS (
+                      SELECT id, name FROM calendars WHERE id = %s
+                    ),
+                    flags AS (
+                      SELECT
+                        EXISTS (SELECT 1 FROM old) AS exists,
+                        EXISTS (SELECT 1 FROM old WHERE name IS NOT DISTINCT FROM %s) AS same
+                    ),
+                    upd AS (
+                      UPDATE calendars c
+                      SET name = %s
+                      FROM old
+                      WHERE c.id = old.id AND old.name IS DISTINCT FROM %s
+                      RETURNING old.name AS old_name, c.name AS new_name, c.id AS calendar_id
+                    )
+                    SELECT
+                      (SELECT exists FROM flags) AS exists,
+                      (SELECT same FROM flags) AS same,
+                      (SELECT old_name FROM upd) AS old_name,
+                      (SELECT new_name FROM upd) AS new_name,
+                      (SELECT calendar_id FROM upd) AS calendar_id;
+                    """,
+                    (calendar_id, new_calendar_name, new_calendar_name, new_calendar_name)
                 )
-                conn.commit()
+                row = cursor.fetchone()
 
+            conn.commit()
+
+        # Cas: calendrier inexistant
+        if not row or not row.get("exists"):
+            return warning_response(
+                message=ERROR_CALENDAR_NOT_FOUND,
+                code="CALENDAR_RENAME_ERROR",
+                status_code=404,
+                uid=uid,
+                origin="CALENDAR_RENAME",
+                log_extra={"calendar_id": calendar_id, "new_calendar_name": new_calendar_name}
+            )
+
+        # Cas: même nom qu'avant
+        if row.get("same"):
+            return warning_response(
+                message="le nom de calendrier est déjà le même",
+                code="CALENDAR_RENAME_ERROR",
+                status_code=400,
+                uid=uid,
+                origin="CALENDAR_RENAME",
+                log_extra={
+                    "calendar_id": calendar_id,
+                    "old_calendar_name": row.get("old_name"),
+                    "new_calendar_name": new_calendar_name
+                }
+            )
+
+        # Succès
         return success_response(
-            message="calendrier renommé", 
-            code="CALENDAR_RENAME_SUCCESS", 
-            uid=uid, 
-            origin="CALENDAR_RENAME", 
-            log_extra={"calendar_id": calendar_id, "old_calendar_name": old_name, "new_calendar_name": new_calendar_name}
+            message="calendrier renommé",
+            code="CALENDAR_RENAME_SUCCESS",
+            uid=uid,
+            origin="CALENDAR_RENAME",
+            log_extra={
+                "calendar_id": row.get("calendar_id") or calendar_id,
+                "old_calendar_name": row.get("old_name"),
+                "new_calendar_name": row.get("new_name") or new_calendar_name
+            }
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la renommation du calendrier", 
-            code="CALENDAR_RENAME_ERROR", 
-            status_code=500, 
-            uid=uid, 
-            origin="CALENDAR_RENAME", 
-            error=str(e))
+            message="erreur lors de la renommation du calendrier",
+            code="CALENDAR_RENAME_ERROR",
+            status_code=500,
+            uid=uid,
+            origin="CALENDAR_RENAME",
+            error=str(e)
+        )
   
 
 # Route pour générer le calendrier 
