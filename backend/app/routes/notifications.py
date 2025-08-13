@@ -100,8 +100,14 @@ def handle_read_notification(notification_id):
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM notifications WHERE id = %s AND user_id = %s", (notification_id, uid))
+                cursor.execute("""
+                    UPDATE notifications
+                    SET read = TRUE
+                    WHERE id = %s AND user_id = %s
+                    RETURNING id    
+                """, (notification_id, uid))
                 notif = cursor.fetchone()
+
                 if not notif:
                     return warning_response(
                         message="notification non trouvée", 
@@ -112,8 +118,7 @@ def handle_read_notification(notification_id):
                         log_extra={"notification_id": notification_id}
                     )
 
-                cursor.execute("UPDATE notifications SET read = TRUE WHERE id = %s AND user_id = %s", (notification_id, uid))
-                conn.commit()
+            conn.commit()
 
         return success_response(
             message="notification marquée comme lue", 
@@ -132,6 +137,7 @@ def handle_read_notification(notification_id):
             origin="NOTIFICATION_READ",
             error=str(e)
         )
+
 
 # Route pour enregistrer un token FCM
 @api.route("/notifications/register-token", methods=["POST"])
