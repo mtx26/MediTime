@@ -4,25 +4,36 @@ def get_boxes(calendar_id):
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
-            SELECT mb.id, mb.name, mb.box_capacity, mb.stock_quantity, mb.stock_alert_threshold, mb.calendar_id, c.name AS calendar_name, mb.dose
-            FROM medicine_boxes mb
-            LEFT JOIN calendars c ON mb.calendar_id = c.id
-            WHERE c.id = %s
+                SELECT
+                  mb.id,
+                  mb.name,
+                  mb.box_capacity,
+                  mb.stock_quantity,
+                  mb.stock_alert_threshold,
+                  mb.calendar_id,
+                  c.name AS calendar_name,
+                  mb.dose,
+                  /* conditions: EXACTEMENT la liste des lignes de medicine_box_conditions */
+                  COALESCE((
+                    SELECT jsonb_agg(to_jsonb(mbc) ORDER BY mbc.created_at)
+                    FROM medicine_box_conditions mbc
+                    WHERE mbc.box_id = mb.id
+                  ), '[]'::jsonb) AS conditions,
+                  /* url_notice_fr liée au nom de la boîte (équivalent à ILIKE sans wildcard) */
+                  (
+                    SELECT maf."url_notice_fr"
+                    FROM medicaments_afmps maf
+                    WHERE maf."name" ILIKE mb.name
+                    LIMIT 1
+                  ) AS url_notice_fr
+                FROM medicine_boxes mb
+                JOIN calendars c ON c.id = mb.calendar_id
+                WHERE mb.calendar_id = %s
+                ORDER BY mb.created_at;
             """, (calendar_id,))
             boxes = cursor.fetchall()
-            for box in boxes:
-                cursor.execute("SELECT * FROM medicine_box_conditions WHERE box_id = %s", (box.get("id"),))
-                conditions = cursor.fetchall()
-                box["conditions"] = conditions
-                cursor.execute("SELECT url_notice_fr FROM medicaments_afmps WHERE name ilike %s", (box.get("name"),))
-                url_notice_fr = cursor.fetchone()
-                if url_notice_fr:
-                    box["url_notice_fr"] = url_notice_fr.get("url_notice_fr")
-                else:
-                    box["url_notice_fr"] = None
-    if not boxes:
-        return []
-    return boxes
+
+    return boxes or []
 
 def update_box(box_id, calendar_id, box):
     name = box.get("name")
