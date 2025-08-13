@@ -116,6 +116,7 @@ export const useRealtimeCalendars = (setCalendarsData, setLoadingStates) => {
       {
         channelName: 'calendars-realtime',
         table: 'calendars',
+        event: '*',
         filter: `owner_uid=eq.${uid}`,
       },
       {

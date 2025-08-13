@@ -10,31 +10,42 @@ def _verify_calendar_share(calendar_id: str, receiver_uid: str) -> bool:
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM calendars WHERE id = %s", (calendar_id,))
-                calendar = cursor.fetchone()
-                if not calendar:
+                cursor.execute("""
+                    SELECT
+                        EXISTS (SELECT 1 FROM calendars WHERE id = %s) AS calendar_exists,
+                        EXISTS (
+                            SELECT 1
+                            FROM shared_calendars
+                            WHERE calendar_id = %s AND receiver_uid = %s
+                        ) AS share_exists
+                """, (calendar_id, calendar_id, receiver_uid))
+
+                row = cursor.fetchone()
+
+                # Calendrier inexistant
+                if not row or not row.get("calendar_exists"):
                     return False
-                
-                cursor.execute("SELECT * FROM shared_calendars WHERE calendar_id = %s AND receiver_uid = %s", (calendar_id, receiver_uid,))
-                shared_calendar = cursor.fetchone()
-                if not shared_calendar:
+
+                # Partage absent pour ce receiver
+                if not row.get("share_exists"):
                     logger.warning("accès refusé", {
                         "origin": "SHARED_VERIFY",
                         "uid": receiver_uid,
                         "calendar_id": calendar_id,
                     })
                     return False
-                
+
                 return True
 
     except Exception as e:
         logger.error("erreur lors de la vérification de l'accès au calendrier partagé", {
             "origin": "SHARED_VERIFY_ERROR",
             "uid": receiver_uid,
-            "calendar_id": calendar_id, 
+            "calendar_id": calendar_id,
             "error": str(e)
         })
         return False
+    
 
 def _verify_calendar(calendar_id: str, uid: str) -> bool:
     try:
