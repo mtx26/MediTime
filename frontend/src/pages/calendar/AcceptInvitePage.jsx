@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
-import { set } from 'lodash';
 
 function AcceptInvitePage({sharedUserCalendars}) {
   const { t } = useTranslation();

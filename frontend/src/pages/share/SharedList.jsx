@@ -166,7 +166,7 @@ function SharedList({
     } else {
       setAlertType("danger");
       setAlertMessage("❌ " + rep.error);
-      setAlertId(receiverEmail + "-" + calendarId);
+      setAlertId(token);
     }
   };
 

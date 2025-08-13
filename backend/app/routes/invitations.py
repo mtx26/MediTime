@@ -2,42 +2,113 @@ from flask import request, g
 from app.utils.responses import success_response, error_response, warning_response
 from app.utils.auth import require_auth
 from app.db.connection import get_connection
-from app.services.calendar import verify_calendar, verify_login_invitation_owner, verify_registration_invitation_owner, verify_login_invitation_receiver
+from app.services.calendar import (
+    verify_calendar,
+    verify_login_invitation_owner,
+    verify_registration_invitation_owner,
+    verify_login_invitation_receiver,
+)
 from app.services.notifications import notify_and_record
 from . import api
-from app.config import Config
 from app.services.notifications import email_address_direct
 from app.utils.measure import measure_time
 import json
 
 
-# Route pour envoyer une invitation à un utilisateur pour un partage de calendrier
+# ---------------------------
+# Helpers communs (DB & notifs)
+# ---------------------------
+
+def _get_user_by_email(cursor, email: str):
+    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+    return cursor.fetchone()
+
+
+def _insert_registration_invitation(cursor, calendar_id: str, email: str):
+    cursor.execute(
+        """
+        INSERT INTO invitations (calendar_id, invited_email)
+        VALUES (%s, %s)
+        RETURNING token
+        """,
+        (calendar_id, email),
+    )
+    row = cursor.fetchone()
+    return row.get("token") if row else None
+
+
+def _create_shared_calendar_invite(cursor, receiver_uid: str, calendar_id: str):
+    cursor.execute(
+        """
+        INSERT INTO shared_calendars (receiver_uid, calendar_id, accepted, access)
+        VALUES (%s, %s, %s, %s)
+        RETURNING token, id
+        """,
+        (receiver_uid, calendar_id, False, "edit"),
+    )
+    row = cursor.fetchone()
+    return (row.get("token"), row.get("id")) if row else (None, None)
+
+
+def _delete_shared_calendar_by_token(cursor, token: str) -> bool:
+    cursor.execute(
+        "DELETE FROM shared_calendars WHERE token = %s RETURNING 1",
+        (token,),
+    )
+    return cursor.fetchone() is not None
+
+
+def _delete_invitation_returning_calendar_owner(cursor, token: str):
+    cursor.execute(
+        """
+        DELETE FROM invitations i
+        USING calendars c
+        WHERE i.calendar_id = c.id
+          AND i.token = %s
+        RETURNING i.calendar_id, c.owner_uid
+        """,
+        (token,),
+    )
+    row = cursor.fetchone()
+    if not row:
+        return (None, None)
+    return (row.get("calendar_id"), row.get("owner_uid"))
+
+
+def _delete_invite_notification(cursor, receiver_uid: str, calendar_id: str, owner_uid: str):
+    # On supprime la notif d’invitation liée à ce calendrier (contenu contient au moins calendar_id)
+    cursor.execute(
+        """
+        DELETE FROM notifications
+        WHERE user_id = %s
+          AND type = %s
+          AND content @> %s::jsonb
+          AND sender_uid = %s
+        """,
+        (receiver_uid, "calendar_invitation", json.dumps({"calendar_id": calendar_id}), owner_uid),
+    )
+
+
+# ---------------------------------------------
+# Route : envoyer une invitation pour un partage
+# ---------------------------------------------
 @api.route("/invitations/<calendar_id>", methods=["POST"])
 @measure_time()
 @require_auth
 @verify_calendar
 def handle_send_invitation(calendar_id):
+    owner_uid = g.uid  # défini avant try pour except éventuel
     try:
-        owner_uid = g.uid
         payload = request.get_json(force=True)
-
         receiver_email = payload.get("email")
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM users WHERE email = %s", (receiver_email,))
-                receiver_user = cursor.fetchone()
+                receiver_user = _get_user_by_email(cursor, receiver_email)
 
+                # Pas d'utilisateur : invitation par email (registration flow)
                 if not receiver_user:
-                    cursor.execute("""
-                        INSERT INTO invitations (calendar_id, invited_email)
-                        VALUES (%s, %s)
-                        RETURNING token
-                    """, (calendar_id, receiver_email))
-                    token_raw = cursor.fetchone()
-                    print(token_raw)
-                    token = token_raw.get("token")
-
+                    token = _insert_registration_invitation(cursor, calendar_id, receiver_email)
                     link = f"/accept-invite?token={token}&type=registration"
 
                     email_address_direct(
@@ -47,7 +118,7 @@ def handle_send_invitation(calendar_id):
                             "link": link,
                             "sender_uid": owner_uid,
                             "calendar_id": calendar_id,
-                        }
+                        },
                     )
 
                     return success_response(
@@ -55,114 +126,109 @@ def handle_send_invitation(calendar_id):
                         code="INVITATION_SEND_SUCCESS",
                         uid=owner_uid,
                         origin="INVITATION_SEND",
-                        log_extra={"calendar_id": calendar_id}
+                        log_extra={"calendar_id": calendar_id},
                     )
 
+                # Utilisateur existant : flow login (shared_calendars + notif)
                 receiver_uid = receiver_user.get("id")
 
-        # Verif si soit même
+        # Invitation à soi-même
         if owner_uid == receiver_uid:
             return warning_response(
-                message="invitation à soi-même", 
-                code="SELF_INVITATION_ERROR", 
-                status_code=400, 
-                uid=owner_uid, 
+                message="invitation à soi-même",
+                code="SELF_INVITATION_ERROR",
+                status_code=400,
+                uid=owner_uid,
                 origin="INVITATION_SEND",
-                log_extra={"calendar_id": calendar_id}
+                log_extra={"calendar_id": calendar_id},
             )
 
         with get_connection() as conn:
-            with conn.cursor() as cursor:  
-                # Vérifier si l'utilisateur a déjà été invité
-                cursor.execute("""
-                    SELECT * 
-                    FROM shared_calendars 
+            with conn.cursor() as cursor:
+                # Déjà invité ?
+                cursor.execute(
+                    """
+                    SELECT 1
+                    FROM shared_calendars
                     WHERE receiver_uid = %s AND calendar_id = %s
-                """, (receiver_uid, calendar_id))
-
-                shared_calendar = cursor.fetchone()
-
-                if shared_calendar:
+                    """,
+                    (receiver_uid, calendar_id),
+                )
+                if cursor.fetchone():
                     return warning_response(
                         message="utilisateur déjà invité",
                         code="ALREADY_INVITED",
                         status_code=400,
                         uid=owner_uid,
                         origin="INVITATION_SEND",
-                        log_extra={"calendar_id": calendar_id}
+                        log_extra={"calendar_id": calendar_id},
                     )
-                
-                # Sauvegarder l'invitation dans la collection "shared_calendars" dans le calendrier de l'utilisateur owner
-                cursor.execute(
-                    """
-                    INSERT INTO shared_calendars (receiver_uid, calendar_id, accepted, access)
-                    VALUES (%s, %s, %s, %s)
-                    RETURNING token, id
-                    """,
-                    (receiver_uid, calendar_id, False, "edit")
-                )
-                raw = cursor.fetchone()
-                token = raw.get("token")
-                shared_calendar_id = raw.get("id")
+
+                # Créer l'invitation (shared_calendars)
+                token, shared_calendar_id = _create_shared_calendar_invite(cursor, receiver_uid, calendar_id)
                 conn.commit()
-                print(token, shared_calendar_id)
 
-                link = f"/accept-invite?token={token}&type=login"
+        link = f"/accept-invite?token={token}&type=login"
 
-                # Créer une notif pour l'utilisateur receveur
-                notify_and_record(
-                    user_id=receiver_uid,
-                    body_or_list={
-                        "calendar_id": calendar_id,
-                        "link": link,
-                        "sender_uid": owner_uid,
-                        "shared_calendar_id": shared_calendar_id
-                    },
-                    notification_type="calendar_invitation",
-                )
+        # Notifier le receveur
+        notify_and_record(
+            user_id=receiver_uid,
+            body_or_list={
+                "calendar_id": calendar_id,
+                "link": link,
+                "sender_uid": owner_uid,
+                "shared_calendar_id": shared_calendar_id,
+            },
+            notification_type="calendar_invitation",
+        )
 
         return success_response(
-            message="invitation envoyée", 
-            code="INVITATION_SEND_SUCCESS", 
-            uid=owner_uid, 
+            message="invitation envoyée",
+            code="INVITATION_SEND_SUCCESS",
+            uid=owner_uid,
             origin="INVITATION_SEND",
-            log_extra={"calendar_id": calendar_id}
+            log_extra={"calendar_id": calendar_id},
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de l'envoi de l'invitation", 
-            code="INVITATION_SEND_ERROR", 
-            status_code=500, 
-            uid=owner_uid, 
+            message="erreur lors de l'envoi de l'invitation",
+            code="INVITATION_SEND_ERROR",
+            status_code=500,
+            uid=owner_uid,
             origin="INVITATION_SEND",
             error=str(e),
-            log_extra={"calendar_id": calendar_id}
+            log_extra={"calendar_id": calendar_id},
         )
 
-# Recupe pour une login
+
+# --------------------------------
+# Récupération d'une login-invite
+# --------------------------------
 @api.route("/invitations/login/<token>", methods=["GET"])
 @measure_time()
 @require_auth
 def handle_login_invitation(token):
+    uid = g.uid
     try:
-        uid = g.uid
-
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT sc.*,
-                        u.email AS owner_email,
-                        u.photo_url AS owner_photo_url,
-                        u.display_name AS owner_display_name,
-                        c.name  AS calendar_name
+                           u.email        AS owner_email,
+                           u.photo_url    AS owner_photo_url,
+                           u.display_name AS owner_display_name,
+                           c.name         AS calendar_name
                     FROM shared_calendars sc
                     JOIN calendars c ON sc.calendar_id = c.id
                     JOIN users u     ON c.owner_uid = u.id
                     WHERE sc.token = %s
-                    AND sc.receiver_uid = %s
-                    AND sc.accepted = FALSE
-                """, (token, uid))
+                      AND sc.receiver_uid = %s
+                      AND sc.accepted = FALSE
+                    """,
+                    (token, uid),
+                )
                 invitation = cursor.fetchone()
 
                 if not invitation:
@@ -171,16 +237,16 @@ def handle_login_invitation(token):
                         code="INVITATION_LOGIN_NOT_FOUND",
                         uid=uid,
                         status_code=404,
-                        origin="INVITATION_LOGIN"
+                        origin="INVITATION_LOGIN",
                     )
 
                 return success_response(
-                    message="invitation acceptée",
-                    code="INVITATION_LOGIN_ACCEPTED",
+                    message="invitation trouvée",
+                    code="INVITATION_LOGIN_FOUND",
                     uid=uid,
                     origin="INVITATION_LOGIN",
-                    data={ "invitation": invitation },
-                    log_extra={"token": token}
+                    data={"invitation": invitation},
+                    log_extra={"token": token},
                 )
 
     except Exception as e:
@@ -190,209 +256,214 @@ def handle_login_invitation(token):
             status_code=500,
             uid=uid,
             origin="INVITATION_LOGIN",
-            log_extra={"error": str(e)}
+            log_extra={"error": str(e)},
         )
 
 
-# Route pour supprimer un utilisateur partagé pour le owner
+# --------------------------------------------------------
+# Suppression d'un utilisateur partagé (par le propriétaire)
+# --------------------------------------------------------
 @api.route("/invitations/login/<token>", methods=["DELETE"])
 @measure_time()
 @require_auth
 @verify_login_invitation_owner
 def delete_login_invitation(token):
+    owner_uid = g.uid if hasattr(g, "uid") else None
+    calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
+    receiver_uid = g.receiver_uid if hasattr(g, "receiver_uid") else None
     try:
-        owner_uid = g.uid
-        calendar_id = g.calendar_id
-        receiver_uid = g.receiver_uid
-
         with get_connection() as conn:
             with conn.cursor() as cursor:
-
-                cursor.execute("DELETE FROM shared_calendars WHERE token = %s", (token,))
-                row = cursor.rowcount
-                if row == 0:
+                deleted = _delete_shared_calendar_by_token(cursor, token)
+                if not deleted:
                     return warning_response(
                         message="calendrier non trouvé",
                         code="SHARED_USERS_DELETE_ERROR",
                         status_code=404,
                         uid=owner_uid,
                         origin="SHARED_USERS_DELETE",
-                        log_extra={"token": token}
+                        log_extra={"token": token},
                     )
 
-                cursor.execute(
-                    "DELETE FROM notifications WHERE user_id = %s AND type = %s AND content = %s::jsonb AND sender_uid = %s",
-                    (
-                        receiver_uid,
-                        "calendar_invitation",
-                        json.dumps({"calendar_id": calendar_id}),
-                        owner_uid
-                    )
-                )       
-                link = f"/calendar/{calendar_id}"
+                # Supprimer la notif d'invitation côté receveur
+                _delete_invite_notification(cursor, receiver_uid, calendar_id, owner_uid)
+                conn.commit()
 
-                notify_and_record(
-                    user_id=receiver_uid,
-                    body_or_list={
-                        "link": link,
-                        "calendar_id": calendar_id,
-                        "sender_uid": owner_uid
-                    },
-                    notification_type="calendar_shared_deleted_by_owner",
-                )
+        # Notifier le receveur que le partage a été retiré
+        link = f"/calendar/{calendar_id}"
+        notify_and_record(
+            user_id=receiver_uid,
+            body_or_list={
+                "link": link,
+                "calendar_id": calendar_id,
+                "sender_uid": owner_uid,
+            },
+            notification_type="calendar_shared_deleted_by_owner",
+        )
 
         return success_response(
-            message="utilisateur partagé supprimé", 
-            code="SHARED_USERS_DELETE_SUCCESS", 
-            uid=receiver_uid, 
+            message="utilisateur partagé supprimé",
+            code="SHARED_USERS_DELETE_SUCCESS",
+            uid=receiver_uid,
             origin="SHARED_USERS_DELETE",
-            log_extra={"calendar_id": calendar_id}
+            log_extra={"calendar_id": calendar_id},
         )
 
     except Exception as e:
         return error_response(
             message="erreur lors de la suppression de l'utilisateur partagé",
-            code="SHARED_USERS_DELETE_ERROR", 
-            status_code=500, 
-            uid=receiver_uid, 
+            code="SHARED_USERS_DELETE_ERROR",
+            status_code=500,
+            uid=owner_uid,
             origin="SHARED_USERS_DELETE",
             error=str(e),
-            log_extra={"calendar_id": calendar_id}
+            log_extra={"calendar_id": calendar_id},
         )
 
 
-# Route pour accepter une invitation pour un partage de calendrier
+# ---------------------------------------------
+# Acceptation d'une login-invite (par le receveur)
+# ---------------------------------------------
 @api.route("/invitations/login/accept/<token>", methods=["POST"])
 @measure_time()
 @require_auth
 @verify_login_invitation_receiver
 def handle_accept_login_invitation(token):
+    uid = g.uid if hasattr(g, "uid") else None
+    calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
+    owner_uid = g.owner_uid if hasattr(g, "owner_uid") else None
     try:
-        uid = g.uid
-        calendar_id = g.calendar_id
-        owner_uid = g.owner_uid
-
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     UPDATE shared_calendars
                     SET accepted = TRUE,
                         accepted_at = NOW()
                     WHERE token = %s
-                    AND receiver_uid = %s
-                    AND accepted = FALSE
-                """, (token, uid))
-
-
-                link = f"/shared-calendars?calendar={calendar_id}"
-
-                # Créer une notif pour l'utilisateur expéditeur
-                notify_and_record(
-                    user_id=owner_uid,
-                    body_or_list={
-                        "link": link,
-                        "calendar_id": calendar_id,
-                        "sender_uid": uid
-                    },
-                    notification_type="calendar_invitation_accepted",
+                      AND receiver_uid = %s
+                      AND accepted = FALSE
+                    """,
+                    (token, uid),
                 )
+                conn.commit()
+
+        link = f"/shared-calendars?calendar={calendar_id}"
+
+        # Notifier le propriétaire
+        notify_and_record(
+            user_id=owner_uid,
+            body_or_list={
+                "link": link,
+                "calendar_id": calendar_id,
+                "sender_uid": uid,
+            },
+            notification_type="calendar_invitation_accepted",
+        )
 
         return success_response(
-            message="invitation acceptée", 
-            code="INVITATION_ACCEPT_SUCCESS", 
-            uid=uid, 
+            message="invitation acceptée",
+            code="INVITATION_ACCEPT_SUCCESS",
+            uid=uid,
             origin="INVITATION_ACCEPT",
             data={"calendar_id": calendar_id},
-            log_extra={"token": token}
+            log_extra={"token": token},
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de l'acceptation de l'invitation", 
-            code="INVITATION_ACCEPT_ERROR", 
-            status_code=500, 
-            uid=uid, 
+            message="erreur lors de l'acceptation de l'invitation",
+            code="INVITATION_ACCEPT_ERROR",
+            status_code=500,
+            uid=uid,
             origin="INVITATION_ACCEPT",
             error=str(e),
-            log_extra={"token": token}
+            log_extra={"token": token},
         )
 
 
-# Route pour rejeter une invitation pour un partage de calendrier
+# ---------------------------------------------
+# Rejet d'une login-invite (par le receveur)
+# ---------------------------------------------
 @api.route("/invitations/login/reject/<token>", methods=["POST"])
 @measure_time()
 @require_auth
 @verify_login_invitation_receiver
 def handle_reject_login_invitation(token):
+    uid = g.uid if hasattr(g, "uid") else None
+    calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
+    owner_uid = g.owner_uid if hasattr(g, "owner_uid") else None
     try:
-        uid = g.uid
-        calendar_id = g.calendar_id
-        owner_uid = g.owner_uid
-
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    """
-                    DELETE FROM shared_calendars WHERE token = %s
-                    """,
-                    (token,)
+                    "DELETE FROM shared_calendars WHERE token = %s",
+                    (token,),
                 )
+                conn.commit()
 
-                link = f"/shared-calendars?calendar={calendar_id}"
-                # Créer une notif pour l'utilisateur expéditeur
-                notify_and_record(
-                    user_id=owner_uid,
-                    body_or_list={
-                        "link": link,
-                        "calendar_id": calendar_id,
-                        "sender_uid": uid
-                    },
-                    notification_type="calendar_invitation_rejected",
-                )
+        link = f"/shared-calendars?calendar={calendar_id}"
+
+        # Notifier le propriétaire
+        notify_and_record(
+            user_id=owner_uid,
+            body_or_list={
+                "link": link,
+                "calendar_id": calendar_id,
+                "sender_uid": uid,
+            },
+            notification_type="calendar_invitation_rejected",
+        )
 
         return success_response(
-            message="invitation rejetée", 
-            code="INVITATION_REJECT_SUCCESS", 
-            uid=uid, 
+            message="invitation rejetée",
+            code="INVITATION_REJECT_SUCCESS",
+            uid=uid,
             origin="INVITATION_REJECT",
-            log_extra={"token": token}
+            log_extra={"token": token},
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors du rejet de l'invitation", 
-            code="INVITATION_REJECT_ERROR", 
-            status_code=500, 
-            uid=uid, 
+            message="erreur lors du rejet de l'invitation",
+            code="INVITATION_REJECT_ERROR",
+            status_code=500,
+            uid=uid,
             origin="INVITATION_REJECT",
             error=str(e),
-            log_extra={"token": token}
+            log_extra={"token": token},
         )
 
-# Recupe pour une registration
+
+# --------------------------------
+# Récupération d'une registration
+# --------------------------------
 @api.route("/invitations/registration/<token>", methods=["GET"])
 @measure_time()
 @require_auth
 def handle_registration_invitation(token):
+    uid = g.uid
     try:
-        uid = g.uid
         user = g.user
         email = user.get("email")
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT i.*,
-                        c.name AS calendar_name,
-                        u.email AS owner_email,
-                        u.photo_url AS owner_photo_url,
-                        u.display_name AS owner_display_name
+                           c.name         AS calendar_name,
+                           u.email        AS owner_email,
+                           u.photo_url    AS owner_photo_url,
+                           u.display_name AS owner_display_name
                     FROM invitations i
                     JOIN calendars c ON i.calendar_id = c.id
                     JOIN users u     ON c.owner_uid = u.id
                     WHERE i.token = %s
-                    AND i.invited_email = %s
-                """, (token, email))
+                      AND i.invited_email = %s
+                    """,
+                    (token, email),
+                )
                 invitation = cursor.fetchone()
 
                 if not invitation:
@@ -401,7 +472,7 @@ def handle_registration_invitation(token):
                         code="INVITATION_NOT_FOUND",
                         uid=uid,
                         status_code=404,
-                        origin="INVITATION_REGISTRATION"
+                        origin="INVITATION_REGISTRATION",
                     )
 
                 return success_response(
@@ -410,7 +481,7 @@ def handle_registration_invitation(token):
                     uid=uid,
                     origin="INVITATION_REGISTRATION",
                     data={"invitation": invitation},
-                    log_extra={"token": token}
+                    log_extra={"token": token},
                 )
 
     except Exception as e:
@@ -420,73 +491,83 @@ def handle_registration_invitation(token):
             uid=uid,
             origin="INVITATION_REGISTRATION",
             status_code=500,
-            log_extra={"error": str(e)}
+            log_extra={"error": str(e)},
         )
 
-# fonction pour supprimer une invitation de calendrier partagé pour un user sans compte
+
+# -------------------------------------------------------------
+# Suppression d'une registration-invite (par le propriétaire)
+# -------------------------------------------------------------
 @api.route("/invitations/registration/<token>", methods=["DELETE"])
 @measure_time()
 @require_auth
 @verify_registration_invitation_owner
 def delete_registration_invitation(token):
+    uid = g.uid if hasattr(g, "uid") else None
+    calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
+    invited_email = g.invited_email if hasattr(g, "invited_email") else None
     try:
-        uid = g.uid
-        calendar_id = g.calendar_id
-        invited_email = g.invited_email
-
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("DELETE FROM invitations WHERE token = %s AND calendar_id = %s", (token, calendar_id))
-                cursor.connection.commit()
-
-                email_address_direct(
-                    to_email=invited_email,
-                    notification_type="calendar_invitation_registration_deleted",
-                    context={
-                        "sender_uid": uid,
-                        "calendar_id": calendar_id,
-                    }
+                cursor.execute(
+                    "DELETE FROM invitations WHERE token = %s AND calendar_id = %s",
+                    (token, calendar_id),
                 )
+                conn.commit()
 
-                return success_response(
-                    message="Invitation de calendrier supprimée",
-                    code="SHARED_CALENDAR_INVITATION_DELETE_SUCCESS",
-                    uid=uid,
-                    origin="DELETE_SHARED_CALENDAR_INVITATION",
-                    log_extra={"calendar_id": calendar_id}
-                )
+        # Email d'information au destinataire
+        email_address_direct(
+            to_email=invited_email,
+            notification_type="calendar_invitation_registration_deleted",
+            context={
+                "sender_uid": uid,
+                "calendar_id": calendar_id,
+            },
+        )
+
+        return success_response(
+            message="Invitation de calendrier supprimée",
+            code="SHARED_CALENDAR_INVITATION_DELETE_SUCCESS",
+            uid=uid,
+            origin="DELETE_SHARED_CALENDAR_INVITATION",
+            log_extra={"calendar_id": calendar_id},
+        )
+
     except Exception as e:
         return error_response(
-            message="Erreur lors de la récupération des données partagées",
-            code="SHARED_GROUPED_LOAD_ERROR",
+            message="Erreur lors de la suppression de l'invitation",
+            code="SHARED_CALENDAR_INVITATION_DELETE_ERROR",
             status_code=500,
             uid=uid,
-            origin="GET_SHARED_GROUPED",
-            error=str(e)
+            origin="DELETE_SHARED_CALENDAR_INVITATION",
+            error=str(e),
         )
-    
 
-# Fonction pour accepter une invitation
+
+# -----------------------------------
+# Acceptation d'une registration
+# -----------------------------------
 @api.route("/invitations/registration/accept/<token>", methods=["POST"])
 @measure_time()
 @require_auth
 def accept_registration_invitation(token):
+    uid = g.uid if hasattr(g, "uid") else None
     try:
-        uid = g.uid
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("""
-                    DELETE FROM invitations i
-                    USING calendars c
-                    WHERE i.calendar_id = c.id
-                    AND i.token = %s
-                    RETURNING i.calendar_id, c.owner_uid
-                """, (token,))
-                row = cursor.fetchone()
-                calendar_id = row.get("calendar_id")
-                owner_uid = row.get("owner_uid")
+                calendar_id, owner_uid = _delete_invitation_returning_calendar_owner(cursor, token)
+                if not calendar_id or not owner_uid:
+                    return error_response(
+                        message="invitation introuvable",
+                        code="INVITATION_NOT_FOUND",
+                        status_code=404,
+                        uid=uid,
+                        origin="ACCEPT_SHARED_CALENDAR_INVITATION",
+                        log_extra={"token": token},
+                    )
 
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO shared_calendars (
                         receiver_uid,
                         calendar_id,
@@ -494,28 +575,30 @@ def accept_registration_invitation(token):
                         accepted_at
                     )
                     VALUES (%s, %s, TRUE, NOW())
-                """, (uid, calendar_id))
+                    """,
+                    (uid, calendar_id),
+                )
                 conn.commit()
 
-                notify_and_record(
-                    user_id=owner_uid,
-                    body_or_list={
-                        "calendar_id": calendar_id,
-                        "link": f"/shared-calendars?calendar={calendar_id}",
-                        "sender_uid": uid,
-                    },
-                    notification_type="calendar_invitation_accepted",
-                )
+        notify_and_record(
+            user_id=owner_uid,
+            body_or_list={
+                "calendar_id": calendar_id,
+                "link": f"/shared-calendars?calendar={calendar_id}",
+                "sender_uid": uid,
+            },
+            notification_type="calendar_invitation_accepted",
+        )
 
-                return success_response(
-                    message="Invitation de calendrier acceptée",
-                    code="SHARED_CALENDAR_INVITATION_ACCEPT_SUCCESS",
-                    uid=uid,
-                    origin="ACCEPT_SHARED_CALENDAR_INVITATION",
-                    data={"calendar_id": calendar_id},
-                    log_extra={"token": token}
-                )
-            
+        return success_response(
+            message="Invitation de calendrier acceptée",
+            code="SHARED_CALENDAR_INVITATION_ACCEPT_SUCCESS",
+            uid=uid,
+            origin="ACCEPT_SHARED_CALENDAR_INVITATION",
+            data={"calendar_id": calendar_id},
+            log_extra={"token": token},
+        )
+
     except Exception as e:
         return error_response(
             message="Erreur lors de l'acceptation de l'invitation",
@@ -523,58 +606,60 @@ def accept_registration_invitation(token):
             status_code=500,
             uid=uid,
             origin="ACCEPT_SHARED_CALENDAR_INVITATION",
-            error=str(e)
+            error=str(e),
         )
 
 
-# Fonction pour rejeter une invitation
+# -----------------------------------
+# Rejet d'une registration
+# -----------------------------------
 @api.route("/invitations/registration/reject/<token>", methods=["POST"])
 @measure_time()
 @require_auth
 def reject_registration_invitation(token):
+    uid = g.uid if hasattr(g, "uid") else None
     try:
-        uid = g.uid
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("""
-                    DELETE FROM invitations i
-                    USING calendars c
-                    WHERE i.calendar_id = c.id
-                    AND i.token = %s
-                    RETURNING i.calendar_id, c.owner_uid
-                """, (token,))
-                
-                row = cursor.fetchone()
-                calendar_id = row.get("calendar_id")
-                owner_uid = row.get("owner_uid")
+                calendar_id, owner_uid = _delete_invitation_returning_calendar_owner(cursor, token)
+                if not calendar_id or not owner_uid:
+                    return error_response(
+                        message="invitation introuvable",
+                        code="INVITATION_NOT_FOUND",
+                        status_code=404,
+                        uid=uid,
+                        origin="REJECT_SHARED_CALENDAR_INVITATION",
+                        log_extra={"token": token},
+                    )
 
                 conn.commit()
 
-                link = f"/shared-calendars?calendar={calendar_id}"
+        link = f"/shared-calendars?calendar={calendar_id}"
 
-                notify_and_record(
-                    user_id=owner_uid,
-                    body_or_list={
-                        "calendar_id": calendar_id,
-                        "link": link,
-                        "sender_uid": uid,
-                    },
-                    notification_type="calendar_shared_deleted_by_receiver",
-                )
+        notify_and_record(
+            user_id=owner_uid,
+            body_or_list={
+                "calendar_id": calendar_id,
+                "link": link,
+                "sender_uid": uid,
+            },
+            notification_type="calendar_shared_deleted_by_receiver",
+        )
 
-                return success_response(
-                    message="Invitation de calendrier acceptée",
-                    code="SHARED_CALENDAR_INVITATION_ACCEPT_SUCCESS",
-                    uid=uid,
-                    origin="ACCEPT_SHARED_CALENDAR_INVITATION",
-                    log_extra={"token": token}
-                )
+        return success_response(
+            message="Invitation de calendrier rejetée",
+            code="SHARED_CALENDAR_INVITATION_REJECT_SUCCESS",
+            uid=uid,
+            origin="REJECT_SHARED_CALENDAR_INVITATION",
+            log_extra={"token": token},
+        )
+
     except Exception as e:
         return error_response(
-            message="Erreur lors de l'acceptation de l'invitation",
-            code="SHARED_CALENDAR_INVITATION_ACCEPT_ERROR",
+            message="Erreur lors du rejet de l'invitation",
+            code="SHARED_CALENDAR_INVITATION_REJECT_ERROR",
             status_code=500,
             uid=uid,
-            origin="ACCEPT_SHARED_CALENDAR_INVITATION",
-            error=str(e)
+            origin="REJECT_SHARED_CALENDAR_INVITATION",
+            error=str(e),
         )
