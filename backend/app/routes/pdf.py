@@ -7,12 +7,11 @@ import time
 from app.utils.logging import log_backend
 import traceback
 
-@api.route("/proxy/pdf", methods=["GET"])
-def proxy_pdf():
+@api.route("/proxy/pdf/<box_id>", methods=["GET"])
+def proxy_pdf(box_id):
     try:
         t_0 = time.time()
 
-        box_id = request.args.get("box_id")
         if not box_id:
             return error_response(
                 message="Missing box_id",

@@ -14,23 +14,22 @@ from app.services.calendar import verify_calendar, verify_token_owner, verify_to
 def handle_tokens():
     try:
         t_0 = time.time()
-        if request.method == "GET":
-            uid = g.uid
+        uid = g.uid
 
-            with get_connection() as conn:
-                with conn.cursor() as cursor:
-                    cursor.execute("SELECT * FROM shared_tokens WHERE owner_uid = %s", (uid,))
-                    tokens_list = cursor.fetchall()
-                    t_1 = time.time()
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT * FROM shared_tokens WHERE owner_uid = %s", (uid,))
+                tokens_list = cursor.fetchall()
+        t_1 = time.time()
 
-            return success_response(
-                message="tokens récupérés", 
-                code="TOKENS_FETCH", 
-                uid=uid, 
-                origin="TOKENS_FETCH", 
-                data={"tokens": tokens_list},
-                log_extra={"time": t_1 - t_0}
-            )
+        return success_response(
+            message="tokens récupérés", 
+            code="TOKENS_FETCH", 
+            uid=uid, 
+            origin="TOKENS_FETCH", 
+            data={"tokens": tokens_list},
+            log_extra={"time": t_1 - t_0}
+        )
         
     except Exception as e:
         return error_response(
@@ -52,14 +51,14 @@ def handle_create_token(calendar_id):
         t_0 = time.time()
         owner_uid = g.uid
 
-        data = request.get_json(force=True)
+        payload = request.get_json(force=True)
 
-        expires_at = data.get("expiresAt")
+        expires_at = payload.get("expiresAt")
         if not expires_at:
             expires_at = None
-            
-        permissions = data.get("permissions")
-        
+
+        permissions = payload.get("permissions")
+
         if not permissions:
             permissions = ["read"]
 
@@ -156,8 +155,9 @@ def handle_update_token_expiration(token):
         t_0 = time.time()
         owner_uid = g.uid
 
-        data = request.get_json(force=True)
-        expires_at = data.get("expiresAt")
+        payload = request.get_json(force=True)
+        expires_at = payload.get("expiresAt")
+
         if not expires_at:
             expires_at = None
 
@@ -199,9 +199,9 @@ def handle_update_token_permissions(token):
         t_0 = time.time()
         owner_uid = g.uid
 
-        data = request.get_json(force=True)
+        payload = request.get_json(force=True)
 
-        permissions = data.get("permissions")
+        permissions = payload.get("permissions")
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -237,7 +237,8 @@ def handle_generate_token_schedule(token):
     try:
         t_0 = time.time()
 
-        start_date = request.args.get("startTime")
+        start_date = request.args.get("startDate")
+
         if not start_date:
             start_date = datetime.now(timezone.utc).date()
         else:
@@ -275,10 +276,11 @@ def handle_generate_token_schedule(token):
 def handle_get_token_metadata(token):
     try:
         t_0 = time.time()
+        calendar_id = g.calendar_id
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM shared_tokens WHERE id = %s", (token,))
+                cursor.execute("SELECT owner_uid FROM shared_tokens WHERE id = %s", (token,))
                 token_data = cursor.fetchone()
                 if not token_data:
                     return warning_response(
@@ -290,7 +292,6 @@ def handle_get_token_metadata(token):
                         log_extra={"token": token}
                     )
 
-                calendar_id = token_data.get("calendar_id")
                 owner_uid = token_data.get("owner_uid")
 
                 t_1 = time.time()

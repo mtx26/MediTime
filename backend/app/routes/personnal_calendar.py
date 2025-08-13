@@ -68,7 +68,8 @@ def handle_create_calendar():
     try:
         t_0 = time.time()
         uid = g.uid
-        calendar_name = request.json.get("calendarName")
+        payload = request.get_json(force=True)
+        calendar_name = payload.get("calendarName")
 
         if not calendar_name:
             return warning_response(
@@ -107,14 +108,13 @@ def handle_create_calendar():
 
 
 # Route pour supprimer un calendrier
-@api.route("/calendars", methods=["DELETE"])
+@api.route("/calendars/<calendar_id>", methods=["DELETE"])
 @require_auth
 @verify_calendar
-def handle_delete_calendar():
+def handle_delete_calendar(calendar_id):
     try:
         t_0 = time.time()
         uid = g.uid
-        calendar_id = request.json.get("calendarId")
 
         if not calendar_id:
             return warning_response(
@@ -164,16 +164,16 @@ def handle_delete_calendar():
 
 
 # Route pour renommer un calendrier
-@api.route("/calendars", methods=["PUT"])
+@api.route("/calendars/<calendar_id>", methods=["PUT"])
 @require_auth
 @verify_calendar
-def handle_rename_calendar():
+def handle_rename_calendar(calendar_id):
     try:
         t_0 = time.time()
         uid = g.uid
-        data = request.get_json(force=True)
-        calendar_id = data.get("calendarId")
-        new_calendar_name = data.get("newCalendarName")
+        payload = request.get_json(force=True)
+
+        new_calendar_name = payload.get("newCalendarName")
 
         if not new_calendar_name:
             return warning_response(
@@ -244,7 +244,8 @@ def handle_calendar_schedule(calendar_id):
         t_0 = time.time()
         owner_uid = g.uid
 
-        start_date = request.args.get("startTime")
+        start_date = request.args.get("startDate")
+
         if not start_date:
             start_date = datetime.now(timezone.utc).date()
         else:
@@ -368,7 +369,9 @@ def update_personnal_stock_decrement_method(calendar_id):
     try:
         t_0 = time.time()
         uid = g.uid
-        method = request.json.get("method")
+
+        payload = request.get_json(force=True)
+        method = payload.get("method")
 
         if not method:
             return warning_response(

@@ -21,10 +21,9 @@ def handle_send_invitation(calendar_id):
     try:
         t_0 = time.time()
         owner_uid = g.uid
+        payload = request.get_json(force=True)
 
-        receiver_email = request.get_json(force=True).get("email")
-
-        owner = fetch_user(owner_uid)
+        receiver_email = payload.get("email")
 
         with get_connection() as conn:
             with conn.cursor() as cursor:

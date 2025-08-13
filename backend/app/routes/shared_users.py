@@ -196,7 +196,8 @@ def handle_user_shared_calendar_schedule(calendar_id):
         t_0 = time.time()
         uid = g.uid
 
-        start_date = request.args.get("startTime")
+        start_date = request.args.get("startDate")
+
         if not start_date:
             start_date = datetime.now(timezone.utc).date()
         else:
@@ -525,6 +526,7 @@ def handle_shared_user_notifications(calendar_id):
     try:
         t_0 = time.time()
         uid = g.uid
+        
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT notifications_enabled FROM shared_calendars WHERE calendar_id = %s", (calendar_id,))
@@ -566,8 +568,11 @@ def handle_shared_user_notifications_update(calendar_id):
     try:
         t_0 = time.time()
         uid = g.uid
-        data = request.get_json()
-        if not data or "notifications-enabled" not in data:
+
+        payload = request.get_json(force=True)
+        notifications_enabled = payload.get("notifications-enabled")
+
+        if not notifications_enabled:
             return warning_response(
                 message="Données manquantes",
                 code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
@@ -576,7 +581,6 @@ def handle_shared_user_notifications_update(calendar_id):
                 origin="SHARED_CALENDARS_NOTIFICATIONS",
                 log_extra={"calendar_id": calendar_id}
             )
-        notifications_enabled = data["notifications-enabled"]
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("UPDATE shared_calendars SET notifications_enabled = %s WHERE calendar_id = %s", (notifications_enabled, calendar_id))

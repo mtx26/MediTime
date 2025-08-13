@@ -45,8 +45,8 @@ def get_user_info():
 def update_user_info():
     uid = g.uid
     try:
-        user_data = request.get_json()
-        if not user_data:
+        payload = request.get_json(force=True)
+        if not payload:
             return error_response(
                 message="aucune donnée reçue",
                 code="USER_UPDATE_ERROR",
@@ -55,11 +55,11 @@ def update_user_info():
                 origin="USER_UPDATE"
             )
 
-        display_name = user_data.get("display_name", None)
-        email = user_data.get("email", None)
-        photo_url = user_data.get("photo_url", None)
-        email_enabled = user_data.get("email_enabled", None)
-        push_enabled = user_data.get("push_enabled", None)
+        display_name = payload.get("display_name", None)
+        email = payload.get("email", None)
+        photo_url = payload.get("photo_url", None)
+        email_enabled = payload.get("email_enabled", None)
+        push_enabled = payload.get("push_enabled", None)
 
         user_db = fetch_user(uid)
 

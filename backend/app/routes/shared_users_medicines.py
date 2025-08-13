@@ -49,9 +49,11 @@ def handle_update_shared_box(calendar_id, box_id):
     try:
         t_0 = time.time()
         uid = g.uid
-        data = request.get_json()
 
-        if not data:
+        payload = request.get_json(force=True)
+        box = payload.get("box")
+
+        if not box:
             return warning_response(
                 message="champs requis manquants",
                 code="MISSING_REQUIRED_FIELDS",
@@ -61,7 +63,7 @@ def handle_update_shared_box(calendar_id, box_id):
                 log_extra={"calendar_id": calendar_id, "box_id": box_id}
             )
 
-        update_box(box_id, calendar_id, data)
+        update_box(box_id, calendar_id, box)
 
         t_1 = time.time()
         return success_response(
@@ -92,9 +94,10 @@ def handle_create_shared_box(calendar_id):
         t_0 = time.time()
         uid = g.uid
 
-        data = request.get_json()
+        payload = request.get_json(force=True)
+        box = payload.get("box")
 
-        if not data:
+        if not box:
             return warning_response(
                 message="champs requis manquants",
                 code="MISSING_REQUIRED_FIELDS",
@@ -104,7 +107,7 @@ def handle_create_shared_box(calendar_id):
                 log_extra={"calendar_id": calendar_id}
             )
 
-        box_id = create_box(calendar_id, data)
+        box_id = create_box(calendar_id, box)
         t_1 = time.time()
 
         return success_response(
@@ -166,7 +169,9 @@ def handle_use_shared_users_pillulier(calendar_id):
         t_0 = time.time()
         uid = g.uid
 
-        start_date = request.args.get("startTime")
+        payload = request.get_json(force=True)
+        start_date = payload.get("startDate")
+
         if not start_date:
             start_date = datetime.now(timezone.utc).date()
         else:
