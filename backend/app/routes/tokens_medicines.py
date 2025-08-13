@@ -1,17 +1,17 @@
 from . import api
 from flask import g
-import time
 from app.db.connection import get_connection
 from app.services.calendar import verify_token
 from app.utils.responses import success_response, error_response
+from app.utils.measure import measure_time
 
 
 # Route pour obtenir les médicaments d’un token public
 @api.route("/tokens/<token>/medicines", methods=["GET"])
 @verify_token
+@measure_time()
 def handle_token_medicines(token):
     try:
-        t_0 = time.time()
         calendar_id = g.calendar_id
 
         with get_connection() as conn:
@@ -29,15 +29,13 @@ def handle_token_medicines(token):
                     WHERE box.calendar_id = %s
                 """, (calendar_id,))
                 medicines = cursor.fetchall()
-                t_1 = time.time()
-
 
         return success_response(
             message="médicaments récupérés",
             code="MEDICINES_SHARED_LOADED",
             origin="TOKEN_MEDICINES_LOAD",
             data={"medicines": medicines},
-            log_extra={"token": token, "time": t_1 - t_0}
+            log_extra={"token": token}
         )
 
     except Exception as e:

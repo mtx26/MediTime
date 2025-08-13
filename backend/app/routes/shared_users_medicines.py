@@ -4,9 +4,9 @@ from . import api
 from app.utils.responses import success_response, error_response, warning_response
 from app.services.calendar import verify_calendar_share
 from app.services.medication import get_boxes, update_box, create_box, delete_box, restock_box
-import time
 from app.services.medication import use_pillulier
 from datetime import datetime, timezone
+from app.utils.measure import measure_time
 
 # Route pour récupérer les boites de médicaments d'un calendrier
 @api.route("/shared/users/calendars/<calendar_id>/boxes", methods=["GET"])
@@ -14,19 +14,17 @@ from datetime import datetime, timezone
 @verify_calendar_share
 def handle_shared_boxes(calendar_id):
     try:
-        t_0 = time.time()
-        receiver_uid = g.uid
+        uid = g.uid
 
         boxes = get_boxes(calendar_id)
-        t_1 = time.time()
 
         return success_response(
             message="boites de médicaments récupérées",
             code="MEDICINE_BOXES_FETCHED",
-            uid=receiver_uid,
+            uid=uid,
             origin="GET_MEDICINE_BOXES",
             data={"boxes": boxes},
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "boxes_count": len(boxes)}
+            log_extra={"calendar_id": calendar_id, "boxes_count": len(boxes)}
         )
 
     except Exception as e:
@@ -34,7 +32,7 @@ def handle_shared_boxes(calendar_id):
             message="erreur lors de la récupération des boites de médicaments",
             code="GET_MEDICINE_BOXES_ERROR",
             status_code=500,
-            uid=receiver_uid,
+            uid=uid,
             origin="GET_MEDICINE_BOXES",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -45,9 +43,9 @@ def handle_shared_boxes(calendar_id):
 @api.route("/shared/users/calendars/<calendar_id>/boxes/<box_id>", methods=["PUT"])
 @require_auth
 @verify_calendar_share
+@measure_time()
 def handle_update_shared_box(calendar_id, box_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         payload = request.get_json(force=True)
@@ -65,13 +63,12 @@ def handle_update_shared_box(calendar_id, box_id):
 
         update_box(box_id, calendar_id, box)
 
-        t_1 = time.time()
         return success_response(
             message="boite de médicaments modifiée",
             code="MEDICINE_BOX_UPDATED",
             uid=uid,
             origin="UPDATE_MEDICINE_BOX",
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "box_id": box_id}
+            log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
     except Exception as e:
@@ -89,9 +86,9 @@ def handle_update_shared_box(calendar_id, box_id):
 @api.route("/shared/users/calendars/<calendar_id>/boxes", methods=["POST"])
 @require_auth
 @verify_calendar_share
+@measure_time()
 def handle_create_shared_box(calendar_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         payload = request.get_json(force=True)
@@ -108,7 +105,6 @@ def handle_create_shared_box(calendar_id):
             )
 
         box_id = create_box(calendar_id, box)
-        t_1 = time.time()
 
         return success_response(
             message="boite de médicaments créée",
@@ -116,7 +112,7 @@ def handle_create_shared_box(calendar_id):
             uid=uid,
             origin="CREATE_MEDICINE_BOX",
             data={"box_id": box_id},
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id}
+            log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
@@ -134,20 +130,19 @@ def handle_create_shared_box(calendar_id):
 @api.route("/shared/users/calendars/<calendar_id>/boxes/<box_id>", methods=["DELETE"])
 @require_auth
 @verify_calendar_share
+@measure_time()
 def handle_delete_shared_box(calendar_id, box_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         delete_box(box_id, calendar_id)
-        t_1 = time.time()
 
         return success_response(
             message="boite de médicaments supprimée",
             code="MEDICINE_BOX_DELETED",
             uid=uid,
             origin="DELETE_MEDICINE_BOX",
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "box_id": box_id}
+            log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
     except Exception as e:
@@ -164,9 +159,9 @@ def handle_delete_shared_box(calendar_id, box_id):
 @api.route("/shared/users/calendars/<calendar_id>/pilluliers/used", methods=["POST"])
 @require_auth
 @verify_calendar_share
+@measure_time()
 def handle_use_shared_users_pillulier(calendar_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         payload = request.get_json(force=True)
@@ -187,13 +182,12 @@ def handle_use_shared_users_pillulier(calendar_id):
                 origin="SHARED_USER_USE_PILLULIER",
                 log_extra={"calendar_id": calendar_id}
             )
-        t_1 = time.time()
         return success_response(
             message="pilulier utilisé avec succès",
             code="PILLULIER_USED",
             uid=uid,
             origin="SHARED_USER_USE_PILLULIER",
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id}
+            log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
         return error_response(
@@ -210,10 +204,10 @@ def handle_use_shared_users_pillulier(calendar_id):
 @api.route("/shared/users/calendars/<calendar_id>/boxes/<box_id>/restock", methods=["POST"])
 @require_auth
 @verify_calendar_share
+@measure_time()
 def handle_shared_user_restock_box(calendar_id, box_id):
     try:
         uid = g.uid
-        t_0 = time.time()
 
         if not restock_box(box_id, calendar_id):
             return warning_response(
@@ -224,14 +218,14 @@ def handle_shared_user_restock_box(calendar_id, box_id):
                 origin="RESTOCK_MEDICINE_BOX",
                 log_extra={"calendar_id": calendar_id, "box_id": box_id}
             )
-        t_1 = time.time()
+
         return success_response(
             message="boite de médicaments réapprovisionnée",
             code="MEDICINE_BOX_RESTOCKED",
             uid=uid,
             origin="RESTOCK_MEDICINE_BOX",
             data={"box_id": box_id},
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "box_id": box_id}
+            log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
     except Exception as e:
         return error_response(

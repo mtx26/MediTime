@@ -1,16 +1,16 @@
-from flask import request, Response
+from flask import request, Response, g
 import requests
 from app.db.connection import get_connection
 from . import api
 from app.utils.responses import error_response
-import time
 from app.utils.logging import log_backend
-import traceback
+from app.utils.measure import measure_time, elapsed_now
+
 
 @api.route("/proxy/pdf/<box_id>", methods=["GET"])
+@measure_time()
 def proxy_pdf(box_id):
     try:
-        t_0 = time.time()
 
         if not box_id:
             return error_response(
@@ -53,9 +53,15 @@ def proxy_pdf(box_id):
         r = requests.get(url_result["url_notice_fr"], stream=True, timeout=10)
         r.raise_for_status()
 
-        t_1 = time.time()
-
-        log_backend.info(f"PDF downloaded in {t_1 - t_0} seconds", {"origin": "PDF_PROXY", "code": "PDF_DOWNLOADED", "url": url_result["url_notice_fr"]})
+        log_backend.info(
+            f"PDF downloaded", 
+            {
+                "origin": "PDF_PROXY", 
+                "code": "PDF_DOWNLOADED", 
+                "url": url_result["url_notice_fr"], 
+                "time": elapsed_now()
+            }
+        )
 
         return Response(
             r.content,
@@ -63,9 +69,10 @@ def proxy_pdf(box_id):
             headers={"Content-Disposition": "inline; filename=notice.pdf", "Content-Type": "application/pdf"}
         )
     except Exception as e:
-        log_backend.error(f"Error downloading PDF: {e}", {
-            "origin": "PDF_PROXY", 
-            "code": "PDF_DOWNLOAD_ERROR", 
-            "error": traceback.format_exc(),
-        })
-        return f"Erreur lors du téléchargement : {e}", 500
+        return error_response(
+            message="Erreur lors du téléchargement du PDF",
+            code="PDF_DOWNLOAD_ERROR",
+            status_code=500,
+            origin="PDF_PROXY",
+            error=str(e)
+        )

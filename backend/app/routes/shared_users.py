@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 from . import api
 from app.services.calendar import verify_calendar_share, verify_calendar, generate_calendar_schedule
 from flask import request, g
-import time
 from app.services.user import fetch_user
 from app.utils.responses import success_response, error_response, warning_response
 from app.db.connection import get_connection
@@ -13,6 +12,7 @@ from app.config import Config
 from urllib.parse import urljoin
 from app.services.medication import check_if_stock_is_low
 from app.services.notifications import email_address_direct
+from app.utils.measure import measure_time
 
 
 ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"
@@ -24,16 +24,15 @@ SELECT_SHARED_CALENDAR = "SELECT * FROM calendars WHERE id = %s"
 # Route pour récupérer les calendriers partagés
 @api.route("/shared/users/calendars", methods=["GET"])
 @require_auth
+@measure_time()
 def handle_shared_calendars():
     try:
-        t_0 = time.time()
         uid = g.uid
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT * FROM shared_calendars WHERE receiver_uid = %s AND accepted = true", (uid,))
                 shared_users = cursor.fetchall()
-                t_1 = time.time()
 
                 if not shared_users:
                     return success_response(
@@ -41,8 +40,7 @@ def handle_shared_calendars():
                         code="SHARED_CALENDARS_LOAD_EMPTY", 
                         uid=uid,
                         origin="SHARED_CALENDARS_LOAD",
-                        data={"calendars": []},
-                        log_extra={"time": t_1 - t_0}
+                        data={"calendars": []}
                     )
 
                 calendars_list = []
@@ -107,15 +105,12 @@ def handle_shared_calendars():
                         "ifLowStock": if_low_stock
                     })
 
-                t_2 = time.time()
-
                 return success_response(
                     message=SUCCESS_SHARED_CALENDARS_LOAD, 
                     code="SHARED_CALENDARS_LOAD_SUCCESS", 
                     uid=uid, 
                     origin="SHARED_CALENDARS_LOAD",
-                    data={"calendars": calendars_list},
-                    log_extra={"time": t_2 - t_0}
+                    data={"calendars": calendars_list}
                 )
 
     except Exception as e:
@@ -132,10 +127,10 @@ def handle_shared_calendars():
 @api.route("/shared/users/calendars/<calendar_id>", methods=["GET"])
 @require_auth
 @verify_calendar_share
+@measure_time()
 def handle_user_shared_calendar(calendar_id):
     try:
-        t_0 = time.time()
-        receiver_uid = g.uid
+        uid = g.uid
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -146,7 +141,7 @@ def handle_user_shared_calendar(calendar_id):
                         message=ERROR_CALENDAR_NOT_FOUND,
                         code="SHARED_CALENDARS_LOAD_ERROR",
                         status_code=404,
-                        uid=receiver_uid,
+                        uid=uid,
                         origin="SHARED_CALENDARS_LOAD",
                         log_extra={"calendar_id": calendar_id}
                     )
@@ -161,20 +156,19 @@ def handle_user_shared_calendar(calendar_id):
                         message=ERROR_CALENDAR_NOT_FOUND,
                         code="SHARED_CALENDARS_LOAD_ERROR",
                         status_code=404,
-                        uid=receiver_uid,
+                        uid=uid,
                         origin="SHARED_CALENDARS_LOAD",
                         log_extra={"calendar_id": calendar_id}
                     )
                 access = shared_user.get("access", "read")
-                t_2 = time.time()
 
         return success_response(
             message=SUCCESS_SHARED_CALENDARS_LOAD,
             code="SHARED_CALENDARS_LOAD_SUCCESS",
-            uid=receiver_uid,
+            uid=uid,
             origin="SHARED_CALENDARS_LOAD",
             data={"calendar_id": calendar_id, "calendar_name": calendar_name, "access": access, "owner_uid": owner_uid},
-            log_extra={"calendar_id": calendar_id, "time": t_2 - t_0}
+            log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
@@ -182,7 +176,7 @@ def handle_user_shared_calendar(calendar_id):
             message="erreur lors de la récupération du calendrier partagé",
             code="SHARED_CALENDARS_ERROR",
             status_code=500,
-            uid=receiver_uid,
+            uid=uid,
             origin="SHARED_CALENDARS_LOAD",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -191,9 +185,9 @@ def handle_user_shared_calendar(calendar_id):
 @api.route("/shared/users/calendars/<calendar_id>/schedule", methods=["GET"])
 @require_auth
 @verify_calendar_share
+@measure_time()
 def handle_user_shared_calendar_schedule(calendar_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         start_date = request.args.get("startDate")
@@ -207,15 +201,13 @@ def handle_user_shared_calendar_schedule(calendar_id):
 
         if_low_stock = check_if_stock_is_low(calendar_id)
 
-        t_1 = time.time()
-            
         return success_response(
             message=SUCCESS_SHARED_CALENDARS_LOAD, 
             code="SHARED_CALENDARS_LOAD_SUCCESS", 
             uid=uid, 
             origin="SHARED_CALENDARS_LOAD",
             data={"schedule": schedule, "table": table, "calendar_name": calendar_name, "if_low_stock": if_low_stock},
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+            log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
@@ -234,9 +226,9 @@ def handle_user_shared_calendar_schedule(calendar_id):
 @api.route("/shared/users/calendars/<calendar_id>", methods=["DELETE"])
 @require_auth
 @verify_calendar_share
+@measure_time()
 def handle_delete_user_shared_calendar(calendar_id):
     try:
-        t_0 = time.time()
         receiver_uid = g.uid
 
         with get_connection() as conn:
@@ -266,14 +258,13 @@ def handle_delete_user_shared_calendar(calendar_id):
                     },
                     notification_type="calendar_shared_deleted_by_receiver",
                 )
-                t_1 = time.time()
 
         return success_response(
             message="calendrier partagé supprimé", 
             code="SHARED_CALENDARS_DELETE_SUCCESS", 
             uid=receiver_uid, 
             origin="SHARED_CALENDARS_DELETE",
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+            log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
@@ -292,9 +283,9 @@ def handle_delete_user_shared_calendar(calendar_id):
 @api.route("/shared/users/<calendar_id>/<receiver_uid>", methods=["DELETE"])
 @require_auth
 @verify_calendar
+@measure_time()
 def handle_delete_user_shared_user(calendar_id, receiver_uid):
     try:
-        t_0 = time.time()
         owner_uid = g.uid
 
         if owner_uid == receiver_uid:
@@ -352,14 +343,13 @@ def handle_delete_user_shared_user(calendar_id, receiver_uid):
                     },
                     notification_type="calendar_shared_deleted_by_owner",
                 )
-                t_1 = time.time()
 
         return success_response(
             message="utilisateur partagé supprimé", 
             code="SHARED_USERS_DELETE_SUCCESS", 
-            uid=receiver_uid, 
+            uid=owner_uid, 
             origin="SHARED_USERS_DELETE",
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+            log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
@@ -367,7 +357,7 @@ def handle_delete_user_shared_user(calendar_id, receiver_uid):
             message="erreur lors de la suppression de l'utilisateur partagé",
             code="SHARED_USERS_DELETE_ERROR", 
             status_code=500, 
-            uid=receiver_uid, 
+            uid=owner_uid, 
             origin="SHARED_USERS_DELETE",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -378,9 +368,9 @@ def handle_delete_user_shared_user(calendar_id, receiver_uid):
 @api.route("/invitations/<calendar_id>", methods=["DELETE"])
 @require_auth
 @verify_calendar
+@measure_time()
 def delete_shared_calendar_invitation(calendar_id):
     try:
-        t_0 = time.time()
         owner_uid = g.uid
 
         token = request.get_json(force=True).get("token")
@@ -410,14 +400,13 @@ def delete_shared_calendar_invitation(calendar_id):
                         "calendar_id": calendar_id,
                     }
                 )
-                t_1 = time.time()
 
                 return success_response(
                     message="Invitation de calendrier supprimée",
                     code="SHARED_CALENDAR_INVITATION_DELETE_SUCCESS",
                     uid=receiver_email,
                     origin="DELETE_SHARED_CALENDAR_INVITATION",
-                    log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+                    log_extra={"calendar_id": calendar_id}
                 )
     except Exception as e:
         return error_response(
@@ -432,9 +421,9 @@ def delete_shared_calendar_invitation(calendar_id):
 
 @api.route("/shared/grouped", methods=["GET"])
 @require_auth
+@measure_time()
 def handle_grouped_shared():
     try:
-        t_0 = time.time()
         uid = g.uid
 
         with get_connection() as conn:
@@ -498,14 +487,13 @@ def handle_grouped_shared():
                     if cal_id in grouped:
                         grouped[cal_id]["invitation"].append(invitation)
 
-        t_1 = time.time()
         return success_response(
             message="Données partagées groupées récupérées",
             code="SHARED_GROUPED_LOAD_SUCCESS",
             uid=uid,
             origin="SHARED_GROUPED_LOAD",
             data={"grouped": grouped},
-            log_extra={"calendar_count": len(grouped), "time": t_1 - t_0}
+            log_extra={"calendar_count": len(grouped)}
         )
 
     except Exception as e:
@@ -522,9 +510,9 @@ def handle_grouped_shared():
 @api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["GET"])
 @require_auth
 @verify_calendar_share
+@measure_time()
 def handle_shared_user_notifications(calendar_id):
     try:
-        t_0 = time.time()
         uid = g.uid
         
         with get_connection() as conn:
@@ -541,14 +529,14 @@ def handle_shared_user_notifications(calendar_id):
                         log_extra={"calendar_id": calendar_id}
                     )
                 notifications_enabled = calendar.get("notifications_enabled", False)
-        t_1 = time.time()
+
         return success_response(
             message="notifications récupérées",
             code="SHARED_CALENDARS_NOTIFICATIONS_SUCCESS",
             uid=uid,
             origin="SHARED_CALENDARS_NOTIFICATIONS",
             data={"notifications-enabled": notifications_enabled},
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+            log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
         return error_response(
@@ -564,9 +552,9 @@ def handle_shared_user_notifications(calendar_id):
 @api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["PUT"])
 @require_auth
 @verify_calendar_share
+@measure_time()
 def handle_shared_user_notifications_update(calendar_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         payload = request.get_json(force=True)
@@ -584,13 +572,13 @@ def handle_shared_user_notifications_update(calendar_id):
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("UPDATE shared_calendars SET notifications_enabled = %s WHERE calendar_id = %s", (notifications_enabled, calendar_id))
-        t_1 = time.time()
+
         return success_response(
             message="Notifications mises à jour",
             code="SHARED_CALENDARS_NOTIFICATIONS_SUCCESS",
             uid=uid,
             origin="SHARED_CALENDARS_NOTIFICATIONS",
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+            log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
         return error_response(

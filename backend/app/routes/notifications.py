@@ -5,8 +5,8 @@ from app.services.user import fetch_user
 from app.services.calendar import fetch_medicine_name
 from app.db.connection import get_connection
 from flask import request, g
-import time
 from app.config import Config
+from app.utils.measure import measure_time
 
 frontend_url = Config.FRONTEND_URL or ""
 
@@ -31,9 +31,9 @@ def get_user_info(uid):
 # Route pour récupérer toutes les notifications
 @api.route("/notifications", methods=["GET"])
 @require_auth
+@measure_time()
 def handle_notifications():
     try:
-        t_0 = time.time()
         uid = g.uid
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -53,7 +53,6 @@ def handle_notifications():
                 sender_info_cache = {}
                 medication_name_cache = {}
                 notifications = []
-                t_1 = time.time()
 
                 for notif in notifications_data:
                     json_body = notif.get("content") or {}
@@ -97,15 +96,13 @@ def handle_notifications():
                         "medication_name": medication_name,
                         "medication_qty": medication_qty,
                     })
-                t_2 = time.time()
 
         return success_response(
             message="notifications récupérées",
             code="NOTIFICATIONS_FETCH_SUCCESS",
             uid=uid,
             origin="NOTIFICATIONS_FETCH",
-            data={"notifications": notifications},
-            log_extra={"time": t_2 - t_0, "time_append": t_2 - t_1}
+            data={"notifications": notifications}
         )
 
     except Exception as e:
@@ -121,9 +118,9 @@ def handle_notifications():
 # Route pour marquer une notification comme lue
 @api.route("/notifications/<notification_id>", methods=["POST"])
 @require_auth
+@measure_time()
 def handle_read_notification(notification_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         with get_connection() as conn:
@@ -142,14 +139,13 @@ def handle_read_notification(notification_id):
 
                 cursor.execute("UPDATE notifications SET read = TRUE WHERE id = %s AND user_id = %s", (notification_id, uid))
                 conn.commit()
-                t_1 = time.time()
 
         return success_response(
             message="notification marquée comme lue", 
             code="NOTIFICATION_READ_SUCCESS", 
             uid=uid, 
             origin="NOTIFICATION_READ",
-            log_extra={"notification_id": notification_id, "time": t_1 - t_0}
+            log_extra={"notification_id": notification_id}
         )
 
     except Exception as e:
@@ -165,6 +161,7 @@ def handle_read_notification(notification_id):
 # Route pour enregistrer un token FCM
 @api.route("/notifications/register-token", methods=["POST"])
 @require_auth
+@measure_time()
 def register_token():
     data = request.json
     token = data.get("token")

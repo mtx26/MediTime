@@ -5,21 +5,20 @@ from app.db.connection import get_connection
 from app.services.calendar import verify_calendar
 from app.services.user import fetch_user
 from app.services.notifications import notify_and_record
-import time
 from . import api
 from urllib.parse import urljoin
 from app.config import Config
 from app.services.notifications import email_address_direct
-
+from app.utils.measure import measure_time
 
 
 # Route pour envoyer une invitation à un utilisateur pour un partage de calendrier
 @api.route("/invitations/send/<calendar_id>", methods=["POST"])
 @require_auth
 @verify_calendar
+@measure_time()
 def handle_send_invitation(calendar_id):
     try:
-        t_0 = time.time()
         owner_uid = g.uid
         payload = request.get_json(force=True)
 
@@ -118,15 +117,12 @@ def handle_send_invitation(calendar_id):
                     notification_type="calendar_invitation",
                 )
 
-
-                t_1 = time.time()
-
         return success_response(
             message="invitation envoyée", 
             code="INVITATION_SEND_SUCCESS", 
             uid=owner_uid, 
             origin="INVITATION_SEND",
-            log_extra={"calendar_id": calendar_id, "time": t_1 - t_0}
+            log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
@@ -144,9 +140,9 @@ def handle_send_invitation(calendar_id):
 # Route pour accepter une invitation pour un partage de calendrier
 @api.route("/invitations/accept/<notification_id>", methods=["POST"])
 @require_auth
+@measure_time()
 def handle_accept_invitation(notification_id):
     try:
-        t_0 = time.time()
         receiver_uid = g.uid
 
         with get_connection() as conn:
@@ -204,14 +200,12 @@ def handle_accept_invitation(notification_id):
                     notification_type="calendar_invitation_accepted",
                 )
 
-                t_1 = time.time()
-
         return success_response(
             message="invitation acceptée", 
             code="INVITATION_ACCEPT_SUCCESS", 
             uid=receiver_uid, 
             origin="INVITATION_ACCEPT",
-            log_extra={"notification_id": notification_id, "time": t_1 - t_0}
+            log_extra={"notification_id": notification_id}
         )
 
     except Exception as e:
@@ -229,9 +223,9 @@ def handle_accept_invitation(notification_id):
 # Route pour rejeter une invitation pour un partage de calendrier
 @api.route("/invitations/reject/<notification_id>", methods=["POST"])
 @require_auth
+@measure_time()
 def handle_reject_invitation(notification_id):
     try:
-        t_0 = time.time()
         receiver_uid = g.uid
 
         with get_connection() as conn:
@@ -289,14 +283,12 @@ def handle_reject_invitation(notification_id):
                     (receiver_uid, calendar_id)
                 )
 
-                t_1 = time.time()
-
         return success_response(
             message="invitation rejetée", 
             code="INVITATION_REJECT_SUCCESS", 
             uid=receiver_uid, 
             origin="INVITATION_REJECT",
-            log_extra={"notification_id": notification_id, "time": t_1 - t_0}
+            log_extra={"notification_id": notification_id}
         )
 
     except Exception as e:

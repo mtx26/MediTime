@@ -1,12 +1,12 @@
 from flask import request, g
 from app.utils.auth import require_auth
-import time
 from . import api
 from app.services.calendar import verify_calendar
 from app.services.medication import update_box, create_box, delete_box, get_boxes, restock_box
 from app.utils.responses import success_response, error_response, warning_response
 from app.services.medication import use_pillulier
 from datetime import datetime, timezone
+from app.utils.measure import measure_time
 
 ERROR_UNAUTHORIZED_ACCESS = "accès refusé"
 
@@ -14,13 +14,12 @@ ERROR_UNAUTHORIZED_ACCESS = "accès refusé"
 @api.route("/calendars/<calendar_id>/boxes", methods=["GET"])
 @require_auth
 @verify_calendar
+@measure_time()
 def handle_boxes(calendar_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         boxes = get_boxes(calendar_id)
-        t_1 = time.time()
 
         return success_response(
             message="boites de médicaments récupérées",
@@ -28,7 +27,7 @@ def handle_boxes(calendar_id):
             uid=uid,
             origin="GET_MEDICINE_BOXES",
             data={"boxes": boxes},
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "boxes_count": len(boxes) if boxes is not None else 0}
+            log_extra={"calendar_id": calendar_id, "boxes_count": len(boxes) if boxes is not None else 0}
         )
 
     except Exception as e:
@@ -47,9 +46,9 @@ def handle_boxes(calendar_id):
 @api.route("/calendars/<calendar_id>/boxes/<box_id>", methods=["PUT"])
 @require_auth
 @verify_calendar
+@measure_time()
 def handle_update_box(calendar_id, box_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         payload = request.get_json(force=True)
@@ -67,14 +66,12 @@ def handle_update_box(calendar_id, box_id):
 
         update_box(box_id, calendar_id, box)
         
-        t_1 = time.time()
-        
         return success_response(
             message="boite de médicaments modifiée",
             code="MEDICINE_BOX_UPDATED",
             uid=uid,
             origin="UPDATE_MEDICINE_BOX",
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "box_id": box_id}
+            log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
     except Exception as e:
@@ -92,9 +89,9 @@ def handle_update_box(calendar_id, box_id):
 @api.route("/calendars/<calendar_id>/boxes", methods=["POST"])
 @require_auth
 @verify_calendar
+@measure_time()
 def handle_create_box(calendar_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         payload = request.get_json(force=True)
@@ -112,14 +109,13 @@ def handle_create_box(calendar_id):
 
         box_id = create_box(calendar_id, box)
 
-        t_1 = time.time()
         return success_response(
             message="boite de médicaments créée",
             code="MEDICINE_BOX_CREATED",
             uid=uid,
             origin="CREATE_MEDICINE_BOX",
             data={"box_id": box_id},
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id}
+            log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
@@ -137,19 +133,19 @@ def handle_create_box(calendar_id):
 @api.route("/calendars/<calendar_id>/boxes/<box_id>", methods=["DELETE"])
 @require_auth
 @verify_calendar
+@measure_time()
 def handle_delete_box(calendar_id, box_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         delete_box(box_id, calendar_id)
-        t_1 = time.time()
+        
         return success_response(
             message="boite de médicaments supprimée",
             code="MEDICINE_BOX_DELETED",
             uid=uid,
             origin="DELETE_MEDICINE_BOX",
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "box_id": box_id}
+            log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
     except Exception as e:
@@ -166,9 +162,9 @@ def handle_delete_box(calendar_id, box_id):
 @api.route("/calendars/<calendar_id>/pilluliers/used", methods=["POST"])
 @require_auth
 @verify_calendar
+@measure_time()
 def handle_use_pillulier(calendar_id):
     try:
-        t_0 = time.time()
         uid = g.uid
         
         payload = request.get_json(force=True)
@@ -181,7 +177,6 @@ def handle_use_pillulier(calendar_id):
 
         result = use_pillulier(calendar_id, start_date)
 
-        t_1 = time.time()
         if result == False:
             return warning_response(
                 message="aucun médicament à utiliser",
@@ -205,7 +200,7 @@ def handle_use_pillulier(calendar_id):
             code="PILLULIER_MEDICATION_USED",
             uid=uid,
             origin="USE_PILLULIER_MEDICATION",
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id}
+            log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
         return error_response(
@@ -221,9 +216,9 @@ def handle_use_pillulier(calendar_id):
 @api.route("/calendars/<calendar_id>/boxes/<box_id>/restock", methods=["POST"])
 @require_auth
 @verify_calendar
+@measure_time()
 def handle_restock_box(calendar_id, box_id):
     try:
-        t_0 = time.time()
         uid = g.uid
 
         if not restock_box(box_id, calendar_id):
@@ -235,7 +230,6 @@ def handle_restock_box(calendar_id, box_id):
                 origin="RESTOCK_MEDICINE_BOX",
                 log_extra={"calendar_id": calendar_id, "box_id": box_id}
             )
-        t_1 = time.time()
 
         return success_response(
             message="boite de médicaments réapprovisionnée",
@@ -243,7 +237,7 @@ def handle_restock_box(calendar_id, box_id):
             uid=uid,
             origin="RESTOCK_MEDICINE_BOX",
             data={"box_id": box_id},
-            log_extra={"time": t_1 - t_0, "calendar_id": calendar_id, "box_id": box_id}
+            log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
     except Exception as e:
         return error_response(

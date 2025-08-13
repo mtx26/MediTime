@@ -3,13 +3,13 @@ from flask import request, g
 from app.utils.auth import require_auth
 from app.utils.responses import success_response, error_response, warning_response
 from app.vertex.gemini import analyze_medical_document
-import time
+from app.utils.measure import measure_time
 
 @api.route("/documents/analyze", methods=["POST"])
 @require_auth
+@measure_time()
 def handle_analyze_medical_document():
     try:
-        t_0 = time.time()
         uid = g.uid
 
         base64_image = request.json.get("image")
@@ -35,15 +35,12 @@ def handle_analyze_medical_document():
                 error="Erreur lors de l'analyse du document médical avec Gemini"
             )
 
-        t_1 = time.time()
-
         return success_response(
             message="document médical analysé avec succès",
             code="DOCUMENT_ANALYZE_SUCCESS",
             uid=uid,
             origin="DOCUMENT_ANALYZE",
-            data={"medicines": analysis_result},
-            log_extra={"time": round(t_1 - t_0, 3)}
+            data={"medicines": analysis_result}
         )
 
     except Exception as e:

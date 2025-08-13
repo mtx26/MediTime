@@ -3,12 +3,14 @@ from flask import request, g
 from app.utils.auth import require_auth
 from app.utils.responses import success_response, error_response
 from app.services.user import fetch_user, update_existing_user, insert_new_user
-import time
 from app.utils.upload import upload_logo
 from app.db.connection import get_connection
+from app.utils.measure import measure_time
+
 
 @api.route("/user/sync", methods=["GET"])
 @require_auth
+@measure_time()
 def get_user_info():
     uid = g.uid
     try:
@@ -42,6 +44,7 @@ def get_user_info():
 
 @api.route("/user/update", methods=["POST"])
 @require_auth
+@measure_time()
 def update_user_info():
     uid = g.uid
     try:
@@ -89,10 +92,10 @@ def update_user_info():
 
 @api.route("/user/photo", methods=["POST"])
 @require_auth
+@measure_time()
 def handle_user_photo():
     uid = None
     try:
-        t_0 = time.time()
         uid = g.uid
 
         photo = request.files.get("photo")
@@ -119,7 +122,7 @@ def handle_user_photo():
             code="USER_PHOTO_SUCCESS",
             uid=uid,
             origin="USER_PHOTO",
-            data={"uid": uid, "photo_url": photo_url, "time": time.time() - t_0}
+            data={"uid": uid, "photo_url": photo_url}
         )
     except Exception as e:
         return error_response(
