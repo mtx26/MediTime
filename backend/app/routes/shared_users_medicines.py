@@ -10,6 +10,7 @@ from app.utils.measure import measure_time
 
 # Route pour récupérer les boites de médicaments d'un calendrier
 @api.route("/shared/users/calendars/<calendar_id>/boxes", methods=["GET"])
+@measure_time()
 @require_auth
 @verify_calendar_share
 def handle_shared_boxes(calendar_id):
@@ -41,9 +42,9 @@ def handle_shared_boxes(calendar_id):
 
 # Route pour modifier une boite de médicaments
 @api.route("/shared/users/calendars/<calendar_id>/boxes/<box_id>", methods=["PUT"])
+@measure_time()
 @require_auth
 @verify_calendar_share
-@measure_time()
 def handle_update_shared_box(calendar_id, box_id):
     try:
         uid = g.uid
@@ -84,9 +85,9 @@ def handle_update_shared_box(calendar_id, box_id):
 
 # Route pour créer une boite de médicaments
 @api.route("/shared/users/calendars/<calendar_id>/boxes", methods=["POST"])
+@measure_time()
 @require_auth
 @verify_calendar_share
-@measure_time()
 def handle_create_shared_box(calendar_id):
     try:
         uid = g.uid
@@ -128,9 +129,9 @@ def handle_create_shared_box(calendar_id):
 
 # Route pour supprimer une boite de médicaments
 @api.route("/shared/users/calendars/<calendar_id>/boxes/<box_id>", methods=["DELETE"])
+@measure_time()
 @require_auth
 @verify_calendar_share
-@measure_time()
 def handle_delete_shared_box(calendar_id, box_id):
     try:
         uid = g.uid
@@ -157,9 +158,9 @@ def handle_delete_shared_box(calendar_id, box_id):
         )
 
 @api.route("/shared/users/calendars/<calendar_id>/pilluliers/used", methods=["POST"])
+@measure_time()
 @require_auth
 @verify_calendar_share
-@measure_time()
 def handle_use_shared_users_pillulier(calendar_id):
     try:
         uid = g.uid
@@ -202,9 +203,9 @@ def handle_use_shared_users_pillulier(calendar_id):
         
 
 @api.route("/shared/users/calendars/<calendar_id>/boxes/<box_id>/restock", methods=["POST"])
+@measure_time()
 @require_auth
 @verify_calendar_share
-@measure_time()
 def handle_shared_user_restock_box(calendar_id, box_id):
     try:
         uid = g.uid

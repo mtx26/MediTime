@@ -14,9 +14,9 @@ from app.utils.measure import measure_time
 
 # Route pour envoyer une invitation à un utilisateur pour un partage de calendrier
 @api.route("/invitations/send/<calendar_id>", methods=["POST"])
+@measure_time()
 @require_auth
 @verify_calendar
-@measure_time()
 def handle_send_invitation(calendar_id):
     try:
         owner_uid = g.uid
@@ -139,8 +139,8 @@ def handle_send_invitation(calendar_id):
 
 # Route pour accepter une invitation pour un partage de calendrier
 @api.route("/invitations/accept/<notification_id>", methods=["POST"])
-@require_auth
 @measure_time()
+@require_auth
 def handle_accept_invitation(notification_id):
     try:
         receiver_uid = g.uid
@@ -222,8 +222,8 @@ def handle_accept_invitation(notification_id):
 
 # Route pour rejeter une invitation pour un partage de calendrier
 @api.route("/invitations/reject/<notification_id>", methods=["POST"])
-@require_auth
 @measure_time()
+@require_auth
 def handle_reject_invitation(notification_id):
     try:
         receiver_uid = g.uid

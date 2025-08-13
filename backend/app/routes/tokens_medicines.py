@@ -8,8 +8,8 @@ from app.utils.measure import measure_time
 
 # Route pour obtenir les médicaments d’un token public
 @api.route("/tokens/<token>/medicines", methods=["GET"])
-@verify_token
 @measure_time()
+@verify_token
 def handle_token_medicines(token):
     try:
         calendar_id = g.calendar_id

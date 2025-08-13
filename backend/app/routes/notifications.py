@@ -30,8 +30,8 @@ def get_user_info(uid):
 
 # Route pour récupérer toutes les notifications
 @api.route("/notifications", methods=["GET"])
-@require_auth
 @measure_time()
+@require_auth
 def handle_notifications():
     try:
         uid = g.uid
@@ -117,8 +117,8 @@ def handle_notifications():
 
 # Route pour marquer une notification comme lue
 @api.route("/notifications/<notification_id>", methods=["POST"])
-@require_auth
 @measure_time()
+@require_auth
 def handle_read_notification(notification_id):
     try:
         uid = g.uid
@@ -160,8 +160,8 @@ def handle_read_notification(notification_id):
 
 # Route pour enregistrer un token FCM
 @api.route("/notifications/register-token", methods=["POST"])
-@require_auth
 @measure_time()
+@require_auth
 def register_token():
     data = request.json
     token = data.get("token")

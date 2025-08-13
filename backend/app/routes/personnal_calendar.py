@@ -16,8 +16,8 @@ ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"
 
 # Route pour récupérer les calendriers de l'utilisateur
 @api.route("/calendars", methods=["GET"])
-@require_auth
 @measure_time()
+@require_auth
 def handle_calendars():
     try:
         uid = g.uid
@@ -62,8 +62,8 @@ def handle_calendars():
 
 # Route pour créer un calendrier
 @api.route("/calendars", methods=["POST"])
-@require_auth
 @measure_time()
+@require_auth
 def handle_create_calendar():
     try:
         uid = g.uid
@@ -108,9 +108,9 @@ def handle_create_calendar():
 
 # Route pour supprimer un calendrier
 @api.route("/calendars/<calendar_id>", methods=["DELETE"])
+@measure_time()
 @require_auth
 @verify_calendar
-@measure_time()
 def handle_delete_calendar(calendar_id):
     try:
         uid = g.uid
@@ -164,9 +164,9 @@ def handle_delete_calendar(calendar_id):
 
 # Route pour renommer un calendrier
 @api.route("/calendars/<calendar_id>", methods=["PUT"])
+@measure_time()
 @require_auth
 @verify_calendar
-@measure_time()
 def handle_rename_calendar(calendar_id):
     try:
         uid = g.uid
@@ -235,9 +235,9 @@ def handle_rename_calendar(calendar_id):
 
 # Route pour générer le calendrier 
 @api.route("/calendars/<calendar_id>/schedule", methods=["GET"])
+@measure_time()
 @require_auth
 @verify_calendar
-@measure_time()
 def handle_calendar_schedule(calendar_id):
     try:
         owner_uid = g.uid
@@ -315,9 +315,9 @@ def download_pdf_calendar(calendar_id):
         )
 
 @api.route("/calendars/<calendar_id>/stock-decrement-method", methods=["GET"])
+@measure_time()
 @require_auth
 @verify_calendar
-@measure_time()
 def get_personnal_stock_decrement_method(calendar_id):
     try:
         uid = g.uid
@@ -357,9 +357,9 @@ def get_personnal_stock_decrement_method(calendar_id):
 
     
 @api.route("/calendars/<calendar_id>/stock-decrement-method", methods=["POST"])
+@measure_time()
 @require_auth
 @verify_calendar
-@measure_time()
 def update_personnal_stock_decrement_method(calendar_id):
     try:
         uid = g.uid

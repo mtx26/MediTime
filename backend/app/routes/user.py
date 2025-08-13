@@ -9,8 +9,8 @@ from app.utils.measure import measure_time
 
 
 @api.route("/user/sync", methods=["GET"])
-@require_auth
 @measure_time()
+@require_auth
 def get_user_info():
     uid = g.uid
     try:
@@ -43,8 +43,8 @@ def get_user_info():
     
 
 @api.route("/user/update", methods=["POST"])
-@require_auth
 @measure_time()
+@require_auth
 def update_user_info():
     uid = g.uid
     try:
@@ -91,8 +91,8 @@ def update_user_info():
 
 
 @api.route("/user/photo", methods=["POST"])
-@require_auth
 @measure_time()
+@require_auth
 def handle_user_photo():
     uid = None
     try:

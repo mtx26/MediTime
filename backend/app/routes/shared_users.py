@@ -23,8 +23,8 @@ SELECT_SHARED_CALENDAR = "SELECT * FROM calendars WHERE id = %s"
 
 # Route pour récupérer les calendriers partagés
 @api.route("/shared/users/calendars", methods=["GET"])
-@require_auth
 @measure_time()
+@require_auth
 def handle_shared_calendars():
     try:
         uid = g.uid
@@ -125,9 +125,9 @@ def handle_shared_calendars():
 
 # Route pour récupérer les informations d'un calendrier partagé
 @api.route("/shared/users/calendars/<calendar_id>", methods=["GET"])
+@measure_time()
 @require_auth
 @verify_calendar_share
-@measure_time()
 def handle_user_shared_calendar(calendar_id):
     try:
         uid = g.uid
@@ -183,9 +183,9 @@ def handle_user_shared_calendar(calendar_id):
         )
 
 @api.route("/shared/users/calendars/<calendar_id>/schedule", methods=["GET"])
+@measure_time()
 @require_auth
 @verify_calendar_share
-@measure_time()
 def handle_user_shared_calendar_schedule(calendar_id):
     try:
         uid = g.uid
@@ -224,9 +224,9 @@ def handle_user_shared_calendar_schedule(calendar_id):
 
 # Route pour supprimer un calendrier partagé pour le receiver
 @api.route("/shared/users/calendars/<calendar_id>", methods=["DELETE"])
+@measure_time()
 @require_auth
 @verify_calendar_share
-@measure_time()
 def handle_delete_user_shared_calendar(calendar_id):
     try:
         receiver_uid = g.uid
@@ -281,9 +281,9 @@ def handle_delete_user_shared_calendar(calendar_id):
 
 # Route pour supprimer un utilisateur partagé pour le owner
 @api.route("/shared/users/<calendar_id>/<receiver_uid>", methods=["DELETE"])
+@measure_time()
 @require_auth
 @verify_calendar
-@measure_time()
 def handle_delete_user_shared_user(calendar_id, receiver_uid):
     try:
         owner_uid = g.uid
@@ -366,9 +366,9 @@ def handle_delete_user_shared_user(calendar_id, receiver_uid):
 
 # fonction pour supprimer une invitation de calendrier partagé pour un user sans compte
 @api.route("/invitations/<calendar_id>", methods=["DELETE"])
+@measure_time()
 @require_auth
 @verify_calendar
-@measure_time()
 def delete_shared_calendar_invitation(calendar_id):
     try:
         owner_uid = g.uid
@@ -420,8 +420,8 @@ def delete_shared_calendar_invitation(calendar_id):
 
 
 @api.route("/shared/grouped", methods=["GET"])
-@require_auth
 @measure_time()
+@require_auth
 def handle_grouped_shared():
     try:
         uid = g.uid
@@ -508,9 +508,9 @@ def handle_grouped_shared():
 
 
 @api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["GET"])
+@measure_time()
 @require_auth
 @verify_calendar_share
-@measure_time()
 def handle_shared_user_notifications(calendar_id):
     try:
         uid = g.uid
@@ -550,9 +550,9 @@ def handle_shared_user_notifications(calendar_id):
         )
 
 @api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["PUT"])
+@measure_time()
 @require_auth
 @verify_calendar_share
-@measure_time()
 def handle_shared_user_notifications_update(calendar_id):
     try:
         uid = g.uid

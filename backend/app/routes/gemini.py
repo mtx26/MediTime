@@ -6,8 +6,8 @@ from app.vertex.gemini import analyze_medical_document
 from app.utils.measure import measure_time
 
 @api.route("/documents/analyze", methods=["POST"])
-@require_auth
 @measure_time()
+@require_auth
 def handle_analyze_medical_document():
     try:
         uid = g.uid

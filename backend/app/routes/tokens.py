@@ -10,8 +10,8 @@ from app.utils.measure import measure_time
 
 # Route pour récupérer tous les tokens et les informations associées
 @api.route("/tokens", methods=["GET"])
-@require_auth
 @measure_time()
+@require_auth
 def handle_tokens():
     try:
         uid = g.uid
@@ -42,9 +42,9 @@ def handle_tokens():
 
 # Route pour créer un lien de partage avec un token
 @api.route("/tokens/<calendar_id>", methods=["POST"])
+@measure_time()
 @require_auth
 @verify_calendar
-@measure_time()
 def handle_create_token(calendar_id):
     try:
         owner_uid = g.uid
@@ -106,9 +106,9 @@ def handle_create_token(calendar_id):
 
 # Route pour révoquer un token
 @api.route("/tokens/revoke/<token>", methods=["POST"])
+@measure_time()
 @require_auth
 @verify_token_owner
-@measure_time()
 def handle_update_revoke_token(token):
     try:
         owner_uid = g.uid
@@ -143,9 +143,9 @@ def handle_update_revoke_token(token):
 
 # Route pour mettre à jour l'expiration d'un token
 @api.route("/tokens/expiration/<token>", methods=["POST"])
+@measure_time()
 @require_auth
 @verify_token_owner
-@measure_time()
 def handle_update_token_expiration(token):
     try:
         owner_uid = g.uid
@@ -185,9 +185,9 @@ def handle_update_token_expiration(token):
 
 # Route pour mettre à jour les permissions d'un token
 @api.route("/tokens/permissions/<token>", methods=["POST"])
+@measure_time()
 @require_auth
 @verify_token_owner
-@measure_time()
 def handle_update_token_permissions(token):
     try:
         owner_uid = g.uid
@@ -222,8 +222,8 @@ def handle_update_token_permissions(token):
 
 # Route pour générer un calendrier partagé pour un token
 @api.route("/tokens/<token>/schedule", methods=["GET"])
-@verify_token
 @measure_time()
+@verify_token
 def handle_generate_token_schedule(token):
     try:
         start_date = request.args.get("startDate")
@@ -258,8 +258,8 @@ def handle_generate_token_schedule(token):
 
 # Route pour obtenir les métadonnées d’un token public
 @api.route("/tokens/<token>", methods=["GET"])
-@verify_token
 @measure_time()
+@verify_token
 def handle_get_token_metadata(token):
     try:
         calendar_id = g.calendar_id
@@ -302,9 +302,9 @@ def handle_get_token_metadata(token):
 
 # Route pour supprimer un token
 @api.route("/tokens/<token>", methods=["DELETE"])
+@measure_time()
 @require_auth
 @verify_token_owner
-@measure_time()
 def handle_delete_token(token):
     try:
         owner_uid = g.uid
