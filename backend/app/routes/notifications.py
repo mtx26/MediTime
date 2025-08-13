@@ -28,81 +28,56 @@ def get_user_info(uid):
     user = fetch_user(uid)
     return user.get("display_name"), user.get("email"), user.get("photo_url")
 
-# Route pour récupérer toutes les notifications
+# Route pour récupérer toutes les notifications (enrichies côté SQL)
 @api.route("/notifications", methods=["GET"])
 @measure_time()
 @require_auth
 def handle_notifications():
+    uid = g.uid
+    DEFAULT_PHOTO = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg"
+
+    sql = """
+    SELECT
+      n.id                                   AS notification_id,
+      n.type                                 AS notification_type,
+      n.read                                 AS read,
+      n.timestamp                            AS timestamp,
+
+      -- Champs tirés du JSONB "content"
+      (n.content->>'calendar_id')::uuid      AS calendar_id,
+      n.content->>'link'                     AS link,
+      n.content->>'medication_qty'           AS medication_qty,
+
+      -- Enrichissements par jointures
+      c.name                                 AS calendar_name,
+      u.display_name                         AS sender_name,
+      u.email                                AS sender_email,
+      COALESCE(u.photo_url, %s)              AS sender_photo_url,
+      mb.name                                AS medication_name
+
+    FROM notifications n
+    LEFT JOIN calendars      c  ON c.id  = NULLIF(n.content->>'calendar_id','')::uuid
+    LEFT JOIN users          u  ON u.id  = n.sender_uid
+    LEFT JOIN medicine_boxes mb ON mb.id = NULLIF(n.content->>'medication_id','')::uuid
+
+    WHERE n.user_id = %s
+      AND (n.content ? 'calendar_id')          -- même comportement que ton `if not calendar_id: continue`
+
+    ORDER BY n.timestamp DESC, n.created_at DESC;
+    """
+
     try:
-        uid = g.uid
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM notifications WHERE user_id = %s", (uid,))
-                notifications_data = cursor.fetchall()
+        with get_connection() as conn, conn.cursor() as cursor:
+            cursor.execute(sql, (DEFAULT_PHOTO, uid))
+            rows = cursor.fetchall()
 
-                if notifications_data is None:
-                    return success_response(
-                        message="aucune notification trouvée",
-                        code="NOTIFICATIONS_FETCH_SUCCESS",
-                        uid=uid,
-                        origin="NOTIFICATIONS_FETCH",
-                        data={"notifications": []}
-                    )
-
-                calendar_name_cache = {}
-                sender_info_cache = {}
-                medication_name_cache = {}
-                notifications = []
-
-                for notif in notifications_data:
-                    json_body = notif.get("content") or {}
-                    sender_uid = notif.get("sender_uid")
-                    calendar_id = json_body.get("calendar_id")
-                    link = json_body.get("link") if json_body.get("link") else None
-                    medication_id = json_body.get("medication_id") if json_body.get("medication_id") else None
-                    medication_qty = json_body.get("medication_qty") if json_body.get("medication_qty") else None
-
-                    if not calendar_id:
-                        continue
-
-                    if medication_id:
-                        if medication_id not in medication_name_cache:
-                            medication_name_cache[medication_id] = fetch_medicine_name(medication_id)
-                        medication_name = medication_name_cache[medication_id]
-                    else:
-                        medication_name = None
-
-                    # Cache calendar name
-                    if calendar_id not in calendar_name_cache:
-                        calendar_name_cache[calendar_id] = get_calendar_name(calendar_id)
-                    calendar_name = calendar_name_cache[calendar_id]
-
-                    # Cache sender info
-                    if sender_uid not in sender_info_cache:
-                        sender_info_cache[sender_uid] = get_user_info(sender_uid)
-                    sender_name, sender_email, sender_photo_url = sender_info_cache[sender_uid]
-
-                    notifications.append({
-                        "notification_id": notif.get("id"),
-                        "notification_type": notif.get("type"),
-                        "read": notif.get("read"),
-                        "timestamp": notif.get("timestamp"),
-                        "calendar_id": calendar_id,
-                        "calendar_name": calendar_name,
-                        "sender_name": sender_name,
-                        "sender_email": sender_email,
-                        "sender_photo_url": sender_photo_url or DEFAULT_PHOTO,
-                        "link" : link,
-                        "medication_name": medication_name,
-                        "medication_qty": medication_qty,
-                    })
-
+        # Pas d'appends: on renvoie les lignes enrichies directement
         return success_response(
             message="notifications récupérées",
             code="NOTIFICATIONS_FETCH_SUCCESS",
             uid=uid,
             origin="NOTIFICATIONS_FETCH",
-            data={"notifications": notifications}
+            data={"notifications": rows}
         )
 
     except Exception as e:
