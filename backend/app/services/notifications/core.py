@@ -149,7 +149,7 @@ def build_notification_text(notification_type: str, context: NotificationDict) -
 
 def generate_email_content(notification_type: str, context: NotificationDict) -> Tuple[str, str, str]:
     title, body_html, cta_label = build_notification_text(notification_type, context)
-    link = context.get("link") or f"{Config.FRONTEND_URL}/notifications"
+    link = f"{Config.FRONTEND_URL}/{context.get("link") or f"notifications"}"
     html = f"""
         <p style="font-size:16px;color:#555;white-space:pre-line;">{body_html}</p>
         <div style="margin:32px 0;">

@@ -5,7 +5,6 @@ from app.db.connection import get_connection
 from app.services.calendar import verify_calendar
 from app.services.notifications import notify_and_record
 from . import api
-from urllib.parse import urljoin
 from app.config import Config
 from app.services.notifications import email_address_direct
 from app.utils.measure import measure_time
@@ -39,7 +38,7 @@ def handle_send_invitation(calendar_id):
                     print(token_raw)
                     token = token_raw.get("token")
 
-                    link = f"{Config.FRONTEND_URL}/accept-invite?token={token}&type=registration"
+                    link = f"/accept-invite?token={token}&type=registration"
 
                     email_address_direct(
                         to_email=receiver_email,
@@ -104,7 +103,7 @@ def handle_send_invitation(calendar_id):
                 )
                 token = cursor.fetchone().get("token")
 
-                link = urljoin(Config.FRONTEND_URL or "", f"/accept-invite?token={token}&type=invitation")
+                link = f"/accept-invite?token={token}&type=invitation"
 
                 # Créer une notif pour l'utilisateur receveur
                 notify_and_record(
@@ -223,7 +222,7 @@ def delete_login_invitation(calendar_id, receiver_uid):
                         owner_uid
                     )
                 )       
-                link = urljoin(Config.FRONTEND_URL or "", f"/calendar/{calendar_id}")
+                link = f"/calendar/{calendar_id}"
 
                 notify_and_record(
                     user_id=receiver_uid,
@@ -289,7 +288,7 @@ def handle_accept_login_invitation(notification_id):
                 
                 calendar_id = notification.get("content").get("calendar_id")
                 sender_uid = notification.get("sender_uid")
-                link = urljoin(Config.FRONTEND_URL or "", f"/shared-calendars?calendar={calendar_id}")
+                link = f"/shared-calendars?calendar={calendar_id}"
                 # Dire que l'utilisateur receveur a accepté l'invitation
                 cursor.execute(
                     """
@@ -372,7 +371,7 @@ def handle_reject_login_invitation(notification_id):
 
                 calendar_id = notification.get("content").get("calendar_id")
                 owner_uid = notification.get("sender_uid")
-                link = urljoin(Config.FRONTEND_URL or "", f"/shared-calendars?calendar={calendar_id}")
+                link = f"/shared-calendars?calendar={calendar_id}"
                 # Supprimer la notif
                 cursor.execute(
                     """
