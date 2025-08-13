@@ -4,8 +4,6 @@ import { useTranslation, Trans } from 'react-i18next';
 export default function NotificationLine({
   notif,
   onRead,
-  onAccept,
-  onReject,
   navigate,
 }) {
   const { t } = useTranslation();
@@ -52,27 +50,15 @@ export default function NotificationLine({
         actions = (
           <div className="mt-2">
             <button
-              aria-label={t('accept')}
-              title={t('accept')}
+              aria-label={t('open')}
+              title={t('open')}
               className="btn btn-sm btn-outline-success me-2"
               onClick={async (e) => {
                 e.stopPropagation();
-                await onAccept(notif.notification_id);
-                navigate(`/shared-user-calendar/${notif.calendar_id}`);
+                navigate(notif.link);
               }}
             >
-              <i className="bi bi-check-circle-fill me-2 text-success"></i> {t('accept')}
-            </button>
-            <button
-              aria-label={t('reject')}
-              title={t('reject')}
-              className="btn btn-sm btn-outline-danger"
-              onClick={(e) => {
-                e.stopPropagation();
-                onReject(notif.notification_id);
-              }}
-            >
-              <i className="bi bi-x-circle-fill me-2 text-danger"></i> {t('reject')}
+              <i className="bi bi-arrow-right-circle me-2 text-success"></i> {t('open')}
             </button>
           </div>
         );

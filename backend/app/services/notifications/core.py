@@ -149,7 +149,7 @@ def build_notification_text(notification_type: str, context: NotificationDict) -
 
 def generate_email_content(notification_type: str, context: NotificationDict) -> Tuple[str, str, str]:
     title, body_html, cta_label = build_notification_text(notification_type, context)
-    link = f"{Config.FRONTEND_URL}/{context.get("link") or f"notifications"}"
+    link = f"{Config.FRONTEND_URL}{context.get('link') or f'/notifications'}"
     html = f"""
         <p style="font-size:16px;color:#555;white-space:pre-line;">{body_html}</p>
         <div style="margin:32px 0;">
@@ -174,12 +174,23 @@ def save_notifications(user_id: str, notification_type: str, items: List[Notific
             for item in items:
                 title, body_html, _ = build_notification_text(notification_type, item)
                 content = {**item, "title": title, "body": body_html}
+                shared_calendar_id = item.get("shared_calendar_id") or None
+                print(shared_calendar_id)
                 cur.execute(
                     """
-                    INSERT INTO notifications (user_id, type, read, timestamp, sender_uid, content)
-                    VALUES (%s, %s, %s, NOW(), %s, %s::jsonb)
+                    INSERT INTO notifications (
+                        user_id, type, read, timestamp, sender_uid, content, shared_calendar_id
+                    )
+                    VALUES (%s, %s, %s, NOW(), %s, %s::jsonb, %s)
                     """,
-                    (user_id, notification_type, False, item.get("sender_uid"), json.dumps(content)),
+                    (
+                        user_id,
+                        notification_type,
+                        False,
+                        item.get("sender_uid"),
+                        json.dumps(content),
+                        shared_calendar_id
+                    ),
                 )
             conn.commit()
     except Exception as e:

@@ -212,6 +212,10 @@
   },
   "home": "Willkommen",
   "invalid_or_expired_link": "Dieser freigegebene Kalenderlink ist ungültig oder abgelaufen.",
+  "invitation": {
+    "invalid_or_expired": "Ungültige oder abgelaufene Einladung",
+    "title": "Einladung"
+  },
   "link": "Link",
   "link_already_exists": "Für diesen Kalender existiert bereits ein Link.",
   "link_copied": "🔗 Link kopiert!",

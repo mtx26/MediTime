@@ -223,3 +223,199 @@ def verify_token_owner(token=None, uid=None):
         return wrapper
 
     return _verify_token_owner(token, uid)
+
+
+def _verify_login_invite_owner(token: str, uid: str):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT sc.calendar_id, sc.receiver_uid, c.owner_uid
+                    FROM shared_calendars sc
+                    JOIN calendars c ON c.id = sc.calendar_id
+                    WHERE sc.token = %s
+                """, (token,))
+                row = cursor.fetchone()
+                if not row:
+                    return False
+
+                if row.get("owner_uid") != uid:
+                    return False
+
+                # On hydrate via retour: calendar_id + receiver_uid
+                return {
+                    "calendar_id": row.get("calendar_id"),
+                    "receiver_uid": row.get("receiver_uid"),
+                }
+
+    except Exception as e:
+        logger.error("erreur lors de la vérification du login invite owner", {
+            "origin": "LOGIN_INVITE_OWNER_VERIFY_ERROR",
+            "token": token,
+            "uid": uid,
+            "error": str(e)
+        })
+        return False
+
+
+def verify_login_invitation_owner(token=None, uid=None):
+    if callable(token):
+        f = token
+
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            tok = (
+                kwargs.get("token")
+                or (request.view_args.get("token") if request.view_args else None)
+                or request.args.get("token")
+            )
+            user_id = kwargs.get("uid") or getattr(g, "uid", None)
+            data = _verify_login_invite_owner(tok, user_id) if tok and user_id else False
+            if not data:
+                return warning_response(
+                    message="accès refusé",
+                    code="LOGIN_INVITE_OWNER_VERIFY_DENIED",
+                    uid=user_id,
+                    origin="LOGIN_INVITE_OWNER_VERIFY",
+                )
+            # hydrate pour le handler
+            g.calendar_id = data["calendar_id"]
+            g.receiver_uid = data["receiver_uid"]
+            return f(*args, **kwargs)
+
+        return wrapper
+
+    # mode appel direct
+    return _verify_login_invite_owner(token, uid)
+
+
+# --- REGISTRATION INVITATION (invitations) ---
+
+def _verify_registration_invite_owner(token: str, uid: str):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT i.calendar_id, i.invited_email, c.owner_uid
+                    FROM invitations i
+                    JOIN calendars c ON c.id = i.calendar_id
+                    WHERE i.token = %s
+                """, (token,))
+                row = cursor.fetchone()
+                if not row:
+                    return False
+
+                if row.get("owner_uid") != uid:
+                    return False
+
+                # On hydrate via retour: calendar_id + invited_email
+                return {
+                    "calendar_id": row.get("calendar_id"),
+                    "invited_email": row.get("invited_email"),
+                }
+
+    except Exception as e:
+        logger.error("erreur lors de la vérification du registration invite owner", {
+            "origin": "REG_INVITE_OWNER_VERIFY_ERROR",
+            "token": token,
+            "uid": uid,
+            "error": str(e)
+        })
+        return False
+
+
+def verify_registration_invitation_owner(token=None, uid=None):
+    if callable(token):
+        f = token
+
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            tok = (
+                kwargs.get("token")
+                or (request.view_args.get("token") if request.view_args else None)
+                or request.args.get("token")
+            )
+            user_id = kwargs.get("uid") or getattr(g, "uid", None)
+            data = _verify_registration_invite_owner(tok, user_id) if tok and user_id else False
+            if not data:
+                return warning_response(
+                    message="accès refusé",
+                    code="REG_INVITE_OWNER_VERIFY_DENIED",
+                    uid=user_id,
+                    origin="REG_INVITE_OWNER_VERIFY",
+                )
+            # hydrate pour le handler
+            g.calendar_id = data["calendar_id"]
+            g.invited_email = data["invited_email"]
+            return f(*args, **kwargs)
+
+        return wrapper
+
+    # mode appel direct
+    return _verify_registration_invite_owner(token, uid)
+
+
+def _verify_login_invite_receiver(token: str, uid: str):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT sc.calendar_id, sc.receiver_uid, sc.accepted, c.owner_uid
+                    FROM shared_calendars sc
+                    JOIN calendars c ON c.id = sc.calendar_id
+                    WHERE sc.token = %s
+                """, (token,))
+                row = cursor.fetchone()
+                if not row:
+                    return False
+
+                # ici on exige que le token cible bien ce receiver
+                if row.get("receiver_uid") != uid:
+                    return False
+
+                return {
+                    "calendar_id": row.get("calendar_id"),
+                    "owner_uid": row.get("owner_uid"),
+                    "accepted": row.get("accepted"),
+                }
+
+    except Exception as e:
+        logger.error("erreur lors de la vérification du login invite receiver", {
+            "origin": "LOGIN_INVITE_RECEIVER_VERIFY_ERROR",
+            "token": token,
+            "uid": uid,
+            "error": str(e)
+        })
+        return False
+
+
+def verify_login_invitation_receiver(token=None, uid=None):
+    if callable(token):
+        f = token
+
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            tok = (
+                kwargs.get("token")
+                or (request.view_args.get("token") if request.view_args else None)
+                or request.args.get("token")
+            )
+            user_id = kwargs.get("uid") or getattr(g, "uid", None)
+            data = _verify_login_invite_receiver(tok, user_id) if tok and user_id else False
+            if not data:
+                return warning_response(
+                    message="accès refusé",
+                    code="LOGIN_INVITE_RECEIVER_VERIFY_DENIED",
+                    uid=user_id,
+                    origin="LOGIN_INVITE_RECEIVER_VERIFY",
+                )
+            # hydrate pour le handler
+            g.calendar_id = data["calendar_id"]
+            g.owner_uid = data["owner_uid"]
+            g.invitation_accepted = data["accepted"]
+            return f(*args, **kwargs)
+
+        return wrapper
+
+    # mode appel direct
+    return _verify_login_invite_receiver(token, uid)

@@ -212,6 +212,10 @@
   },
   "home": "Benvenuto",
   "invalid_or_expired_link": "Questo collegamento al calendario condiviso non è valido o è scaduto.",
+  "invitation": {
+    "invalid_or_expired": "Invito non valido o scaduto",
+    "title": "Invito"
+  },
   "link": "Collegamento",
   "link_already_exists": "Esiste già un collegamento per questo calendario.",
   "link_copied": "🔗 Link copiato!",

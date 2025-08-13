@@ -212,6 +212,10 @@
   },
   "home": "Accueil",
   "invalid_or_expired_link": "Ce lien de calendrier partagé est invalide ou a expiré.",
+  "invitation": {
+    "invalid_or_expired": "Invitation invalide ou expirée",
+    "title": "Invitation"
+  },
   "link": "Lien",
   "link_already_exists": "Un lien existe déjà pour ce calendrier.",
   "link_copied": "🔗 Lien copié !",

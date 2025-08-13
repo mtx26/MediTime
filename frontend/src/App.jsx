@@ -358,58 +358,99 @@ function App() {
 
   /// login
 
-  // Fonction pour supprimer un utilisateur partagé pour le owner
-  const deleteLoginInvitation = useCallback(async (calendarId, userId) => {
+  // Fonction pour récupérer une invitation
+  const getLoginInvitation = useCallback(async (token) => {
     return await performApiCall({
-      url: `${API_URL}/api/invitations/login/${calendarId}/${userId}`,
+      url: `${API_URL}/api/invitations/login/${token}`,
+      method: 'GET',
+      origin: 'INVITATION_GET',
+      uid,
+      analyticsEvent: 'get_invitation',
+      analyticsData: { token, uid },
+    });
+  }, []);
+
+  // Fonction pour supprimer un utilisateur partagé pour le owner
+  const deleteLoginInvitation = useCallback(async (token) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/login/${token}`,
       method: 'DELETE',
       origin: 'SHARED_USER_DELETE',
       uid,
       analyticsEvent: 'delete_shared_user',
-      analyticsData: { calendarId, userId, uid },
+      analyticsData: { token, uid },
     });
   }, []);
   
 
   // Fonction pour accepter une invitation
-  const acceptLoginInvitation = useCallback(async (notificationId) => {
+  const acceptLoginInvitation = useCallback(async (token) => {
     return await performApiCall({
-      url: `${API_URL}/api/invitations/login/accept/${notificationId}`,
+      url: `${API_URL}/api/invitations/login/accept/${token}`,
       method: 'POST',
       origin: 'INVITATION_ACCEPT',
       uid,
       analyticsEvent: 'accept_invitation',
-      analyticsData: { notificationId, uid },
+      analyticsData: { token, uid },
     });
   }, []);
   
 
   // Fonction pour rejeter une invitation
-  const rejectLoginInvitation = useCallback(async (notificationId) => {
+  const rejectLoginInvitation = useCallback(async (token) => {
     return await performApiCall({
-      url: `${API_URL}/api/invitations/login/reject/${notificationId}`,
+      url: `${API_URL}/api/invitations/login/reject/${token}`,
       method: 'POST',
       origin: 'INVITATION_REJECT',
       uid,
       analyticsEvent: 'reject_invitation',
-      analyticsData: { notificationId, uid },
+      analyticsData: { token, uid },
     });
   }, []);
 
   /// Registration
 
-  const deleteRegistrationInvitation = useCallback(async (calendar_id, receiver_email, token) => {
+  const getRegistrationInvitation = useCallback(async (token) => {
     return await performApiCall({
-      url: `${API_URL}/api/invitations/registration/${calendar_id}`,
+      url: `${API_URL}/api/invitations/registration/${token}`,
+      method: 'GET',
+      origin: 'INVITATION_GET',
+      uid,
+      analyticsEvent: 'get_invitation',
+      analyticsData: { token, uid },
+    });
+  }, []);
+
+  const deleteRegistrationInvitation = useCallback(async (token) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/registration/${token}`,
       method: 'DELETE',
       origin: 'INVITATION_DELETE',
-      body: {
-        email: receiver_email,
-        token: token
-      },
       uid,
       analyticsEvent: 'delete_invitation',
-      analyticsData: { calendar_id, uid },
+      analyticsData: { token, uid },
+    });
+  }, []);
+
+  const acceptRegistrationInvitation = useCallback(async (token) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/registration/accept/${token}`,
+      method: 'POST',
+      origin: 'INVITATION_ACCEPT',
+      uid,
+      analyticsEvent: 'accept_invitation',
+      analyticsData: { token, uid },
+    });
+  }, []);
+
+  const rejectRegistrationInvitation = useCallback(async (token) => {
+    return await performApiCall({
+      url: `${API_URL}/api/invitations/registration/reject/${token}`,
+      method: 'POST',
+      origin: 'INVITATION_REJECT',
+      uid,
+      analyticsEvent: 'reject_invitation',
+      analyticsData: { token, uid },
     });
   }, []);
 
@@ -662,9 +703,13 @@ function App() {
       fetchSharedUserCalendarSchedule,
       fetchGroupedSharedCalendars,
       sendInvitation,
+      getLoginInvitation,
       acceptLoginInvitation,
       rejectLoginInvitation,
       deleteLoginInvitation,
+      getRegistrationInvitation,
+      acceptRegistrationInvitation,
+      rejectRegistrationInvitation,
       deleteRegistrationInvitation,
       deleteSharedCalendar,
       sharedCalendarsData,

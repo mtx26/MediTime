@@ -212,6 +212,10 @@
   },
   "home": "いらっしゃいませ",
   "invalid_or_expired_link": "この共有カレンダーのリンクは無効か期限が切れています。",
+  "invitation": {
+    "invalid_or_expired": "無効または期限切れの招待",
+    "title": "招待"
+  },
   "link": "リンク",
   "link_already_exists": "このカレンダーへのリンクは既に存在します。",
   "link_copied": "🔗 リンクをコピーしました!",

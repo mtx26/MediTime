@@ -123,46 +123,43 @@ function SharedList({
     setSelectedModifyToken(null);
   };
 
-  const deleteLoginInvitationConfirmAction = (calendarId, user) => {
+  const deleteLoginInvitationConfirmAction = (token) => {
     setAlertType("confirm-danger");
     setAlertMessage(t("delete_access_confirm"));
-    setAlertId(user.receiver_uid + "-" + calendarId);
-    setOnConfirmAction(() => () => handleDeleteLoginInvitation(calendarId, user));
+    setAlertId(token);
+    setOnConfirmAction(() => () => handleDeleteLoginInvitation(token));
   };
 
   // 🔄 Suppression de l'utilisateur
-  const handleDeleteLoginInvitation = async (calendarId, user) => {
-    const rep = await sharedUserCalendars.deleteLoginInvitation(
-      calendarId,
-      user.receiver_uid,
-    );
+  const handleDeleteLoginInvitation = async (token) => {
+    const rep = await sharedUserCalendars.deleteLoginInvitation(token);
     if (rep.success) {
       setAlertType("success");
       setAlertMessage("✅ " + rep.message);
-      setAlertId(user.receiver_uid + "-" + calendarId);
+      setAlertId(token);
       setTimeout(async () => {
         await setGroupedSharedFunction();
       }, 1000);
     } else {
       setAlertType("danger");
       setAlertMessage("❌ " + rep.error);
-      setAlertId(user.receiver_uid + "-" + calendarId);
+      setAlertId(token);
     }
   };
 
-  const deleteRegistrationInvitationConfirmAction = (calendarId, receiverEmail, token) => {
+  const deleteRegistrationInvitationConfirmAction = (token) => {
     setAlertType("confirm-danger");
     setAlertMessage(t("delete_link_confirm"));
-    setAlertId(token + "-" + calendarId);
-    setOnConfirmAction(() => () => handledeleteRegistrationInvitation(calendarId, receiverEmail, token));
+    setAlertId(token);
+    setOnConfirmAction(() => () => handledeleteRegistrationInvitation(token));
   };
 
-  const handledeleteRegistrationInvitation = async (calendarId, receiverEmail, token) => {
-    const rep = await sharedUserCalendars.deleteRegistrationInvitation(calendarId, receiverEmail, token);
+  const handledeleteRegistrationInvitation = async (token) => {
+    const rep = await sharedUserCalendars.deleteRegistrationInvitation(token);
     if (rep.success) {
       setAlertType("success");
       setAlertMessage("✅ " + rep.message);
-      setAlertId(token + "-" + calendarId);
+      setAlertId(token);
       setTimeout(async () => {
         await setGroupedSharedFunction();
       }, 1000);
@@ -283,7 +280,7 @@ function SharedList({
 
   if (
     personalCalendars.calendarsData &&
-    personalCalendars.calendarsData.length === 0
+    personalCalendars.calendarsData?.length === 0
   ) {
     return (
       <div className="container mt-4 text-center">
@@ -300,7 +297,7 @@ function SharedList({
           className="d-flex flex-nowrap gap-2 p-1 overflow-auto"
           style={{ scrollBehavior: 'smooth' }}
         >
-          {personalCalendars.calendarsData.map((calendar) => (
+          {(personalCalendars?.calendarsData || []).map((calendar) => (
             <button
               key={calendar.id}
               className={`btn rounded-pill px-3 py-1 fw-semibold shadow-sm text-nowrap ${
@@ -747,8 +744,8 @@ function UserList({
         </h5>
         {/* Liste des utilisateurs partagés */}
         {(data.users || []).map((user) => (
-          <li className="list-group-item" key={user.receiver_uid + "-" + calendarId}>
-            {alertId === user.receiver_uid + "-" + calendarId && (
+          <li className="list-group-item" key={user.token}>
+            {alertId === user.token && (
               <AlertSystem
                 type={alertType}
                 message={alertMessage}
@@ -808,7 +805,7 @@ function UserList({
                           <i className="bi bi-trash"></i> {t('delete')}
                         </>
                       ),
-                      onClick: () => deleteLoginInvitationConfirmAction(calendarId, user),
+                      onClick: () => deleteLoginInvitationConfirmAction(user.token),
                       danger: true,
                     },
                   ]}
@@ -820,36 +817,20 @@ function UserList({
         ))}
         {/* Liste des utilisateurs invités */}
         {(data.invitation || []).map((invitation) => {
-          const isExpired = invitation.expires_at && new Date(invitation.expires_at) < new Date();
 
-          let badgeClass = "bg-warning text-dark";
-          let badgeText = t("pending");
-
-          if (isExpired) {
-            badgeClass = "bg-danger";
-            badgeText = t("expired");
-          } else if (invitation.accepted) {
-            badgeClass = "bg-success";
-            badgeText = t("accepted");
-          }
-
-          const displayName = invitation.receiver_name || invitation.invited_email || t("unknown_user");
-          const displayEmail = invitation.receiver_email || invitation.invited_email || "";
+          const displayName = invitation.invited_email || t("unknown_user");
 
           const avatarUrl =
             invitation.receiver_photo_url ||
             `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`;
 
-          const expiresDate = invitation.expires_at
-            ? new Date(invitation.expires_at).toLocaleDateString()
-            : t("no_expiration");
 
           return (
             <li
               className="list-group-item"
-              key={invitation.token + "-" + calendarId}
+              key={invitation.token}
             >
-              {alertId === invitation.token + "-" + calendarId && (
+              {alertId === invitation.token && (
                 <AlertSystem
                   type={alertType}
                   message={alertMessage}
@@ -874,16 +855,13 @@ function UserList({
                   />
                   <div>
                     <strong>{displayName}</strong>
-                    <div className="text-muted" style={{ fontSize: "0.85rem" }}>
-                      {t("expires_at")}: {expiresDate}
-                    </div>
                   </div>
                 </div>
 
                 {/* Colonne statut */}
                 <div className="col-2 d-flex align-items-center justify-content-center">
-                  <span className={`badge rounded-pill ${badgeClass}`}>
-                    {badgeText}
+                  <span className={`badge rounded-pill bg-warning text-dark`}>
+                    {t("pending")}
                   </span>
                 </div>
 
@@ -897,7 +875,7 @@ function UserList({
                             <i className="bi bi-trash"></i> {t("delete")}
                           </>
                         ),
-                        onClick: () => deleteRegistrationInvitationConfirmAction(calendarId, invitation.invited_email, invitation.token),
+                        onClick: () => deleteRegistrationInvitationConfirmAction(invitation.token),
                         danger: true,
                       },
                     ]}

@@ -212,6 +212,10 @@
   },
   "home": "Bienvenido",
   "invalid_or_expired_link": "Este enlace de calendario compartido no es válido o ha expirado.",
+  "invitation": {
+    "invalid_or_expired": "Invitación no válida o vencida",
+    "title": "Invitación"
+  },
   "link": "Enlace",
   "link_already_exists": "Ya existe un enlace para este calendario.",
   "link_copied": "🔗 ¡Enlace copiado!",

@@ -100,7 +100,6 @@ function Navbar({ sharedProps }) {
   }, []);
 
   const { notificationsData, readNotification } = sharedProps.notifications;
-  const { acceptLoginInvitation, rejectLoginInvitation } =  sharedProps.sharedUserCalendars;
 
   if (isPillboxPage) {
     return (
@@ -303,8 +302,6 @@ function Navbar({ sharedProps }) {
                             key={notif.notification_id}
                             notif={notif}
                             onRead={readNotification}
-                            onAccept={acceptLoginInvitation}
-                            onReject={rejectLoginInvitation}
                             navigate={navigate}
                           />
                         ))

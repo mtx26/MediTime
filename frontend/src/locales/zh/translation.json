@@ -212,6 +212,10 @@
   },
   "home": "欢迎",
   "invalid_or_expired_link": "此共享日历链接无效或已过期。",
+  "invitation": {
+    "invalid_or_expired": "邀请无效或已过期",
+    "title": "邀请"
+  },
   "link": "关联",
   "link_already_exists": "此日历的链接已存在。",
   "link_copied": "🔗 链接已复制！",
