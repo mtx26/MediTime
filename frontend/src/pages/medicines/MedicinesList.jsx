@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useRealtimeTokenMedicines } from '../../hooks/realtime/useRealtimeMedicines';
 import { useTranslation } from 'react-i18next';
 
 function MedicinesList() {
   // 📍 Paramètres d’URL et navigation
   const { sharedToken } = useParams(); // Récupération du token de partage depuis l'URL
-  const navigate = useNavigate(); // Hook de navigation
   const { t, i18n } = useTranslation();
 
   // ✅ État de récupération des médicaments partagés
@@ -50,14 +49,6 @@ function MedicinesList() {
 
   return (
     <div className="container mt-4">
-      <button
-        className="btn btn-outline-primary mb-3"
-        onClick={() => navigate(`/shared-token-calendar/${sharedToken}`)}
-      >
-        <i className="bi bi-calendar-date"></i>
-        <span> {t('medicines.back_to_calendar')}</span>
-      </button>
-
       <h4>
         <i className="bi bi-capsule"></i>
         <span> {t('medicines.list_title')}</span>
