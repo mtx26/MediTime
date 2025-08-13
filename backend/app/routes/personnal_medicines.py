@@ -13,20 +13,12 @@ ERROR_UNAUTHORIZED_ACCESS = "accès refusé"
 # Route pour récupérer les boites de médicaments d'un calendrier
 @api.route("/calendars/<calendar_id>/boxes", methods=["GET"])
 @require_auth
+@verify_calendar
 def handle_boxes(calendar_id):
     try:
         t_0 = time.time()
         uid = g.uid
 
-        if not verify_calendar(calendar_id, uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="UNAUTHORIZED_ACCESS",
-                status_code=404,
-                uid=uid,
-                origin="GET_MEDICINE_BOXES",
-                log_extra={"calendar_id": calendar_id}
-            )
         boxes = get_boxes(calendar_id)
         t_1 = time.time()
 
@@ -54,6 +46,7 @@ def handle_boxes(calendar_id):
 # Route pour modifier une boite de médicaments
 @api.route("/calendars/<calendar_id>/boxes/<box_id>", methods=["PUT"])
 @require_auth
+@verify_calendar
 def handle_update_box(calendar_id, box_id):
     try:
         t_0 = time.time()
@@ -61,7 +54,7 @@ def handle_update_box(calendar_id, box_id):
 
         data = request.get_json()
 
-        if not data or not verify_calendar(calendar_id, uid):
+        if not data:
             return warning_response(
                 message="champs requis manquants",
                 code="MISSING_REQUIRED_FIELDS",
@@ -97,6 +90,7 @@ def handle_update_box(calendar_id, box_id):
 # Route pour créer une boite de médicaments
 @api.route("/calendars/<calendar_id>/boxes", methods=["POST"])
 @require_auth
+@verify_calendar
 def handle_create_box(calendar_id):
     try:
         t_0 = time.time()
@@ -104,7 +98,7 @@ def handle_create_box(calendar_id):
 
         data = request.get_json()
 
-        if not data or not verify_calendar(calendar_id, uid):
+        if not data:
             return warning_response(
                 message="champs requis manquants",
                 code="MISSING_REQUIRED_FIELDS",
@@ -140,20 +134,11 @@ def handle_create_box(calendar_id):
 # Route pour supprimer une boite de médicaments
 @api.route("/calendars/<calendar_id>/boxes/<box_id>", methods=["DELETE"])
 @require_auth
+@verify_calendar
 def handle_delete_box(calendar_id, box_id):
     try:
         t_0 = time.time()
         uid = g.uid
-
-        if not verify_calendar(calendar_id, uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="UNAUTHORIZED_ACCESS",
-                status_code=404,
-                uid=uid,
-                origin="DELETE_MEDICINE_BOX",
-                log_extra={"calendar_id": calendar_id}
-            )
 
         delete_box(box_id, calendar_id)
         t_1 = time.time()
@@ -178,6 +163,7 @@ def handle_delete_box(calendar_id, box_id):
 
 @api.route("/calendars/<calendar_id>/pilluliers/used", methods=["POST"])
 @require_auth
+@verify_calendar
 def handle_use_pillulier(calendar_id):
     try:
         t_0 = time.time()
@@ -187,16 +173,6 @@ def handle_use_pillulier(calendar_id):
             start_date = datetime.now(timezone.utc).date()
         else:
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-        
-        if not verify_calendar(calendar_id, uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="UNAUTHORIZED_ACCESS",
-                status_code=404,
-                uid=uid,
-                origin="USE_PILLULIER_MEDICATION",
-                log_extra={"calendar_id": calendar_id}
-            )
 
         result = use_pillulier(calendar_id, start_date)
 
@@ -239,20 +215,11 @@ def handle_use_pillulier(calendar_id):
     
 @api.route("/calendars/<calendar_id>/boxes/<box_id>/restock", methods=["POST"])
 @require_auth
+@verify_calendar
 def handle_restock_box(calendar_id, box_id):
     try:
         t_0 = time.time()
         uid = g.uid
-
-        if not verify_calendar(calendar_id, uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="UNAUTHORIZED_ACCESS",
-                status_code=404,
-                uid=uid,
-                origin="RESTOCK_MEDICINE_BOX",
-                log_extra={"calendar_id": calendar_id, "box_id": box_id}
-            )
 
         if not restock_box(box_id, calendar_id):
             return warning_response(

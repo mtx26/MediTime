@@ -1,32 +1,24 @@
 from . import api
+from flask import g
 import time
 from app.db.connection import get_connection
 from app.services.calendar import verify_token
-from app.utils.responses import success_response, error_response, warning_response
+from app.utils.responses import success_response, error_response
 
 
 # Route pour obtenir les médicaments d’un token public
 @api.route("/tokens/<token>/medicines", methods=["GET"])
+@verify_token
 def handle_token_medicines(token):
     try:
         t_0 = time.time()
-        calendar_id = verify_token(token)
-        if not calendar_id:
-            return warning_response(
-                message="token invalide",
-                code="TOKEN_INVALID",
-                status_code=404,
-                uid="unknown",
-                origin="TOKEN_MEDICINES_LOAD",
-                log_extra={"token": token}
-            )
-            
+        calendar_id = g.calendar_id
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
-                    SELECT 
-                        cond.*,
+                    SELECT
+                        cond.*, 
                         box.name,
                         box.dose,
                         box.box_capacity,

@@ -8,8 +8,6 @@ from app.db.connection import get_connection
 from app.services.calendar import generate_calendar_schedule
 from app.services.calendar import verify_calendar, verify_token_owner, verify_token
 
-ERROR_UNAUTHORIZED_ACCESS = "accès refusé"
-
 # Route pour récupérer tous les tokens et les informations associées
 @api.route("/tokens", methods=["GET"])
 @require_auth
@@ -48,6 +46,7 @@ def handle_tokens():
 # Route pour créer un lien de partage avec un token
 @api.route("/tokens/<calendar_id>", methods=["POST"])
 @require_auth
+@verify_calendar
 def handle_create_token(calendar_id):
     try:
         t_0 = time.time()
@@ -63,8 +62,6 @@ def handle_create_token(calendar_id):
         
         if not permissions:
             permissions = ["read"]
-
-        verify_calendar(calendar_id, owner_uid)
 
 
         # Verifier si le calendrier est déjà partagé
@@ -114,20 +111,11 @@ def handle_create_token(calendar_id):
 # Route pour révoquer un token
 @api.route("/tokens/revoke/<token>", methods=["POST"])
 @require_auth
+@verify_token_owner
 def handle_update_revoke_token(token):
     try:
         t_0 = time.time()
         owner_uid = g.uid
-
-        if not verify_token_owner(token, owner_uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS, 
-                code="TOKEN_NOT_AUTHORIZED", 
-                status_code=403, 
-                uid=owner_uid, 
-                origin="TOKEN_REVOKE", 
-                log_extra={"token": token}
-            )
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -162,6 +150,7 @@ def handle_update_revoke_token(token):
 # Route pour mettre à jour l'expiration d'un token
 @api.route("/tokens/expiration/<token>", methods=["POST"])
 @require_auth
+@verify_token_owner
 def handle_update_token_expiration(token):
     try:
         t_0 = time.time()
@@ -175,16 +164,6 @@ def handle_update_token_expiration(token):
         if expires_at:
             expires_at = datetime.strptime(expires_at, "%Y-%m-%d").date()
 
-        if not verify_token_owner(token, owner_uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS, 
-                code="TOKEN_NOT_AUTHORIZED", 
-                status_code=403, 
-                uid=owner_uid, 
-                origin="TOKEN_EXPIRATION_UPDATE", 
-                log_extra={"token": token}
-            )
-        
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("UPDATE shared_tokens SET expires_at = %s WHERE id = %s AND owner_uid = %s", (expires_at, token, owner_uid))
@@ -214,6 +193,7 @@ def handle_update_token_expiration(token):
 # Route pour mettre à jour les permissions d'un token
 @api.route("/tokens/permissions/<token>", methods=["POST"])
 @require_auth
+@verify_token_owner
 def handle_update_token_permissions(token):
     try:
         t_0 = time.time()
@@ -221,16 +201,6 @@ def handle_update_token_permissions(token):
 
         data = request.get_json(force=True)
 
-        if not verify_token_owner(token, owner_uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS, 
-                code="TOKEN_NOT_AUTHORIZED", 
-                status_code=403, 
-                uid=owner_uid, 
-                origin="TOKEN_PERMISSIONS_UPDATE", 
-                log_extra={"token": token}
-            )
-        
         permissions = data.get("permissions")
 
         with get_connection() as conn:
@@ -262,6 +232,7 @@ def handle_update_token_permissions(token):
 # Route pour générer un calendrier partagé pour un token
 @api.route("/tokens/<token>/schedule", methods=["GET"])
 @require_auth
+@verify_token
 def handle_generate_token_schedule(token):
     try:
         t_0 = time.time()
@@ -272,16 +243,7 @@ def handle_generate_token_schedule(token):
         else:
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
-        calendar_id = verify_token(token)
-        if not calendar_id:
-            return warning_response(
-                message="token invalide", 
-                code="TOKEN_INVALID", 
-                status_code=404, 
-                uid="unknown", 
-                origin="TOKEN_GENERATE_SCHEDULE", 
-                log_extra={"token": token}
-            )
+        calendar_id = g.calendar_id
 
         schedule, table, calendar_name = generate_calendar_schedule(calendar_id, start_date)
         
@@ -309,18 +271,10 @@ def handle_generate_token_schedule(token):
 # Route pour obtenir les métadonnées d’un token public
 @api.route("/tokens/<token>", methods=["GET"])
 @require_auth
+@verify_token
 def handle_get_token_metadata(token):
     try:
         t_0 = time.time()
-        if not verify_token(token):
-            return warning_response(
-                message="token invalide",
-                code="TOKEN_INVALID",
-                status_code=404,
-                uid="unknown",
-                origin="TOKEN_METADATA_LOAD",
-                log_extra={"token": token}
-            )
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -365,20 +319,11 @@ def handle_get_token_metadata(token):
 # Route pour supprimer un token
 @api.route("/tokens/<token>", methods=["DELETE"])
 @require_auth
+@verify_token_owner
 def handle_delete_token(token):
     try:
         t_0 = time.time()
         owner_uid = g.uid
-
-        if not verify_token_owner(token, owner_uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS, 
-                code="TOKEN_NOT_AUTHORIZED", 
-                status_code=403, 
-                uid=owner_uid, 
-                origin="TOKEN_DELETE", 
-                log_extra={"token": token}
-            )
 
         with get_connection() as conn:
             with conn.cursor() as cursor:

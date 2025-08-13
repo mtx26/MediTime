@@ -131,21 +131,12 @@ def handle_shared_calendars():
 # Route pour récupérer les informations d'un calendrier partagé
 @api.route("/shared/users/calendars/<calendar_id>", methods=["GET"])
 @require_auth
+@verify_calendar_share
 def handle_user_shared_calendar(calendar_id):
     try:
         t_0 = time.time()
         receiver_uid = g.uid
 
-        if not verify_calendar_share(calendar_id, receiver_uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="SHARED_CALENDARS_LOAD_ERROR",
-                status_code=403,
-                uid=receiver_uid,
-                origin="SHARED_CALENDARS_LOAD",
-                log_extra={"calendar_id": calendar_id}
-            )
-        
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(SELECT_SHARED_CALENDAR, (calendar_id,))
@@ -197,23 +188,13 @@ def handle_user_shared_calendar(calendar_id):
             log_extra={"calendar_id": calendar_id}
         )
 
-# Route pour générer un calendrier partagé
 @api.route("/shared/users/calendars/<calendar_id>/schedule", methods=["GET"])
 @require_auth
+@verify_calendar_share
 def handle_user_shared_calendar_schedule(calendar_id):
     try:
         t_0 = time.time()
         uid = g.uid
-
-        if not verify_calendar_share(calendar_id, uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="SHARED_CALENDARS_LOAD_ERROR",
-                status_code=403,
-                uid=uid,
-                origin="SHARED_CALENDARS_LOAD",
-                log_extra={"calendar_id": calendar_id}
-            )
 
         start_date = request.args.get("startTime")
         if not start_date:
@@ -251,21 +232,11 @@ def handle_user_shared_calendar_schedule(calendar_id):
 # Route pour supprimer un calendrier partagé pour le receiver
 @api.route("/shared/users/calendars/<calendar_id>", methods=["DELETE"])
 @require_auth
+@verify_calendar_share
 def handle_delete_user_shared_calendar(calendar_id):
     try:
         t_0 = time.time()
         receiver_uid = g.uid
-
-        if not verify_calendar_share(calendar_id, receiver_uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS, 
-                code="SHARED_CALENDARS_DELETE_ERROR", 
-                status_code=403, 
-                uid=receiver_uid, 
-                origin="SHARED_CALENDARS_DELETE",
-                log_extra={"calendar_id": calendar_id}
-            )
-        
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -319,6 +290,7 @@ def handle_delete_user_shared_calendar(calendar_id):
 # Route pour supprimer un utilisateur partagé pour le owner
 @api.route("/shared/users/<calendar_id>/<receiver_uid>", methods=["DELETE"])
 @require_auth
+@verify_calendar
 def handle_delete_user_shared_user(calendar_id, receiver_uid):
     try:
         t_0 = time.time()
@@ -404,20 +376,11 @@ def handle_delete_user_shared_user(calendar_id, receiver_uid):
 # fonction pour supprimer une invitation de calendrier partagé pour un user sans compte
 @api.route("/invitations/<calendar_id>", methods=["DELETE"])
 @require_auth
+@verify_calendar
 def delete_shared_calendar_invitation(calendar_id):
     try:
         t_0 = time.time()
         owner_uid = g.uid
-
-        if not verify_calendar(calendar_id, owner_uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="UNAUTHORIZED_ACCESS",
-                status_code=404,
-                uid=owner_uid,
-                origin="GET_MEDICINE_BOXES",
-                log_extra={"calendar_id": calendar_id}
-            )
 
         token = request.get_json(force=True).get("token")
         receiver_email = request.get_json(force=True).get("email")
@@ -557,19 +520,11 @@ def handle_grouped_shared():
 
 @api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["GET"])
 @require_auth
+@verify_calendar_share
 def handle_shared_user_notifications(calendar_id):
     try:
         t_0 = time.time()
         uid = g.uid
-        if not verify_calendar_share(calendar_id, uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
-                status_code=403,
-                uid=uid,
-                origin="SHARED_CALENDARS_NOTIFICATIONS",
-                log_extra={"calendar_id": calendar_id}
-            )
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT notifications_enabled FROM shared_calendars WHERE calendar_id = %s", (calendar_id,))
@@ -606,19 +561,11 @@ def handle_shared_user_notifications(calendar_id):
 
 @api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["PUT"])
 @require_auth
+@verify_calendar_share
 def handle_shared_user_notifications_update(calendar_id):
     try:
         t_0 = time.time()
         uid = g.uid
-        if not verify_calendar_share(calendar_id, uid):
-            return warning_response(
-                message=ERROR_UNAUTHORIZED_ACCESS,
-                code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
-                status_code=403,
-                uid=uid,
-                origin="SHARED_CALENDARS_NOTIFICATIONS",
-                log_extra={"calendar_id": calendar_id}
-            )
         data = request.get_json()
         if not data or "notifications-enabled" not in data:
             return warning_response(

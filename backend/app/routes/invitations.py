@@ -16,6 +16,7 @@ from app.services.notifications import email_address_direct
 # Route pour envoyer une invitation à un utilisateur pour un partage de calendrier
 @api.route("/invitations/send/<calendar_id>", methods=["POST"])
 @require_auth
+@verify_calendar
 def handle_send_invitation(calendar_id):
     try:
         t_0 = time.time()
@@ -23,16 +24,6 @@ def handle_send_invitation(calendar_id):
 
         receiver_email = request.get_json(force=True).get("email")
 
-        if not verify_calendar(calendar_id, owner_uid):
-            return warning_response(
-                message="calendrier non trouvé", 
-                code="CALENDAR_NOT_FOUND", 
-                status_code=404, 
-                uid=owner_uid, 
-                origin="INVITATION_SEND",
-                log_extra={"calendar_id": calendar_id}
-            )
-        
         owner = fetch_user(owner_uid)
 
         with get_connection() as conn:

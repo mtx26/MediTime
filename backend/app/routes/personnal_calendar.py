@@ -109,19 +109,20 @@ def handle_create_calendar():
 # Route pour supprimer un calendrier
 @api.route("/calendars", methods=["DELETE"])
 @require_auth
+@verify_calendar
 def handle_delete_calendar():
     try:
         t_0 = time.time()
         uid = g.uid
         calendar_id = request.json.get("calendarId")
 
-        if not calendar_id or not verify_calendar(calendar_id, uid):
+        if not calendar_id:
             return warning_response(
-                message="identifiant de calendrier invalide", 
-                code="CALENDAR_DELETE_ERROR", 
-                status_code=400, 
-                uid=uid, 
-                origin="CALENDAR_DELETE_ERROR", 
+                message="identifiant de calendrier invalide",
+                code="CALENDAR_DELETE_ERROR",
+                status_code=400,
+                uid=uid,
+                origin="CALENDAR_DELETE_ERROR",
                 log_extra={"calendar_id": calendar_id}
             )
 
@@ -165,6 +166,7 @@ def handle_delete_calendar():
 # Route pour renommer un calendrier
 @api.route("/calendars", methods=["PUT"])
 @require_auth
+@verify_calendar
 def handle_rename_calendar():
     try:
         t_0 = time.time()
@@ -173,19 +175,9 @@ def handle_rename_calendar():
         calendar_id = data.get("calendarId")
         new_calendar_name = data.get("newCalendarName")
 
-        if not verify_calendar(calendar_id, uid):
-            return warning_response(
-                message="accès refusé", 
-                code="ACCESS_DENIED", 
-                status_code=400, 
-                uid=uid, 
-                origin="CALENDAR_RENAME", 
-                log_extra={"calendar_id": calendar_id, "new_calendar_name": new_calendar_name}
-            )
-
         if not new_calendar_name:
             return warning_response(
-                message="nom de calendrier manquant", 
+                message="nom de calendrier manquant",
                 code="CALENDAR_RENAME_ERROR", 
                 status_code=400, 
                 uid=uid, 
@@ -246,6 +238,7 @@ def handle_rename_calendar():
 # Route pour générer le calendrier 
 @api.route("/calendars/<calendar_id>/schedule", methods=["GET"])
 @require_auth
+@verify_calendar
 def handle_calendar_schedule(calendar_id):
     try:
         t_0 = time.time()
@@ -256,16 +249,6 @@ def handle_calendar_schedule(calendar_id):
             start_date = datetime.now(timezone.utc).date()
         else:
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-
-        if not verify_calendar(calendar_id, owner_uid):
-            return warning_response(
-                message="accès refusé", 
-                code="ACCESS_DENIED", 
-                status_code=400, 
-                uid=owner_uid, 
-                origin="CALENDAR_GENERATE", 
-                log_extra={"calendar_id": calendar_id}
-            )
 
         schedule, table, calendar_name = generate_calendar_schedule(calendar_id, start_date)
 
@@ -297,35 +280,7 @@ def handle_calendar_schedule(calendar_id):
 def download_pdf_calendar(calendar_id):
     try:
         t_0 = time.time()
-        # TODO: Secirisé cette route
-        """        token = request.args.get("token")
-                if not token:
-                    return error_response(
-                        message="token manquant",
-                        code="MISSING_TOKEN",
-                        status_code=400,
-                        origin="PDF_DOWNLOAD"
-                    )
-
-                user = decode_token(token)
-                if not user:
-                    return warning_response(
-                        message="accès refusé", 
-                        code="ACCESS_DENIED", 
-                        status_code=400, 
-                        origin="PDF_DOWNLOAD", 
-                        log_extra={"calendar_id": calendar_id}
-                    )
-                uid = user.get("sub")
-                if not verify_calendar(calendar_id, uid):
-                    return warning_response(
-                        message="accès refusé", 
-                        code="ACCESS_DENIED", 
-                        status_code=400, 
-                        origin="PDF_DOWNLOAD", 
-                        log_extra={"calendar_id": calendar_id}
-                    )
-        """
+        # TODO: Sécuriser cette route
 
         if not calendar_id:
             return error_response(
@@ -366,19 +321,11 @@ def download_pdf_calendar(calendar_id):
 
 @api.route("/calendars/<calendar_id>/stock-decrement-method", methods=["GET"])
 @require_auth
+@verify_calendar
 def get_personnal_stock_decrement_method(calendar_id):
     try:
         t_0 = time.time()
         uid = g.uid
-        if not verify_calendar(calendar_id, uid):
-            return warning_response(
-                message="accès refusé", 
-                code="ACCESS_DENIED",
-                status_code=400,
-                uid=uid,
-                origin="STOCK_DECREMENT_METHOD_FETCH",
-                log_extra={"calendar_id": calendar_id}
-            )
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT stock_decrement_method FROM calendars WHERE id = %s", (calendar_id,))
@@ -416,6 +363,7 @@ def get_personnal_stock_decrement_method(calendar_id):
     
 @api.route("/calendars/<calendar_id>/stock-decrement-method", methods=["POST"])
 @require_auth
+@verify_calendar
 def update_personnal_stock_decrement_method(calendar_id):
     try:
         t_0 = time.time()
@@ -424,23 +372,14 @@ def update_personnal_stock_decrement_method(calendar_id):
 
         if not method:
             return warning_response(
-                message="method manquant", 
-                code="STOCK_DECREMENT_METHOD_UPDATE_ERROR", 
-                status_code=400, 
-                uid=uid, 
-                origin="STOCK_DECREMENT_METHOD_UPDATE", 
+                message="method manquant",
+                code="STOCK_DECREMENT_METHOD_UPDATE_ERROR",
+                status_code=400,
+                uid=uid,
+                origin="STOCK_DECREMENT_METHOD_UPDATE",
                 log_extra={"calendar_id": calendar_id}
             )
 
-        if not verify_calendar(calendar_id, uid):
-            return warning_response(
-                message="accès refusé", 
-                code="ACCESS_DENIED", 
-                status_code=400, 
-                uid=uid, 
-                origin="STOCK_DECREMENT_METHOD_UPDATE", 
-                log_extra={"calendar_id": calendar_id}
-            )
         uptate_stock_decrement_method(calendar_id, method)
         t_1 = time.time()
         return success_response(
@@ -461,52 +400,3 @@ def update_personnal_stock_decrement_method(calendar_id):
             log_extra={"calendar_id": calendar_id}
         )
 
-"""@api.route("/calendars/<calendar_id>/notifications", methods=["GET"])
-@require_auth
-def fetch_personal_notifications_enabled(calendar_id):
-    try:
-        t_0 = time.time()
-        uid = g.uid
-        if not verify_calendar(calendar_id, uid):
-            return warning_response(
-                message="accès refusé", 
-                code="ACCESS_DENIED", 
-                status_code=400, 
-                uid=uid, 
-                origin="NOTIFICATIONS_FETCH", 
-                log_extra={"calendar_id": calendar_id}
-            )
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("SELECT notifications_enabled FROM calendars WHERE id = %s", (calendar_id,))
-                result = cursor.fetchone()
-                if result is None:
-                    return warning_response(
-                        message=ERROR_CALENDAR_NOT_FOUND,
-                        code="NOTIFICATIONS_FETCH_ERROR",
-                        status_code=404,
-                        uid=uid,
-                        origin="NOTIFICATIONS_FETCH",
-                        log_extra={"calendar_id": calendar_id}
-                    )
-                notifications_enabled = result.get("notifications_enabled", False)
-        t_1 = time.time()
-        return success_response(
-            message="notifications récupérées",
-            code="NOTIFICATIONS_FETCH_SUCCESS",
-            uid=uid,
-            origin="NOTIFICATIONS_FETCH",
-            data={"notifications_enabled": notifications_enabled},
-            log_extra={"calendar_id": calendar_id, "notifications-enabled": notifications_enabled, "time": t_1 - t_0}
-        )
-    except Exception as e:
-        return error_response(
-            message="erreur lors de la récupération des notifications",
-            code="NOTIFICATIONS_FETCH_ERROR",
-            status_code=500,
-            uid=uid,
-            origin="NOTIFICATIONS_FETCH",
-            error=str(e),
-            log_extra={"calendar_id": calendar_id}
-        )
-"""
