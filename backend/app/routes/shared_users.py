@@ -310,15 +310,15 @@ def handle_grouped_shared():
         '[]'::jsonb
       ) AS users,
 
-      -- TOKENS
-      COALESCE(
+        -- TOKENS
+        COALESCE(
         (
-          SELECT jsonb_agg( (to_jsonb(st) - 'id') ORDER BY st.created_at )
-          FROM shared_tokens st
-          WHERE st.calendar_id = c.id
+            SELECT jsonb_agg(to_jsonb(st) ORDER BY st.created_at)
+            FROM shared_tokens st
+            WHERE st.calendar_id = c.id
         ),
         '[]'::jsonb
-      ) AS tokens,
+        ) AS tokens,
 
       -- INVITATIONS
       COALESCE(
