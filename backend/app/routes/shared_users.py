@@ -83,66 +83,7 @@ def handle_shared_calendars():
             origin="SHARED_CALENDARS_LOAD",
             error=str(e)
         )
-    
 
-# Route pour récupérer les informations d'un calendrier partagé
-@api.route("/shared/users/calendars/<calendar_id>", methods=["GET"])
-@measure_time()
-@require_auth
-@verify_calendar_share
-def handle_user_shared_calendar(calendar_id):
-    try:
-        uid = g.uid
-
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(SELECT_SHARED_CALENDAR, (calendar_id,))
-                calendar = cursor.fetchone()
-                if not calendar:
-                    return warning_response(
-                        message=ERROR_CALENDAR_NOT_FOUND,
-                        code="SHARED_CALENDARS_LOAD_ERROR",
-                        status_code=404,
-                        uid=uid,
-                        origin="SHARED_CALENDARS_LOAD",
-                        log_extra={"calendar_id": calendar_id}
-                    )
-                calendar_name = calendar.get("name")
-                owner_uid = calendar.get("owner_uid")
-
-
-                cursor.execute("SELECT * FROM shared_calendars WHERE calendar_id = %s", (calendar_id,))
-                shared_user = cursor.fetchone()
-                if not shared_user:
-                    return warning_response(
-                        message=ERROR_CALENDAR_NOT_FOUND,
-                        code="SHARED_CALENDARS_LOAD_ERROR",
-                        status_code=404,
-                        uid=uid,
-                        origin="SHARED_CALENDARS_LOAD",
-                        log_extra={"calendar_id": calendar_id}
-                    )
-                access = shared_user.get("access", "read")
-
-        return success_response(
-            message=SUCCESS_SHARED_CALENDARS_LOAD,
-            code="SHARED_CALENDARS_LOAD_SUCCESS",
-            uid=uid,
-            origin="SHARED_CALENDARS_LOAD",
-            data={"calendar_id": calendar_id, "calendar_name": calendar_name, "access": access, "owner_uid": owner_uid},
-            log_extra={"calendar_id": calendar_id}
-        )
-
-    except Exception as e:
-        return error_response(
-            message="erreur lors de la récupération du calendrier partagé",
-            code="SHARED_CALENDARS_ERROR",
-            status_code=500,
-            uid=uid,
-            origin="SHARED_CALENDARS_LOAD",
-            error=str(e),
-            log_extra={"calendar_id": calendar_id}
-        )
 
 @api.route("/shared/users/calendars/<calendar_id>/schedule", methods=["GET"])
 @measure_time()
