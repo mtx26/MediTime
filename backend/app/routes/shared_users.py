@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 from . import api
 from app.services.calendar import verify_calendar_share, generate_calendar_schedule
 from flask import request, g
-from app.services.user import fetch_user
 from app.utils.responses import success_response, error_response, warning_response
 from app.db.connection import get_connection
 from app.services.notifications import notify_and_record
@@ -29,97 +28,62 @@ def handle_shared_calendars():
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM shared_calendars WHERE receiver_uid = %s AND accepted = true", (uid,))
-                shared_users = cursor.fetchall()
+                cursor.execute("""
+                    SELECT
+                        sc.calendar_id AS id,
+                        sc.access,
+                        c.name AS name,
+                        c.owner_uid,
+                        u.display_name AS owner_name,
+                        u.email AS owner_email,
+                        COALESCE(u.photo_url, 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg') AS owner_photo_url,
+                        COUNT(mb.id) AS "boxesCount",
+                        COALESCE(BOOL_OR(mb.stock_quantity <= mb.stock_alert_threshold), FALSE) AS "ifLowStock"
+                    FROM shared_calendars sc
+                    JOIN calendars c            ON sc.calendar_id = c.id
+                    JOIN users u                ON c.owner_uid = u.id
+                    LEFT JOIN medicine_boxes mb ON mb.calendar_id = c.id
+                    WHERE sc.receiver_uid = %s
+                      AND sc.accepted = TRUE
+                    GROUP BY
+                        sc.calendar_id, sc.access, c.id, c.name, c.owner_uid,
+                        u.display_name, u.email, u.photo_url
+                """, (uid,))
+                rows = cursor.fetchall()
 
-                if not shared_users:
-                    return success_response(
-                        message=SUCCESS_SHARED_CALENDARS_LOAD,
-                        code="SHARED_CALENDARS_LOAD_EMPTY", 
-                        uid=uid,
-                        origin="SHARED_CALENDARS_LOAD",
-                        data={"calendars": []}
-                    )
+        if not rows:
+            return success_response(
+                message=SUCCESS_SHARED_CALENDARS_LOAD,
+                code="SHARED_CALENDARS_LOAD_EMPTY",
+                uid=uid,
+                origin="SHARED_CALENDARS_LOAD",
+                data={"calendars": []}
+            )
 
-                calendars_list = []
-                for shared_user in shared_users:
+        calendars_list = [
+            dict(row)
+            for row in rows
+            if verify_calendar_share(row["id"], uid)
+        ]
 
-                    calendar_id = shared_user.get("calendar_id")
-                    access = shared_user.get("access", "read")
-
-                    # Récupère le calendrier nom du calendrier et le nom de l'owner
-                    cursor.execute(SELECT_SHARED_CALENDAR, (calendar_id,))
-                    calendar = cursor.fetchone()
-                    if not calendar:
-                        return warning_response(
-                            message=ERROR_CALENDAR_NOT_FOUND,
-                            code="SHARED_CALENDARS_LOAD_ERROR",
-                            status_code=404,
-                            uid=uid,
-                            origin="SHARED_CALENDARS_LOAD",
-                            log_extra={"calendar_id": calendar_id}
-                        )
-                    owner_uid = calendar.get("owner_uid")
-
-                    # Récupère le nombre de médicaments
-                    cursor.execute("SELECT COUNT(*) FROM medicine_boxes WHERE calendar_id = %s", (calendar_id,))
-                    boxes_count = cursor.fetchone()
-                    boxes_count = boxes_count.get("count", 0) if boxes_count else 0
-
-                    if_low_stock = check_if_stock_is_low(calendar_id)
-
-                    calendar_name = calendar.get("name")
-
-                    # Récupère les infos de l'owner
-                    owner = fetch_user(owner_uid)
-                    if owner is None:
-                        return warning_response(
-                            message="utilisateur partagé non trouvé",
-                            code="SHARED_CALENDARS_LOAD_ERROR",
-                            status_code=404,
-                            uid=uid,
-                            origin="SHARED_CALENDARS_LOAD",
-                            log_extra={"calendar_id": calendar_id, "calendar_name": calendar_name}
-                        )
-                    owner_name = owner.get("display_name")
-                    owner_email = owner.get("email")
-                    owner_photo_url = owner.get("photo_url")
-                    if not owner_photo_url:
-                        owner_photo_url = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg"
-
-                    if not verify_calendar_share(calendar_id, uid):
-                        continue
-
-                    # Ajoute les infos à la réponse
-                    calendars_list.append({
-                        "id": calendar_id,
-                        "name": calendar_name,
-                        "owner_uid": owner_uid,
-                        "owner_name": owner_name,
-                        "owner_photo_url": owner_photo_url,
-                        "owner_email": owner_email,
-                        "access": access,
-                        "boxesCount": boxes_count,
-                        "ifLowStock": if_low_stock
-                    })
-
-                return success_response(
-                    message=SUCCESS_SHARED_CALENDARS_LOAD, 
-                    code="SHARED_CALENDARS_LOAD_SUCCESS", 
-                    uid=uid, 
-                    origin="SHARED_CALENDARS_LOAD",
-                    data={"calendars": calendars_list}
-                )
+        return success_response(
+            message=SUCCESS_SHARED_CALENDARS_LOAD,
+            code="SHARED_CALENDARS_LOAD_SUCCESS",
+            uid=uid,
+            origin="SHARED_CALENDARS_LOAD",
+            data={"calendars": calendars_list}
+        )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération des calendriers partagés", 
-            code="SHARED_CALENDARS_ERROR", 
-            status_code=500, 
-            uid=uid, 
+            message="erreur lors de la récupération des calendriers partagés",
+            code="SHARED_CALENDARS_ERROR",
+            status_code=500,
+            uid=g.get("uid"),
             origin="SHARED_CALENDARS_LOAD",
             error=str(e)
         )
+    
 
 # Route pour récupérer les informations d'un calendrier partagé
 @api.route("/shared/users/calendars/<calendar_id>", methods=["GET"])
