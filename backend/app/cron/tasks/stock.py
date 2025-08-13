@@ -9,32 +9,42 @@ def decrease_stock():
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                # recup les calendar avec stock_decrement_method = auto
+                # Récupère d'un coup tous les calendars concernés + leurs boîtes
                 cursor.execute("""
-                    SELECT * FROM calendars
-                    WHERE stock_decrement_method = 'daily_midnight'
+                    SELECT
+                      c.id AS calendar_id,
+                      COALESCE(
+                        jsonb_agg(to_jsonb(mb) ORDER BY mb.created_at)
+                          FILTER (WHERE mb.id IS NOT NULL),
+                        '[]'::jsonb
+                      ) AS boxes
+                    FROM calendars c
+                    LEFT JOIN medicine_boxes mb ON mb.calendar_id = c.id
+                    WHERE c.stock_decrement_method = 'daily_midnight'
+                    GROUP BY c.id
                 """)
-                calendars = cursor.fetchall()
+                rows = cursor.fetchall()
 
-                for calendar in calendars:
-                    calendar_id = calendar.get("id")
-                    cursor.execute("""
-                        SELECT * FROM medicine_boxes
-                        WHERE calendar_id = %s
-                    """, (calendar_id,))
-                    results = cursor.fetchall()
+                current_date = datetime.now(timezone.utc).date()
 
-                    current_date = datetime.now(timezone.utc).date()
+                for row in rows:
+                    calendar_id = row.get("calendar_id")
+                    boxes = row.get("boxes") or []
 
-                    for result in results:
-                        id_box = result.get("id")
-                        qty = result.get("stock_quantity")
+                    for box in boxes:
+                        id_box = box.get("id")
+                        qty = box.get("stock_quantity")
                         process_box_decrement(cursor, id_box, qty, current_date, days=1)
-                    
+
+                    # Une seule notif par calendrier après traitement de ses boîtes
                     check_low_stock_and_notify_for_calendar(calendar_id)
 
             conn.commit()
         log_backend.info("✅ Fin de la diminution des stocks", {"origin": "CRON", "code": "STOCK_DECREASE_SUCCESS"})
 
     except Exception as e:
-        log_backend.error(f"Erreur lors de la diminution des stocks: {e}", {"origin": "CRON", "code": "STOCK_DECREASE_ERROR", "error": str(e)})
+        log_backend.error(
+            f"Erreur lors de la diminution des stocks: {e}",
+            {"origin": "CRON", "code": "STOCK_DECREASE_ERROR", "error": str(e)}
+        )
+
