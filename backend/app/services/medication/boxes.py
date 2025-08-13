@@ -36,28 +36,52 @@ def get_boxes(calendar_id):
     return boxes or []
 
 def update_box(box_id, calendar_id, box):
+    import json
+
     name = box.get("name")
     dose = box.get("dose")
     box_capacity = box.get("box_capacity")
     stock_alert_threshold = box.get("stock_alert_threshold")
     stock_quantity = box.get("stock_quantity")
-    conditions = box.get("conditions", [])
+    conditions = box.get("conditions", []) or []
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
-                UPDATE medicine_boxes 
-                SET name = %s, dose = %s, box_capacity = %s, stock_alert_threshold = %s, stock_quantity = %s 
-                WHERE id = %s AND calendar_id = %s
-            """, (name, dose, box_capacity, stock_alert_threshold, stock_quantity, box_id, calendar_id))
-            cursor.execute("DELETE FROM medicine_box_conditions WHERE box_id = %s", (box_id,))
-            if conditions:
-                for condition in conditions:
-                    cursor.execute("""
-                        INSERT INTO medicine_box_conditions 
-                        (id, box_id, tablet_count, interval_days, start_date, time_of_day)
-                        VALUES (%s, %s, %s, %s, %s, %s)
-                    """, (condition.get("id"), box_id, condition.get("tablet_count"), condition.get("interval_days"), condition.get("start_date"), condition.get("time_of_day")))
+WITH upd AS (
+  UPDATE medicine_boxes 
+  SET name = %s,
+      dose = %s,
+      box_capacity = %s,
+      stock_alert_threshold = %s,
+      stock_quantity = %s
+  WHERE id = %s AND calendar_id = %s
+  RETURNING id
+),
+del AS (
+  DELETE FROM medicine_box_conditions
+  WHERE box_id = %s
+),
+ins AS (
+  INSERT INTO medicine_box_conditions (id, box_id, tablet_count, interval_days, start_date, time_of_day)
+  SELECT
+    COALESCE((c->>'id')::uuid, gen_random_uuid())                 AS id,
+    %s                                                             AS box_id,
+    (c->>'tablet_count')::float8                                   AS tablet_count,
+    (c->>'interval_days')::int                                     AS interval_days,
+    NULLIF(c->>'start_date','')::date                              AS start_date,
+    COALESCE(NULLIF(c->>'time_of_day',''), 'morning')              AS time_of_day
+  FROM jsonb_array_elements(%s::jsonb) AS c
+  RETURNING 1
+)
+SELECT 1;
+""", (
+    name, dose, box_capacity, stock_alert_threshold, stock_quantity,
+    box_id, calendar_id,      # upd WHERE
+    box_id,                   # del
+    box_id,                   # ins (box_id)
+    json.dumps(conditions)    # ins (payload)
+))
             conn.commit()
 
 def create_box(calendar_id, box):
