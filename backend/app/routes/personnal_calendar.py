@@ -23,24 +23,30 @@ def handle_calendars():
         uid = g.uid
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM calendars WHERE owner_uid = %s", (uid,))
+                cursor.execute("""
+                    SELECT 
+                        c.*, 
+                        COUNT(mb.id) AS count
+                    FROM calendars c
+                    LEFT JOIN medicine_boxes mb 
+                        ON mb.calendar_id = c.id
+                    WHERE c.owner_uid = %s
+                    GROUP BY c.id
+                """, (uid,))
                 calendars = cursor.fetchall()
 
-                if calendars is None:
+                if not calendars:
                     return warning_response(
                         message=ERROR_CALENDAR_NOT_FOUND, 
                         code="CALENDAR_FETCH_ERROR", 
                         status_code=404, 
                         uid=uid, 
-                        origin="CALENDAR_FETCH", 
+                        origin="CALENDAR_FETCH"
                     )
-                for calendar in calendars:
-                    cursor.execute("SELECT COUNT(*) FROM medicine_boxes WHERE calendar_id = %s", (calendar["id"],))
-                    boxes_count = cursor.fetchone()
-                    calendar["boxesCount"] = boxes_count.get("count", 0) if boxes_count else 0
 
-                    if_low_stock = check_if_stock_is_low(calendar["id"])
-                    calendar["ifLowStock"] = if_low_stock
+                for calendar in calendars:
+                    calendar["boxesCount"] = calendar.get("count", 0)
+                    calendar["ifLowStock"] = check_if_stock_is_low(calendar["id"])
 
         return success_response(
             message="calendriers récupérés", 
