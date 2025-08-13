@@ -1,0 +1,39 @@
+name: Dump public schema
+
+on:
+  schedule:
+    - cron: "0 2 * * *"   # Tous les jours à 02h
+  workflow_dispatch:
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # ✅ Donne le droit de push
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        run: |
+          curl -sL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz \
+          | tar -xz && sudo mv supabase /usr/local/bin/supabase
+
+      - name: Dump public (schema only)
+        run: |
+          mkdir -p dumps
+          supabase db dump --db-url "$SUPABASE_DB_URL" \
+            --schema public \
+            --file dumps/public_schema.sql
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dumps/public_schema.sql
+          git commit -m "Update public schema" || echo "No changes"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
