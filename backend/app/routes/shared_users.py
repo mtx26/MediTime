@@ -281,69 +281,74 @@ def handle_delete_user_shared_calendar(calendar_id):
 @measure_time()
 @require_auth
 def handle_grouped_shared():
+    uid = g.uid
+
+    sql = """
+    SELECT
+      c.id   AS calendar_id,
+      c.name AS calendar_name,
+
+      -- USERS (shared_calendars x users)
+      COALESCE(
+        (
+          SELECT jsonb_agg(
+                   jsonb_build_object(
+                     'receiver_uid', sc.receiver_uid,
+                     'access', sc.access,
+                     'accepted', sc.accepted,
+                     'token', sc.token,
+                     'receiver_photo_url', COALESCE(u.photo_url, 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg'),
+                     'receiver_name', u.display_name,
+                     'receiver_email', u.email
+                   )
+                   ORDER BY u.display_name NULLS LAST
+                 )
+          FROM shared_calendars sc
+          JOIN users u ON u.id = sc.receiver_uid
+          WHERE sc.calendar_id = c.id
+        ),
+        '[]'::jsonb
+      ) AS users,
+
+      -- TOKENS
+      COALESCE(
+        (
+          SELECT jsonb_agg( (to_jsonb(st) - 'id') ORDER BY st.created_at )
+          FROM shared_tokens st
+          WHERE st.calendar_id = c.id
+        ),
+        '[]'::jsonb
+      ) AS tokens,
+
+      -- INVITATIONS
+      COALESCE(
+        (
+          SELECT jsonb_agg( (to_jsonb(i) - 'id') ORDER BY i.created_at )
+          FROM invitations i
+          WHERE i.calendar_id = c.id
+        ),
+        '[]'::jsonb
+      ) AS invitations
+
+    FROM calendars c
+    WHERE c.owner_uid = %s
+    ORDER BY c.name;
+    """
+
     try:
-        uid = g.uid
+        with get_connection() as conn, conn.cursor() as cursor:
+            cursor.execute(sql, (uid,))
+            rows = cursor.fetchall()
 
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                # Étape 1 : récupérer tous les calendriers personnels
-                cursor.execute("SELECT id, name FROM calendars WHERE owner_uid = %s", (uid,))
-                calendars = cursor.fetchall()
-                calendar_ids = [cal["id"] for cal in calendars]
-
-                grouped = {
-                    cal["id"]: {
-                        "calendar_name": cal["name"],
-                        "users": [],
-                        "invitation": [],
-                        "tokens": []
-                    }
-                    for cal in calendars
-                }
-
-                # Étape 2 : récupérer les utilisateurs partagés
-                cursor.execute("SELECT * FROM shared_calendars WHERE calendar_id = ANY(%s::uuid[])", (calendar_ids,))
-                shared_users = cursor.fetchall()
-
-                for shared in shared_users:
-                    calendar_id = shared["calendar_id"]
-                    receiver_uid = shared["receiver_uid"]
-
-                    if not verify_calendar_share(calendar_id, receiver_uid):
-                        continue
-
-                    receiver = fetch_user(receiver_uid)
-                    if not receiver:
-                        continue
-
-                    user_info = {
-                        "receiver_uid": receiver_uid,
-                        "access": shared.get("access", "read"),
-                        "accepted": shared.get("accepted", False),
-                        "receiver_photo_url": receiver.get("photo_url") or "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg",
-                        "receiver_name": receiver.get("display_name"),
-                        "receiver_email": receiver.get("email")
-                    }
-
-                    if calendar_id in grouped:
-                        grouped[calendar_id]["users"].append(user_info)
-
-                # Étape 3 : récupérer les tokens partagés
-                cursor.execute("SELECT * FROM shared_tokens WHERE calendar_id = ANY(%s::uuid[])", (calendar_ids,))
-                tokens = cursor.fetchall()
-
-                for token in tokens:
-                    cal_id = token["calendar_id"]
-                    if cal_id in grouped:
-                        grouped[cal_id]["tokens"].append(token)
-
-                cursor.execute("SELECT * FROM invitations WHERE calendar_id = ANY(%s::uuid[])", (calendar_ids,))
-                invitations = cursor.fetchall()
-
-                for invitation in invitations:
-                    cal_id = invitation["calendar_id"]
-                    if cal_id in grouped:
-                        grouped[cal_id]["invitation"].append(invitation)
+        grouped = {
+            row["calendar_id"]: {
+                "calendar_name": row["calendar_name"],
+                "users": row["users"],            # jsonb list
+                "tokens": row["tokens"],          # jsonb list
+                "invitation": row["invitations"], # garde ta clé existante
+            }
+            for row in rows
+        }
 
         return success_response(
             message="Données partagées groupées récupérées",
@@ -356,13 +361,13 @@ def handle_grouped_shared():
 
     except Exception as e:
         return error_response(
-            message="Erreur lors du groupement des données partagées",
+            message="Erreur lors du chargement des données partagées groupées",
             code="SHARED_GROUPED_LOAD_ERROR",
-            status_code=500,
-            uid=g.uid,
+            uid=uid,
             origin="SHARED_GROUPED_LOAD",
             error=str(e)
         )
+
 
 
 @api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["GET"])
