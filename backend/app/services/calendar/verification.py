@@ -1,6 +1,6 @@
 from functools import wraps
 from datetime import datetime, timezone
-from flask import g, request
+from flask import g
 
 from app.db.connection import get_connection
 from app.utils.logging import log_backend as logger
@@ -126,11 +126,6 @@ def verify_calendar_share(calendar_id=None, receiver_uid=None):
         @wraps(f)
         def wrapper(*args, **kwargs):
             cal_id = kwargs.get("calendar_id")
-            if not cal_id and request.view_args:
-                cal_id = request.view_args.get("calendar_id")
-            if not cal_id and request.is_json:
-                body = request.get_json(silent=True) or {}
-                cal_id = body.get("calendarId") or body.get("calendar_id")
             uid = kwargs.get("receiver_uid") or getattr(g, "uid", None)
             if not cal_id or not _verify_calendar_share(cal_id, uid):
                 return warning_response(
@@ -153,11 +148,6 @@ def verify_calendar(calendar_id=None, uid=None):
         @wraps(f)
         def wrapper(*args, **kwargs):
             cal_id = kwargs.get("calendar_id")
-            if not cal_id and request.view_args:
-                cal_id = request.view_args.get("calendar_id")
-            if not cal_id and request.is_json:
-                body = request.get_json(silent=True) or {}
-                cal_id = body.get("calendarId") or body.get("calendar_id")
             user_id = kwargs.get("uid") or getattr(g, "uid", None)
             if not cal_id or not _verify_calendar(cal_id, user_id):
                 return warning_response(
@@ -179,11 +169,7 @@ def verify_token(token=None):
 
         @wraps(f)
         def wrapper(*args, **kwargs):
-            tok = (
-                kwargs.get("token")
-                or request.view_args.get("token") if request.view_args else None
-                or request.args.get("token")
-            )
+            tok = kwargs.get("token")
             calendar_id = _verify_token(tok)
             if not calendar_id:
                 return warning_response(
@@ -205,11 +191,7 @@ def verify_token_owner(token=None, uid=None):
 
         @wraps(f)
         def wrapper(*args, **kwargs):
-            tok = (
-                kwargs.get("token")
-                or request.view_args.get("token") if request.view_args else None
-                or request.args.get("token")
-            )
+            tok = kwargs.get("token")
             user_id = kwargs.get("uid") or getattr(g, "uid", None)
             if not tok or not _verify_token_owner(tok, user_id):
                 return warning_response(
