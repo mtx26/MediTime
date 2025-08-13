@@ -115,27 +115,43 @@ def handle_update_revoke_token(token):
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("UPDATE shared_tokens SET revoked = not revoked WHERE id = %s AND owner_uid = %s", (token, owner_uid))
+                # Toggle + récupérer la nouvelle valeur en une seule requête
+                cursor.execute("""
+                    UPDATE shared_tokens
+                    SET revoked = NOT revoked
+                    WHERE id = %s AND owner_uid = %s
+                    RETURNING revoked
+                """, (token, owner_uid))
+                row = cursor.fetchone()
 
-                cursor.execute("SELECT revoked FROM shared_tokens WHERE id = %s AND owner_uid = %s", (token, owner_uid))
-                revoked = cursor.fetchone()
-                revoked = revoked.get("revoked")
-
-                return success_response(
-                    message="token révoqué" if revoked else "token réactivé", 
-                    code="TOKEN_REVOKE_SUCCESS" if revoked else "TOKEN_REACTIVATED_SUCCESS", 
-                    uid=owner_uid, 
-                    origin="TOKEN_REVOKE", 
+            if not row:
+                return warning_response(
+                    message="token introuvable",
+                    code="TOKEN_REVOKE_ERROR",
+                    status_code=404,
+                    uid=owner_uid,
+                    origin="TOKEN_REVOKE",
                     log_extra={"token": token}
                 )
+
+            conn.commit()
+
+        revoked = row.get("revoked", False)
+        return success_response(
+            message="token révoqué" if revoked else "token réactivé",
+            code="TOKEN_REVOKE_SUCCESS" if revoked else "TOKEN_REACTIVATED_SUCCESS",
+            uid=owner_uid,
+            origin="TOKEN_REVOKE",
+            log_extra={"token": token, "revoked": revoked}
+        )
 
     except Exception as e:
         return error_response(
             message="erreur lors de la révocation du token",
-            code="TOKEN_REVOKE_ERROR", 
-            status_code=500, 
-            uid=owner_uid, 
-            origin="TOKEN_REVOKE", 
+            code="TOKEN_REVOKE_ERROR",
+            status_code=500,
+            uid=owner_uid,
+            origin="TOKEN_REVOKE",
             error=str(e),
             log_extra={"token": token}
         )
