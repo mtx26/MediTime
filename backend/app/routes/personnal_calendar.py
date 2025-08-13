@@ -133,37 +133,41 @@ def handle_delete_calendar(calendar_id):
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM calendars WHERE id = %s", (calendar_id,))
-                calendar = cursor.fetchone()
-                
-                if calendar is None:
-                    return warning_response(
-                        message=ERROR_CALENDAR_NOT_FOUND, 
-                        code="CALENDAR_DELETE_ERROR", 
-                        status_code=404, 
-                        uid=uid, 
-                        origin="CALENDAR_DELETE_ERROR", 
-                        log_extra={"calendar_id": calendar_id}
-                    )
+                # Supprime et vérifie en une seule requête
+                cursor.execute("""
+                    DELETE FROM calendars
+                    WHERE id = %s
+                    RETURNING 1
+                """, (calendar_id,))
+                deleted = cursor.fetchone()
 
-                cursor.execute("DELETE FROM calendars WHERE id = %s", (calendar_id,))
-                conn.commit()
+            conn.commit()
+
+        if not deleted:
+            return warning_response(
+                message=ERROR_CALENDAR_NOT_FOUND,
+                code="CALENDAR_DELETE_ERROR",
+                status_code=404,
+                uid=uid,
+                origin="CALENDAR_DELETE_ERROR",
+                log_extra={"calendar_id": calendar_id}
+            )
 
         return success_response(
-            message="calendrier supprimé", 
-            code="CALENDAR_DELETE_SUCCESS", 
-            uid=uid, 
-            origin="CALENDAR_DELETE", 
+            message="calendrier supprimé",
+            code="CALENDAR_DELETE_SUCCESS",
+            uid=uid,
+            origin="CALENDAR_DELETE",
             log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la suppression du calendrier", 
-            code="CALENDAR_DELETE_ERROR", 
-            status_code=500, 
-            uid=uid, 
-            origin="CALENDAR_DELETE", 
+            message="erreur lors de la suppression du calendrier",
+            code="CALENDAR_DELETE_ERROR",
+            status_code=500,
+            uid=uid,
+            origin="CALENDAR_DELETE",
             error=str(e)
         )
 
