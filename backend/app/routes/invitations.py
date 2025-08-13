@@ -555,7 +555,6 @@ def accept_registration_invitation(token):
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                # Suppression de l'invitation et récupération owner/calendar
                 calendar_id, owner_uid = _delete_invitation_returning_calendar_owner(cursor, token)
                 if not calendar_id or not owner_uid:
                     return error_response(
@@ -564,10 +563,9 @@ def accept_registration_invitation(token):
                         status_code=404,
                         uid=uid,
                         origin="ACCEPT_SHARED_CALENDAR_INVITATION",
-                        log_extra={"token": token}
+                        log_extra={"token": token},
                     )
 
-                # Ajout direct dans shared_calendars (pas de SQL construit à la main)
                 cursor.execute(
                     """
                     INSERT INTO shared_calendars (
@@ -578,11 +576,10 @@ def accept_registration_invitation(token):
                     )
                     VALUES (%s, %s, TRUE, NOW())
                     """,
-                    (uid, calendar_id)
+                    (uid, calendar_id),
                 )
                 conn.commit()
 
-        # Notification au propriétaire
         notify_and_record(
             user_id=owner_uid,
             body_or_list={
@@ -599,7 +596,7 @@ def accept_registration_invitation(token):
             uid=uid,
             origin="ACCEPT_SHARED_CALENDAR_INVITATION",
             data={"calendar_id": calendar_id},
-            log_extra={"token": token}
+            log_extra={"token": token},
         )
 
     except Exception as e:
@@ -609,7 +606,7 @@ def accept_registration_invitation(token):
             status_code=500,
             uid=uid,
             origin="ACCEPT_SHARED_CALENDAR_INVITATION",
-            error=str(e)
+            error=str(e),
         )
 
 
