@@ -3,7 +3,7 @@ import Security from './Security';
 import Notification from './Notification';
 import Account from './Account';
 import Preferences from './Preferences';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { handleLogout, resetPassword } from '../../services/auth/authService';
 import { UserContext } from '../../contexts/UserContext';
 import AlertSystem from '../../components/common/AlertSystem';
@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 const SettingsPage = ({ sharedProps }) => {
   const { t } = useTranslation();
   const location = useLocation();
+  const { lng } = useParams();
   const { userInfo } = useContext(UserContext);
   const [alertType, setAlertType] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
@@ -55,25 +56,25 @@ const SettingsPage = ({ sharedProps }) => {
               <div className="nav flex-column nav-pills">
                 <Link
                   className={`nav-link text-start ${activeTab === 'account' ? 'active' : ''}`}
-                  to="/settings?tab=account"
+                  to={`/${lng}/settings?tab=account`}
                 >
                   <i className="bi bi-person me-2"></i> {t('settings.account')}
                 </Link>
                 <Link
                   className={`nav-link text-start ${activeTab === 'security' ? 'active' : ''}`}
-                  to="/settings?tab=security"
+                  to={`/${lng}/settings?tab=security`}
                 >
                   <i className="bi bi-shield-lock me-2"></i> {t('settings.security')}
                 </Link>
                 <Link
                   className={`nav-link text-start ${activeTab === 'notifications' ? 'active' : ''}`}
-                  to="/settings?tab=notifications"
+                  to={`/${lng}/settings?tab=notifications`}
                 >
                   <i className="bi bi-bell me-2"></i> {t('notifications')}
                 </Link>
                 <Link
                   className={`nav-link text-start ${activeTab === 'preferences' ? 'active' : ''}`}
-                  to="/settings?tab=preferences"
+                  to={`/${lng}/settings?tab=preferences`}
                 >
                   <i className="bi bi-sliders me-2"></i> {t('settings.preferences')}
                 </Link>

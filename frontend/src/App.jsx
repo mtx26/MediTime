@@ -1,6 +1,6 @@
 // App.js
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Navbar from './components/common/Header';
 import Footer from './components/common/Footer';
 import AppRoutes from './routes/AppRouter';
@@ -11,11 +11,13 @@ import RealtimeManager from './components/realtime/RealtimeManager';
 import { getToken } from './services/supabase/tokenUtils';
 import { performApiCall } from './services/api/apiUtils';
 import { useTranslation } from 'react-i18next';
+import { getLocale } from './config/languages';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { lng } = useParams();
   const [tokensList, setTokensList] = useState([]);
   const [calendarsData, setCalendarsData] = useState(null);
   const [notificationsData, setNotificationsData] = useState(null);
@@ -828,28 +830,33 @@ function App() {
     sendTokenToBackend();
   }, [userInfo?.uid]);
 
-  return (
-    <Router>
-      <div className="d-flex flex-column min-vh-100">
-        <Navbar sharedProps={sharedProps} />
-        <main className="flex-grow-1 d-flex flex-column pb-5 pb-lg-0">
-          {userInfo && (
-            <RealtimeManager
-              setCalendarsData={setCalendarsData}
-              setSharedCalendarsData={setSharedCalendarsData}
-              setNotificationsData={setNotificationsData}
-              setTokensList={setTokensList}
-              setLoadingStates={setLoadingStates}
-            />
-          )}
+  useEffect(() => {
+    if (lng && i18n.language !== lng) {
+      i18n.changeLanguage(lng);
+    }
+    document.documentElement.setAttribute('lang', getLocale(lng));
+  }, [lng, i18n]);
 
-          <div className="container mt-4 pb-5 pb-lg-0">
-            <AppRoutes sharedProps={sharedProps} />
-          </div>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+  return (
+    <div className="d-flex flex-column min-vh-100">
+      <Navbar sharedProps={sharedProps} />
+      <main className="flex-grow-1 d-flex flex-column pb-5 pb-lg-0">
+        {userInfo && (
+          <RealtimeManager
+            setCalendarsData={setCalendarsData}
+            setSharedCalendarsData={setSharedCalendarsData}
+            setNotificationsData={setNotificationsData}
+            setTokensList={setTokensList}
+            setLoadingStates={setLoadingStates}
+          />
+        )}
+
+        <div className="container mt-4 pb-5 pb-lg-0">
+          <AppRoutes sharedProps={sharedProps} />
+        </div>
+      </main>
+      <Footer />
+    </div>
   );
 }
 

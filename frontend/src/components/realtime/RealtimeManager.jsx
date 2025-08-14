@@ -30,8 +30,12 @@ export default function RealtimeManager({
     '/add-calendar',
   ];
 
+  // strip possible language prefix (e.g. /fr) before matching routes
+  const pathWithoutLang =
+    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+
   const isRealtimeEnabled = enabledRoutes.some((route) =>
-    location.pathname.startsWith(route)
+    pathWithoutLang.startsWith(route)
   );
 
   // ✅ Appel des hooks (OK car toujours dans un composant monté dans <Router>)
