@@ -46,6 +46,8 @@ function ActionSheet({ actions, buttonSize, minimal = false }) {
       }
       ref={buttonRef}
       onClick={toggleDropdown}
+      label={t('Actions')}
+      title={t('Actions')}
     >
       <i
         className="bi bi-three-dots-vertical"
