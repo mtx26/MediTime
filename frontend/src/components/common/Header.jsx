@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { handleLogout } from '../../services/auth/authService';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +13,7 @@ function Navbar({ sharedProps }) {
   const { userInfo } = useContext(UserContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const { lng } = useParams();
   const { t } = useTranslation();
   const [calendarInfo, setCalendarInfo] = useState(null);
   const [basePath, setBasePath] = useState(null);
@@ -21,13 +22,15 @@ function Navbar({ sharedProps }) {
   const notifRef = useRef();
   const userRef = useRef();
   const [tokenId, setTokenId] = useState(null);
+  const pathAfterLang = location.pathname.split('/').slice(2).join('/');
+  const pathWithSlash = '/' + pathAfterLang;
   const locationList = {
-    calendar: location.pathname.startsWith('/calendar/'),
-    sharedUserCalendar: location.pathname.startsWith('/shared-user-calendar/'),
-    tokenCalendar: location.pathname.startsWith('/shared-token-calendar/'),
+    calendar: pathWithSlash.startsWith('/calendar/'),
+    sharedUserCalendar: pathWithSlash.startsWith('/shared-user-calendar/'),
+    tokenCalendar: pathWithSlash.startsWith('/shared-token-calendar/'),
   };
 
-  const pathParts = location.pathname.split('/').filter(Boolean);
+  const pathParts = pathAfterLang.split('/').filter(Boolean);
 
   const locationAvailableForReturnToCalendarList = {
     calendar: 
@@ -59,7 +62,7 @@ function Navbar({ sharedProps }) {
       setBasePath('calendar');
       setCalendarInfo(
         sharedProps.personalCalendars.calendarsData.find(
-          (calendar) => calendar.id === location.pathname.split('/')[2]
+          (calendar) => calendar.id === pathParts[1]
         )
       );
     } else if (
@@ -69,12 +72,12 @@ function Navbar({ sharedProps }) {
       setBasePath('shared-user-calendar');
       setCalendarInfo(
         sharedProps.sharedUserCalendars.sharedCalendarsData.find(
-          (calendar) => calendar.id === location.pathname.split('/')[2]
+          (calendar) => calendar.id === pathParts[1]
         )
       );
     } else if (locationList.tokenCalendar) {
       setBasePath('shared-token-calendar');
-      setTokenId(location.pathname.split('/')[2]);
+      setTokenId(pathParts[1]);
     } else {
       setCalendarInfo(null);
       setBasePath(null);
@@ -104,7 +107,7 @@ function Navbar({ sharedProps }) {
   if (isPillboxPage) {
     return (
       <Link
-        to={`/${basePath}/${calendarInfo?.id}`}
+        to={`/${lng}/${basePath}/${calendarInfo?.id}`}
         className="fs-2 text-dark align-self-end"
         style={{
           position: 'fixed',
@@ -127,7 +130,7 @@ function Navbar({ sharedProps }) {
           {/* Logo / Retour */}
           {locationAvailableForReturnToCalendarList.calendar ||
           locationAvailableForReturnToCalendarList.sharedUserCalendar ? (
-            <Link to="/calendars" className="navbar-brand fs-4">
+            <Link to={`/${lng}/calendars`} className="navbar-brand fs-4">
               <i className="bi bi-arrow-left"></i> {t('back')}
             </Link>
           ) : calendarInfo?.id &&
@@ -135,7 +138,7 @@ function Navbar({ sharedProps }) {
             (locationAvailableForReturnToCalendar.calendar ||
               locationAvailableForReturnToCalendar.sharedUserCalendar) ? (
             <Link
-              to={`/${basePath}/${calendarInfo.id}`}
+              to={`/${lng}/${basePath}/${calendarInfo.id}`}
               className="navbar-brand fs-4"
             >
               <i className="bi bi-arrow-left"></i> {t('back')}
@@ -144,13 +147,13 @@ function Navbar({ sharedProps }) {
             tokenId &&
             locationAvailableForReturnToCalendar.tokenCalendar ? (
             <Link
-              to={`/shared-token-calendar/${tokenId}`}
+              to={`/${lng}/shared-token-calendar/${tokenId}`}
               className="navbar-brand fs-4"
             >
               <i className="bi bi-arrow-left"></i> {t('back')}
             </Link>
           ) : (
-            <Link to="/" className="navbar-brand fw-bold text-primary fs-4">
+            <Link to={`/${lng}/home`} className="navbar-brand fw-bold text-primary fs-4">
               <i className="bi bi-capsule"></i> {t('app.title')}
             </Link>
           )}
@@ -165,7 +168,7 @@ function Navbar({ sharedProps }) {
                   <h4 className="m-0">
                     {calendarInfo && basePath && calendarInfo.id && (
                       <Link
-                        to={`/${basePath}/${calendarInfo.id}`}
+                        to={`/${lng}/${basePath}/${calendarInfo.id}`}
                         className="text-decoration-none text-dark"
                       >
                         <span className="text-muted">{t('calendar.label')} : </span>
@@ -188,7 +191,7 @@ function Navbar({ sharedProps }) {
                   )}
                   {locationList.tokenCalendar && tokenId && (
                     <Link
-                      to={`/shared-token-calendar/${tokenId}`}
+                      to={`/${lng}/shared-token-calendar/${tokenId}`}
                       className="text-decoration-none text-dark"
                     >
                       <div className="badge bg-info mt-2">
@@ -204,7 +207,7 @@ function Navbar({ sharedProps }) {
                 {calendarInfo && basePath && calendarInfo.id && (
                   <h4 className="m-1 fw-bold">
                     <Link
-                      to={`/${basePath}/${calendarInfo.id}`}
+                      to={`/${lng}/${basePath}/${calendarInfo.id}`}
                       className="text-decoration-none text-dark"
                     >
                       {calendarInfo.name}
@@ -225,7 +228,7 @@ function Navbar({ sharedProps }) {
                 )}
                 {locationList.tokenCalendar && tokenId && (
                   <Link
-                    to={`/shared-token-calendar/${tokenId}`}
+                    to={`/${lng}/shared-token-calendar/${tokenId}`}
                     className="text-decoration-none text-dark"
                   >
                     <div className="badge bg-info">
@@ -241,18 +244,18 @@ function Navbar({ sharedProps }) {
           <div className="d-none d-lg-flex align-items-center">
             <ul className="navbar-nav align-items-center gap-2">
               <li className="nav-item">
-                <Link to="/calendars" className="nav-link">
+                <Link to={`/${lng}/calendars`} className="nav-link">
                   <i className="bi bi-calendar-date fs-5"></i> {t('calendars')}
                 </Link>
               </li>
               <li className="nav-item">
-                <Link to="/shared-calendars" className="nav-link">
+                <Link to={`/${lng}/shared-calendars`} className="nav-link">
                   <i className="bi bi-box-arrow-up fs-5"></i> {t('shared')}
                 </Link>
               </li>
               {userInfo?.role === 'admin' && (
                 <li className="nav-item">
-                  <Link to="/admin" className="nav-link">
+                  <Link to={`/${lng}/admin`} className="nav-link">
                     <i className="bi bi-lock fs-5"></i> {t('admin')}
                   </Link>
                 </li>
@@ -323,7 +326,7 @@ function Navbar({ sharedProps }) {
                         className="btn btn-sm btn-outline-primary w-100"
                         aria-label="Ouvrir les notifications"
                         title="Ouvrir les notifications"
-                        onClick={() => navigate('/notifications')}
+                        onClick={() => navigate(`/${lng}/notifications`)}
                       >
                         <i className="bi bi-bell"></i> {t('open_notifications')}
                       </button>
@@ -379,12 +382,12 @@ function Navbar({ sharedProps }) {
                     {userInfo ? (
                       <>
                         <li>
-                          <Link className="dropdown-item" to="/profile">
+                          <Link className="dropdown-item" to={`/${lng}/profile`}>
                             <i className="bi bi-person fs-5 me-2"></i> {t('profile')}
                           </Link>
                         </li>
                         <li>
-                          <Link className="dropdown-item" to="/settings">
+                          <Link className="dropdown-item" to={`/${lng}/settings`}>
                             <i className="bi bi-gear fs-5 me-2"></i> {t('settings.label')}
                           </Link>
                         </li>
@@ -406,13 +409,13 @@ function Navbar({ sharedProps }) {
                     ) : (
                       <>
                         <li>
-                          <Link className="dropdown-item" to="/login">
+                          <Link className="dropdown-item" to={`/${lng}/login`}>
                             <i className="bi bi-box-arrow-in-right fs-5 me-2"></i>{' '}
                             {t('login')}
                           </Link>
                         </li>
                         <li>
-                          <Link className="dropdown-item" to="/register">
+                          <Link className="dropdown-item" to={`/${lng}/register`}>
                             <i className="bi bi-person-plus fs-5 me-2"></i>{' '}
                             {t('register')}
                           </Link>
@@ -430,19 +433,19 @@ function Navbar({ sharedProps }) {
       <nav className="navbar fixed-bottom bg-white shadow-sm py-2 border-top border-2 d-lg-none">
         <div className="container-fluid d-flex justify-content-around mb-3">
           <Link
-            to="/calendars"
+            to={`/${lng}/calendars`}
             className="text-center text-dark text-decoration-none link-hover"
           >
             <i className="bi bi-calendar-event fs-1"></i>
           </Link>
           <Link
-            to="/shared-calendars"
+            to={`/${lng}/shared-calendars`}
             className="text-center text-dark text-decoration-none link-hover"
           >
             <i className="bi bi-people fs-1"></i>
           </Link>
           <Link
-            to="/notifications"
+            to={`/${lng}/notifications`}
             className="text-center text-dark text-decoration-none link-hover position-relative"
           >
             <i className="bi bi-bell fs-1"></i>
@@ -454,7 +457,7 @@ function Navbar({ sharedProps }) {
               )}
           </Link>
           <Link
-            to="/settings"
+            to={`/${lng}/settings`}
             className="text-center text-dark text-decoration-none link-hover"
           >
             {userInfo ? (

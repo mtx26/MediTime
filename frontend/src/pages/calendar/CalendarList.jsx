@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import AlertSystem from '../../components/common/AlertSystem';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 import ActionSheet from '../../components/common/ActionSheet';
@@ -11,6 +11,7 @@ function SelectCalendar({
   sharedUserCalendars
 }) {
   const navigate = useNavigate();
+  const { lng } = useParams();
   const { t } = useTranslation();
 
   // 📅 Gestion des calendriers
@@ -170,7 +171,7 @@ function SelectCalendar({
                       </span>
                     </div>
                     {calendarData.ifLowStock && (
-                      <button className="btn p-0" onClick={() => navigate(`/calendar/${calendarData.id}/stock-alerts`)}>
+                      <button className="btn p-0" onClick={() => navigate(`/${lng}/calendar/${calendarData.id}/stock-alerts`)}>
                         <span className="badge bg-warning d-flex align-items-center gap-1">
                           <i className='bi bi-exclamation-triangle-fill'></i>{t('stock_alert')}
                         </span>
@@ -183,7 +184,7 @@ function SelectCalendar({
                     className="btn btn-outline-success"
                     title={t('open')}
                     aria-label={t('open')}
-                    onClick={() => navigate('/calendar/' + calendarData.id)}
+                    onClick={() => navigate(`/${lng}/calendar/${calendarData.id}`)}
                   >
                     {t('open')}
                   </button>
@@ -206,7 +207,7 @@ function SelectCalendar({
                             <i className="bi bi-box-arrow-up me-2"></i> {t('share')}
                           </>
                         ),
-                        onClick: () => navigate(`/shared-calendars?calendar=${calendarData.id}`),
+                        onClick: () => navigate(`/${lng}/shared-calendars?calendar=${calendarData.id}`),
                       },
                       { separator: true },
                       {
@@ -215,7 +216,7 @@ function SelectCalendar({
                             <i className="bi bi-capsule me-2"></i> {t('medicines.label')}
                           </>
                         ),
-                        onClick: () => navigate(`/calendar/${calendarData.id}/boxes`),
+                        onClick: () => navigate(`/${lng}/calendar/${calendarData.id}/boxes`),
                       },
                       {
                         label: (
@@ -231,7 +232,8 @@ function SelectCalendar({
                             <i className="bi bi-exclamation-triangle-fill me-2"></i> {t('stock')}
                           </>
                         ),
-                        onClick: () => navigate(`/calendar/${calendarData.id}/stock-alerts`),
+                        onClick: () =>
+                          navigate(`/${lng}/calendar/${calendarData.id}/stock-alerts`),
                       },
                       { separator: true },
                       {
@@ -240,7 +242,8 @@ function SelectCalendar({
                             <i className="bi bi-gear me-2"></i> {t('settings.label')}
                           </>
                         ),
-                        onClick: () => navigate(`/calendar/${calendarData.id}/settings`),
+                        onClick: () =>
+                          navigate(`/${lng}/calendar/${calendarData.id}/settings`),
                       },
                       { separator: true },
                       {
@@ -308,7 +311,7 @@ function SelectCalendar({
 
             <button
               className="text-center btn btn-outline-primary rounded-0 rounded-bottom"
-              onClick={() => navigate('/add-calendar')}
+              onClick={() => navigate(`/${lng}/add-calendar`)}
             >
               <i className="bi bi-calendar-plus me-2"></i> {t('calendar.add_calendar')}
             </button>
@@ -387,7 +390,7 @@ function SelectCalendar({
                         />
                       </div>
                       {calendarData.ifLowStock && (
-                        <button className="btn p-0" onClick={() => navigate(`/shared-user-calendar/${calendarData.id}/stock-alerts`)}>
+                        <button className="btn p-0" onClick={() => navigate(`/${lng}/shared-user-calendar/${calendarData.id}/stock-alerts`)}>
                           <span className="badge bg-warning d-flex align-items-center gap-1">
                             <i className='bi bi-exclamation-triangle-fill'></i>{t('stock_alert')}
                           </span>
@@ -400,7 +403,7 @@ function SelectCalendar({
                       title={t('open')}
                       aria-label={t('open')}
                       onClick={() =>
-                        navigate('/shared-user-calendar/' + calendarData.id)
+                        navigate(`/${lng}/shared-user-calendar/${calendarData.id}`)
                       }
                     >
                       {t('open')}
@@ -414,7 +417,7 @@ function SelectCalendar({
                             </>
                           ),
                           onClick: () => {
-                            navigate(`/shared-user-calendar/${calendarData.id}/boxes`);
+                            navigate(`/${lng}/shared-user-calendar/${calendarData.id}/boxes`);
                           },
                         },
                         {
@@ -432,7 +435,7 @@ function SelectCalendar({
                             </>
                           ),
                           onClick: () => {
-                            navigate(`/shared-user-calendar/${calendarData.id}/stock-alerts`);
+                            navigate(`/${lng}/shared-user-calendar/${calendarData.id}/stock-alerts`);
                           },
                         },
                         { separator: true },
@@ -443,7 +446,7 @@ function SelectCalendar({
                             </>
                           ),
                           onClick: () => {
-                            navigate(`/shared-user-calendar/${calendarData.id}/settings`);
+                            navigate(`/${lng}/shared-user-calendar/${calendarData.id}/settings`);
                           },
                         },
                         { separator: true },

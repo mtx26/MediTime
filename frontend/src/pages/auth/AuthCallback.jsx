@@ -1,6 +1,6 @@
 // src/pages/AuthCallback.jsx
 import { useEffect, useContext, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { getGlobalReloadUser, UserContext } from '../../contexts/UserContext';
 import { log } from '../../utils/logger';
@@ -9,6 +9,7 @@ import { getValidRedirect } from '../../utils/redirect';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
+  const { lng } = useParams();
   const reloadUser = getGlobalReloadUser();
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
@@ -48,7 +49,7 @@ const AuthCallback = () => {
           origin: 'CALLBACK_ERROR',
           uid: null,
         });
-        return navigate('/login', { replace: true });
+        return navigate(`/${lng}/login`, { replace: true });
       }
 
       const user = session.user;
@@ -73,11 +74,16 @@ const AuthCallback = () => {
     const type = typeRef.current;
 
     if (redirect) {
-      navigate(redirect, { replace: true });
+      if (redirect.startsWith('/')) {
+        const cleaned = redirect.replace(/^\/[a-z]{2}(?=\/|$)/, '');
+        navigate(`/${lng}${cleaned}`, { replace: true });
+      } else {
+        navigate(redirect, { replace: true });
+      }
       return;
     }
 
-    navigate(getRedirectPath(type), { replace: true });
+    navigate(`/${lng}${getRedirectPath(type)}`, { replace: true });
   }, [userInfo, navigate]);
 
   return <p>{t('auth_callback.loading')}</p>;

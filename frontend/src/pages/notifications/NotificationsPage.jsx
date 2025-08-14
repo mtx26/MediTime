@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import NotificationLine from '../../components/common/NotificationLine';
 import ActionSheet from '../../components/common/ActionSheet';
@@ -7,6 +7,7 @@ import ActionSheet from '../../components/common/ActionSheet';
 function NotificationsPage({ notifications, sharedUserCalendars }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { lng } = useParams();
 
   if (notifications.notificationsData === null) {
     return (
@@ -37,7 +38,7 @@ function NotificationsPage({ notifications, sharedUserCalendars }) {
                   <i className="bi bi-gear-fill me-2"></i> {t('settings.label')}
                 </>
               ),
-              onClick: () => navigate('/settings?tab=notifications'),
+              onClick: () => navigate(`/${lng}/settings?tab=notifications`),
             },
           ]}
         />

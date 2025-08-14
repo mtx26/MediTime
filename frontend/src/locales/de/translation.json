@@ -619,5 +619,9 @@
     "desc": "Weil im Gesundheitswesen kein Raum für Improvisation ist. MediTime bietet Ihnen eine klare, intuitive und sichere Lösung für die tägliche Nachverfolgung Ihrer Behandlungen und der Ihrer Angehörigen.",
     "title": "Warum MediTime wählen?"
   },
-  "yes": "Ja"
+  "yes": "Ja",
+  "home_meta": {
+    "title": "MediTime - Behandlungsplaner",
+    "description": "Verwalten und teilen Sie Ihre Medikamenteneinnahme ganz einfach."
+  }
 }

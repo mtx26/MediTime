@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import isEqual from 'lodash/isEqual';
@@ -27,6 +27,7 @@ export default function PillboxDisplay({
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
   const navigate = useNavigate();
+  const { lng } = useParams();
   const [calendarTable, setCalendarTable] = useState([]);
   const [selectedMedIndex, setSelectedMedIndex] = useState(0);
   const [orderedMeds, setOrderedMeds] = useState([]);
@@ -118,7 +119,7 @@ export default function PillboxDisplay({
                 setSuccessMessage(true);
               } else if (type === 'pillbox') {
                 calendarSource.decreaseStock(calendarId);
-                navigate(`/${basePath}/${calendarId}`);
+                navigate(`/${lng}/${basePath}/${calendarId}`);
               }
               setShowConfirmation(false);
             }}

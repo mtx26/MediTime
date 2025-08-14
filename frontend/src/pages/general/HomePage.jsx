@@ -1,21 +1,28 @@
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
+import Seo from '../../seo/Seo';
 
 function HomePage() {
   const navigate = useNavigate();
+  const { lng } = useParams();
   const { userInfo } = useContext(UserContext);
   const { t } = useTranslation();
   
-  const handleAccess = () => navigate('/calendars');
-  const handleLogin = () => navigate('/login');
-  const handleRegister = () => navigate('/register');
+  const handleAccess = () => navigate(`/${lng}/calendars`);
+  const handleLogin = () => navigate(`/${lng}/login`);
+  const handleRegister = () => navigate(`/${lng}/register`);
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isAndroid = /android/i.test(navigator.userAgent);
 
   return (
     <>
+      <Seo
+        title={t('home_meta.title')}
+        description={t('home_meta.description')}
+        path="/home"
+      />
       <header className="hero hero bg-light border-bottom shadow-sm py-5 rounded-3">
         <div className="container text-center">
           <div className='d-flex align-items-center justify-content-center gap-1'>
@@ -160,14 +167,14 @@ function HomePage() {
       <section className="bg-white border-top py-4">
         <div className="container text-center">
           <a
-            href="/privacy"
+            href={`/${lng}/privacy`}
             className="text-muted text-decoration-none small me-3"
           >
             {t('privacy.label')}
           </a>
           <span className="text-muted small">|</span>
           <a
-            href="/terms"
+            href={`/${lng}/terms`}
             className="text-muted   text-decoration-none small ms-3"
           >
             {t('terms.label')}

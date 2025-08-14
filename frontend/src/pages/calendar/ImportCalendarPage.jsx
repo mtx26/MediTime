@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AlertSystem from '../../components/common/AlertSystem';
 
@@ -17,6 +17,7 @@ export default function ImportCalendarPage({ personalCalendars }) {
   const [alertType, setAlertType] = useState('');
 
   const navigate = useNavigate();
+  const { lng } = useParams();
 
   useEffect(() => {
     if (file) {
@@ -124,7 +125,7 @@ export default function ImportCalendarPage({ personalCalendars }) {
                         setAlertMessage(t('calendar.no_medicines_found'));
                         setAlertType('info');
                       }
-                      navigate('/add-calendar/review', {
+                      navigate(`/${lng}/add-calendar/review`, {
                         state: { importedMedicines: rep.medicines },
                       });
                     } else {

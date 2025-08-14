@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
 import AlertSystem from '../../components/common/AlertSystem';
 import { log } from '../../utils/logger';
@@ -17,6 +17,7 @@ function VerifyEmail() {
 
   // 📍 Navigation
   const navigate = useNavigate(); // Hook de navigation
+  const { lng } = useParams();
 
   useEffect(() => {
     if (userInfo?.emailVerified) {
@@ -25,7 +26,7 @@ function VerifyEmail() {
         origin: 'VerifyEmail.jsx',
         userInfo,
       });
-      navigate('/calendars');
+      navigate(`/${lng}/calendars`);
     }
   }, [userInfo, navigate]); // ✅ Si userInfo.emailVerified change, on redirige
 
@@ -38,7 +39,7 @@ function VerifyEmail() {
       try {
         await supabase.auth.sendEmailVerification({
           options: {
-            redirectTo: window.location.origin + '/auth/callback',
+            redirectTo: `${window.location.origin}/${lng}/auth/callback`,
           },
         });
         setAlertMessage(t('auth.verification_sent'));

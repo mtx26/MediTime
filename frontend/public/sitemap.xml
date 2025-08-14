@@ -1,34 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset 
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
   <url>
-    <loc>https://meditime-app.com/home</loc>
+    <loc>https://meditime-app.com/fr/home</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/home" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/home" />
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://meditime-app.com/login</loc>
+    <loc>https://meditime-app.com/fr/login</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/login" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/login" />
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://meditime-app.com/register</loc>
+    <loc>https://meditime-app.com/fr/register</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/register" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/register" />
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://meditime-app.com/reset-password</loc>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://meditime-app.com/reset-password-confirm</loc>
+    <loc>https://meditime-app.com/fr/reset-password</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/reset-password" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/reset-password" />
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://meditime-app.com/verify-email</loc>
+    <loc>https://meditime-app.com/fr/reset-password-confirm</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/reset-password-confirm" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/reset-password-confirm" />
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://meditime-app.com/fr/verify-email</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/verify-email" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/verify-email" />
     <priority>0.5</priority>
   </url>
 
