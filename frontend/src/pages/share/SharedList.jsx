@@ -238,10 +238,6 @@ function SharedList({
     setGroupedSharedFunction,
   ]);
 
-  useEffect(() => {
-    console.log(groupedShared)
-  }, [groupedShared]);
-
   // 🔄 Initialisation des permissions et des dates d'expiration
   useEffect(() => {
     if (userInfo && personalCalendars.calendarsData) {

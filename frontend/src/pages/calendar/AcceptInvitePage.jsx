@@ -33,13 +33,11 @@ function AcceptInvitePage({sharedUserCalendars}) {
       const rep = await sharedUserCalendars.getLoginInvitation(token);
       if (rep.success) {
         setInvitation(rep.invitation);
-        console.log(rep.invitation);
       }
     } else if (type === 'registration') {
       const rep = await sharedUserCalendars.getRegistrationInvitation(token);
       if (rep.success) {
         setInvitation(rep.invitation);
-        console.log(rep.invitation);
       }
     }
     setLoading(false);
