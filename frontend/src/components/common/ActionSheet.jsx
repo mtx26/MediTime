@@ -1,10 +1,12 @@
 import { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 
 function ActionSheet({ actions, buttonSize, minimal = false }) {
   const [show, setShow] = useState(false);
   const buttonRef = useRef(null);
   const dropdownRef = useRef(null);
+  const { t } = useTranslation();
 
   const toggleDropdown = () => {
     setShow((prev) => !prev);
