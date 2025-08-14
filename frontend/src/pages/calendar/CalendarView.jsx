@@ -11,7 +11,6 @@ import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import AlertSystem from '../../components/common/AlertSystem';
 import isEqual from 'lodash/isEqual';
 import bootstrap5Plugin from '@fullcalendar/bootstrap5';
-import 'bootstrap/dist/css/bootstrap.css';
 import DateModal from '../../components/calendar/DateModal';
 import WeekCalendarSelector from '../../components/calendar/WeekCalendarSelector';
 import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';

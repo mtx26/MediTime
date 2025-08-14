@@ -16,7 +16,7 @@ function HomePage() {
 
   return (
     <>
-      <header className="hero bg-light border-bottom shadow-sm py-5 rounded-3">
+      <header className="hero hero bg-light border-bottom shadow-sm py-5 rounded-3">
         <div className="container text-center">
           <div className='d-flex align-items-center justify-content-center gap-1'>
             <i className="bi bi-capsule display-1 text-primary" aria-hidden="true"></i>
