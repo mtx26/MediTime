@@ -18,15 +18,10 @@ function HomePage() {
     <>
       <header className="hero bg-light border-bottom shadow-sm py-5 rounded-3">
         <div className="container text-center">
-          <img
-            src="/icons/logo.png"
-            width="400"
-            height="200"
-            alt="MediTime"
-            decoding="async"
-            fetchpriority="high"
-          />
-          <h1 className="mt-3 fw-bold text-primary">{t('app.title')}</h1>
+          <div className='d-flex align-items-center justify-content-center gap-1'>
+            <i className="bi bi-capsule display-1 text-primary" aria-hidden="true"></i>
+            <h1 className="mt-3 fw-bold text-primary">{t('app.title')}</h1>
+          </div>
           <p className="lead text-muted">{t('app.subtitle')}</p>
           <div className="mt-4 d-flex flex-column flex-md-row justify-content-center gap-3">
             {userInfo ? (
