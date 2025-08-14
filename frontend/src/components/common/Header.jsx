@@ -62,7 +62,7 @@ function Navbar({ sharedProps }) {
       setBasePath('calendar');
       setCalendarInfo(
         sharedProps.personalCalendars.calendarsData.find(
-          (calendar) => calendar.id === location.pathname.split('/')[2]
+          (calendar) => calendar.id === pathParts[1]
         )
       );
     } else if (
@@ -72,12 +72,12 @@ function Navbar({ sharedProps }) {
       setBasePath('shared-user-calendar');
       setCalendarInfo(
         sharedProps.sharedUserCalendars.sharedCalendarsData.find(
-          (calendar) => calendar.id === location.pathname.split('/')[2]
+          (calendar) => calendar.id === pathParts[1]
         )
       );
     } else if (locationList.tokenCalendar) {
       setBasePath('shared-token-calendar');
-      setTokenId(location.pathname.split('/')[2]);
+      setTokenId(pathParts[1]);
     } else {
       setCalendarInfo(null);
       setBasePath(null);
@@ -147,7 +147,7 @@ function Navbar({ sharedProps }) {
             tokenId &&
             locationAvailableForReturnToCalendar.tokenCalendar ? (
             <Link
-              to={`/shared-token-calendar/${tokenId}`}
+              to={`/${lng}/shared-token-calendar/${tokenId}`}
               className="navbar-brand fs-4"
             >
               <i className="bi bi-arrow-left"></i> {t('back')}
@@ -191,7 +191,7 @@ function Navbar({ sharedProps }) {
                   )}
                   {locationList.tokenCalendar && tokenId && (
                     <Link
-                      to={`/shared-token-calendar/${tokenId}`}
+                      to={`/${lng}/shared-token-calendar/${tokenId}`}
                       className="text-decoration-none text-dark"
                     >
                       <div className="badge bg-info mt-2">
@@ -228,7 +228,7 @@ function Navbar({ sharedProps }) {
                 )}
                 {locationList.tokenCalendar && tokenId && (
                   <Link
-                    to={`/shared-token-calendar/${tokenId}`}
+                    to={`/${lng}/shared-token-calendar/${tokenId}`}
                     className="text-decoration-none text-dark"
                   >
                     <div className="badge bg-info">
@@ -326,7 +326,7 @@ function Navbar({ sharedProps }) {
                         className="btn btn-sm btn-outline-primary w-100"
                         aria-label="Ouvrir les notifications"
                         title="Ouvrir les notifications"
-                        onClick={() => navigate('/notifications')}
+                        onClick={() => navigate(`/${lng}/notifications`)}
                       >
                         <i className="bi bi-bell"></i> {t('open_notifications')}
                       </button>

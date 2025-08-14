@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 function AddCalendarPage({ personalCalendars }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { lng } = useParams();
 
   const [newCalendarName, setNewCalendarName] = useState('');
   const [importType, setImportType] = useState('manual');
@@ -16,12 +17,12 @@ function AddCalendarPage({ personalCalendars }) {
     if (importType === 'manual') {
       const rep = await personalCalendars.addCalendar(newCalendarName);
       if (rep.success) {
-        navigate('/calendar/' + rep.calendarId + '/boxes');
+        navigate(`/${lng}/calendar/${rep.calendarId}/boxes`);
       } else {
         alert('❌ ' + rep.error);
       }
     } else if (importType === 'file') {
-      navigate('/add-calendar/import?name=' + encodeURIComponent(newCalendarName));
+      navigate(`/${lng}/add-calendar/import?name=${encodeURIComponent(newCalendarName)}`);
     }
   };
 

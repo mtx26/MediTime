@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../services/supabase/supabaseClient';
 import AlertSystem from '../../components/common/AlertSystem';
 import { log } from '../../utils/logger';
@@ -12,6 +12,7 @@ export default function ResetPasswordConfirm() {
   const [loading, setLoading] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
   const navigate = useNavigate();
+  const { lng } = useParams();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -59,7 +60,7 @@ export default function ResetPasswordConfirm() {
     } else {
       setAlertType('success');
       setAlertMessage(t('reset_password_confirm.success'));
-      setTimeout(() => navigate('/login'), 2500);
+      setTimeout(() => navigate(`/${lng}/login`), 2500);
     }
 
     setLoading(false);

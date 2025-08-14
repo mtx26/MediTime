@@ -196,7 +196,10 @@ function Auth() {
                       user: userInfo.uid,
                     });
                     if (redirect) {
-                      navigate(redirect, { replace: true });
+                      navigate(
+                        redirect.startsWith('/') ? `/${lng}${redirect}` : redirect,
+                        { replace: true }
+                      );
                     }
                   }
                 } else {
