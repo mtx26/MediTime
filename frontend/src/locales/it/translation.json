@@ -619,5 +619,9 @@
     "desc": "Perché l'assistenza sanitaria non lascia spazio all'improvvisazione. MediTime ti offre una soluzione chiara, intuitiva e sicura per monitorare i tuoi trattamenti e quelli dei tuoi cari, giorno dopo giorno.",
     "title": "Perché scegliere MediTime?"
   },
-  "yes": "SÌ"
+  "yes": "SÌ",
+  "home_meta": {
+    "title": "MediTime - Pianificatore di trattamento",
+    "description": "Gestisci e condividi facilmente l'assunzione dei tuoi farmaci."
+  }
 }

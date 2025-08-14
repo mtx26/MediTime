@@ -619,5 +619,9 @@
     "desc": "Porque a saúde não deixa espaço para improvisação. O MediTime oferece uma solução clara, intuitiva e segura para acompanhar seus tratamentos e os de seus entes queridos, dia após dia.",
     "title": "Por que escolher o MediTime?"
   },
-  "yes": "Sim"
+  "yes": "Sim",
+  "home_meta": {
+    "title": "MediTime - Planejador de Tratamento",
+    "description": "Gerencie e compartilhe facilmente sua ingestão de medicamentos."
+  }
 }

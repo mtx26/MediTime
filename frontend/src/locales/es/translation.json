@@ -619,5 +619,9 @@
     "desc": "Porque la atención médica no admite improvisaciones. MediTime te ofrece una solución clara, intuitiva y segura para el seguimiento diario de tus tratamientos y los de tus seres queridos.",
     "title": "¿Por qué elegir MediTime?"
   },
-  "yes": "Sí"
+  "yes": "Sí",
+  "home_meta": {
+    "title": "MediTime - Planificador de tratamientos",
+    "description": "Administre y comparta fácilmente su toma de medicamentos."
+  }
 }

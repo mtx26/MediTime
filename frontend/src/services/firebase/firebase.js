@@ -40,7 +40,6 @@ export const requestPermissionAndGetToken = async (uid) => {
   } catch (err) {
     log.error('[FCM] Erreur permission ou token', {
       uid: uid,
-      token: token,
       origin: 'FCM_TOKEN_ERROR',
       error: err,
     });
