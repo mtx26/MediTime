@@ -1,16 +1,16 @@
 from . import api
-from app.utils.auth import require_auth
+from app.utils import require_auth
 from datetime import datetime, timezone
 from flask import request, g, Response
 from app.db.connection import get_connection
-from app.services.calendar import generate_calendar_schedule, uptate_stock_decrement_method
+from app.services.calendar import generate_calendar_schedule, update_stock_decrement_method
 from app.services.calendar import verify_calendar
 from app.utils.responses import success_response, error_response, warning_response
 from app.utils.logging import log_backend
 from app.services.documents import generate_medicine_conditions_pdf
 from app.services.medication import check_if_stock_is_low
-from app.utils.measure import measure_time, elapsed_now
-
+from app.utils import measure_time, elapsed_now
+from app.utils import with_query_origin
 
 ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"
 
@@ -18,35 +18,38 @@ ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"
 @api.route("/calendars", methods=["GET"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="REALTIME_CALENDAR_FETCH")
 def handle_calendars():
     try:
         uid = g.uid
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM calendars WHERE owner_uid = %s", (uid,))
+                cursor.execute("""
+                    SELECT 
+                        c.*, 
+                        COUNT(mb.id) AS count
+                    FROM calendars c
+                    LEFT JOIN medicine_boxes mb 
+                        ON mb.calendar_id = c.id
+                    WHERE c.owner_uid = %s
+                    GROUP BY c.id
+                """, (uid,))
                 calendars = cursor.fetchall()
 
-                if calendars is None:
+                if not calendars:
                     return warning_response(
                         message=ERROR_CALENDAR_NOT_FOUND, 
                         code="CALENDAR_FETCH_ERROR", 
-                        status_code=404, 
-                        uid=uid, 
-                        origin="CALENDAR_FETCH", 
+                        status_code=404
                     )
-                for calendar in calendars:
-                    cursor.execute("SELECT COUNT(*) FROM medicine_boxes WHERE calendar_id = %s", (calendar["id"],))
-                    boxes_count = cursor.fetchone()
-                    calendar["boxesCount"] = boxes_count.get("count", 0) if boxes_count else 0
 
-                    if_low_stock = check_if_stock_is_low(calendar["id"])
-                    calendar["ifLowStock"] = if_low_stock
+                for calendar in calendars:
+                    calendar["boxesCount"] = calendar.get("count", 0)
+                    calendar["ifLowStock"] = check_if_stock_is_low(calendar["id"])
 
         return success_response(
             message="calendriers récupérés", 
             code="CALENDAR_FETCH_SUCCESS", 
-            uid=uid, 
-            origin="CALENDAR_FETCH", 
             data={"calendars": calendars},
         )
     except Exception as e:
@@ -54,8 +57,6 @@ def handle_calendars():
             message="erreur lors de la récupération des calendriers", 
             code="CALENDAR_FETCH_ERROR", 
             status_code=500, 
-            uid=uid, 
-            origin="CALENDAR_FETCH", 
             error=str(e)
         )
 
@@ -64,6 +65,7 @@ def handle_calendars():
 @api.route("/calendars", methods=["POST"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="CALENDAR_CREATE")
 def handle_create_calendar():
     try:
         uid = g.uid
@@ -75,8 +77,6 @@ def handle_create_calendar():
                 message="nom de calendrier manquant", 
                 code="CALENDAR_CREATE_ERROR", 
                 status_code=400, 
-                uid=uid, 
-                origin="CALENDAR_CREATE", 
                 log_extra={"calendar_name": calendar_name}
             )
 
@@ -89,8 +89,6 @@ def handle_create_calendar():
         return success_response(
             message="calendrier créé", 
             code="CALENDAR_CREATE", 
-            uid=uid, 
-            origin="CALENDAR_CREATE",
             data={"calendarId": calendar_id, "calendarName": calendar_name},
             log_extra={"calendar_name": calendar_name}
         )
@@ -100,8 +98,6 @@ def handle_create_calendar():
             message="erreur lors de la création du calendrier", 
             code="CALENDAR_CREATE_ERROR", 
             status_code=500, 
-            uid=uid, 
-            origin="CALENDAR_CREATE", 
             error=str(e)
         )
 
@@ -111,6 +107,7 @@ def handle_create_calendar():
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="CALENDAR_DELETE")
 def handle_delete_calendar(calendar_id):
     try:
         uid = g.uid
@@ -120,44 +117,40 @@ def handle_delete_calendar(calendar_id):
                 message="identifiant de calendrier invalide",
                 code="CALENDAR_DELETE_ERROR",
                 status_code=400,
-                uid=uid,
-                origin="CALENDAR_DELETE_ERROR",
                 log_extra={"calendar_id": calendar_id}
             )
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM calendars WHERE id = %s", (calendar_id,))
-                calendar = cursor.fetchone()
-                
-                if calendar is None:
-                    return warning_response(
-                        message=ERROR_CALENDAR_NOT_FOUND, 
-                        code="CALENDAR_DELETE_ERROR", 
-                        status_code=404, 
-                        uid=uid, 
-                        origin="CALENDAR_DELETE_ERROR", 
-                        log_extra={"calendar_id": calendar_id}
-                    )
+                # Supprime et vérifie en une seule requête
+                cursor.execute("""
+                    DELETE FROM calendars
+                    WHERE id = %s
+                    RETURNING 1
+                """, (calendar_id,))
+                deleted = cursor.fetchone()
 
-                cursor.execute("DELETE FROM calendars WHERE id = %s", (calendar_id,))
-                conn.commit()
+            conn.commit()
+
+        if not deleted:
+            return warning_response(
+                message=ERROR_CALENDAR_NOT_FOUND,
+                code="CALENDAR_DELETE_ERROR",
+                status_code=404,
+                log_extra={"calendar_id": calendar_id}
+            )
 
         return success_response(
-            message="calendrier supprimé", 
-            code="CALENDAR_DELETE_SUCCESS", 
-            uid=uid, 
-            origin="CALENDAR_DELETE", 
+            message="calendrier supprimé",
+            code="CALENDAR_DELETE_SUCCESS",
             log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la suppression du calendrier", 
-            code="CALENDAR_DELETE_ERROR", 
-            status_code=500, 
-            uid=uid, 
-            origin="CALENDAR_DELETE", 
+            message="erreur lors de la suppression du calendrier",
+            code="CALENDAR_DELETE_ERROR",
+            status_code=500,
             error=str(e)
         )
 
@@ -167,70 +160,93 @@ def handle_delete_calendar(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="CALENDAR_RENAME")
 def handle_rename_calendar(calendar_id):
     try:
         uid = g.uid
         payload = request.get_json(force=True)
-
         new_calendar_name = payload.get("newCalendarName")
 
         if not new_calendar_name:
             return warning_response(
                 message="nom de calendrier manquant",
-                code="CALENDAR_RENAME_ERROR", 
-                status_code=400, 
-                uid=uid, 
-                origin="CALENDAR_RENAME", 
+                code="CALENDAR_RENAME_ERROR",
+                status_code=400,
                 log_extra={"calendar_id": calendar_id, "new_calendar_name": new_calendar_name}
             )
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT name FROM calendars WHERE id = %s", (calendar_id,))
-                result = cursor.fetchone()
-
-                if result is None:
-                    return warning_response(
-                        message=ERROR_CALENDAR_NOT_FOUND, 
-                        code="CALENDAR_RENAME_ERROR", 
-                        status_code=404, 
-                        uid=uid, 
-                        origin="CALENDAR_RENAME", 
-                        log_extra={"calendar_id": calendar_id, "new_calendar_name": new_calendar_name})
-
-                old_name = result['name']
-
-                if new_calendar_name == old_name:
-                    return warning_response(
-                        message="le nom de calendrier est déjà le même", 
-                        code="CALENDAR_RENAME_ERROR", 
-                        status_code=400, 
-                        uid=uid, 
-                        origin="CALENDAR_RENAME", 
-                        log_extra={"calendar_id": calendar_id, "old_calendar_name": old_name, "new_calendar_name": new_calendar_name}
-                    )
                 cursor.execute(
-                    "UPDATE calendars SET name = %s WHERE id = %s",
-                    (new_calendar_name, calendar_id)
+                    """
+                    WITH old AS (
+                      SELECT id, name FROM calendars WHERE id = %s
+                    ),
+                    flags AS (
+                      SELECT
+                        EXISTS (SELECT 1 FROM old) AS exists,
+                        EXISTS (SELECT 1 FROM old WHERE name IS NOT DISTINCT FROM %s) AS same
+                    ),
+                    upd AS (
+                      UPDATE calendars c
+                      SET name = %s
+                      FROM old
+                      WHERE c.id = old.id AND old.name IS DISTINCT FROM %s
+                      RETURNING old.name AS old_name, c.name AS new_name, c.id AS calendar_id
+                    )
+                    SELECT
+                      (SELECT exists FROM flags) AS exists,
+                      (SELECT same FROM flags) AS same,
+                      (SELECT old_name FROM upd) AS old_name,
+                      (SELECT new_name FROM upd) AS new_name,
+                      (SELECT calendar_id FROM upd) AS calendar_id;
+                    """,
+                    (calendar_id, new_calendar_name, new_calendar_name, new_calendar_name)
                 )
-                conn.commit()
+                row = cursor.fetchone()
 
+            conn.commit()
+
+        # Cas: calendrier inexistant
+        if not row or not row.get("exists"):
+            return warning_response(
+                message=ERROR_CALENDAR_NOT_FOUND,
+                code="CALENDAR_RENAME_ERROR",
+                status_code=404,
+                log_extra={"calendar_id": calendar_id, "new_calendar_name": new_calendar_name}
+            )
+
+        # Cas: même nom qu'avant
+        if row.get("same"):
+            return warning_response(
+                message="le nom de calendrier est déjà le même",
+                code="CALENDAR_RENAME_ERROR",
+                status_code=400,
+                log_extra={
+                    "calendar_id": calendar_id,
+                    "old_calendar_name": row.get("old_name"),
+                    "new_calendar_name": new_calendar_name
+                }
+            )
+
+        # Succès
         return success_response(
-            message="calendrier renommé", 
-            code="CALENDAR_RENAME_SUCCESS", 
-            uid=uid, 
-            origin="CALENDAR_RENAME", 
-            log_extra={"calendar_id": calendar_id, "old_calendar_name": old_name, "new_calendar_name": new_calendar_name}
+            message="calendrier renommé",
+            code="CALENDAR_RENAME_SUCCESS",
+            log_extra={
+                "calendar_id": row.get("calendar_id") or calendar_id,
+                "old_calendar_name": row.get("old_name"),
+                "new_calendar_name": row.get("new_name") or new_calendar_name
+            }
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la renommation du calendrier", 
-            code="CALENDAR_RENAME_ERROR", 
-            status_code=500, 
-            uid=uid, 
-            origin="CALENDAR_RENAME", 
-            error=str(e))
+            message="erreur lors de la renommation du calendrier",
+            code="CALENDAR_RENAME_ERROR",
+            status_code=500,
+            error=str(e)
+        )
   
 
 # Route pour générer le calendrier 
@@ -238,10 +254,9 @@ def handle_rename_calendar(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="CALENDAR_FETCH_SCHEDULE")
 def handle_calendar_schedule(calendar_id):
     try:
-        owner_uid = g.uid
-
         start_date = request.args.get("startDate")
 
         if not start_date:
@@ -255,9 +270,7 @@ def handle_calendar_schedule(calendar_id):
 
         return success_response(
             message="calendrier généré", 
-            code="CALENDAR_GENERATE_SUCCESS", 
-            uid=owner_uid, 
-            origin="CALENDAR_GENERATE", 
+            code="CALENDAR_GENERATE_SUCCESS",
             data={"schedule": schedule, "table": table, "calendar_name": calendar_name, "if_low_stock": if_low_stock},
             log_extra={"calendar_id": calendar_id}
         )
@@ -267,14 +280,13 @@ def handle_calendar_schedule(calendar_id):
             message="erreur lors de la génération du calendrier", 
             code="CALENDAR_GENERATE_ERROR", 
             status_code=500, 
-            uid=owner_uid, 
-            origin="CALENDAR_GENERATE", 
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
 
 @api.route("/calendars/<calendar_id>/pdf", methods=["GET"])
 @measure_time()
+@with_query_origin(default_origin="PDF_DOWNLOAD")
 def download_pdf_calendar(calendar_id):
     try:
         # TODO: Sécuriser cette route
@@ -284,7 +296,6 @@ def download_pdf_calendar(calendar_id):
                 message="calendar_id manquant",
                 code="MISSING_CALENDAR_ID",
                 status_code=400,
-                origin="PDF_DOWNLOAD"
             )
 
         # Génère le PDF en mémoire
@@ -292,7 +303,7 @@ def download_pdf_calendar(calendar_id):
 
         # Log facultatif
         log_backend.info("PDF généré avec succès", {
-            "origin": "PDF_DOWNLOAD",
+            "origin": g.origin,
             "code": "PDF_DOWNLOAD_SUCCESS",
             "time": elapsed_now()
         })
@@ -310,7 +321,6 @@ def download_pdf_calendar(calendar_id):
             message="Erreur lors du téléchargement du PDF",
             code="PDF_DOWNLOAD_ERROR_CALENDAR",
             status_code=500,
-            origin="PDF_DOWNLOAD",
             error=str(e)
         )
 
@@ -318,6 +328,7 @@ def download_pdf_calendar(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="STOCK_DECREMENT_METHOD_FETCH")
 def get_personnal_stock_decrement_method(calendar_id):
     try:
         uid = g.uid
@@ -330,8 +341,6 @@ def get_personnal_stock_decrement_method(calendar_id):
                         message=ERROR_CALENDAR_NOT_FOUND,
                         code="STOCK_DECREMENT_METHOD_FETCH_ERROR",
                         status_code=404,
-                        uid=uid,
-                        origin="STOCK_DECREMENT_METHOD_FETCH",
                         log_extra={"calendar_id": calendar_id}
                     )
                 method = result.get("stock_decrement_method")
@@ -339,8 +348,6 @@ def get_personnal_stock_decrement_method(calendar_id):
         return success_response(
             message="méthode de diminution de stock récupérée",
             code="STOCK_DECREMENT_METHOD_FETCH_SUCCESS",
-            uid=uid,
-            origin="STOCK_DECREMENT_METHOD_FETCH",
             data={"method": method},
             log_extra={"calendar_id": calendar_id, "method": method}
         )
@@ -349,8 +356,6 @@ def get_personnal_stock_decrement_method(calendar_id):
             message="erreur lors de la récupération de la méthode de diminution de stock",
             code="STOCK_DECREMENT_METHOD_FETCH_ERROR",
             status_code=500,
-            uid=uid,
-            origin="STOCK_DECREMENT_METHOD_FETCH",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
@@ -360,6 +365,7 @@ def get_personnal_stock_decrement_method(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="STOCK_DECREMENT_METHOD_UPDATE")
 def update_personnal_stock_decrement_method(calendar_id):
     try:
         uid = g.uid
@@ -372,18 +378,14 @@ def update_personnal_stock_decrement_method(calendar_id):
                 message="method manquant",
                 code="STOCK_DECREMENT_METHOD_UPDATE_ERROR",
                 status_code=400,
-                uid=uid,
-                origin="STOCK_DECREMENT_METHOD_UPDATE",
                 log_extra={"calendar_id": calendar_id}
             )
 
-        uptate_stock_decrement_method(calendar_id, method)
+        update_stock_decrement_method(calendar_id, method)
 
         return success_response(
             message="methode de diminution de stock mise à jour", 
             code="STOCK_DECREMENT_METHOD_UPDATE_SUCCESS",
-            uid=uid,
-            origin="STOCK_DECREMENT_METHOD_UPDATE",
             log_extra={"calendar_id": calendar_id, "method": method}
         )
     except Exception as e:
@@ -391,8 +393,6 @@ def update_personnal_stock_decrement_method(calendar_id):
             message="erreur lors de la mise à jour de la méthode de diminution de stock", 
             code="STOCK_DECREMENT_METHOD_UPDATE_ERROR", 
             status_code=500, 
-            uid=uid, 
-            origin="STOCK_DECREMENT_METHOD_UPDATE", 
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )

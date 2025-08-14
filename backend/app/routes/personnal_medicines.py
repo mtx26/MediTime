@@ -7,6 +7,7 @@ from app.utils.responses import success_response, error_response, warning_respon
 from app.services.medication import use_pillulier
 from datetime import datetime, timezone
 from app.utils.measure import measure_time
+from app.utils import with_query_origin
 
 ERROR_UNAUTHORIZED_ACCESS = "accès refusé"
 
@@ -15,17 +16,14 @@ ERROR_UNAUTHORIZED_ACCESS = "accès refusé"
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="REALTIME_PERSONAL_CALENDAR_BOXES")
 def handle_boxes(calendar_id):
     try:
-        uid = g.uid
-
         boxes = get_boxes(calendar_id)
 
         return success_response(
             message="boites de médicaments récupérées",
             code="MEDICINE_BOXES_FETCHED",
-            uid=uid,
-            origin="GET_MEDICINE_BOXES",
             data={"boxes": boxes},
             log_extra={"calendar_id": calendar_id, "boxes_count": len(boxes) if boxes is not None else 0}
         )
@@ -35,8 +33,6 @@ def handle_boxes(calendar_id):
             message="erreur lors de la récupération des boites de médicaments",
             code="GET_MEDICINE_BOXES_ERROR",
             status_code=500,
-            uid=uid,
-            origin="GET_MEDICINE_BOXES",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
@@ -47,6 +43,7 @@ def handle_boxes(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="BOX_UPDATE")
 def handle_update_box(calendar_id, box_id):
     try:
         uid = g.uid
@@ -59,8 +56,6 @@ def handle_update_box(calendar_id, box_id):
                 message="champs requis manquants",
                 code="MISSING_REQUIRED_FIELDS",
                 status_code=400,
-                uid=uid,
-                origin="UPDATE_MEDICINE_BOX",
                 log_extra={"calendar_id": calendar_id, "box_id": box_id}
             )
 
@@ -69,8 +64,6 @@ def handle_update_box(calendar_id, box_id):
         return success_response(
             message="boite de médicaments modifiée",
             code="MEDICINE_BOX_UPDATED",
-            uid=uid,
-            origin="UPDATE_MEDICINE_BOX",
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
@@ -79,8 +72,6 @@ def handle_update_box(calendar_id, box_id):
             message="erreur lors de la modification de la boite de médicaments",
             code="UPDATE_MEDICINE_BOX_ERROR",
             status_code=500,
-            uid=uid,
-            origin="UPDATE_MEDICINE_BOX",
             error=str(e),
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
@@ -90,6 +81,7 @@ def handle_update_box(calendar_id, box_id):
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="BOX_CREATE")
 def handle_create_box(calendar_id):
     try:
         uid = g.uid
@@ -102,8 +94,6 @@ def handle_create_box(calendar_id):
                 message="champs requis manquants",
                 code="MISSING_REQUIRED_FIELDS",
                 status_code=400,
-                uid=uid,
-                origin="CREATE_MEDICINE_BOX",
                 log_extra={"calendar_id": calendar_id}
             )
 
@@ -112,8 +102,6 @@ def handle_create_box(calendar_id):
         return success_response(
             message="boite de médicaments créée",
             code="MEDICINE_BOX_CREATED",
-            uid=uid,
-            origin="CREATE_MEDICINE_BOX",
             data={"box_id": box_id},
             log_extra={"calendar_id": calendar_id}
         )
@@ -123,8 +111,6 @@ def handle_create_box(calendar_id):
             message="erreur lors de la création de la boite de médicaments",
             code="CREATE_MEDICINE_BOX_ERROR",
             status_code=500,
-            uid=uid,
-            origin="CREATE_MEDICINE_BOX",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
@@ -134,6 +120,7 @@ def handle_create_box(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="BOX_DELETE")
 def handle_delete_box(calendar_id, box_id):
     try:
         uid = g.uid
@@ -143,8 +130,6 @@ def handle_delete_box(calendar_id, box_id):
         return success_response(
             message="boite de médicaments supprimée",
             code="MEDICINE_BOX_DELETED",
-            uid=uid,
-            origin="DELETE_MEDICINE_BOX",
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
@@ -153,8 +138,6 @@ def handle_delete_box(calendar_id, box_id):
             message="erreur lors de la suppression de la boite de médicaments",
             code="DELETE_MEDICINE_BOX_ERROR",
             status_code=500,
-            uid=uid,
-            origin="DELETE_MEDICINE_BOX",
             error=str(e),
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
@@ -163,6 +146,7 @@ def handle_delete_box(calendar_id, box_id):
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="USE_PILLULIER")
 def handle_use_pillulier(calendar_id):
     try:
         uid = g.uid
@@ -182,8 +166,6 @@ def handle_use_pillulier(calendar_id):
                 message="aucun médicament à utiliser",
                 code="NO_MEDICATION_TO_USE",
                 status_code=404,
-                uid=uid,
-                origin="USE_PILLULIER_MEDICATION",
                 log_extra={"calendar_id": calendar_id}
             )
         elif result is None:
@@ -191,15 +173,11 @@ def handle_use_pillulier(calendar_id):
                 message="mode de décompte non supporté",
                 code="UNSUPPORTED_DECREMENT_MODE",
                 status_code=400,
-                uid=uid,
-                origin="USE_PILLULIER_MEDICATION",
                 log_extra={"calendar_id": calendar_id}
             )
         return success_response(
             message="médicaments utilisés",
             code="PILLULIER_MEDICATION_USED",
-            uid=uid,
-            origin="USE_PILLULIER_MEDICATION",
             log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
@@ -207,8 +185,6 @@ def handle_use_pillulier(calendar_id):
             message="erreur lors de l'utilisation du pillulier",
             code="USE_PILLULIER_MEDICATION_ERROR",
             status_code=500,
-            uid=uid,
-            origin="USE_PILLULIER_MEDICATION",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
@@ -217,6 +193,7 @@ def handle_use_pillulier(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="BOX_RESTOCK")
 def handle_restock_box(calendar_id, box_id):
     try:
         uid = g.uid
@@ -226,26 +203,20 @@ def handle_restock_box(calendar_id, box_id):
                 message="boite de médicaments non trouvée",
                 code="MEDICINE_BOX_NOT_FOUND",
                 status_code=404,
-                uid=uid,
-                origin="RESTOCK_MEDICINE_BOX",
                 log_extra={"calendar_id": calendar_id, "box_id": box_id}
             )
 
         return success_response(
             message="boite de médicaments réapprovisionnée",
-            code="MEDICINE_BOX_RESTOCKED",
-            uid=uid,
-            origin="RESTOCK_MEDICINE_BOX",
+            code="BOX_RESTOCKED_SUCCESS",
             data={"box_id": box_id},
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
     except Exception as e:
         return error_response(
             message="erreur lors du réapprovisionnement de la boite de médicaments",
-            code="RESTOCK_MEDICINE_BOX_ERROR",
+            code="BOX_RESTOCK_ERROR",
             status_code=500,
-            uid=uid,
-            origin="RESTOCK_MEDICINE_BOX",
             error=str(e),
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )

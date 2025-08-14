@@ -7,11 +7,13 @@ from app.db.connection import get_connection
 from app.services.calendar import generate_calendar_schedule
 from app.services.calendar import verify_calendar, verify_token_owner, verify_token
 from app.utils.measure import measure_time
+from app.utils import with_query_origin
 
 # Route pour récupérer tous les tokens et les informations associées
 @api.route("/tokens", methods=["GET"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="REALTIME_TOKENS_FETCH")
 def handle_tokens():
     try:
         uid = g.uid
@@ -24,8 +26,6 @@ def handle_tokens():
         return success_response(
             message="tokens récupérés", 
             code="TOKENS_FETCH", 
-            uid=uid, 
-            origin="TOKENS_FETCH", 
             data={"tokens": tokens_list}
         )
         
@@ -34,8 +34,6 @@ def handle_tokens():
             message="erreur lors de la récupération des tokens",
             code="TOKENS_ERROR", 
             status_code=500, 
-            uid=uid, 
-            origin="TOKENS_FETCH", 
             error=str(e)
         )
 
@@ -45,6 +43,7 @@ def handle_tokens():
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="TOKEN_CREATE")
 def handle_create_token(calendar_id):
     try:
         owner_uid = g.uid
@@ -71,8 +70,6 @@ def handle_create_token(calendar_id):
                         message="token déjà partagé", 
                         code="TOKEN_ALREADY_SHARED", 
                         status_code=400, 
-                        uid=owner_uid, 
-                        origin="TOKEN_ALREADY_SHARED", 
                         log_extra={"calendar_id": calendar_id}
                     )
                 
@@ -87,8 +84,6 @@ def handle_create_token(calendar_id):
                 return success_response(
                     message="token créé", 
                     code="TOKEN_CREATED", 
-                    uid=owner_uid, 
-                    origin="TOKEN_CREATE",
                     log_extra={"calendar_id": calendar_id}
                 )
 
@@ -96,9 +91,7 @@ def handle_create_token(calendar_id):
         return error_response(
             message="erreur lors de la création du token",
             code="TOKEN_CREATE_ERROR", 
-            status_code=500, 
-            uid=owner_uid, 
-            origin="TOKEN_CREATE", 
+            status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
@@ -109,33 +102,44 @@ def handle_create_token(calendar_id):
 @measure_time()
 @require_auth
 @verify_token_owner
+@with_query_origin(default_origin="TOKEN_REVOKE")
 def handle_update_revoke_token(token):
     try:
         owner_uid = g.uid
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("UPDATE shared_tokens SET revoked = not revoked WHERE id = %s AND owner_uid = %s", (token, owner_uid))
+                # Toggle + récupérer la nouvelle valeur en une seule requête
+                cursor.execute("""
+                    UPDATE shared_tokens
+                    SET revoked = NOT revoked
+                    WHERE id = %s AND owner_uid = %s
+                    RETURNING revoked
+                """, (token, owner_uid))
+                row = cursor.fetchone()
 
-                cursor.execute("SELECT revoked FROM shared_tokens WHERE id = %s AND owner_uid = %s", (token, owner_uid))
-                revoked = cursor.fetchone()
-                revoked = revoked.get("revoked")
-
-                return success_response(
-                    message="token révoqué" if revoked else "token réactivé", 
-                    code="TOKEN_REVOKE_SUCCESS" if revoked else "TOKEN_REACTIVATED_SUCCESS", 
-                    uid=owner_uid, 
-                    origin="TOKEN_REVOKE", 
+            if not row:
+                return warning_response(
+                    message="token introuvable",
+                    code="TOKEN_REVOKE_ERROR",
+                    status_code=404,
                     log_extra={"token": token}
                 )
+
+            conn.commit()
+
+        revoked = row.get("revoked", False)
+        return success_response(
+            message="token révoqué" if revoked else "token réactivé",
+            code="TOKEN_REVOKE_SUCCESS" if revoked else "TOKEN_REACTIVATED_SUCCESS",
+            log_extra={"token": token, "revoked": revoked}
+        )
 
     except Exception as e:
         return error_response(
             message="erreur lors de la révocation du token",
-            code="TOKEN_REVOKE_ERROR", 
-            status_code=500, 
-            uid=owner_uid, 
-            origin="TOKEN_REVOKE", 
+            code="TOKEN_REVOKE_ERROR",
+            status_code=500,
             error=str(e),
             log_extra={"token": token}
         )
@@ -146,6 +150,7 @@ def handle_update_revoke_token(token):
 @measure_time()
 @require_auth
 @verify_token_owner
+@with_query_origin(default_origin="TOKEN_EXPIRATION_UPDATE")
 def handle_update_token_expiration(token):
     try:
         owner_uid = g.uid
@@ -166,8 +171,6 @@ def handle_update_token_expiration(token):
                 return success_response(
                     message="expiration du token mise à jour", 
                     code="TOKEN_EXPIRATION_UPDATED", 
-                    uid=owner_uid, 
-                    origin="TOKEN_EXPIRATION_UPDATE", 
                     log_extra={"token": token}
                 )
 
@@ -175,9 +178,7 @@ def handle_update_token_expiration(token):
         return error_response(
             message="erreur lors de la mise à jour de l'expiration du token",
             code="TOKEN_EXPIRATION_UPDATE_ERROR", 
-            status_code=500, 
-            uid=owner_uid, 
-            origin="TOKEN_EXPIRATION_UPDATE", 
+            status_code=500,
             error=str(e),
             log_extra={"token": token}
         )
@@ -188,6 +189,7 @@ def handle_update_token_expiration(token):
 @measure_time()
 @require_auth
 @verify_token_owner
+@with_query_origin(default_origin="TOKEN_PERMISSIONS_UPDATE")
 def handle_update_token_permissions(token):
     try:
         owner_uid = g.uid
@@ -203,8 +205,6 @@ def handle_update_token_permissions(token):
                 return success_response(
                     message="permissions du token mises à jour", 
                     code="TOKEN_PERMISSIONS_UPDATED", 
-                    uid=owner_uid, 
-                    origin="TOKEN_PERMISSIONS_UPDATE", 
                     log_extra={"token": token}
                 )
 
@@ -212,9 +212,7 @@ def handle_update_token_permissions(token):
         return error_response(
             message="erreur lors de la mise à jour des permissions du token",
             code="TOKEN_PERMISSIONS_UPDATE_ERROR", 
-            status_code=500, 
-            uid=owner_uid, 
-            origin="TOKEN_PERMISSIONS_UPDATE", 
+            status_code=500,
             error=str(e),
             log_extra={"token": token}
         )
@@ -224,6 +222,7 @@ def handle_update_token_permissions(token):
 @api.route("/tokens/<token>/schedule", methods=["GET"])
 @measure_time()
 @verify_token
+@with_query_origin(default_origin="TOKEN_FETCH_SCHEDULE")
 def handle_generate_token_schedule(token):
     try:
         start_date = request.args.get("startDate")
@@ -260,6 +259,7 @@ def handle_generate_token_schedule(token):
 @api.route("/tokens/<token>", methods=["GET"])
 @measure_time()
 @verify_token
+@with_query_origin(default_origin="TOKEN_METADATA_LOAD")
 def handle_get_token_metadata(token):
     try:
         calendar_id = g.calendar_id
@@ -305,6 +305,7 @@ def handle_get_token_metadata(token):
 @measure_time()
 @require_auth
 @verify_token_owner
+@with_query_origin(default_origin="TOKEN_DELETE")
 def handle_delete_token(token):
     try:
         owner_uid = g.uid
@@ -315,9 +316,7 @@ def handle_delete_token(token):
 
                 return success_response(
                     message="token supprimé", 
-                    code="TOKEN_DELETE_SUCCESS", 
-                    uid=owner_uid, 
-                    origin="TOKEN_DELETE", 
+                    code="TOKEN_DELETE_SUCCESS",
                     log_extra={"token": token}
                 )
 
@@ -325,9 +324,7 @@ def handle_delete_token(token):
         return error_response(
             message="erreur lors de la suppression du token",
             code="TOKEN_DELETE_ERROR", 
-            status_code=500, 
-            uid=owner_uid, 
-            origin="TOKEN_DELETE", 
+            status_code=500,
             error=str(e),
             log_extra={"token": token}
         )

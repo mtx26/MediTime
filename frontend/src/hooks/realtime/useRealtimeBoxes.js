@@ -46,8 +46,8 @@ const fetchBoxes = async ({
 
     const logOrigin =
       sourceType === 'personal'
-        ? 'REALTIME_PERSONAL_CALENDAR_MEDICINE_BOXES_SUCCESS'
-        : 'REALTIME_SHARED_CALENDAR_MEDICINE_BOXES_SUCCESS';
+        ? 'REALTIME_PERSONAL_CALENDAR_BOXES'
+        : 'REALTIME_SHARED_CALENDAR_BOXES';
 
     analyticsPromise.then((analytics) => {
       if (analytics) {

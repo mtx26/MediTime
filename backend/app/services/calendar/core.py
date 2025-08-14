@@ -6,33 +6,45 @@ def generate_calendar_schedule(calendar_id, start_date):
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM calendars WHERE id = %s", (calendar_id,))
-                calendar = cursor.fetchone()
-                if calendar is None:
-                    return [], [], None
-
                 cursor.execute("""
-                    SELECT 
-                        cond.*,
-                        box.name,
-                        box.dose
-                    FROM medicine_box_conditions cond
-                    JOIN medicine_boxes box ON cond.box_id = box.id
-                    WHERE box.calendar_id = %s
+                    SELECT
+                        c.name AS calendar_name,
+                        cond.id,
+                        cond.box_id,
+                        cond.time_of_day,
+                        cond.interval_days,
+                        cond.start_date,
+                        cond.tablet_count,
+                        cond.created_at,
+                        cond.updated_at,
+                        box.name AS name,
+                        box.dose AS dose
+                    FROM calendars c
+                    JOIN medicine_boxes box ON box.calendar_id = c.id
+                    JOIN medicine_box_conditions cond ON cond.box_id = box.id
+                    WHERE c.id = %s
                 """, (calendar_id,))
 
-                medicines = cursor.fetchall()
-                if medicines:
-                    schedule = generate_schedule(start_date, medicines)
-                    table = generate_table(start_date, medicines)
-                    return schedule, table, calendar.get("name")
-                else:
+                rows = cursor.fetchall()
+                if not rows:
+                    # calendrier inexistant ou aucun médoc -> même retour qu’avant
                     return [], [], None
+
+                calendar_name = rows[0].get("calendar_name")
+                # on retire simplement la clé de chaque ligne pour garder EXACTEMENT cond.* + name + dose
+                for r in rows:
+                    r.pop("calendar_name", None)
+
+                medicines = rows  # déjà sous forme de liste de dicts comme avant
+                schedule = generate_schedule(start_date, medicines)
+                table = generate_table(start_date, medicines)
+                return schedule, table, calendar_name
 
     except Exception as e:
         logger.error("erreur lors de la génération du calendrier", {
             "origin": "CALENDAR_GENERATE_ERROR",
-            "error": str(e)
+            "error": str(e),
+            "calendar_id": calendar_id
         })
         return [], [], None
 
@@ -201,7 +213,7 @@ def fetch_medicine_name(medication_id):
             return result.get("name", "unknown")
         
 
-def uptate_stock_decrement_method(calendar_id, method):
+def update_stock_decrement_method(calendar_id, method):
     """
     Met à jour la méthode de diminution de stock pour un calendrier.
     """

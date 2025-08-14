@@ -40,15 +40,17 @@ const fetchCalendars = async (uid, setCalendarsData, setLoadingStates) => {
     });
 
     log.info(data.message, {
-      origin: 'CALENDARS_FETCH_SUCCESS',
+      origin: 'REALTIME_CALENDAR_FETCH',
       uid,
+      code: 'REALTIME_CALENDAR_FETCH_SUCCESS',
       count: data.calendars?.length,
     });
   } catch (err) {
     setLoadingStates((prev) => ({ ...prev, calendars: false }));
     log.error(err.message || 'Échec de récupération des calendriers', {
-      origin: 'CALENDARS_FETCH_ERROR',
+      origin: 'REALTIME_CALENDAR_FETCH',
       uid,
+      code: 'REALTIME_CALENDAR_FETCH_ERROR',
     });
   }
 };
@@ -86,14 +88,16 @@ const fetchSharedCalendars = async (
     });
 
     log.info(data.message, {
-      origin: 'SHARED_CALENDARS_FETCH_SUCCESS',
+      origin: 'REALTIME_SHARED_CALENDARS_FETCH',
+      code: 'REALTIME_SHARED_CALENDARS_FETCH_SUCCESS',
       uid,
       count: data.calendars?.length,
     });
   } catch (err) {
     setLoadingStates((prev) => ({ ...prev, sharedCalendars: false }));
     log.error(err.message || 'Échec de récupération des calendriers partagés', {
-      origin: 'SHARED_CALENDARS_FETCH_ERROR',
+      origin: 'REALTIME_SHARED_CALENDARS_FETCH',
+      code: 'REALTIME_SHARED_CALENDARS_FETCH_ERROR',
       uid,
     });
   }
@@ -116,6 +120,7 @@ export const useRealtimeCalendars = (setCalendarsData, setLoadingStates) => {
       {
         channelName: 'calendars-realtime',
         table: 'calendars',
+        event: '*',
         filter: `owner_uid=eq.${uid}`,
       },
       {

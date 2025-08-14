@@ -44,16 +44,18 @@ const fetchNotifications = async (
     });
 
     log.info(data.message, {
-      origin: 'NOTIFICATIONS_FETCH_SUCCESS',
+      origin: 'REALTIME_NOTIFICATIONS_FETCH',
       uid,
+      code: 'REALTIME_NOTIFICATIONS_FETCH_SUCCESS',
       count: data.notifications?.length,
     });
   } catch (err) {
     setNotificationsData([]);
     setLoadingStates((prev) => ({ ...prev, notifications: false }));
     log.error(err.message || 'Échec de récupération des notifications', err, {
-      origin: 'NOTIFICATIONS_FETCH_ERROR',
+      origin: 'REALTIME_NOTIFICATIONS_FETCH',
       uid,
+      code: 'REALTIME_NOTIFICATIONS_FETCH_ERROR',
     });
   }
 };
