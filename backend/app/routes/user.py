@@ -6,11 +6,13 @@ from app.services.user import fetch_user, update_existing_user, insert_new_user
 from app.utils.upload import upload_logo
 from app.db.connection import get_connection
 from app.utils.measure import measure_time
+from app.utils import with_query_origin
 
 
 @api.route("/user/sync", methods=["GET"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="USER_SYNC_GET")
 def get_user_info():
     uid = g.uid
     try:
@@ -20,15 +22,11 @@ def get_user_info():
                 message="utilisateur introuvable",
                 code="USER_NOT_FOUND",
                 status_code=404,
-                uid=uid,
-                origin="USER_SYNC_GET"
             )
 
         return success_response(
             message="informations utilisateur récupérées",
             code="USER_SYNC_SUCCESS",
-            uid=uid,
-            origin="USER_SYNC_GET",
             data={**user}
         )
     except Exception as e:
@@ -36,8 +34,6 @@ def get_user_info():
             message="erreur lors de la récupération des données utilisateur",
             code="USER_SYNC_ERROR",
             status_code=500,
-            uid=uid,
-            origin="USER_SYNC_GET",
             error=str(e),
         )
     
@@ -45,6 +41,7 @@ def get_user_info():
 @api.route("/user/update", methods=["POST"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="USER_UPDATE")
 def update_user_info():
     uid = g.uid
     try:
@@ -54,8 +51,6 @@ def update_user_info():
                 message="aucune donnée reçue",
                 code="USER_UPDATE_ERROR",
                 status_code=400,
-                uid=uid,
-                origin="USER_UPDATE"
             )
 
         display_name = payload.get("display_name", None)
@@ -74,8 +69,6 @@ def update_user_info():
         return success_response(
             message="données utilisateur mises à jour",
             code="USER_UPDATE_SUCCESS",
-            uid=uid,
-            origin="USER_UPDATE",
             data={**updated_user}
         )
 
@@ -84,8 +77,6 @@ def update_user_info():
             message="erreur lors de la mise à jour",
             code="USER_UPDATE_ERROR",
             status_code=500,
-            uid=uid,
-            origin="USER_UPDATE",
             error=str(e),
         )
 
@@ -93,6 +84,7 @@ def update_user_info():
 @api.route("/user/photo", methods=["POST"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="USER_PHOTO")
 def handle_user_photo():
     uid = None
     try:
@@ -104,8 +96,6 @@ def handle_user_photo():
                 message="erreur lors de la récupération de la photo de l'utilisateur",
                 code="USER_PHOTO_ERROR",
                 status_code=400,
-                uid=uid,
-                origin="USER_PHOTO"
             )
 
         photo_url = upload_logo(photo)
@@ -120,8 +110,6 @@ def handle_user_photo():
         return success_response(
             message="photo de l'utilisateur mise à jour",
             code="USER_PHOTO_SUCCESS",
-            uid=uid,
-            origin="USER_PHOTO",
             data={"uid": uid, "photo_url": photo_url}
         )
     except Exception as e:
@@ -129,7 +117,5 @@ def handle_user_photo():
             message="erreur lors de la mise à jour de la photo de l'utilisateur",
             code="USER_PHOTO_ERROR",
             status_code=500,
-            uid=uid,
-            origin="USER_PHOTO",
             error=str(e),
         )

@@ -89,7 +89,7 @@ function App() {
     const result = await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/schedule?startDate=${start}`,
       method: 'GET',
-      origin: 'CALENDAR_FETCH',
+      origin: 'CALENDAR_FETCH_SCHEDULE',
       uid,
       analyticsEvent: 'fetch_personal_calendar_schedule',
       analyticsData: {
@@ -191,7 +191,7 @@ function App() {
       url: `${API_URL}/api/calendars/${calendarId}/pilluliers/used`,
       method: 'POST',
       body: { startDate: start },
-      origin: 'PILLULIER_USE_MEDICATION',
+      origin: 'USE_PILLULIER',
       uid,
       analyticsEvent: 'use_pillulier_medication',
       analyticsData: { calendarId, uid, startDate: start },
@@ -254,7 +254,7 @@ function App() {
     const result = await performApiCall({
       url: `${API_URL}/api/tokens/${token}/schedule?startDate=${start}`,
       method: 'GET',
-      origin: 'SHARED_CALENDAR_FETCH',
+      origin: 'TOKEN_FETCH_SCHEDULE',
       analyticsEvent: 'fetch_token_calendar_schedule',
       analyticsData: {
         token,
@@ -280,7 +280,7 @@ function App() {
       url: `${API_URL}/api/tokens/${calendarId}`,
       method: 'POST',
       body: { expiresAt, permissions },
-      origin: 'SHARED_CALENDAR_CREATE',
+      origin: 'TOKEN_CREATE',
       analyticsEvent: 'create_token',
       analyticsData: { calendarId },
     });
@@ -292,7 +292,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/tokens/${token}`,
       method: 'DELETE',
-      origin: 'SHARED_CALENDAR_DELETE',
+      origin: 'TOKEN_DELETE',
       uid,
       analyticsEvent: 'delete_token',
       analyticsData: { token, uid },
@@ -363,7 +363,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/invitations/login/${token}`,
       method: 'GET',
-      origin: 'INVITATION_GET',
+      origin: 'GET_INVITATION_LOGIN',
       uid,
       analyticsEvent: 'get_invitation',
       analyticsData: { token, uid },
@@ -375,7 +375,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/invitations/login/${token}`,
       method: 'DELETE',
-      origin: 'SHARED_USER_DELETE',
+      origin: 'DELETE_INVITATION_LOGIN',
       uid,
       analyticsEvent: 'delete_shared_user',
       analyticsData: { token, uid },
@@ -388,7 +388,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/invitations/login/accept/${token}`,
       method: 'POST',
-      origin: 'INVITATION_ACCEPT',
+      origin: 'ACCEPT_INVITATION_LOGIN',
       uid,
       analyticsEvent: 'accept_invitation',
       analyticsData: { token, uid },
@@ -401,7 +401,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/invitations/login/reject/${token}`,
       method: 'POST',
-      origin: 'INVITATION_REJECT',
+      origin: 'REJECT_INVITATION_LOGIN',
       uid,
       analyticsEvent: 'reject_invitation',
       analyticsData: { token, uid },
@@ -414,7 +414,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/invitations/registration/${token}`,
       method: 'GET',
-      origin: 'INVITATION_GET',
+      origin: 'GET_INVITATION_REGISTRATION',
       uid,
       analyticsEvent: 'get_invitation',
       analyticsData: { token, uid },
@@ -425,7 +425,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/invitations/registration/${token}`,
       method: 'DELETE',
-      origin: 'INVITATION_DELETE',
+      origin: 'DELETE_INVITATION_REGISTRATION',
       uid,
       analyticsEvent: 'delete_invitation',
       analyticsData: { token, uid },
@@ -436,7 +436,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/invitations/registration/accept/${token}`,
       method: 'POST',
-      origin: 'INVITATION_ACCEPT',
+      origin: 'ACCEPT_INVITATION_REGISTRATION',
       uid,
       analyticsEvent: 'accept_invitation',
       analyticsData: { token, uid },
@@ -447,7 +447,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/invitations/registration/reject/${token}`,
       method: 'POST',
-      origin: 'INVITATION_REJECT',
+      origin: 'REJECT_INVITATION_REGISTRATION',
       uid,
       analyticsEvent: 'reject_invitation',
       analyticsData: { token, uid },
@@ -490,7 +490,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/shared/grouped`,
       method: 'GET',
-      origin: 'SHARED_USERS_FETCH',
+      origin: 'SHARED_FETCH',
       uid,
       analyticsEvent: 'fetch_shared_users',
       analyticsData: { uid },
@@ -508,7 +508,7 @@ function App() {
       const response = await performApiCall({
         url: `${API_URL}/api/shared/users/calendars/${calendarId}/schedule?startDate=${start}`,
         method: 'GET',
-        origin: 'SHARED_USER_CALENDAR_FETCH',
+        origin: 'SHARED_CALENDAR_FETCH_SCHEDULE',
         uid,
         analyticsEvent: 'fetch_shared_user_calendar_schedule',
         analyticsData: { calendarId, uid, startDate: start },
@@ -541,7 +541,7 @@ function App() {
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/boxes/${boxId}`,
       method: 'PUT',
       body: { box },
-      origin: 'SHARED_BOX_UPDATE',
+      origin: 'BOX_UPDATE',
       uid,
       analyticsEvent: 'update_shared_user_box',
       analyticsData: { calendarId, uid },
@@ -569,7 +569,7 @@ function App() {
             stock_quantity: stockQuantity,
           },
         },
-        origin: 'SHARED_BOX_CREATE',
+        origin: 'BOX_CREATE',
         uid,
         analyticsEvent: 'create_shared_user_box',
         analyticsData: { calendarId, uid },
@@ -593,7 +593,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/boxes/${boxId}`,
       method: 'DELETE',
-      origin: 'SHARED_BOX_DELETE',
+      origin: 'BOX_DELETE',
       uid,
       analyticsEvent: 'delete_shared_user_box',
       analyticsData: { calendarId, uid },
@@ -607,7 +607,7 @@ function App() {
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/pilluliers/used`,
       method: 'POST',
       body: { startDate: start },
-      origin: 'SHARED_USER_PILLULIER_USE_MEDICATION',
+      origin: 'USE_PILLULIER',
       uid,
       analyticsEvent: 'use_shared_user_pillulier_medication',
       analyticsData: { calendarId, startDate: start },
@@ -618,7 +618,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/boxes/${boxId}/restock`,
       method: 'POST',
-      origin: 'SHARED_BOX_RESTOCK',
+      origin: 'BOX_RESTOCK',
       uid,
       analyticsEvent: 'restock_shared_user_box',
       analyticsData: { calendarId, boxId, uid },
@@ -663,9 +663,9 @@ function App() {
       url: `${API_URL}/api/documents/analyze`,
       method: 'POST',
       body: { image: base64 },
-      origin: 'SHARED_USER_IMAGE_ANALYZE',
+      origin: 'DOCUMENT_ANALYZE',
       uid,
-      analyticsEvent: 'analyze_shared_user_image',
+      analyticsEvent: 'DOCUMENT_ANALYZE',
       analyticsData: { uid },
     });
   }, []);
@@ -810,14 +810,16 @@ function App() {
           log.info(t('fcm.token_registered'), {
             uid: userInfo.uid,
             token: tokenFcm,
-            origin: 'FCM_TOKEN_REGISTER_SUCCESS',
+            origin: 'FCM_TOKEN',
+            code: 'FCM_TOKEN_REGISTER_SUCCESS',
           });
         })
         .catch((error) => {
           log.error(t('fcm.token_send_error'), {
             uid: userInfo.uid,
             token: tokenFcm,
-            origin: 'FCM_TOKEN_REGISTER_ERROR',
+            origin: 'FCM_TOKEN',
+            code: 'FCM_TOKEN_REGISTER_ERROR',
             error: error,
           });
         });

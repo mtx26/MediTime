@@ -30,15 +30,17 @@ const fetchTokenMedicines = async (
     });
 
     log.info(data.message, {
-      origin: 'REALTIME_TOKEN_MEDICINES_SUCCESS',
+      origin: 'REALTIME_TOKEN_MEDICINES',
+      code: 'REALTIME_TOKEN_MEDICINES_SUCCESS',
       token,
       count: data.medicines.length,
     });
   } catch (err) {
     setLoadingMedicines(false);
     log.error(err.message, err, {
-      origin: 'REALTIME_TOKEN_MEDICINES_FETCH_ERROR',
+      origin: 'REALTIME_TOKEN_MEDICINES',
       token,
+      code: 'REALTIME_TOKEN_MEDICINES_ERROR',
     });
   }
 };
@@ -67,7 +69,8 @@ export const useRealtimeTokenMedicines = (
       } catch (err) {
         setLoadingMedicines(false);
         log.error(err.message, err, {
-          origin: 'REALTIME_TOKEN_INIT_ERROR',
+          origin: 'TOKEN_METADATA_LOAD',
+          code: 'TOKEN_METADATA_LOAD_ERROR',
           token,
         });
       }

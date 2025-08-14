@@ -13,7 +13,7 @@ from . import api
 from app.services.notifications import email_address_direct
 from app.utils.measure import measure_time
 import json
-
+from app.utils import with_query_origin
 
 # ---------------------------
 # Helpers communs (DB & notifs)
@@ -96,6 +96,7 @@ def _delete_invite_notification(cursor, receiver_uid: str, calendar_id: str, own
 @measure_time()
 @require_auth
 @verify_calendar
+@with_query_origin(default_origin="INVITATION_SEND")
 def handle_send_invitation(calendar_id):
     owner_uid = g.uid  # défini avant try pour except éventuel
     try:
@@ -124,8 +125,6 @@ def handle_send_invitation(calendar_id):
                     return success_response(
                         message="invitation envoyée",
                         code="INVITATION_SEND_SUCCESS",
-                        uid=owner_uid,
-                        origin="INVITATION_SEND",
                         log_extra={"calendar_id": calendar_id},
                     )
 
@@ -138,8 +137,6 @@ def handle_send_invitation(calendar_id):
                 message="invitation à soi-même",
                 code="SELF_INVITATION_ERROR",
                 status_code=400,
-                uid=owner_uid,
-                origin="INVITATION_SEND",
                 log_extra={"calendar_id": calendar_id},
             )
 
@@ -159,8 +156,6 @@ def handle_send_invitation(calendar_id):
                         message="utilisateur déjà invité",
                         code="ALREADY_INVITED",
                         status_code=400,
-                        uid=owner_uid,
-                        origin="INVITATION_SEND",
                         log_extra={"calendar_id": calendar_id},
                     )
 
@@ -185,8 +180,6 @@ def handle_send_invitation(calendar_id):
         return success_response(
             message="invitation envoyée",
             code="INVITATION_SEND_SUCCESS",
-            uid=owner_uid,
-            origin="INVITATION_SEND",
             log_extra={"calendar_id": calendar_id},
         )
 
@@ -195,8 +188,6 @@ def handle_send_invitation(calendar_id):
             message="erreur lors de l'envoi de l'invitation",
             code="INVITATION_SEND_ERROR",
             status_code=500,
-            uid=owner_uid,
-            origin="INVITATION_SEND",
             error=str(e),
             log_extra={"calendar_id": calendar_id},
         )
@@ -208,6 +199,7 @@ def handle_send_invitation(calendar_id):
 @api.route("/invitations/login/<token>", methods=["GET"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="GET_INVITATION_LOGIN")
 def handle_login_invitation(token):
     uid = g.uid
     try:
@@ -235,16 +227,12 @@ def handle_login_invitation(token):
                     return error_response(
                         message="invitation non trouvée",
                         code="INVITATION_LOGIN_NOT_FOUND",
-                        uid=uid,
                         status_code=404,
-                        origin="INVITATION_LOGIN",
                     )
 
                 return success_response(
                     message="invitation trouvée",
                     code="INVITATION_LOGIN_FOUND",
-                    uid=uid,
-                    origin="INVITATION_LOGIN",
                     data={"invitation": invitation},
                     log_extra={"token": token},
                 )
@@ -254,8 +242,6 @@ def handle_login_invitation(token):
             message="Erreur lors de la récupération de l'invitation",
             code="INVITATION_LOGIN_FETCH_ERROR",
             status_code=500,
-            uid=uid,
-            origin="INVITATION_LOGIN",
             log_extra={"error": str(e)},
         )
 
@@ -267,6 +253,7 @@ def handle_login_invitation(token):
 @measure_time()
 @require_auth
 @verify_login_invitation_owner
+@with_query_origin(default_origin="DELETE_INVITATION_LOGIN")
 def delete_login_invitation(token):
     owner_uid = g.uid if hasattr(g, "uid") else None
     calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
@@ -280,8 +267,6 @@ def delete_login_invitation(token):
                         message="calendrier non trouvé",
                         code="SHARED_USERS_DELETE_ERROR",
                         status_code=404,
-                        uid=owner_uid,
-                        origin="SHARED_USERS_DELETE",
                         log_extra={"token": token},
                     )
 
@@ -304,8 +289,6 @@ def delete_login_invitation(token):
         return success_response(
             message="utilisateur partagé supprimé",
             code="SHARED_USERS_DELETE_SUCCESS",
-            uid=receiver_uid,
-            origin="SHARED_USERS_DELETE",
             log_extra={"calendar_id": calendar_id},
         )
 
@@ -314,8 +297,6 @@ def delete_login_invitation(token):
             message="erreur lors de la suppression de l'utilisateur partagé",
             code="SHARED_USERS_DELETE_ERROR",
             status_code=500,
-            uid=owner_uid,
-            origin="SHARED_USERS_DELETE",
             error=str(e),
             log_extra={"calendar_id": calendar_id},
         )
@@ -328,6 +309,7 @@ def delete_login_invitation(token):
 @measure_time()
 @require_auth
 @verify_login_invitation_receiver
+@with_query_origin(default_origin="INVITATION_LOGIN_ACCEPT")
 def handle_accept_login_invitation(token):
     uid = g.uid if hasattr(g, "uid") else None
     calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
@@ -364,8 +346,6 @@ def handle_accept_login_invitation(token):
         return success_response(
             message="invitation acceptée",
             code="INVITATION_ACCEPT_SUCCESS",
-            uid=uid,
-            origin="INVITATION_ACCEPT",
             data={"calendar_id": calendar_id},
             log_extra={"token": token},
         )
@@ -375,8 +355,6 @@ def handle_accept_login_invitation(token):
             message="erreur lors de l'acceptation de l'invitation",
             code="INVITATION_ACCEPT_ERROR",
             status_code=500,
-            uid=uid,
-            origin="INVITATION_ACCEPT",
             error=str(e),
             log_extra={"token": token},
         )
@@ -389,6 +367,7 @@ def handle_accept_login_invitation(token):
 @measure_time()
 @require_auth
 @verify_login_invitation_receiver
+@with_query_origin(default_origin="INVITATION_LOGIN_REJECT")
 def handle_reject_login_invitation(token):
     uid = g.uid if hasattr(g, "uid") else None
     calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
@@ -418,8 +397,6 @@ def handle_reject_login_invitation(token):
         return success_response(
             message="invitation rejetée",
             code="INVITATION_REJECT_SUCCESS",
-            uid=uid,
-            origin="INVITATION_REJECT",
             log_extra={"token": token},
         )
 
@@ -428,8 +405,6 @@ def handle_reject_login_invitation(token):
             message="erreur lors du rejet de l'invitation",
             code="INVITATION_REJECT_ERROR",
             status_code=500,
-            uid=uid,
-            origin="INVITATION_REJECT",
             error=str(e),
             log_extra={"token": token},
         )
@@ -441,6 +416,7 @@ def handle_reject_login_invitation(token):
 @api.route("/invitations/registration/<token>", methods=["GET"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="GET_INVITATION_REGISTRATION")
 def handle_registration_invitation(token):
     uid = g.uid
     try:
@@ -470,16 +446,12 @@ def handle_registration_invitation(token):
                     return error_response(
                         message="invitation non trouvée",
                         code="INVITATION_NOT_FOUND",
-                        uid=uid,
                         status_code=404,
-                        origin="INVITATION_REGISTRATION",
                     )
 
                 return success_response(
                     message="invitation trouvée",
                     code="INVITATION_FOUND",
-                    uid=uid,
-                    origin="INVITATION_REGISTRATION",
                     data={"invitation": invitation},
                     log_extra={"token": token},
                 )
@@ -488,8 +460,6 @@ def handle_registration_invitation(token):
         return error_response(
             message="Erreur lors de la récupération de l'invitation",
             code="INVITATION_FETCH_ERROR",
-            uid=uid,
-            origin="INVITATION_REGISTRATION",
             status_code=500,
             log_extra={"error": str(e)},
         )
@@ -502,6 +472,7 @@ def handle_registration_invitation(token):
 @measure_time()
 @require_auth
 @verify_registration_invitation_owner
+@with_query_origin(default_origin="DELETE_INVITATION_REGISTRATION")
 def delete_registration_invitation(token):
     uid = g.uid if hasattr(g, "uid") else None
     calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
@@ -528,8 +499,6 @@ def delete_registration_invitation(token):
         return success_response(
             message="Invitation de calendrier supprimée",
             code="SHARED_CALENDAR_INVITATION_DELETE_SUCCESS",
-            uid=uid,
-            origin="DELETE_SHARED_CALENDAR_INVITATION",
             log_extra={"calendar_id": calendar_id},
         )
 
@@ -538,8 +507,6 @@ def delete_registration_invitation(token):
             message="Erreur lors de la suppression de l'invitation",
             code="SHARED_CALENDAR_INVITATION_DELETE_ERROR",
             status_code=500,
-            uid=uid,
-            origin="DELETE_SHARED_CALENDAR_INVITATION",
             error=str(e),
         )
 
@@ -550,6 +517,7 @@ def delete_registration_invitation(token):
 @api.route("/invitations/registration/accept/<token>", methods=["POST"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="ACCEPT_INVITATION_REGISTRATION")
 def accept_registration_invitation(token):
     uid = g.uid if hasattr(g, "uid") else None
     try:
@@ -561,8 +529,6 @@ def accept_registration_invitation(token):
                         message="invitation introuvable",
                         code="INVITATION_NOT_FOUND",
                         status_code=404,
-                        uid=uid,
-                        origin="ACCEPT_SHARED_CALENDAR_INVITATION",
                         log_extra={"token": token},
                     )
 
@@ -593,8 +559,6 @@ def accept_registration_invitation(token):
         return success_response(
             message="Invitation de calendrier acceptée",
             code="SHARED_CALENDAR_INVITATION_ACCEPT_SUCCESS",
-            uid=uid,
-            origin="ACCEPT_SHARED_CALENDAR_INVITATION",
             data={"calendar_id": calendar_id},
             log_extra={"token": token},
         )
@@ -604,8 +568,6 @@ def accept_registration_invitation(token):
             message="Erreur lors de l'acceptation de l'invitation",
             code="SHARED_CALENDAR_INVITATION_ACCEPT_ERROR",
             status_code=500,
-            uid=uid,
-            origin="ACCEPT_SHARED_CALENDAR_INVITATION",
             error=str(e),
         )
 
@@ -616,6 +578,7 @@ def accept_registration_invitation(token):
 @api.route("/invitations/registration/reject/<token>", methods=["POST"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="REJECT_INVITATION_REGISTRATION")
 def reject_registration_invitation(token):
     uid = g.uid if hasattr(g, "uid") else None
     try:
@@ -627,8 +590,6 @@ def reject_registration_invitation(token):
                         message="invitation introuvable",
                         code="INVITATION_NOT_FOUND",
                         status_code=404,
-                        uid=uid,
-                        origin="REJECT_SHARED_CALENDAR_INVITATION",
                         log_extra={"token": token},
                     )
 
@@ -649,8 +610,6 @@ def reject_registration_invitation(token):
         return success_response(
             message="Invitation de calendrier rejetée",
             code="SHARED_CALENDAR_INVITATION_REJECT_SUCCESS",
-            uid=uid,
-            origin="REJECT_SHARED_CALENDAR_INVITATION",
             log_extra={"token": token},
         )
 
@@ -659,7 +618,5 @@ def reject_registration_invitation(token):
             message="Erreur lors du rejet de l'invitation",
             code="SHARED_CALENDAR_INVITATION_REJECT_ERROR",
             status_code=500,
-            uid=uid,
-            origin="REJECT_SHARED_CALENDAR_INVITATION",
             error=str(e),
         )
