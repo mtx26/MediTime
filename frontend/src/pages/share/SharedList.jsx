@@ -366,6 +366,7 @@ const calendarActions = ({
   setAlertId,
   setOnConfirmAction,
   t,
+  lng,
 }) => {
   return [
     {
@@ -424,6 +425,7 @@ function CalendarCard({
   emailsToInvite, setEmailsToInvite, navigate, personalCalendars,
 }) {
   const { t } = useTranslation();
+  const { lng } = useParams();
   const alertHandlers = { alertId, alertType, alertMessage, onConfirmAction, setAlertMessage, setOnConfirmAction, setAlertId };
   const tokenProps = { ...alertHandlers, setAlertType, handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions, handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyToken, setSelectedModifyToken, tokenCalendars };
   const userProps = { ...alertHandlers, handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
@@ -445,6 +447,7 @@ function CalendarCard({
                 setAlertId,
                 setOnConfirmAction,
                 t,
+                lng,
               })}
             />
           </h2>
@@ -487,6 +490,7 @@ function TokenList({
   tokenCalendars,
 }) {
   const { t } = useTranslation();
+  const { lng } = useParams();
   return (
     <>
       {(data.tokens || []).map((token) => (
