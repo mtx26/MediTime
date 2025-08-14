@@ -1,16 +1,4 @@
 User-agent: *
-Disallow: /account
-Disallow: /notifications
-Disallow: /calendars
-Disallow: /calendar
-Disallow: /shared-calendars
-Disallow: /shared-user-calendar
-Disallow: /shared-token-calendar
-
-Allow: /login
-Allow: /register
-Allow: /reset-password
-Allow: /verify-email
 Allow: /
 
 Sitemap: https://meditime-app.com/sitemap.xml
