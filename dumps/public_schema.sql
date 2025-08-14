@@ -85,14 +85,9 @@ CREATE TABLE IF NOT EXISTS "public"."invitations" (
     "invited_email" "text",
     "role" "text" DEFAULT 'write'::"text" NOT NULL,
     "token" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "expires_at" timestamp with time zone DEFAULT ("now"() + '14 days'::interval) NOT NULL,
-    "redeemed_at" timestamp with time zone,
-    "redeemed_by" "uuid",
-    "status" "text" DEFAULT 'pending'::"text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    CONSTRAINT "invitations_role_check" CHECK (("role" = ANY (ARRAY['read'::"text", 'write'::"text", 'admin'::"text"]))),
-    CONSTRAINT "invitations_status_check" CHECK (("status" = ANY (ARRAY['pending'::"text", 'accepted'::"text", 'revoked'::"text"])))
+    CONSTRAINT "invitations_role_check" CHECK (("role" = ANY (ARRAY['read'::"text", 'write'::"text", 'admin'::"text"])))
 );
 
 
@@ -165,7 +160,8 @@ CREATE TABLE IF NOT EXISTS "public"."notifications" (
     "timestamp" timestamp with time zone DEFAULT "now"(),
     "sender_uid" "uuid" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "shared_calendar_id" "uuid"
 );
 
 
@@ -359,11 +355,6 @@ ALTER TABLE ONLY "public"."invitations"
 
 
 
-ALTER TABLE ONLY "public"."invitations"
-    ADD CONSTRAINT "invitations_redeemed_by_fkey" FOREIGN KEY ("redeemed_by") REFERENCES "public"."users"("id") ON DELETE SET NULL;
-
-
-
 ALTER TABLE ONLY "public"."medicine_box_conditions"
     ADD CONSTRAINT "medicine_box_conditions_box_id_fkey" FOREIGN KEY ("box_id") REFERENCES "public"."medicine_boxes"("id") ON DELETE CASCADE;
 
@@ -375,7 +366,12 @@ ALTER TABLE ONLY "public"."medicine_boxes"
 
 
 ALTER TABLE ONLY "public"."notifications"
-    ADD CONSTRAINT "notifications_sender_uid_fkey" FOREIGN KEY ("sender_uid") REFERENCES "public"."users"("id") ON DELETE SET NULL;
+    ADD CONSTRAINT "notifications_sender_uid_fkey" FOREIGN KEY ("sender_uid") REFERENCES "public"."users"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."notifications"
+    ADD CONSTRAINT "notifications_shared_calendar_id_fkey" FOREIGN KEY ("shared_calendar_id") REFERENCES "public"."shared_calendars"("id") ON DELETE CASCADE;
 
 
 
