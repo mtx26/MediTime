@@ -112,8 +112,10 @@ function Navbar({ sharedProps }) {
           right: '1rem',
           zIndex: 1050,
         }}
+        aria-label="Fermer"
       >
-        <i className="bi bi-x-lg"></i>
+        <i className="bi bi-x-lg" aria-hidden="true"></i>
+        <span className="visually-hidden">Fermer</span>
       </Link>
     );
   }
@@ -350,6 +352,7 @@ function Navbar({ sharedProps }) {
                         width="32"
                         height="32"
                         referrerPolicy="no-referrer"
+                        loading="lazy"
                       />
                       <span className="text-muted">
                         {userInfo.displayName || t('user')}
@@ -465,6 +468,7 @@ function Navbar({ sharedProps }) {
                 width="38"
                 height="38"
                 referrerPolicy="no-referrer"
+                loading="lazy"
               />
             ) : (
               <i className="bi bi-person-circle fs-1"></i>

@@ -1,7 +1,5 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getAnalytics, isSupported } from 'firebase/analytics';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { log } from '../../utils/logger';
 
 // 🔐 Configuration Firebase
@@ -18,7 +16,8 @@ const firebaseConfig = {
 // 🚀 Initialisation
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const messaging = getMessaging(app);
+let messaging;
+let onMessageFn;
 
 // 🔔 Récupérer le token de notifications
 export const requestPermissionAndGetToken = async (uid) => {
@@ -26,6 +25,8 @@ export const requestPermissionAndGetToken = async (uid) => {
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') throw new Error('Permission refusée');
 
+    const { getMessaging, getToken } = await import('firebase/messaging');
+    messaging = messaging || getMessaging(app);
     const token = await getToken(messaging, {
       vapidKey: import.meta.env.VITE_FCM_VAPID_KEY,
     });
@@ -47,9 +48,19 @@ export const requestPermissionAndGetToken = async (uid) => {
   }
 };
 
-const analyticsPromise = isSupported().then((yes) =>
-  yes ? getAnalytics(app) : null
-);
+const analyticsPromise = (async () => {
+  const { getAnalytics, isSupported } = await import('firebase/analytics');
+  return (await isSupported()) ? getAnalytics(app) : null;
+})();
+
+const getMessagingModule = async () => {
+  if (!messaging) {
+    const { getMessaging, onMessage } = await import('firebase/messaging');
+    messaging = getMessaging(app);
+    onMessageFn = onMessage;
+  }
+  return { messaging, onMessage: onMessageFn };
+};
 
 // 📤 Exportation
-export { db, analyticsPromise, messaging, onMessage };
+export { db, analyticsPromise, getMessagingModule };

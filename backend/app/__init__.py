@@ -1,6 +1,7 @@
 # app/__init__.py
 
-from flask import Flask
+from flask import Flask, request
+from flask_compress import Compress
 from app.config.config import Config
 from app.routes import register_routes
 from app.auth.google_services import init_firebase, init_vertex_ai
@@ -11,6 +12,7 @@ from app.cron import start_cron
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    Compress(app)
 
     # 🌍 Active CORS avec cookies si jamais Firebase envoie une session (optionnel)
     CORS(app, supports_credentials=True)
@@ -20,5 +22,14 @@ def create_app():
     init_firebase()
     init_vertex_ai()
     start_cron()
+
+    @app.after_request
+    def add_cache_headers(response):
+        path = request.path
+        if any(ext in path for ext in [".js", ".css", ".png", ".webp", ".avif", ".ico"]) and "v=" in request.query_string.decode():
+            response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+        elif path.endswith('.html'):
+            response.headers['Cache-Control'] = 'no-store'
+        return response
 
     return app
