@@ -4,12 +4,14 @@ from app.db.connection import get_connection
 from app.services.calendar import verify_token
 from app.utils.responses import success_response, error_response
 from app.utils.measure import measure_time
+from app.utils import with_query_origin
 
 
 # Route pour obtenir les médicaments d’un token public
 @api.route("/tokens/<token>/medicines", methods=["GET"])
 @measure_time()
 @verify_token
+@with_query_origin(default_origin="REALTIME_TOKEN_MEDICINES")
 def handle_token_medicines(token):
     try:
         calendar_id = g.calendar_id
@@ -33,7 +35,6 @@ def handle_token_medicines(token):
         return success_response(
             message="médicaments récupérés",
             code="MEDICINES_SHARED_LOADED",
-            origin="TOKEN_MEDICINES_LOAD",
             data={"medicines": medicines},
             log_extra={"token": token}
         )
@@ -44,6 +45,5 @@ def handle_token_medicines(token):
             code="MEDICINES_SHARED_ERROR",
             status_code=500,
             error=str(e),
-            origin="TOKEN_MEDICINES_LOAD",
             log_extra={"token": token}
         )

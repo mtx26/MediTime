@@ -40,14 +40,16 @@ export const useRealtimeTokens = (setTokensList, setLoadingStates) => {
       });
 
       log.info(data.message, {
-        origin: 'TOKENS_FETCH_SUCCESS',
+        origin: 'REALTIME_TOKENS_FETCH',
+        code: 'REALTIME_TOKENS_FETCH_SUCCESS',
         uid,
         count: data.tokens.length,
       });
     } catch (err) {
       setLoadingStates((prev) => ({ ...prev, tokens: false }));
       log.error(err.message || 'Échec de récupération des tokens', err, {
-        origin: 'TOKENS_FETCH_ERROR',
+        origin: 'REALTIME_TOKENS_FETCH',
+        code: 'REALTIME_TOKENS_FETCH_ERROR',
         uid,
       });
     }

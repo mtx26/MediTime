@@ -213,7 +213,7 @@ def fetch_medicine_name(medication_id):
             return result.get("name", "unknown")
         
 
-def uptate_stock_decrement_method(calendar_id, method):
+def update_stock_decrement_method(calendar_id, method):
     """
     Met à jour la méthode de diminution de stock pour un calendrier.
     """

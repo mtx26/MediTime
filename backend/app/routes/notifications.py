@@ -7,6 +7,7 @@ from app.db.connection import get_connection
 from flask import request, g
 from app.config import Config
 from app.utils.measure import measure_time
+from app.utils import with_query_origin
 
 frontend_url = Config.FRONTEND_URL or ""
 
@@ -32,6 +33,7 @@ def get_user_info(uid):
 @api.route("/notifications", methods=["GET"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="REALTIME_NOTIFICATIONS_FETCH")
 def handle_notifications():
     uid = g.uid
     DEFAULT_PHOTO = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg"
@@ -75,8 +77,6 @@ def handle_notifications():
         return success_response(
             message="notifications récupérées",
             code="NOTIFICATIONS_FETCH_SUCCESS",
-            uid=uid,
-            origin="NOTIFICATIONS_FETCH",
             data={"notifications": rows}
         )
 
@@ -85,8 +85,6 @@ def handle_notifications():
             message="erreur lors de la récupération des notifications",
             code="NOTIFICATIONS_FETCH_ERROR",
             status_code=500,
-            uid=uid,
-            origin="NOTIFICATIONS_FETCH",
             error=str(e)
         )
 
@@ -94,6 +92,7 @@ def handle_notifications():
 @api.route("/notifications/<notification_id>", methods=["POST"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="NOTIFICATION_READ")
 def handle_read_notification(notification_id):
     try:
         uid = g.uid
@@ -113,8 +112,6 @@ def handle_read_notification(notification_id):
                         message="notification non trouvée", 
                         code="NOTIFICATION_READ_ERROR", 
                         status_code=404, 
-                        uid=uid, 
-                        origin="NOTIFICATION_READ",
                         log_extra={"notification_id": notification_id}
                     )
 
@@ -123,8 +120,6 @@ def handle_read_notification(notification_id):
         return success_response(
             message="notification marquée comme lue", 
             code="NOTIFICATION_READ_SUCCESS", 
-            uid=uid, 
-            origin="NOTIFICATION_READ",
             log_extra={"notification_id": notification_id}
         )
 
@@ -132,9 +127,7 @@ def handle_read_notification(notification_id):
         return error_response(
             message="erreur lors de la marque de la notification comme lue", 
             code="NOTIFICATION_READ_ERROR", 
-            status_code=500, 
-            uid=uid, 
-            origin="NOTIFICATION_READ",
+            status_code=500,
             error=str(e)
         )
 
@@ -143,6 +136,7 @@ def handle_read_notification(notification_id):
 @api.route("/notifications/register-token", methods=["POST"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="FCM_TOKEN")
 def register_token():
     data = request.json
     token = data.get("token")
@@ -153,7 +147,6 @@ def register_token():
             message="données manquantes", 
             code="MISSING_DATA",
             status_code=400,
-            origin="FCM_REGISTER"
         )
 
     try:
@@ -169,8 +162,6 @@ def register_token():
         return success_response(
             message="token enregistré", 
             code="FCM_REGISTERED",
-            uid=uid,
-            origin="FCM_REGISTER",
             log_extra={"token": token}
         )
 
@@ -179,6 +170,5 @@ def register_token():
             message="erreur lors de l'enregistrement du token", 
             code="FCM_REGISTER_ERROR",
             status_code=500,
-            origin="FCM_REGISTER",
             error=str(e)
         )

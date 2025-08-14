@@ -55,7 +55,8 @@ const Account = ({ sharedProps }) => {
     reloadUser();
     
     log.info(data.message, {
-      origin: 'PHOTO_UPLOAD_SUCCESS',
+      origin: 'USER_PHOTO',
+      code: 'PHOTO_UPLOAD_SUCCESS',
       uid: userInfo.uid,
     });
   };

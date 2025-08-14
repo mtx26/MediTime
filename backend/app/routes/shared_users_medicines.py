@@ -7,12 +7,14 @@ from app.services.medication import get_boxes, update_box, create_box, delete_bo
 from app.services.medication import use_pillulier
 from datetime import datetime, timezone
 from app.utils.measure import measure_time
+from app.utils import with_query_origin
 
 # Route pour récupérer les boites de médicaments d'un calendrier
 @api.route("/shared/users/calendars/<calendar_id>/boxes", methods=["GET"])
 @measure_time()
 @require_auth
 @verify_calendar_share
+@with_query_origin(default_origin="REALTIME_SHARED_CALENDAR_BOXES")
 def handle_shared_boxes(calendar_id):
     try:
         uid = g.uid
@@ -22,8 +24,6 @@ def handle_shared_boxes(calendar_id):
         return success_response(
             message="boites de médicaments récupérées",
             code="MEDICINE_BOXES_FETCHED",
-            uid=uid,
-            origin="GET_MEDICINE_BOXES",
             data={"boxes": boxes},
             log_extra={"calendar_id": calendar_id, "boxes_count": len(boxes)}
         )
@@ -33,8 +33,6 @@ def handle_shared_boxes(calendar_id):
             message="erreur lors de la récupération des boites de médicaments",
             code="GET_MEDICINE_BOXES_ERROR",
             status_code=500,
-            uid=uid,
-            origin="GET_MEDICINE_BOXES",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
@@ -45,6 +43,7 @@ def handle_shared_boxes(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar_share
+@with_query_origin(default_origin="BOX_UPDATE")
 def handle_update_shared_box(calendar_id, box_id):
     try:
         uid = g.uid
@@ -57,8 +56,6 @@ def handle_update_shared_box(calendar_id, box_id):
                 message="champs requis manquants",
                 code="MISSING_REQUIRED_FIELDS",
                 status_code=400,
-                uid=uid,
-                origin="UPDATE_MEDICINE_BOX",
                 log_extra={"calendar_id": calendar_id, "box_id": box_id}
             )
 
@@ -67,8 +64,6 @@ def handle_update_shared_box(calendar_id, box_id):
         return success_response(
             message="boite de médicaments modifiée",
             code="MEDICINE_BOX_UPDATED",
-            uid=uid,
-            origin="UPDATE_MEDICINE_BOX",
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
@@ -77,8 +72,6 @@ def handle_update_shared_box(calendar_id, box_id):
             message="erreur lors de la modification de la boite de médicaments",
             code="UPDATE_MEDICINE_BOX_ERROR",
             status_code=500,
-            uid=uid,
-            origin="UPDATE_MEDICINE_BOX",
             error=str(e),
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
@@ -88,6 +81,7 @@ def handle_update_shared_box(calendar_id, box_id):
 @measure_time()
 @require_auth
 @verify_calendar_share
+@with_query_origin(default_origin="BOX_CREATE")
 def handle_create_shared_box(calendar_id):
     try:
         uid = g.uid
@@ -100,8 +94,6 @@ def handle_create_shared_box(calendar_id):
                 message="champs requis manquants",
                 code="MISSING_REQUIRED_FIELDS",
                 status_code=400,
-                uid=uid,
-                origin="CREATE_MEDICINE_BOX",
                 log_extra={"calendar_id": calendar_id}
             )
 
@@ -110,8 +102,6 @@ def handle_create_shared_box(calendar_id):
         return success_response(
             message="boite de médicaments créée",
             code="MEDICINE_BOX_CREATED",
-            uid=uid,
-            origin="CREATE_MEDICINE_BOX",
             data={"box_id": box_id},
             log_extra={"calendar_id": calendar_id}
         )
@@ -121,8 +111,6 @@ def handle_create_shared_box(calendar_id):
             message="erreur lors de la création de la boite de médicaments",
             code="CREATE_MEDICINE_BOX_ERROR",
             status_code=500,
-            uid=uid,
-            origin="CREATE_MEDICINE_BOX",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
@@ -132,17 +120,14 @@ def handle_create_shared_box(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar_share
+@with_query_origin(default_origin="BOX_DELETE")
 def handle_delete_shared_box(calendar_id, box_id):
     try:
-        uid = g.uid
-
         delete_box(box_id, calendar_id)
 
         return success_response(
             message="boite de médicaments supprimée",
             code="MEDICINE_BOX_DELETED",
-            uid=uid,
-            origin="DELETE_MEDICINE_BOX",
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
@@ -151,8 +136,6 @@ def handle_delete_shared_box(calendar_id, box_id):
             message="erreur lors de la suppression de la boite de médicaments",
             code="DELETE_MEDICINE_BOX_ERROR",
             status_code=500,
-            uid=uid,
-            origin="DELETE_MEDICINE_BOX",
             error=str(e),
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
@@ -161,6 +144,7 @@ def handle_delete_shared_box(calendar_id, box_id):
 @measure_time()
 @require_auth
 @verify_calendar_share
+@with_query_origin(default_origin="USE_PILLULIER")
 def handle_use_shared_users_pillulier(calendar_id):
     try:
         uid = g.uid
@@ -179,15 +163,11 @@ def handle_use_shared_users_pillulier(calendar_id):
                 message="erreur lors de l'utilisation du pilulier",
                 code="USE_PILLULIER_ERROR",
                 status_code=500,
-                uid=uid,
-                origin="SHARED_USER_USE_PILLULIER",
                 log_extra={"calendar_id": calendar_id}
             )
         return success_response(
             message="pilulier utilisé avec succès",
             code="PILLULIER_USED",
-            uid=uid,
-            origin="SHARED_USER_USE_PILLULIER",
             log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
@@ -195,8 +175,6 @@ def handle_use_shared_users_pillulier(calendar_id):
             message="erreur lors de l'utilisation du pilulier",
             code="USE_PILLULIER_ERROR",
             status_code=500,
-            uid=uid,
-            origin="SHARED_USER_USE_PILLULIER",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
@@ -206,6 +184,7 @@ def handle_use_shared_users_pillulier(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar_share
+@with_query_origin(default_origin="BOX_RESTOCK")
 def handle_shared_user_restock_box(calendar_id, box_id):
     try:
         uid = g.uid
@@ -215,16 +194,12 @@ def handle_shared_user_restock_box(calendar_id, box_id):
                 message="boite de médicaments non trouvée",
                 code="MEDICINE_BOX_NOT_FOUND",
                 status_code=404,
-                uid=uid,
-                origin="RESTOCK_MEDICINE_BOX",
                 log_extra={"calendar_id": calendar_id, "box_id": box_id}
             )
 
         return success_response(
             message="boite de médicaments réapprovisionnée",
             code="MEDICINE_BOX_RESTOCKED",
-            uid=uid,
-            origin="RESTOCK_MEDICINE_BOX",
             data={"box_id": box_id},
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
@@ -233,8 +208,6 @@ def handle_shared_user_restock_box(calendar_id, box_id):
             message="erreur lors du réapprovisionnement de la boite de médicaments",
             code="RESTOCK_MEDICINE_BOX_ERROR",
             status_code=500,
-            uid=uid,
-            origin="RESTOCK_MEDICINE_BOX",
             error=str(e),
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )

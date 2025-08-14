@@ -92,7 +92,8 @@ export const UserProvider = ({ children }) => {
     } catch (error) {
       log.error('[UserContext] Erreur lors de reloadUser', {
         error,
-        origin: 'USER_CONTEXT_RELOAD_USER',
+        origin: 'USER_SYNC_GET',
+        code: 'USER_SYNC_ERROR',
       });
     }
   }, []);

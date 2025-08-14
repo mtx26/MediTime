@@ -10,6 +10,7 @@ from app.config import Config
 from urllib.parse import urljoin
 from app.services.medication import check_if_stock_is_low
 from app.utils.measure import measure_time
+from app.utils import with_query_origin
 
 
 ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"
@@ -22,6 +23,7 @@ SELECT_SHARED_CALENDAR = "SELECT * FROM calendars WHERE id = %s"
 @api.route("/shared/users/calendars", methods=["GET"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="REALTIME_SHARED_CALENDARS_FETCH")
 def handle_shared_calendars():
     try:
         uid = g.uid
@@ -55,8 +57,6 @@ def handle_shared_calendars():
             return success_response(
                 message=SUCCESS_SHARED_CALENDARS_LOAD,
                 code="SHARED_CALENDARS_LOAD_EMPTY",
-                uid=uid,
-                origin="SHARED_CALENDARS_LOAD",
                 data={"calendars": []}
             )
 
@@ -69,8 +69,6 @@ def handle_shared_calendars():
         return success_response(
             message=SUCCESS_SHARED_CALENDARS_LOAD,
             code="SHARED_CALENDARS_LOAD_SUCCESS",
-            uid=uid,
-            origin="SHARED_CALENDARS_LOAD",
             data={"calendars": calendars_list}
         )
 
@@ -79,8 +77,6 @@ def handle_shared_calendars():
             message="erreur lors de la récupération des calendriers partagés",
             code="SHARED_CALENDARS_ERROR",
             status_code=500,
-            uid=g.get("uid"),
-            origin="SHARED_CALENDARS_LOAD",
             error=str(e)
         )
 
@@ -89,6 +85,7 @@ def handle_shared_calendars():
 @measure_time()
 @require_auth
 @verify_calendar_share
+@with_query_origin(default_origin="SHARED_CALENDAR_FETCH_SCHEDULE")
 def handle_user_shared_calendar_schedule(calendar_id):
     try:
         uid = g.uid
@@ -107,8 +104,6 @@ def handle_user_shared_calendar_schedule(calendar_id):
         return success_response(
             message=SUCCESS_SHARED_CALENDARS_LOAD, 
             code="SHARED_CALENDARS_LOAD_SUCCESS", 
-            uid=uid, 
-            origin="SHARED_CALENDARS_LOAD",
             data={"schedule": schedule, "table": table, "calendar_name": calendar_name, "if_low_stock": if_low_stock},
             log_extra={"calendar_id": calendar_id}
         )
@@ -117,9 +112,7 @@ def handle_user_shared_calendar_schedule(calendar_id):
         return error_response(
             message="erreur lors de la récupération du calendrier partagé",
             code="SHARED_CALENDARS_ERROR", 
-            status_code=500, 
-            uid=uid, 
-            origin="SHARED_CALENDARS_LOAD",
+            status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
@@ -130,6 +123,7 @@ def handle_user_shared_calendar_schedule(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar_share
+@with_query_origin(default_origin="SHARED_CALENDAR_DELETE")
 def handle_delete_user_shared_calendar(calendar_id):
     try:
         receiver_uid = g.uid
@@ -149,10 +143,8 @@ def handle_delete_user_shared_calendar(calendar_id):
                 if not result:
                     return warning_response(
                         message=ERROR_CALENDAR_NOT_FOUND,
-                        code="SHARED_CALENDARS_DELETE_ERROR",
+                        code="SHARED_CALENDAR_DELETE_ERROR",
                         status_code=404,
-                        uid=receiver_uid,
-                        origin="SHARED_CALENDARS_DELETE",
                         log_extra={"calendar_id": calendar_id}
                     )
 
@@ -171,9 +163,7 @@ def handle_delete_user_shared_calendar(calendar_id):
 
         return success_response(
             message="calendrier partagé supprimé",
-            code="SHARED_CALENDARS_DELETE_SUCCESS",
-            uid=receiver_uid,
-            origin="SHARED_CALENDARS_DELETE",
+            code="SHARED_CALENDAR_DELETE_SUCCESS",
             log_extra={"calendar_id": calendar_id}
         )
 
@@ -182,8 +172,6 @@ def handle_delete_user_shared_calendar(calendar_id):
             message="erreur lors de la suppression du calendrier partagé",
             code="SHARED_CALENDARS_DELETE_ERROR",
             status_code=500,
-            uid=receiver_uid,
-            origin="SHARED_CALENDARS_DELETE",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
@@ -192,6 +180,7 @@ def handle_delete_user_shared_calendar(calendar_id):
 @api.route("/shared/grouped", methods=["GET"])
 @measure_time()
 @require_auth
+@with_query_origin(default_origin="SHARED_FETCH")
 def handle_grouped_shared():
     uid = g.uid
 
@@ -265,8 +254,6 @@ def handle_grouped_shared():
         return success_response(
             message="Données partagées groupées récupérées",
             code="SHARED_GROUPED_LOAD_SUCCESS",
-            uid=uid,
-            origin="SHARED_GROUPED_LOAD",
             data={"grouped": grouped},
             log_extra={"calendar_count": len(grouped)}
         )
@@ -275,8 +262,6 @@ def handle_grouped_shared():
         return error_response(
             message="Erreur lors du chargement des données partagées groupées",
             code="SHARED_GROUPED_LOAD_ERROR",
-            uid=uid,
-            origin="SHARED_GROUPED_LOAD",
             error=str(e)
         )
 
@@ -286,6 +271,7 @@ def handle_grouped_shared():
 @measure_time()
 @require_auth
 @verify_calendar_share
+@with_query_origin(default_origin="SHARED_USER_NOTIFICATIONS_ENABLED_FETCH")
 def handle_shared_user_notifications(calendar_id):
     try:
         uid = g.uid
@@ -308,8 +294,6 @@ def handle_shared_user_notifications(calendar_id):
         return success_response(
             message="notifications récupérées",
             code="SHARED_CALENDARS_NOTIFICATIONS_SUCCESS",
-            uid=uid,
-            origin="SHARED_CALENDARS_NOTIFICATIONS",
             data={"notifications-enabled": notifications_enabled},
             log_extra={"calendar_id": calendar_id}
         )
@@ -318,8 +302,6 @@ def handle_shared_user_notifications(calendar_id):
             message="erreur lors de la récupération des notifications",
             code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
             status_code=500,
-            uid=uid,
-            origin="SHARED_CALENDARS_NOTIFICATIONS",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
@@ -328,6 +310,7 @@ def handle_shared_user_notifications(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar_share
+@with_query_origin(default_origin="SHARED_USER_NOTIFICATIONS_ENABLED_UPDATE")
 def handle_shared_user_notifications_update(calendar_id):
     try:
         uid = g.uid
@@ -340,8 +323,6 @@ def handle_shared_user_notifications_update(calendar_id):
                 message="Données manquantes",
                 code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
                 status_code=400,
-                uid=uid,
-                origin="SHARED_CALENDARS_NOTIFICATIONS",
                 log_extra={"calendar_id": calendar_id}
             )
         with get_connection() as conn:
@@ -351,8 +332,6 @@ def handle_shared_user_notifications_update(calendar_id):
         return success_response(
             message="Notifications mises à jour",
             code="SHARED_CALENDARS_NOTIFICATIONS_SUCCESS",
-            uid=uid,
-            origin="SHARED_CALENDARS_NOTIFICATIONS",
             log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
@@ -360,8 +339,6 @@ def handle_shared_user_notifications_update(calendar_id):
             message="Erreur lors de la mise à jour des notifications",
             code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
             status_code=500,
-            uid=uid,
-            origin="SHARED_CALENDARS_NOTIFICATIONS",
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
