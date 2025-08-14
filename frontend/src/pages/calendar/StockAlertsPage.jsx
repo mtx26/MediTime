@@ -126,7 +126,7 @@ function StockAlertsPage({
       ) : (
         <div className="row g-3">
           {alerts.map((med) => (
-            <div key={med.id} className="col-12 col-md-6 col-lg-4 p-0">
+            <div key={med.id} className="col-12 col-lg-6">
               <div className={`card shadow h-100 ${med.stock_quantity <= 0 ? 'border-danger' : 'border-warning'}`}>
                 <div className="card-body d-flex flex-column justify-content-between">
                   <div>
