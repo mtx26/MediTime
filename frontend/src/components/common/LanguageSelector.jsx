@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactFlagsSelect from 'react-flags-select';
 import { LANGUAGES } from '../../config/languages';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function LanguageSelector() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { lng } = useParams();
   const [selected, setSelected] = useState('FR');
 
   useEffect(() => {
