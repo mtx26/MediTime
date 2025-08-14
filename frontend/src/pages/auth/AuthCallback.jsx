@@ -74,10 +74,12 @@ const AuthCallback = () => {
     const type = typeRef.current;
 
     if (redirect) {
-      navigate(
-        redirect.startsWith('/') ? `/${lng}${redirect}` : redirect,
-        { replace: true }
-      );
+      if (redirect.startsWith('/')) {
+        const cleaned = redirect.replace(/^\/[a-z]{2}(?=\/|$)/, '');
+        navigate(`/${lng}${cleaned}`, { replace: true });
+      } else {
+        navigate(redirect, { replace: true });
+      }
       return;
     }
 

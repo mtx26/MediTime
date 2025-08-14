@@ -43,6 +43,7 @@ function buildFullPath(loc) {
 function PrivateRoute({ element }) {
   const { userInfo } = useContext(UserContext);
   const location = useLocation();
+  const { lng } = useParams();
 
   if (!userInfo) {
     const full = buildFullPath(location);
