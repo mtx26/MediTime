@@ -1,8 +1,6 @@
 import { useContext, useCallback } from 'react';
 import { UserContext } from '../../contexts/UserContext';
-import { analyticsPromise } from '../../services/firebase/firebase';
 import { log } from '../../utils/logger';
-import { logEvent } from 'firebase/analytics';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 
@@ -30,6 +28,10 @@ export const useRealtimeTokens = (setTokensList, setLoadingStates) => {
       setTokensList(data.tokens);
       setLoadingStates((prev) => ({ ...prev, tokens: false }));
 
+      const [{ analyticsPromise }, { logEvent }] = await Promise.all([
+        import('../../services/firebase/firebase'),
+        import('firebase/analytics'),
+      ]);
       analyticsPromise.then((analytics) => {
         if (analytics) {
           logEvent(analytics, 'fetch_tokens', {

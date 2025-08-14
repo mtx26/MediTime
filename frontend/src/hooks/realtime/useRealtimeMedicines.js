@@ -1,7 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { analyticsPromise } from '../../services/firebase/firebase';
 import { log } from '../../utils/logger';
-import { logEvent } from 'firebase/analytics';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 
@@ -21,6 +19,10 @@ const fetchTokenMedicines = async (
     setMedicinesData(sorted);
     setLoadingMedicines(true);
 
+    const [{ analyticsPromise }, { logEvent }] = await Promise.all([
+      import('../../services/firebase/firebase'),
+      import('firebase/analytics'),
+    ]);
     analyticsPromise.then((analytics) => {
       if (analytics) {
         logEvent(analytics, 'fetch_token_calendar_medicines', {

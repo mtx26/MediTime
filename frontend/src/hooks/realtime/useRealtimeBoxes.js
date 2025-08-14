@@ -2,8 +2,6 @@ import { useEffect, useContext, useCallback } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { UserContext } from '../../contexts/UserContext';
 import { log } from '../../utils/logger';
-import { analyticsPromise } from '../../services/firebase/firebase';
-import { logEvent } from 'firebase/analytics';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -49,6 +47,10 @@ const fetchBoxes = async ({
         ? 'REALTIME_PERSONAL_CALENDAR_BOXES'
         : 'REALTIME_SHARED_CALENDAR_BOXES';
 
+    const [{ analyticsPromise }, { logEvent }] = await Promise.all([
+      import('../../services/firebase/firebase'),
+      import('firebase/analytics'),
+    ]);
     analyticsPromise.then((analytics) => {
       if (analytics) {
         logEvent(analytics, eventName, {
