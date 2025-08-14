@@ -1,9 +1,9 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { enabledLanguageCodes } from './config/languages';
+import { enabledLanguageCodes } from '../config/languages';
 
-const translationFiles = import.meta.glob('./locales/*/translation.json', { eager: true });
+const translationFiles = import.meta.glob('../locales/*/translation.json', { eager: true });
 
 const resources = {};
 

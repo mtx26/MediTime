@@ -1,6 +1,7 @@
 // App.js
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { getLangFromPath, DEFAULT_LANG } from './i18n/langRoutes';
 import Navbar from './components/common/Header';
 import Footer from './components/common/Footer';
 import AppRoutes from './routes/AppRouter';
@@ -10,12 +11,11 @@ import { formatToLocalISODate } from './utils/calendar/dateUtils';
 import RealtimeManager from './components/realtime/RealtimeManager';
 import { getToken } from './services/supabase/tokenUtils';
 import { performApiCall } from './services/api/apiUtils';
-import { useTranslation } from 'react-i18next';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
-  const { t } = useTranslation();
+  const currentLang = getLangFromPath(window.location.pathname) || DEFAULT_LANG;
   const [tokensList, setTokensList] = useState([]);
   const [calendarsData, setCalendarsData] = useState(null);
   const [notificationsData, setNotificationsData] = useState(null);
@@ -829,7 +829,7 @@ function App() {
   }, [userInfo?.uid]);
 
   return (
-    <Router>
+    <Router basename={`/${currentLang}`}>
       <div className="d-flex flex-column min-vh-100">
         <Navbar sharedProps={sharedProps} />
         <main className="flex-grow-1 d-flex flex-column pb-5 pb-lg-0">

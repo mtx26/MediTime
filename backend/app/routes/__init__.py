@@ -16,7 +16,9 @@ from .notifications import *
 from .user import *
 from .pdf import *
 from .gemini import *
+from .frontend import frontend
 
 
 def register_routes(app):
     app.register_blueprint(api, url_prefix='/api')
+    app.register_blueprint(frontend)
