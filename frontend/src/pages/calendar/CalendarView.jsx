@@ -26,6 +26,7 @@ function CalendarPage({
   const navigate = useNavigate(); // Hook de navigation
   const location = useLocation();
   const params = useParams();
+  const { lng } = params;
   const { t } = useTranslation();
 
   // 🔐 Contexte d'authentification
@@ -57,11 +58,14 @@ function CalendarPage({
   let calendarId = params.calendarId;
   let basePath = 'calendar';
 
-  if (location.pathname.startsWith('/shared-user-calendar')) {
+  const pathWithoutLang =
+    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+
+  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
     basePath = 'shared-user-calendar';
-  } else if (location.pathname.startsWith('/shared-token-calendar')) {
+  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
     calendarType = 'token';
     calendarId = params.sharedToken;
     basePath = 'shared-token-calendar';
@@ -211,7 +215,7 @@ function CalendarPage({
                 {/* Bouton Médicaments qui prend tout l'espace dispo */}
                 <button
                   className="btn btn-outline-secondary flex-grow-1 me-auto"
-                  onClick={() => navigate(`/${basePath}/${calendarId}/boxes`)}
+                  onClick={() => navigate(`/${lng}/${basePath}/${calendarId}/boxes`)}
                   aria-label={t('medicines.label')}
                   title={t('medicines.label')}
                 >
@@ -229,7 +233,8 @@ function CalendarPage({
                             <i className="bi bi-box-arrow-up me-2" /> {t('share')}
                           </>
                         ),
-                        onClick: () => navigate(`/shared-calendars?calendar=${calendarId}`),
+                        onClick: () =>
+                          navigate(`/${lng}/shared-calendars?calendar=${calendarId}`),
                       },
                       { separator: true },
                       {
@@ -246,7 +251,8 @@ function CalendarPage({
                             <i className="bi bi-exclamation-triangle me-2" /> {t('stock')}
                           </>
                         ),
-                        onClick: () => navigate(`/${basePath}/${calendarId}/stock-alerts`),
+                        onClick: () =>
+                          navigate(`/${lng}/${basePath}/${calendarId}/stock-alerts`),
                       },
                       { separator: true },
                       {
@@ -255,7 +261,8 @@ function CalendarPage({
                             <i className="bi bi-gear me-2" /> {t('settings.label')}
                           </>
                         ),
-                        onClick: () => navigate(`/${basePath}/${calendarId}/settings`),
+                        onClick: () =>
+                          navigate(`/${lng}/${basePath}/${calendarId}/settings`),
                       },
                       { separator: true },
                       {
@@ -267,7 +274,7 @@ function CalendarPage({
                         onClick: async () => {
                           const rep = await personalCalendars.deleteCalendar(calendarId);
                           if (rep.success) {
-                            navigate('/calendars');
+                            navigate(`/${lng}/calendars`);
                           } else {
                             setAlertType('danger');
                             setAlertMessage(rep.error);
@@ -296,7 +303,8 @@ function CalendarPage({
                             <i className="bi bi-gear me-2" /> {t('settings.label')}
                           </>
                         ),
-                        onClick: () => navigate(`/${basePath}/${calendarId}/settings`),
+                        onClick: () =>
+                          navigate(`/${lng}/${basePath}/${calendarId}/settings`),
                       },
                       { separator: true },
                       {
@@ -317,7 +325,8 @@ function CalendarPage({
                 <button
                   type="button"
                   className="alert w-100 alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow"
-                  onClick={() => navigate(`/${basePath}/${calendarId}/stock-alerts`)}
+                  onClick={() =>
+                    navigate(`/${lng}/${basePath}/${calendarId}/stock-alerts`)}
                   title={t('stock_alert_tooltip')}
                   aria-label={t('stock_alert')}
                 >
@@ -361,7 +370,10 @@ function CalendarPage({
                   </h4>
                   <button
                     className="btn btn-outline-success w-100"
-                    onClick={() => navigate(`/${basePath}/${calendarId}/pillbox?date=${startDate}`)}
+                    onClick={() =>
+                      navigate(
+                        `/${lng}/${basePath}/${calendarId}/pillbox?date=${startDate}`
+                      )}
                   >
                     <i className="bi bi-capsule"></i> {t('pillbox.fill')}
                   </button>

@@ -13,7 +13,10 @@ const Stock = ({ personalCalendars }) => {
   let calendarId = params.calendarId;
   let basePath = 'calendar';
 
-  if (location.pathname.startsWith('/shared-user-calendar')) {
+  const pathWithoutLang =
+    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+
+  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
     basePath = 'shared-user-calendar';
