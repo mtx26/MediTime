@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   GoogleHandleLogin,
   registerWithEmail,
@@ -34,9 +34,11 @@ function Auth() {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const { lng } = useParams();
   const [redirect, setRedirect] = useState();
   useEffect(() => {
-    setActiveTab(location.pathname === '/register' ? 'register' : 'login');
+    const last = location.pathname.split('/').pop();
+    setActiveTab(last === 'register' ? 'register' : 'login');
     setRedirect(
       getValidRedirect(new URLSearchParams(location.search).get('redirect'))
     );
@@ -294,7 +296,7 @@ function Auth() {
 
             {activeTab === 'login' && (
               <div className="mb-3 text-end">
-                <Link to="/reset-password" className="text-decoration-none">
+                <Link to={`/${lng}/reset-password`} className="text-decoration-none">
                   {t('auth.forgot_password')}
                 </Link>
               </div>
@@ -320,7 +322,7 @@ function Auth() {
                   htmlFor="terms"
                 >
                   {t('auth.accept_terms')}
-                  <Link to="/terms" className="text-decoration-none">
+                  <Link to={`/${lng}/terms`} className="text-decoration-none">
                     {t('auth.terms_link')}
                   </Link>
                 </label>
