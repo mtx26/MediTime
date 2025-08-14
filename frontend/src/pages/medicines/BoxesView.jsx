@@ -30,10 +30,13 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   let calendarType = 'personal';
   let calendarId = params.calendarId;
 
-  if (location.pathname.startsWith('/shared-user-calendar')) {
+  const pathWithoutLang =
+    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+
+  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
-  } else if (location.pathname.startsWith('/shared-token-calendar')) {
+  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
     calendarType = 'token';
     calendarId = params.sharedToken;
   }

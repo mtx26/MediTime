@@ -13,6 +13,7 @@ function CalendarSettingsPage({
   const { t } = useTranslation();
   const location = useLocation();
   const params = useParams();
+  const { lng } = params;
 
   const sharedProps = {
     personalCalendars,
@@ -24,11 +25,14 @@ function CalendarSettingsPage({
   let calendarId = params.calendarId;
   let basePath = 'calendar';
 
-  if (location.pathname.startsWith('/shared-user-calendar')) {
+  const pathWithoutLang =
+    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+
+  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
     basePath = 'shared-user-calendar';
-  } else if (location.pathname.startsWith('/shared-token-calendar')) {
+  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
     calendarType = 'token';
     calendarId = params.sharedToken;
     basePath = 'shared-token-calendar';
@@ -94,7 +98,7 @@ function CalendarSettingsPage({
                   <>
                     <Link
                       className={`nav-link text-start ${activeTab === 'stock' ? 'active' : ''}`}
-                      to={`/${basePath}/${calendarId}/settings?tab=stock`}
+                      to={`/${lng}/${basePath}/${calendarId}/settings?tab=stock`}
                     >
                       <i className="bi bi-capsule me-2"></i>
                       {t('calendar_settings.stock.label')}
@@ -106,7 +110,7 @@ function CalendarSettingsPage({
                   <>
                     <Link
                       className={`nav-link text-start ${activeTab === 'notifications' ? 'active' : ''}`}
-                      to={`/${basePath}/${calendarId}/settings?tab=notifications`}
+                      to={`/${lng}/${basePath}/${calendarId}/settings?tab=notifications`}
                     >
                       <i className="bi bi-bell me-2"></i>
                       {t('calendar_settings.notifications.label')}
@@ -117,7 +121,7 @@ function CalendarSettingsPage({
                 {/* 
                 <Link
                   className={`nav-link text-start ${activeTab === 'sharing' ? 'active' : ''}`}
-                  to={`/${basePath}/${calendarId}/settings?tab=sharing`}
+                  to={`/${lng}/${basePath}/${calendarId}/settings?tab=sharing`}
                 >
                   <i className="bi bi-share me-2"></i>
                   {t('calendar_settings.sharing.label')}

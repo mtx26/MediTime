@@ -1,6 +1,6 @@
 // src/pages/AcceptInvitePage.jsx
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 
@@ -13,6 +13,7 @@ function AcceptInvitePage({sharedUserCalendars}) {
   const [invitation, setInvitation] = useState(null);
 
   const navigate = useNavigate();
+  const { lng } = useParams();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -52,13 +53,13 @@ function AcceptInvitePage({sharedUserCalendars}) {
       const rep = await sharedUserCalendars.acceptLoginInvitation(token);
       if (rep.success) {
         calendarId = rep.calendar_id;
-        navigate(`/shared-user-calendar/${calendarId}`);
+        navigate(`/${lng}/shared-user-calendar/${calendarId}`);
       }
     } else if (type === 'registration') {
       const rep = await sharedUserCalendars.acceptRegistrationInvitation(token);
       if (rep.success) {
         calendarId = rep.calendar_id;
-        navigate(`/shared-user-calendar/${calendarId}`);
+        navigate(`/${lng}/shared-user-calendar/${calendarId}`);
       }
     }
     setLoading(false);
@@ -69,12 +70,12 @@ function AcceptInvitePage({sharedUserCalendars}) {
     if (type === 'login') {
       const rep = await sharedUserCalendars.rejectLoginInvitation(token);
       if (rep.success) {
-        navigate('/calendars');
+        navigate(`/${lng}/calendars`);
       }
     } else if (type === 'registration') {
       const rep = await sharedUserCalendars.rejectRegistrationInvitation(token);
       if (rep.success) {
-        navigate('/calendars');
+        navigate(`/${lng}/calendars`);
       }
     }
     setLoading(false);

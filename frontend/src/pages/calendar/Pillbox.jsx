@@ -7,15 +7,19 @@ import PillboxDisplay from '../../components/calendar/PillboxDisplay';
 function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const location = useLocation();
   const params = useParams();
+
   let calendarType = 'personal';
   let calendarId = params.calendarId;
   let basePath = 'calendar';
 
-  if (location.pathname.startsWith('/shared-user-calendar')) {
+  const pathWithoutLang =
+    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+
+  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
     basePath = 'shared-user-calendar';
-  } else if (location.pathname.startsWith('/shared-token-calendar')) {
+  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
     calendarType = 'token';
     calendarId = params.sharedToken;
     basePath = 'shared-token-calendar';
