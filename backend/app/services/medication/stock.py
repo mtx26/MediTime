@@ -4,7 +4,6 @@ from app.db.connection import get_connection
 from app.services.notifications import notify_and_record
 from app.utils.logging import log_backend
 from app.config import Config
-from urllib.parse import urljoin
 from collections import defaultdict
 
 def process_box_decrement(cursor, id_box, qty, start_date, days=7):
@@ -91,7 +90,7 @@ def check_low_stock_and_notify():
 
         for result in results:
             calendar_id = result["calendar_id"]
-            link = urljoin(Config.FRONTEND_URL or "", f"/medication/{result['id']}")
+            link = f"/medication/{result['id']}"
             notif = {
                 "link": link,
                 "medication_id": result["id"],
@@ -188,7 +187,7 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
         grouped: dict[str, list[dict]] = defaultdict(list)
         for result in results:
             med_id = result.get("id")
-            link = urljoin(Config.FRONTEND_URL or "", f"/medication/{med_id}")
+            link = f"/medication/{med_id}"
             uid_owner = result.get("owner_uid")
 
             notif = {
