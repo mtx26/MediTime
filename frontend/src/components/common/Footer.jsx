@@ -30,7 +30,7 @@ function Footer() {
               <div className="col-sm-6">
                 <ul className="list-unstyled">
                   <li>
-                    <i className="bi bi-house me-2 text-primary"></i>
+                    <i className="bi bi-house me-2 text-primary" aria-hidden="true"></i>
                     <Link
                       to="/home"
                       className="text-muted text-decoration-none link-hover"
@@ -39,7 +39,7 @@ function Footer() {
                     </Link>
                   </li>
                   <li>
-                    <i className="bi bi-info-circle me-2 text-primary"></i>
+                    <i className="bi bi-info-circle me-2 text-primary" aria-hidden="true"></i>
                     <Link
                       to="/about"
                       className="text-muted text-decoration-none link-hover"
@@ -48,7 +48,7 @@ function Footer() {
                     </Link>
                   </li>
                   <li>
-                    <i className="bi bi-file-earmark-text me-2 text-primary"></i>
+                    <i className="bi bi-file-earmark-text me-2 text-primary" aria-hidden="true"></i>
                     <Link
                       to="/terms"
                       className="text-muted text-decoration-none link-hover"
@@ -57,7 +57,7 @@ function Footer() {
                     </Link>
                   </li>
                   <li>
-                    <i className="bi bi-shield-lock me-2 text-primary"></i>
+                    <i className="bi bi-shield-lock me-2 text-primary" aria-hidden="true"></i>
                     <Link
                       to="/privacy"
                       className="text-muted text-decoration-none link-hover"
@@ -71,7 +71,7 @@ function Footer() {
                 <div className="col-sm-6">
                   <ul className="list-unstyled">
                     <li>
-                      <i className="bi bi-person-gear me-2 text-primary"></i>
+                      <i className="bi bi-person-gear me-2 text-primary" aria-hidden="true"></i>
                       <Link
                         to="/account"
                         className="text-muted text-decoration-none link-hover"
@@ -80,7 +80,7 @@ function Footer() {
                       </Link>
                     </li>
                     <li>
-                      <i className="bi bi-calendar2-week me-2 text-primary"></i>
+                      <i className="bi bi-calendar2-week me-2 text-primary" aria-hidden="true"></i>
                       <Link
                         to="/calendars"
                         className="text-muted text-decoration-none link-hover"
@@ -89,7 +89,7 @@ function Footer() {
                       </Link>
                     </li>
                     <li>
-                      <i className="bi bi-box-arrow-up me-2 text-primary"></i>
+                      <i className="bi bi-box-arrow-up me-2 text-primary" aria-hidden="true"></i>
                       <Link
                         to="/shared-calendars"
                         className="text-muted text-decoration-none link-hover"
@@ -98,7 +98,7 @@ function Footer() {
                       </Link>
                     </li>
                     <li>
-                      <i className="bi bi-bell me-2 text-primary"></i>
+                      <i className="bi bi-bell me-2 text-primary" aria-hidden="true"></i>
                       <Link
                         to="/notifications"
                         className="text-muted text-decoration-none link-hover"
@@ -112,7 +112,7 @@ function Footer() {
               <div className="col-sm-6">
                 <ul className="list-unstyled">
                   <li>
-                    <i className="bi bi-envelope me-2 text-primary"></i>
+                    <i className="bi bi-envelope me-2 text-primary" aria-hidden="true"></i>
                     <a
                       href="mailto:mtx_26@hotmail.com"
                       className="text-muted text-decoration-none link-hover"
@@ -123,7 +123,7 @@ function Footer() {
                     </a>
                   </li>
                   <li>
-                    <i className="bi bi-github me-2 text-primary"></i>
+                    <i className="bi bi-github me-2 text-primary" aria-hidden="true"></i>
                     <a
                       href="https://github.com/mtx26/MediTime"
                       target="_blank"
@@ -145,7 +145,7 @@ function Footer() {
           >
             <div className="text-md-end text-center">
               <div className="fw-bold text-primary fs-5">
-                <i className="bi bi-capsule me-2"></i> {t('app.title')}
+                <i className="bi bi-capsule me-2" aria-hidden="true"></i> {t('app.title')}
               </div>
               <div className="text-muted small">
                 © {currentYear} — {t('rights_reserved')}

@@ -2,8 +2,6 @@ import { useContext, useCallback } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import { UserContext } from '../../contexts/UserContext';
-import { analyticsPromise } from '../../services/firebase/firebase';
-import { logEvent } from 'firebase/analytics';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -30,6 +28,10 @@ const fetchCalendars = async (uid, setCalendarsData, setLoadingStates) => {
     setCalendarsData(sortedCalendars);
     setLoadingStates((prev) => ({ ...prev, calendars: false }));
 
+    const [{ analyticsPromise }, { logEvent }] = await Promise.all([
+      import('../../services/firebase/firebase'),
+      import('firebase/analytics'),
+    ]);
     analyticsPromise.then((analytics) => {
       if (analytics) {
         logEvent(analytics, 'fetch_calendars', {
@@ -78,6 +80,10 @@ const fetchSharedCalendars = async (
     setSharedCalendarsData(data.calendars);
     setLoadingStates((prev) => ({ ...prev, sharedCalendars: false }));
 
+    const [{ analyticsPromise }, { logEvent }] = await Promise.all([
+      import('../../services/firebase/firebase'),
+      import('firebase/analytics'),
+    ]);
     analyticsPromise.then((analytics) => {
       if (analytics) {
         logEvent(analytics, 'fetch_shared_calendars', {

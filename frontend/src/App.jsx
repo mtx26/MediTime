@@ -5,7 +5,6 @@ import Navbar from './components/common/Header';
 import Footer from './components/common/Footer';
 import AppRoutes from './routes/AppRouter';
 import { log } from './utils/logger';
-import { requestPermissionAndGetToken } from './services/firebase/firebase';
 import { UserContext } from './contexts/UserContext';
 import { formatToLocalISODate } from './utils/calendar/dateUtils';
 import RealtimeManager from './components/realtime/RealtimeManager';
@@ -790,6 +789,7 @@ function App() {
 
     // 🔐 Demande de permission et envoi du token
     const sendTokenToBackend = async () => {
+      const { requestPermissionAndGetToken } = await import('./services/firebase/firebase');
       const tokenFcm = await requestPermissionAndGetToken(userInfo?.uid);
       const token = await getToken();
       if (!token || !userInfo?.uid) return;

@@ -1,37 +1,37 @@
-import React, { useContext } from 'react';
+import React, { useContext, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import { UserContext } from '../contexts/UserContext';
 
-import HomePage from '../pages/general/HomePage';
+const HomePage = lazy(() => import('../pages/general/HomePage'));
 
-import Auth from '../pages/auth/Auth';
-import ResetPassword from '../pages/auth/ResetPassword';
-import ResetPasswordConfirm from '../pages/auth/ResetPasswordConfirm';
-import VerifyEmail from '../pages/auth/VerifyEmail';
+const Auth = lazy(() => import('../pages/auth/Auth'));
+const ResetPassword = lazy(() => import('../pages/auth/ResetPassword'));
+const ResetPasswordConfirm = lazy(() => import('../pages/auth/ResetPasswordConfirm'));
+const VerifyEmail = lazy(() => import('../pages/auth/VerifyEmail'));
 
-import NotificationsPage from '../pages/notifications/NotificationsPage';
-import SettingsPage from '../pages/settings/SettingsPage';
-import AddCalendarPage from '../pages/calendar/AddCalendarPage';
-import ImportCalendarPage from '../pages/calendar/ImportCalendarPage';
-import MedicineReview from '../pages/calendar/MedicineReview';
-import AcceptInvitePage from '../pages/calendar/AcceptInvitePage';
+const NotificationsPage = lazy(() => import('../pages/notifications/NotificationsPage'));
+const SettingsPage = lazy(() => import('../pages/settings/SettingsPage'));
+const AddCalendarPage = lazy(() => import('../pages/calendar/AddCalendarPage'));
+const ImportCalendarPage = lazy(() => import('../pages/calendar/ImportCalendarPage'));
+const MedicineReview = lazy(() => import('../pages/calendar/MedicineReview'));
+const AcceptInvitePage = lazy(() => import('../pages/calendar/AcceptInvitePage'));
 
-import CalendarView from '../pages/calendar/CalendarView';
-import PillboxPage from '../pages/calendar/Pillbox';
-import CalendarList from '../pages/calendar/CalendarList';
-import SharedList from '../pages/share/SharedList';
-import StockAlertsPage from '../pages/calendar/StockAlertsPage';
+const CalendarView = lazy(() => import('../pages/calendar/CalendarView'));
+const PillboxPage = lazy(() => import('../pages/calendar/Pillbox'));
+const CalendarList = lazy(() => import('../pages/calendar/CalendarList'));
+const SharedList = lazy(() => import('../pages/share/SharedList'));
+const StockAlertsPage = lazy(() => import('../pages/calendar/StockAlertsPage'));
 
-import MedicinesList from '../pages/medicines/MedicinesList';
-import BoxesView from '../pages/medicines/BoxesView';
-import NotFound from '../pages/general/NotFound';
+const MedicinesList = lazy(() => import('../pages/medicines/MedicinesList'));
+const BoxesView = lazy(() => import('../pages/medicines/BoxesView'));
+const NotFound = lazy(() => import('../pages/general/NotFound'));
 
-import PrivacyPage from '../pages/general/PrivacyPage';
-import TermsPage from '../pages/general/TermsPage';
+const PrivacyPage = lazy(() => import('../pages/general/PrivacyPage'));
+const TermsPage = lazy(() => import('../pages/general/TermsPage'));
 
-import AuthCallback from '../pages/auth/AuthCallback';
-import CalendarSettingsPage from '../pages/calendar/CalendarSettingsPage';
+const AuthCallback = lazy(() => import('../pages/auth/AuthCallback'));
+const CalendarSettingsPage = lazy(() => import('../pages/calendar/CalendarSettingsPage'));
 
 function buildFullPath(loc) {
   const path = loc.pathname || '/';
@@ -75,8 +75,20 @@ function RouteWithLoader({ element, isLoading }) {
 function AppRoutes({ sharedProps }) {
   const { userInfo } = useContext(UserContext);
 
+  const fallback = (
+    <div
+      className="d-flex justify-content-center align-items-center"
+      style={{ flexGrow: 1, minHeight: '60vh' }}
+    >
+      <span className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Chargement...</span>
+      </span>
+    </div>
+  );
+
   return (
-    <Routes>
+    <Suspense fallback={fallback}>
+      <Routes>
       <Route
         path="/login"
         element={userInfo ? <Navigate to="/calendars" /> : <Auth />}
@@ -334,7 +346,8 @@ function AppRoutes({ sharedProps }) {
       <Route path="/" element={userInfo ? <Navigate to="/calendars" /> : <Navigate to="/home" />} />
 
       <Route path="/auth/callback" element={<AuthCallback />} />
-    </Routes>
+      </Routes>
+    </Suspense>
   );
 }
 

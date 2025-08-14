@@ -1,8 +1,6 @@
 // apiUtils.js
 import { getToken } from '../supabase/tokenUtils.js';
-import { analyticsPromise } from '../firebase/firebase';
 import { log } from '../../utils/logger';
-import { logEvent } from 'firebase/analytics';
 
 function withQuery(url, params) {
   const clean = Object.fromEntries(
@@ -49,6 +47,10 @@ export async function performApiCall({
 
     // Analytics optionnels
     if (analyticsEvent) {
+      const [{ analyticsPromise }, { logEvent }] = await Promise.all([
+        import('../firebase/firebase'),
+        import('firebase/analytics'),
+      ]);
       analyticsPromise.then((analytics) => {
         if (analytics) logEvent(analytics, analyticsEvent, { ...analyticsData });
       });

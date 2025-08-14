@@ -1,6 +1,6 @@
 # app/__init__.py
 
-from flask import Flask
+from flask import Flask, request
 from app.config.config import Config
 from app.routes import register_routes
 from app.auth.google_services import init_firebase, init_vertex_ai
@@ -20,5 +20,14 @@ def create_app():
     init_firebase()
     init_vertex_ai()
     start_cron()
+
+    @app.after_request
+    def add_cache_headers(response):
+        path = request.path
+        if any(ext in path for ext in [".js", ".css", ".png", ".webp", ".avif", ".ico"]) and "v=" in request.query_string.decode():
+            response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+        elif path.endswith('.html'):
+            response.headers['Cache-Control'] = 'no-store'
+        return response
 
     return app

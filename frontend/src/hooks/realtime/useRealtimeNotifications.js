@@ -1,9 +1,7 @@
 import { useContext, useCallback } from 'react';
 import { UserContext } from '../../contexts/UserContext';
-import { analyticsPromise } from '../../services/firebase/firebase';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '../../utils/logger';
-import { logEvent } from 'firebase/analytics';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -34,6 +32,10 @@ const fetchNotifications = async (
     setNotificationsData(sortedNotifications);
     setLoadingStates((prev) => ({ ...prev, notifications: false }));
 
+    const [{ analyticsPromise }, { logEvent }] = await Promise.all([
+      import('../../services/firebase/firebase'),
+      import('firebase/analytics'),
+    ]);
     analyticsPromise.then((analytics) => {
       if (analytics) {
         logEvent(analytics, 'fetch_notifications', {
