@@ -8,6 +8,13 @@ import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 
+const getBorderClass = (box) => {
+  if (box.box_capacity === 0) return '';
+  if (box.stock_quantity <= 0) return 'border-danger';
+  if (box.stock_quantity <= box.stock_alert_threshold) return 'border-warning';
+  return '';
+};
+
 function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const location = useLocation();
   const params = useParams();
@@ -296,31 +303,26 @@ function BoxCard({
   dose,
 }) {
   const { t } = useTranslation();
-  const editable = selectedModifyBox === box.id;
-  const timeOfDayMap = {
-    morning: t('morning'),
-    noon: t('noon'),
-    evening: t('evening'),
-  };
+    const editable = selectedModifyBox === box.id;
+    const timeOfDayMap = {
+      morning: t('morning'),
+      noon: t('noon'),
+      evening: t('evening'),
+    };
 
-  const openNotice = (box_id) => {
-    const url = `${import.meta.env.VITE_API_URL}/api/proxy/pdf/${box_id}`;
-    window.open(url, '_blank');
-  };
+    const openNotice = (box_id) => {
+      const url = `${import.meta.env.VITE_API_URL}/api/proxy/pdf/${box_id}`;
+      window.open(url, '_blank');
+    };
 
-  return (
-    <div
-      className={`card h-100 shadow border ${
-        box.box_capacity === 0
-          ? ''
-          : box.stock_quantity <= 0
-            ? 'border-danger'
-            : box.stock_quantity <= box.stock_alert_threshold
-              ? 'border-warning'
-              : ''
-      }`}
-    >
-      <div className="card-body position-relative">
+    const toggleDrop = () =>
+      setSelectedDropBox((prev) => ({ ...prev, [box.id]: !prev[box.id] }));
+
+    const borderClass = getBorderClass(box);
+
+    return (
+      <div className={`card h-100 shadow border ${borderClass}`}>
+        <div className="card-body position-relative">
         <div className="position-absolute top-0 end-0 m-2">
           {(!selectedModifyBox || selectedModifyBox !== box.id) && (
             <ActionSheet
@@ -463,13 +465,7 @@ function BoxCard({
               type="button"
               title={t('boxes.intake_conditions')}
               aria-label={t('boxes.intake_conditions')}
-              onClick={() => {
-                if (selectedDropBox[box.id] === true) {
-                  setSelectedDropBox((prev) => ({ ...prev, [box.id]: false }));
-                } else {
-                  setSelectedDropBox((prev) => ({ ...prev, [box.id]: true }));
-                }
-              }}
+                onClick={toggleDrop}
             >
               <span>{t('boxes.intake_conditions')}</span>
               <i

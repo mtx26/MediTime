@@ -48,6 +48,60 @@ function Auth() {
     if (tab !== activeTab) setActiveTab(tab);
   };
 
+  const handleLogin = async () => {
+    const error = await loginWithEmail(email, password, redirect);
+    if (error) {
+      setAlertMessage(
+        '❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`)
+      );
+      setAlertType('danger');
+      return;
+    }
+    log.info('Connexion réussie', {
+      id: 'LOGIN-SUCCESS',
+      origin: 'Auth.jsx',
+      user: userInfo.uid,
+    });
+    if (redirect) {
+      navigate(redirect.startsWith('/') ? `/${lng}${redirect}` : redirect, {
+        replace: true,
+      });
+    }
+  };
+
+  const handleRegister = async () => {
+    const error = await registerWithEmail(email, password, name, redirect);
+    if (error) {
+      setAlertMessage(
+        '❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`)
+      );
+      setAlertType('danger');
+      return;
+    }
+    log.info('Inscription réussie', {
+      id: 'REGISTER-SUCCESS',
+      origin: 'Auth.jsx',
+      user: userInfo.uid,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (activeTab === 'login') {
+        await handleLogin();
+      } else {
+        await handleRegister();
+      }
+    } catch (err) {
+      log.error('Supabase auth error', {
+        id: 'AUTH-ERROR',
+        origin: 'Auth.jsx',
+        stack: err.stack,
+      });
+    }
+  };
+
   return (
     <div className="container d-flex justify-content-center align-items-center my-5">
       <div
@@ -180,50 +234,7 @@ function Auth() {
             duration={duration}
           />
 
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              try {
-                if (activeTab === 'login') {
-                  const error = await loginWithEmail(email, password, redirect);
-                  if (error) {
-                    setAlertMessage('❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`));
-                    setAlertType('danger');
-                  } else {
-                    log.info('Connexion réussie', {
-                      id: 'LOGIN-SUCCESS',
-                      origin: 'Auth.jsx',
-                      user: userInfo.uid,
-                    });
-                    if (redirect) {
-                      navigate(
-                        redirect.startsWith('/') ? `/${lng}${redirect}` : redirect,
-                        { replace: true }
-                      );
-                    }
-                  }
-                } else {
-                  const error = await registerWithEmail(email, password, name, redirect);
-                  if (error) {
-                    setAlertMessage('❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`));
-                    setAlertType('danger');
-                  } else {
-                    log.info('Inscription réussie', {
-                      id: 'REGISTER-SUCCESS',
-                      origin: 'Auth.jsx',
-                      user: userInfo.uid,
-                    });
-                  }
-                }
-              } catch (err) {
-                log.error('Supabase auth error', {
-                  id: 'AUTH-ERROR',
-                  origin: 'Auth.jsx',
-                  stack: err.stack,
-                });
-              }
-            }}
-          >
+            <form onSubmit={handleSubmit}>
             {activeTab === 'register' && (
               <div className="mb-3">
                 <label htmlFor="name" className="form-label">

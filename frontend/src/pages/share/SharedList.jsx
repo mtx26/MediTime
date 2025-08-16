@@ -89,6 +89,35 @@ function SharedList({
     setSelectedModifyToken(null);
   };
 
+  const promptDeleteCalendar = ({
+    calendarId,
+    navigate,
+    personalCalendars,
+    setAlertType,
+    setAlertMessage,
+    setAlertId,
+    setOnConfirmAction,
+    t,
+    lng,
+  }) => {
+    setAlertType("confirm-danger");
+    setAlertMessage(t("delete_calendar_confirm"));
+    setAlertId(calendarId);
+    setOnConfirmAction(() => async () => {
+      const rep = await personalCalendars.deleteCalendar(calendarId);
+      if (rep.success) {
+        setAlertType("success");
+        setAlertMessage("✅ " + rep.message);
+        setTimeout(() => {
+          navigate(`/${lng}/calendars`);
+        }, 1000);
+      } else {
+        setAlertType("danger");
+        setAlertMessage("❌ " + rep.error);
+      }
+    });
+  };
+
   // 🔄 Activation/désactivation du lien
   const handleToggleToken = async (tokenId) => {
     const rep = await tokenCalendars.updateRevokeToken(tokenId);
@@ -388,24 +417,18 @@ const calendarActions = ({
           <i className="bi bi-trash me-2"></i> {t("delete")}
         </>
       ),
-      onClick: () => {
-        setAlertType("confirm-danger");
-        setAlertMessage(t("delete_calendar_confirm"));
-        setAlertId(calendarId);
-        setOnConfirmAction(() => async () => {
-          const rep = await personalCalendars.deleteCalendar(calendarId);
-          if (rep.success) {
-            setAlertType("success");
-            setAlertMessage("✅ " + rep.message);
-            setTimeout(() => {
-              navigate(`/${lng}/calendars`);
-            }, 1000);
-          } else {
-            setAlertType("danger");
-            setAlertMessage("❌ " + rep.error);
-          }
-        });
-      },
+      onClick: () =>
+        promptDeleteCalendar({
+          calendarId,
+          navigate,
+          personalCalendars,
+          setAlertType,
+          setAlertMessage,
+          setAlertId,
+          setOnConfirmAction,
+          t,
+          lng,
+        }),
       danger: true,
     },
   ];
