@@ -212,6 +212,10 @@
     "title3": "Safety assured"
   },
   "home": "Welcome",
+  "home_meta": {
+    "title": "MediTime - Medicine schedule planner",
+    "description": "Plan and share your medication schedules easily."
+  },
   "invalid_or_expired_link": "This shared calendar link is invalid or has expired.",
   "invitation": {
     "invalid_or_expired": "Invalid or expired invitation",

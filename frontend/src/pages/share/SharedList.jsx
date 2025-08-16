@@ -6,7 +6,7 @@ import HoveredUserProfile from "../../components/common/HoveredUserProfile";
 import { formatToLocalISODate } from "../../utils/calendar/dateUtils";
 import { useTranslation } from "react-i18next";
 import ActionSheet from '../../components/common/ActionSheet';
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, useParams } from "react-router-dom";
 
 //TODO: changer l'affichage general pour simplifier les choses
 
@@ -23,6 +23,7 @@ function SharedList({
   const [searchParams, setSearchParams] = useSearchParams();
   const calendarFromURL = searchParams.get('calendar');
   const navigate = useNavigate(); // Hook pour la navigation
+  const { lng } = useParams();
 
   // ⚠️ Alertes et confirmations
   const [alertType, setAlertType] = useState(""); // Type d'alerte (ex. success, error)
@@ -49,7 +50,7 @@ function SharedList({
   const handleCopyLink = async (token) => {
     try {
       await navigator.clipboard.writeText(
-        `${VITE_URL}/shared-token-calendar/${token.id}`,
+        `${VITE_URL}/${lng}/shared-token-calendar/${token.id}`,
       );
       setAlertType("success");
       setAlertMessage(t("link_copied"));
@@ -237,10 +238,6 @@ function SharedList({
     setGroupedSharedFunction,
   ]);
 
-  useEffect(() => {
-    console.log(groupedShared)
-  }, [groupedShared]);
-
   // 🔄 Initialisation des permissions et des dates d'expiration
   useEffect(() => {
     if (userInfo && personalCalendars.calendarsData) {
@@ -365,6 +362,7 @@ const calendarActions = ({
   setAlertId,
   setOnConfirmAction,
   t,
+  lng,
 }) => {
   return [
     {
@@ -373,7 +371,7 @@ const calendarActions = ({
           <i className="bi bi-eye me-2"></i> {t("open")}
         </>
       ),
-      onClick: () => navigate(`/calendar/${calendarId}`),
+      onClick: () => navigate(`/${lng}/calendar/${calendarId}`),
     },
     {
       label: (
@@ -381,7 +379,7 @@ const calendarActions = ({
           <i className="bi bi-capsule me-2"></i> {t("medicines.label")}
         </>
       ),
-      onClick: () => navigate(`/calendar/${calendarId}/boxes`),
+      onClick: () => navigate(`/${lng}/calendar/${calendarId}/boxes`),
     },
     { separator: true },
     {
@@ -400,7 +398,7 @@ const calendarActions = ({
             setAlertType("success");
             setAlertMessage("✅ " + rep.message);
             setTimeout(() => {
-              navigate("/calendars");
+              navigate(`/${lng}/calendars`);
             }, 1000);
           } else {
             setAlertType("danger");
@@ -423,6 +421,7 @@ function CalendarCard({
   emailsToInvite, setEmailsToInvite, navigate, personalCalendars,
 }) {
   const { t } = useTranslation();
+  const { lng } = useParams();
   const alertHandlers = { alertId, alertType, alertMessage, onConfirmAction, setAlertMessage, setOnConfirmAction, setAlertId };
   const tokenProps = { ...alertHandlers, setAlertType, handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions, handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyToken, setSelectedModifyToken, tokenCalendars };
   const userProps = { ...alertHandlers, handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
@@ -444,6 +443,7 @@ function CalendarCard({
                 setAlertId,
                 setOnConfirmAction,
                 t,
+                lng,
               })}
             />
           </h2>
@@ -486,6 +486,7 @@ function TokenList({
   tokenCalendars,
 }) {
   const { t } = useTranslation();
+  const { lng } = useParams();
   return (
     <>
       {(data.tokens || []).map((token) => (
@@ -562,7 +563,7 @@ function TokenList({
                   className={`form-control border-2 border-${token.revoked ? "danger" : "success"}`}
                   aria-label={t("shared_link_label")}
                   title={t("shared_link_label")}
-                  value={`${VITE_URL}/shared-token-calendar/${token.id}`}
+                  value={`${VITE_URL}/${lng}/shared-token-calendar/${token.id}`}
                   readOnly
                 />
                 <button

@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactFlagsSelect from 'react-flags-select';
 import { LANGUAGES } from '../../config/languages';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function LanguageSelector() {
-  const { i18n, t  } = useTranslation();
+  const { i18n } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [selected, setSelected] = useState('FR');
 
   useEffect(() => {
@@ -15,6 +18,10 @@ function LanguageSelector() {
   const onSelect = (flagCode) => {
     const lang = LANGUAGES.find(lang => lang.flag === flagCode);
     if (lang) {
+      const segments = location.pathname.split('/');
+      segments[1] = lang.code;
+      const newPath = segments.join('/') || '/';
+      navigate(`${newPath}${location.search}${location.hash}`);
       i18n.changeLanguage(lang.code);
       setSelected(lang.flag);
     }

@@ -212,6 +212,10 @@
     "title3": "Sécurité assurée"
   },
   "home": "Accueil",
+  "home_meta": {
+    "title": "MediTime - Planificateur de traitements",
+    "description": "Gérez et partagez facilement vos prises de médicaments."
+  },
   "invalid_or_expired_link": "Ce lien de calendrier partagé est invalide ou a expiré.",
   "invitation": {
     "invalid_or_expired": "Invitation invalide ou expirée",

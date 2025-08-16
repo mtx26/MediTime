@@ -1,5 +1,5 @@
 import React, { useContext, lazy, Suspense } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
 
 import { UserContext } from '../contexts/UserContext';
 
@@ -43,12 +43,13 @@ function buildFullPath(loc) {
 function PrivateRoute({ element }) {
   const { userInfo } = useContext(UserContext);
   const location = useLocation();
+  const { lng } = useParams();
 
   if (!userInfo) {
     const full = buildFullPath(location);
     return (
       <Navigate
-        to={`/login?redirect=${encodeURIComponent(full)}`}
+        to={`/${lng}/login?redirect=${encodeURIComponent(full)}`}
         replace
       />
     );
@@ -74,6 +75,7 @@ function RouteWithLoader({ element, isLoading }) {
 
 function AppRoutes({ sharedProps }) {
   const { userInfo } = useContext(UserContext);
+  const { lng } = useParams();
 
   const fallback = (
     <div
@@ -90,28 +92,28 @@ function AppRoutes({ sharedProps }) {
     <Suspense fallback={fallback}>
       <Routes>
       <Route
-        path="/login"
-        element={userInfo ? <Navigate to="/calendars" /> : <Auth />}
+        path="login"
+        element={userInfo ? <Navigate to={`/${lng}/calendars`} /> : <Auth />}
       />
       <Route
-        path="/register"
-        element={userInfo ? <Navigate to="/calendars" /> : <Auth />}
+        path="register"
+        element={userInfo ? <Navigate to={`/${lng}/calendars`} /> : <Auth />}
       />
       <Route
-        path="/reset-password"
+        path="reset-password"
         element={<ResetPassword />}
       />
       <Route
-        path="/reset-password-confirm"
+        path="reset-password-confirm"
         element={<ResetPasswordConfirm />}
       />
       <Route
-        path="/verify-email"
-        element={userInfo ? <VerifyEmail /> : <Navigate to="/login" />}
+        path="verify-email"
+        element={userInfo ? <VerifyEmail /> : <Navigate to={`/${lng}/login`} />}
       />
 
       <Route
-        path="/settings"
+        path="settings"
         element={
           <PrivateRoute
             element={
@@ -124,7 +126,7 @@ function AppRoutes({ sharedProps }) {
         }
       />
       <Route
-        path="/notifications"
+        path="notifications"
         element={
           <PrivateRoute
             element={
@@ -138,7 +140,7 @@ function AppRoutes({ sharedProps }) {
       />
 
       <Route
-        path="/shared-calendars"
+        path="shared-calendars"
         element={
           <PrivateRoute
             element={
@@ -150,7 +152,7 @@ function AppRoutes({ sharedProps }) {
           />
         }
       />
-      <Route path="/accept-invite">
+      <Route path="accept-invite">
         <Route
           index
           element={
@@ -160,7 +162,7 @@ function AppRoutes({ sharedProps }) {
           }
         />
       </Route>
-      <Route path="/add-calendar">
+      <Route path="add-calendar">
         <Route
           index
           element={
@@ -186,7 +188,7 @@ function AppRoutes({ sharedProps }) {
           }
         />
       </Route>
-      <Route path="/calendar/:calendarId">
+      <Route path="calendar/:calendarId">
         <Route
           index
           element={
@@ -254,7 +256,7 @@ function AppRoutes({ sharedProps }) {
         />
       </Route>
       <Route
-        path="/calendars"
+        path="calendars"
         element={
           <PrivateRoute
             element={
@@ -266,7 +268,7 @@ function AppRoutes({ sharedProps }) {
           />
         }
       />
-      <Route path="/shared-user-calendar/:calendarId">
+      <Route path="shared-user-calendar/:calendarId">
         <Route
           index
           element={
@@ -333,19 +335,19 @@ function AppRoutes({ sharedProps }) {
           }
         />
       </Route>
-      <Route path="/shared-token-calendar/:sharedToken">
+      <Route path="shared-token-calendar/:sharedToken">
         <Route index element={<CalendarView {...sharedProps} />} />
         <Route path="boxes" element={<MedicinesList {...sharedProps} />} />
         <Route path="pillbox" element={<PillboxPage {...sharedProps} />} />
       </Route>
 
-      <Route path="/privacy" element={<PrivacyPage />} />
-      <Route path="/terms" element={<TermsPage />} />
-      <Route path="/home" element={<HomePage />} />
+      <Route path="privacy" element={<PrivacyPage />} />
+      <Route path="terms" element={<TermsPage />} />
+      <Route path="home" element={<HomePage />} />
       <Route path="*" element={<NotFound />} />
-      <Route path="/" element={userInfo ? <Navigate to="/calendars" /> : <Navigate to="/home" />} />
+      <Route path="" element={userInfo ? <Navigate to={`/${lng}/calendars`} /> : <Navigate to={`/${lng}/home`} />} />
 
-      <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="auth/callback" element={<AuthCallback />} />
       </Routes>
     </Suspense>
   );

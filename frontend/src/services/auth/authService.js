@@ -8,9 +8,10 @@ import { getGlobalReloadUser } from '../../contexts/UserContext';
 const API_URL = import.meta.env.VITE_API_URL;
 
 function buildCallbackUrl(redirect) {
+  const lang = window.location.pathname.split('/')[1] || '';
   return (
     window.location.origin +
-    '/auth/callback' +
+    `/${lang}/auth/callback` +
     (redirect ? `?redirect=${encodeURIComponent(redirect)}` : '')
   );
 }
@@ -250,7 +251,7 @@ export const loginWithEmail = async (email, password, redirect) => {
 export const resetPassword = async (email) => {
   try {
     await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/auth/callback',
+      redirectTo: buildCallbackUrl(),
     });
   } catch (error) {
     log.error(
@@ -271,7 +272,7 @@ export const handleLogout = async () => {
   try {
     await supabase.auth.signOut({
       options: {
-        redirectTo: window.location.origin + '/auth/callback',
+        redirectTo: buildCallbackUrl(),
       },
     });
   } catch (error) {
@@ -290,7 +291,7 @@ export const updateUserPassword = async (newPassword) => {
     await supabase.auth.updateUser({
       password: newPassword,
       options: {
-        redirectTo: window.location.origin + '/auth/callback',
+        redirectTo: buildCallbackUrl(),
       },
     });
   } catch (error) {
@@ -334,7 +335,7 @@ export const loginWithMagicLink = async (email, redirect) => {
 export const inviteUserByEmail = async (email) => {
   try {
     const { error } = await supabase.auth.admin.inviteUserByEmail(email, {
-      redirectTo: window.location.origin + '/auth/callback',
+      redirectTo: buildCallbackUrl(),
     });
     if (error) {
       log.error("Erreur lors de l'invitation de l'utilisateur", error.message, {
@@ -360,7 +361,7 @@ export const updateUserEmail = async (newEmail) => {
     const { error } = await supabase.auth.updateUser({
       email: newEmail,
       options: {
-        emailRedirectTo: window.location.origin + '/auth/callback',
+        emailRedirectTo: buildCallbackUrl(),
       },
     });
     if (error) {
@@ -385,7 +386,7 @@ export const updateUserEmail = async (newEmail) => {
 export const reauthenticateUser = async () => {
   try {
     await supabase.auth.reauthenticate({
-      redirectTo: window.location.origin + '/auth/callback',
+      redirectTo: buildCallbackUrl(),
     });
   } catch (error) {
     log.error('Erreur lors de la réauthentification', error.message, {

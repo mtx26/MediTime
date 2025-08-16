@@ -6,6 +6,29 @@ from app.db.connection import get_connection
 from app.utils.logging import log_backend as logger
 from app.utils.responses import warning_response
 
+ACCESS_DENIED_MSG = "accès refusé"
+
+
+def _extract_calendar_id(kwargs) -> str | None:
+    cal_id = kwargs.get("calendar_id")
+    if cal_id:
+        return cal_id
+    cal_id = getattr(request, "view_args", {}).get("calendar_id")
+    if cal_id:
+        return cal_id
+    if request.is_json:
+        body = request.get_json(silent=True) or {}
+        return body.get("calendarId") or body.get("calendar_id")
+    return None
+
+
+def _extract_token(kwargs) -> str | None:
+    return (
+        kwargs.get("token")
+        or getattr(request, "view_args", {}).get("token")
+        or request.args.get("token")
+    )
+
 def _verify_calendar_share(calendar_id: str, receiver_uid: str) -> bool:
     try:
         with get_connection() as conn:
@@ -28,7 +51,7 @@ def _verify_calendar_share(calendar_id: str, receiver_uid: str) -> bool:
 
                 # Partage absent pour ce receiver
                 if not row.get("share_exists"):
-                    logger.warning("accès refusé", {
+                    logger.warning(ACCESS_DENIED_MSG, {
                         "origin": "SHARED_VERIFY",
                         "uid": receiver_uid,
                         "calendar_id": calendar_id,
@@ -136,16 +159,11 @@ def verify_calendar_share(calendar_id=None, receiver_uid=None):
 
         @wraps(f)
         def wrapper(*args, **kwargs):
-            cal_id = kwargs.get("calendar_id")
-            if not cal_id and request.view_args:
-                cal_id = request.view_args.get("calendar_id")
-            if not cal_id and request.is_json:
-                body = request.get_json(silent=True) or {}
-                cal_id = body.get("calendarId") or body.get("calendar_id")
+            cal_id = _extract_calendar_id(kwargs)
             uid = kwargs.get("receiver_uid") or getattr(g, "uid", None)
             if not cal_id or not _verify_calendar_share(cal_id, uid):
                 return warning_response(
-                    message="accès refusé",
+                    message=ACCESS_DENIED_MSG,
                     code="SHARED_VERIFY_DENIED",
                     uid=uid,
                     origin="SHARED_VERIFY",
@@ -163,16 +181,11 @@ def verify_calendar(calendar_id=None, uid=None):
 
         @wraps(f)
         def wrapper(*args, **kwargs):
-            cal_id = kwargs.get("calendar_id")
-            if not cal_id and request.view_args:
-                cal_id = request.view_args.get("calendar_id")
-            if not cal_id and request.is_json:
-                body = request.get_json(silent=True) or {}
-                cal_id = body.get("calendarId") or body.get("calendar_id")
+            cal_id = _extract_calendar_id(kwargs)
             user_id = kwargs.get("uid") or getattr(g, "uid", None)
             if not cal_id or not _verify_calendar(cal_id, user_id):
                 return warning_response(
-                    message="accès refusé",
+                    message=ACCESS_DENIED_MSG,
                     code="CALENDAR_VERIFY_DENIED",
                     uid=user_id,
                     origin="CALENDAR_VERIFY",
@@ -190,11 +203,7 @@ def verify_token(token=None):
 
         @wraps(f)
         def wrapper(*args, **kwargs):
-            tok = (
-                kwargs.get("token")
-                or request.view_args.get("token") if request.view_args else None
-                or request.args.get("token")
-            )
+            tok = _extract_token(kwargs)
             calendar_id = _verify_token(tok)
             if not calendar_id:
                 return warning_response(
@@ -216,15 +225,11 @@ def verify_token_owner(token=None, uid=None):
 
         @wraps(f)
         def wrapper(*args, **kwargs):
-            tok = (
-                kwargs.get("token")
-                or request.view_args.get("token") if request.view_args else None
-                or request.args.get("token")
-            )
+            tok = _extract_token(kwargs)
             user_id = kwargs.get("uid") or getattr(g, "uid", None)
             if not tok or not _verify_token_owner(tok, user_id):
                 return warning_response(
-                    message="accès refusé",
+                    message=ACCESS_DENIED_MSG,
                     code="TOKEN_OWNER_VERIFY_DENIED",
                     uid=user_id,
                     origin="TOKEN_OWNER_VERIFY",
@@ -284,7 +289,7 @@ def verify_login_invitation_owner(token=None, uid=None):
             data = _verify_login_invite_owner(tok, user_id) if tok and user_id else False
             if not data:
                 return warning_response(
-                    message="accès refusé",
+                    message=ACCESS_DENIED_MSG,
                     code="LOGIN_INVITE_OWNER_VERIFY_DENIED",
                     uid=user_id,
                     origin="LOGIN_INVITE_OWNER_VERIFY",
@@ -350,7 +355,7 @@ def verify_registration_invitation_owner(token=None, uid=None):
             data = _verify_registration_invite_owner(tok, user_id) if tok and user_id else False
             if not data:
                 return warning_response(
-                    message="accès refusé",
+                    message=ACCESS_DENIED_MSG,
                     code="REG_INVITE_OWNER_VERIFY_DENIED",
                     uid=user_id,
                     origin="REG_INVITE_OWNER_VERIFY",
@@ -415,7 +420,7 @@ def verify_login_invitation_receiver(token=None, uid=None):
             data = _verify_login_invite_receiver(tok, user_id) if tok and user_id else False
             if not data:
                 return warning_response(
-                    message="accès refusé",
+                    message=ACCESS_DENIED_MSG,
                     code="LOGIN_INVITE_RECEIVER_VERIFY_DENIED",
                     uid=user_id,
                     origin="LOGIN_INVITE_RECEIVER_VERIFY",
