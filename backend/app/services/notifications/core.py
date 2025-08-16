@@ -15,6 +15,8 @@ from html import escape
 # ========= Constantes =========
 ORIGIN = "NOTIFICATIONS"
 DEFAULT_CHANNELS: Tuple[str, ...] = ("push", "email", "web")
+DEFAULT_USER_NAME = "un utilisateur"
+VIEW_CALENDAR_LABEL = "Voir le calendrier"
 
 # ========= Types =========
 NotificationDict = Dict[str, Any]
@@ -23,9 +25,9 @@ NotificationDict = Dict[str, Any]
 # ========= Helpers de données =========
 def fetch_user_name(user_id: str | None) -> str:
     if not user_id:
-        return "un utilisateur"
+        return DEFAULT_USER_NAME
     user = fetch_user(user_id)
-    return user.get("display_name") if user else "un utilisateur"
+    return user.get("display_name") if user else DEFAULT_USER_NAME
 
 
 def fetch_calendar_name(calendar_id: str | None) -> str | None:
@@ -81,7 +83,7 @@ def _format_medication_list(medications: List[NotificationDict]) -> str:
     return "<ul style='margin:8px 0; padding-left:20px;'>" + "".join(lis) + "</ul>"
 
 def build_notification_text(notification_type: str, context: NotificationDict) -> Tuple[str, str, str]:
-    sender = _h(context.get("sender_name") or "un utilisateur")
+    sender = _h(context.get("sender_name") or DEFAULT_USER_NAME)
     cal = _h(context.get("calendar_name") or "ce calendrier")
 
     match notification_type:
@@ -103,12 +105,12 @@ def build_notification_text(notification_type: str, context: NotificationDict) -
         case "calendar_invitation_accepted":
             title = "✅ Invitation acceptée"
             body = _p(f"<b>{sender}</b> a accepté votre invitation pour « <b>{cal}</b> ».")
-            return (title, body, "Voir le calendrier")
+            return (title, body, VIEW_CALENDAR_LABEL)
 
         case "calendar_invitation_rejected":
             title = "❌ Invitation refusée"
             body = _p(f"<b>{sender}</b> a refusé votre invitation pour « <b>{cal}</b> ».")
-            return (title, body, "Voir le calendrier")
+            return (title, body, VIEW_CALENDAR_LABEL)
 
         case "calendar_shared_deleted_by_owner":
             title = "🔒 Partage annulé"
@@ -118,14 +120,14 @@ def build_notification_text(notification_type: str, context: NotificationDict) -
         case "calendar_shared_deleted_by_receiver":
             title = "📤 Partage retiré"
             body = _p(f"<b>{sender}</b> a retiré le calendrier « <b>{cal}</b> » de son compte.")
-            return (title, body, "Voir le calendrier")
+            return (title, body, VIEW_CALENDAR_LABEL)
 
         case "low_stock":
             title = f"⚠️ Stock faible – calendrier « {cal} »"
             if context.get("medications"):
                 body = _p(f"Certains médicaments du calendrier <b>« {cal} »</b> sont en stock critique :") \
                        + _format_medication_list(context["medications"])
-                return (title, body, "Voir le calendrier")
+                return (title, body, VIEW_CALENDAR_LABEL)
 
             med_name = _h(fetch_medicine_name(context.get("medication_id")))
             qty = context.get("medication_qty") or 0
@@ -134,7 +136,7 @@ def build_notification_text(notification_type: str, context: NotificationDict) -
             else:
                 stock_txt = f"<span style='color:orange;font-weight:bold;'>{qty} restant{'s' if qty != 1 else ''}</span>"
             body = _p(f"Le médicament <b>« {med_name} »</b> est {stock_txt}.")
-            return (title, body, "Voir le calendrier")
+            return (title, body, VIEW_CALENDAR_LABEL)
 
         case _:
             count = context.get("notification_count")
