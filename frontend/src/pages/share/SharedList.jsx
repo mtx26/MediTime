@@ -89,6 +89,34 @@ function SharedList({
     setSelectedModifyToken(null);
   };
 
+  const promptDeleteCalendar = ({
+    calendarId,
+    navigate,
+    personalCalendars,
+    setAlertType,
+    setAlertMessage,
+    setAlertId,
+    setOnConfirmAction,
+    t,
+    lng,
+  }) => {
+    setAlertType("confirm-danger");
+    setAlertMessage(t("delete_calendar_confirm"));
+    setAlertId(calendarId);
+    const onConfirm = async () => {
+      const rep = await personalCalendars.deleteCalendar(calendarId);
+      if (rep.success) {
+        setAlertType("success");
+        setAlertMessage("✅ " + rep.message);
+        setTimeout(() => navigate(`/${lng}/calendars`), 1000);
+      } else {
+        setAlertType("danger");
+        setAlertMessage("❌ " + rep.error);
+      }
+    };
+    setOnConfirmAction(() => onConfirm);
+  };
+
   // 🔄 Activation/désactivation du lien
   const handleToggleToken = async (tokenId) => {
     const rep = await tokenCalendars.updateRevokeToken(tokenId);
@@ -103,11 +131,23 @@ function SharedList({
     setSelectedModifyToken(null);
   };
 
+  const promptRegenerateToken = (tokenId, calendarId) => {
+    setAlertType("confirm-danger");
+    setAlertMessage(t("regenerate_link_confirm"));
+    setAlertId(tokenId);
+    const onConfirm = async () => {
+      await tokenCalendars.deleteToken(tokenId);
+      await handleCreateToken(calendarId);
+    };
+    setOnConfirmAction(() => onConfirm);
+  };
+
   const deleteTokenConfirmAction = (tokenId) => {
     setAlertType("confirm-danger");
     setAlertMessage(t("delete_link_confirm"));
     setAlertId(tokenId);
-    setOnConfirmAction(() => () => handleDeleteToken(tokenId));
+    const onConfirm = () => handleDeleteToken(tokenId);
+    setOnConfirmAction(() => onConfirm);
   };
 
   // 🔄 Suppression du lien
@@ -128,7 +168,8 @@ function SharedList({
     setAlertType("confirm-danger");
     setAlertMessage(t("delete_access_confirm"));
     setAlertId(token);
-    setOnConfirmAction(() => () => handleDeleteLoginInvitation(token));
+    const onConfirm = () => handleDeleteLoginInvitation(token);
+    setOnConfirmAction(() => onConfirm);
   };
 
   // 🔄 Suppression de l'utilisateur
@@ -152,7 +193,8 @@ function SharedList({
     setAlertType("confirm-danger");
     setAlertMessage(t("delete_link_confirm"));
     setAlertId(token);
-    setOnConfirmAction(() => () => handledeleteRegistrationInvitation(token));
+    const onConfirm = () => handledeleteRegistrationInvitation(token);
+    setOnConfirmAction(() => onConfirm);
   };
 
   const handledeleteRegistrationInvitation = async (token) => {
@@ -388,24 +430,18 @@ const calendarActions = ({
           <i className="bi bi-trash me-2"></i> {t("delete")}
         </>
       ),
-      onClick: () => {
-        setAlertType("confirm-danger");
-        setAlertMessage(t("delete_calendar_confirm"));
-        setAlertId(calendarId);
-        setOnConfirmAction(() => async () => {
-          const rep = await personalCalendars.deleteCalendar(calendarId);
-          if (rep.success) {
-            setAlertType("success");
-            setAlertMessage("✅ " + rep.message);
-            setTimeout(() => {
-              navigate(`/${lng}/calendars`);
-            }, 1000);
-          } else {
-            setAlertType("danger");
-            setAlertMessage("❌ " + rep.error);
-          }
-        });
-      },
+      onClick: () =>
+        promptDeleteCalendar({
+          calendarId,
+          navigate,
+          personalCalendars,
+          setAlertType,
+          setAlertMessage,
+          setAlertId,
+          setOnConfirmAction,
+          t,
+          lng,
+        }),
       danger: true,
     },
   ];
@@ -513,15 +549,7 @@ function TokenList({
                         <i className="bi bi-arrow-clockwise me-2"></i> {t('regenerate')}
                       </>
                     ),
-                    onClick: () => {
-                      setAlertType("confirm-danger");
-                      setAlertMessage(t("regenerate_link_confirm"));
-                      setAlertId(token.id);
-                      setOnConfirmAction(() => async () => {
-                        await tokenCalendars.deleteToken(token.id);
-                        await handleCreateToken(calendarId);
-                      });
-                    },
+                    onClick: () => promptRegenerateToken(token.id, calendarId),
                   },
                   { separator: true },
                   {

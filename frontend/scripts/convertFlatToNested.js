@@ -8,29 +8,32 @@ const SRC_DIR = path.join(__dirname, '../src');
 // 🔁 Conversion flat → nested avec transformation "key" → "key.label" si conflit
 function unflattenWithLabel(flatObj, keysToConvert) {
   const nestedObj = {};
-  for (const flatKey in flatObj) {
-    const keys = flatKey.split('.');
-    let current = nestedObj;
-
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-
-      if (i === keys.length - 1) {
-        if (keysToConvert.includes(keys[0]) && keys.length === 1) {
-          if (!current[key]) current[key] = {};
-          current[key]['label'] = flatObj[flatKey];
-        } else {
-          current[key] = flatObj[flatKey];
-        }
-      } else {
-        if (!current[key] || typeof current[key] !== 'object') {
-          current[key] = {};
-        }
-        current = current[key];
-      }
-    }
+  for (const [flatKey, value] of Object.entries(flatObj)) {
+    const targetKeys = buildTargetKeys(flatKey, keysToConvert);
+    assignValue(nestedObj, targetKeys, value);
   }
   return nestedObj;
+}
+
+function buildTargetKeys(flatKey, keysToConvert) {
+  const keys = flatKey.split('.');
+  if (keys.length === 1 && keysToConvert.includes(keys[0])) {
+    return [keys[0], 'label'];
+  }
+  return keys;
+}
+
+function assignValue(obj, keys, value) {
+  let current = obj;
+  keys.forEach((key, index) => {
+    if (index === keys.length - 1) {
+      current[key] = value;
+    } else {
+      current[key] =
+        typeof current[key] === 'object' && current[key] !== null ? current[key] : {};
+      current = current[key];
+    }
+  });
 }
 
 // 📂 Trouve les clés plates en conflit avec des sous-clés (ex: "settings" et "settings.account")
