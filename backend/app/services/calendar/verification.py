@@ -29,7 +29,6 @@ def _extract_token(kwargs) -> str | None:
         or request.args.get("token")
     )
 
-
 def _verify_calendar_share(calendar_id: str, receiver_uid: str) -> bool:
     try:
         with get_connection() as conn:
