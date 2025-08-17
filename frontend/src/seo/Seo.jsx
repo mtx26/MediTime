@@ -1,15 +1,14 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES, getLocale, DEFAULT_LANG } from '../config/languages';
-// Manual document metadata management
 
-const SITE_URL = import.meta.env.VITE_SITE_URL || 'https://meditime-app.com';
-const OG_IMAGE = `${SITE_URL}/icons/og-image.png`;
+
+const VITE_URL = import.meta.env.VITE_VITE_URL;
 
 function Seo({ title, description, path }) {
   const { i18n } = useTranslation();
   const lng = i18n.language;
-  const url = `${SITE_URL}/${lng}${path}`;
+  const url = `${VITE_URL}/${lng}${path}`;
 
   useEffect(() => {
     document.documentElement.lang = lng;
@@ -35,12 +34,12 @@ function Seo({ title, description, path }) {
     LANGUAGES.forEach((lang) => {
       upsertTag('link', 'hreflang', lang.code, {
         rel: 'alternate',
-        href: `${SITE_URL}/${lang.code}${path}`,
+        href: `${VITE_URL}/${lang.code}${path}`,
       });
     });
     upsertTag('link', 'hreflang', 'x-default', {
       rel: 'alternate',
-      href: `${SITE_URL}/${DEFAULT_LANG}${path}`,
+      href: `${VITE_URL}/${DEFAULT_LANG}${path}`,
     });
 
     upsertTag('meta', 'property', 'og:locale', { content: getLocale(lng) });
@@ -61,7 +60,7 @@ function Seo({ title, description, path }) {
     });
     upsertTag('meta', 'name', 'twitter:title', { content: title });
     upsertTag('meta', 'name', 'twitter:description', { content: description });
-    upsertTag('meta', 'name', 'twitter:image', { content: OG_IMAGE });
+    upsertTag('meta', 'name', 'twitter:image', { content: `${VITE_URL}/icons/og-image.png` });
     upsertTag('meta', 'name', 'twitter:site', { content: '@MediTime' });
   }, [title, description, path, lng]);
 
