@@ -846,7 +846,7 @@ function App() {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Seo title={t('app.title')} description={t('app.subtitle')} path={path} />
+      <Seo title={t('home_meta.title')} description={t('home_meta.description')} path={path} />
       <Navbar sharedProps={sharedProps} />
       <main className="flex-grow-1 d-flex flex-column pb-5 pb-lg-0">
         {userInfo && (
