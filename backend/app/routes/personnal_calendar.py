@@ -21,7 +21,7 @@ ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"
 @with_query_origin(default_origin="REALTIME_CALENDAR_FETCH")
 def handle_calendars():
     try:
-        uid = g.uid
+        uid = g.uid if hasattr(g, "uid") else None
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
@@ -68,7 +68,7 @@ def handle_calendars():
 @with_query_origin(default_origin="CALENDAR_CREATE")
 def handle_create_calendar():
     try:
-        uid = g.uid
+        uid = g.uid if hasattr(g, "uid") else None
         payload = request.get_json(force=True)
         calendar_name = payload.get("calendarName")
 
@@ -110,7 +110,6 @@ def handle_create_calendar():
 @with_query_origin(default_origin="CALENDAR_DELETE")
 def handle_delete_calendar(calendar_id):
     try:
-        uid = g.uid
 
         if not calendar_id:
             return warning_response(
@@ -163,7 +162,6 @@ def handle_delete_calendar(calendar_id):
 @with_query_origin(default_origin="CALENDAR_RENAME")
 def handle_rename_calendar(calendar_id):
     try:
-        uid = g.uid
         payload = request.get_json(force=True)
         new_calendar_name = payload.get("newCalendarName")
 
@@ -331,7 +329,6 @@ def download_pdf_calendar(calendar_id):
 @with_query_origin(default_origin="STOCK_DECREMENT_METHOD_FETCH")
 def get_personnal_stock_decrement_method(calendar_id):
     try:
-        uid = g.uid
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT stock_decrement_method FROM calendars WHERE id = %s", (calendar_id,))
@@ -368,7 +365,6 @@ def get_personnal_stock_decrement_method(calendar_id):
 @with_query_origin(default_origin="STOCK_DECREMENT_METHOD_UPDATE")
 def update_personnal_stock_decrement_method(calendar_id):
     try:
-        uid = g.uid
 
         payload = request.get_json(force=True)
         method = payload.get("method")

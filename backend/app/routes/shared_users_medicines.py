@@ -17,7 +17,6 @@ from app.utils import with_query_origin
 @with_query_origin(default_origin="REALTIME_SHARED_CALENDAR_BOXES")
 def handle_shared_boxes(calendar_id):
     try:
-        uid = g.uid
 
         boxes = get_boxes(calendar_id)
 
@@ -46,7 +45,6 @@ def handle_shared_boxes(calendar_id):
 @with_query_origin(default_origin="BOX_UPDATE")
 def handle_update_shared_box(calendar_id, box_id):
     try:
-        uid = g.uid
 
         payload = request.get_json(force=True)
         box = payload.get("box")
@@ -84,7 +82,6 @@ def handle_update_shared_box(calendar_id, box_id):
 @with_query_origin(default_origin="BOX_CREATE")
 def handle_create_shared_box(calendar_id):
     try:
-        uid = g.uid
 
         payload = request.get_json(force=True)
         box = payload.get("box")
@@ -147,7 +144,6 @@ def handle_delete_shared_box(calendar_id, box_id):
 @with_query_origin(default_origin="USE_PILLULIER")
 def handle_use_shared_users_pillulier(calendar_id):
     try:
-        uid = g.uid
 
         payload = request.get_json(force=True)
         start_date = payload.get("startDate")
@@ -187,7 +183,6 @@ def handle_use_shared_users_pillulier(calendar_id):
 @with_query_origin(default_origin="BOX_RESTOCK")
 def handle_shared_user_restock_box(calendar_id, box_id):
     try:
-        uid = g.uid
 
         if not restock_box(box_id, calendar_id):
             return warning_response(

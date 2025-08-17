@@ -14,7 +14,7 @@ from app.utils import with_query_origin
 @require_auth
 @with_query_origin(default_origin="USER_SYNC_GET")
 def get_user_info():
-    uid = g.uid
+    uid = g.uid if hasattr(g, "uid") else None
     try:
         user = fetch_user(uid)
         if not user:
@@ -43,7 +43,7 @@ def get_user_info():
 @require_auth
 @with_query_origin(default_origin="USER_UPDATE")
 def update_user_info():
-    uid = g.uid
+    uid = g.uid if hasattr(g, "uid") else None
     try:
         payload = request.get_json(force=True)
         if not payload:
@@ -86,9 +86,8 @@ def update_user_info():
 @require_auth
 @with_query_origin(default_origin="USER_PHOTO")
 def handle_user_photo():
-    uid = None
     try:
-        uid = g.uid
+        uid = g.uid if hasattr(g, "uid") else None
 
         photo = request.files.get("photo")
         if not photo:
@@ -110,7 +109,7 @@ def handle_user_photo():
         return success_response(
             message="photo de l'utilisateur mise à jour",
             code="USER_PHOTO_SUCCESS",
-            data={"uid": uid, "photo_url": photo_url}
+            data={"photo_url": photo_url}
         )
     except Exception as e:
         return error_response(

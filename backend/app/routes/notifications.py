@@ -35,7 +35,7 @@ def get_user_info(uid):
 @require_auth
 @with_query_origin(default_origin="REALTIME_NOTIFICATIONS_FETCH")
 def handle_notifications():
-    uid = g.uid
+    uid = g.uid if hasattr(g, "uid") else None
     DEFAULT_PHOTO = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg"
 
     sql = """
@@ -95,7 +95,7 @@ def handle_notifications():
 @with_query_origin(default_origin="NOTIFICATION_READ")
 def handle_read_notification(notification_id):
     try:
-        uid = g.uid
+        uid = g.uid if hasattr(g, "uid") else None
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -140,7 +140,7 @@ def handle_read_notification(notification_id):
 def register_token():
     data = request.json
     token = data.get("token")
-    uid = g.uid
+    uid = g.uid if hasattr(g, "uid") else None
 
     if not token or not uid:
         return error_response(

@@ -12,7 +12,7 @@ from app.utils import with_query_origin
 @with_query_origin(default_origin="DOCUMENT_ANALYZE")
 def handle_analyze_medical_document():
     try:
-        uid = g.uid
+        uid = g.uid if hasattr(g, "uid") else None
 
         base64_image = request.json.get("image")
 

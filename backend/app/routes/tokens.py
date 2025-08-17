@@ -16,7 +16,7 @@ from app.utils import with_query_origin
 @with_query_origin(default_origin="REALTIME_TOKENS_FETCH")
 def handle_tokens():
     try:
-        uid = g.uid
+        uid = g.uid if hasattr(g, "uid") else None
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -46,7 +46,7 @@ def handle_tokens():
 @with_query_origin(default_origin="TOKEN_CREATE")
 def handle_create_token(calendar_id):
     try:
-        owner_uid = g.uid
+        owner_uid = g.uid if hasattr(g, "uid") else None
 
         payload = request.get_json(force=True)
 
@@ -105,7 +105,6 @@ def handle_create_token(calendar_id):
 @with_query_origin(default_origin="TOKEN_REVOKE")
 def handle_update_revoke_token(token):
     try:
-        owner_uid = g.uid
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -113,9 +112,9 @@ def handle_update_revoke_token(token):
                 cursor.execute("""
                     UPDATE shared_tokens
                     SET revoked = NOT revoked
-                    WHERE id = %s AND owner_uid = %s
+                    WHERE id = %s
                     RETURNING revoked
-                """, (token, owner_uid))
+                """, (token,))
                 row = cursor.fetchone()
 
             if not row:
@@ -153,7 +152,6 @@ def handle_update_revoke_token(token):
 @with_query_origin(default_origin="TOKEN_EXPIRATION_UPDATE")
 def handle_update_token_expiration(token):
     try:
-        owner_uid = g.uid
 
         payload = request.get_json(force=True)
         expires_at = payload.get("expiresAt")
@@ -166,7 +164,7 @@ def handle_update_token_expiration(token):
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("UPDATE shared_tokens SET expires_at = %s WHERE id = %s AND owner_uid = %s", (expires_at, token, owner_uid))
+                cursor.execute("UPDATE shared_tokens SET expires_at = %s WHERE id = %s", (expires_at, token))
 
                 return success_response(
                     message="expiration du token mise à jour", 
@@ -192,7 +190,6 @@ def handle_update_token_expiration(token):
 @with_query_origin(default_origin="TOKEN_PERMISSIONS_UPDATE")
 def handle_update_token_permissions(token):
     try:
-        owner_uid = g.uid
 
         payload = request.get_json(force=True)
 
@@ -200,7 +197,7 @@ def handle_update_token_permissions(token):
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("UPDATE shared_tokens SET permissions = %s WHERE id = %s AND owner_uid = %s", (permissions, token, owner_uid))
+                cursor.execute("UPDATE shared_tokens SET permissions = %s WHERE id = %s", (permissions, token))
 
                 return success_response(
                     message="permissions du token mises à jour", 
@@ -308,7 +305,6 @@ def handle_get_token_metadata(token):
 @with_query_origin(default_origin="TOKEN_DELETE")
 def handle_delete_token(token):
     try:
-        owner_uid = g.uid
 
         with get_connection() as conn:
             with conn.cursor() as cursor:

@@ -46,7 +46,6 @@ def handle_boxes(calendar_id):
 @with_query_origin(default_origin="BOX_UPDATE")
 def handle_update_box(calendar_id, box_id):
     try:
-        uid = g.uid
 
         payload = request.get_json(force=True)
         box = payload.get("box")
@@ -84,7 +83,6 @@ def handle_update_box(calendar_id, box_id):
 @with_query_origin(default_origin="BOX_CREATE")
 def handle_create_box(calendar_id):
     try:
-        uid = g.uid
 
         payload = request.get_json(force=True)
         box = payload.get("box")
@@ -123,7 +121,6 @@ def handle_create_box(calendar_id):
 @with_query_origin(default_origin="BOX_DELETE")
 def handle_delete_box(calendar_id, box_id):
     try:
-        uid = g.uid
 
         delete_box(box_id, calendar_id)
         
@@ -149,8 +146,6 @@ def handle_delete_box(calendar_id, box_id):
 @with_query_origin(default_origin="USE_PILLULIER")
 def handle_use_pillulier(calendar_id):
     try:
-        uid = g.uid
-        
         payload = request.get_json(force=True)
         start_date = payload.get("startTime")
         
@@ -196,7 +191,6 @@ def handle_use_pillulier(calendar_id):
 @with_query_origin(default_origin="BOX_RESTOCK")
 def handle_restock_box(calendar_id, box_id):
     try:
-        uid = g.uid
 
         if not restock_box(box_id, calendar_id):
             return warning_response(

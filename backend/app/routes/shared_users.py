@@ -26,7 +26,7 @@ SELECT_SHARED_CALENDAR = "SELECT * FROM calendars WHERE id = %s"
 @with_query_origin(default_origin="REALTIME_SHARED_CALENDARS_FETCH")
 def handle_shared_calendars():
     try:
-        uid = g.uid
+        uid = g.uid if hasattr(g, "uid") else None
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -88,7 +88,6 @@ def handle_shared_calendars():
 @with_query_origin(default_origin="SHARED_CALENDAR_FETCH_SCHEDULE")
 def handle_user_shared_calendar_schedule(calendar_id):
     try:
-        uid = g.uid
 
         start_date = request.args.get("startDate")
 
@@ -126,7 +125,7 @@ def handle_user_shared_calendar_schedule(calendar_id):
 @with_query_origin(default_origin="SHARED_CALENDAR_DELETE")
 def handle_delete_user_shared_calendar(calendar_id):
     try:
-        receiver_uid = g.uid
+        receiver_uid = g.uid if hasattr(g, "uid") else None
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -182,7 +181,7 @@ def handle_delete_user_shared_calendar(calendar_id):
 @require_auth
 @with_query_origin(default_origin="SHARED_FETCH")
 def handle_grouped_shared():
-    uid = g.uid
+    uid = g.uid if hasattr(g, "uid") else None
 
     sql = """
     SELECT
@@ -274,7 +273,6 @@ def handle_grouped_shared():
 @with_query_origin(default_origin="SHARED_USER_NOTIFICATIONS_ENABLED_FETCH")
 def handle_shared_user_notifications(calendar_id):
     try:
-        uid = g.uid
         
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -285,8 +283,6 @@ def handle_shared_user_notifications(calendar_id):
                         message="calendrier partagé non trouvé",
                         code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
                         status_code=404,
-                        uid=uid,
-                        origin="SHARED_CALENDARS_NOTIFICATIONS",
                         log_extra={"calendar_id": calendar_id}
                     )
                 notifications_enabled = calendar.get("notifications_enabled", False)
@@ -313,7 +309,6 @@ def handle_shared_user_notifications(calendar_id):
 @with_query_origin(default_origin="SHARED_USER_NOTIFICATIONS_ENABLED_UPDATE")
 def handle_shared_user_notifications_update(calendar_id):
     try:
-        uid = g.uid
 
         payload = request.get_json(force=True)
         notifications_enabled = payload.get("notifications-enabled")

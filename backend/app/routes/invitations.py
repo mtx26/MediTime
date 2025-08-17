@@ -98,7 +98,7 @@ def _delete_invite_notification(cursor, receiver_uid: str, calendar_id: str, own
 @verify_calendar
 @with_query_origin(default_origin="INVITATION_SEND")
 def handle_send_invitation(calendar_id):
-    owner_uid = g.uid  # défini avant try pour except éventuel
+    owner_uid = g.uid if hasattr(g, "uid") else None  # défini avant try pour except éventuel
     try:
         payload = request.get_json(force=True)
         receiver_email = payload.get("email")
@@ -201,7 +201,7 @@ def handle_send_invitation(calendar_id):
 @require_auth
 @with_query_origin(default_origin="GET_INVITATION_LOGIN")
 def handle_login_invitation(token):
-    uid = g.uid
+    uid = g.uid if hasattr(g, "uid") else None
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -418,7 +418,6 @@ def handle_reject_login_invitation(token):
 @require_auth
 @with_query_origin(default_origin="GET_INVITATION_REGISTRATION")
 def handle_registration_invitation(token):
-    uid = g.uid
     try:
         user = g.user
         email = user.get("email")
@@ -436,7 +435,7 @@ def handle_registration_invitation(token):
                     JOIN calendars c ON i.calendar_id = c.id
                     JOIN users u     ON c.owner_uid = u.id
                     WHERE i.token = %s
-                      AND i.invited_email = %s
+                        AND LOWER(i.invited_email) = LOWER(%s)
                     """,
                     (token, email),
                 )
