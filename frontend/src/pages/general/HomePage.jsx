@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
-import Seo from '../../seo/Seo';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -18,11 +17,6 @@ function HomePage() {
 
   return (
     <>
-      <Seo
-        title={t('home_meta.title')}
-        description={t('home_meta.description')}
-        path="/home"
-      />
       <header className="hero hero bg-light border-bottom shadow-sm py-5 rounded-3">
         <div className="container text-center">
           <div className='d-flex align-items-center justify-content-center gap-1'>

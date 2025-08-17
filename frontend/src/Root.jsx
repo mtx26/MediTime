@@ -8,16 +8,16 @@ import {
 } from 'react-router-dom';
 import App from './App';
 import { useTranslation } from 'react-i18next';
-import { enabledLanguageCodes, LANGUAGES } from './config/languages';
+import { enabledLanguageCodes, DEFAULT_LANG } from './config/languages';
 
 function LanguageRoutes() {
   const location = useLocation();
   const { i18n } = useTranslation();
-  const rawLang = i18n.language || LANGUAGES[0].code;
+  const rawLang = i18n.language || DEFAULT_LANG;
   const normalizedLang = rawLang.split('-')[0];
   const defaultLang = enabledLanguageCodes.includes(normalizedLang)
     ? normalizedLang
-    : LANGUAGES[0].code;
+    : DEFAULT_LANG;
   const pathParts = location.pathname.split('/');
   const currentLang = pathParts[1];
 

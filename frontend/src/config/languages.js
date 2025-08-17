@@ -10,6 +10,8 @@ export const LANGUAGES = [
   { flag: 'RU', code: 'ru', locale: 'ru-RU', label: 'Русский' }
 ];
 
+export const DEFAULT_LANG = 'en';
+
 export const getLocale = (code) => {
   return LANGUAGES.find((lang) => lang.code === code)?.locale || code;
 };
