@@ -53,7 +53,7 @@ function Seo({ title, description, path }) {
     upsertTag('meta', 'property', 'og:description', { content: description });
     upsertTag('meta', 'property', 'og:url', { content: url });
     upsertTag('meta', 'property', 'og:type', { content: 'website' });
-    upsertTag('meta', 'property', 'og:image', { content: OG_IMAGE });
+    upsertTag('meta', 'property', 'og:image', { content: `${VITE_URL}/icons/og-image.png` });
 
     upsertTag('meta', 'name', 'twitter:card', {
       content: 'summary_large_image',
