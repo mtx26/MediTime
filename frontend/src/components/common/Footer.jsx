@@ -116,7 +116,7 @@ function Footer() {
                   <li>
                     <i className="bi bi-envelope me-2 text-primary" aria-hidden="true"></i>
                     <a
-                      href="mailto:mtx_26@hotmail.com"
+                      href="mailto:mtx_26@outlook.be"
                       className="text-muted text-decoration-none link-hover"
                       target="_blank"
                       rel="noopener noreferrer"
