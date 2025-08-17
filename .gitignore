@@ -37,4 +37,3 @@ __pycache__/
 backend/app/test/
 frontend/massReplace.js
 frontend/src/test/
-frontend/public/icons/og-image.png
