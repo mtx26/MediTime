@@ -1,6 +1,6 @@
 // App.js
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import Navbar from './components/common/Header';
 import Footer from './components/common/Footer';
 import AppRoutes from './routes/AppRouter';
@@ -11,6 +11,7 @@ import RealtimeManager from './components/realtime/RealtimeManager';
 import { getToken } from './services/supabase/tokenUtils';
 import { performApiCall } from './services/api/apiUtils';
 import { useTranslation } from 'react-i18next';
+import Seo from './seo/Seo';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -25,6 +26,7 @@ const fileToBase64 = (file) =>
 function App() {
   const { t, i18n } = useTranslation();
   const { lng } = useParams();
+  const location = useLocation();
   const [tokensList, setTokensList] = useState([]);
   const [calendarsData, setCalendarsData] = useState(null);
   const [notificationsData, setNotificationsData] = useState(null);
@@ -838,8 +840,13 @@ function App() {
     document.documentElement.setAttribute('lang', lng);
   }, [lng, i18n]);
 
+  const path = location.pathname.startsWith(`/${lng}`)
+    ? location.pathname.slice(lng.length + 1) || '/home'
+    : location.pathname;
+
   return (
     <div className="d-flex flex-column min-vh-100">
+      <Seo title={t('app.title')} description={t('app.subtitle')} path={path} />
       <Navbar sharedProps={sharedProps} />
       <main className="flex-grow-1 d-flex flex-column pb-5 pb-lg-0">
         {userInfo && (
