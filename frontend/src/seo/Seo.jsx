@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LANGUAGES, getLocale, DEFAULT_LANG } from '../config/languages';
+import { LANGUAGES, DEFAULT_LANG } from '../config/languages';
 
 
 const VITE_URL = import.meta.env.VITE_VITE_URL;
@@ -42,10 +42,10 @@ function Seo({ title, description, path }) {
       href: `${VITE_URL}/${DEFAULT_LANG}${path}`,
     });
 
-    upsertTag('meta', 'property', 'og:locale', { content: getLocale(lng) });
+    upsertTag('meta', 'property', 'og:locale', { content: lng });
     LANGUAGES.filter((lang) => lang.code !== lng).forEach((lang) => {
       upsertTag('meta', 'property', 'og:locale:alternate', {
-        content: lang.locale,
+        content: lang.code,
       });
     });
     upsertTag('meta', 'property', 'og:site_name', { content: 'MediTime' });
