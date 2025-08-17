@@ -6,6 +6,13 @@
     <loc>https://meditime-app.com/fr/home</loc>
     <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/home" />
     <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/home" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://meditime-app.com/es/home" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://meditime-app.com/de/home" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://meditime-app.com/it/home" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://meditime-app.com/ja/home" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://meditime-app.com/zh/home" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://meditime-app.com/pt/home" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://meditime-app.com/ru/home" />
     <priority>1.0</priority>
   </url>
 
@@ -13,6 +20,13 @@
     <loc>https://meditime-app.com/fr/login</loc>
     <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/login" />
     <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/login" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://meditime-app.com/es/login" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://meditime-app.com/de/login" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://meditime-app.com/it/login" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://meditime-app.com/ja/login" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://meditime-app.com/zh/login" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://meditime-app.com/pt/login" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://meditime-app.com/ru/login" />
     <priority>0.8</priority>
   </url>
 
@@ -20,6 +34,13 @@
     <loc>https://meditime-app.com/fr/register</loc>
     <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/register" />
     <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/register" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://meditime-app.com/es/register" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://meditime-app.com/de/register" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://meditime-app.com/it/register" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://meditime-app.com/ja/register" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://meditime-app.com/zh/register" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://meditime-app.com/pt/register" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://meditime-app.com/ru/register" />
     <priority>0.8</priority>
   </url>
 
@@ -27,6 +48,13 @@
     <loc>https://meditime-app.com/fr/reset-password</loc>
     <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/reset-password" />
     <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/reset-password" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://meditime-app.com/es/reset-password" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://meditime-app.com/de/reset-password" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://meditime-app.com/it/reset-password" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://meditime-app.com/ja/reset-password" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://meditime-app.com/zh/reset-password" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://meditime-app.com/pt/reset-password" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://meditime-app.com/ru/reset-password" />
     <priority>0.5</priority>
   </url>
 
@@ -34,6 +62,13 @@
     <loc>https://meditime-app.com/fr/reset-password-confirm</loc>
     <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/reset-password-confirm" />
     <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/reset-password-confirm" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://meditime-app.com/es/reset-password-confirm" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://meditime-app.com/de/reset-password-confirm" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://meditime-app.com/it/reset-password-confirm" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://meditime-app.com/ja/reset-password-confirm" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://meditime-app.com/zh/reset-password-confirm" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://meditime-app.com/pt/reset-password-confirm" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://meditime-app.com/ru/reset-password-confirm" />
     <priority>0.5</priority>
   </url>
 
@@ -41,6 +76,13 @@
     <loc>https://meditime-app.com/fr/verify-email</loc>
     <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/verify-email" />
     <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/verify-email" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://meditime-app.com/es/verify-email" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://meditime-app.com/de/verify-email" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://meditime-app.com/it/verify-email" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://meditime-app.com/ja/verify-email" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://meditime-app.com/zh/verify-email" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://meditime-app.com/pt/verify-email" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://meditime-app.com/ru/verify-email" />
     <priority>0.5</priority>
   </url>
 
