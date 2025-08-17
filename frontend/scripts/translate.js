@@ -100,135 +100,154 @@ async function translateObject(obj, targetLang) {
 // 🚀 Traitement principal
 (async () => {
   const source = loadJSON(sourceFile);
-
   for (const lang of LANGUAGES) {
-    const { code, locale } = lang;
-    if (code === 'fr') continue;
-
-    const outputFile = path.join(outputBase, code, 'translation.json');
-    let target = fs.existsSync(outputFile) ? loadJSON(outputFile) : {};
-
-    if (checkOnly) {
-      const missing = findMissingKeys(source, target);
-      if (missing.length > 0) {
-        console.log(`⛔ Clés manquantes pour ${code} (${locale}):`);
-        missing.forEach(k => console.log(`  - ${k}`));
-      } else {
-        console.log(`✅ ${code} : toutes les clés sont présentes.`);
-      }
-      continue;
-    }
-
-    if (localOnly) {
-      target.locale = locale;
-      saveJSON(outputFile, target);
-      console.log(`🔁 ${code} : locale mis à jour en "${locale}"`);
-      continue;
-    }
-
-    if (args.includes('--fill-missing')) {
-      const missing = findMissingKeys(source, target);
-      if (missing.length === 0) {
-        console.log(`✅ ${code} : aucune clé manquante.`);
-        continue;
-      }
-
-      console.log(`🧩 Remplissage des clés manquantes pour ${code}...`);
-      for (const fullKey of missing) {
-        const keys = fullKey.split('.');
-        let value = keys.reduce((obj, key) => obj?.[key], source);
-
-        if (value === undefined || value === null) {
-          console.warn(`⚠️  Clé introuvable dans fr: "${fullKey}"`);
-          continue;
-        }
-
-        // Cas : objet avec une seule clé string → traduit directement
-        if (
-          typeof value === 'object' &&
-          value !== null &&
-          Object.keys(value).length === 1 &&
-          typeof Object.values(value)[0] === 'string'
-        ) {
-          const onlyKey = Object.keys(value)[0];
-          const onlyVal = value[onlyKey];
-
-          try {
-            const [translated] = await translate.translate(onlyVal, code);
-            let ref = target;
-            while (keys.length > 1) {
-              const k = keys.shift();
-              ref[k] = ref[k] || {};
-              ref = ref[k];
-            }
-            ref[keys[0]] = { [onlyKey]: translated };
-            console.log(`✅ ${code} : "${fullKey}.${onlyKey}" → "${translated}"`);
-          } catch (e) {
-            console.error(`❌ Erreur de traduction pour ${fullKey}.${onlyKey} (${code}) : ${e.message}`);
-          }
-          continue;
-        }
-
-        // Cas : chaîne simple → traduit normalement
-        if (typeof value === 'string') {
-          try {
-            const protectedValue = protectPlaceholders(value);
-            const [translatedRaw] = await translate.translate(protectedValue, code);
-            const translated = restorePlaceholders(translatedRaw);
-            console.log(`✅ "${value}" → "${protectedValue}" → "${translated}"`);
-            
-            let ref = target;
-            while (keys.length > 1) {
-              const k = keys.shift();
-              ref[k] = ref[k] || {};
-              ref = ref[k];
-            }
-            ref[keys[0]] = translated;
-            console.log(`✅ ${code} : "${fullKey}" → "${translated}"`);
-          } catch (e) {
-            console.error(`❌ Erreur de traduction pour ${fullKey} (${code}) : ${e.message}`);
-          }
-          continue;
-        }
-
-        // Cas : objet complexe → traduction récursive
-        if (typeof value === 'object') {
-          try {
-            const translatedSubtree = await translateObject(value, code);
-            let ref = target;
-            while (keys.length > 1) {
-              const k = keys.shift();
-              ref[k] = ref[k] || {};
-              ref = ref[k];
-            }
-            ref[keys[0]] = translatedSubtree;
-            console.log(`✅ ${code} : "${fullKey}" → (sous-clés traduites)`);
-          } catch (e) {
-            console.error(`❌ Erreur de traduction récursive pour ${fullKey} (${code}) : ${e.message}`);
-          }
-          continue;
-        }
-
-        console.warn(`⚠️  Clé ignorée (type non pris en charge): "${fullKey}"`);
-      }
-
-      target.locale = locale;
-      saveJSON(outputFile, target);
-      console.log(`✅ ${code} : clés manquantes ajoutées.`);
-      continue;
-    }
-
-    if (!forceTranslate && fs.existsSync(outputFile)) {
-      console.log(`⏩ ${code} : fichier existant. Utilise --force ou --fill-missing.`);
-      continue;
-    }
-
-    console.log(`🌐 Traduction de 'fr' → '${code}'...`);
-    const translated = await translateObject(source, code);
-    translated.locale = locale;
-    saveJSON(outputFile, translated);
-    console.log(`✅ ${code} : traduction complète enregistrée.`);
+    await processLanguage(lang, source);
   }
-
   console.log('✨ Script terminé.');
 })();
+
+async function processLanguage(lang, source) {
+  const { code, locale } = lang;
+  if (code === 'fr') return;
+
+  const outputFile = path.join(outputBase, code, 'translation.json');
+  const target = fs.existsSync(outputFile) ? loadJSON(outputFile) : {};
+
+  if (checkOnly) return logMissing(source, target, code, locale);
+  if (localOnly) return updateLocale(target, outputFile, code, locale);
+  if (args.includes('--fill-missing'))
+    return await fillMissing(source, target, code, locale, outputFile);
+  if (!forceTranslate && fs.existsSync(outputFile)) {
+    console.log(`⏩ ${code} : fichier existant. Utilise --force ou --fill-missing.`);
+    return;
+  }
+  await translateAndSave(source, code, locale, outputFile);
+}
+
+function logMissing(source, target, code, locale) {
+  const missing = findMissingKeys(source, target);
+  if (missing.length > 0) {
+    console.log(`⛔ Clés manquantes pour ${code} (${locale}):`);
+    missing.forEach((k) => console.log(`  - ${k}`));
+  } else {
+    console.log(`✅ ${code} : toutes les clés sont présentes.`);
+  }
+}
+
+function updateLocale(target, outputFile, code, locale) {
+  target.locale = locale;
+  saveJSON(outputFile, target);
+  console.log(`🔁 ${code} : locale mis à jour en "${locale}"`);
+}
+
+async function fillMissing(source, target, code, locale, outputFile) {
+  const missing = findMissingKeys(source, target);
+  if (missing.length === 0) {
+    console.log(`✅ ${code} : aucune clé manquante.`);
+    return;
+  }
+
+  console.log(`🧩 Remplissage des clés manquantes pour ${code}...`);
+  for (const fullKey of missing) {
+    await translateMissingKey(fullKey, source, target, code);
+  }
+
+  target.locale = locale;
+  saveJSON(outputFile, target);
+  console.log(`✅ ${code} : clés manquantes ajoutées.`);
+}
+
+async function translateMissingKey(fullKey, source, target, code) {
+  const keys = fullKey.split('.');
+  const value = keys.reduce((obj, key) => obj?.[key], source);
+  if (value === undefined || value === null) {
+    console.warn(`⚠️  Clé introuvable dans fr: "${fullKey}"`);
+    return;
+  }
+  if (isSingleStringObject(value)) {
+    await translateSingleStringObject(value, keys, target, code, fullKey);
+    return;
+  }
+  if (typeof value === 'string') {
+    await translateSimpleString(value, keys, target, code, fullKey);
+    return;
+  }
+  if (typeof value === 'object') {
+    await translateComplexObject(value, keys, target, code, fullKey);
+    return;
+  }
+  console.warn(`⚠️  Clé ignorée (type non pris en charge): "${fullKey}"`);
+}
+
+function isSingleStringObject(value) {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    Object.keys(value).length === 1 &&
+    typeof Object.values(value)[0] === 'string'
+  );
+}
+
+async function translateSingleStringObject(value, keys, target, code, fullKey) {
+  const onlyKey = Object.keys(value)[0];
+  const onlyVal = value[onlyKey];
+  try {
+    const [translated] = await translate.translate(onlyVal, code);
+    let ref = target;
+    while (keys.length > 1) {
+      const k = keys.shift();
+      ref[k] = ref[k] || {};
+      ref = ref[k];
+    }
+    ref[keys[0]] = { [onlyKey]: translated };
+    console.log(`✅ ${code} : "${fullKey}.${onlyKey}" → "${translated}"`);
+  } catch (e) {
+    console.error(
+      `❌ Erreur de traduction pour ${fullKey}.${onlyKey} (${code}) : ${e.message}`
+    );
+  }
+}
+
+async function translateSimpleString(value, keys, target, code, fullKey) {
+  try {
+    const protectedValue = protectPlaceholders(value);
+    const [translatedRaw] = await translate.translate(protectedValue, code);
+    const translated = restorePlaceholders(translatedRaw);
+    let ref = target;
+    while (keys.length > 1) {
+      const k = keys.shift();
+      ref[k] = ref[k] || {};
+      ref = ref[k];
+    }
+    ref[keys[0]] = translated;
+    console.log(`✅ ${code} : "${fullKey}" → "${translated}"`);
+  } catch (e) {
+    console.error(`❌ Erreur de traduction pour ${fullKey} (${code}) : ${e.message}`);
+  }
+}
+
+async function translateComplexObject(value, keys, target, code, fullKey) {
+  try {
+    const translatedSubtree = await translateObject(value, code);
+    let ref = target;
+    while (keys.length > 1) {
+      const k = keys.shift();
+      ref[k] = ref[k] || {};
+      ref = ref[k];
+    }
+    ref[keys[0]] = translatedSubtree;
+    console.log(`✅ ${code} : "${fullKey}" → (sous-clés traduites)`);
+  } catch (e) {
+    console.error(
+      `❌ Erreur de traduction récursive pour ${fullKey} (${code}) : ${e.message}`
+    );
+  }
+}
+
+async function translateAndSave(source, code, locale, outputFile) {
+  console.log(`🌐 Traduction de 'fr' → '${code}'...`);
+  const translated = await translateObject(source, code);
+  translated.locale = locale;
+  saveJSON(outputFile, translated);
+  console.log(`✅ ${code} : traduction complète enregistrée.`);
+}

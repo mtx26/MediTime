@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef } from 'react';
+import React, { useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { handleLogout } from '../../services/auth/authService';
@@ -9,53 +9,63 @@ import PropTypes from 'prop-types';
 import LanguageSelector from './LanguageSelector.jsx';
 import { useTranslation } from 'react-i18next';
 
+function buildLocationList(pathWithSlash) {
+  return {
+    calendar: pathWithSlash.startsWith('/calendar/'),
+    sharedUserCalendar: pathWithSlash.startsWith('/shared-user-calendar/'),
+    tokenCalendar: pathWithSlash.startsWith('/shared-token-calendar/'),
+  };
+}
+
+function buildReturnToCalendarList(pathParts) {
+  return {
+    calendar: pathParts.length === 2 && pathParts[0] === 'calendar',
+    sharedUserCalendar:
+      pathParts.length === 2 && pathParts[0] === 'shared-user-calendar',
+  };
+}
+
+function buildReturnToCalendar(pathParts) {
+  const isDetailPage =
+    pathParts.length === 3 &&
+    ['medicines', 'boxes', 'pillbox', 'settings', 'stock-alerts'].includes(
+      pathParts[2]
+    );
+  return {
+    calendar: pathParts[0] === 'calendar' && isDetailPage,
+    sharedUserCalendar:
+      pathParts[0] === 'shared-user-calendar' && isDetailPage,
+    tokenCalendar: pathParts.length === 3 && pathParts[0] === 'shared-token-calendar',
+  };
+}
+
+const isPillbox = (pathParts) =>
+  pathParts.length === 3 &&
+  ['calendar', 'shared-user-calendar', 'shared-token-calendar'].includes(
+    pathParts[0]
+  ) &&
+  pathParts[2] === 'pillbox';
+
 function Navbar({ sharedProps }) {
   const { userInfo } = useContext(UserContext);
   const navigate = useNavigate();
   const location = useLocation();
   const { lng } = useParams();
-  const { t } = useTranslation();
-  const [calendarInfo, setCalendarInfo] = useState(null);
-  const [basePath, setBasePath] = useState(null);
-  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const notifRef = useRef();
-  const userRef = useRef();
-  const [tokenId, setTokenId] = useState(null);
-  const pathAfterLang = location.pathname.split('/').slice(2).join('/');
-  const pathWithSlash = '/' + pathAfterLang;
-  const locationList = {
-    calendar: pathWithSlash.startsWith('/calendar/'),
-    sharedUserCalendar: pathWithSlash.startsWith('/shared-user-calendar/'),
-    tokenCalendar: pathWithSlash.startsWith('/shared-token-calendar/'),
-  };
-
-  const pathParts = pathAfterLang.split('/').filter(Boolean);
-
-  const locationAvailableForReturnToCalendarList = {
-    calendar: 
-      pathParts.length === 2 && pathParts[0] === 'calendar',
-    sharedUserCalendar:
-      pathParts.length === 2 && pathParts[0] === 'shared-user-calendar',
-  };
-
-  const locationAvailableForReturnToCalendar = {
-    calendar:
-      pathParts.length === 3 &&
-      pathParts[0] === 'calendar' &&
-      (pathParts[2] === 'medicines' || pathParts[2] === 'boxes' || pathParts[2] === 'pillbox' || pathParts[2] === 'settings' || pathParts[2] === 'stock-alerts'),
-    sharedUserCalendar:
-      pathParts.length === 3 &&
-      pathParts[0] === 'shared-user-calendar' &&
-      (pathParts[2] === 'medicines' || pathParts[2] === 'boxes' || pathParts[2] === 'pillbox' || pathParts[2] === 'settings' || pathParts[2] === 'stock-alerts'),
-    tokenCalendar:
-      pathParts.length === 3 && pathParts[0] === 'shared-token-calendar',
-  };
-
-  const isPillboxPage =
-    pathParts.length === 3 &&
-    ['calendar', 'shared-user-calendar', 'shared-token-calendar'].includes(pathParts[0]) &&
-    pathParts[2] === 'pillbox';
+    const { t } = useTranslation();
+    const [calendarInfo, setCalendarInfo] = useState(null);
+    const [basePath, setBasePath] = useState(null);
+    const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+    const [showUserDropdown, setShowUserDropdown] = useState(false);
+    const notifRef = useRef();
+    const userRef = useRef();
+    const [tokenId, setTokenId] = useState(null);
+    const pathAfterLang = location.pathname.split('/').slice(2).join('/');
+    const pathWithSlash = '/' + pathAfterLang;
+    const pathParts = pathAfterLang.split('/').filter(Boolean);
+    const locationList = buildLocationList(pathWithSlash);
+    const locationAvailableForReturnToCalendarList = buildReturnToCalendarList(pathParts);
+    const locationAvailableForReturnToCalendar = buildReturnToCalendar(pathParts);
+    const isPillboxPage = isPillbox(pathParts);
 
   useEffect(() => {
     if (locationList.calendar && sharedProps.personalCalendars.calendarsData) {
@@ -89,18 +99,19 @@ function Navbar({ sharedProps }) {
     sharedProps.sharedUserCalendars.sharedCalendarsData,
   ]);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
+    const handleClickOutside = useCallback((e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) {
         setShowNotifDropdown(false);
       }
       if (userRef.current && !userRef.current.contains(e.target)) {
         setShowUserDropdown(false);
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    }, []);
+
+    useEffect(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [handleClickOutside]);
 
   const { notificationsData, readNotification } = sharedProps.notifications;
 

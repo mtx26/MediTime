@@ -15,6 +15,14 @@ import { getLocale } from './config/languages';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+const fileToBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
 function App() {
   const { t, i18n } = useTranslation();
   const { lng } = useParams();
@@ -651,25 +659,19 @@ function App() {
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  const analyzeImage = useCallback(async (file) => {
-    const fileToBase64 = (file) => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(',')[1]); // on retire le préfixe data:
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-    const base64 = await fileToBase64(file);
+    const analyzeImage = useCallback(async (file) => {
+      const base64 = await fileToBase64(file);
 
-    return await performApiCall({
-      url: `${API_URL}/api/documents/analyze`,
-      method: 'POST',
-      body: { image: base64 },
-      origin: 'DOCUMENT_ANALYZE',
-      uid,
-      analyticsEvent: 'DOCUMENT_ANALYZE',
-      analyticsData: { uid },
-    });
-  }, []);
+      return await performApiCall({
+        url: `${API_URL}/api/documents/analyze`,
+        method: 'POST',
+        body: { image: base64 },
+        origin: 'DOCUMENT_ANALYZE',
+        uid,
+        analyticsEvent: 'DOCUMENT_ANALYZE',
+        analyticsData: { uid },
+      });
+    }, []);
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
