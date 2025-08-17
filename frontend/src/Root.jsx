@@ -13,7 +13,11 @@ import { enabledLanguageCodes, LANGUAGES } from './config/languages';
 function LanguageRoutes() {
   const location = useLocation();
   const { i18n } = useTranslation();
-  const defaultLang = i18n.language || LANGUAGES[0].code;
+  const rawLang = i18n.language || LANGUAGES[0].code;
+  const normalizedLang = rawLang.split('-')[0];
+  const defaultLang = enabledLanguageCodes.includes(normalizedLang)
+    ? normalizedLang
+    : LANGUAGES[0].code;
   const pathParts = location.pathname.split('/');
   const currentLang = pathParts[1];
 
