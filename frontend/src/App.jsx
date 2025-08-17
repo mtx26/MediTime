@@ -11,7 +11,6 @@ import RealtimeManager from './components/realtime/RealtimeManager';
 import { getToken } from './services/supabase/tokenUtils';
 import { performApiCall } from './services/api/apiUtils';
 import { useTranslation } from 'react-i18next';
-import { getLocale } from './config/languages';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -836,7 +835,7 @@ function App() {
     if (lng && i18n.language !== lng) {
       i18n.changeLanguage(lng);
     }
-    document.documentElement.setAttribute('lang', getLocale(lng));
+    document.documentElement.setAttribute('lang', lng);
   }, [lng, i18n]);
 
   return (
