@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LANGUAGES } from '../config/languages';
+import { LANGUAGES, getLocale } from '../config/languages';
 
 const SITE_URL = import.meta.env.VITE_SITE_URL || 'https://meditime-app.com';
 
@@ -8,6 +8,10 @@ function Seo({ title, description, path }) {
   const { i18n } = useTranslation();
   const lng = i18n.language;
   const url = `${SITE_URL}/${lng}${path}`;
+
+  useEffect(() => {
+    document.documentElement.lang = lng;
+  }, [lng]);
   return (
     <>
       <title>{title}</title>
@@ -19,6 +23,14 @@ function Seo({ title, description, path }) {
           rel="alternate"
           hrefLang={lang.code}
           href={`${SITE_URL}/${lang.code}${path}`}
+        />
+      ))}
+      <meta property="og:locale" content={getLocale(lng)} />
+      {LANGUAGES.filter((lang) => lang.code !== lng).map((lang) => (
+        <meta
+          key={lang.code}
+          property="og:locale:alternate"
+          content={lang.locale}
         />
       ))}
       <meta property="og:title" content={title} />
