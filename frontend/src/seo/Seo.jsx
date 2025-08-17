@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LANGUAGES, getLocale } from '../config/languages';
+import { LANGUAGES, getLocale, DEFAULT_LANG } from '../config/languages';
+// Manual document metadata management
 
 const SITE_URL = import.meta.env.VITE_SITE_URL || 'https://meditime-app.com';
+const OG_IMAGE = `${SITE_URL}/icons/og-image.png`;
 
 function Seo({ title, description, path }) {
   const { i18n } = useTranslation();
@@ -11,37 +13,59 @@ function Seo({ title, description, path }) {
 
   useEffect(() => {
     document.documentElement.lang = lng;
-  }, [lng]);
-  return (
-    <>
-      <title>{title}</title>
-      <meta name="description" content={description} />
-      <link rel="canonical" href={url} />
-      {LANGUAGES.map((lang) => (
-        <link
-          key={lang.code}
-          rel="alternate"
-          hrefLang={lang.code}
-          href={`${SITE_URL}/${lang.code}${path}`}
-        />
-      ))}
-      <meta property="og:locale" content={getLocale(lng)} />
-      {LANGUAGES.filter((lang) => lang.code !== lng).map((lang) => (
-        <meta
-          key={lang.code}
-          property="og:locale:alternate"
-          content={lang.locale}
-        />
-      ))}
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:url" content={url} />
-      <meta property="og:type" content="website" />
-      <meta name="twitter:card" content="summary" />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-    </>
-  );
+    document.title = title;
+
+    const upsertTag = (tagName, keyAttr, key, attrs) => {
+      const selector = `${tagName}[${keyAttr}="${key}"]`;
+      let tag = document.head.querySelector(selector);
+      if (!tag) {
+        tag = document.createElement(tagName);
+        tag.setAttribute(keyAttr, key);
+        document.head.appendChild(tag);
+      }
+      Object.entries(attrs).forEach(([attr, value]) => {
+        tag.setAttribute(attr, value);
+      });
+    };
+
+    upsertTag('meta', 'name', 'description', { content: description });
+    upsertTag('meta', 'name', 'robots', { content: 'index,follow' });
+    upsertTag('link', 'rel', 'canonical', { href: url });
+
+    LANGUAGES.forEach((lang) => {
+      upsertTag('link', 'hreflang', lang.code, {
+        rel: 'alternate',
+        href: `${SITE_URL}/${lang.code}${path}`,
+      });
+    });
+    upsertTag('link', 'hreflang', 'x-default', {
+      rel: 'alternate',
+      href: `${SITE_URL}/${DEFAULT_LANG}${path}`,
+    });
+
+    upsertTag('meta', 'property', 'og:locale', { content: getLocale(lng) });
+    LANGUAGES.filter((lang) => lang.code !== lng).forEach((lang) => {
+      upsertTag('meta', 'property', 'og:locale:alternate', {
+        content: lang.locale,
+      });
+    });
+    upsertTag('meta', 'property', 'og:site_name', { content: 'MediTime' });
+    upsertTag('meta', 'property', 'og:title', { content: title });
+    upsertTag('meta', 'property', 'og:description', { content: description });
+    upsertTag('meta', 'property', 'og:url', { content: url });
+    upsertTag('meta', 'property', 'og:type', { content: 'website' });
+    upsertTag('meta', 'property', 'og:image', { content: OG_IMAGE });
+
+    upsertTag('meta', 'name', 'twitter:card', {
+      content: 'summary_large_image',
+    });
+    upsertTag('meta', 'name', 'twitter:title', { content: title });
+    upsertTag('meta', 'name', 'twitter:description', { content: description });
+    upsertTag('meta', 'name', 'twitter:image', { content: OG_IMAGE });
+    upsertTag('meta', 'name', 'twitter:site', { content: '@MediTime' });
+  }, [title, description, path, lng]);
+
+  return null;
 }
 
 export default Seo;

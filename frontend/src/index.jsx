@@ -9,5 +9,5 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <UserProvider>
     <Root />
-  </UserProvider>
+  </UserProvider>,
 );
