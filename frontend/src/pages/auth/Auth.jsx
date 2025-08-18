@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import {
   GoogleHandleLogin,
   registerWithEmail,
@@ -33,7 +33,6 @@ function Auth() {
   const [duration, setDuration] = useState(2000); // État pour la durée de l'alerte
 
   const location = useLocation();
-  const navigate = useNavigate();
   const { lng } = useParams();
   const [redirect, setRedirect] = useState();
   useEffect(() => {
@@ -62,11 +61,6 @@ function Auth() {
       origin: 'Auth.jsx',
       user: userInfo?.uid,
     });
-    if (redirect) {
-      navigate(redirect.startsWith('/') ? `/${lng}${redirect}` : redirect, {
-        replace: true,
-      });
-    }
   };
 
   const handleRegister = async () => {
