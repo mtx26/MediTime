@@ -2,7 +2,7 @@
 import { useEffect, useContext, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../services/supabase/supabaseClient';
-import { getGlobalReloadUser, UserContext } from '../../contexts/UserContext';
+import { UserContext } from '../../contexts/UserContext';
 import { log } from '../../utils/logger';
 import { useTranslation } from 'react-i18next';
 import { getValidRedirect } from '../../utils/redirect';
@@ -10,7 +10,6 @@ import { getValidRedirect } from '../../utils/redirect';
 const AuthCallback = () => {
   const navigate = useNavigate();
   const { lng } = useParams();
-  const reloadUser = getGlobalReloadUser();
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
 
@@ -31,7 +30,7 @@ const AuthCallback = () => {
     redirectMap.get(String(rawType)) || '/calendars';
 
 
-  // 1) Vérifie la session et lance le reloadUser
+  // 1) Vérifie la session
   useEffect(() => {
     const handleRedirect = async () => {
       const search = new URLSearchParams(window.location.search);
@@ -53,8 +52,6 @@ const AuthCallback = () => {
       }
 
       const user = session.user;
-      reloadUser();
-
       log.info(t('auth_callback.success'), {
         origin: 'CALLBACK_SUCCESS',
         uid: user.id,
@@ -64,7 +61,7 @@ const AuthCallback = () => {
     };
 
     handleRedirect();
-  }, [navigate, reloadUser, t]);
+  }, [navigate, t]);
 
   // 2) Redirige quand userInfo est dispo
   useEffect(() => {
