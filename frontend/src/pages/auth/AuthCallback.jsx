@@ -10,9 +10,9 @@ import { getValidRedirect } from '../../utils/redirect';
 const AuthCallback = () => {
   const navigate = useNavigate();
   const { lng } = useParams();
-  const reloadUser = getGlobalReloadUser();
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
+  const reloadUser = getGlobalReloadUser();
 
   // Pour stocker redirect et type entre les deux effets
   const redirectRef = useRef(null);
@@ -53,7 +53,7 @@ const AuthCallback = () => {
       }
 
       const user = session.user;
-      reloadUser();
+      reloadUser(session);
 
       log.info(t('auth_callback.success'), {
         origin: 'CALLBACK_SUCCESS',

@@ -19,14 +19,24 @@ export const UserProvider = ({ children }) => {
     });
   }, []);
 
-  const reloadUser = useCallback(async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+  const reloadUser = useCallback(async (currentSession) => {
+    let session = currentSession;
+    let user = currentSession?.user;
+
+    if (!session || !user) {
+      const {
+        data: { session: fetchedSession },
+      } = await supabase.auth.getSession();
+      const {
+        data: { user: fetchedUser },
+      } = await supabase.auth.getUser();
+      session = fetchedSession;
+      user = fetchedUser;
+    }
+
     if (!user || !session) return;
+
+    tokenRef.current = session.access_token;
 
     console.trace('[TRACE] reloadUser appelé');
 
@@ -106,10 +116,9 @@ export const UserProvider = ({ children }) => {
     const { data: listener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === 'TOKEN_REFRESHED' && session) {
-          if (tokenRef.current !== session.access_token) {
-            tokenRef.current = session.access_token;
+          if (tokenRef.current && tokenRef.current !== session.access_token) {
             log.info('[UserContext] Token mis à jour, appel reloadUser');
-            reloadUser();
+            reloadUser(session);
           }
         } else if (event === 'SIGNED_OUT') {
           setUserInfo(null);
