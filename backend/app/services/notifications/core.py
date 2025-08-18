@@ -177,7 +177,6 @@ def save_notifications(user_id: str, notification_type: str, items: List[Notific
                 title, body_html, _ = build_notification_text(notification_type, item)
                 content = {**item, "title": title, "body": body_html}
                 shared_calendar_id = item.get("shared_calendar_id") or None
-                print(shared_calendar_id)
                 cur.execute(
                     """
                     INSERT INTO notifications (
