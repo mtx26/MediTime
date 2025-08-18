@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import {
   GoogleHandleLogin,
   registerWithEmail,
@@ -33,8 +33,8 @@ function Auth() {
   const [duration, setDuration] = useState(2000); // État pour la durée de l'alerte
 
   const location = useLocation();
-  const navigate = useNavigate();
   const { lng } = useParams();
+  const navigate = useNavigate();
   const [redirect, setRedirect] = useState();
   useEffect(() => {
     const last = location.pathname.split('/').pop();
@@ -49,7 +49,7 @@ function Auth() {
   };
 
   const handleLogin = async () => {
-    const error = await loginWithEmail(email, password, redirect);
+    const error = await loginWithEmail(email, password);
     if (error) {
       setAlertMessage(
         '❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`)
@@ -62,11 +62,10 @@ function Auth() {
       origin: 'Auth.jsx',
       user: userInfo?.uid,
     });
-    if (redirect) {
-      navigate(redirect.startsWith('/') ? `/${lng}${redirect}` : redirect, {
-        replace: true,
-      });
-    }
+    const callbackUrl =
+      `/${lng}/auth/callback` +
+      (redirect ? `?redirect=${encodeURIComponent(redirect)}` : '');
+    navigate(callbackUrl, { replace: true });
   };
 
   const handleRegister = async () => {
