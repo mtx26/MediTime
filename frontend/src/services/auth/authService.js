@@ -220,7 +220,7 @@ export const registerWithEmail = async (email, password, name, redirect) => {
 /**
  * Connexion avec email et mot de passe
  */
-export const loginWithEmail = async (email, password, redirect) => {
+export const loginWithEmail = async (email, password) => {
   try {
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -234,7 +234,6 @@ export const loginWithEmail = async (email, password, redirect) => {
       return error;
     }
 
-    window.location.href = buildCallbackUrl(redirect);
     return null;
   } catch (error) {
     log.error('Erreur lors de la connexion avec email :', error.message, {

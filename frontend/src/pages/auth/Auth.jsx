@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import {
   GoogleHandleLogin,
   registerWithEmail,
@@ -34,6 +34,7 @@ function Auth() {
 
   const location = useLocation();
   const { lng } = useParams();
+  const navigate = useNavigate();
   const [redirect, setRedirect] = useState();
   useEffect(() => {
     const last = location.pathname.split('/').pop();
@@ -48,7 +49,7 @@ function Auth() {
   };
 
   const handleLogin = async () => {
-    const error = await loginWithEmail(email, password, redirect);
+    const error = await loginWithEmail(email, password);
     if (error) {
       setAlertMessage(
         '❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`)
@@ -61,6 +62,9 @@ function Auth() {
       origin: 'Auth.jsx',
       user: userInfo?.uid,
     });
+    navigate(
+      `/${lng}/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`
+    );
   };
 
   const handleRegister = async () => {
