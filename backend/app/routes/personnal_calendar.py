@@ -37,10 +37,10 @@ def handle_calendars():
                 calendars = cursor.fetchall()
 
                 if not calendars:
-                    return warning_response(
-                        message=ERROR_CALENDAR_NOT_FOUND, 
-                        code="CALENDAR_FETCH_ERROR", 
-                        status_code=404
+                    return success_response(
+                        message="calendriers récupérés",
+                        code="CALENDAR_FETCH_SUCCESS",
+                        data={"calendars": []},
                     )
 
                 for calendar in calendars:
@@ -48,8 +48,8 @@ def handle_calendars():
                     calendar["ifLowStock"] = check_if_stock_is_low(calendar["id"])
 
         return success_response(
-            message="calendriers récupérés", 
-            code="CALENDAR_FETCH_SUCCESS", 
+            message="calendriers récupérés",
+            code="CALENDAR_FETCH_SUCCESS",
             data={"calendars": calendars},
         )
     except Exception as e:
