@@ -105,7 +105,11 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'TOKEN_REFRESHED' && session) {
+        if (event === 'SIGNED_IN' && session) {
+          tokenRef.current = session.access_token;
+          log.info('[UserContext] Connexion détectée, appel reloadUser');
+          reloadUser();
+        } else if (event === 'TOKEN_REFRESHED' && session) {
           if (tokenRef.current !== session.access_token) {
             tokenRef.current = session.access_token;
             log.info('[UserContext] Token mis à jour, appel reloadUser');

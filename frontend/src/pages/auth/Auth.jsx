@@ -62,9 +62,16 @@ function Auth() {
       origin: 'Auth.jsx',
       user: userInfo?.uid,
     });
-    navigate(
-      `/${lng}/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`
-    );
+    if (redirect) {
+      navigate(
+        redirect.startsWith('/') ? `/${lng}${redirect}` : redirect,
+        {
+          replace: true,
+        }
+      );
+    } else {
+      navigate(`/${lng}/calendars`, { replace: true });
+    }
   };
 
   const handleRegister = async () => {
