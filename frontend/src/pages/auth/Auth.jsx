@@ -60,7 +60,7 @@ function Auth() {
     log.info('Connexion réussie', {
       id: 'LOGIN-SUCCESS',
       origin: 'Auth.jsx',
-      user: userInfo.uid,
+      user: userInfo?.uid,
     });
     if (redirect) {
       navigate(redirect.startsWith('/') ? `/${lng}${redirect}` : redirect, {
@@ -81,7 +81,7 @@ function Auth() {
     log.info('Inscription réussie', {
       id: 'REGISTER-SUCCESS',
       origin: 'Auth.jsx',
-      user: userInfo.uid,
+      user: userInfo?.uid,
     });
   };
 
