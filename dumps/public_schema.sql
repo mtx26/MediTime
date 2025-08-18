@@ -22,21 +22,6 @@ COMMENT ON SCHEMA "public" IS 'standard public schema';
 
 
 
-CREATE OR REPLACE FUNCTION "public"."set_redeemed_at"() RETURNS "trigger"
-    LANGUAGE "plpgsql"
-    AS $$
-BEGIN
-    IF NEW.redeemed_by IS NOT NULL AND OLD.redeemed_by IS NULL THEN
-        NEW.redeemed_at := now();
-    END IF;
-    RETURN NEW;
-END;
-$$;
-
-
-ALTER FUNCTION "public"."set_redeemed_at"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."touch_updated_at"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -286,10 +271,6 @@ CREATE UNIQUE INDEX "invitations_token_idx" ON "public"."invitations" USING "btr
 
 
 
-CREATE OR REPLACE TRIGGER "trg_set_redeemed_at" BEFORE UPDATE ON "public"."invitations" FOR EACH ROW EXECUTE FUNCTION "public"."set_redeemed_at"();
-
-
-
 CREATE OR REPLACE TRIGGER "trg_touch_updated_at_calendars" BEFORE UPDATE ON "public"."calendars" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
 
 
@@ -399,12 +380,6 @@ GRANT USAGE ON SCHEMA "public" TO "postgres";
 GRANT USAGE ON SCHEMA "public" TO "anon";
 GRANT USAGE ON SCHEMA "public" TO "authenticated";
 GRANT USAGE ON SCHEMA "public" TO "service_role";
-
-
-
-GRANT ALL ON FUNCTION "public"."set_redeemed_at"() TO "anon";
-GRANT ALL ON FUNCTION "public"."set_redeemed_at"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."set_redeemed_at"() TO "service_role";
 
 
 
