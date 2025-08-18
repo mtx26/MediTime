@@ -53,7 +53,7 @@ const AuthCallback = () => {
       }
 
       const user = session.user;
-      reloadUser();
+      reloadUser(session);
 
       log.info(t('auth_callback.success'), {
         origin: 'CALLBACK_SUCCESS',
