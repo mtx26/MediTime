@@ -330,30 +330,6 @@ export const loginWithMagicLink = async (email, redirect) => {
 };
 
 /**
- * Invitation d'un utilisateur par email
- */
-export const inviteUserByEmail = async (email) => {
-  try {
-    const { error } = await supabase.auth.admin.inviteUserByEmail(email, {
-      redirectTo: buildCallbackUrl(),
-    });
-    if (error) {
-      log.error("Erreur lors de l'invitation de l'utilisateur", error.message, {
-        origin: 'INVITE_USER_BY_EMAIL',
-        uid: null,
-      });
-      return error;
-    }
-    return null;
-  } catch (error) {
-    log.error("Erreur lors de l'invitation de l'utilisateur", error.message, {
-      origin: 'INVITE_USER_BY_EMAIL',
-      uid: null,
-    });
-  }
-};
-
-/**
  * Mise à jour de l'email utilisateur
  */
 export const updateUserEmail = async (newEmail) => {
