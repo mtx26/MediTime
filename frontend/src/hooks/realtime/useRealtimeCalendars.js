@@ -20,12 +20,13 @@ const fetchCalendars = async (uid, setCalendarsData, setLoadingStates) => {
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
+    if (!res.ok && res.status !== 404) throw new Error(data.error);
 
-    const sortedCalendars = data.calendars.sort((a, b) =>
+    const calendars = (data.calendars || []).sort((a, b) =>
       a.name.localeCompare(b.name)
     );
-    setCalendarsData(sortedCalendars);
+
+    setCalendarsData(calendars);
     setLoadingStates((prev) => ({ ...prev, calendars: false }));
 
     const [{ analyticsPromise }, { logEvent }] = await Promise.all([
@@ -36,7 +37,7 @@ const fetchCalendars = async (uid, setCalendarsData, setLoadingStates) => {
       if (analytics) {
         logEvent(analytics, 'fetch_calendars', {
           uid,
-          count: data.calendars?.length,
+          count: calendars.length,
         });
       }
     });
@@ -44,8 +45,10 @@ const fetchCalendars = async (uid, setCalendarsData, setLoadingStates) => {
     log.info(data.message, {
       origin: 'REALTIME_CALENDAR_FETCH',
       uid,
-      code: 'REALTIME_CALENDAR_FETCH_SUCCESS',
-      count: data.calendars?.length,
+      code: calendars.length
+        ? 'REALTIME_CALENDAR_FETCH_SUCCESS'
+        : 'REALTIME_CALENDAR_FETCH_EMPTY',
+      count: calendars.length,
     });
   } catch (err) {
     setLoadingStates((prev) => ({ ...prev, calendars: false }));
