@@ -1,10 +1,23 @@
-![Backend CI](https://github.com/mtx26/medic/actions/workflows/backend-ci.yml/badge.svg)
-![Frontend CI](https://github.com/mtx26/medic/actions/workflows/frontend-ci.yml/badge.svg)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mtx26_medic&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mtx26_medic)
-[![Backend Uptime](https://img.shields.io/uptimerobot/status/m800604412-b3dfcffa4d1ddbcda5043748?label=Backend%20Uptime)](https://stats.uptimerobot.com/grkagF4D8K)
-[![Frontend Uptime](https://img.shields.io/uptimerobot/status/m800604510-1a3da771d8926ec5f29f31c3?label=Frontend%20Uptime)](https://stats.uptimerobot.com/grkagF4D8K)
 
+<p align="center">
+  <img src="frontend/public/icons/logo.png" alt="MediTime logo" width="120" />
+</p>
 
+<h1 align="center">MediTime</h1>
+
+<p align="center">A modern web application for managing medication schedules.</p>
+
+<p align="center">
+  <a href="https://github.com/mtx26/medic/actions/workflows/backend-ci.yml"><img src="https://github.com/mtx26/medic/actions/workflows/backend-ci.yml/badge.svg" alt="Backend CI" /></a>
+  <a href="https://github.com/mtx26/medic/actions/workflows/frontend-ci.yml"><img src="https://github.com/mtx26/medic/actions/workflows/frontend-ci.yml/badge.svg" alt="Frontend CI" /></a>
+  <a href="https://sonarcloud.io/summary/new_code?id=mtx26_medic"><img src="https://sonarcloud.io/api/project_badges/measure?project=mtx26_medic&metric=alert_status" alt="Quality Gate Status" /></a>
+  <a href="https://stats.uptimerobot.com/grkagF4D8K"><img src="https://img.shields.io/uptimerobot/status/m800604412-b3dfcffa4d1ddbcda5043748?label=Backend%20Uptime" alt="Backend Uptime" /></a>
+  <a href="https://stats.uptimerobot.com/grkagF4D8K"><img src="https://img.shields.io/uptimerobot/status/m800604510-1a3da771d8926ec5f29f31c3?label=Frontend%20Uptime" alt="Frontend Uptime" /></a>
+  <img src="https://img.shields.io/github/last-commit/mtx26/medic" alt="Last Commit" />
+  <img src="https://img.shields.io/github/issues/mtx26/medic" alt="Open Issues" />
+  <img src="https://img.shields.io/github/stars/mtx26/medic?style=social" alt="GitHub stars" />
+  <img src="https://img.shields.io/badge/license-private-red" alt="License: Private" />
+</p>
 
 **MediTime** is a modern web application for managing medication schedules, built with **React** and **Flask**. Data is stored in **Supabase** and authentication relies on Supabase JWT tokens.
 
@@ -39,6 +52,13 @@ MediTime/
 
 ---
 
+## 📦 Prerequisites
+
+- [Node.js](https://nodejs.org/) 18+
+- [Python](https://www.python.org/) 3.11+
+
+---
+
 ## ⚙️ Quick Setup
 
 ```bash
@@ -57,17 +77,18 @@ npm run dev
 
 ---
 
-## 🧠 Technologies Used
+## 🛠️ Tech Stack
 
-* **Frontend**: React, Bootstrap, RSuite, FullCalendar, i18next
-* **Backend**: Flask with Supabase (PostgreSQL via psycopg2)
-* **Auth**: Supabase JWT (Firebase only for FCM push messages)
-* **Storage**: Cloudinary for uploads
-* **Messaging**: Twilio SMS, SMTP email, Firebase Cloud Messaging
-* **Scheduling**: `schedule` library for cron tasks
-* **Internationalization**: Google Cloud Translate script
-* **CI/CD**: GitHub Actions, SonarCloud, UptimeRobot
-* **Env Management**: python-dotenv / dotenv
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
+![Twilio](https://img.shields.io/badge/Twilio-F22F46?style=for-the-badge&logo=twilio&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
+![SonarCloud](https://img.shields.io/badge/SonarCloud-F3702A?style=for-the-badge&logo=sonarcloud&logoColor=white)
+![UptimeRobot](https://img.shields.io/badge/UptimeRobot-45C4B0?style=for-the-badge&logo=uptime-kuma&logoColor=white)
 
 ---
 
@@ -83,6 +104,12 @@ npm run dev
 * **schedule** – cron-style background tasks for stock management.
 
 The frontend currently supports the following languages: English, French, Spanish, German, Italian, Japanese, Chinese, Portuguese and Russian.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read the [CODE_OF_CONDUCT](./CODE_OF_CONDUCT.md) before submitting issues or pull requests.
 
 ---
 
