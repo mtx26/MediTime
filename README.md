@@ -20,7 +20,7 @@
 
 ## 🚀 Key Features
 
-* 🔐 Supabase Authentication (Google / Email)
+* 🔐 Supabase Authentication (Google, GitHub, Twitter, Facebook, Discord, Microsoft, Email)
 * 📅 Create and manage personal or shared calendars
 * 💊 Medication tracking: time, dose, frequency, alternation
 * 🔗 Share calendars via public links or with other authenticated users
@@ -29,7 +29,7 @@
 * 🔄 Real-time data updates via Supabase Realtime
 * 🌍 Multilingual interface powered by i18next
 * ⏰ Automatic stock checks via daily cron tasks
-* ☁️ Cloudinary uploads and SMTP notifications
+* ☁️ Cloudinary uploads and email notifications (Zoho Mail)
 * 📱 Responsive interface, mobile-optimized
 
 ---
@@ -42,6 +42,7 @@ MediTime/
 ├── backend/          # Flask API (auth, logic, Supabase access)
 ├── dumps/            # Database dumps
 ├── .github/          # GitHub Actions workflows (CI/CD)
+├── captain-definition # CapRover deployment config
 ├── launch.bat        # Local launch script (Windows)
 └── README.md         # This file
 ```
@@ -83,6 +84,18 @@ npm run dev
 ![Google Cloud](https://img.shields.io/badge/Google%20Cloud-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 ![UptimeRobot](https://img.shields.io/badge/UptimeRobot-45C4B0?style=for-the-badge&logo=uptime-kuma&logoColor=white)
+![CapRover](https://img.shields.io/badge/CapRover-1E90FF?style=for-the-badge&logo=caprover&logoColor=white)
+![Zoho](https://img.shields.io/badge/Zoho-DB2828?style=for-the-badge&logo=zoho&logoColor=white)
+
+---
+
+## 🔑 OAuth Providers
+
+![Google](https://img.shields.io/badge/Google-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
+![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)
+![Facebook](https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white)
+![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)
 
 ---
 
@@ -92,11 +105,19 @@ npm run dev
 * **Google Cloud Translate** – automatic generation of translation files.
 * **Google Cloud Console** – service configuration and management.
 * **Cloudinary** – storage of uploaded images.
-* **SMTP** – outgoing email notifications.
+* **Zoho Mail** – SMTP provider for outgoing notifications.
 * **UptimeRobot** – monitoring backend and frontend availability.
 * **schedule** – cron-style background tasks for stock management.
+* **CapRover** – self-hosted PaaS for deployment.
+* **Base de données des médicaments** – official Belgian medicines database for human use.
 
 The frontend currently supports the following languages: English, French, Spanish, German, Italian, Japanese, Chinese, Portuguese and Russian.
+
+---
+
+## ☁️ Deployment
+
+This project uses [CapRover](https://caprover.com/) for containerized hosting. The `captain-definition` file at the repository root describes how the application is built and deployed on the platform.
 
 ---
 
