@@ -1,9 +1,7 @@
 
 <p align="center">
-  <img src="frontend/public/icons/logo.png" alt="MediTime logo" width="120" />
+  <img src="frontend/public/icons/logo.png" alt="MediTime logo" width="300" />
 </p>
-
-<h1 align="center">MediTime</h1>
 
 <p align="center">A modern web application for managing medication schedules.</p>
 
