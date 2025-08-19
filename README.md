@@ -10,16 +10,13 @@
 <p align="center">
   <a href="https://github.com/mtx26/medic/actions/workflows/backend-ci.yml"><img src="https://github.com/mtx26/medic/actions/workflows/backend-ci.yml/badge.svg" alt="Backend CI" /></a>
   <a href="https://github.com/mtx26/medic/actions/workflows/frontend-ci.yml"><img src="https://github.com/mtx26/medic/actions/workflows/frontend-ci.yml/badge.svg" alt="Frontend CI" /></a>
-  <a href="https://sonarcloud.io/summary/new_code?id=mtx26_medic"><img src="https://sonarcloud.io/api/project_badges/measure?project=mtx26_medic&metric=alert_status" alt="Quality Gate Status" /></a>
   <a href="https://stats.uptimerobot.com/grkagF4D8K"><img src="https://img.shields.io/uptimerobot/status/m800604412-b3dfcffa4d1ddbcda5043748?label=Backend%20Uptime" alt="Backend Uptime" /></a>
   <a href="https://stats.uptimerobot.com/grkagF4D8K"><img src="https://img.shields.io/uptimerobot/status/m800604510-1a3da771d8926ec5f29f31c3?label=Frontend%20Uptime" alt="Frontend Uptime" /></a>
   <img src="https://img.shields.io/github/last-commit/mtx26/medic" alt="Last Commit" />
-  <img src="https://img.shields.io/github/issues/mtx26/medic" alt="Open Issues" />
-  <img src="https://img.shields.io/github/stars/mtx26/medic?style=social" alt="GitHub stars" />
   <img src="https://img.shields.io/badge/license-private-red" alt="License: Private" />
 </p>
 
-**MediTime** is a modern web application for managing medication schedules, built with **React** and **Flask**. Data is stored in **Supabase** and authentication relies on Supabase JWT tokens.
+**MediTime** is a modern web application for managing medication schedules, built with **React&nbsp;19** and **Flask**. Data is stored in **Supabase** and authentication relies on Supabase JWT tokens.
 
 ---
 
@@ -34,7 +31,7 @@
 * 🔄 Real-time data updates via Supabase Realtime
 * 🌍 Multilingual interface powered by i18next
 * ⏰ Automatic stock checks via daily cron tasks
-* ☁️ Cloudinary uploads and Twilio/SMTP notifications
+* ☁️ Cloudinary uploads and SMTP notifications
 * 📱 Responsive interface, mobile-optimized
 
 ---
@@ -43,8 +40,9 @@
 
 ```
 MediTime/
-├── frontend/         # React app (user interface)
+├── frontend/         # React 19 app (user interface)
 ├── backend/          # Flask API (auth, logic, Supabase access)
+├── dumps/            # Database dumps
 ├── .github/          # GitHub Actions workflows (CI/CD)
 ├── launch.bat        # Local launch script (Windows)
 └── README.md         # This file
@@ -84,10 +82,8 @@ npm run dev
 ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
-![Twilio](https://img.shields.io/badge/Twilio-F22F46?style=for-the-badge&logo=twilio&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Google Cloud](https://img.shields.io/badge/Google%20Cloud-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
-![SonarCloud](https://img.shields.io/badge/SonarCloud-F3702A?style=for-the-badge&logo=sonarcloud&logoColor=white)
 ![UptimeRobot](https://img.shields.io/badge/UptimeRobot-45C4B0?style=for-the-badge&logo=uptime-kuma&logoColor=white)
 
 ---
@@ -95,10 +91,9 @@ npm run dev
 ## 🌐 External Services & Integrations
 
 * **Supabase** – primary database and authentication provider.
-* **Firebase Cloud Messaging** – push notifications for web and mobile.
 * **Google Cloud Translate** – automatic generation of translation files.
+* **Google Cloud Console** – service configuration and management.
 * **Cloudinary** – storage of uploaded images.
-* **Twilio** – sending SMS notifications.
 * **SMTP** – outgoing email notifications.
 * **UptimeRobot** – monitoring backend and frontend availability.
 * **schedule** – cron-style background tasks for stock management.
