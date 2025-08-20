@@ -1,5 +1,6 @@
 {
   "schemaVersion": 2,
+  "githubRepo": "https://github.com/mtx26/medic",
   "dockerfileLines": [
     "FROM python:3.10",
     "WORKDIR /app",
