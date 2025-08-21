@@ -21,6 +21,8 @@ def import_afmps_to_bis(
     Nettoie accents, aligne colonnes, parse dates, retire les guillemets de code_fmd.
     """
 
+    print(f"Importing AFMPS data from {csv_path} into {table_name}...")
+
     # ---------- utils ----------
     def deaccent(s: str) -> str:
         return "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
@@ -154,13 +156,24 @@ def import_afmps_to_bis(
 
     with get_connection() as conn:
         with conn.cursor() as cur:
+            cur.execute(f"DELETE FROM {table_name};")
+            conn.commit()
+            
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            print("Deleted existing rows in the table.")
+            
             for start in range(0, total, chunk_size):
                 chunk = df_sql.iloc[start:start+chunk_size]
                 records = [row_to_tuple(r) for _, r in chunk.iterrows()]
                 if records:
                     execute_values(cur, insert_sql, records)
                     inserted += len(records)
+                
+                print(f"Inserted {inserted} rows so far...")
         conn.commit()
+
+    print(f"Importé {inserted} lignes sur {total} lues depuis {csv_path} dans {table_name}")
 
     return {
         "table": table_name,
