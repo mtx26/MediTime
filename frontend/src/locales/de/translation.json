@@ -102,7 +102,7 @@
     "intake_conditions": "Einnahmebedingungen",
     "name": "Name",
     "new_box": "Neue Box",
-    "qr_code_help_text": "",
+    "qr_code_help_text": "Der DataMatrix-Code befindet sich auf der Medikamentenverpackung in der Nähe des Barcodes. Es handelt sich um ein kleines schwarz-weißes Quadrat.",
     "remaining_qty": "Restmenge",
     "restock": "Auffüllen",
     "save": "Speichern",
@@ -148,7 +148,22 @@
     "today": "Heute",
     "week": "Woche",
     "weekly_help": "Klicken Sie auf einen Tag im Kalender, um die zugehörigen Medikamente in einem Fenster anzuzeigen.",
-    "weekly_view": "Kalender nach Woche"
+    "weekly_view": "Kalender nach Woche",
+    "add_with_qr": "Erstellen Sie einen Kalender durch Scannen von QR",
+    "calendar_name": "Kalendername",
+    "calendar_name_placeholder": "Geben Sie den Namen des Kalenders ein",
+    "scan_medicines": "Medikamente scannen",
+    "scan_medicines_description": "Scannen Sie die DataMatrix-Codes auf Ihren Medikamentenpackungen. Jedes gescannte Medikament wird automatisch Ihrem neuen Plan hinzugefügt.",
+    "creating_calendar": "Erstellung läuft ...",
+    "scanner_button_hint": "Verwenden Sie die Schaltfläche „Hinzufügen“ auf dem Scanner, um den Kalender zu erstellen",
+    "error_no_calendar_name": "Bitte geben Sie einen Kalendernamen ein",
+    "error_no_medicines": "Keine Medikamente gescannt",
+    "error_calendar_creation": "Fehler beim Erstellen des Kalenders",
+    "error_partial_success": "Kalender erstellt, aber {{count}} Medikamente konnten nicht hinzugefügt werden",
+    "scan_qr_option": "QR-Codes scannen",
+    "import_type_qr_description": "Scannen Sie die DataMatrix-Codes auf Ihren Medikamentenpackungen, um Ihren Zeitplan automatisch zu erstellen.",
+    "import_type_manual_description": "Erstellen Sie einen leeren Kalender und fügen Sie Medikamente manuell hinzu.",
+    "import_type_file_description": "Importieren Sie einen Kalender aus einer exportierten Datei."
   },
   "calendar_completed": "Kalender erfolgreich abgeschlossen!",
   "calendar_settings": {
@@ -627,5 +642,17 @@
     "desc": "Weil im Gesundheitswesen kein Raum für Improvisation ist. MediTime bietet Ihnen eine klare, intuitive und sichere Lösung für die tägliche Nachverfolgung Ihrer Behandlungen und der Ihrer Angehörigen.",
     "title": "Warum MediTime wählen?"
   },
-  "yes": "Ja"
+  "yes": "Ja",
+  "scanner": {
+    "title": "Scannen Sie einen QR-Code",
+    "close": "Schließen",
+    "searching": "Forschung...",
+    "camera_instruction": "Zeigen Sie auf den DataMatrix-Code",
+    "camera_error": "Zugriff auf die Kamera nicht möglich.",
+    "medicine_not_found": "Medikament nicht gefunden",
+    "quantity": "Menge: {{Menge}}",
+    "remove_from_list": "Aus der Liste entfernen",
+    "add": "Hinzufügen",
+    "cancel": "Stornieren"
+  }
 }

@@ -102,7 +102,7 @@
     "intake_conditions": "Conditions of taking",
     "name": "Name",
     "new_box": "New box",
-    "qr_code_help_text": "",
+    "qr_code_help_text": "The DataMatrix code is located on the medication packaging, near the barcode. It is a small black and white square.",
     "remaining_qty": "Remaining quantity",
     "restock": "Restocking",
     "save": "Save",
@@ -148,7 +148,22 @@
     "today": "Today",
     "week": "Week",
     "weekly_help": "Click on a day in the calendar to see the associated medications in a window.",
-    "weekly_view": "Calendar by week"
+    "weekly_view": "Calendar by week",
+    "add_with_qr": "Create a calendar by scanning QR",
+    "calendar_name": "Calendar Name",
+    "calendar_name_placeholder": "Enter the name of the calendar",
+    "scan_medicines": "Scan medications",
+    "scan_medicines_description": "Scan the DataMatrix codes on your medication boxes. Each scanned medication will be automatically added to your new schedule.",
+    "creating_calendar": "Creation in progress...",
+    "scanner_button_hint": "Use the scanner's \"Add\" button to create the calendar",
+    "error_no_calendar_name": "Please enter a calendar name",
+    "error_no_medicines": "No medication scanned",
+    "error_calendar_creation": "Error creating calendar",
+    "error_partial_success": "Calendar created but {{count}} medication(s) could not be added",
+    "scan_qr_option": "Scanner QR codes",
+    "import_type_qr_description": "Scan the DataMatrix codes on your medication boxes to automatically create your schedule.",
+    "import_type_manual_description": "Create an empty calendar and add medications manually.",
+    "import_type_file_description": "Import a calendar from an exported file."
   },
   "calendar_completed": "Calendar successfully completed!",
   "calendar_settings": {
@@ -627,5 +642,17 @@
     "desc": "Because healthcare doesn't leave room for improvisation. MediTime offers you a clear, intuitive, and secure solution for tracking your treatments and those of your loved ones, day after day.",
     "title": "Why choose MediTime?"
   },
-  "yes": "Yes"
+  "yes": "Yes",
+  "scanner": {
+    "title": "Scan a QR code",
+    "close": "Close",
+    "searching": "Research...",
+    "camera_instruction": "Point to the DataMatrix code",
+    "camera_error": "Unable to access the camera.",
+    "medicine_not_found": "Drug not found",
+    "quantity": "Quantity: {{quantity}}",
+    "remove_from_list": "Remove from list",
+    "add": "Add",
+    "cancel": "Cancel"
+  }
 }

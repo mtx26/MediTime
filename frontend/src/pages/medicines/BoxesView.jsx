@@ -31,6 +31,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const [modifyBoxCapacity, setModifyBoxCapacity] = useState({});
   const [showTooltip, setShowTooltip] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
+  const [singleScan, setSingleScan] = useState(false); // true pour update, false pour add
+  const [currentEditingBoxId, setCurrentEditingBoxId] = useState(null); // ID de la boîte en cours d'édition
   const [modifyBoxStockAlertThreshold, setModifyBoxStockAlertThreshold] =
     useState({});
   const [modifyBoxStockQuantity, setModifyBoxStockQuantity] = useState({});
@@ -105,10 +107,10 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     }
   };
 
-  // Ajouter tous les médicaments scannés
-  const addAllScannedMedicines = async (scannedMedicines) => {
+  // Ajouter des nouvelles boîtes (mode création)
+  const addScannedMedicines = async (scannedMedicines) => {
     if (!scannedMedicines || scannedMedicines.length === 0) {
-      setAlertMessage('⚠️ Aucun médicament à ajouter');
+      setAlertMessage('⚠️ Ajouter des médicaments');
       setAlertType('warning');
       return { success: false };
     }
@@ -144,18 +146,75 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
     // Message de résultat
     if (errorCount === 0) {
-      setAlertMessage(`✅ ${successCount} médicament(s) ajouté(s) avec succès`);
+      setAlertMessage(`✅ Ajouté`);
       setAlertType('success');
       return { success: true, successCount, errorCount };
     } else if (successCount === 0) {
-      setAlertMessage(`❌ Erreur lors de l'ajout des médicaments`);
+      setAlertMessage(`❌ Ajouter des médicaments`);
       setAlertType('danger');
       return { success: false, successCount, errorCount };
     } else {
-      setAlertMessage(`⚠️ ${successCount} médicament(s) ajouté(s), ${errorCount} erreur(s)`);
+      setAlertMessage(`⚠️ ${successCount} ajouté(s), ${errorCount} erreur(s)`);
       setAlertType('warning');
       return { success: true, successCount, errorCount }; // Partiel = succès
     }
+  };
+
+  // Mettre à jour une boîte existante (mode modification)
+  const updateScannedMedicine = async (scannedMedicines) => {
+    if (!scannedMedicines || scannedMedicines.length === 0 || !currentEditingBoxId) {
+      setAlertMessage('⚠️ Ajouter un médicament');
+      setAlertType('warning');
+      return { success: false };
+    }
+
+    const medicine = scannedMedicines[0]; // Prendre le premier médicament en mode single
+    try {
+      const box = {
+        name: medicine.medicine.name,
+        dose: medicine.dose,
+        box_capacity: medicine.conditionnement,
+        stock_alert_threshold: medicine.stockAlertThreshold,
+        stock_quantity: medicine.conditionnement,
+        conditions: [],
+      };
+      
+      const res = await calendarSource.updateBox(calendarId, currentEditingBoxId, box);
+      
+      // Fermer la modal et reset
+      setShowQRModal(false);
+      setCurrentEditingBoxId(null);
+      setSingleScan(false);
+      
+      if (res.success) {
+        setAlertMessage('✅ Ajouté');
+        setAlertType('success');
+        return { success: true, successCount: 1, errorCount: 0 };
+      } else {
+        setAlertMessage('❌ Ajouter un médicament');
+        setAlertType('danger');
+        return { success: false, successCount: 0, errorCount: 1 };
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour:', error);
+      setAlertMessage('❌ Ajouter un médicament');
+      setAlertType('danger');
+      return { success: false, successCount: 0, errorCount: 1 };
+    }
+  };
+
+  // Ouvrir le scanner en mode ajout (multiple médicaments)
+  const openAddMode = () => {
+    setSingleScan(false);
+    setCurrentEditingBoxId(null);
+    setShowQRModal(true);
+  };
+
+  // Ouvrir le scanner en mode modification (un seul médicament)
+  const openUpdateMode = (boxId) => {
+    setSingleScan(true);
+    setCurrentEditingBoxId(boxId);
+    setShowQRModal(true);
   };
 
   const deleteBox = async (boxId) => {
@@ -286,6 +345,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                     setBoxConditions={setBoxConditions}
                     setDose={setDose}
                     dose={dose}
+                    openUpdateMode={openUpdateMode}
                   />
                 </form>
               ) : (
@@ -311,6 +371,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                   setBoxConditions={setBoxConditions}
                   setDose={setDose}
                   dose={dose}
+                  openUpdateMode={openUpdateMode}
                 />
               )}
             </div>
@@ -334,7 +395,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
               </button>
               <button
                 type="button"
-                onClick={() => setShowQRModal(true)}
+                onClick={openAddMode}
                 className="btn p-0 border-0 bg-transparent text-start flex-fill"
                 style={{ cursor: 'pointer' }}
                 aria-label={t('boxes.add_with_qr')}
@@ -377,10 +438,15 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
       {/* Composant QRCodeScanner avec modal intégrée */}
       <QRCodeScanner
+        modal={true}
         show={showQRModal}
-        singleScan={false}
-        onAddAll={addAllScannedMedicines}
-        onClose={() => setShowQRModal(false)}
+        singleScan={singleScan}
+        onAddAll={singleScan ? updateScannedMedicine : addScannedMedicines}
+        onClose={() => {
+          setShowQRModal(false);
+          setCurrentEditingBoxId(null);
+          setSingleScan(false);
+        }}
       />
     </div>
   );
@@ -406,437 +472,436 @@ function BoxCard({
   setBoxConditions,
   setDose,
   dose,
+  openUpdateMode
 }) {
   const { t } = useTranslation();
-    const editable = selectedModifyBox === box.id;
-    const timeOfDayMap = {
-      morning: t('morning'),
-      noon: t('noon'),
-      evening: t('evening'),
-    };
 
-    const openNotice = (box_id) => {
-      const url = `${import.meta.env.VITE_API_URL}/api/proxy/pdf/${box_id}`;
-      window.open(url, '_blank');
-    };
+  const editable = selectedModifyBox === box.id;
+  const timeOfDayMap = {
+    morning: t('morning'),
+    noon: t('noon'),
+    evening: t('evening'),
+  };
 
-    const toggleDrop = () =>
-      setSelectedDropBox((prev) => ({ ...prev, [box.id]: !prev[box.id] }));
+  const openNotice = (box_id) => {
+    const url = `${import.meta.env.VITE_API_URL}/api/proxy/pdf/${box_id}`;
+    window.open(url, '_blank');
+  };
 
-    const borderClass = getBorderClass(box);
+  const toggleDrop = () =>
+    setSelectedDropBox((prev) => ({ ...prev, [box.id]: !prev[box.id] }));
 
-    return (
-      <div className={`card h-100 shadow border ${borderClass}`}>
-        <div className="card-body position-relative">
-        <div className="position-absolute top-0 end-0 m-2">
-          {(!selectedModifyBox || selectedModifyBox !== box.id) && (
-            <ActionSheet
-              buttonSize="sm"
-              actions={[
-                {
-                  label: (
-                    <>
-                      <i className="bi bi-qr-code-scan me-2" /> {t('boxes.scan_qr_code')}
-                    </>
-                  ),
-                  onClick: () => {
-                    // TODO: Implémenter le scanner QR code
-                    console.log('Scanner QR code pour la boîte:', box.id);
-                  },
-                },
-                { separator: true },
-                {
-                  label: (
-                    <>
-                      <i className="bi bi-pencil me-2" /> {t('boxes.edit')}
-                    </>
-                  ),
-                  onClick: () => setSelectedModifyBox(box.id),
-                },
-                {
-                  label: (
-                    <>
-                      <i className="bi bi-file-earmark-pdf me-2" /> {t('boxes.view_notice')}
-                    </>
-                  ),
-                  onClick: () => openNotice(box.id),
-                },
-                { separator: true },
-                {
-                  label: (
-                    <>
-                      <i className="bi bi-trash me-2" /> {t('boxes.delete')}
-                    </>
-                  ),
-                  onClick: () => deleteBox(box.id),
-                  danger: true,
-                },
-              ]}
-            />
-          )}
-        </div>
+  const borderClass = getBorderClass(box);
 
-        <h5 className="card-title fs-semibold mb-1">
-          {selectedModifyBox && selectedModifyBox === box.id ? (
-            <InputDropdown
-              name={modifyBoxName[box.id]}
-              dose={dose[box.id]}
-              onChangeName={(newName) =>
-                setModifyBoxName({ ...modifyBoxName, [box.id]: newName })
-              }
-              onChangeDose={(newDose) =>
-                setDose({ ...dose, [box.id]: newDose })
-              }
-              onChangeBoxCapacity={(newBoxCapacity) =>
-                setModifyBoxCapacity({
-                  ...modifyBoxCapacity,
-                  [box.id]: newBoxCapacity,
-                })
-              }
-              onChangeStockQuantity={(newStockQuantity) =>
-                setModifyBoxStockQuantity({
-                  ...modifyBoxStockQuantity,
-                  [box.id]: newStockQuantity,
-                })
-              }
-              fetchSuggestions={fetchSuggestions}
-            />
-          ) : (
-            modifyBoxName[box.id] +
-            (dose[box.id] > 0 ? ' (' + dose[box.id] + ' mg)' : '')
-          )}
-        </h5>
+  return (
+    <div className={`card h-100 shadow border ${borderClass}`}>
+      <div className="card-body position-relative">
+      <div className="position-absolute top-0 end-0 m-2">
+        {(!selectedModifyBox || selectedModifyBox !== box.id) && (
+          <ActionSheet
+            buttonSize="sm"
+            actions={[
+              {
+                label: (
+                  <>
+                    <i className="bi bi-qr-code-scan me-2" /> {t('boxes.scan_qr_code')}
+                  </>
+                ),
+                onClick: () => openUpdateMode(box.id),
+              },
+              { separator: true },
+              {
+                label: (
+                  <>
+                    <i className="bi bi-pencil me-2" /> {t('boxes.edit')}
+                  </>
+                ),
+                onClick: () => setSelectedModifyBox(box.id),
+              },
+              {
+                label: (
+                  <>
+                    <i className="bi bi-file-earmark-pdf me-2" /> {t('boxes.view_notice')}
+                  </>
+                ),
+                onClick: () => openNotice(box.id),
+              },
+              { separator: true },
+              {
+                label: (
+                  <>
+                    <i className="bi bi-trash me-2" /> {t('boxes.delete')}
+                  </>
+                ),
+                onClick: () => deleteBox(box.id),
+                danger: true,
+              },
+            ]}
+          />
+        )}
+      </div>
 
-        <div className="d-flex mb-2 gap-2">
-          <BoxField
-            type="number"
-            label={t('boxes.capacity')}
-            value={modifyBoxCapacity[box.id]}
-            editable={editable}
-            onChange={(e) =>
+      <h5 className="card-title fs-semibold mb-1">
+        {selectedModifyBox && selectedModifyBox === box.id ? (
+          <InputDropdown
+            name={modifyBoxName[box.id]}
+            dose={dose[box.id]}
+            onChangeName={(newName) =>
+              setModifyBoxName({ ...modifyBoxName, [box.id]: newName })
+            }
+            onChangeDose={(newDose) =>
+              setDose({ ...dose, [box.id]: newDose })
+            }
+            onChangeBoxCapacity={(newBoxCapacity) =>
               setModifyBoxCapacity({
                 ...modifyBoxCapacity,
-                [box.id]: e.target.value,
+                [box.id]: newBoxCapacity,
               })
             }
-          />
-          <BoxField
-            type="number"
-            label={t('boxes.alert_threshold')}
-            value={modifyBoxStockAlertThreshold[box.id]}
-            editable={editable}
-            onChange={(e) =>
-              setModifyBoxStockAlertThreshold({
-                ...modifyBoxStockAlertThreshold,
-                [box.id]: e.target.value,
-              })
-            }
-          />
-        </div>
-        <div className="d-flex mb-2 gap-2 align-items-center">
-          <BoxField
-            type="number"
-            label={t('boxes.remaining_qty')}
-            value={modifyBoxStockQuantity[box.id]}
-            editable={editable}
-            onChange={(e) =>
+            onChangeStockQuantity={(newStockQuantity) =>
               setModifyBoxStockQuantity({
                 ...modifyBoxStockQuantity,
-                [box.id]: e.target.value,
+                [box.id]: newStockQuantity,
               })
             }
+            fetchSuggestions={fetchSuggestions}
           />
-          {(!selectedModifyBox || selectedModifyBox !== box.id) && (
-            <>
-              <div className="w-50">
-                <button
-                  className="btn btn-outline-success"
-                  onClick={() => restockBox(box.id)}
-                  aria-label={t('boxes.restock')}
-                  title={t('boxes.restock')}
-                >
-                  <i className="bi bi-plus-circle"></i> {t('boxes.restock')}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-
-        {(!selectedModifyBox || selectedModifyBox !== box.id) && (
-          <div className="d-flex mb-2 align-items-center w-100 gap-2">
-            <StockBadge box={box} />
-            <ConditionUnlessBadge 
-              conditions={box.conditions} 
-              boxId={box.id} 
-              setSelectedDropBox={setSelectedDropBox}
-              setSelectedModifyBox={setSelectedModifyBox}
-            />
-          </div> 
+        ) : (
+          modifyBoxName[box.id] +
+          (dose[box.id] > 0 ? ' (' + dose[box.id] + ' mg)' : '')
         )}
+      </h5>
 
-        <div className="mt-4 mb-2">
-          <hr className="border-dark mb-0" />
-          <h5 className="w-100">
-            <button
-              className="btn w-100 text-start d-flex justify-content-between align-items-center border-0 bg-transparent px-0 pb-0 mb-0"
-              type="button"
-              title={t('boxes.intake_conditions')}
-              aria-label={t('boxes.intake_conditions')}
-                onClick={toggleDrop}
-            >
-              <span>{t('boxes.intake_conditions')}</span>
-              <i
-                className={`bi bi-chevron-${selectedDropBox[box.id] === true ? 'up' : 'down'}`}
-              ></i>
-            </button>
-          </h5>
-
-          {/* Condition de prise */}
-          {selectedDropBox[box.id] === true && (
-            <div className="mt-2">
-              {editable ? (
-                <>
-                  {Object.values(boxConditions[box.id] || {})
-                    .filter((condition) => condition !== undefined)
-                    .map((condition) => (
-                      <div key={condition.id}>
-                        <div className="mb-2 p-3 border rounded bg-light">
-                          <label htmlFor="tablet_count">
-                            {t('boxes.condition.tablet_count')}
-                          </label>
-                          <input
-                            type="number"
-                            className="form-control form-control-sm"
-                            defaultValue={condition.tablet_count}
-                            title={t('boxes.condition.tablet_count')}
-                            aria-label={t('boxes.condition.tablet_count')}
-                            min={0}
-                            step={0.25}
-                            onChange={(e) =>
-                              setBoxConditions((prev) => ({
-                                ...prev,
-                                [box.id]: {
-                                  ...prev[box.id],
-                                  [condition.id]: {
-                                    ...prev[box.id][condition.id],
-                                    tablet_count: e.target.value,
-                                  },
-                                },
-                              }))
-                            }
-                          />
-                          <label htmlFor="time_of_day">{t('boxes.condition.time_of_day')}</label>
-                          <select
-                            className="form-control form-control-sm"
-                            defaultValue={condition.time_of_day}
-                            title={t('boxes.condition.time_of_day')}
-                            aria-label={t('boxes.condition.time_of_day')}
-                            onChange={(e) =>
-                              setBoxConditions((prev) => ({
-                                ...prev,
-                                [box.id]: {
-                                  ...prev[box.id],
-                                  [condition.id]: {
-                                    ...prev[box.id][condition.id],
-                                    time_of_day: e.target.value,
-                                  },
-                                },
-                              }))
-                            }
-                          >
-                            <option value="morning">{t('morning')}</option>
-                            <option value="noon">{t('noon')}</option>
-                            <option value="evening">{t('evening')}</option>
-                          </select>
-                          <label htmlFor="interval_days">
-                            {t('boxes.condition.interval_days')}
-                          </label>
-                          <input
-                            type="number"
-                            className="form-control form-control-sm"
-                            defaultValue={condition.interval_days}
-                            title={t('boxes.condition.interval_days')}
-                            aria-label={t('boxes.condition.interval_days')}
-                            min={0}
-                            step={1}
-                            onChange={(e) =>
-                              setBoxConditions((prev) => ({
-                                ...prev,
-                                [box.id]: {
-                                  ...prev[box.id],
-                                  [condition.id]: {
-                                    ...prev[box.id][condition.id],
-                                    interval_days: e.target.value,
-                                  },
-                                },
-                              }))
-                            }
-                          />
-                          <label htmlFor="start_date">{t('boxes.condition.start_date')}</label>
-                          <input
-                            type="date"
-                            className="form-control form-control-sm"
-                            title={t('boxes.condition.start_date')}
-                            aria-label={t('boxes.condition.start_date')}
-                            disabled={condition.interval_days === 1}
-                            defaultValue={
-                              condition.start_date
-                                ? new Date(condition.start_date)
-                                    .toISOString()
-                                    .split('T')[0]
-                                : ''
-                            }
-                            onChange={(e) =>
-                              setBoxConditions((prev) => ({
-                                ...prev,
-                                [box.id]: {
-                                  ...prev[box.id],
-                                  [condition.id]: {
-                                    ...prev[box.id][condition.id],
-                                    start_date: e.target.value,
-                                  },
-                                },
-                              }))
-                            }
-                          />
-                          <button
-                            type="button"
-                            className="btn btn-danger btn-sm mt-2"
-                            onClick={() =>
-                              setBoxConditions((prev) => ({
-                                ...prev,
-                                [box.id]: {
-                                  ...prev[box.id],
-                                  [condition.id]: undefined,
-                                },
-                              }))
-                            }
-                            title={t('boxes.condition.delete')}
-                            aria-label={t('boxes.condition.delete')}
-                          >
-                            <i className="bi bi-trash"></i> {t('boxes.condition.delete')}
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-
-                  <button
-                    type="button"
-                    className="btn btn-outline-dark w-100"
-                    onClick={() => {
-                      const id = uuidv4();
-                      setBoxConditions((prev) => ({
-                        ...prev,
-                        [box.id]: {
-                          ...prev[box.id],
-                          [id]: {
-                            id,
-                            tablet_count: 1,
-                            interval_days: 1,
-                            start_date: null,
-                            time_of_day: 'morning',
-                          },
-                        },
-                      }));
-                      setSelectedModifyBox(box.id);
-                    }}
-                  >
-                  <i className="bi bi-plus-lg me-2"></i>
-                  {t('boxes.condition.add')}
-                  </button>
-                </>
-              ) : Object.values(box.conditions).filter(
-                  (condition) => condition !== undefined
-                ).length > 0 ? (
-                Object.values(box.conditions)
-                  .filter((condition) => condition !== undefined)
-                  .map((condition) => (
-                    <div
-                      className="mb-2 p-3 border rounded bg-light"
-                      key={condition.id}
-                    >
-                      <strong>
-                        {condition.tablet_count}{' '}
-                        {condition.tablet_count > 1 ? t('boxes.tablets') : t('boxes.tablet')}
-                      </strong>{' '}
-                      {t('boxes.every')} {' '}
-                      <strong>
-                        {condition.interval_days}{' '}
-                        {condition.interval_days > 1 ? t('boxes.days') : t('boxes.day')}
-                      </strong>{' '}
-                      {t('boxes.each')} {' '}
-                      <strong>{timeOfDayMap[condition.time_of_day]}</strong>
-                      <br />
-                      {condition.interval_days > 1 && (
-                        <small className="text-muted">
-                          {t('boxes.from')} {' '}
-                          {new Date(condition.start_date).toLocaleDateString()}
-                        </small>
-                      )}
-                    </div>
-                  ))
-              ) : (
-                <div className="border rounded bg-light d-flex justify-content-start align-items-center p-2 mb-2">
-                  <p className="text-muted mb-0">{t('boxes.condition.none')}</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {selectedModifyBox && selectedModifyBox === box.id && (
+      <div className="d-flex mb-2 gap-2">
+        <BoxField
+          type="number"
+          label={t('boxes.capacity')}
+          value={modifyBoxCapacity[box.id]}
+          editable={editable}
+          onChange={(e) =>
+            setModifyBoxCapacity({
+              ...modifyBoxCapacity,
+              [box.id]: e.target.value,
+            })
+          }
+        />
+        <BoxField
+          type="number"
+          label={t('boxes.alert_threshold')}
+          value={modifyBoxStockAlertThreshold[box.id]}
+          editable={editable}
+          onChange={(e) =>
+            setModifyBoxStockAlertThreshold({
+              ...modifyBoxStockAlertThreshold,
+              [box.id]: e.target.value,
+            })
+          }
+        />
+      </div>
+      <div className="d-flex mb-2 gap-2 align-items-center">
+        <BoxField
+          type="number"
+          label={t('boxes.remaining_qty')}
+          value={modifyBoxStockQuantity[box.id]}
+          editable={editable}
+          onChange={(e) =>
+            setModifyBoxStockQuantity({
+              ...modifyBoxStockQuantity,
+              [box.id]: e.target.value,
+            })
+          }
+        />
+        {(!selectedModifyBox || selectedModifyBox !== box.id) && (
           <>
-            <hr />
-            <div className="d-flex gap-2">
+            <div className="w-50">
               <button
-                type="submit"
-                className="btn btn-success btn-sm"
-                aria-label={t('boxes.save')}
-                title={t('boxes.save')}
+                className="btn btn-outline-success"
+                onClick={() => restockBox(box.id)}
+                aria-label={t('boxes.restock')}
+                title={t('boxes.restock')}
               >
-                <i className="bi bi-save"></i> {t('boxes.save')}
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => {
-                  setSelectedModifyBox(null);
-                  setModifyBoxName({ ...modifyBoxName, [box.id]: box.name });
-                  setModifyBoxCapacity({
-                    ...modifyBoxCapacity,
-                    [box.id]: box.box_capacity,
-                  });
-                  setModifyBoxStockAlertThreshold({
-                    ...modifyBoxStockAlertThreshold,
-                    [box.id]: box.stock_alert_threshold,
-                  });
-                  setModifyBoxStockQuantity({
-                    ...modifyBoxStockQuantity,
-                    [box.id]: box.stock_quantity,
-                  });
-                  setBoxConditions({
-                    ...boxConditions,
-                    [box.id]: box.conditions.reduce(
-                      (acc, condition) => ({
-                        ...acc,
-                        [condition.id]: condition,
-                      }),
-                      {}
-                    ),
-                  });
-                  setDose({ ...dose, [box.id]: box.dose });
-                }}
-                aria-label={t('boxes.cancel')}
-                title={t('boxes.cancel')}
-              >
-                <i className="bi bi-x"></i> {t('boxes.cancel')}
+                <i className="bi bi-plus-circle"></i> {t('boxes.restock')}
               </button>
             </div>
           </>
         )}
       </div>
+
+      {(!selectedModifyBox || selectedModifyBox !== box.id) && (
+        <div className="d-flex mb-2 align-items-center w-100 gap-2">
+          <StockBadge box={box} />
+          <ConditionUnlessBadge 
+            conditions={box.conditions} 
+            boxId={box.id} 
+            setSelectedDropBox={setSelectedDropBox}
+            setSelectedModifyBox={setSelectedModifyBox}
+          />
+        </div> 
+      )}
+
+      <div className="mt-4 mb-2">
+        <hr className="border-dark mb-0" />
+        <h5 className="w-100">
+          <button
+            className="btn w-100 text-start d-flex justify-content-between align-items-center border-0 bg-transparent px-0 pb-0 mb-0"
+            type="button"
+            title={t('boxes.intake_conditions')}
+            aria-label={t('boxes.intake_conditions')}
+              onClick={toggleDrop}
+          >
+            <span>{t('boxes.intake_conditions')}</span>
+            <i
+              className={`bi bi-chevron-${selectedDropBox[box.id] === true ? 'up' : 'down'}`}
+            ></i>
+          </button>
+        </h5>
+
+        {/* Condition de prise */}
+        {selectedDropBox[box.id] === true && (
+          <div className="mt-2">
+            {editable ? (
+              <>
+                {Object.values(boxConditions[box.id] || {})
+                  .filter((condition) => condition !== undefined)
+                  .map((condition) => (
+                    <div key={condition.id}>
+                      <div className="mb-2 p-3 border rounded bg-light">
+                        <label htmlFor="tablet_count">
+                          {t('boxes.condition.tablet_count')}
+                        </label>
+                        <input
+                          type="number"
+                          className="form-control form-control-sm"
+                          defaultValue={condition.tablet_count}
+                          title={t('boxes.condition.tablet_count')}
+                          aria-label={t('boxes.condition.tablet_count')}
+                          min={0}
+                          step={0.25}
+                          onChange={(e) =>
+                            setBoxConditions((prev) => ({
+                              ...prev,
+                              [box.id]: {
+                                ...prev[box.id],
+                                [condition.id]: {
+                                  ...prev[box.id][condition.id],
+                                  tablet_count: e.target.value,
+                                },
+                              },
+                            }))
+                          }
+                        />
+                        <label htmlFor="time_of_day">{t('boxes.condition.time_of_day')}</label>
+                        <select
+                          className="form-control form-control-sm"
+                          defaultValue={condition.time_of_day}
+                          title={t('boxes.condition.time_of_day')}
+                          aria-label={t('boxes.condition.time_of_day')}
+                          onChange={(e) =>
+                            setBoxConditions((prev) => ({
+                              ...prev,
+                              [box.id]: {
+                                ...prev[box.id],
+                                [condition.id]: {
+                                  ...prev[box.id][condition.id],
+                                  time_of_day: e.target.value,
+                                },
+                              },
+                            }))
+                          }
+                        >
+                          <option value="morning">{t('morning')}</option>
+                          <option value="noon">{t('noon')}</option>
+                          <option value="evening">{t('evening')}</option>
+                        </select>
+                        <label htmlFor="interval_days">
+                          {t('boxes.condition.interval_days')}
+                        </label>
+                        <input
+                          type="number"
+                          className="form-control form-control-sm"
+                          defaultValue={condition.interval_days}
+                          title={t('boxes.condition.interval_days')}
+                          aria-label={t('boxes.condition.interval_days')}
+                          min={0}
+                          step={1}
+                          onChange={(e) =>
+                            setBoxConditions((prev) => ({
+                              ...prev,
+                              [box.id]: {
+                                ...prev[box.id],
+                                [condition.id]: {
+                                  ...prev[box.id][condition.id],
+                                  interval_days: e.target.value,
+                                },
+                              },
+                            }))
+                          }
+                        />
+                        <label htmlFor="start_date">{t('boxes.condition.start_date')}</label>
+                        <input
+                          type="date"
+                          className="form-control form-control-sm"
+                          title={t('boxes.condition.start_date')}
+                          aria-label={t('boxes.condition.start_date')}
+                          disabled={condition.interval_days === 1}
+                          defaultValue={
+                            condition.start_date
+                              ? new Date(condition.start_date)
+                                  .toISOString()
+                                  .split('T')[0]
+                              : ''
+                          }
+                          onChange={(e) =>
+                            setBoxConditions((prev) => ({
+                              ...prev,
+                              [box.id]: {
+                                ...prev[box.id],
+                                [condition.id]: {
+                                  ...prev[box.id][condition.id],
+                                  start_date: e.target.value,
+                                },
+                              },
+                            }))
+                          }
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-danger btn-sm mt-2"
+                          onClick={() =>
+                            setBoxConditions((prev) => ({
+                              ...prev,
+                              [box.id]: {
+                                ...prev[box.id],
+                                [condition.id]: undefined,
+                              },
+                            }))
+                          }
+                          title={t('boxes.condition.delete')}
+                          aria-label={t('boxes.condition.delete')}
+                        >
+                          <i className="bi bi-trash"></i> {t('boxes.condition.delete')}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                <button
+                  type="button"
+                  className="btn btn-outline-dark w-100"
+                  onClick={() => {
+                    const id = uuidv4();
+                    setBoxConditions((prev) => ({
+                      ...prev,
+                      [box.id]: {
+                        ...prev[box.id],
+                        [id]: {
+                          id,
+                          tablet_count: 1,
+                          interval_days: 1,
+                          start_date: null,
+                          time_of_day: 'morning',
+                        },
+                      },
+                    }));
+                    setSelectedModifyBox(box.id);
+                  }}
+                >
+                <i className="bi bi-plus-lg me-2"></i>
+                {t('boxes.condition.add')}
+                </button>
+              </>
+            ) : Object.values(box.conditions).filter(
+                (condition) => condition !== undefined
+              ).length > 0 ? (
+              Object.values(box.conditions)
+                .filter((condition) => condition !== undefined)
+                .map((condition) => (
+                  <div
+                    className="mb-2 p-3 border rounded bg-light"
+                    key={condition.id}
+                  >
+                    <strong>
+                      {condition.tablet_count}{' '}
+                      {condition.tablet_count > 1 ? t('boxes.tablets') : t('boxes.tablet')}
+                    </strong>{' '}
+                    {t('boxes.every')} {' '}
+                    <strong>
+                      {condition.interval_days}{' '}
+                      {condition.interval_days > 1 ? t('boxes.days') : t('boxes.day')}
+                    </strong>{' '}
+                    {t('boxes.each')} {' '}
+                    <strong>{timeOfDayMap[condition.time_of_day]}</strong>
+                    <br />
+                    {condition.interval_days > 1 && (
+                      <small className="text-muted">
+                        {t('boxes.from')} {' '}
+                        {new Date(condition.start_date).toLocaleDateString()}
+                      </small>
+                    )}
+                  </div>
+                ))
+            ) : (
+              <div className="border rounded bg-light d-flex justify-content-start align-items-center p-2 mb-2">
+                <p className="text-muted mb-0">{t('boxes.condition.none')}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {selectedModifyBox && selectedModifyBox === box.id && (
+        <>
+          <hr />
+          <div className="d-flex gap-2">
+            <button
+              type="submit"
+              className="btn btn-success btn-sm"
+              aria-label={t('boxes.save')}
+              title={t('boxes.save')}
+            >
+              <i className="bi bi-save"></i> {t('boxes.save')}
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => {
+                setSelectedModifyBox(null);
+                setModifyBoxName({ ...modifyBoxName, [box.id]: box.name });
+                setModifyBoxCapacity({
+                  ...modifyBoxCapacity,
+                  [box.id]: box.box_capacity,
+                });
+                setModifyBoxStockAlertThreshold({
+                  ...modifyBoxStockAlertThreshold,
+                  [box.id]: box.stock_alert_threshold,
+                });
+                setModifyBoxStockQuantity({
+                  ...modifyBoxStockQuantity,
+                  [box.id]: box.stock_quantity,
+                });
+                setBoxConditions({
+                  ...boxConditions,
+                  [box.id]: box.conditions.reduce(
+                    (acc, condition) => ({
+                      ...acc,
+                      [condition.id]: condition,
+                    }),
+                    {}
+                  ),
+                });
+                setDose({ ...dose, [box.id]: box.dose });
+              }}
+              aria-label={t('boxes.cancel')}
+              title={t('boxes.cancel')}
+            >
+              <i className="bi bi-x"></i> {t('boxes.cancel')}
+            </button>
+          </div>
+        </>
+      )}
     </div>
-  );
+  </div>
+);
 }
 
 function BoxField({

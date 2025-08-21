@@ -23,6 +23,8 @@ function AddCalendarPage({ personalCalendars }) {
       }
     } else if (importType === 'file') {
       navigate(`/${lng}/add-calendar/import?name=${encodeURIComponent(newCalendarName)}`);
+    } else if (importType === 'qr') {
+      navigate(`/${lng}/add-calendar/qr?name=${encodeURIComponent(newCalendarName)}`);
     }
   };
 
@@ -59,6 +61,7 @@ function AddCalendarPage({ personalCalendars }) {
               value={importType}
             >
               <option value="manual">{t('calendar.import_type_manual')}</option>
+              <option value="qr">{t('calendar.scan_qr_option')}</option>
               <option value="file">{t('calendar.import_type_file')}</option>
             </select>
           </div>
@@ -73,6 +76,30 @@ function AddCalendarPage({ personalCalendars }) {
               <i className="bi bi-plus-lg"></i>
               <span> {t('add')}</span>
             </button>
+          </div>
+        </div>
+
+        {/* Description de l'option sélectionnée */}
+        <div className="p-3">
+          <div className="col-12">
+            {importType === 'manual' && (
+              <div className="alert alert-info">
+                <i className="bi bi-info-circle me-2"></i>
+                {t('calendar.import_type_manual_description')}
+              </div>
+            )}
+            {importType === 'qr' && (
+              <div className="alert alert-success">
+                <i className="bi bi-qr-code-scan me-2"></i>
+                {t('calendar.import_type_qr_description')}
+              </div>
+            )}
+            {importType === 'file' && (
+              <div className="alert alert-warning">
+                <i className="bi bi-file-earmark-arrow-up me-2"></i>
+                {t('calendar.import_type_file_description')}
+              </div>
+            )}
           </div>
         </div>
       </form>

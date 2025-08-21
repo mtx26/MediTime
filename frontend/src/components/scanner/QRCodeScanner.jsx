@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { readBarcodes } from "zxing-wasm/reader";
 import { fetchMedicaments } from "../../utils/api/scanner";
 
@@ -11,10 +12,11 @@ const readerOptions = {
 export default function QRCodeScanner({
   onMedicineFound = null,
   singleScan = false,
-  onAddAll = null, // Fonction pour ajouter tous les médicaments
   onClose = null,   // Fonction pour fermer la modal
-  show = false     // Contrôle l'affichage de la modal
+  show = false,     // Contrôle l'affichage de la modal
+  modal = true      // Active/désactive le mode modal
 }) {
+  const { t } = useTranslation();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
@@ -59,7 +61,7 @@ export default function QRCodeScanner({
         scanLoop(); // démarrer la boucle
       } catch (e) {
         console.error(e);
-        setError(e?.message || "Impossible d'accéder à la caméra.");
+        setError(e?.message || t('scanner.camera_error'));
       }
     }
 
@@ -73,22 +75,22 @@ export default function QRCodeScanner({
       }
     }
 
-    // Démarrer seulement si la modal est visible
-    if (show) {
+    // Démarrer seulement si la modal est visible (mode modal) ou toujours (mode non-modal)
+    if (modal ? show : true) {
       start();
     } else {
       stop();
     }
 
     return stop;
-  }, [show]); // Dépend de show maintenant
+  }, [show, modal]); // Dépend de show et modal maintenant
 
-  // Reset des données quand la modal s'ouvre
+  // Reset des données quand la modal s'ouvre (mode modal uniquement)
   useEffect(() => {
-    if (show) {
+    if (modal && show) {
       resetScannedMedicines();
     }
-  }, [show]);
+  }, [show, modal]);
 
   // Boucle de scan (requestAnimationFrame)
   const scanLoop = async () => {
@@ -283,133 +285,159 @@ export default function QRCodeScanner({
 
   return (
     <>
-      {/* Modal Bootstrap */}
-      <div 
-        className={`modal fade ${show ? 'show' : ''}`} 
-        style={{ display: show ? 'block' : 'none' }} 
-        tabIndex="-1"
-      >
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">
-                <i className="bi bi-qr-code-scan me-2"></i>
-                Scanner un QR code
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={handleClose}
-                aria-label="Fermer"
-              ></button>
-            </div>
-            <div className="modal-body">
-              <div>
-                {/* Aperçu caméra */}
-                <div className="position-relative mb-3" style={{ borderRadius: 8, overflow: "hidden", aspectRatio: "4/3" }}>
-                  <video
-                    ref={videoRef}
-                    playsInline
-                    muted
-                    className="w-100 h-100 bg-dark"
-                    style={{ objectFit: "cover" }}
-                  />
-                  <canvas
-                    ref={canvasRef}
-                    className="position-absolute top-0 start-0 w-100 h-100"
-                    style={{ objectFit: "cover" }}
-                  />
+      {modal ? (
+        // Mode Modal Bootstrap
+        <>
+          <div 
+            className={`modal fade ${show ? 'show' : ''}`} 
+            style={{ display: show ? 'block' : 'none' }} 
+            tabIndex="-1"
+          >
+            <div className="modal-dialog modal-dialog-centered modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">
+                    <i className="bi bi-qr-code-scan me-2"></i>
+                    {t('scanner.title')}
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={handleClose}
+                    aria-label={t('scanner.close')}
+                  ></button>
                 </div>
-
-                {/* Messages d'erreur */}
-                {error && (
-                  <div className="alert alert-danger">
-                    <i className="bi bi-exclamation-triangle me-2"></i>
-                    {error}
-                  </div>
-                )}
-
-                {/* Instructions */}
-                {gtins.length === 0 && !error && (
-                  <div className="text-center text-muted mb-3">
-                    <i className="bi bi-camera me-2"></i>
-                    Pointez vers le code DataMatrix
-                  </div>
-                )}
-
-                {/* Résultats */}
-                {gtins.length > 0 && (
-                  <ul className="list-group">
-                    {gtins.map((gtin) => {
-                      const medicine = medicines[gtin];
-                      const isLoading = loadingGtin === gtin;
-                      
-                      return (
-                        <li key={gtin} className="list-group-item d-flex justify-content-between align-items-center">
-                          {isLoading ? (
-                            <div className="d-flex align-items-center">
-                              <div className="spinner-border spinner-border-sm me-2"></div>
-                              Recherche...
-                            </div>
-                          ) : medicine ? (
-                            <div>
-                              <h6 className="mb-1 text-primary">
-                                {medicine.name}
-                                {medicine.dose && ` (${medicine.dose})`}
-                              </h6>
-                              {medicine.conditionnement && (
-                                <small className="text-muted">Quantité : {medicine.conditionnement}</small>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="text-warning">
-                              <i className="bi bi-exclamation-triangle me-2"></i>
-                              Médicament non trouvé
-                            </div>
-                          )}
-                          
-                          {medicine && (
-                            <button
-                              className="btn btn-outline-danger btn-sm"
-                              onClick={() => removeMedicine(gtin)}
-                              title="Supprimer de la liste"
-                            >
-                              <i className="bi bi-trash"></i>
-                            </button>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
+                <div className="modal-body">
+                  {renderScannerContent()}
+                </div>
+                <div className="modal-footer">
+                  {renderFooterButtons()}
+                </div>
               </div>
             </div>
-            <div className="modal-footer">
-              {scannedMedicines.length > 0 && onAddAll && (
-                <button
-                  type="button"
-                  className="btn btn-success"
-                  onClick={handleAddAll}
-                >
-                  <i className="bi bi-plus-circle me-2"></i>
-                  Ajouter tous les médicaments ({scannedMedicines.length})
-                </button>
-              )}
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={handleClose}
-              >
-                <i className="bi bi-x-circle me-2"></i>
-                Annuler
-              </button>
-            </div>
           </div>
+          {/* Overlay pour modal Bootstrap */}
+          {show && <div className="modal-backdrop fade show"></div>}
+        </>
+      ) : (
+        // Mode Non-modal (intégré directement)
+        <div>
+          {renderScannerContent()}
+          {renderFooterButtons()}
         </div>
-      </div>
-
-      {/* Overlay pour modal Bootstrap */}
-      {show && <div className="modal-backdrop fade show"></div>}
+      )}
     </>
   );
+
+  // Fonction pour rendre le contenu du scanner
+  function renderScannerContent() {
+    return (
+      <div>
+        {/* Aperçu caméra */}
+        <div className="position-relative mb-3" style={{ borderRadius: 8, overflow: "hidden", aspectRatio: "4/3" }}>
+          <video
+            ref={videoRef}
+            playsInline
+            muted
+            className="w-100 h-100 bg-dark"
+            style={{ objectFit: "cover" }}
+          />
+          <canvas
+            ref={canvasRef}
+            className="position-absolute top-0 start-0 w-100 h-100"
+            style={{ objectFit: "cover" }}
+          />
+        </div>
+
+        {/* Messages d'erreur */}
+        {error && (
+          <div className="alert alert-danger">
+            <i className="bi bi-exclamation-triangle me-2"></i>
+            {error}
+          </div>
+        )}
+
+        {/* Instructions */}
+        {gtins.length === 0 && !error && (
+          <div className="text-center text-muted mb-3">
+            <i className="bi bi-camera me-2"></i>
+            {t('scanner.camera_instruction')}
+          </div>
+        )}
+
+        {/* Résultats */}
+        {gtins.length > 0 && (
+          <ul className="list-group">
+            {gtins.map((gtin) => {
+              const medicine = medicines[gtin];
+              const isLoading = loadingGtin === gtin;
+              
+              return (
+                <li key={gtin} className="list-group-item d-flex justify-content-between align-items-center">
+                  {isLoading ? (
+                    <div className="d-flex align-items-center">
+                      <div className="spinner-border spinner-border-sm me-2"></div>
+                      {t('scanner.searching')}
+                    </div>
+                  ) : medicine ? (
+                    <div>
+                      <h6 className="mb-1 text-primary">
+                        {medicine.name}
+                        {medicine.dose && ` (${medicine.dose})`}
+                      </h6>
+                      {medicine.conditionnement && (
+                        <small className="text-muted">{t('scanner.quantity', { quantity: medicine.conditionnement })}</small>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-warning">
+                      <i className="bi bi-exclamation-triangle me-2"></i>
+                      {t('scanner.medicine_not_found')}
+                    </div>
+                  )}
+                  
+                  {medicine && (
+                    <button
+                      className="btn btn-outline-danger btn-sm"
+                      onClick={() => removeMedicine(gtin)}
+                      title={t('scanner.remove_from_list')}
+                    >
+                      <i className="bi bi-trash"></i>
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    );
+  }
+
+  // Fonction pour rendre les boutons du footer
+  function renderFooterButtons() {
+    return (
+      <div className={modal ? "" : "mt-3 d-flex justify-content-end gap-2"}>
+        {scannedMedicines.length > 0 && onAddAll ? (
+          <button
+            type="button"
+            className="btn btn-success w-100"
+            onClick={handleAddAll}
+          >
+            <i className="bi bi-plus-circle me-2"></i>
+            {t('scanner.add')}
+          </button>
+        ) : (
+          <button
+              type="button"
+              className="btn btn-secondary w-100"
+              onClick={handleClose}
+          >
+            <i className="bi bi-x-circle me-2"></i>
+            {modal ? t('scanner.cancel') : t('scanner.close')}
+          </button>
+        )}
+      </div>
+    );
+  }
 }

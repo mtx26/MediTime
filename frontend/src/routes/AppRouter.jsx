@@ -13,9 +13,9 @@ const VerifyEmail = lazy(() => import('../pages/auth/VerifyEmail'));
 const NotificationsPage = lazy(() => import('../pages/notifications/NotificationsPage'));
 const SettingsPage = lazy(() => import('../pages/settings/SettingsPage'));
 const AddCalendarPage = lazy(() => import('../pages/calendar/AddCalendarPage'));
+const AddCalendarQRPage = lazy(() => import('../pages/calendar/AddCalendarQRPage'));
 const ImportCalendarPage = lazy(() => import('../pages/calendar/ImportCalendarPage'));
 const MedicineReview = lazy(() => import('../pages/calendar/MedicineReview'));
-const ScannerPage = lazy(() => import('../pages/calendar/ScannerTestPage'));
 const AcceptInvitePage = lazy(() => import('../pages/calendar/AcceptInvitePage'));
 
 const CalendarView = lazy(() => import('../pages/calendar/CalendarView'));
@@ -112,19 +112,6 @@ function AppRoutes({ sharedProps }) {
         path="verify-email"
         element={userInfo ? <VerifyEmail /> : <Navigate to={`/${lng}/login`} />}
       />
-      <Route
-        path="scanner"
-        element={
-          <PrivateRoute
-            element={
-              <RouteWithLoader
-                element={<ScannerPage {...sharedProps} />}
-                isLoading={sharedProps.loadingStates.isInitialLoading}
-              />
-            }
-          />
-        }
-      />
 
       <Route
         path="settings"
@@ -190,6 +177,14 @@ function AppRoutes({ sharedProps }) {
           element={
             <PrivateRoute
               element={<ImportCalendarPage {...sharedProps} />}
+            />
+          }
+        />
+        <Route
+          path="qr"
+          element={
+            <PrivateRoute
+              element={<AddCalendarQRPage {...sharedProps} />}
             />
           }
         />

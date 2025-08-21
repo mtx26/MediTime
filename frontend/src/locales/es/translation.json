@@ -102,7 +102,7 @@
     "intake_conditions": "Condiciones de toma",
     "name": "Nombre",
     "new_box": "Nueva caja",
-    "qr_code_help_text": "",
+    "qr_code_help_text": "El código DataMatrix se encuentra en el envase del medicamento, cerca del código de barras. Es un pequeño cuadrado blanco y negro.",
     "remaining_qty": "Cantidad restante",
     "restock": "Reposición de existencias",
     "save": "Ahorrar",
@@ -148,7 +148,22 @@
     "today": "Hoy",
     "week": "Semana",
     "weekly_help": "Haga clic en un día del calendario para ver los medicamentos asociados en una ventana.",
-    "weekly_view": "Calendario por semana"
+    "weekly_view": "Calendario por semana",
+    "add_with_qr": "Crea un calendario escaneando QR",
+    "calendar_name": "Nombre del calendario",
+    "calendar_name_placeholder": "Introduzca el nombre del calendario",
+    "scan_medicines": "Medicamentos para escanear",
+    "scan_medicines_description": "Escanee los códigos DataMatrix de sus cajas de medicamentos. Cada medicamento escaneado se añadirá automáticamente a su nuevo horario.",
+    "creating_calendar": "Creación en progreso...",
+    "scanner_button_hint": "Utilice el botón \"Agregar\" del escáner para crear el calendario",
+    "error_no_calendar_name": "Por favor, introduzca un nombre de calendario",
+    "error_no_medicines": "No se escaneó ningún medicamento",
+    "error_calendar_creation": "Error al crear el calendario",
+    "error_partial_success": "Calendario creado pero no se pudieron agregar {{count}} medicamentos",
+    "scan_qr_option": "Escáner de códigos QR",
+    "import_type_qr_description": "Escanee los códigos DataMatrix en sus cajas de medicamentos para crear automáticamente su cronograma.",
+    "import_type_manual_description": "Cree un calendario vacío y agregue medicamentos manualmente.",
+    "import_type_file_description": "Importar un calendario desde un archivo exportado."
   },
   "calendar_completed": "¡Calendario completado exitosamente!",
   "calendar_settings": {
@@ -627,5 +642,17 @@
     "desc": "Porque la atención médica no admite improvisaciones. MediTime te ofrece una solución clara, intuitiva y segura para el seguimiento diario de tus tratamientos y los de tus seres queridos.",
     "title": "¿Por qué elegir MediTime?"
   },
-  "yes": "Sí"
+  "yes": "Sí",
+  "scanner": {
+    "title": "Escanear un código QR",
+    "close": "Cerca",
+    "searching": "Investigación...",
+    "camera_instruction": "Señale el código DataMatrix",
+    "camera_error": "No se puede acceder a la cámara.",
+    "medicine_not_found": "Medicamento no encontrado",
+    "quantity": "Cantidad: {{cantidad}}",
+    "remove_from_list": "Eliminar de la lista",
+    "add": "Agregar",
+    "cancel": "Cancelar"
+  }
 }

@@ -102,7 +102,7 @@
     "intake_conditions": "受講条件",
     "name": "名前",
     "new_box": "新しい箱",
-    "qr_code_help_text": "",
+    "qr_code_help_text": "DataMatrixコードは、医薬品のパッケージのバーコードの近くにあります。小さな白黒の四角形です。",
     "remaining_qty": "残り数量",
     "restock": "再入荷",
     "save": "保存",
@@ -148,7 +148,22 @@
     "today": "今日",
     "week": "週",
     "weekly_help": "カレンダーの日付をクリックすると、関連する薬がウィンドウに表示されます。",
-    "weekly_view": "週ごとのカレンダー"
+    "weekly_view": "週ごとのカレンダー",
+    "add_with_qr": "QRをスキャンしてカレンダーを作成する",
+    "calendar_name": "カレンダー名",
+    "calendar_name_placeholder": "カレンダーの名前を入力してください",
+    "scan_medicines": "薬をスキャンする",
+    "scan_medicines_description": "薬箱のDataMatrixコードをスキャンしてください。スキャンされた薬は新しいスケジュールに自動的に追加されます。",
+    "creating_calendar": "作成中です...",
+    "scanner_button_hint": "スキャナの「追加」ボタンを使用してカレンダーを作成します",
+    "error_no_calendar_name": "カレンダー名を入力してください",
+    "error_no_medicines": "薬はスキャンされていません",
+    "error_calendar_creation": "カレンダーの作成中にエラーが発生しました",
+    "error_partial_success": "カレンダーは作成されましたが、{{count}} 個の薬を追加できませんでした",
+    "scan_qr_option": "QRコードスキャナー",
+    "import_type_qr_description": "薬箱の DataMatrix コードをスキャンして、スケジュールを自動的に作成します。",
+    "import_type_manual_description": "空のカレンダーを作成し、手動で薬を追加します。",
+    "import_type_file_description": "エクスポートされたファイルからカレンダーをインポートします。"
   },
   "calendar_completed": "カレンダーが無事完成しました！",
   "calendar_settings": {
@@ -627,5 +642,17 @@
     "desc": "医療には即興の余地はありません。MediTimeは、あなたとあなたの大切な人の治療を日々記録するための、明確で直感的、そして安全なソリューションを提供します。",
     "title": "MediTimeを選ぶ理由"
   },
-  "yes": "はい"
+  "yes": "はい",
+  "scanner": {
+    "title": "QRコードをスキャンする",
+    "close": "近い",
+    "searching": "研究...",
+    "camera_instruction": "DataMatrixコードを指す",
+    "camera_error": "カメラにアクセスできません。",
+    "medicine_not_found": "薬物は見つかりませんでした",
+    "quantity": "数量: {{数量}}",
+    "remove_from_list": "リストから削除",
+    "add": "追加",
+    "cancel": "キャンセル"
+  }
 }
