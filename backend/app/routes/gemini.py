@@ -25,9 +25,9 @@ def handle_analyze_medical_document():
 
         analysis_result = analyze_medical_document(base64_image)
 
-        if "error" in analysis_result:
+        if not analysis_result:
             return error_response(
-                message=analysis_result["error"],
+                message="Erreur lors de l'analyse du document médical avec Gemini",
                 code="DOCUMENT_ANALYZE_GEMINI_ERROR",
                 status_code=500,
                 error="Erreur lors de l'analyse du document médical avec Gemini"

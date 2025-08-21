@@ -1,25 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import QRCodeScanner from '../../components/scanner/QRCodeScanner';
+import QRCodeScanner from '../../scanner/QRCodeScanner';
+import { useNavigate, useParams } from 'react-router-dom';
 
-function AddCalendarQRPage({ personalCalendars }) {
+function QRScanImport({ calendarName, personalCalendars, setError }) {
   const { t } = useTranslation();
+  const [isCreating, setIsCreating] = useState(false);
   const navigate = useNavigate();
   const { lng } = useParams();
-  
-  const [calendarName, setCalendarName] = useState('');
-  const [isCreating, setIsCreating] = useState(false);
-  const [error, setError] = useState('');
-
-  // Récupérer le nom du calendrier depuis l'URL
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get('name');
-    if (name) {
-      setCalendarName(decodeURIComponent(name));
-    }
-  }, []);
 
   const handleCreateCalendar = async (medicines) => {
     if (!calendarName.trim()) {
@@ -95,49 +83,60 @@ function AddCalendarQRPage({ personalCalendars }) {
     }
   };
 
+  if (isCreating) {
+    return (
+      <div 
+        className="d-flex justify-content-center align-items-center"
+        style={{ flexGrow: 1, minHeight: '40vh' }}
+      >
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">{t('calendar.creating_calendar')}</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container card shadow p-0" style={{ maxWidth: '800px' }}>
-      <h4 className="mb-4 fw-bold text-center mt-4">
-        <i className="bi bi-qr-code-scan me-2"></i>
-        {t('calendar.create_calendar_qr', { calendarName })}
-      </h4>
-      <div className="card-body">
-
-        {isCreating ? (
-          <div 
-            className="d-flex justify-content-center align-items-center"
-            style={{ flexGrow: 1, minHeight: '60vh' }}
-          >
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">{t('calendar.creating_calendar')}</span>
-            </div>
-          </div>
-        ) : (
+    <div className="row">
+		<hr/>
+      <div className="col-12">
+        <div>
           <div>
-            {error && (
-              <div className="alert alert-danger">
-                {error}
-              </div>
-            )}
+            <h5 className="mb-3 text-center">
+              <i className="bi bi-qr-code-scan me-2"></i>
+              {t('scanner.title')}
+            </h5>         
+            <QRCodeScanner
+              modal={false}
+              onAddAll={handleCreateCalendar}
+              singleScan={true}
+            />
+          </div>
+        </div>
 
-            <div className="mb-4">
-              <h6 className="fw-bold mb-3">{t('calendar.scan_medicines')}</h6>
-              <p className="text-muted small mb-3">
-                {t('calendar.scan_medicines_description')}
+        {/* Alert explicative en dessous */}
+        <div className="alert alert-success mt-3">
+          <div className="d-flex align-items-center">
+            <i className="bi bi-info-circle me-3"></i>
+            <div>
+              <strong>{t('calendar.import_type_qr_description')}</strong>
+              <p className="mb-0 small mt-1">
+                Scannez les codes QR de vos médicaments pour créer automatiquement votre calendrier avec toutes les informations nécessaires.
               </p>
-              
-              <QRCodeScanner
-                modal={false}
-                onAddAll={handleCreateCalendar}
-                onClose={() => navigate(`/${lng}/calendars`)}
-                singleScan={false}
-              />
             </div>
           </div>
-        )}
+          <div className="mt-3 text-center">
+            <img 
+              src="/icons/datamatrix.webp" 
+              alt="Data Matrix QR Code" 
+              className="img-fluid"
+              style={{ maxHeight: '160px' }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-export default AddCalendarQRPage;
+export default QRScanImport;

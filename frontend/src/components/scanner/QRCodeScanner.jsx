@@ -13,6 +13,7 @@ export default function QRCodeScanner({
   onMedicineFound = null,
   singleScan = false,
   onClose = null,   // Fonction pour fermer la modal
+  onAddAll = null,  // Fonction pour ajouter tous les médicaments scannés
   show = false,     // Contrôle l'affichage de la modal
   modal = true      // Active/désactive le mode modal
 }) {
@@ -427,7 +428,7 @@ export default function QRCodeScanner({
             <i className="bi bi-plus-circle me-2"></i>
             {t('scanner.add')}
           </button>
-        ) : (
+        ) : (modal && (
           <button
               type="button"
               className="btn btn-secondary w-100"
@@ -436,7 +437,7 @@ export default function QRCodeScanner({
             <i className="bi bi-x-circle me-2"></i>
             {modal ? t('scanner.cancel') : t('scanner.close')}
           </button>
-        )}
+        ))}
       </div>
     );
   }

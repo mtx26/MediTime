@@ -11,8 +11,7 @@ const DEFAULT_CONDITION = {
 
 export default function MedicineReview() {
   const location = useLocation();
-  const importedData = location.state?.importedMedicines;
-  const medicineBoxes = importedData?.medicine_boxes ?? [];
+  const medicineBoxes = location.state?.importedMedicines ?? [];
 
   const [medicines, setMedicines] = useState(medicineBoxes);
 
