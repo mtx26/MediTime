@@ -40,7 +40,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
     if (droppedFile && droppedFile.type.startsWith('image/')) {
       setFile(droppedFile);
     } else {
-      setAlertMessage('Seuls les fichiers image sont acceptés (jpg, png, webp, gif).');
+      setAlertMessage(t('image_upload.file_type_error'));
       setAlertType('warning');
     }
   };
@@ -51,7 +51,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
       setFile(selectedFile);
       setAlertMessage(''); // Clear any previous alert
     } else {
-      setAlertMessage('Seuls les fichiers image sont acceptés (jpg, png, webp, gif).');
+      setAlertMessage(t('image_upload.file_type_error'));
       setAlertType('warning');
     }
   };
@@ -69,7 +69,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
     e.preventDefault(); // Empêcher la soumission par défaut du formulaire
     
     if (!file) {
-      setAlertMessage('Veuillez sélectionner un fichier image.');
+      setAlertMessage(t('image_upload.select_file_error'));
       setAlertType('warning');
       return;
     }
@@ -96,16 +96,16 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
             },
           });
         } else {
-          setAlertMessage(t('calendar.image_analysis_no_medicines'));
+          setAlertMessage(t('image_upload.no_medicines_found'));
           setAlertType('info');
         }
       } else {
-        setAlertMessage(analysisResult.error || t('calendar.image_analysis_error'));
+        setAlertMessage(analysisResult.error || t('image_upload.analysis_error'));
         setAlertType('danger');
       }
     } catch (error) {
       console.error('Erreur lors de l\'analyse de l\'image:', error);
-      setAlertMessage('Erreur lors de l\'analyse du fichier');
+      setAlertMessage(t('image_upload.file_analysis_error'));
       setAlertType('danger');
     } finally {
       setIsProcessing(false);
@@ -137,7 +137,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
           <div>
             <h5 className="mb-3 text-center">
               <i className="bi bi-cloud-upload me-2"></i>
-              Sélectionner et prévisualiser un fichier
+              {t('image_upload.title')}
             </h5>
 
             <div className="row">
@@ -161,7 +161,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
                     <div className="position-relative d-inline-block">
                       <img
                         src={previewUrl}
-                        alt="Aperçu"
+                        alt={t('image_upload.preview_alt')}
                         className="img-fluid rounded border shadow-sm mb-3"
                         style={{ maxHeight: '200px', maxWidth: '100%', objectFit: 'cover' }}
                       />
@@ -172,23 +172,23 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
                           e.stopPropagation(); // Empêcher le clic sur la zone de drop
                           removeFile();
                         }}
-                        title="Supprimer l'image"
+                        title={t('image_upload.remove_image')}
                       >
                         <i className="bi bi-x"></i>
                       </button>
                       <div className="mt-2">
                         <p className="mb-1 fw-semibold text-success">
                           <i className="bi bi-check-circle me-2"></i>
-                          Fichier sélectionné
+                          {t('image_upload.file_selected')}
                         </p>
-                        <small className="text-muted">Cliquez pour changer de fichier</small>
+                        <small className="text-muted">{t('image_upload.click_to_change')}</small>
                       </div>
                     </div>
                   ) : (
                     <div>
                       <i className="bi bi-cloud-upload display-4 text-muted mb-3"></i>
                       <p className="mb-1 fw-semibold">{t('calendar.drag_and_drop')}</p>
-                      <small className="text-muted">JPG, PNG, WEBP, GIF</small>
+                      <small className="text-muted">{t('image_upload.file_types')}</small>
                     </div>
                   )}
                 </div>

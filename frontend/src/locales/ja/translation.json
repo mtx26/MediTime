@@ -136,7 +136,7 @@
     "confirm_delete": "カレンダーを削除しますか?",
     "confirm_delete_shared": "共有カレンダーを削除しますか?",
     "confirm_rename": "カレンダーの名前を変更しますか?",
-    "create_calendar_qr": "",
+    "create_calendar_qr": "QRコードをスキャン: {{calendarName}}",
     "creating_calendar": "作成中です...",
     "daily_view": "日めくりカレンダー",
     "day": "日",
@@ -156,7 +156,7 @@
     "month": "月",
     "name": "カレンダー名",
     "new_name": "新しい名前",
-    "processing": "",
+    "processing": "処理中です…",
     "reference_week": "参照週",
     "scan_medicines": "薬をスキャンする",
     "scan_medicines_description": "薬箱のDataMatrixコードをスキャンしてください。スキャンされた薬は新しいスケジュールに自動的に追加されます。",
@@ -656,5 +656,28 @@
     "desc": "医療には即興の余地はありません。MediTimeは、あなたとあなたの大切な人の治療を日々記録するための、明確で直感的、そして安全なソリューションを提供します。",
     "title": "MediTimeを選ぶ理由"
   },
-  "yes": "はい"
+  "yes": "はい",
+  "image_upload": {
+    "title": "ファイルを選択してプレビューする",
+    "file_type_error": "画像ファイルのみ受け入れられます（jpg、png、webp、gif）。",
+    "select_file_error": "画像ファイルを選択してください。",
+    "no_medicines_found": "画像内に薬剤は見つかりません。",
+    "analysis_error": "画像の解析中にエラーが発生しました。",
+    "file_analysis_error": "ファイルの解析エラー",
+    "preview_alt": "プレビュー",
+    "remove_image": "画像を削除",
+    "file_selected": "選択したファイル",
+    "click_to_change": "ファイルを変更するにはクリックしてください",
+    "file_types": "JPG、PNG、WEBP、GIF"
+  },
+  "medicine_review": {
+    "title": "薬物レビュー",
+    "current_stock": "現在の在庫",
+    "maximum_stock": "在庫最大数",
+    "time_of_day": "一瞬",
+    "select_option": "選択...",
+    "start_date": "始まり",
+    "delete_condition": "この条件を削除する",
+    "finish": "終了するには"
+  }
 }

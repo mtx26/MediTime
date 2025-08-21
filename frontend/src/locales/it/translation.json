@@ -136,7 +136,7 @@
     "confirm_delete": "Eliminare il calendario?",
     "confirm_delete_shared": "Eliminare il calendario condiviso?",
     "confirm_rename": "Rinominare il calendario?",
-    "create_calendar_qr": "",
+    "create_calendar_qr": "Scansiona QR: {{calendarName}}",
     "creating_calendar": "Creazione in corso...",
     "daily_view": "Calendario giornaliero",
     "day": "Giorno",
@@ -156,7 +156,7 @@
     "month": "Mese",
     "name": "Nome del calendario",
     "new_name": "Nuovo nome",
-    "processing": "",
+    "processing": "Elaborazione in corso…",
     "reference_week": "Settimana di riferimento",
     "scan_medicines": "Scansiona i farmaci",
     "scan_medicines_description": "Scansiona i codici DataMatrix sulle confezioni dei tuoi farmaci. Ogni farmaco scansionato verrà automaticamente aggiunto al tuo nuovo programma.",
@@ -656,5 +656,28 @@
     "desc": "Perché l'assistenza sanitaria non lascia spazio all'improvvisazione. MediTime ti offre una soluzione chiara, intuitiva e sicura per monitorare i tuoi trattamenti e quelli dei tuoi cari, giorno dopo giorno.",
     "title": "Perché scegliere MediTime?"
   },
-  "yes": "SÌ"
+  "yes": "SÌ",
+  "image_upload": {
+    "title": "Seleziona e visualizza in anteprima un file",
+    "file_type_error": "Sono accettati solo file immagine (jpg, png, webp, gif).",
+    "select_file_error": "Seleziona un file immagine.",
+    "no_medicines_found": "Nessun farmaco trovato nell'immagine.",
+    "analysis_error": "Errore durante l'analisi dell'immagine.",
+    "file_analysis_error": "Errore durante l'analisi del file",
+    "preview_alt": "Anteprima",
+    "remove_image": "Elimina immagine",
+    "file_selected": "File selezionato",
+    "click_to_change": "Clicca per cambiare file",
+    "file_types": "JPG, PNG, WEBP, GIF"
+  },
+  "medicine_review": {
+    "title": "Revisione dei farmaci",
+    "current_stock": "Scorte attuali",
+    "maximum_stock": "Massima scorta",
+    "time_of_day": "Momento",
+    "select_option": "Selezionare...",
+    "start_date": "Inizio",
+    "delete_condition": "Rimuovi questa condizione",
+    "finish": "Per finire"
+  }
 }

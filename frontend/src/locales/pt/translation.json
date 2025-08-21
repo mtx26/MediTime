@@ -136,7 +136,7 @@
     "confirm_delete": "Excluir o calendário?",
     "confirm_delete_shared": "Excluir calendário compartilhado?",
     "confirm_rename": "Renomear o calendário?",
-    "create_calendar_qr": "",
+    "create_calendar_qr": "Escaneie o QR Code: {{calendarName}}",
     "creating_calendar": "Criação em andamento...",
     "daily_view": "Calendário diário",
     "day": "Dia",
@@ -156,7 +156,7 @@
     "month": "Mês",
     "name": "Nome do calendário",
     "new_name": "Novo nome",
-    "processing": "",
+    "processing": "Processamento em andamento…",
     "reference_week": "Semana de referência",
     "scan_medicines": "Medicamentos para escaneamento",
     "scan_medicines_description": "Escaneie os códigos DataMatrix nas suas caixas de medicamentos. Cada medicamento escaneado será adicionado automaticamente à sua nova agenda.",
@@ -656,5 +656,28 @@
     "desc": "Porque a saúde não deixa espaço para improvisação. O MediTime oferece uma solução clara, intuitiva e segura para acompanhar seus tratamentos e os de seus entes queridos, dia após dia.",
     "title": "Por que escolher o MediTime?"
   },
-  "yes": "Sim"
+  "yes": "Sim",
+  "image_upload": {
+    "title": "Selecione e visualize um arquivo",
+    "file_type_error": "Somente arquivos de imagem são aceitos (jpg, png, webp, gif).",
+    "select_file_error": "Selecione um arquivo de imagem.",
+    "no_medicines_found": "Nenhum medicamento encontrado na imagem.",
+    "analysis_error": "Erro ao analisar a imagem.",
+    "file_analysis_error": "Erro ao analisar o arquivo",
+    "preview_alt": "Visualização",
+    "remove_image": "Excluir imagem",
+    "file_selected": "Arquivo selecionado",
+    "click_to_change": "Clique para alterar o arquivo",
+    "file_types": "JPG, PNG, WEBP, GIF"
+  },
+  "medicine_review": {
+    "title": "Revisão de Medicamentos",
+    "current_stock": "Estoque atual",
+    "maximum_stock": "Estoque máximo",
+    "time_of_day": "Momento",
+    "select_option": "Selecione...",
+    "start_date": "Começo",
+    "delete_condition": "Remova esta condição",
+    "finish": "Para terminar"
+  }
 }

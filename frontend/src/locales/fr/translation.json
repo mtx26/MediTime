@@ -237,6 +237,19 @@
     "description": "Gérez et partagez facilement vos prises de médicaments.",
     "title": "MediTime - Planificateur de traitements"
   },
+  "image_upload": {
+    "title": "Sélectionner et prévisualiser un fichier",
+    "file_type_error": "Seuls les fichiers image sont acceptés (jpg, png, webp, gif).",
+    "select_file_error": "Veuillez sélectionner un fichier image.",
+    "no_medicines_found": "Aucun médicament trouvé dans l'image.",
+    "analysis_error": "Erreur lors de l'analyse de l'image.",
+    "file_analysis_error": "Erreur lors de l'analyse du fichier",
+    "preview_alt": "Aperçu",
+    "remove_image": "Supprimer l'image",
+    "file_selected": "Fichier sélectionné",
+    "click_to_change": "Cliquez pour changer de fichier",
+    "file_types": "JPG, PNG, WEBP, GIF"
+  },
   "invalid_or_expired_link": "Ce lien de calendrier partagé est invalide ou a expiré.",
   "invitation": {
     "invalid_or_expired": "Invitation invalide ou expirée",
@@ -277,6 +290,16 @@
     "title": "Disponible sur votre téléphone"
   },
   "modify": "Modifier",
+  "medicine_review": {
+    "title": "Révision du médicament",
+    "current_stock": "Stock actuel",
+    "maximum_stock": "Stock maximum",
+    "time_of_day": "Moment",
+    "select_option": "Sélectionner...",
+    "start_date": "Début",
+    "delete_condition": "Supprimer cette condition",
+    "finish": "Terminer"
+  },
   "morning": "Matin",
   "my_calendars": "Mes calendriers",
   "never": "Jamais",

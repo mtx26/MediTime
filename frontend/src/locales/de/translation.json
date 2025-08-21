@@ -136,7 +136,7 @@
     "confirm_delete": "Kalender löschen?",
     "confirm_delete_shared": "Freigegebenen Kalender löschen?",
     "confirm_rename": "Kalender umbenennen?",
-    "create_calendar_qr": "",
+    "create_calendar_qr": "QR scannen: {{calendarName}}",
     "creating_calendar": "Erstellung läuft ...",
     "daily_view": "Tageskalender",
     "day": "Tag",
@@ -156,7 +156,7 @@
     "month": "Monat",
     "name": "Kalendername",
     "new_name": "Neuer Name",
-    "processing": "",
+    "processing": "Verarbeitung läuft…",
     "reference_week": "Referenzwoche",
     "scan_medicines": "Medikamente scannen",
     "scan_medicines_description": "Scannen Sie die DataMatrix-Codes auf Ihren Medikamentenpackungen. Jedes gescannte Medikament wird automatisch Ihrem neuen Plan hinzugefügt.",
@@ -656,5 +656,28 @@
     "desc": "Weil im Gesundheitswesen kein Raum für Improvisation ist. MediTime bietet Ihnen eine klare, intuitive und sichere Lösung für die tägliche Nachverfolgung Ihrer Behandlungen und der Ihrer Angehörigen.",
     "title": "Warum MediTime wählen?"
   },
-  "yes": "Ja"
+  "yes": "Ja",
+  "image_upload": {
+    "title": "Auswählen und Vorschau einer Datei",
+    "file_type_error": "Es werden nur Bilddateien akzeptiert (jpg, png, webp, gif).",
+    "select_file_error": "Bitte wählen Sie eine Bilddatei aus.",
+    "no_medicines_found": "Im Bild wurden keine Medikamente gefunden.",
+    "analysis_error": "Fehler beim Parsen des Bildes.",
+    "file_analysis_error": "Fehler beim Parsen der Datei",
+    "preview_alt": "Vorschau",
+    "remove_image": "Bild löschen",
+    "file_selected": "Ausgewählte Datei",
+    "click_to_change": "Klicken Sie hier, um die Datei zu ändern",
+    "file_types": "JPG, PNG, WEBP, GIF"
+  },
+  "medicine_review": {
+    "title": "Arzneimittelüberprüfung",
+    "current_stock": "Aktueller Bestand",
+    "maximum_stock": "Lagerbestand maximal",
+    "time_of_day": "Moment",
+    "select_option": "Wählen...",
+    "start_date": "Anfang",
+    "delete_condition": "Entfernen Sie diese Bedingung",
+    "finish": "Zum Abschluss"
+  }
 }

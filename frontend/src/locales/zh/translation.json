@@ -136,7 +136,7 @@
     "confirm_delete": "删除日历？",
     "confirm_delete_shared": "删除共享日历？",
     "confirm_rename": "重命名日历？",
-    "create_calendar_qr": "",
+    "create_calendar_qr": "扫描二维码：{{calendarName}}",
     "creating_calendar": "正在创作...",
     "daily_view": "日历",
     "day": "天",
@@ -156,7 +156,7 @@
     "month": "月",
     "name": "日历名称",
     "new_name": "新名称",
-    "processing": "",
+    "processing": "正在处理…",
     "reference_week": "参考周",
     "scan_medicines": "扫描药物",
     "scan_medicines_description": "扫描药盒上的 DataMatrix 码。扫描的每种药物都会自动添加到您的新药计划中。",
@@ -656,5 +656,28 @@
     "desc": "因为医疗保健不容即兴发挥。MediTime 为您提供清晰、直观、安全的解决方案，让您日复一日地追踪自己和亲人的治疗情况。",
     "title": "为什么选择 MediTime？"
   },
-  "yes": "是的"
+  "yes": "是的",
+  "image_upload": {
+    "title": "选择并预览文件",
+    "file_type_error": "仅接受图像文件（jpg、png、webp、gif）。",
+    "select_file_error": "请选择一个图像文件。",
+    "no_medicines_found": "图像中未发现药物。",
+    "analysis_error": "解析图像时出错。",
+    "file_analysis_error": "解析文件时出错",
+    "preview_alt": "预览",
+    "remove_image": "删除图片",
+    "file_selected": "选定文件",
+    "click_to_change": "单击更改文件",
+    "file_types": "JPG、PNG、WEBP、GIF"
+  },
+  "medicine_review": {
+    "title": "药物审查",
+    "current_stock": "现有库存",
+    "maximum_stock": "库存上限",
+    "time_of_day": "片刻",
+    "select_option": "选择...",
+    "start_date": "开始",
+    "delete_condition": "删除此条件",
+    "finish": "结束"
+  }
 }

@@ -136,7 +136,7 @@
     "confirm_delete": "¿Borrar el calendario?",
     "confirm_delete_shared": "¿Eliminar calendario compartido?",
     "confirm_rename": "¿Cambiar el nombre del calendario?",
-    "create_calendar_qr": "",
+    "create_calendar_qr": "Escanear QR: {{calendarName}}",
     "creating_calendar": "Creación en progreso...",
     "daily_view": "Calendario diario",
     "day": "Día",
@@ -156,7 +156,7 @@
     "month": "Mes",
     "name": "Nombre del calendario",
     "new_name": "Nuevo nombre",
-    "processing": "",
+    "processing": "Procesamiento en progreso…",
     "reference_week": "Semana de referencia",
     "scan_medicines": "Medicamentos para escanear",
     "scan_medicines_description": "Escanee los códigos DataMatrix de sus cajas de medicamentos. Cada medicamento escaneado se añadirá automáticamente a su nuevo horario.",
@@ -656,5 +656,28 @@
     "desc": "Porque la atención médica no admite improvisaciones. MediTime te ofrece una solución clara, intuitiva y segura para el seguimiento diario de tus tratamientos y los de tus seres queridos.",
     "title": "¿Por qué elegir MediTime?"
   },
-  "yes": "Sí"
+  "yes": "Sí",
+  "image_upload": {
+    "title": "Seleccionar y obtener una vista previa de un archivo",
+    "file_type_error": "Sólo se aceptan archivos de imagen (jpg, png, webp, gif).",
+    "select_file_error": "Seleccione un archivo de imagen.",
+    "no_medicines_found": "No se encontró ningún medicamento en la imagen.",
+    "analysis_error": "Error al analizar la imagen.",
+    "file_analysis_error": "Error al analizar el archivo",
+    "preview_alt": "Avance",
+    "remove_image": "Eliminar imagen",
+    "file_selected": "Archivo seleccionado",
+    "click_to_change": "Haga clic para cambiar el archivo",
+    "file_types": "JPG, PNG, WEBP, GIF"
+  },
+  "medicine_review": {
+    "title": "Revisión de medicamentos",
+    "current_stock": "Stock actual",
+    "maximum_stock": "Stock máximo",
+    "time_of_day": "Momento",
+    "select_option": "Seleccionar...",
+    "start_date": "Comienzo",
+    "delete_condition": "Eliminar esta condición",
+    "finish": "Para terminar"
+  }
 }

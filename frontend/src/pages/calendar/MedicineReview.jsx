@@ -169,9 +169,9 @@ export default function MedicineReview() {
     
     if (field === 'time_of_day') {
       const timeOptions = {
-        'morning': 'Matin',
-        'noon': 'Midi', 
-        'evening': 'Soir'
+        'morning': t('morning'),
+        'noon': t('noon'), 
+        'evening': t('evening')
       };
       return timeOptions[value] || value;
     }
@@ -185,7 +185,7 @@ export default function MedicineReview() {
       label: (
         <>
           <i className="bi bi-pencil me-2"></i>
-          Modifier
+          {t('modify')}
         </>
       ),
       onClick: () => setEditMode(true),
@@ -199,7 +199,10 @@ export default function MedicineReview() {
       <div className="card mx-auto shadow p-4 mb-4" style={{ maxWidth: 500 }}>
         {/* Header avec ActionSheet */}
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h6 className="mb-0">Révision du médicament</h6>
+          <h5 className="text-center fw-bold">
+            <i className="bi bi-pencil me-2"></i>
+            {t('medicine_review.title')}
+          </h5>
           {!editMode && (
             <ActionSheet 
               actions={actionSheetActions}
@@ -210,7 +213,7 @@ export default function MedicineReview() {
         <div className="position-relative mb-3">
           <div className="row">
           <div className="col-12 col-md-6 mb-3 text-start">
-            <label htmlFor="name">Nom :</label><br />
+            <label htmlFor="name">{t('boxes.name')} :</label><br />
             {wasInitiallyMissing(index, 'name') || editMode ? (
               <input
                 type="text"
@@ -222,7 +225,7 @@ export default function MedicineReview() {
                 }}
                 onClick={() => setShowDropdown(true)}
                 onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                placeholder="Commencez à taper..."
+                placeholder={t('boxes.start_typing')}
               />
             ) : (
               <div className="form-control form-control-sm bg-light border">
@@ -232,7 +235,7 @@ export default function MedicineReview() {
           </div>
 
           <div className="col-12 col-md-6 mb-3 text-start">
-            <label htmlFor="dose">Dosage :</label><br />
+            <label htmlFor="dose">{t('boxes.dose')} :</label><br />
             {wasInitiallyMissing(index, 'dose') || editMode ? (
               <input
                 className={`form-control form-control-sm ${isMissing(current.dose) ? 'is-invalid' : ''}`}
@@ -252,14 +255,14 @@ export default function MedicineReview() {
                 }}
                 onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
                 id="dose"
-                placeholder="mg"
-                title="Dosage"
-                aria-label="Dosage"
+                placeholder={t('mg')}
+                title={t('boxes.dose')}
+                aria-label={t('boxes.dose')}
                 min={0}
               />
             ) : (
               <div className="form-control form-control-sm bg-light border">
-                <strong>{current.dose} mg</strong>
+                <strong>{current.dose} {t('mg')}</strong>
               </div>
             )}
           </div>
@@ -295,18 +298,18 @@ export default function MedicineReview() {
 
         <div className="row mb-3">
           {[{
-            label: 'Stock actuel',
+            label: t('medicine_review.current_stock'),
             field: 'stock_quantity',
             type: 'number',
             required: false,
           }, {
-            label: 'Stock maximum',
+            label: t('medicine_review.maximum_stock'),
             field: 'stock_max',
             type: 'number',
             min: '0',
             required: false,
           }, {
-            label: "Seuil d'alerte",
+            label: t('boxes.alert_threshold'),
             field: 'stock_alert_threshold',
             type: 'number',
             min: '0',
@@ -335,32 +338,32 @@ export default function MedicineReview() {
         </div>
         <hr />
         <div className="mb-2 text-start d-flex justify-content-between align-items-center">
-          <strong>Conditions de prise :</strong>
+          <strong>{t('boxes.intake_conditions')} :</strong>
         </div>
 
         {current.conditions.map((cond, i) => (
           <div key={i} className="mb-3 border rounded p-3 text-start bg-light">
             {[{
-              label: 'Moment',
+              label: t('medicine_review.time_of_day'),
               field: 'time_of_day',
               type: 'select',
               options: [
-                { value: '', label: 'Sélectionner...' },
-                { value: 'morning', label: 'Matin' },
-                { value: 'noon', label: 'Midi' },
-                { value: 'evening', label: 'Soir' },
+                { value: '', label: t('medicine_review.select_option') },
+                { value: 'morning', label: t('morning') },
+                { value: 'noon', label: t('noon') },
+                { value: 'evening', label: t('evening') },
               ],
             }, {
-              label: 'Intervalle (jours)',
+              label: t('boxes.condition.interval_days'),
               field: 'interval_days',
               type: 'number',
               min: '1',
             }, {
-              label: 'Début',
+              label: t('medicine_review.start_date'),
               field: 'start_date',
               type: 'date',
             }, {
-              label: 'Comprimés',
+              label: t('boxes.condition.tablet_count'),
               field: 'tablet_count',
               type: 'number',
               step: '0.25',
@@ -417,11 +420,11 @@ export default function MedicineReview() {
                   updated[index].conditions.splice(i, 1);
                   setMedicines(updated);
                 }}
-                title="Supprimer cette condition"
-                aria-label="Supprimer cette condition"
+                title={t('medicine_review.delete_condition')}
+                aria-label={t('medicine_review.delete_condition')}
               >
                 <i className="bi bi-trash me-2"></i>
-                Supprimer
+                {t('delete')}
               </button>
             )}
           </div>
@@ -444,11 +447,11 @@ export default function MedicineReview() {
             className="btn btn-secondary" 
             onClick={goPrev} 
             disabled={index === 0}
-            title="Précédent"
-            aria-label="Précédent"
+            title={t('previous')}
+            aria-label={t('previous')}
           >
             <i className="bi bi-chevron-left me-2"></i>
-            Précédent
+            {t('previous')}
           </button>
           <div className="d-flex align-items-center">
             <span className="text-muted">{index + 1} / {medicines.length}</span>
@@ -457,11 +460,11 @@ export default function MedicineReview() {
             className={`btn ${index < medicines.length - 1 ? "btn-primary" : "btn-success"}`}
             onClick={goNext}
             disabled={!isCurrentValid()}
-            title={index < medicines.length - 1 ? "Suivant" : "Terminer"}
-            aria-label="Suivant"
+            title={index < medicines.length - 1 ? t('next') : t('medicine_review.finish')}
+            aria-label={t('next')}
           >
             {index < medicines.length - 1 ? <i className="bi bi-chevron-right me-2"></i> : <i className="bi bi-check2-circle me-2"></i>}
-            {index < medicines.length - 1 ? "Suivant" : "Terminer"}
+            {index < medicines.length - 1 ? t('next') : t('medicine_review.finish')}
           </button>
         </div>
       </div>

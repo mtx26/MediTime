@@ -136,7 +136,7 @@
     "confirm_delete": "Delete the calendar?",
     "confirm_delete_shared": "Delete shared calendar?",
     "confirm_rename": "Rename the calendar?",
-    "create_calendar_qr": "",
+    "create_calendar_qr": "Scan QR : {{calendarName}}",
     "creating_calendar": "Creation in progress...",
     "daily_view": "Daily calendar",
     "day": "Day",
@@ -156,7 +156,7 @@
     "month": "Month",
     "name": "Calendar Name",
     "new_name": "New name",
-    "processing": "",
+    "processing": "Processing in progress…",
     "reference_week": "Reference week",
     "scan_medicines": "Scan medications",
     "scan_medicines_description": "Scan the DataMatrix codes on your medication boxes. Each scanned medication will be automatically added to your new schedule.",
@@ -656,5 +656,28 @@
     "desc": "Because healthcare doesn't leave room for improvisation. MediTime offers you a clear, intuitive, and secure solution for tracking your treatments and those of your loved ones, day after day.",
     "title": "Why choose MediTime?"
   },
-  "yes": "Yes"
+  "yes": "Yes",
+  "image_upload": {
+    "title": "Select and preview a file",
+    "file_type_error": "Only image files are accepted (jpg, png, webp, gif).",
+    "select_file_error": "Please select an image file.",
+    "no_medicines_found": "No medication found in the image.",
+    "analysis_error": "Error parsing image.",
+    "file_analysis_error": "Error parsing file",
+    "preview_alt": "Preview",
+    "remove_image": "Delete image",
+    "file_selected": "Selected file",
+    "click_to_change": "Click to change file",
+    "file_types": "JPG, PNG, WEBP, GIF"
+  },
+  "medicine_review": {
+    "title": "Drug Review",
+    "current_stock": "Current stock",
+    "maximum_stock": "Stock maximum",
+    "time_of_day": "Moment",
+    "select_option": "Select...",
+    "start_date": "Beginning",
+    "delete_condition": "Remove this condition",
+    "finish": "To end"
+  }
 }
