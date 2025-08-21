@@ -164,7 +164,7 @@ function Navbar({ sharedProps }) {
               <i className="bi bi-arrow-left"></i> {t('back')}
             </Link>
           ) : (
-            <Link to={`/${lng}/home`} className="navbar-brand fw-bold text-primary fs-4">
+            <Link to={`/${lng}/`} className="navbar-brand fw-bold text-primary fs-4">
               <i className="bi bi-capsule"></i> {t('app.title')}
             </Link>
           )}
