@@ -461,7 +461,7 @@ export default function MedicineReview() {
             aria-label="Suivant"
           >
             {index < medicines.length - 1 ? <i className="bi bi-chevron-right me-2"></i> : <i className="bi bi-check2-circle me-2"></i>}
-            {index < medicines.length - 1 ? "Suivant ›" : "Terminer"}
+            {index < medicines.length - 1 ? "Suivant" : "Terminer"}
           </button>
         </div>
       </div>

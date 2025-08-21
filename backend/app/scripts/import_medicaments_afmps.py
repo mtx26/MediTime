@@ -3,7 +3,6 @@ import re
 import unicodedata
 from datetime import datetime
 from typing import Optional, Dict, Any, Tuple
-
 import pandas as pd
 from psycopg2.extras import execute_values
 from app.db.connection import get_connection
