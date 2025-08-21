@@ -15,6 +15,7 @@ const SettingsPage = lazy(() => import('../pages/settings/SettingsPage'));
 const AddCalendarPage = lazy(() => import('../pages/calendar/AddCalendarPage'));
 const ImportCalendarPage = lazy(() => import('../pages/calendar/ImportCalendarPage'));
 const MedicineReview = lazy(() => import('../pages/calendar/MedicineReview'));
+const ScannerPage = lazy(() => import('../pages/calendar/ScannerPage'));
 const AcceptInvitePage = lazy(() => import('../pages/calendar/AcceptInvitePage'));
 
 const CalendarView = lazy(() => import('../pages/calendar/CalendarView'));
@@ -110,6 +111,19 @@ function AppRoutes({ sharedProps }) {
       <Route
         path="verify-email"
         element={userInfo ? <VerifyEmail /> : <Navigate to={`/${lng}/login`} />}
+      />
+      <Route
+        path="scanner"
+        element={
+          <PrivateRoute
+            element={
+              <RouteWithLoader
+                element={<ScannerPage {...sharedProps} />}
+                isLoading={sharedProps.loadingStates.isInitialLoading}
+              />
+            }
+          />
+        }
       />
 
       <Route

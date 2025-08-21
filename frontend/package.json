@@ -29,7 +29,8 @@
     "react-flags-select": "^2.5.0",
     "react-i18next": "^15.6.1",
     "react-router-dom": "^7.6.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zxing-wasm": "^2.2.1"
   },
   "scripts": {
     "dev": "vite",
