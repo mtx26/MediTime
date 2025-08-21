@@ -1,4 +1,5 @@
 from app.db.connection import get_connection
+import json
 
 def get_boxes(calendar_id):
     with get_connection() as conn:
@@ -36,8 +37,6 @@ def get_boxes(calendar_id):
     return boxes or []
 
 def update_box(box_id, calendar_id, box):
-    import json
-
     name = box.get("name")
     dose = box.get("dose")
     box_capacity = box.get("box_capacity")
@@ -85,25 +84,45 @@ SELECT 1;
             conn.commit()
 
 def create_box(calendar_id, box):
-    name = box.get("name", "nouvelle boite")
+    name = box.get("name") or "nouvelle boite"
+    dose = box.get("dose", 0)
     box_capacity = box.get("box_capacity", 0)
     stock_alert_threshold = box.get("stock_alert_threshold", 10)
     stock_quantity = box.get("stock_quantity", 0)
-    dose = box.get("dose", 0)
+    conditions = box.get("conditions", []) or []
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO medicine_boxes (calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity) 
-                VALUES (%s, %s, %s, %s, %s, %s)
-                RETURNING id
-            """, (calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity))
-            box = cursor.fetchone()
-            box_id = box.get("id")
+WITH ins_box AS (
+  INSERT INTO medicine_boxes (calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity)
+  VALUES (%s, %s, %s, %s, %s, %s)
+  RETURNING id
+),
+ins_cond AS (
+  INSERT INTO medicine_box_conditions (id, box_id, tablet_count, interval_days, start_date, time_of_day)
+  SELECT
+    COALESCE((c->>'id')::uuid, gen_random_uuid())        AS id,
+    (SELECT id FROM ins_box)                             AS box_id,
+    (c->>'tablet_count')::float8                         AS tablet_count,
+    (c->>'interval_days')::int                           AS interval_days,
+    NULLIF(c->>'start_date','')::date                    AS start_date,
+    COALESCE(NULLIF(c->>'time_of_day',''), 'morning')    AS time_of_day
+  FROM jsonb_array_elements(%s::jsonb) AS c
+  -- si le tableau est vide, cette clause n'insère rien (comportement OK)
+  RETURNING 1
+)
+SELECT id FROM ins_box;
+""", (
+    calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity,
+    json.dumps(conditions)
+))
+            row = cursor.fetchone()
+            # Selon votre cursor (tuple ou dict), récupère l'id proprement :
+            box_id = row[0] if row and not isinstance(row, dict) else (row.get("id") if row else None)
             conn.commit()
 
     return box_id
-
 def delete_box(box_id, calendar_id):
     with get_connection() as conn:
         with conn.cursor() as cursor:
@@ -116,40 +135,48 @@ def get_medicines_for_calendar(calendar_id):
         with conn.cursor() as cursor:
             cursor.execute("""
                 SELECT
-                    mb.name,
-                    mb.dose,
-                    c.tablet_count,
-                    c.time_of_day,
-                    c.interval_days,
-                    c.start_date
-                FROM medicine_boxes mb
-                LEFT JOIN medicine_box_conditions c ON mb.id = c.box_id
-                WHERE mb.calendar_id = %s
-                ORDER BY mb.name, c.start_date NULLS LAST
+                  COALESCE(
+                    jsonb_agg(
+                      jsonb_build_object(
+                        m.box_id::text,
+                        jsonb_build_object(
+                          'name', m.name,
+                          'dose', m.dose,
+                          'conditions', m.conditions
+                        )
+                      )
+                      ORDER BY m.name
+                    ),
+                    '[]'::jsonb
+                  ) AS medicines
+                FROM (
+                  SELECT
+                    mb.id   AS box_id,
+                    mb.name AS name,
+                    mb.dose AS dose,
+                    COALESCE(
+                      jsonb_agg(
+                        jsonb_build_object(
+                          'tablet_count', c.tablet_count,
+                          'time_of_day',  c.time_of_day,
+                          'interval_days', c.interval_days,
+                          'start_date',    c.start_date
+                        )
+                        ORDER BY c.start_date NULLS LAST
+                      ) FILTER (WHERE c.id IS NOT NULL),
+                      '[]'::jsonb
+                    ) AS conditions
+                  FROM medicine_boxes mb
+                  LEFT JOIN medicine_box_conditions c
+                    ON c.box_id = mb.id
+                  WHERE mb.calendar_id = %s
+                  GROUP BY mb.id, mb.name, mb.dose
+                ) AS m;
             """, (calendar_id,))
-            medicines = cursor.fetchall()
+            row = cursor.fetchone()
+            return row.get("medicines") or []
 
-            grouped = {}
-            for med in medicines:
-                name = med["name"]
-                dose = med["dose"]
 
-                # Extraire les conditions uniquement
-                condition = {
-                    "tablet_count": med["tablet_count"],
-                    "time_of_day": med["time_of_day"],
-                    "interval_days": med["interval_days"],
-                    "start_date": med["start_date"],
-                }
-
-                if name not in grouped:
-                    grouped[name] = {
-                        "dose": dose,
-                        "conditions": []
-                    }
-                grouped[name]["conditions"].append(condition)
-
-            return grouped
         
 def restock_box(box_id, calendar_id):
     try:

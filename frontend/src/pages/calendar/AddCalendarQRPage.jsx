@@ -13,7 +13,7 @@ function AddCalendarQRPage({ personalCalendars }) {
   const [error, setError] = useState('');
 
   // Récupérer le nom du calendrier depuis l'URL
-  React.useEffect(() => {
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const name = urlParams.get('name');
     if (name) {
