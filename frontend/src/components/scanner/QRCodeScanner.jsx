@@ -3,6 +3,27 @@ import { useTranslation } from "react-i18next";
 import { readBarcodes } from "zxing-wasm/reader";
 import { fetchMedicaments } from "../../utils/api/scanner";
 
+// Styles CSS pour les contrôles
+const controlsStyle = `
+  .scanner-controls .form-range {
+    height: 0.5rem;
+    width: 120px;
+  }
+  .scanner-controls .form-select-sm {
+    padding: 0.125rem 0.25rem;
+    font-size: 0.75rem;
+    min-width: 120px;
+  }
+`;
+
+// Injecter les styles
+if (typeof document !== 'undefined' && !document.getElementById('scanner-controls-styles')) {
+  const style = document.createElement('style');
+  style.id = 'scanner-controls-styles';
+  style.textContent = controlsStyle;
+  document.head.appendChild(style);
+}
+
 const readerOptions = {
   tryHarder: true,
   formats: ["DataMatrix"],
@@ -26,9 +47,36 @@ const QRCodeScanner = forwardRef(({
   const [gtins, setGtins] = useState([]); // liste des GTIN uniques (01)
   const [medicines, setMedicines] = useState({}); // cache des médicaments trouvés par GTIN - contient directement les medicine_boxes
   const [loadingGtin, setLoadingGtin] = useState(null); // GTIN en cours de recherche
+  
+  // Nouveaux états pour les contrôles de caméra
+  const [zoom, setZoom] = useState(1.5); // Zoom par défaut à 1.5
+  const [availableCameras, setAvailableCameras] = useState([]);
+  const [selectedCamera, setSelectedCamera] = useState(null);
+  const [showControls, setShowControls] = useState(false);
+  const hideControlsTimeoutRef = useRef(null);
+  const streamRef = useRef(null);
+  const isLoadingRef = useRef(false);
+  const lastScanTimeRef = useRef(0);
+  const scanIntervalMs = 150; // Intervalle entre les scans en ms (réduit la consommation)
 
   // Pour éviter de pousser 20x le même code d'affilée
   const lastSeenRef = useRef({ text: "", t: 0 });
+
+  // Fonction pour masquer automatiquement les contrôles
+  const autoHideControls = () => {
+    if (hideControlsTimeoutRef.current) {
+      clearTimeout(hideControlsTimeoutRef.current);
+    }
+    hideControlsTimeoutRef.current = setTimeout(() => {
+      setShowControls(false);
+    }, 3000); // Masquer après 3 secondes d'inactivité
+  };
+
+  // Fonction pour afficher les contrôles
+  const showControlsTemporary = () => {
+    setShowControls(true);
+    autoHideControls();
+  };
 
   // Exposer handleAddAll au composant parent via useImperativeHandle
   useImperativeHandle(ref, () => ({
@@ -53,39 +101,112 @@ const QRCodeScanner = forwardRef(({
   }, [medicines, onStateChange]);
 
   useEffect(() => {
-    let stream;
+    // Fonction pour obtenir la liste des caméras disponibles
+    async function getCameras() {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cameras = devices.filter(device => device.kind === 'videoinput');
+        setAvailableCameras(cameras);
+        
+        // Sélectionner la caméra arrière par défaut si disponible
+        if (cameras.length > 0 && !selectedCamera) {
+          const backCamera = cameras.find(camera => 
+            camera.label.toLowerCase().includes('back') || 
+            camera.label.toLowerCase().includes('rear') ||
+            camera.label.toLowerCase().includes('environment')
+          );
+          setSelectedCamera(backCamera || cameras[0]);
+        }
+      } catch (error) {
+        console.error('Erreur lors de l\'énumération des caméras:', error);
+      }
+    }
 
     async function start() {
+      // Éviter les chargements multiples simultanés
+      if (isLoadingRef.current) return;
+      isLoadingRef.current = true;
+
       setError("");
+      
+      // Arrêter le stream précédent s'il existe
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
+        // Obtenir les caméras disponibles
+        await getCameras();
+
+        const constraints = {
           video: {
-            facingMode: { ideal: "environment" },
+            deviceId: selectedCamera ? { exact: selectedCamera.deviceId } : undefined,
+            facingMode: selectedCamera ? undefined : { ideal: "environment" },
             // Astuces mobiles utiles :
             // width: { ideal: 1280 }, height: { ideal: 720 },
             // frameRate: { ideal: 30 }
           },
           audio: false,
-        });
+        };
 
-        if (!videoRef.current) return;
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        streamRef.current = stream;
+
+        if (!videoRef.current) {
+          isLoadingRef.current = false;
+          return;
+        }
+
+        // Attendre que la vidéo soit prête avant de jouer
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-
-        scanLoop(); // démarrer la boucle
+        
+        try {
+          await videoRef.current.play();
+          scanLoop(); // démarrer la boucle
+        } catch (playError) {
+          console.warn('Erreur lors de la lecture vidéo:', playError);
+          // Réessayer après un court délai
+          setTimeout(async () => {
+            try {
+              if (videoRef.current && videoRef.current.srcObject) {
+                await videoRef.current.play();
+                scanLoop();
+              }
+            } catch (retryError) {
+              console.error('Impossible de démarrer la vidéo:', retryError);
+            }
+          }, 100);
+        }
       } catch (e) {
         console.error(e);
-        setError(e?.message || t('scanner.camera_error'));
+        let errorMessage = e?.message || t('scanner.camera_error');
+        
+        setError(errorMessage);
+      } finally {
+        isLoadingRef.current = false;
       }
     }
 
     function stop() {
+      isLoadingRef.current = false;
+      
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
-      if (stream) {
-        stream.getTracks().forEach((t) => t.stop());
+      if (hideControlsTimeoutRef.current) {
+        clearTimeout(hideControlsTimeoutRef.current);
+        hideControlsTimeoutRef.current = null;
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+      }
+      
+      // Nettoyer la vidéo
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
       }
     }
 
@@ -97,7 +218,34 @@ const QRCodeScanner = forwardRef(({
     }
 
     return stop;
-  }, [show, modal]); // Dépend de show et modal maintenant
+  }, [show, modal, selectedCamera]); // Retiré zoom des dépendances pour éviter les rechargements
+
+  // Fonction pour changer le zoom (zoom numérique CSS)
+  const handleZoomChange = (newZoom) => {
+    setZoom(newZoom);
+  };
+
+  // Fonction pour changer de caméra
+  const handleCameraChange = (camera) => {
+    setSelectedCamera(camera);
+  };
+
+  // Fonction pour obtenir un nom de caméra court
+  const getCameraDisplayName = (camera, index) => {
+    if (!camera.label) return `Caméra ${index + 1}`;
+    
+    const label = camera.label.toLowerCase();
+    if (label.includes('back') || label.includes('rear') || label.includes('environment')) {
+      return 'Arrière';
+    } else if (label.includes('front') || label.includes('user') || label.includes('facing')) {
+      return 'Avant';
+    } else if (label.includes('external')) {
+      return 'Externe';
+    } else {
+      // Prendre les premiers mots du nom de la caméra
+      return camera.label.split(' ').slice(0, 2).join(' ').substring(0, 15);
+    }
+  };
 
   // Reset des données quand la modal s'ouvre (mode modal uniquement)
   useEffect(() => {
@@ -106,11 +254,24 @@ const QRCodeScanner = forwardRef(({
     }
   }, [show, modal]);
 
-  // Boucle de scan (requestAnimationFrame)
+  // Boucle de scan (requestAnimationFrame) avec throttling
   const scanLoop = async () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas) return;
+    if (!video || !canvas) {
+      rafRef.current = requestAnimationFrame(scanLoop);
+      return;
+    }
+
+    const now = performance.now();
+    
+    // Throttling: ne scanner que si assez de temps s'est écoulé
+    if (now - lastScanTimeRef.current < scanIntervalMs) {
+      rafRef.current = requestAnimationFrame(scanLoop);
+      return;
+    }
+    
+    lastScanTimeRef.current = now;
 
     try {
       const w = video.videoWidth || 0;
@@ -139,9 +300,8 @@ const QRCodeScanner = forwardRef(({
           // Tracé contour si dispo
           drawDetection(ctx, r);
 
-          // Anti-spam très basique
-          const now = performance.now();
-          const sameAsLast = r.text === lastSeenRef.current.text && (now - lastSeenRef.current.t < 1200);
+          // Anti-spam très basique (augmenté pour réduire la consommation)
+          const sameAsLast = r.text === lastSeenRef.current.text && (now - lastSeenRef.current.t < 2000);
           lastSeenRef.current = { text: r.text, t: now };
 
           if (!sameAsLast) {
@@ -163,6 +323,7 @@ const QRCodeScanner = forwardRef(({
       // console.warn(e);
     }
 
+    // Programmer le prochain scan
     rafRef.current = requestAnimationFrame(scanLoop);
   };
 
@@ -198,7 +359,8 @@ const QRCodeScanner = forwardRef(({
 
   // Fonction pour chercher le médicament associé au GTIN et créer directement une medicine_box
   const searchMedicine = async (gtin) => {
-    if (medicines[gtin] || loadingGtin === gtin) return; // Déjà en cache ou en cours
+    // Vérifier si le médicament est déjà en cours de recherche ou s'il est dans la liste active
+    if (loadingGtin === gtin || (medicines[gtin] && gtins.includes(gtin))) return;
     
     setLoadingGtin(gtin);
     try {
@@ -247,6 +409,10 @@ const QRCodeScanner = forwardRef(({
       delete newMedicines[gtinToRemove];
       return newMedicines;
     });
+    // S'assurer que le GTIN n'est plus en cours de chargement
+    if (loadingGtin === gtinToRemove) {
+      setLoadingGtin(null);
+    }
   };
 
   // Gérer l'ajout de tous les médicaments avec reset
@@ -346,20 +512,119 @@ const QRCodeScanner = forwardRef(({
   function renderScannerContent() {
     return (
       <div>
-        {/* Aperçu caméra */}
-        <div className="position-relative mb-3" style={{ borderRadius: 8, overflow: "hidden", aspectRatio: "4/3" }}>
+        {/* Aperçu caméra avec contrôles */}
+        <div 
+          className="position-relative mb-3 mx-auto" 
+          style={{ 
+            borderRadius: 8, 
+            overflow: "hidden", 
+            aspectRatio: "16/10", 
+            maxWidth: "400px",
+            width: "100%"
+          }}
+          onMouseEnter={showControlsTemporary}
+          onMouseLeave={() => {
+            if (hideControlsTimeoutRef.current) {
+              clearTimeout(hideControlsTimeoutRef.current);
+            }
+            setShowControls(false);
+          }}
+          onTouchStart={showControlsTemporary}
+        >
           <video
             ref={videoRef}
             playsInline
             muted
             className="w-100 h-100 bg-dark"
-            style={{ objectFit: "cover" }}
+            style={{ 
+              objectFit: "cover",
+              transform: `scale(${zoom})`,
+              transformOrigin: "center center"
+            }}
           />
           <canvas
             ref={canvasRef}
             className="position-absolute top-0 start-0 w-100 h-100"
-            style={{ objectFit: "cover" }}
+            style={{ 
+              objectFit: "cover",
+              transform: `scale(${zoom})`,
+              transformOrigin: "center center"
+            }}
           />
+          
+          {/* Contrôles discrets */}
+          <div 
+            className={`scanner-controls position-absolute top-0 end-0 p-2 transition-opacity ${showControls ? 'opacity-100' : 'opacity-25'}`}
+            style={{ 
+              background: 'rgba(0,0,0,0.7)', 
+              borderRadius: '0 8px 0 8px',
+              transition: 'opacity 0.3s ease',
+              backdropFilter: 'blur(4px)'
+            }}
+          >
+            {/* Contrôle de zoom */}
+            <div className="mb-2 text-center">
+              <label className="form-label text-white small mb-1 d-block">
+                <i className="bi bi-zoom-in me-1"></i>
+                Zoom: {zoom}x
+              </label>
+              <input
+                type="range"
+                className="form-range"
+                min="1"
+                max="5"
+                step="0.5"
+                value={zoom}
+                onChange={(e) => {
+                  handleZoomChange(parseFloat(e.target.value));
+                  autoHideControls(); // Réinitialiser le timer
+                }}
+              />
+            </div>
+            
+            {/* Sélection de caméra */}
+            {availableCameras.length > 1 && (
+              <div className="text-center">
+                <label className="form-label text-white small mb-1 d-block">
+                  <i className="bi bi-camera me-1"></i>
+                  Caméra
+                </label>
+                <select
+                  className="form-select form-select-sm"
+                  value={selectedCamera?.deviceId || ''}
+                  onChange={(e) => {
+                    const camera = availableCameras.find(c => c.deviceId === e.target.value);
+                    handleCameraChange(camera);
+                    autoHideControls(); // Réinitialiser le timer
+                  }}
+                >
+                  {availableCameras.map((camera, index) => (
+                    <option key={camera.deviceId} value={camera.deviceId}>
+                      {getCameraDisplayName(camera, index)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+          
+          {/* Bouton pour afficher/masquer les contrôles sur mobile */}
+          <button
+            className="btn btn-sm btn-secondary position-absolute bottom-0 end-0 m-2 d-md-none"
+            onClick={() => {
+              if (showControls) {
+                setShowControls(false);
+                if (hideControlsTimeoutRef.current) {
+                  clearTimeout(hideControlsTimeoutRef.current);
+                }
+              } else {
+                showControlsTemporary();
+              }
+            }}
+            style={{ opacity: 0.7 }}
+          >
+            <i className="bi bi-gear"></i>
+          </button>
         </div>
 
         {/* Messages d'erreur */}

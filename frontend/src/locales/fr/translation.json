@@ -437,16 +437,18 @@
   "revoke_link": "Révoquer le lien",
   "rights_reserved": "Tous droits réservés",
   "scanner": {
-    "add": "Ajouter",
+    "add": "Ajouter tous les médicaments",
+    "camera": "Caméra",
     "camera_error": "Impossible d'accéder à la caméra.",
-    "camera_instruction": "Pointez vers le code DataMatrix",
+    "camera_instruction": "Pointez la caméra vers un code DataMatrix",
     "cancel": "Annuler",
     "close": "Fermer",
     "medicine_not_found": "Médicament non trouvé",
     "quantity": "Quantité : {{quantity}}",
-    "remove_from_list": "Supprimer de la liste",
-    "searching": "Recherche...",
-    "title": "Scanner un QR code"
+    "remove_from_list": "Retirer de la liste",
+    "searching": "Recherche en cours...",
+    "select_camera": "Sélectionner une caméra",
+    "title": "Scanner de médicaments"
   },
   "security": {
     "current_email": "Email actuel :",
