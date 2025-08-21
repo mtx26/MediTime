@@ -13,8 +13,6 @@ const VerifyEmail = lazy(() => import('../pages/auth/VerifyEmail'));
 const NotificationsPage = lazy(() => import('../pages/notifications/NotificationsPage'));
 const SettingsPage = lazy(() => import('../pages/settings/SettingsPage'));
 const AddCalendarPage = lazy(() => import('../pages/calendar/AddCalendarPage'));
-const AddCalendarQRPage = lazy(() => import('../pages/calendar/AddCalendarQRPage'));
-const ImportCalendarPage = lazy(() => import('../pages/calendar/ImportCalendarPage'));
 const MedicineReview = lazy(() => import('../pages/calendar/MedicineReview'));
 const AcceptInvitePage = lazy(() => import('../pages/calendar/AcceptInvitePage'));
 
@@ -169,22 +167,6 @@ function AppRoutes({ sharedProps }) {
           element={
             <PrivateRoute
               element={<AddCalendarPage {...sharedProps} />}
-            />
-          }
-        />
-        <Route
-          path="import"
-          element={
-            <PrivateRoute
-              element={<ImportCalendarPage {...sharedProps} />}
-            />
-          }
-        />
-        <Route
-          path="qr"
-          element={
-            <PrivateRoute
-              element={<AddCalendarQRPage {...sharedProps} />}
             />
           }
         />
