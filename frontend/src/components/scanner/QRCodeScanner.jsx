@@ -449,7 +449,7 @@ const QRCodeScanner = forwardRef(({
     if (!text) return null;
 
     // Normaliser les séparateurs GS1
-    const GS1_SEPARATOR = "\u001D"; // Caractère de séparation GS1 (Group Separator)
+    const GS1_SEPARATOR = String.fromCharCode(29); // Caractère de séparation GS1 (Group Separator, code ASCII 29)
     const cleaned = text.replace(new RegExp(GS1_SEPARATOR, "g"), ""); // retire le GS (FNC1) si présent
 
     // 1) Format standard parenthésé "(01) 14chiffres"
