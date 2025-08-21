@@ -27,6 +27,119 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const [loadingBoxes, setLoadingBoxes] = useState(undefined);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('');
+  
+  // Fonction utilitaire pour gérer les alertes
+  const showAlert = (message, type) => {
+    setAlertMessage(message);
+    setAlertType(type);
+  };
+
+  // Fonction utilitaire pour gérer les réponses API
+  const handleApiResponse = (res, successMessage = null) => {
+    if (res.success) {
+      showAlert('✅ ' + (successMessage || res.message), 'success');
+    } else {
+      showAlert('❌ ' + res.error, 'danger');
+    }
+    return res.success;
+  };
+
+  // Fonction utilitaire pour créer des actions d'ActionSheet avec icônes
+  const createAction = (icon, label, onClick, danger = false) => ({
+    label: (
+      <>
+        <i className={`bi bi-${icon} me-2`} /> {label}
+      </>
+    ),
+    onClick,
+    danger
+  });
+
+  // Fonction utilitaire pour créer un séparateur
+  const createSeparator = () => ({ separator: true });
+
+  // Fonction pour générer les actions communes des ActionSheet
+  const getCommonActions = (calendarType) => {
+    const actions = [];
+    
+    // Action commune : Export PDF
+    actions.push(createAction('download', t('boxes.export_pdf'), () => calendarSource.downloadCalendarPdf(calendarId)));
+    
+    if (calendarType === 'personal') {
+      // Actions spécifiques au calendrier personnel
+      actions.unshift(createAction('box-arrow-up', t('share'), () => navigate(`/${lng}/shared-calendars?calendar=${calendarId}`)));
+      actions.push(
+        createSeparator(),
+        createAction('exclamation-triangle', t('stock'), () => navigate(`/${lng}/${basePath}/${calendarId}/stock-alerts`))
+      );
+    }
+    
+    // Actions communes : Paramètres et Suppression
+    actions.push(
+      createSeparator(),
+      createAction('gear', t('settings.label'), () => navigate(`/${lng}/${basePath}/${calendarId}/settings`)),
+      createSeparator()
+    );
+    
+    if (calendarType === 'personal') {
+      actions.push(createAction('trash', t('delete'), async () => {
+        const rep = await personalCalendars.deleteCalendar(calendarId);
+        if (rep.success) {
+          navigate(`/${lng}/calendars`);
+        } else {
+          showAlert(rep.error, 'danger');
+        }
+      }, true));
+    } else if (calendarType === 'sharedUser') {
+      actions.push(createAction('trash3', t('delete'), () => sharedUserCalendars.deleteSharedCalendar(calendarId), true));
+    }
+    
+    return actions;
+  };
+
+  // Fonction utilitaire pour créer des cartes d'action
+  const createActionCard = (borderColor, iconClass, textColor, text, onClick, ariaLabel, hasTooltip = false) => (
+    <button
+      type="button"
+      onClick={onClick}
+      className="btn p-0 border-0 bg-transparent text-start flex-fill"
+      style={{ cursor: 'pointer' }}
+      aria-label={ariaLabel}
+      title={ariaLabel}
+    >
+      <div className={`card h-100 shadow border border-${borderColor}`}>
+        <div className={`card-body d-flex flex-column justify-content-center align-items-center p-3 ${hasTooltip ? 'position-relative' : ''}`}>
+          {hasTooltip && (
+            <button
+              type="button"
+              className="btn btn-link position-absolute top-0 end-0 m-1 p-1 text-info"
+              style={{ fontSize: '1.2rem' }}
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+            >
+              <i className="bi bi-info-circle"></i>
+              {showTooltip && (
+                <div
+                  className="position-absolute bg-dark text-white p-2 rounded shadow"
+                  style={{
+                    top: '100%',
+                    right: '0',
+                    width: '200px',
+                    fontSize: '0.8rem',
+                    zIndex: 1050
+                  }}
+                >
+                  {t('boxes.qr_code_help_text')}
+                </div>
+              )}
+            </button>
+          )}
+          <i className={`${iconClass} ${textColor} fs-1`}></i>
+          <p className={`${textColor} fw-bold mt-2 mb-0 text-center`}>{text}</p>
+        </div>
+      </div>
+    </button>
+  );
   const [selectedModifyBox, setSelectedModifyBox] = useState(null);
   const [selectedDropBox, setSelectedDropBox] = useState({});
   const [modifyBoxName, setModifyBoxName] = useState({});
@@ -97,25 +210,13 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       selectedModifyBox,
       box
     );
-    if (res.success) {
-      setAlertMessage('✅ ' + res.message);
-      setAlertType('success');
-    } else {
-      setAlertMessage('❌ ' + res.error);
-      setAlertType('danger');
-    }
+    handleApiResponse(res);
     setSelectedModifyBox(null);
   };
 
   const restockBox = async (boxId) => {
     const res = await calendarSource.restockBox(calendarId, boxId);
-    if (res.success) {
-      setAlertMessage('✅ ' + res.message);
-      setAlertType('success');
-    } else {
-      setAlertMessage('❌ ' + res.error);
-      setAlertType('danger');
-    }
+    handleApiResponse(res);
   };
 
   const addBox = async () => {
@@ -129,8 +230,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   // Ajouter des nouvelles boîtes (mode création) - maintenant reçoit directement des medicine_boxes
   const addScannedMedicines = async (medicineBoxes) => {
     if (!medicineBoxes || medicineBoxes.length === 0) {
-      setAlertMessage('⚠️ Ajouter des médicaments');
-      setAlertType('warning');
+      showAlert('⚠️ Ajouter des médicaments', 'warning');
       return { success: false };
     }
 
@@ -163,18 +263,15 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     // Fermer la modal
     setShowQRModal(false);
 
-    // Message de résultat
+    // Message de résultat avec fonction utilitaire
     if (errorCount === 0) {
-      setAlertMessage(`✅ Ajouté`);
-      setAlertType('success');
+      showAlert('✅ Ajouté', 'success');
       return { success: true, successCount, errorCount };
     } else if (successCount === 0) {
-      setAlertMessage(`❌ Ajouter des médicaments`);
-      setAlertType('danger');
+      showAlert('❌ Ajouter des médicaments', 'danger');
       return { success: false, successCount, errorCount };
     } else {
-      setAlertMessage(`⚠️ ${successCount} ajouté(s), ${errorCount} erreur(s)`);
-      setAlertType('warning');
+      showAlert(`⚠️ ${successCount} ajouté(s), ${errorCount} erreur(s)`, 'warning');
       return { success: true, successCount, errorCount }; // Partiel = succès
     }
   };
@@ -182,8 +279,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   // Mettre à jour une boîte existante (mode modification) - maintenant reçoit directement des medicine_boxes
   const updateScannedMedicine = async (medicineBoxes) => {
     if (!medicineBoxes || medicineBoxes.length === 0 || !currentEditingBoxId) {
-      setAlertMessage('⚠️ Ajouter un médicament');
-      setAlertType('warning');
+      showAlert('⚠️ Ajouter un médicament', 'warning');
       return { success: false };
     }
 
@@ -206,18 +302,15 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       setSingleScan(false);
       
       if (res.success) {
-        setAlertMessage('✅ Ajouté');
-        setAlertType('success');
+        showAlert('✅ Ajouté', 'success');
         return { success: true, successCount: 1, errorCount: 0 };
       } else {
-        setAlertMessage('❌ Ajouter un médicament');
-        setAlertType('danger');
+        showAlert('❌ Ajouter un médicament', 'danger');
         return { success: false, successCount: 0, errorCount: 1 };
       }
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
-      setAlertMessage('❌ Ajouter un médicament');
-      setAlertType('danger');
+      showAlert('❌ Ajouter un médicament', 'danger');
       return { success: false, successCount: 0, errorCount: 1 };
     }
   };
@@ -238,13 +331,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   const deleteBox = async (boxId) => {
     const res = await calendarSource.deleteBox(calendarId, boxId);
-    if (res.success) {
-      setAlertMessage('✅ ' + res.message);
-      setAlertType('success');
-    } else {
-      setAlertMessage('❌ ' + res.error);
-      setAlertType('danger');
-    }
+    handleApiResponse(res);
   };
 
   useEffect(() => {
@@ -313,99 +400,10 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
           </h4>
           <div className="ms-auto">
             {calendarType === 'personal' && (
-              <ActionSheet
-                actions={[
-                  {
-                    label: (
-                      <>
-                        <i className="bi bi-box-arrow-up me-2" /> {t('share')}
-                      </>
-                    ),
-                    onClick: () =>
-                      navigate(`/${lng}/shared-calendars?calendar=${calendarId}`),
-                  },
-                  { separator: true },
-                  {
-                    label: (
-                      <>
-                        <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
-                      </>
-                    ),
-                    onClick: () => calendarSource.downloadCalendarPdf(calendarId),
-                  },
-                  {
-                    label: (
-                      <>
-                        <i className="bi bi-exclamation-triangle me-2" /> {t('stock')}
-                      </>
-                    ),
-                    onClick: () =>
-                      navigate(`/${lng}/${basePath}/${calendarId}/stock-alerts`),
-                  },
-                  { separator: true },
-                  {
-                    label: (
-                      <>
-                        <i className="bi bi-gear me-2" /> {t('settings.label')}
-                      </>
-                    ),
-                    onClick: () =>
-                      navigate(`/${lng}/${basePath}/${calendarId}/settings`),
-                  },
-                  { separator: true },
-                  {
-                    label: (
-                      <>
-                        <i className="bi bi-trash me-2" /> {t('delete')}
-                      </>
-                    ),
-                    onClick: async () => {
-                      const rep = await personalCalendars.deleteCalendar(calendarId);
-                      if (rep.success) {
-                        navigate(`/${lng}/calendars`);
-                      } else {
-                        setAlertType('danger');
-                        setAlertMessage(rep.error);
-                      }
-                    },
-                    danger: true,
-                  },
-                ]}
-              />
+              <ActionSheet actions={getCommonActions('personal')} />
             )}
             {calendarType === 'sharedUser' && (
-              <ActionSheet
-                actions={[
-                  {
-                    label: (
-                      <>
-                        <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
-                      </>
-                    ),
-                    onClick: () => calendarSource.downloadCalendarPdf(calendarId),
-                  },
-                  { separator: true },
-                  {
-                    label: (
-                      <>
-                        <i className="bi bi-gear me-2" /> {t('settings.label')}
-                      </>
-                    ),
-                    onClick: () =>
-                      navigate(`/${lng}/${basePath}/${calendarId}/settings`),
-                  },
-                  { separator: true },
-                  {
-                    label: (
-                      <>
-                        <i className="bi bi-trash3 me-2"></i> {t('delete')}
-                      </>
-                    ),
-                    onClick: () => sharedUserCalendars.deleteSharedCalendar(calendarId),
-                    danger: true,
-                  },
-                ]}
-              />
+              <ActionSheet actions={getCommonActions('sharedUser')} />
             )}
           </div>
         </div>
@@ -480,59 +478,23 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
           ))}
           <div className="col-12 col-md-6 mb-3">
             <div className="d-flex flex-column gap-2 h-100">
-              <button
-                type="button"
-                onClick={() => addBox()}
-                className="btn p-0 border-0 bg-transparent text-start flex-fill"
-                style={{ cursor: 'pointer' }}
-                aria-label={t('boxes.add_manual')}
-                title={t('boxes.add_manual')}
-              >
-                <div className="card h-100 shadow border border-success">
-                  <div className="card-body d-flex flex-column justify-content-center align-items-center p-3">
-                    <i className="bi bi-plus-circle text-success fs-1"></i>
-                    <p className="text-success fw-bold mt-2 mb-0 text-center">{t('boxes.add_manual')}</p>
-                  </div>
-                </div>
-              </button>
-              <button
-                type="button"
-                onClick={openAddMode}
-                className="btn p-0 border-0 bg-transparent text-start flex-fill"
-                style={{ cursor: 'pointer' }}
-                aria-label={t('boxes.add_with_qr')}
-                title={t('boxes.add_with_qr')}
-              >
-                <div className="card h-100 shadow border border-primary">
-                  <div className="card-body d-flex flex-column justify-content-center align-items-center p-3 position-relative">
-                    <button
-                      type="button"
-                      className="btn btn-link position-absolute top-0 end-0 m-1 p-1 text-info"
-                      style={{ fontSize: '1.2rem' }}
-                      onMouseEnter={() => setShowTooltip(true)}
-                      onMouseLeave={() => setShowTooltip(false)}
-                    >
-                      <i className="bi bi-info-circle"></i>
-                      {showTooltip && (
-                        <div
-                          className="position-absolute bg-dark text-white p-2 rounded shadow"
-                          style={{
-                            top: '100%',
-                            right: '0',
-                            width: '200px',
-                            fontSize: '0.8rem',
-                            zIndex: 1050
-                          }}
-                        >
-                          {t('boxes.qr_code_help_text')}
-                        </div>
-                      )}
-                    </button>
-                    <i className="bi bi-qr-code-scan text-primary fs-1"></i>
-                    <p className="text-primary fw-bold mt-2 mb-0 text-center">{t('boxes.add_with_qr')}</p>
-                  </div>
-                </div>
-              </button>
+              {createActionCard(
+                'success',
+                'bi bi-plus-circle',
+                'text-success',
+                t('boxes.add_manual'),
+                () => addBox(),
+                t('boxes.add_manual')
+              )}
+              {createActionCard(
+                'primary',
+                'bi bi-qr-code-scan',
+                'text-primary',
+                t('boxes.add_with_qr'),
+                openAddMode,
+                t('boxes.add_with_qr'),
+                true
+              )}
             </div>
           </div>
         </div>
@@ -577,6 +539,131 @@ function BoxCard({
   openUpdateMode
 }) {
   const { t } = useTranslation();
+
+  // Fonction pour créer les actions de la BoxCard
+  const getBoxActions = () => [
+    {
+      label: (
+        <>
+          <i className="bi bi-qr-code-scan me-2" /> {t('boxes.scan_qr_code')}
+        </>
+      ),
+      onClick: () => openUpdateMode(box.id),
+    },
+    { separator: true },
+    {
+      label: (
+        <>
+          <i className="bi bi-pencil me-2" /> {t('boxes.edit')}
+        </>
+      ),
+      onClick: () => setSelectedModifyBox(box.id),
+    },
+    {
+      label: (
+        <>
+          <i className="bi bi-file-earmark-pdf me-2" /> {t('boxes.view_notice')}
+        </>
+      ),
+      onClick: () => openNotice(box.id),
+    },
+    { separator: true },
+    {
+      label: (
+        <>
+          <i className="bi bi-trash me-2" /> {t('boxes.delete')}
+        </>
+      ),
+      onClick: () => deleteBox(box.id),
+      danger: true,
+    },
+  ];
+
+  // Fonction pour réinitialiser les états de modification
+  const resetModificationStates = () => {
+    setSelectedModifyBox(null);
+    setModifyBoxName({ ...modifyBoxName, [box.id]: box.name });
+    setModifyBoxCapacity({
+      ...modifyBoxCapacity,
+      [box.id]: box.box_capacity,
+    });
+    setModifyBoxStockAlertThreshold({
+      ...modifyBoxStockAlertThreshold,
+      [box.id]: box.stock_alert_threshold,
+    });
+    setModifyBoxStockQuantity({
+      ...modifyBoxStockQuantity,
+      [box.id]: box.stock_quantity,
+    });
+    setBoxConditions({
+      ...boxConditions,
+      [box.id]: box.conditions.reduce(
+        (acc, condition) => ({
+          ...acc,
+          [condition.id]: condition,
+        }),
+        {}
+      ),
+    });
+    setDose({ ...dose, [box.id]: box.dose });
+  };
+
+  // Fonction utilitaire pour créer des boutons avec icônes
+  const createIconButton = (className, icon, text, onClick, ariaLabel, title) => (
+    <button
+      type="button"
+      className={className}
+      onClick={onClick}
+      aria-label={ariaLabel || text}
+      title={title || text}
+    >
+      <i className={`bi bi-${icon}`}></i> {text}
+    </button>
+  );
+
+  // Fonction pour ajouter une nouvelle condition
+  const addNewCondition = () => {
+    const id = `temp_${uuidv4()}`; // Préfixe pour les nouvelles conditions
+    setBoxConditions((prev) => ({
+      ...prev,
+      [box.id]: {
+        ...prev[box.id],
+        [id]: {
+          id,
+          tablet_count: 1,
+          interval_days: 1,
+          start_date: null,
+          time_of_day: 'morning',
+        },
+      },
+    }));
+    setSelectedModifyBox(box.id);
+  };
+
+  // Fonction pour supprimer une condition
+  const deleteCondition = (conditionId) => {
+    setBoxConditions((prev) => ({
+      ...prev,
+      [box.id]: {
+        ...prev[box.id],
+        [conditionId]: undefined,
+      },
+    }));
+  };
+
+  // Fonction pour gérer le changement d'une condition
+  const handleConditionChange = (conditionId, field, value) => {
+    setBoxConditions((prev) => ({
+      ...prev,
+      [box.id]: {
+        ...prev[box.id],
+        [conditionId]: {
+          ...prev[box.id][conditionId],
+          [field]: value,
+        },
+      },
+    }));
+  };
 
   const editable = selectedModifyBox === box.id;
   const timeOfDayMap = {
@@ -652,43 +739,7 @@ function BoxCard({
         {(!selectedModifyBox || selectedModifyBox !== box.id) && (
           <ActionSheet
             buttonSize="sm"
-            actions={[
-              {
-                label: (
-                  <>
-                    <i className="bi bi-qr-code-scan me-2" /> {t('boxes.scan_qr_code')}
-                  </>
-                ),
-                onClick: () => openUpdateMode(box.id),
-              },
-              { separator: true },
-              {
-                label: (
-                  <>
-                    <i className="bi bi-pencil me-2" /> {t('boxes.edit')}
-                  </>
-                ),
-                onClick: () => setSelectedModifyBox(box.id),
-              },
-              {
-                label: (
-                  <>
-                    <i className="bi bi-file-earmark-pdf me-2" /> {t('boxes.view_notice')}
-                  </>
-                ),
-                onClick: () => openNotice(box.id),
-              },
-              { separator: true },
-              {
-                label: (
-                  <>
-                    <i className="bi bi-trash me-2" /> {t('boxes.delete')}
-                  </>
-                ),
-                onClick: () => deleteBox(box.id),
-                danger: true,
-              },
-            ]}
+            actions={getBoxActions()}
           />
         )}
       </div>
@@ -770,14 +821,14 @@ function BoxCard({
         {(!selectedModifyBox || selectedModifyBox !== box.id) && (
           <>
             <div className="w-50">
-              <button
-                className="btn btn-outline-success"
-                onClick={() => restockBox(box.id)}
-                aria-label={t('boxes.restock')}
-                title={t('boxes.restock')}
-              >
-                <i className="bi bi-plus-circle"></i> {t('boxes.restock')}
-              </button>
+              {createIconButton(
+                "btn btn-outline-success",
+                "plus-circle",
+                t('boxes.restock'),
+                () => restockBox(box.id),
+                t('boxes.restock'),
+                t('boxes.restock')
+              )}
             </div>
           </>
         )}
@@ -831,18 +882,7 @@ function BoxCard({
                                 defaultValue={condition[field]}
                                 title={label}
                                 aria-label={label}
-                                onChange={(e) =>
-                                  setBoxConditions((prev) => ({
-                                    ...prev,
-                                    [box.id]: {
-                                      ...prev[box.id],
-                                      [condition.id]: {
-                                        ...prev[box.id][condition.id],
-                                        [field]: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
+                                onChange={(e) => handleConditionChange(condition.id, field, e.target.value)}
                               >
                                 {options.map(opt => (
                                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -862,67 +902,29 @@ function BoxCard({
                                 min={min}
                                 step={step}
                                 disabled={disabled}
-                                onChange={(e) =>
-                                  setBoxConditions((prev) => ({
-                                    ...prev,
-                                    [box.id]: {
-                                      ...prev[box.id],
-                                      [condition.id]: {
-                                        ...prev[box.id][condition.id],
-                                        [field]: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
+                                onChange={(e) => handleConditionChange(condition.id, field, e.target.value)}
                               />
                             )}
                           </div>
                         ))}
-                        <button
-                          type="button"
-                          className="btn btn-danger btn-sm mt-2"
-                          onClick={() =>
-                            setBoxConditions((prev) => ({
-                              ...prev,
-                              [box.id]: {
-                                ...prev[box.id],
-                                [condition.id]: undefined,
-                              },
-                            }))
-                          }
-                          title={t('boxes.condition.delete')}
-                          aria-label={t('boxes.condition.delete')}
-                        >
-                          <i className="bi bi-trash"></i> {t('boxes.condition.delete')}
-                        </button>
+                        {createIconButton(
+                          "btn btn-danger btn-sm mt-2",
+                          "trash",
+                          t('boxes.condition.delete'),
+                          () => deleteCondition(condition.id),
+                          t('boxes.condition.delete'),
+                          t('boxes.condition.delete')
+                        )}
                       </div>
                     </div>
                   ))}
 
-                <button
-                  type="button"
-                  className="btn btn-outline-dark w-100"
-                  onClick={() => {
-                    const id = `temp_${uuidv4()}`; // Préfixe pour les nouvelles conditions
-                    setBoxConditions((prev) => ({
-                      ...prev,
-                      [box.id]: {
-                        ...prev[box.id],
-                        [id]: {
-                          id,
-                          tablet_count: 1,
-                          interval_days: 1,
-                          start_date: null,
-                          time_of_day: 'morning',
-                        },
-                      },
-                    }));
-                    setSelectedModifyBox(box.id);
-                  }}
-                >
-                <i className="bi bi-plus-lg me-2"></i>
-                {t('boxes.condition.add')}
-                </button>
+                {createIconButton(
+                  "btn btn-outline-dark w-100",
+                  "plus-lg",
+                  t('boxes.condition.add'),
+                  addNewCondition
+                )}
               </>
             ) : Object.values(box.conditions).filter(
                 (condition) => condition !== undefined
@@ -975,41 +977,14 @@ function BoxCard({
             >
               <i className="bi bi-save"></i> {t('boxes.save')}
             </button>
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              onClick={() => {
-                setSelectedModifyBox(null);
-                setModifyBoxName({ ...modifyBoxName, [box.id]: box.name });
-                setModifyBoxCapacity({
-                  ...modifyBoxCapacity,
-                  [box.id]: box.box_capacity,
-                });
-                setModifyBoxStockAlertThreshold({
-                  ...modifyBoxStockAlertThreshold,
-                  [box.id]: box.stock_alert_threshold,
-                });
-                setModifyBoxStockQuantity({
-                  ...modifyBoxStockQuantity,
-                  [box.id]: box.stock_quantity,
-                });
-                setBoxConditions({
-                  ...boxConditions,
-                  [box.id]: box.conditions.reduce(
-                    (acc, condition) => ({
-                      ...acc,
-                      [condition.id]: condition,
-                    }),
-                    {}
-                  ),
-                });
-                setDose({ ...dose, [box.id]: box.dose });
-              }}
-              aria-label={t('boxes.cancel')}
-              title={t('boxes.cancel')}
-            >
-              <i className="bi bi-x"></i> {t('boxes.cancel')}
-            </button>
+            {createIconButton(
+              "btn btn-secondary btn-sm",
+              "x",
+              t('boxes.cancel'),
+              resetModificationStates,
+              t('boxes.cancel'),
+              t('boxes.cancel')
+            )}
           </div>
         </>
       )}
@@ -1053,29 +1028,25 @@ function BoxField({
 
 function StockBadge({ box }) {
   const { t } = useTranslation();
+  
+  // Fonction utilitaire pour créer un badge
+  const createBadge = (bgColor, icon, text) => (
+    <span className={`badge bg-${bgColor}`}>
+      <i className={`bi bi-${icon}`} /> {text}
+    </span>
+  );
+  
   if (box.box_capacity === 0) return null;
 
   if (box.stock_quantity <= 0) {
-    return (
-      <span className="badge bg-danger">
-        <i className="bi bi-exclamation-triangle" /> {t('boxes.stock.badge.out')}
-      </span>
-    );
+    return createBadge('danger', 'exclamation-triangle', t('boxes.stock.badge.out'));
   }
 
   if (box.stock_quantity <= box.stock_alert_threshold) {
-    return (
-      <span className="badge bg-warning">
-        <i className="bi bi-exclamation-triangle" /> {t('boxes.stock.badge.low')}
-      </span>
-    );
+    return createBadge('warning', 'exclamation-triangle', t('boxes.stock.badge.low'));
   }
 
-  return (
-    <span className="badge bg-success">
-      <i className="bi bi-check-circle" /> {t('boxes.stock.badge.high')}
-    </span>
-  );
+  return createBadge('success', 'check-circle', t('boxes.stock.badge.high'));
 }
 
 function ConditionUnlessBadge({ conditions, boxId, setSelectedDropBox, setSelectedModifyBox }) {
@@ -1083,6 +1054,13 @@ function ConditionUnlessBadge({ conditions, boxId, setSelectedDropBox, setSelect
 
   const hasNoConditions =
     Object.values(conditions || {}).filter((c) => c !== undefined).length === 0;
+
+  // Fonction utilitaire pour créer un badge
+  const createBadge = (bgColor, icon, text) => (
+    <span className={`badge bg-${bgColor}`}>
+      <i className={`bi bi-${icon}`} /> {text}
+    </span>
+  );
 
   return hasNoConditions ? (
     <button 
@@ -1092,9 +1070,7 @@ function ConditionUnlessBadge({ conditions, boxId, setSelectedDropBox, setSelect
         setSelectedModifyBox(boxId)
       }}
     >
-      <span className="badge bg-warning">
-        <i className="bi bi-info-circle" /> {t('boxes.condition.none')}
-      </span>
+      {createBadge('warning', 'info-circle', t('boxes.condition.none'))}
     </button>
   ) : null;
 }
