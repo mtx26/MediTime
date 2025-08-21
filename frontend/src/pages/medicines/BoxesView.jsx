@@ -105,36 +105,53 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     }
   };
 
-  const handleQRMedicineFound = async ({ medicine, action }) => {
-    if (action === 'select') {
-      // Créer une nouvelle boîte avec toutes les informations du médicament scanné
-      console.log('Médicament détecté:', medicine);
-      const dose = parseInt(medicine.dose?.replace(/\D/g, '') || 0);
-      const conditionnement = medicine.conditionnement;
-      const stockAlertThreshold = 10;
+  // Ajouter tous les médicaments scannés
+  const addAllScannedMedicines = async (scannedMedicines) => {
+    if (!scannedMedicines || scannedMedicines.length === 0) {
+      setAlertMessage('⚠️ Aucun médicament à ajouter');
+      setAlertType('warning');
+      return;
+    }
 
-      console.log('Medicine object:', medicine);
-      console.log('Parsed values:', { dose, conditionnement });
+    let successCount = 0;
+    let errorCount = 0;
 
-      const res = await calendarSource.createBox(
-        calendarId, 
-        medicine.name,
-        conditionnement, // boxCapacity
-        stockAlertThreshold,
-        conditionnement, // stockQuantity
-        dose // dose
-      );
-      
-      console.log('CreateBox result:', res);
+    for (const item of scannedMedicines) {
+      try {
+        const res = await calendarSource.createBox(
+          calendarId,
+          item.medicine.name,
+          item.conditionnement, // boxCapacity
+          item.stockAlertThreshold,
+          item.conditionnement, // stockQuantity
+          item.dose // dose
+        );
 
-      if (res.success) {
-        setShowQRModal(false);
-        setAlertMessage('✅ Médicament ajouté avec succès');
-        setAlertType('success');
-      } else {
-        setAlertMessage('❌ Erreur lors de la création de la boîte: ' + (res.error || 'Erreur inconnue'));
-        setAlertType('danger');
+        if (res.success) {
+          successCount++;
+        } else {
+          errorCount++;
+          console.error('Erreur création boîte:', res.error);
+        }
+      } catch (error) {
+        errorCount++;
+        console.error('Erreur lors de la création:', error);
       }
+    }
+
+    // Fermer la modal
+    setShowQRModal(false);
+
+    // Message de résultat
+    if (errorCount === 0) {
+      setAlertMessage(`✅ ${successCount} médicament(s) ajouté(s) avec succès`);
+      setAlertType('success');
+    } else if (successCount === 0) {
+      setAlertMessage(`❌ Erreur lors de l'ajout des médicaments`);
+      setAlertType('danger');
+    } else {
+      setAlertMessage(`⚠️ ${successCount} médicament(s) ajouté(s), ${errorCount} erreur(s)`);
+      setAlertType('warning');
     }
   };
 
@@ -355,53 +372,13 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         </div>
       </div>
 
-      {/* Modal pour scanner QR code */}
-      <div className={`modal fade ${showQRModal ? 'show' : ''}`} style={{ display: showQRModal ? 'block' : 'none' }} tabIndex="-1">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">
-                <i className="bi bi-qr-code-scan me-2"></i>
-                Scanner un QR code
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => setShowQRModal(false)}
-                aria-label="Fermer"
-              ></button>
-            </div>
-            <div className="modal-body">
-              {showQRModal && (
-                <QRCodeScanner
-                  singleScan={true}
-                  onMedicineFound={(medicine) => {
-                    handleQRMedicineFound({ medicine, action: 'select' });
-                  }}
-                  onError={(error) => {
-                    console.error('Erreur lors du scan:', error);
-                    setAlertType('danger');
-                    setAlertMessage('Erreur lors du scan du QR code');
-                    setShowQRModal(false);
-                  }}
-                />
-              )}
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setShowQRModal(false)}
-              >
-                Annuler
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Overlay pour modal Bootstrap */}
-      {showQRModal && <div className="modal-backdrop fade show"></div>}
+      {/* Composant QRCodeScanner avec modal intégrée */}
+      <QRCodeScanner
+        show={showQRModal}
+        singleScan={false}
+        onAddAll={addAllScannedMedicines}
+        onClose={() => setShowQRModal(false)}
+      />
     </div>
   );
 }

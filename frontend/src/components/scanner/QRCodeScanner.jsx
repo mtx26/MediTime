@@ -8,7 +8,13 @@ const readerOptions = {
   maxNumberOfSymbols: 1,
 };
 
-export default function QRCodeScanner({ onMedicineFound = null, singleScan = false }) {
+export default function QRCodeScanner({
+  onMedicineFound = null,
+  singleScan = false,
+  onAddAll = null, // Fonction pour ajouter tous les médicaments
+  onClose = null,   // Fonction pour fermer la modal
+  show = false     // Contrôle l'affichage de la modal
+}) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
@@ -16,6 +22,7 @@ export default function QRCodeScanner({ onMedicineFound = null, singleScan = fal
   const [gtins, setGtins] = useState([]); // liste des GTIN uniques (01)
   const [medicines, setMedicines] = useState({}); // cache des médicaments trouvés par GTIN
   const [loadingGtin, setLoadingGtin] = useState(null); // GTIN en cours de recherche
+  const [scannedMedicines, setScannedMedicines] = useState([]); // Liste temporaire locale
 
   // Pour éviter de pousser 20x le même code d'affilée
   const lastSeenRef = useRef({ text: "", t: 0 });
@@ -162,9 +169,29 @@ export default function QRCodeScanner({ onMedicineFound = null, singleScan = fal
         const medicine = results[0]; // Prendre le premier résultat
         setMedicines(prev => ({ ...prev, [gtin]: medicine }));
         
-        // Callback optionnel pour notifier le parent
+        // Ajouter automatiquement à la liste temporaire locale
+        const dose = parseInt(medicine.dose?.replace(/\D/g, '') || 0);
+        const conditionnement = medicine.conditionnement;
+        
+        const medicineToAdd = {
+          gtin,
+          medicine,
+          dose,
+          conditionnement,
+          stockAlertThreshold: 10
+        };
+
+        setScannedMedicines(prev => {
+          // Éviter les doublons basés sur le GTIN
+          const exists = prev.some(item => item.gtin === gtin);
+          if (exists) return prev;
+          
+          return [...prev, medicineToAdd];
+        });
+        
+        // Callback optionnel pour notifier le parent (pour l'action "Ajouter tous")
         if (onMedicineFound) {
-          onMedicineFound(medicine);
+          onMedicineFound({ ...medicine, gtin });
         }
       } else {
         setMedicines(prev => ({ ...prev, [gtin]: null })); // Aucun résultat trouvé
@@ -175,6 +202,17 @@ export default function QRCodeScanner({ onMedicineFound = null, singleScan = fal
     } finally {
       setLoadingGtin(null);
     }
+  };
+
+  // Fonction pour supprimer un médicament scanné
+  const removeMedicine = (gtinToRemove) => {
+    setGtins(prev => prev.filter(gtin => gtin !== gtinToRemove));
+    setMedicines(prev => {
+      const newMedicines = { ...prev };
+      delete newMedicines[gtinToRemove];
+      return newMedicines;
+    });
+    setScannedMedicines(prev => prev.filter(item => item.gtin !== gtinToRemove));
   };
 
   // Extraction GTIN (AI 01) : 14 chiffres
@@ -198,76 +236,131 @@ export default function QRCodeScanner({ onMedicineFound = null, singleScan = fal
   }
 
   return (
-    <div>
-      {/* Aperçu caméra */}
-      <div className="position-relative mb-3" style={{ borderRadius: 8, overflow: "hidden", aspectRatio: "4/3" }}>
-        <video
-          ref={videoRef}
-          playsInline
-          muted
-          className="w-100 h-100 bg-dark"
-          style={{ objectFit: "cover" }}
-        />
-        <canvas
-          ref={canvasRef}
-          className="position-absolute top-0 start-0 w-100 h-100"
-          style={{ objectFit: "cover" }}
-        />
+    <>
+      {/* Modal Bootstrap */}
+      <div 
+        className={`modal fade ${show ? 'show' : ''}`} 
+        style={{ display: show ? 'block' : 'none' }} 
+        tabIndex="-1"
+      >
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">
+                <i className="bi bi-qr-code-scan me-2"></i>
+                Scanner un QR code
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={onClose}
+                aria-label="Fermer"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <div>
+                {/* Aperçu caméra */}
+                <div className="position-relative mb-3" style={{ borderRadius: 8, overflow: "hidden", aspectRatio: "4/3" }}>
+                  <video
+                    ref={videoRef}
+                    playsInline
+                    muted
+                    className="w-100 h-100 bg-dark"
+                    style={{ objectFit: "cover" }}
+                  />
+                  <canvas
+                    ref={canvasRef}
+                    className="position-absolute top-0 start-0 w-100 h-100"
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+
+                {/* Messages d'erreur */}
+                {error && (
+                  <div className="alert alert-danger">
+                    <i className="bi bi-exclamation-triangle me-2"></i>
+                    {error}
+                  </div>
+                )}
+
+                {/* Instructions */}
+                {gtins.length === 0 && !error && (
+                  <div className="text-center text-muted mb-3">
+                    <i className="bi bi-camera me-2"></i>
+                    Pointez vers le code DataMatrix
+                  </div>
+                )}
+
+                {/* Résultats */}
+                {gtins.length > 0 && (
+                  <ul className="list-group">
+                    {gtins.map((gtin) => {
+                      const medicine = medicines[gtin];
+                      const isLoading = loadingGtin === gtin;
+                      
+                      return (
+                        <li key={gtin} className="list-group-item d-flex justify-content-between align-items-center">
+                          {isLoading ? (
+                            <div className="d-flex align-items-center">
+                              <div className="spinner-border spinner-border-sm me-2"></div>
+                              Recherche...
+                            </div>
+                          ) : medicine ? (
+                            <div>
+                              <h6 className="mb-1 text-primary">{medicine.name}</h6>
+                              {medicine.dose && (
+                                <small className="text-muted">Dose : {medicine.dose}</small>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-warning">
+                              <i className="bi bi-exclamation-triangle me-2"></i>
+                              Médicament non trouvé
+                            </div>
+                          )}
+                          
+                          {medicine && (
+                            <button
+                              className="btn btn-outline-danger btn-sm"
+                              onClick={() => removeMedicine(gtin)}
+                              title="Supprimer de la liste"
+                            >
+                              <i className="bi bi-trash"></i>
+                            </button>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            </div>
+            <div className="modal-footer">
+              {scannedMedicines.length > 0 && onAddAll && (
+                <button
+                  type="button"
+                  className="btn btn-success"
+                  onClick={() => onAddAll(scannedMedicines)}
+                >
+                  <i className="bi bi-plus-circle me-2"></i>
+                  Ajouter tous les médicaments ({scannedMedicines.length})
+                </button>
+              )}
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={onClose}
+              >
+                <i className="bi bi-x-circle me-2"></i>
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Messages d'erreur */}
-      {error && (
-        <div className="alert alert-danger">
-          <i className="bi bi-exclamation-triangle me-2"></i>
-          {error}
-        </div>
-      )}
-
-      {/* Instructions */}
-      {gtins.length === 0 && !error && (
-        <div className="text-center text-muted mb-3">
-          <i className="bi bi-camera me-2"></i>
-          Pointez vers le code DataMatrix
-        </div>
-      )}
-
-      {/* Résultats */}
-      {gtins.map((gtin) => {
-        const medicine = medicines[gtin];
-        const isLoading = loadingGtin === gtin;
-        
-        return (
-          <div key={gtin} className="border rounded p-3 mb-2">
-            {isLoading ? (
-              <div className="text-center">
-                <div className="spinner-border spinner-border-sm me-2"></div>
-                Recherche...
-              </div>
-            ) : medicine ? (
-              <div>
-                <h6 className="text-primary mb-1">{medicine.name}</h6>
-                {medicine.dose && (
-                  <small className="text-muted">Dose : {medicine.dose}</small>
-                )}
-                {onMedicineFound && (
-                  <button 
-                    className="btn btn-success w-100 mt-2"
-                    onClick={() => onMedicineFound({ gtin, medicine, action: 'select' })}
-                  >
-                    <i className="bi bi-check2 me-2"></i>
-                    Utiliser ce médicament
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="text-warning text-center">
-                <i className="bi bi-exclamation-triangle me-2"></i>
-                Médicament non trouvé
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
+      {/* Overlay pour modal Bootstrap */}
+      {show && <div className="modal-backdrop fade show"></div>}
+    </>
   );
 }
