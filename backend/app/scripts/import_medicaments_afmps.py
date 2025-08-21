@@ -36,9 +36,9 @@ def import_afmps_to_bis(
 
     def extract_name_and_dose(name: str) -> Tuple[str, str]:
         name = "" if name is None else str(name)
-        # Fixed regex to prevent ReDoS attacks by using atomic groups and possessive quantifiers
+        # Fixed regex to prevent ReDoS attacks by using non-overlapping pattern matching
         m = re.search(
-            r"\b\d+(?:[.,]\d+)*(?:\s*[.,/-]\s*\d+(?:[.,]\d+)*)*\s*(?:mg|µg|ug|mcg|u|ui|ml|g|%|mmol)(?:/\d+(?:[.,]\d+)*\s*ml)?\b",
+            r"\b\d+(?:[.,]\d+)?(?:\s*[.,/-]\s*\d+(?:[.,]\d+)?)?\s*(?:mg|µg|ug|mcg|u|ui|ml|g|%|mmol)(?:/\d+(?:[.,]\d+)?\s*ml)?\b",
             name,
             re.IGNORECASE,
         )
