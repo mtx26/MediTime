@@ -76,6 +76,8 @@
   "back": "Back",
   "boxes": {
     "add_box": "Add a box",
+    "add_manual": "Add manually",
+    "add_with_qr": "Scanner QR code",
     "alert_threshold": "Alert threshold",
     "cancel": "Cancel",
     "capacity": "Box capacity",
@@ -100,9 +102,11 @@
     "intake_conditions": "Conditions of taking",
     "name": "Name",
     "new_box": "New box",
+    "qr_code_help_text": "",
     "remaining_qty": "Remaining quantity",
     "restock": "Restocking",
     "save": "Save",
+    "scan_qr_code": "Scanner QR code",
     "start_typing": "Start typing...",
     "stock": {
       "alerts": {
@@ -213,8 +217,8 @@
   },
   "home": "Welcome",
   "home_meta": {
-    "title": "MediTime - Medicine schedule planner",
-    "description": "Plan and share your medication schedules easily."
+    "description": "Plan and share your medication schedules easily.",
+    "title": "MediTime - Medicine schedule planner"
   },
   "invalid_or_expired_link": "This shared calendar link is invalid or has expired.",
   "invitation": {

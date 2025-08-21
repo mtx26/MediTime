@@ -15,7 +15,7 @@ const SettingsPage = lazy(() => import('../pages/settings/SettingsPage'));
 const AddCalendarPage = lazy(() => import('../pages/calendar/AddCalendarPage'));
 const ImportCalendarPage = lazy(() => import('../pages/calendar/ImportCalendarPage'));
 const MedicineReview = lazy(() => import('../pages/calendar/MedicineReview'));
-const ScannerPage = lazy(() => import('../pages/calendar/ScannerPage'));
+const ScannerPage = lazy(() => import('../pages/calendar/ScannerTestPage'));
 const AcceptInvitePage = lazy(() => import('../pages/calendar/AcceptInvitePage'));
 
 const CalendarView = lazy(() => import('../pages/calendar/CalendarView'));

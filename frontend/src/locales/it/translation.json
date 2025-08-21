@@ -76,6 +76,8 @@
   "back": "Indietro",
   "boxes": {
     "add_box": "Aggiungi una casella",
+    "add_manual": "Aggiungi manualmente",
+    "add_with_qr": "Scannerizza il codice QR",
     "alert_threshold": "Soglia di allerta",
     "cancel": "Cancellare",
     "capacity": "Capacità della scatola",
@@ -100,9 +102,11 @@
     "intake_conditions": "Condizioni di assunzione",
     "name": "Nome",
     "new_box": "Nuova scatola",
+    "qr_code_help_text": "",
     "remaining_qty": "Quantità rimanente",
     "restock": "Riassortimento",
     "save": "Salva",
+    "scan_qr_code": "Scannerizza il codice QR",
     "start_typing": "Inizia a digitare...",
     "stock": {
       "alerts": {
@@ -212,6 +216,10 @@
     "title3": "Sicurezza assicurata"
   },
   "home": "Benvenuto",
+  "home_meta": {
+    "description": "Gestisci e condividi facilmente l'assunzione dei tuoi farmaci.",
+    "title": "MediTime - Pianificatore di trattamento"
+  },
   "invalid_or_expired_link": "Questo collegamento al calendario condiviso non è valido o è scaduto.",
   "invitation": {
     "invalid_or_expired": "Invito non valido o scaduto",
@@ -619,9 +627,5 @@
     "desc": "Perché l'assistenza sanitaria non lascia spazio all'improvvisazione. MediTime ti offre una soluzione chiara, intuitiva e sicura per monitorare i tuoi trattamenti e quelli dei tuoi cari, giorno dopo giorno.",
     "title": "Perché scegliere MediTime?"
   },
-  "yes": "SÌ",
-  "home_meta": {
-    "title": "MediTime - Pianificatore di trattamento",
-    "description": "Gestisci e condividi facilmente l'assunzione dei tuoi farmaci."
-  }
+  "yes": "SÌ"
 }

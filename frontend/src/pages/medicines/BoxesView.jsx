@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
+import QRCodeScanner from '../../components/scanner/QRCodeScanner';
 
 const getBorderClass = (box) => {
   if (box.box_capacity === 0) return '';
@@ -28,6 +29,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const [selectedDropBox, setSelectedDropBox] = useState({});
   const [modifyBoxName, setModifyBoxName] = useState({});
   const [modifyBoxCapacity, setModifyBoxCapacity] = useState({});
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
   const [modifyBoxStockAlertThreshold, setModifyBoxStockAlertThreshold] =
     useState({});
   const [modifyBoxStockQuantity, setModifyBoxStockQuantity] = useState({});
@@ -99,6 +102,39 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     if (res.success) {
       setSelectedModifyBox(res.boxId);
       setSelectedDropBox((prev) => ({ ...prev, [res.boxId]: true }));
+    }
+  };
+
+  const handleQRMedicineFound = async ({ medicine, action }) => {
+    if (action === 'select') {
+      // Créer une nouvelle boîte avec toutes les informations du médicament scanné
+      console.log('Médicament détecté:', medicine);
+      const dose = parseInt(medicine.dose?.replace(/\D/g, '') || 0);
+      const conditionnement = medicine.conditionnement;
+      const stockAlertThreshold = 10;
+
+      console.log('Medicine object:', medicine);
+      console.log('Parsed values:', { dose, conditionnement });
+
+      const res = await calendarSource.createBox(
+        calendarId, 
+        medicine.name,
+        conditionnement, // boxCapacity
+        stockAlertThreshold,
+        conditionnement, // stockQuantity
+        dose // dose
+      );
+      
+      console.log('CreateBox result:', res);
+
+      if (res.success) {
+        setShowQRModal(false);
+        setAlertMessage('✅ Médicament ajouté avec succès');
+        setAlertType('success');
+      } else {
+        setAlertMessage('❌ Erreur lors de la création de la boîte: ' + (res.error || 'Erreur inconnue'));
+        setAlertType('danger');
+      }
     }
   };
 
@@ -260,23 +296,112 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
             </div>
           ))}
           <div className="col-12 col-md-6 mb-3">
-            <button
-              type="button"
-              onClick={() => addBox()}
-              className="btn p-0 border-0 bg-transparent text-start h-100 w-100"
-              style={{ cursor: 'pointer' }}
-              aria-label={t('boxes.add_box')}
-              title={t('boxes.add_box')}
-            >
-              <div className="card h-100 shadow border border-success">
-                <div className="card-body d-flex flex-column justify-content-center align-items-center">
-                  <i className="bi bi-plus-circle text-success fs-1"></i>
+            <div className="d-flex flex-column gap-2 h-100">
+              <button
+                type="button"
+                onClick={() => addBox()}
+                className="btn p-0 border-0 bg-transparent text-start flex-fill"
+                style={{ cursor: 'pointer' }}
+                aria-label={t('boxes.add_manual')}
+                title={t('boxes.add_manual')}
+              >
+                <div className="card h-100 shadow border border-success">
+                  <div className="card-body d-flex flex-column justify-content-center align-items-center p-3">
+                    <i className="bi bi-plus-circle text-success fs-1"></i>
+                    <p className="text-success fw-bold mt-2 mb-0 text-center">{t('boxes.add_manual')}</p>
+                  </div>
                 </div>
-              </div>
-            </button>
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowQRModal(true)}
+                className="btn p-0 border-0 bg-transparent text-start flex-fill"
+                style={{ cursor: 'pointer' }}
+                aria-label={t('boxes.add_with_qr')}
+                title={t('boxes.add_with_qr')}
+              >
+                <div className="card h-100 shadow border border-primary">
+                  <div className="card-body d-flex flex-column justify-content-center align-items-center p-3 position-relative">
+                    <button
+                      type="button"
+                      className="btn btn-link position-absolute top-0 end-0 m-1 p-1 text-info"
+                      style={{ fontSize: '1.2rem' }}
+                      onMouseEnter={() => setShowTooltip(true)}
+                      onMouseLeave={() => setShowTooltip(false)}
+                    >
+                      <i className="bi bi-info-circle"></i>
+                      {showTooltip && (
+                        <div
+                          className="position-absolute bg-dark text-white p-2 rounded shadow"
+                          style={{
+                            top: '100%',
+                            right: '0',
+                            width: '200px',
+                            fontSize: '0.8rem',
+                            zIndex: 1050
+                          }}
+                        >
+                          {t('boxes.qr_code_help_text')}
+                        </div>
+                      )}
+                    </button>
+                    <i className="bi bi-qr-code-scan text-primary fs-1"></i>
+                    <p className="text-primary fw-bold mt-2 mb-0 text-center">{t('boxes.add_with_qr')}</p>
+                  </div>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Modal pour scanner QR code */}
+      <div className={`modal fade ${showQRModal ? 'show' : ''}`} style={{ display: showQRModal ? 'block' : 'none' }} tabIndex="-1">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">
+                <i className="bi bi-qr-code-scan me-2"></i>
+                Scanner un QR code
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={() => setShowQRModal(false)}
+                aria-label="Fermer"
+              ></button>
+            </div>
+            <div className="modal-body">
+              {showQRModal && (
+                <QRCodeScanner
+                  singleScan={true}
+                  onMedicineFound={(medicine) => {
+                    handleQRMedicineFound({ medicine, action: 'select' });
+                  }}
+                  onError={(error) => {
+                    console.error('Erreur lors du scan:', error);
+                    setAlertType('danger');
+                    setAlertMessage('Erreur lors du scan du QR code');
+                    setShowQRModal(false);
+                  }}
+                />
+              )}
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowQRModal(false)}
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Overlay pour modal Bootstrap */}
+      {showQRModal && <div className="modal-backdrop fade show"></div>}
     </div>
   );
 }
@@ -328,6 +453,18 @@ function BoxCard({
             <ActionSheet
               buttonSize="sm"
               actions={[
+                {
+                  label: (
+                    <>
+                      <i className="bi bi-qr-code-scan me-2" /> {t('boxes.scan_qr_code')}
+                    </>
+                  ),
+                  onClick: () => {
+                    // TODO: Implémenter le scanner QR code
+                    console.log('Scanner QR code pour la boîte:', box.id);
+                  },
+                },
+                { separator: true },
                 {
                   label: (
                     <>

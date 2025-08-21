@@ -76,6 +76,8 @@
   "back": "戻る",
   "boxes": {
     "add_box": "ボックスを追加する",
+    "add_manual": "手動で追加",
+    "add_with_qr": "スキャナーQRコード",
     "alert_threshold": "アラートしきい値",
     "cancel": "キャンセル",
     "capacity": "ボックス容量",
@@ -100,9 +102,11 @@
     "intake_conditions": "受講条件",
     "name": "名前",
     "new_box": "新しい箱",
+    "qr_code_help_text": "",
     "remaining_qty": "残り数量",
     "restock": "再入荷",
     "save": "保存",
+    "scan_qr_code": "スキャナーQRコード",
     "start_typing": "入力を開始してください...",
     "stock": {
       "alerts": {
@@ -212,6 +216,10 @@
     "title3": "安全保証"
   },
   "home": "いらっしゃいませ",
+  "home_meta": {
+    "description": "薬の摂取量を簡単に管理、共有できます。",
+    "title": "MediTime - 治療プランナー"
+  },
   "invalid_or_expired_link": "この共有カレンダーのリンクは無効か期限が切れています。",
   "invitation": {
     "invalid_or_expired": "無効または期限切れの招待",
@@ -619,9 +627,5 @@
     "desc": "医療には即興の余地はありません。MediTimeは、あなたとあなたの大切な人の治療を日々記録するための、明確で直感的、そして安全なソリューションを提供します。",
     "title": "MediTimeを選ぶ理由"
   },
-  "yes": "はい",
-  "home_meta": {
-    "title": "MediTime - 治療プランナー",
-    "description": "薬の摂取量を簡単に管理、共有できます。"
-  }
+  "yes": "はい"
 }

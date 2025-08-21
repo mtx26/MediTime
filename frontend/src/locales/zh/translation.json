@@ -76,6 +76,8 @@
   "back": "后退",
   "boxes": {
     "add_box": "添加框",
+    "add_manual": "手动添加",
+    "add_with_qr": "扫描二维码",
     "alert_threshold": "警报阈值",
     "cancel": "取消",
     "capacity": "盒子容量",
@@ -100,9 +102,11 @@
     "intake_conditions": "服用条件",
     "name": "姓名",
     "new_box": "新盒子",
+    "qr_code_help_text": "",
     "remaining_qty": "剩余数量",
     "restock": "补货",
     "save": "节省",
+    "scan_qr_code": "扫描二维码",
     "start_typing": "开始输入...",
     "stock": {
       "alerts": {
@@ -212,6 +216,10 @@
     "title3": "安全有保障"
   },
   "home": "欢迎",
+  "home_meta": {
+    "description": "轻松管理和分享您的药物摄入量。",
+    "title": "MediTime - 治疗计划器"
+  },
   "invalid_or_expired_link": "此共享日历链接无效或已过期。",
   "invitation": {
     "invalid_or_expired": "邀请无效或已过期",
@@ -619,9 +627,5 @@
     "desc": "因为医疗保健不容即兴发挥。MediTime 为您提供清晰、直观、安全的解决方案，让您日复一日地追踪自己和亲人的治疗情况。",
     "title": "为什么选择 MediTime？"
   },
-  "yes": "是的",
-  "home_meta": {
-    "title": "MediTime - 治疗计划器",
-    "description": "轻松管理和分享您的药物摄入量。"
-  }
+  "yes": "是的"
 }

@@ -76,6 +76,8 @@
   "back": "Zurück",
   "boxes": {
     "add_box": "Eine Box hinzufügen",
+    "add_manual": "Manuell hinzufügen",
+    "add_with_qr": "QR-Code scannen",
     "alert_threshold": "Alarmschwellenwert",
     "cancel": "Stornieren",
     "capacity": "Boxkapazität",
@@ -100,9 +102,11 @@
     "intake_conditions": "Einnahmebedingungen",
     "name": "Name",
     "new_box": "Neue Box",
+    "qr_code_help_text": "",
     "remaining_qty": "Restmenge",
     "restock": "Auffüllen",
     "save": "Speichern",
+    "scan_qr_code": "QR-Code scannen",
     "start_typing": "Beginnen Sie mit der Eingabe...",
     "stock": {
       "alerts": {
@@ -212,6 +216,10 @@
     "title3": "Geschützte Sicherheit"
   },
   "home": "Willkommen",
+  "home_meta": {
+    "description": "Verwalten und teilen Sie Ihre Medikamenteneinnahme ganz einfach.",
+    "title": "MediTime - Behandlungsplaner"
+  },
   "invalid_or_expired_link": "Dieser freigegebene Kalenderlink ist ungültig oder abgelaufen.",
   "invitation": {
     "invalid_or_expired": "Ungültige oder abgelaufene Einladung",
@@ -619,9 +627,5 @@
     "desc": "Weil im Gesundheitswesen kein Raum für Improvisation ist. MediTime bietet Ihnen eine klare, intuitive und sichere Lösung für die tägliche Nachverfolgung Ihrer Behandlungen und der Ihrer Angehörigen.",
     "title": "Warum MediTime wählen?"
   },
-  "yes": "Ja",
-  "home_meta": {
-    "title": "MediTime - Behandlungsplaner",
-    "description": "Verwalten und teilen Sie Ihre Medikamenteneinnahme ganz einfach."
-  }
+  "yes": "Ja"
 }

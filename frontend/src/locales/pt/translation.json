@@ -76,6 +76,8 @@
   "back": "Voltar",
   "boxes": {
     "add_box": "Adicionar uma caixa",
+    "add_manual": "Adicionar manualmente",
+    "add_with_qr": "Leitor de código QR",
     "alert_threshold": "Limiar de alerta",
     "cancel": "Cancelar",
     "capacity": "Capacidade da caixa",
@@ -100,9 +102,11 @@
     "intake_conditions": "Condições de tomada",
     "name": "Nome",
     "new_box": "Nova caixa",
+    "qr_code_help_text": "",
     "remaining_qty": "Quantidade restante",
     "restock": "Reabastecimento",
     "save": "Salvar",
+    "scan_qr_code": "Leitor de código QR",
     "start_typing": "Comece a digitar...",
     "stock": {
       "alerts": {
@@ -212,6 +216,10 @@
     "title3": "Segurança garantida"
   },
   "home": "Bem-vindo",
+  "home_meta": {
+    "description": "Gerencie e compartilhe facilmente sua ingestão de medicamentos.",
+    "title": "MediTime - Planejador de Tratamento"
+  },
   "invalid_or_expired_link": "Este link de calendário compartilhado é inválido ou expirou.",
   "invitation": {
     "invalid_or_expired": "Convite inválido ou expirado",
@@ -619,9 +627,5 @@
     "desc": "Porque a saúde não deixa espaço para improvisação. O MediTime oferece uma solução clara, intuitiva e segura para acompanhar seus tratamentos e os de seus entes queridos, dia após dia.",
     "title": "Por que escolher o MediTime?"
   },
-  "yes": "Sim",
-  "home_meta": {
-    "title": "MediTime - Planejador de Tratamento",
-    "description": "Gerencie e compartilhe facilmente sua ingestão de medicamentos."
-  }
+  "yes": "Sim"
 }

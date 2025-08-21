@@ -76,6 +76,8 @@
   "back": "Retour",
   "boxes": {
     "add_box": "Ajouter une boîte",
+    "add_manual": "Ajouter manuellement",
+    "add_with_qr": "Scanner QR code",
     "alert_threshold": "Seuil d’alerte",
     "cancel": "Annuler",
     "capacity": "Capacité de la boîte",
@@ -100,9 +102,11 @@
     "intake_conditions": "Conditions de prise",
     "name": "Nom",
     "new_box": "Nouvelle boîte",
+    "qr_code_help_text": "Le code DataMatrix se trouve sur l'emballage du médicament, près du code-barres. C'est un petit carré noir et blanc.",
     "remaining_qty": "Quantité restante",
     "restock": "Réstockage",
     "save": "Enregistrer",
+    "scan_qr_code": "Scanner QR code",
     "start_typing": "Commencez à taper...",
     "stock": {
       "alerts": {
@@ -213,8 +217,8 @@
   },
   "home": "Accueil",
   "home_meta": {
-    "title": "MediTime - Planificateur de traitements",
-    "description": "Gérez et partagez facilement vos prises de médicaments."
+    "description": "Gérez et partagez facilement vos prises de médicaments.",
+    "title": "MediTime - Planificateur de traitements"
   },
   "invalid_or_expired_link": "Ce lien de calendrier partagé est invalide ou a expiré.",
   "invitation": {

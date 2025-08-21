@@ -1,6 +1,6 @@
-// ScannerDataMatrix.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { readBarcodes } from "zxing-wasm/reader";
+import { fetchMedicaments } from "../../utils/api/scanner";
 
 const readerOptions = {
   tryHarder: true,
@@ -8,12 +8,14 @@ const readerOptions = {
   maxNumberOfSymbols: 1,
 };
 
-export default function ScannerDataMatrix() {
+export default function QRCodeScanner({ onMedicineFound = null, singleScan = false }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
   const [error, setError] = useState("");
   const [gtins, setGtins] = useState([]); // liste des GTIN uniques (01)
+  const [medicines, setMedicines] = useState({}); // cache des médicaments trouvés par GTIN
+  const [loadingGtin, setLoadingGtin] = useState(null); // GTIN en cours de recherche
 
   // Pour éviter de pousser 20x le même code d'affilée
   const lastSeenRef = useRef({ text: "", t: 0 });
@@ -100,13 +102,19 @@ export default function ScannerDataMatrix() {
           if (!sameAsLast) {
             const gtin = extractGTIN01(r.text);
             if (gtin) {
-              setGtins((prev) => (prev.includes(gtin) ? prev : [...prev, gtin]));
+              setGtins((prev) => {
+                if (prev.includes(gtin)) return prev;
+                // Nouveau GTIN détecté, chercher le médicament
+                searchMedicine(gtin);
+                const newGtins = singleScan ? [gtin] : [...prev, gtin];
+                return newGtins;
+              });
             }
           }
         }
       }
     } catch (e) {
-      // On ne spam pas l’erreur (caméra/permission/etc.)
+      // On ne spam pas l'erreur (caméra/permission/etc.)
       // console.warn(e);
     }
 
@@ -143,6 +151,32 @@ export default function ScannerDataMatrix() {
     }
   }
 
+  // Fonction pour chercher le médicament associé au GTIN
+  const searchMedicine = async (gtin) => {
+    if (medicines[gtin] || loadingGtin === gtin) return; // Déjà en cache ou en cours
+    
+    setLoadingGtin(gtin);
+    try {
+      const results = await fetchMedicaments(gtin);
+      if (results && results.length > 0) {
+        const medicine = results[0]; // Prendre le premier résultat
+        setMedicines(prev => ({ ...prev, [gtin]: medicine }));
+        
+        // Callback optionnel pour notifier le parent
+        if (onMedicineFound) {
+          onMedicineFound(medicine);
+        }
+      } else {
+        setMedicines(prev => ({ ...prev, [gtin]: null })); // Aucun résultat trouvé
+      }
+    } catch (error) {
+      console.error("Erreur lors de la recherche du médicament:", error);
+      setMedicines(prev => ({ ...prev, [gtin]: null }));
+    } finally {
+      setLoadingGtin(null);
+    }
+  };
+
   // Extraction GTIN (AI 01) : 14 chiffres
   // Gère plusieurs formats courants : "(01)12345678901234", "0112345678901234",
   // ou avec séparateurs FNC1 (\x1D) présents.
@@ -164,49 +198,76 @@ export default function ScannerDataMatrix() {
   }
 
   return (
-    <div className="container" style={{ maxWidth: 680 }}>
-      <h3>Scan boite médicament</h3>
-
-      <div style={{ position: "relative", width: "100%", borderRadius: 8, overflow: "hidden" }}>
+    <div>
+      {/* Aperçu caméra */}
+      <div className="position-relative mb-3" style={{ borderRadius: 8, overflow: "hidden", aspectRatio: "4/3" }}>
         <video
           ref={videoRef}
           playsInline
           muted
-          style={{ width: "100%", display: "block", background: "#000" }}
+          className="w-100 h-100 bg-dark"
+          style={{ objectFit: "cover" }}
         />
         <canvas
           ref={canvasRef}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-          }}
+          className="position-absolute top-0 start-0 w-100 h-100"
+          style={{ objectFit: "cover" }}
         />
       </div>
 
+      {/* Messages d'erreur */}
       {error && (
-        <p style={{ color: "#e66", marginTop: 12 }}>
-          ❌ {error}
-        </p>
+        <div className="alert alert-danger">
+          <i className="bi bi-exclamation-triangle me-2"></i>
+          {error}
+        </div>
       )}
 
-      <div style={{ marginTop: 16 }}>
-        <strong>GTIN (01) détectés (uniques) :</strong>
-        <ul className="list-group" style={{ marginTop: 8 }}>
-          {gtins.length === 0 && (
-            <li className="list-group-item" style={{ opacity: 0.6 }}>
-              Aucun code pour le moment.
-            </li>
-          )}
-          {gtins.map((g) => (
-            <li key={g} className="list-group-item d-flex justify-content-between align-items-center">
-              {g}
-              <code style={{ fontSize: 12, opacity: 0.7 }}>(01)</code>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {/* Instructions */}
+      {gtins.length === 0 && !error && (
+        <div className="text-center text-muted mb-3">
+          <i className="bi bi-camera me-2"></i>
+          Pointez vers le code DataMatrix
+        </div>
+      )}
+
+      {/* Résultats */}
+      {gtins.map((gtin) => {
+        const medicine = medicines[gtin];
+        const isLoading = loadingGtin === gtin;
+        
+        return (
+          <div key={gtin} className="border rounded p-3 mb-2">
+            {isLoading ? (
+              <div className="text-center">
+                <div className="spinner-border spinner-border-sm me-2"></div>
+                Recherche...
+              </div>
+            ) : medicine ? (
+              <div>
+                <h6 className="text-primary mb-1">{medicine.name}</h6>
+                {medicine.dose && (
+                  <small className="text-muted">Dose : {medicine.dose}</small>
+                )}
+                {onMedicineFound && (
+                  <button 
+                    className="btn btn-success w-100 mt-2"
+                    onClick={() => onMedicineFound({ gtin, medicine, action: 'select' })}
+                  >
+                    <i className="bi bi-check2 me-2"></i>
+                    Utiliser ce médicament
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="text-warning text-center">
+                <i className="bi bi-exclamation-triangle me-2"></i>
+                Médicament non trouvé
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
