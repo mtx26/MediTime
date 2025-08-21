@@ -68,15 +68,29 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const conditions = Object.values(boxConditions[selectedModifyBox]).filter(
+      (condition) => condition !== undefined
+    );
+    
+    // Séparer les nouvelles conditions des conditions existantes
+    const processedConditions = conditions.map(condition => {
+      // Si l'ID commence par "temp_", c'est une nouvelle condition
+      if (condition.id && condition.id.startsWith('temp_')) {
+        // Ne pas envoyer l'ID pour les nouvelles conditions
+        const { id, ...conditionWithoutId } = condition;
+        return conditionWithoutId;
+      }
+      // Pour les conditions existantes, garder l'ID
+      return condition;
+    });
+    
     const box = {
       name: modifyBoxName[selectedModifyBox],
       dose: dose[selectedModifyBox],
       box_capacity: modifyBoxCapacity[selectedModifyBox],
       stock_alert_threshold: modifyBoxStockAlertThreshold[selectedModifyBox],
       stock_quantity: modifyBoxStockQuantity[selectedModifyBox],
-      conditions: Object.values(boxConditions[selectedModifyBox]).filter(
-        (condition) => condition !== undefined
-      ),
+      conditions: processedConditions,
     };
     const res = await calendarSource.updateBox(
       calendarId,
@@ -571,6 +585,56 @@ function BoxCard({
     evening: t('evening'),
   };
 
+  // Configuration des champs de conditions
+  const getConditionFields = (condition) => [
+    {
+      label: t('boxes.condition.tablet_count'),
+      field: 'tablet_count',
+      type: 'number',
+      min: '0',
+      step: '0.25',
+    }, 
+    {
+      label: t('boxes.condition.time_of_day'),
+      field: 'time_of_day',
+      type: 'select',
+      options: [
+        { value: 'morning', label: t('morning') },
+        { value: 'noon', label: t('noon') },
+        { value: 'evening', label: t('evening') },
+      ],
+    }, 
+    {
+      label: t('boxes.condition.interval_days'),
+      field: 'interval_days',
+      type: 'number',
+      min: '0',
+      step: '1',
+    }, 
+    {
+      label: t('boxes.condition.start_date'),
+      field: 'start_date',
+      type: 'date',
+      disabled: condition.interval_days === 1,
+    }
+  ];
+
+  // Fonction pour obtenir la valeur affichée d'un champ
+  const getDisplayValue = (field, value, options = null) => {
+    if (!value && value !== 0) return '-';
+    
+    if (options) {
+      const option = options.find(opt => opt.value === value);
+      return option?.label || value;
+    }
+    
+    if (field === 'time_of_day') {
+      return timeOfDayMap[value] || value;
+    }
+    
+    return value;
+  };
+
   const openNotice = (box_id) => {
     const url = `${import.meta.env.VITE_API_URL}/api/proxy/pdf/${box_id}`;
     window.open(url, '_blank');
@@ -661,30 +725,34 @@ function BoxCard({
       </h5>
 
       <div className="d-flex mb-2 gap-2">
-        <BoxField
-          type="number"
-          label={t('boxes.capacity')}
-          value={modifyBoxCapacity[box.id]}
-          editable={editable}
-          onChange={(e) =>
+        {[{
+          label: t('boxes.capacity'),
+          field: 'box_capacity',
+          value: modifyBoxCapacity[box.id],
+          onChange: (e) =>
             setModifyBoxCapacity({
               ...modifyBoxCapacity,
               [box.id]: e.target.value,
-            })
-          }
-        />
-        <BoxField
-          type="number"
-          label={t('boxes.alert_threshold')}
-          value={modifyBoxStockAlertThreshold[box.id]}
-          editable={editable}
-          onChange={(e) =>
+            }),
+        }, {
+          label: t('boxes.alert_threshold'),
+          field: 'stock_alert_threshold',
+          value: modifyBoxStockAlertThreshold[box.id],
+          onChange: (e) =>
             setModifyBoxStockAlertThreshold({
               ...modifyBoxStockAlertThreshold,
               [box.id]: e.target.value,
-            })
-          }
-        />
+            }),
+        }].map(({ label, field, value, onChange }) => (
+          <BoxField
+            key={field}
+            type="number"
+            label={label}
+            value={value}
+            editable={editable}
+            onChange={onChange}
+          />
+        ))}
       </div>
       <div className="d-flex mb-2 gap-2 align-items-center">
         <BoxField
@@ -754,104 +822,62 @@ function BoxCard({
                   .map((condition) => (
                     <div key={condition.id}>
                       <div className="mb-2 p-3 border rounded bg-light">
-                        <label htmlFor="tablet_count">
-                          {t('boxes.condition.tablet_count')}
-                        </label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          defaultValue={condition.tablet_count}
-                          title={t('boxes.condition.tablet_count')}
-                          aria-label={t('boxes.condition.tablet_count')}
-                          min={0}
-                          step={0.25}
-                          onChange={(e) =>
-                            setBoxConditions((prev) => ({
-                              ...prev,
-                              [box.id]: {
-                                ...prev[box.id],
-                                [condition.id]: {
-                                  ...prev[box.id][condition.id],
-                                  tablet_count: e.target.value,
-                                },
-                              },
-                            }))
-                          }
-                        />
-                        <label htmlFor="time_of_day">{t('boxes.condition.time_of_day')}</label>
-                        <select
-                          className="form-control form-control-sm"
-                          defaultValue={condition.time_of_day}
-                          title={t('boxes.condition.time_of_day')}
-                          aria-label={t('boxes.condition.time_of_day')}
-                          onChange={(e) =>
-                            setBoxConditions((prev) => ({
-                              ...prev,
-                              [box.id]: {
-                                ...prev[box.id],
-                                [condition.id]: {
-                                  ...prev[box.id][condition.id],
-                                  time_of_day: e.target.value,
-                                },
-                              },
-                            }))
-                          }
-                        >
-                          <option value="morning">{t('morning')}</option>
-                          <option value="noon">{t('noon')}</option>
-                          <option value="evening">{t('evening')}</option>
-                        </select>
-                        <label htmlFor="interval_days">
-                          {t('boxes.condition.interval_days')}
-                        </label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          defaultValue={condition.interval_days}
-                          title={t('boxes.condition.interval_days')}
-                          aria-label={t('boxes.condition.interval_days')}
-                          min={0}
-                          step={1}
-                          onChange={(e) =>
-                            setBoxConditions((prev) => ({
-                              ...prev,
-                              [box.id]: {
-                                ...prev[box.id],
-                                [condition.id]: {
-                                  ...prev[box.id][condition.id],
-                                  interval_days: e.target.value,
-                                },
-                              },
-                            }))
-                          }
-                        />
-                        <label htmlFor="start_date">{t('boxes.condition.start_date')}</label>
-                        <input
-                          type="date"
-                          className="form-control form-control-sm"
-                          title={t('boxes.condition.start_date')}
-                          aria-label={t('boxes.condition.start_date')}
-                          disabled={condition.interval_days === 1}
-                          defaultValue={
-                            condition.start_date
-                              ? new Date(condition.start_date)
-                                  .toISOString()
-                                  .split('T')[0]
-                              : ''
-                          }
-                          onChange={(e) =>
-                            setBoxConditions((prev) => ({
-                              ...prev,
-                              [box.id]: {
-                                ...prev[box.id],
-                                [condition.id]: {
-                                  ...prev[box.id][condition.id],
-                                  start_date: e.target.value,
-                                },
-                              },
-                            }))
-                          }
-                        />
+                        {getConditionFields(condition).map(({ label, field, type, min, step, options, disabled }) => (
+                          <div key={field}>
+                            <label htmlFor={field}>{label}</label>
+                            {type === 'select' ? (
+                              <select
+                                className="form-control form-control-sm"
+                                defaultValue={condition[field]}
+                                title={label}
+                                aria-label={label}
+                                onChange={(e) =>
+                                  setBoxConditions((prev) => ({
+                                    ...prev,
+                                    [box.id]: {
+                                      ...prev[box.id],
+                                      [condition.id]: {
+                                        ...prev[box.id][condition.id],
+                                        [field]: e.target.value,
+                                      },
+                                    },
+                                  }))
+                                }
+                              >
+                                {options.map(opt => (
+                                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <input
+                                type={type}
+                                className="form-control form-control-sm"
+                                defaultValue={
+                                  field === 'start_date' && condition.start_date
+                                    ? new Date(condition.start_date).toISOString().split('T')[0]
+                                    : condition[field]
+                                }
+                                title={label}
+                                aria-label={label}
+                                min={min}
+                                step={step}
+                                disabled={disabled}
+                                onChange={(e) =>
+                                  setBoxConditions((prev) => ({
+                                    ...prev,
+                                    [box.id]: {
+                                      ...prev[box.id],
+                                      [condition.id]: {
+                                        ...prev[box.id][condition.id],
+                                        [field]: e.target.value,
+                                      },
+                                    },
+                                  }))
+                                }
+                              />
+                            )}
+                          </div>
+                        ))}
                         <button
                           type="button"
                           className="btn btn-danger btn-sm mt-2"
@@ -877,7 +903,7 @@ function BoxCard({
                   type="button"
                   className="btn btn-outline-dark w-100"
                   onClick={() => {
-                    const id = uuidv4();
+                    const id = `temp_${uuidv4()}`; // Préfixe pour les nouvelles conditions
                     setBoxConditions((prev) => ({
                       ...prev,
                       [box.id]: {
@@ -918,7 +944,7 @@ function BoxCard({
                       {condition.interval_days > 1 ? t('boxes.days') : t('boxes.day')}
                     </strong>{' '}
                     {t('boxes.each')} {' '}
-                    <strong>{timeOfDayMap[condition.time_of_day]}</strong>
+                    <strong>{getDisplayValue('time_of_day', condition.time_of_day)}</strong>
                     <br />
                     {condition.interval_days > 1 && (
                       <small className="text-muted">

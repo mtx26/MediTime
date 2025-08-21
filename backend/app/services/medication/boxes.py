@@ -37,6 +37,7 @@ def get_boxes(calendar_id):
     return boxes or []
 
 def update_box(box_id, calendar_id, box):
+    print(f"Updating box {box_id} for calendar {calendar_id} with data: {box}")
     name = box.get("name")
     dose = box.get("dose")
     box_capacity = box.get("box_capacity")
@@ -62,9 +63,8 @@ del AS (
   WHERE box_id = %s
 ),
 ins AS (
-  INSERT INTO medicine_box_conditions (id, box_id, tablet_count, interval_days, start_date, time_of_day)
+  INSERT INTO medicine_box_conditions (box_id, tablet_count, interval_days, start_date, time_of_day)
   SELECT
-    COALESCE((c->>'id')::uuid, gen_random_uuid())                 AS id,
     %s                                                             AS box_id,
     (c->>'tablet_count')::float8                                   AS tablet_count,
     (c->>'interval_days')::int                                     AS interval_days,
@@ -82,6 +82,7 @@ SELECT 1;
     json.dumps(conditions)    # ins (payload)
 ))
             conn.commit()
+
 
 def create_box(calendar_id, box):
     name = box.get("name") or "nouvelle boite"
