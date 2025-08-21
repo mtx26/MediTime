@@ -110,7 +110,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     if (!scannedMedicines || scannedMedicines.length === 0) {
       setAlertMessage('⚠️ Aucun médicament à ajouter');
       setAlertType('warning');
-      return;
+      return { success: false };
     }
 
     let successCount = 0;
@@ -146,12 +146,15 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     if (errorCount === 0) {
       setAlertMessage(`✅ ${successCount} médicament(s) ajouté(s) avec succès`);
       setAlertType('success');
+      return { success: true, successCount, errorCount };
     } else if (successCount === 0) {
       setAlertMessage(`❌ Erreur lors de l'ajout des médicaments`);
       setAlertType('danger');
+      return { success: false, successCount, errorCount };
     } else {
       setAlertMessage(`⚠️ ${successCount} médicament(s) ajouté(s), ${errorCount} erreur(s)`);
       setAlertType('warning');
+      return { success: true, successCount, errorCount }; // Partiel = succès
     }
   };
 

@@ -27,6 +27,15 @@ export default function QRCodeScanner({
   // Pour éviter de pousser 20x le même code d'affilée
   const lastSeenRef = useRef({ text: "", t: 0 });
 
+  // Fonction pour réinitialiser la liste des médicaments scannés
+  const resetScannedMedicines = () => {
+    setGtins([]);
+    setMedicines({});
+    setScannedMedicines([]);
+    setLoadingGtin(null);
+    setError("");
+  };
+
   useEffect(() => {
     let stream;
 
@@ -64,9 +73,22 @@ export default function QRCodeScanner({
       }
     }
 
-    start();
+    // Démarrer seulement si la modal est visible
+    if (show) {
+      start();
+    } else {
+      stop();
+    }
+
     return stop;
-  }, []);
+  }, [show]); // Dépend de show maintenant
+
+  // Reset des données quand la modal s'ouvre
+  useEffect(() => {
+    if (show) {
+      resetScannedMedicines();
+    }
+  }, [show]);
 
   // Boucle de scan (requestAnimationFrame)
   const scanLoop = async () => {
@@ -215,6 +237,30 @@ export default function QRCodeScanner({
     setScannedMedicines(prev => prev.filter(item => item.gtin !== gtinToRemove));
   };
 
+  // Gérer l'ajout de tous les médicaments avec reset
+  const handleAddAll = async () => {
+    if (onAddAll) {
+      try {
+        const result = await onAddAll(scannedMedicines);
+        // Reset seulement si l'ajout a réussi
+        if (result && result.success !== false) {
+          resetScannedMedicines(); // Remettre à zéro après ajout réussi
+        }
+      } catch (error) {
+        console.error("Erreur lors de l'ajout des médicaments:", error);
+        // Ne pas reset en cas d'erreur pour permettre de réessayer
+      }
+    }
+  };
+
+  // Gérer la fermeture avec reset
+  const handleClose = () => {
+    resetScannedMedicines(); // Remettre à zéro à la fermeture
+    if (onClose) {
+      onClose();
+    }
+  };
+
   // Extraction GTIN (AI 01) : 14 chiffres
   // Gère plusieurs formats courants : "(01)12345678901234", "0112345678901234",
   // ou avec séparateurs FNC1 (\x1D) présents.
@@ -253,7 +299,7 @@ export default function QRCodeScanner({
               <button
                 type="button"
                 className="btn-close"
-                onClick={onClose}
+                onClick={handleClose}
                 aria-label="Fermer"
               ></button>
             </div>
@@ -307,9 +353,12 @@ export default function QRCodeScanner({
                             </div>
                           ) : medicine ? (
                             <div>
-                              <h6 className="mb-1 text-primary">{medicine.name}</h6>
-                              {medicine.dose && (
-                                <small className="text-muted">Dose : {medicine.dose}</small>
+                              <h6 className="mb-1 text-primary">
+                                {medicine.name}
+                                {medicine.dose && ` (${medicine.dose})`}
+                              </h6>
+                              {medicine.conditionnement && (
+                                <small className="text-muted">Quantité : {medicine.conditionnement}</small>
                               )}
                             </div>
                           ) : (
@@ -340,7 +389,7 @@ export default function QRCodeScanner({
                 <button
                   type="button"
                   className="btn btn-success"
-                  onClick={() => onAddAll(scannedMedicines)}
+                  onClick={handleAddAll}
                 >
                   <i className="bi bi-plus-circle me-2"></i>
                   Ajouter tous les médicaments ({scannedMedicines.length})
@@ -349,7 +398,7 @@ export default function QRCodeScanner({
               <button
                 type="button"
                 className="btn btn-secondary"
-                onClick={onClose}
+                onClick={handleClose}
               >
                 <i className="bi bi-x-circle me-2"></i>
                 Annuler
