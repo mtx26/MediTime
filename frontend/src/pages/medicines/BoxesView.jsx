@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';
 import AlertSystem from '../../components/common/AlertSystem';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
@@ -19,6 +19,8 @@ const getBorderClass = (box) => {
 function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const location = useLocation();
   const params = useParams();
+  const navigate = useNavigate();
+  const lng = params.lng;
   const { t } = useTranslation();
 
   const [boxes, setBoxes] = useState([]);
@@ -41,6 +43,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
+  let basePath = 'calendar';
 
   const pathWithoutLang =
     location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
@@ -48,9 +51,11 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   if (pathWithoutLang.startsWith('/shared-user-calendar')) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
+    basePath = 'shared-user-calendar';
   } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
     calendarType = 'token';
     calendarId = params.sharedToken;
+    basePath = 'shared-token-calendar';
   }
 
   const calendarSource = getCalendarSourceMap(
@@ -293,18 +298,101 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
             <i className="bi bi-box-seam me-2"></i> {t('boxes.title')}
           </h4>
           <div className="ms-auto">
-            <ActionSheet
-              actions={[
-                {
-                  label: (
-                    <>
-                      <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
-                    </>
-                  ),
-                  onClick: () => calendarSource.downloadCalendarPdf(calendarId),
-                },
-              ]}
-            />
+            {calendarType === 'personal' && (
+              <ActionSheet
+                actions={[
+                  {
+                    label: (
+                      <>
+                        <i className="bi bi-box-arrow-up me-2" /> {t('share')}
+                      </>
+                    ),
+                    onClick: () =>
+                      navigate(`/${lng}/shared-calendars?calendar=${calendarId}`),
+                  },
+                  { separator: true },
+                  {
+                    label: (
+                      <>
+                        <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+                      </>
+                    ),
+                    onClick: () => calendarSource.downloadCalendarPdf(calendarId),
+                  },
+                  {
+                    label: (
+                      <>
+                        <i className="bi bi-exclamation-triangle me-2" /> {t('stock')}
+                      </>
+                    ),
+                    onClick: () =>
+                      navigate(`/${lng}/${basePath}/${calendarId}/stock-alerts`),
+                  },
+                  { separator: true },
+                  {
+                    label: (
+                      <>
+                        <i className="bi bi-gear me-2" /> {t('settings.label')}
+                      </>
+                    ),
+                    onClick: () =>
+                      navigate(`/${lng}/${basePath}/${calendarId}/settings`),
+                  },
+                  { separator: true },
+                  {
+                    label: (
+                      <>
+                        <i className="bi bi-trash me-2" /> {t('delete')}
+                      </>
+                    ),
+                    onClick: async () => {
+                      const rep = await personalCalendars.deleteCalendar(calendarId);
+                      if (rep.success) {
+                        navigate(`/${lng}/calendars`);
+                      } else {
+                        setAlertType('danger');
+                        setAlertMessage(rep.error);
+                      }
+                    },
+                    danger: true,
+                  },
+                ]}
+              />
+            )}
+            {calendarType === 'sharedUser' && (
+              <ActionSheet
+                actions={[
+                  {
+                    label: (
+                      <>
+                        <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+                      </>
+                    ),
+                    onClick: () => calendarSource.downloadCalendarPdf(calendarId),
+                  },
+                  { separator: true },
+                  {
+                    label: (
+                      <>
+                        <i className="bi bi-gear me-2" /> {t('settings.label')}
+                      </>
+                    ),
+                    onClick: () =>
+                      navigate(`/${lng}/${basePath}/${calendarId}/settings`),
+                  },
+                  { separator: true },
+                  {
+                    label: (
+                      <>
+                        <i className="bi bi-trash3 me-2"></i> {t('delete')}
+                      </>
+                    ),
+                    onClick: () => sharedUserCalendars.deleteSharedCalendar(calendarId),
+                    danger: true,
+                  },
+                ]}
+              />
+            )}
           </div>
         </div>
 
