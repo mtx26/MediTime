@@ -151,7 +151,7 @@ export default function MedicineReview() {
     }
 
     const timeout = setTimeout(async () => {
-      const results = await fetchSuggestions(current.name, current.dose);
+      const results = await fetchSuggestions(current.name, current.dose || '');
       setSuggestions(results || []);
     }, 300);
 
@@ -207,8 +207,9 @@ export default function MedicineReview() {
           )}
         </div>
         
-        <div className="row mb-3">
-          <div className="col-6 position-relative mb-3 text-start">
+        <div className="position-relative mb-3">
+          <div className="row">
+          <div className="col-12 col-md-6 mb-3 text-start">
             <label htmlFor="name">Nom :</label><br />
             {wasInitiallyMissing(index, 'name') || editMode ? (
               <input
@@ -228,30 +229,6 @@ export default function MedicineReview() {
                 <strong>{current.name}</strong>
               </div>
             )}
-            {editMode && showDropdown && suggestions.length > 0 && (
-              <ul className="dropdown-menu show w-100 position-absolute top-100 start-0 z-3" style={{ maxHeight: 200, overflowY: 'auto' }}>
-                {suggestions.map((item, i) => (
-                  <li key={i}>
-                    <button
-                      type="button"
-                      className="dropdown-item text-wrap"
-                      onClick={() => {
-                        const onlyNumbers = parseInt(item.dose.replace(/\D/g, ''));
-                        handleChange('name', item.name);
-                        handleChange('dose', onlyNumbers);
-                        handleChange('stock_max', item.conditionnement);
-                        handleChange('stock_quantity', item.conditionnement);
-                        setShowDropdown(false);
-                        setSuggestions([]);
-                      }}
-                    >
-                    {item.name} - {item.dose} - {item.conditionnement}{' '}
-                    {item.forme_pharmaceutique}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
 
           <div className="col-12 col-md-6 mb-3 text-start">
@@ -261,7 +238,19 @@ export default function MedicineReview() {
                 className={`form-control form-control-sm ${isMissing(current.dose) ? 'is-invalid' : ''}`}
                 type="number"
                 value={current.dose}
-                onChange={(e) => handleChange('dose', e.target.value)}
+                onChange={(e) => {
+                  handleChange('dose', e.target.value);
+                  if (current.name && current.name.length >= 2) {
+                    setShowDropdown(true);
+                  }
+                }}
+                onFocus={() => {
+                  // Afficher les suggestions si le nom est rempli et qu'il y en a
+                  if (current.name && current.name.length >= 2 && suggestions.length > 0) {
+                    setShowDropdown(true);
+                  }
+                }}
+                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
                 id="dose"
                 placeholder="mg"
                 title="Dosage"
@@ -275,6 +264,36 @@ export default function MedicineReview() {
             )}
           </div>
 
+          </div>
+
+          {/* Dropdown des suggestions juste en dessous */}
+          {showDropdown && suggestions.length > 0 && (
+            <ul className="dropdown-menu show w-100 position-absolute z-3" style={{ maxHeight: 200, overflowY: 'auto', top: '100%', left: 0, right: 0 }}>
+              {suggestions.map((item, i) => (
+                <li key={i}>
+                  <button
+                    type="button"
+                    className="dropdown-item text-wrap"
+                    onClick={() => {
+                      const onlyNumbers = parseInt(item.dose.replace(/\D/g, ''));
+                      handleChange('name', item.name);
+                      handleChange('dose', onlyNumbers);
+                      handleChange('stock_max', item.conditionnement);
+                      handleChange('stock_quantity', item.conditionnement);
+                      setShowDropdown(false);
+                      setSuggestions([]);
+                    }}
+                  >
+                  {item.name} - {item.dose} - {item.conditionnement}{' '}
+                  {item.forme_pharmaceutique}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="row mb-3">
           {[{
             label: 'Stock actuel',
             field: 'stock_quantity',
