@@ -1,1 +1,1 @@
-from .import_medicaments_afmps import *
+# from .import_medicaments_afmps import *
