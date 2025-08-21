@@ -249,7 +249,8 @@
     "file_selected": "Fichier sélectionné",
     "click_to_change": "Cliquez pour changer de fichier",
     "file_types": "JPG, PNG, WEBP, GIF",
-    "preview_error": "Erreur lors de l'affichage de la prévisualisation"
+    "preview_error": "Erreur lors de l'affichage de la prévisualisation",
+    "click_to_select_file": "Cliquez ou glissez-déposez pour sélectionner un fichier"
   },
   "invalid_or_expired_link": "Ce lien de calendrier partagé est invalide ou a expiré.",
   "invitation": {

@@ -671,7 +671,8 @@
     "file_selected": "Selected file",
     "click_to_change": "Click to change file",
     "file_types": "JPG, PNG, WEBP, GIF",
-    "preview_error": "Error displaying preview"
+    "preview_error": "Error displaying preview",
+    "click_to_select_file": "Click or drag and drop to select a file"
   },
   "medicine_review": {
     "title": "Drug Review",

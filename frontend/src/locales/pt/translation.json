@@ -671,7 +671,8 @@
     "file_selected": "Arquivo selecionado",
     "click_to_change": "Clique para alterar o arquivo",
     "file_types": "JPG, PNG, WEBP, GIF",
-    "preview_error": "Erro ao exibir a pré-visualização"
+    "preview_error": "Erro ao exibir a pré-visualização",
+    "click_to_select_file": "Clique ou arraste e solte para selecionar um arquivo"
   },
   "medicine_review": {
     "title": "Revisão de Medicamentos",

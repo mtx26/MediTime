@@ -671,7 +671,8 @@
     "file_selected": "Ausgewählte Datei",
     "click_to_change": "Klicken Sie hier, um die Datei zu ändern",
     "file_types": "JPG, PNG, WEBP, GIF",
-    "preview_error": "Fehler beim Anzeigen der Vorschau"
+    "preview_error": "Fehler beim Anzeigen der Vorschau",
+    "click_to_select_file": "Klicken oder ziehen Sie eine Datei, um sie auszuwählen"
   },
   "medicine_review": {
     "title": "Arzneimittelüberprüfung",

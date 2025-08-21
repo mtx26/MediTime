@@ -671,7 +671,8 @@
     "file_selected": "选定文件",
     "click_to_change": "单击更改文件",
     "file_types": "JPG、PNG、WEBP、GIF",
-    "preview_error": "显示预览时出错"
+    "preview_error": "显示预览时出错",
+    "click_to_select_file": "单击或拖放以选择文件"
   },
   "medicine_review": {
     "title": "药物审查",

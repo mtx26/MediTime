@@ -160,6 +160,15 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                   onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      fileInputRef.current?.click();
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={t('image_upload.click_to_select_file')}
                 >
                   <input
                     type="file"

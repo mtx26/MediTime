@@ -671,7 +671,8 @@
     "file_selected": "File selezionato",
     "click_to_change": "Clicca per cambiare file",
     "file_types": "JPG, PNG, WEBP, GIF",
-    "preview_error": "Errore durante la visualizzazione dell'anteprima"
+    "preview_error": "Errore durante la visualizzazione dell'anteprima",
+    "click_to_select_file": "Fare clic o trascinare e rilasciare per selezionare un file"
   },
   "medicine_review": {
     "title": "Revisione dei farmaci",
