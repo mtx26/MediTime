@@ -1,34 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import QRCodeScanner from '../../scanner/QRCodeScanner';
 import { useNavigate, useParams } from 'react-router-dom';
 
-function QRScanImport({ calendarName, personalCalendars, setError }) {
+const QRScanImport = forwardRef(({ calendarName, personalCalendars, onStateChange }, ref) => {
   const { t } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
   const navigate = useNavigate();
   const { lng } = useParams();
+  const scannerRef = useRef();
+
+  // Exposer la référence du scanner au composant parent
+  useImperativeHandle(ref, () => scannerRef.current);
 
   const handleCreateCalendar = async (medicines) => {
-    if (!calendarName.trim()) {
-      setError(t('calendar.error_no_calendar_name'));
-      return { success: false };
-    }
-
-    if (!medicines || medicines.length === 0) {
-      setError(t('calendar.error_no_medicines'));
-      return { success: false };
-    }
 
     setIsCreating(true);
-    setError('');
 
     try {
       // Créer le calendrier
       const calendarResult = await personalCalendars.addCalendar(calendarName);
       
       if (!calendarResult.success) {
-        setError('❌ ' + t('calendar.error_calendar_creation') + ': ' + calendarResult.error);
         return { success: false };
       }
 
@@ -42,10 +35,10 @@ function QRScanImport({ calendarName, personalCalendars, setError }) {
         try {
           const boxResult = await personalCalendars.createPersonalBox(
             calendarId,
-            medicine.medicine.name,
-            medicine.conditionnement, // boxCapacity
-            medicine.stockAlertThreshold,
-            medicine.conditionnement, // stockQuantity
+            medicine.name, // Nouvelle structure unifiée
+            medicine.box_capacity, // boxCapacity
+            medicine.stock_alert_threshold,
+            medicine.stock_quantity, // stockQuantity
             medicine.dose // dose
           );
 
@@ -67,7 +60,6 @@ function QRScanImport({ calendarName, personalCalendars, setError }) {
         return { success: true, successCount, errorCount };
       } else {
         // Succès partiel ou échec
-        setError(t('calendar.error_partial_success', { count: errorCount }));
         setTimeout(() => {
           navigate(`/${lng}/calendar/${calendarId}/boxes`);
         }, 3000);
@@ -76,7 +68,6 @@ function QRScanImport({ calendarName, personalCalendars, setError }) {
 
     } catch (error) {
       console.error('Erreur lors de la création:', error);
-      setError('❌ ' + t('calendar.error_calendar_creation'));
       return { success: false };
     } finally {
       setIsCreating(false);
@@ -100,43 +91,22 @@ function QRScanImport({ calendarName, personalCalendars, setError }) {
     <div className="row">
 		<hr/>
       <div className="col-12">
-        <div>
-          <div>
-            <h5 className="mb-3 text-center">
-              <i className="bi bi-qr-code-scan me-2"></i>
-              {t('scanner.title')}
-            </h5>         
-            <QRCodeScanner
-              modal={false}
-              onAddAll={handleCreateCalendar}
-              singleScan={true}
-            />
-          </div>
-        </div>
-
-        {/* Alert explicative en dessous */}
-        <div className="alert alert-success mt-3">
-          <div className="d-flex align-items-center">
-            <i className="bi bi-info-circle me-3"></i>
-            <div>
-              <strong>{t('calendar.import_type_qr_description')}</strong>
-              <p className="mb-0 small mt-1">
-                Scannez les codes QR de vos médicaments pour créer automatiquement votre calendrier avec toutes les informations nécessaires.
-              </p>
-            </div>
-          </div>
-          <div className="mt-3 text-center">
-            <img 
-              src="/icons/datamatrix.webp" 
-              alt="Data Matrix QR Code" 
-              className="img-fluid"
-              style={{ maxHeight: '160px' }}
-            />
-          </div>
-        </div>
+				<div>
+					<h5 className="mb-3 text-center">
+						<i className="bi bi-qr-code-scan me-2"></i>
+						{t('scanner.title')}
+					</h5>         
+					<QRCodeScanner
+						ref={scannerRef}
+						modal={false}
+						onAddAll={handleCreateCalendar}
+						singleScan={false}
+						onStateChange={onStateChange}
+					/>
+				</div>
       </div>
     </div>
   );
-}
+});
 
 export default QRScanImport;

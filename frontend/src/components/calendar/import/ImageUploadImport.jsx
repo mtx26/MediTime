@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AlertSystem from '../../common/AlertSystem';
 
-function ImageUploadImport({ calendarName, personalCalendars, onError }) {
+const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onStateChange }, ref) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { lng } = useParams();
@@ -23,6 +23,16 @@ function ImageUploadImport({ calendarName, personalCalendars, onError }) {
       setPreviewUrl(null);
     }
   }, [file]);
+
+  // Notify parent of state changes
+  useEffect(() => {
+    if (onStateChange) {
+      onStateChange({
+        hasFile: !!file,
+        isProcessing: isProcessing
+      });
+    }
+  }, [file, isProcessing, onStateChange]);
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -50,6 +60,11 @@ function ImageUploadImport({ calendarName, personalCalendars, onError }) {
     e.preventDefault();
   };
 
+  // Expose the import function to parent
+  useImperativeHandle(ref, () => ({
+    handleImport: () => handleImport(new Event('submit'))
+  }));
+
   const handleImport = async (e) => {
     e.preventDefault(); // Empêcher la soumission par défaut du formulaire
     
@@ -60,7 +75,7 @@ function ImageUploadImport({ calendarName, personalCalendars, onError }) {
     }
 
     if (!calendarName.trim()) {
-      onError('Le nom du calendrier est requis.');
+      setError('❌ ' + t('calendar.error_no_calendar_name'));
       return;
     }
 
@@ -72,7 +87,6 @@ function ImageUploadImport({ calendarName, personalCalendars, onError }) {
       const analysisResult = await personalCalendars.analyzeImage(file);
       
       if (analysisResult.success) {
-				console.log(analysisResult.medicines);
         if (analysisResult.medicines && analysisResult.medicines.length > 0) {
           // Rediriger vers la page de review avec les médicaments trouvés
           navigate(`/${lng}/add-calendar/review`, {
@@ -82,15 +96,17 @@ function ImageUploadImport({ calendarName, personalCalendars, onError }) {
             },
           });
         } else {
-          setAlertMessage(t('calendar.no_medicines_found'));
+          setAlertMessage(t('calendar.image_analysis_no_medicines'));
           setAlertType('info');
         }
       } else {
-        onError(analysisResult.error || t('calendar.image_analysis_error'));
+        setAlertMessage(analysisResult.error || t('calendar.image_analysis_error'));
+        setAlertType('danger');
       }
     } catch (error) {
       console.error('Erreur lors de l\'analyse de l\'image:', error);
-      onError('Erreur lors de l\'analyse du fichier');
+      setAlertMessage('Erreur lors de l\'analyse du fichier');
+      setAlertType('danger');
     } finally {
       setIsProcessing(false);
     }
@@ -107,7 +123,7 @@ function ImageUploadImport({ calendarName, personalCalendars, onError }) {
 
   return (
     <div className="row">
-			<hr/>
+      <hr/>
       <div className="col-12">
         {alertMessage && (
           <AlertSystem 
@@ -179,48 +195,12 @@ function ImageUploadImport({ calendarName, personalCalendars, onError }) {
               </div>
             </div>
 
-            {file && (
-              <div className="row mt-4">
-                <div className="col-12 text-center">
-                  <button
-                    className="btn btn-primary btn-lg px-5"
-                    onClick={handleImport}
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? (
-                      <>
-                        <div className="spinner-border spinner-border-sm me-2" role="status">
-                          <span className="visually-hidden">{t('calendar.processing')}</span>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <i className="bi bi-upload me-2"></i>
-                        {t('add')}
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Alert explicative en dessous */}
-        <div className="alert alert-warning mt-3">
-          <div className="d-flex align-items-center">
-            <i className="bi bi-info-circle me-3"></i>
-            <div>
-              <strong>{t('calendar.import_type_file')}</strong>
-              <p className="mb-0 small mt-1">
-                {t('calendar.import_type_file_description')}
-              </p>
-            </div>
+            {/* Bouton déplacé vers le parent - AddCalendarPage */}
           </div>
         </div>
       </div>
     </div>
   );
-}
+});
 
 export default ImageUploadImport;

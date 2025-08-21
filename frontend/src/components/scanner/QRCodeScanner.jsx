@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle, use } from "react";
 import { useTranslation } from "react-i18next";
 import { readBarcodes } from "zxing-wasm/reader";
 import { fetchMedicaments } from "../../utils/api/scanner";
@@ -9,35 +9,48 @@ const readerOptions = {
   maxNumberOfSymbols: 1,
 };
 
-export default function QRCodeScanner({
+const QRCodeScanner = forwardRef(({
   onMedicineFound = null,
   singleScan = false,
   onClose = null,   // Fonction pour fermer la modal
   onAddAll = null,  // Fonction pour ajouter tous les médicaments scannés
   show = false,     // Contrôle l'affichage de la modal
-  modal = true      // Active/désactive le mode modal
-}) {
+  modal = true,     // Active/désactive le mode modal
+  onStateChange = null,
+}, ref) => {
   const { t } = useTranslation();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
   const [error, setError] = useState("");
   const [gtins, setGtins] = useState([]); // liste des GTIN uniques (01)
-  const [medicines, setMedicines] = useState({}); // cache des médicaments trouvés par GTIN
+  const [medicines, setMedicines] = useState({}); // cache des médicaments trouvés par GTIN - contient directement les medicine_boxes
   const [loadingGtin, setLoadingGtin] = useState(null); // GTIN en cours de recherche
-  const [scannedMedicines, setScannedMedicines] = useState([]); // Liste temporaire locale
 
   // Pour éviter de pousser 20x le même code d'affilée
   const lastSeenRef = useRef({ text: "", t: 0 });
+
+  // Exposer handleAddAll au composant parent via useImperativeHandle
+  useImperativeHandle(ref, () => ({
+    handleAddAll
+  }));
 
   // Fonction pour réinitialiser la liste des médicaments scannés
   const resetScannedMedicines = () => {
     setGtins([]);
     setMedicines({});
-    setScannedMedicines([]);
     setLoadingGtin(null);
     setError("");
   };
+
+  useEffect(() => {
+    if (onStateChange) {
+      const medicineBoxes = Object.values(medicines).filter(med => med !== null);
+      onStateChange({
+        hasMedicine: medicineBoxes.length > 0
+      });
+    }
+  }, [medicines, onStateChange]);
 
   useEffect(() => {
     let stream;
@@ -183,7 +196,7 @@ export default function QRCodeScanner({
     }
   }
 
-  // Fonction pour chercher le médicament associé au GTIN
+  // Fonction pour chercher le médicament associé au GTIN et créer directement une medicine_box
   const searchMedicine = async (gtin) => {
     if (medicines[gtin] || loadingGtin === gtin) return; // Déjà en cache ou en cours
     
@@ -191,32 +204,29 @@ export default function QRCodeScanner({
     try {
       const results = await fetchMedicaments(gtin);
       if (results && results.length > 0) {
-        const medicine = results[0]; // Prendre le premier résultat
-        setMedicines(prev => ({ ...prev, [gtin]: medicine }));
+        const medicineData = results[0]; // Prendre le premier résultat
         
-        // Ajouter automatiquement à la liste temporaire locale
-        const dose = parseInt(medicine.dose?.replace(/\D/g, '') || 0);
-        const conditionnement = medicine.conditionnement;
+        // Créer directement une structure medicine_box
+        const dose = parseInt(medicineData.dose?.replace(/\D/g, '') || 0);
+        const conditionnement = parseInt(medicineData.conditionnement?.replace(/\D/g, '') || 0);
         
-        const medicineToAdd = {
+        const medicineBox = {
           gtin,
-          medicine,
-          dose,
-          conditionnement,
-          stockAlertThreshold: 10
+          name: medicineData.name,
+          dose: dose,
+          box_capacity: conditionnement,
+          stock_quantity: conditionnement,
+          stock_alert_threshold: 10,
+          conditions: [], // Conditions par défaut vides
+          // Garder les données originales pour référence
+          original_data: medicineData
         };
 
-        setScannedMedicines(prev => {
-          // Éviter les doublons basés sur le GTIN
-          const exists = prev.some(item => item.gtin === gtin);
-          if (exists) return prev;
-          
-          return [...prev, medicineToAdd];
-        });
+        setMedicines(prev => ({ ...prev, [gtin]: medicineBox }));
         
-        // Callback optionnel pour notifier le parent (pour l'action "Ajouter tous")
+        // Callback optionnel pour notifier le parent
         if (onMedicineFound) {
-          onMedicineFound({ ...medicine, gtin });
+          onMedicineFound(medicineBox);
         }
       } else {
         setMedicines(prev => ({ ...prev, [gtin]: null })); // Aucun résultat trouvé
@@ -237,16 +247,18 @@ export default function QRCodeScanner({
       delete newMedicines[gtinToRemove];
       return newMedicines;
     });
-    setScannedMedicines(prev => prev.filter(item => item.gtin !== gtinToRemove));
   };
 
   // Gérer l'ajout de tous les médicaments avec reset
   const handleAddAll = async () => {
     if (onAddAll) {
       try {
-        const result = await onAddAll(scannedMedicines);
+        // Récupérer les medicine_boxes valides (non null)
+        const medicineBoxes = Object.values(medicines).filter(med => med !== null);
+        
+        const result = await onAddAll(medicineBoxes);
         // Reset seulement si l'ajout a réussi
-        if (result && result.success !== false) {
+        if (result && result.success) {
           resetScannedMedicines(); // Remettre à zéro après ajout réussi
         }
       } catch (error) {
@@ -384,10 +396,10 @@ export default function QRCodeScanner({
                     <div>
                       <h6 className="mb-1 text-primary">
                         {medicine.name}
-                        {medicine.dose && ` (${medicine.dose})`}
+                        {medicine.dose && ` (${medicine.dose} mg)`}
                       </h6>
-                      {medicine.conditionnement && (
-                        <small className="text-muted">{t('scanner.quantity', { quantity: medicine.conditionnement })}</small>
+                      {medicine.box_capacity && (
+                        <small className="text-muted">{t('scanner.quantity', { quantity: medicine.box_capacity })}</small>
                       )}
                     </div>
                   ) : (
@@ -417,28 +429,34 @@ export default function QRCodeScanner({
 
   // Fonction pour rendre les boutons du footer
   function renderFooterButtons() {
+    const validMedicines = Object.values(medicines).filter(med => med !== null);
+    
     return (
       <div className={modal ? "" : "mt-3 d-flex justify-content-end gap-2"}>
-        {scannedMedicines.length > 0 && onAddAll ? (
-          <button
-            type="button"
-            className="btn btn-success w-100"
-            onClick={handleAddAll}
-          >
-            <i className="bi bi-plus-circle me-2"></i>
-            {t('scanner.add')}
-          </button>
-        ) : (modal && (
-          <button
+        {modal && (
+          validMedicines.length > 0 && onAddAll ? (
+            <button
               type="button"
-              className="btn btn-secondary w-100"
-              onClick={handleClose}
-          >
-            <i className="bi bi-x-circle me-2"></i>
-            {modal ? t('scanner.cancel') : t('scanner.close')}
-          </button>
-        ))}
+              className="btn btn-success w-100"
+              onClick={handleAddAll}
+            >
+              <i className="bi bi-plus-circle me-2"></i>
+              {t('scanner.add')}
+            </button>
+          ) : (
+            <button
+                type="button"
+                className="btn btn-secondary w-100"
+                onClick={handleClose}
+            >
+              <i className="bi bi-x-circle me-2"></i>
+              {modal ? t('scanner.cancel') : t('scanner.close')}
+            </button>
+          )
+        )}
       </div>
     );
   }
-}
+});
+
+export default QRCodeScanner;

@@ -54,10 +54,10 @@ function AddCalendarQRPage({ personalCalendars }) {
         try {
           const boxResult = await personalCalendars.createPersonalBox(
             calendarId,
-            medicine.medicine.name,
-            medicine.conditionnement, // boxCapacity
-            medicine.stockAlertThreshold,
-            medicine.conditionnement, // stockQuantity
+            medicine.name, // Nouvelle structure unifiée
+            medicine.box_capacity, // boxCapacity
+            medicine.stock_alert_threshold,
+            medicine.stock_quantity, // stockQuantity
             medicine.dose // dose
           );
 

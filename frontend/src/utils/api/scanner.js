@@ -14,7 +14,6 @@ export const fetchMedicaments = async (code_fmd) => {
   });
   
   const data = await res.json();
-  console.log('Médicament trouvé:', data);
 
 
   return data;

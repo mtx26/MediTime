@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import QRScanImport from '../../components/calendar/import/QRScanImport';
@@ -11,19 +11,31 @@ function AddCalendarPage({ personalCalendars }) {
 
   const [newCalendarName, setNewCalendarName] = useState('');
   const [importType, setImportType] = useState('manual');
-  const [error, setError] = useState('');
+  
+  // Refs pour les composants d'import
+  const imageImportRef = useRef(null);
+  const qrScanRef = useRef(null);
+  
+  // State pour l'état du composant d'import d'image
+  const [imageImportState, setImageImportState] = useState({
+    hasFile: false,
+    isProcessing: false
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!newCalendarName.trim()) return;
+  const [qrScanState, setQrScanState] = useState({
+    hasMedicine: false
+  });
 
+  const handleSubmit = async () => {
     if (importType === 'manual') {
       const rep = await personalCalendars.addCalendar(newCalendarName);
       if (rep.success) {
         navigate(`/${lng}/calendar/${rep.calendarId}/boxes`);
-      } else {
-        setError('❌ ' + rep.error);
       }
+    } else if (importType === 'qr' && qrScanRef.current) {
+      qrScanRef.current.handleAddAll();
+    } else if (importType === 'file' && imageImportRef.current) {
+      imageImportRef.current.handleImport();
     }
   };
 
@@ -38,12 +50,17 @@ function AddCalendarPage({ personalCalendars }) {
         </div>
 
         <div className="card-body">
-          <form onSubmit={handleSubmit}>
-            {/* Première ligne: Nom du calendrier et type d'import */}
+          {/* Form principal pour le nom du calendrier - toujours visible */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+          >
             <div className="row g-3 mb-4">
               <div className="col-md-8">
                 <label htmlFor="newCalendarName" className="form-label">
-                  {t('calendar.name')}
+                  {t('calendar.name')} <span className="text-danger">*</span>
                 </label>
                 <input
                   id="newCalendarName"
@@ -58,7 +75,7 @@ function AddCalendarPage({ personalCalendars }) {
 
               <div className="col-md-4">
                 <label htmlFor="importType" className="form-label">
-                  {t('calendar.import_type')}
+                  {t('calendar.import_type')} <span className="text-danger">*</span>
                 </label>
                 <select
                   className="form-select"
@@ -73,70 +90,123 @@ function AddCalendarPage({ personalCalendars }) {
               </div>
             </div>
 
-            {/* Bouton pour mode manuel uniquement */}
+            {/* Mode manuel */}
             {importType === 'manual' && (
-              <div className="row mb-4">
-                <div className="col-12 d-flex justify-content-center">
-                  <button
-                    type="submit"
-                    className="btn btn-primary btn-lg px-5"
-                  >
-                    <i className="bi bi-plus-lg me-2"></i>
-                    {t('add')}
-                  </button>
+              <div>
+                <div className="row mb-4">
+                  <div className="col-12 d-flex justify-content-center">
+                    <button
+                      type="submit"
+                      className="btn btn-success w-100"
+                    >
+                      <i className="bi bi-plus-lg me-2"></i>
+                      {t('add')}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
 
-            {/* Messages d'erreur pour mode manuel uniquement */}
-            {importType === 'manual' && error && (
-              <div className="row mb-4">
-                <div className="col-12">
-                  <div className="alert alert-danger" role="alert">
-                    {error}
+                <div className="row">
+                  <div className="col-12">
+                    <div className="alert alert-info mt-3">
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-info-circle me-2"></i>
+                        <div>
+                          <strong>{t('calendar.import_type_manual')}</strong>
+                          <p className="mb-0 small mt-1">
+                            {t('calendar.import_type_manual_description')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Description pour mode manuel */}
-            {importType === 'manual' && (
-              <div className="row">
-                <div className="col-12">
-                  <div className="alert alert-info">
-                    <i className="bi bi-info-circle me-2"></i>
-                    {t('calendar.import_type_manual_description')}
+            {/* Composants d'import pour QR et fichier */}
+            {importType === 'qr' && (
+              <>
+                <QRScanImport
+                  ref={qrScanRef}
+                  calendarName={newCalendarName}
+                  personalCalendars={personalCalendars}
+                  onStateChange={setQrScanState}
+                />
+                
+                {/* Bouton pour créer le calendrier avec les médicaments scannés */}
+                <div className="row mt-4">
+                  <div className="col-12 d-flex justify-content-center">
+                    <button
+                      type="submit"
+                      className="btn btn-success w-100"
+                      disabled={!qrScanState.hasMedicine}
+                    >
+                      <i className="bi bi-plus-circle me-2"></i>
+                      {t('add')}
+                    </button>
                   </div>
                 </div>
-              </div>
+                
+                {/* Alert explicative en dessous */}
+                <div className="alert alert-success mt-3">
+                  <div className="d-flex align-items-center">
+                    <i className="bi bi-info-circle me-3"></i>
+                    <div>
+                      <strong>{t('calendar.scan_qr_option')}</strong>
+                      <p className="mb-0 small mt-1">
+                        {t('calendar.import_type_qr_description')}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-center">
+                    <img 
+                      src="/icons/datamatrix.webp" 
+                      alt="Data Matrix QR Code" 
+                      className="img-fluid"
+                      style={{ maxHeight: '160px' }}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+            {importType === 'file' && (
+              <>
+                <ImageUploadImport
+                  ref={imageImportRef}
+                  calendarName={newCalendarName}
+                  personalCalendars={personalCalendars}
+                  onStateChange={setImageImportState}
+                />
+                
+                {/* Bouton d'import pour les fichiers */}
+                <div className="row mt-4">
+                  <div className="col-12 d-flex justify-content-center">
+                    <button
+                      type="submit"
+                      className="btn btn-success w-100"
+                      disabled={!imageImportState.hasFile || imageImportState.isProcessing}
+                    >
+                      <i className="bi bi-upload me-2"></i>
+                      {t('add')}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Alert explicative en dessous */}
+                <div className="alert alert-warning mt-3">
+                  <div className="d-flex align-items-center">
+                    <i className="bi bi-info-circle me-3"></i>
+                    <div>
+                      <strong>{t('calendar.import_type_file')}</strong>
+                      <p className="mb-0 small mt-1">
+                        {t('calendar.import_type_file_description')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </>
             )}
           </form>
-
-          {/* Composants d'import pour QR et fichier - en dehors du form */}
-          {importType === 'qr' && (
-            <QRScanImport
-              calendarName={newCalendarName}
-              personalCalendars={personalCalendars}
-              setError={setError}
-            />
-          )}
-          {importType === 'file' && (
-            <ImageUploadImport
-              calendarName={newCalendarName}
-              personalCalendars={personalCalendars}
-            />
-          )}
-
-          {/* Messages d'erreur en bas pour les imports QR et fichier */}
-          {(importType === 'qr' || importType === 'file') && error && (
-            <div className="row mt-4">
-              <div className="col-12">
-                <div className="alert alert-danger" role="alert">
-                  {error}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

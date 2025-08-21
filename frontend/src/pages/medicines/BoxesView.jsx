@@ -107,9 +107,9 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     }
   };
 
-  // Ajouter des nouvelles boîtes (mode création)
-  const addScannedMedicines = async (scannedMedicines) => {
-    if (!scannedMedicines || scannedMedicines.length === 0) {
+  // Ajouter des nouvelles boîtes (mode création) - maintenant reçoit directement des medicine_boxes
+  const addScannedMedicines = async (medicineBoxes) => {
+    if (!medicineBoxes || medicineBoxes.length === 0) {
       setAlertMessage('⚠️ Ajouter des médicaments');
       setAlertType('warning');
       return { success: false };
@@ -118,15 +118,15 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     let successCount = 0;
     let errorCount = 0;
 
-    for (const item of scannedMedicines) {
+    for (const medicineBox of medicineBoxes) {
       try {
         const res = await calendarSource.createBox(
           calendarId,
-          item.medicine.name,
-          item.conditionnement, // boxCapacity
-          item.stockAlertThreshold,
-          item.conditionnement, // stockQuantity
-          item.dose // dose
+          medicineBox.name,
+          medicineBox.box_capacity, // boxCapacity
+          medicineBox.stock_alert_threshold,
+          medicineBox.stock_quantity, // stockQuantity
+          medicineBox.dose // dose
         );
 
         if (res.success) {
@@ -160,22 +160,22 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     }
   };
 
-  // Mettre à jour une boîte existante (mode modification)
-  const updateScannedMedicine = async (scannedMedicines) => {
-    if (!scannedMedicines || scannedMedicines.length === 0 || !currentEditingBoxId) {
+  // Mettre à jour une boîte existante (mode modification) - maintenant reçoit directement des medicine_boxes
+  const updateScannedMedicine = async (medicineBoxes) => {
+    if (!medicineBoxes || medicineBoxes.length === 0 || !currentEditingBoxId) {
       setAlertMessage('⚠️ Ajouter un médicament');
       setAlertType('warning');
       return { success: false };
     }
 
-    const medicine = scannedMedicines[0]; // Prendre le premier médicament en mode single
+    const medicineBox = medicineBoxes[0]; // Prendre le premier médicament en mode single
     try {
       const box = {
-        name: medicine.medicine.name,
-        dose: medicine.dose,
-        box_capacity: medicine.conditionnement,
-        stock_alert_threshold: medicine.stockAlertThreshold,
-        stock_quantity: medicine.conditionnement,
+        name: medicineBox.name,
+        dose: medicineBox.dose,
+        box_capacity: medicineBox.box_capacity,
+        stock_alert_threshold: medicineBox.stock_alert_threshold,
+        stock_quantity: medicineBox.stock_quantity,
         conditions: [],
       };
       
