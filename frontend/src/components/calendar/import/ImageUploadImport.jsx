@@ -14,11 +14,23 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
   const [alertType, setAlertType] = useState('');
   const fileInputRef = useRef(null);
 
+  // Fonction pour valider une URL de prévisualisation d'image
+  const isValidImagePreviewUrl = (url) => {
+    if (!url) return false;
+    // Vérifier que l'URL est un blob URL créé par createObjectURL
+    return url.startsWith('blob:') && url.includes(window.location.origin);
+  };
+
   useEffect(() => {
     if (file) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      return () => URL.revokeObjectURL(url);
+      // Valider que le fichier est bien une image avant de créer l'URL
+      if (file.type.startsWith('image/')) {
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+        return () => URL.revokeObjectURL(url);
+      } else {
+        setPreviewUrl(null);
+      }
     } else {
       setPreviewUrl(null);
     }
@@ -157,13 +169,20 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
                     style={{ display: 'none' }}
                   />
                   
-                  {previewUrl ? (
+                  {previewUrl && isValidImagePreviewUrl(previewUrl) ? (
                     <div className="position-relative d-inline-block">
                       <img
                         src={previewUrl}
                         alt={t('image_upload.preview_alt')}
                         className="img-fluid rounded border shadow-sm mb-3"
                         style={{ maxHeight: '200px', maxWidth: '100%', objectFit: 'cover' }}
+                        onError={() => {
+                          // En cas d'erreur de chargement, supprimer la prévisualisation
+                          setPreviewUrl(null);
+                          setFile(null);
+                          setAlertMessage(t('image_upload.preview_error'));
+                          setAlertType('warning');
+                        }}
                       />
                       <button
                         type="button"

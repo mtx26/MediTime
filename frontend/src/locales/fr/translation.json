@@ -248,7 +248,8 @@
     "remove_image": "Supprimer l'image",
     "file_selected": "Fichier sélectionné",
     "click_to_change": "Cliquez pour changer de fichier",
-    "file_types": "JPG, PNG, WEBP, GIF"
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "preview_error": "Erreur lors de l'affichage de la prévisualisation"
   },
   "invalid_or_expired_link": "Ce lien de calendrier partagé est invalide ou a expiré.",
   "invitation": {

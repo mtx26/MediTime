@@ -423,7 +423,9 @@
     "quantity": "数量：{{quantity}}",
     "remove_from_list": "从列表中删除",
     "searching": "研究...",
-    "title": "扫描二维码"
+    "title": "扫描二维码",
+    "camera": "相机",
+    "select_camera": "选择相机"
   },
   "security": {
     "current_email": "当前电子邮件：",
@@ -668,7 +670,8 @@
     "remove_image": "删除图片",
     "file_selected": "选定文件",
     "click_to_change": "单击更改文件",
-    "file_types": "JPG、PNG、WEBP、GIF"
+    "file_types": "JPG、PNG、WEBP、GIF",
+    "preview_error": "显示预览时出错"
   },
   "medicine_review": {
     "title": "药物审查",

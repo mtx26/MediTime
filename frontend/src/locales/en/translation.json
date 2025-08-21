@@ -423,7 +423,9 @@
     "quantity": "Quantity: {{quantity}}",
     "remove_from_list": "Remove from list",
     "searching": "Research...",
-    "title": "Scan a QR code"
+    "title": "Scan a QR code",
+    "camera": "Camera",
+    "select_camera": "Select a camera"
   },
   "security": {
     "current_email": "Current email:",
@@ -668,7 +670,8 @@
     "remove_image": "Delete image",
     "file_selected": "Selected file",
     "click_to_change": "Click to change file",
-    "file_types": "JPG, PNG, WEBP, GIF"
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "preview_error": "Error displaying preview"
   },
   "medicine_review": {
     "title": "Drug Review",

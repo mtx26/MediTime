@@ -423,7 +423,9 @@
     "quantity": "数量: {{数量}}",
     "remove_from_list": "リストから削除",
     "searching": "研究...",
-    "title": "QRコードをスキャンする"
+    "title": "QRコードをスキャンする",
+    "camera": "カメラ",
+    "select_camera": "カメラを選択"
   },
   "security": {
     "current_email": "現在のメールアドレス:",
@@ -668,7 +670,8 @@
     "remove_image": "画像を削除",
     "file_selected": "選択したファイル",
     "click_to_change": "ファイルを変更するにはクリックしてください",
-    "file_types": "JPG、PNG、WEBP、GIF"
+    "file_types": "JPG、PNG、WEBP、GIF",
+    "preview_error": "プレビューの表示中にエラーが発生しました"
   },
   "medicine_review": {
     "title": "薬物レビュー",

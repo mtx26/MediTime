@@ -423,7 +423,9 @@
     "quantity": "Menge: {{Menge}}",
     "remove_from_list": "Aus der Liste entfernen",
     "searching": "Forschung...",
-    "title": "Scannen Sie einen QR-Code"
+    "title": "Scannen Sie einen QR-Code",
+    "camera": "Kamera",
+    "select_camera": "Wählen Sie eine Kamera aus"
   },
   "security": {
     "current_email": "Aktuelle E-Mail:",
@@ -668,7 +670,8 @@
     "remove_image": "Bild löschen",
     "file_selected": "Ausgewählte Datei",
     "click_to_change": "Klicken Sie hier, um die Datei zu ändern",
-    "file_types": "JPG, PNG, WEBP, GIF"
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "preview_error": "Fehler beim Anzeigen der Vorschau"
   },
   "medicine_review": {
     "title": "Arzneimittelüberprüfung",

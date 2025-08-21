@@ -423,7 +423,9 @@
     "quantity": "Количество: {{quantity}}",
     "remove_from_list": "Удалить из списка",
     "searching": "Исследовать...",
-    "title": "Отсканируйте QR-код"
+    "title": "Отсканируйте QR-код",
+    "camera": "Камера",
+    "select_camera": "Выберите камеру"
   },
   "security": {
     "current_email": "Текущий адрес электронной почты:",
@@ -668,7 +670,8 @@
     "remove_image": "Удалить изображение",
     "file_selected": "Выбранный файл",
     "click_to_change": "Нажмите, чтобы изменить файл",
-    "file_types": "JPG, PNG, WEBP, GIF"
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "preview_error": "Ошибка отображения предварительного просмотра"
   },
   "medicine_review": {
     "title": "Обзор лекарств",

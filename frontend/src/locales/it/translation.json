@@ -423,7 +423,9 @@
     "quantity": "Quantità: {{quantità}}",
     "remove_from_list": "Rimuovi dall'elenco",
     "searching": "Ricerca...",
-    "title": "Scansiona un codice QR"
+    "title": "Scansiona un codice QR",
+    "camera": "Telecamera",
+    "select_camera": "Seleziona una telecamera"
   },
   "security": {
     "current_email": "Email attuale:",
@@ -668,7 +670,8 @@
     "remove_image": "Elimina immagine",
     "file_selected": "File selezionato",
     "click_to_change": "Clicca per cambiare file",
-    "file_types": "JPG, PNG, WEBP, GIF"
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "preview_error": "Errore durante la visualizzazione dell'anteprima"
   },
   "medicine_review": {
     "title": "Revisione dei farmaci",

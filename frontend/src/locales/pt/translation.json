@@ -423,7 +423,9 @@
     "quantity": "Quantidade: {{quantidade}}",
     "remove_from_list": "Remover da lista",
     "searching": "Pesquisar...",
-    "title": "Escaneie um código QR"
+    "title": "Escaneie um código QR",
+    "camera": "Câmera",
+    "select_camera": "Selecione uma câmera"
   },
   "security": {
     "current_email": "E-mail atual:",
@@ -668,7 +670,8 @@
     "remove_image": "Excluir imagem",
     "file_selected": "Arquivo selecionado",
     "click_to_change": "Clique para alterar o arquivo",
-    "file_types": "JPG, PNG, WEBP, GIF"
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "preview_error": "Erro ao exibir a pré-visualização"
   },
   "medicine_review": {
     "title": "Revisão de Medicamentos",
