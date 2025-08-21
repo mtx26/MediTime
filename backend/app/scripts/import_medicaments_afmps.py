@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Optional, Dict, Any, Tuple
 import pandas as pd
 from psycopg2.extras import execute_values
+from psycopg2 import sql
 from app.db.connection import get_connection
 
 
@@ -21,6 +22,17 @@ def import_afmps_to_bis(
     """
 
     print(f"Importing AFMPS data from {csv_path} into {table_name}...")
+
+    # ---------- validation sécurité ----------
+    def validate_table_name(table_name: str) -> bool:
+        """Valide le nom de table pour éviter les injections SQL"""
+        # Autorise seulement les noms de table avec schema.table ou table
+        # Caractères autorisés : lettres, chiffres, underscores, points
+        pattern = r'^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)?$'
+        return bool(re.match(pattern, table_name))
+
+    if not validate_table_name(table_name):
+        raise ValueError(f"Nom de table invalide : {table_name}")
 
     # ---------- utils ----------
     def deaccent(s: str) -> str:
@@ -138,10 +150,18 @@ def import_afmps_to_bis(
     # ---------- insertion ----------
     total = len(df_sql)
     inserted = 0
-    insert_sql = f"""
-        INSERT INTO {table_name} ({", ".join(columns_sql)})
-        VALUES %s
-    """
+    
+    # Construction sécurisée de la requête SQL avec psycopg2.sql
+    schema_table = table_name.split('.')
+    if len(schema_table) == 2:
+        table_identifier = sql.Identifier(schema_table[0], schema_table[1])
+    else:
+        table_identifier = sql.Identifier(table_name)
+    
+    insert_sql_template = sql.SQL("INSERT INTO {} ({}) VALUES %s").format(
+        table_identifier,
+        sql.SQL(", ").join(map(sql.Identifier, columns_sql))
+    )
 
     def row_to_tuple(row):
         vals = []
@@ -156,9 +176,10 @@ def import_afmps_to_bis(
 
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(f"DELETE FROM {table_name};")
+            # Construction sécurisée de la requête DELETE
+            delete_sql = sql.SQL("DELETE FROM {}").format(table_identifier)
+            cur.execute(delete_sql)
             conn.commit()
-            
     with get_connection() as conn:
         with conn.cursor() as cur:
             print("Deleted existing rows in the table.")
@@ -167,7 +188,7 @@ def import_afmps_to_bis(
                 chunk = df_sql.iloc[start:start+chunk_size]
                 records = [row_to_tuple(r) for _, r in chunk.iterrows()]
                 if records:
-                    execute_values(cur, insert_sql, records)
+                    execute_values(cur, insert_sql_template, records)
                     inserted += len(records)
                 
                 print(f"Inserted {inserted} rows so far...")
