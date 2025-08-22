@@ -27,15 +27,23 @@ export default function MedicineReview() {
 
   const isMissing = (v) => !v?.toString().trim();
 
+  const CONDITION_FIELDS = ['time_of_day', 'interval_days', 'tablet_count', 'start_date'];
+
+  const safeGet = (obj, key) => (
+    Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : undefined
+  );
+
   const isConditionFieldMissing = (field, cond) => {
+    if (!CONDITION_FIELDS.includes(field)) return true;
     if (field === 'start_date') {
-      return parseInt(cond.interval_days) > 1 && isMissing(cond.start_date);
+      return parseInt(safeGet(cond, 'interval_days')) > 1 && isMissing(safeGet(cond, 'start_date'));
     }
     // Pour time_of_day, on considère que c'est manquant si c'est vide ou la valeur par défaut
     if (field === 'time_of_day') {
-      return !cond[field] || cond[field] === '' || cond[field].toString().trim() === '';
+      const v = safeGet(cond, field);
+      return !v || v === '' || v.toString().trim() === '';
     }
-    return isMissing(cond[field]);
+    return isMissing(safeGet(cond, field));
   };
 
   // Créer une clé unique pour identifier un champ
@@ -57,13 +65,17 @@ export default function MedicineReview() {
     setInitialMissing(prev => new Set([...prev, key]));
   };
 
+  const MAIN_FIELDS = ['name', 'dose', 'stock_quantity', 'stock_max', 'stock_alert_threshold'];
+
   const handleChange = (field, value) => {
+    if (!MAIN_FIELDS.includes(field)) return;
     const updated = [...medicines];
     updated[index][field] = value;
     setMedicines(updated);
   };
 
   const handleConditionChange = (i, field, value) => {
+    if (!CONDITION_FIELDS.includes(field)) return;
     const updated = [...medicines];
     updated[index].conditions[i][field] = value;
     setMedicines(updated);
@@ -81,7 +93,7 @@ export default function MedicineReview() {
       current.dose.toString().trim();
 
     const conditionsValid = current.conditions.every((cond) =>
-      !['time_of_day', 'interval_days', 'tablet_count', 'start_date'].some((field) =>
+      !CONDITION_FIELDS.some((field) =>
         isConditionFieldMissing(field, cond)
       )
     );
@@ -135,7 +147,7 @@ export default function MedicineReview() {
     // Vérifier les conditions
     if (current.conditions) {
       current.conditions.forEach((cond, condIndex) => {
-        ['time_of_day', 'interval_days', 'tablet_count', 'start_date'].forEach(field => {
+        CONDITION_FIELDS.forEach(field => {
           if (isConditionFieldMissing(field, cond)) {
             markAsMissing(index, field, condIndex);
           }
@@ -161,21 +173,23 @@ export default function MedicineReview() {
   // Fonction pour obtenir la valeur affichée d'un champ
   const getDisplayValue = (field, value, options = null) => {
     if (!value && value !== 0) return '-';
-    
+
     if (options) {
       const option = options.find(opt => opt.value === value);
       return option?.label || value;
     }
-    
+
     if (field === 'time_of_day') {
       const timeOptions = {
         'morning': t('morning'),
-        'noon': t('noon'), 
+        'noon': t('noon'),
         'evening': t('evening')
       };
-      return timeOptions[value] || value;
+      return Object.prototype.hasOwnProperty.call(timeOptions, value)
+        ? timeOptions[value]
+        : value;
     }
-    
+
     return value;
   };
 
@@ -317,11 +331,11 @@ export default function MedicineReview() {
           }].map(({ label, field, type, min, required = true }) => (
             <div key={field} className="mb-2 text-start col-12 col-md-6 mb-3 text-muted">
               <label htmlFor={field}>{label} :</label><br />
-              {editMode || (required && isMissing(current[field])) ? (
+              {editMode || (required && isMissing(safeGet(current, field))) ? (
                 <input
-                  className={`form-control form-control-sm ${required && isMissing(current[field]) ? 'is-invalid' : ''}`}
+                  className={`form-control form-control-sm ${required && isMissing(safeGet(current, field)) ? 'is-invalid' : ''}`}
                   type={type}
-                  value={current[field]}
+                  value={safeGet(current, field) || ''}
                   onChange={(e) => handleChange(field, e.target.value)}
                   id={field}
                   title={label}
@@ -330,7 +344,7 @@ export default function MedicineReview() {
                 />
               ) : (
                 <div className="form-control form-control-sm bg-light border">
-                  {getDisplayValue(field, current[field])}
+                  {getDisplayValue(field, safeGet(current, field))}
                 </div>
               )}
             </div>
@@ -371,7 +385,7 @@ export default function MedicineReview() {
             }].map(({ label, field, type, step, min, options }) => {
               const missing = isConditionFieldMissing(field, cond);
               const wasFieldInitiallyMissing = wasInitiallyMissing(index, field, i);
-              const disabled = field === 'start_date' && parseInt(cond.interval_days) === 1;
+              const disabled = field === 'start_date' && parseInt(safeGet(cond, 'interval_days')) === 1;
 
               return (
                 <div key={field} className="mb-1">
@@ -381,7 +395,7 @@ export default function MedicineReview() {
                       <select
                         className={`form-select form-select-sm ${missing ? 'is-invalid' : ''}`}
                         id={field}
-                        value={cond[field]}
+                        value={safeGet(cond, field) || ''}
                         onChange={(e) => handleConditionChange(i, field, e.target.value)}
                         title={label}
                         aria-label={label}
@@ -395,7 +409,7 @@ export default function MedicineReview() {
                         type={type}
                         className={`form-control form-control-sm ${missing ? 'is-invalid' : ''}`}
                         id={field}
-                        value={cond[field]}
+                        value={safeGet(cond, field) || ''}
                         onChange={(e) => handleConditionChange(i, field, e.target.value)}
                         disabled={disabled}
                         step={step}
@@ -406,7 +420,7 @@ export default function MedicineReview() {
                     )
                   ) : (
                     <div className="form-control form-control-sm bg-white border">
-                      <strong>{getDisplayValue(field, cond[field], options)}</strong>
+                      <strong>{getDisplayValue(field, safeGet(cond, field), options)}</strong>
                     </div>
                   )}
                 </div>

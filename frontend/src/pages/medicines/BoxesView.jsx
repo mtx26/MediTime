@@ -190,7 +190,9 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const boxConditionsForSelected = boxConditions[selectedModifyBox] || {};
+    const boxConditionsForSelected = Object.prototype.hasOwnProperty.call(boxConditions, selectedModifyBox)
+      ? boxConditions[selectedModifyBox]
+      : {};
     const conditions = Object.values(boxConditionsForSelected).filter(
       (condition) => condition !== undefined
     );
@@ -200,7 +202,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       // Si l'ID commence par "temp_", c'est une nouvelle condition
       if (condition.id && condition.id.startsWith('temp_')) {
         // Ne pas envoyer l'ID pour les nouvelles conditions
-        const { id, ...conditionWithoutId } = condition;
+        const { id: _discarded, ...conditionWithoutId } = condition;
         return conditionWithoutId;
       }
       // Pour les conditions existantes, garder l'ID

@@ -188,8 +188,9 @@ def clear_existing_data(table_identifier: sql.Composable) -> None:
     """Supprime les données existantes de la table"""
     with get_connection() as conn:
         with conn.cursor() as cur:
-            delete_sql = sql.SQL("DELETE FROM {}").format(table_identifier)
-            cur.execute(delete_sql)
+            cur.execute(
+                sql.SQL("DELETE FROM {}").format(table_identifier)
+            )
             conn.commit()
 
 
