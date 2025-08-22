@@ -21,11 +21,11 @@ def _parse_date(val):
     for fmt in ("%Y-%m-%d",):
         try:
             return datetime.strptime(val, fmt).date()
-        except Exception:
-            pass
+        except ValueError:
+            continue  # Format non valide, essayer le suivant
     try:
         return datetime.fromisoformat(val).date()
-    except Exception:
+    except (ValueError, TypeError):
         return None
 
 def _fmt_date(val):

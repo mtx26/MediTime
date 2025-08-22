@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle, use } from "react";
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import { useTranslation } from "react-i18next";
 import { readBarcodes } from "zxing-wasm/reader";
 import { fetchMedicaments } from "../../utils/api/scanner";
@@ -450,7 +450,7 @@ const QRCodeScanner = forwardRef(({
 
     // Normaliser les séparateurs GS1
     const GS1_SEPARATOR = String.fromCharCode(29); // Caractère de séparation GS1 (Group Separator, code ASCII 29)
-    const cleaned = text.replace(new RegExp(GS1_SEPARATOR, "g"), ""); // retire le GS (FNC1) si présent
+    const cleaned = text.replaceAll(GS1_SEPARATOR, ""); // retire le GS (FNC1) si présent
 
     // 1) Format standard parenthésé "(01) 14chiffres"
     let m = cleaned.match(/\(01\)\s*([0-9]{14})/);

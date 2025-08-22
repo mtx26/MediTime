@@ -87,7 +87,8 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
     }
 
     if (!calendarName.trim()) {
-      setError('❌ ' + t('calendar.error_no_calendar_name'));
+      setAlertMessage('❌ ' + t('calendar.error_no_calendar_name'));
+      setAlertType('error');
       return;
     }
 

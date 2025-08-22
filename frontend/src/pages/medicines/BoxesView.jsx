@@ -190,7 +190,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       // Si l'ID commence par "temp_", c'est une nouvelle condition
       if (condition.id && condition.id.startsWith('temp_')) {
         // Ne pas envoyer l'ID pour les nouvelles conditions
-        const { id, ...conditionWithoutId } = condition;
+        const { id: _id, ...conditionWithoutId } = condition;
         return conditionWithoutId;
       }
       // Pour les conditions existantes, garder l'ID
