@@ -184,12 +184,18 @@ def row_to_tuple(row, columns_sql: list) -> tuple:
     return tuple(vals)
 
 
-def clear_existing_data(table_identifier: sql.Composable) -> None:
-    """Supprime les données existantes de la table"""
+def clear_existing_data(table_name: str) -> None:
+    """Supprime les données existantes de la table de façon sécurisée"""
+    schema_table = table_name.split('.')
+    if len(schema_table) == 2:
+        identifier = sql.Identifier(schema_table[0], schema_table[1])
+    else:
+        identifier = sql.Identifier(table_name)
+
     with get_connection() as conn:
         with conn.cursor() as cur:
-            delete_sql = sql.SQL("DELETE FROM {}").format(table_identifier)
-            cur.execute(delete_sql)
+            delete_query = sql.Composed([sql.SQL("DELETE FROM "), identifier])
+            cur.execute(delete_query)
             conn.commit()
 
 
@@ -246,7 +252,7 @@ def import_afmps_to_bis(
     table_identifier, insert_sql_template = create_sql_identifiers(table_name, columns_sql)
 
     # Suppression des données existantes
-    clear_existing_data(table_identifier)
+    clear_existing_data(table_name)
 
     # Insertion des nouvelles données
     total = len(df_sql)
