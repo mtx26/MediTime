@@ -83,20 +83,21 @@ CREATE TABLE IF NOT EXISTS "public"."medicaments_afmps" (
     "name" "text",
     "dose" "text",
     "forme_pharmaceutique" "text",
-    "voie d’administration" "text",
+    "voie_administration" "text",
     "conditionnement" "text",
-    "substance active" "text",
-    "code atc" "text",
-    "code cnk" "text",
+    "substance_active" "text",
+    "code_atc" "text",
+    "code_cnk" "text",
+    "code_fmd" "text",
     "url_notice_fr" "text",
-    "url notice nl" "text",
-    "url notice de" "text",
-    "url rcp" "text",
-    "url summary rmp fr" "text",
-    "url summary rmp nl" "text",
-    "url summary rmp de" "text",
-    "date de dernière publication rcp/notice" "date",
-    "date de dernière approbation rcp/notice" "date",
+    "url_notice_nl" "text",
+    "url_notice_de" "text",
+    "url_rcp" "text",
+    "url_summary_rmp_fr" "text",
+    "url_summary_rmp_nl" "text",
+    "url_summary_rmp_de" "text",
+    "date_derniere_publication_rcp_notice" "date",
+    "date_derniere_approbation_rcp_notice" "date",
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"()
 );
@@ -271,6 +272,10 @@ CREATE UNIQUE INDEX "invitations_token_idx" ON "public"."invitations" USING "btr
 
 
 
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_bis_medicaments_afmps" BEFORE UPDATE ON "public"."medicaments_afmps" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
 CREATE OR REPLACE TRIGGER "trg_touch_updated_at_calendars" BEFORE UPDATE ON "public"."calendars" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
 
 
@@ -280,10 +285,6 @@ CREATE OR REPLACE TRIGGER "trg_touch_updated_at_fcm_tokens" BEFORE UPDATE ON "pu
 
 
 CREATE OR REPLACE TRIGGER "trg_touch_updated_at_invitations" BEFORE UPDATE ON "public"."invitations" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
-
-
-
-CREATE OR REPLACE TRIGGER "trg_touch_updated_at_medicaments_afmps" BEFORE UPDATE ON "public"."medicaments_afmps" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
 
 
 
