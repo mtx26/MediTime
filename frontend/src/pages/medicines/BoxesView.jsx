@@ -40,6 +40,14 @@ const createIconButton = (className, icon, text, onClick, ariaLabel, title) => (
   </button>
 );
 
+const isSafeKey = (key) => (
+  typeof key === 'string' &&
+  /^\w+$/.test(key) &&
+  key !== '__proto__' &&
+  key !== 'prototype' &&
+  key !== 'constructor'
+);
+
 const createBadge = (bgColor, icon, text) => (
   <span className={`badge bg-${bgColor}`}>
     <i className={`bi bi-${icon}`} /> {text}
@@ -190,7 +198,10 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const boxConditionsForSelected = boxConditions[selectedModifyBox] || {};
+    const boxConditionsForSelected = isSafeKey(selectedModifyBox) &&
+      Object.prototype.hasOwnProperty.call(boxConditions, selectedModifyBox)
+        ? boxConditions[selectedModifyBox]
+        : {};
     const conditions = Object.values(boxConditionsForSelected).filter(
       (condition) => condition !== undefined
     );
@@ -200,7 +211,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       // Si l'ID commence par "temp_", c'est une nouvelle condition
       if (condition.id && condition.id.startsWith('temp_')) {
         // Ne pas envoyer l'ID pour les nouvelles conditions
-        const { id, ...conditionWithoutId } = condition;
+        const conditionWithoutId = (({ id, ...rest }) => rest)(condition);
         return conditionWithoutId;
       }
       // Pour les conditions existantes, garder l'ID

@@ -45,7 +45,7 @@ const QRCodeScanner = forwardRef(({
   const rafRef = useRef(null);
   const [error, setError] = useState("");
   const [gtins, setGtins] = useState([]); // liste des GTIN uniques (01)
-  const [medicines, setMedicines] = useState({}); // cache des médicaments trouvés par GTIN - contient directement les medicine_boxes
+    const [medicines, setMedicines] = useState(() => Object.create(null)); // cache des médicaments trouvés par GTIN - contient directement les medicine_boxes
   const [loadingGtin, setLoadingGtin] = useState(null); // GTIN en cours de recherche
   
   // Nouveaux états pour les contrôles de caméra
@@ -85,8 +85,8 @@ const QRCodeScanner = forwardRef(({
 
   // Fonction pour réinitialiser la liste des médicaments scannés
   const resetScannedMedicines = () => {
-    setGtins([]);
-    setMedicines({});
+      setGtins([]);
+      setMedicines(Object.create(null));
     setLoadingGtin(null);
     setError("");
   };
@@ -306,7 +306,7 @@ const QRCodeScanner = forwardRef(({
 
           if (!sameAsLast) {
             const gtin = extractGTIN01(r.text);
-            if (gtin) {
+            if (gtin && isSafeKey(gtin)) {
               setGtins((prev) => {
                 if (prev.includes(gtin)) return prev;
                 // Nouveau GTIN détecté, chercher le médicament
@@ -330,7 +330,7 @@ const QRCodeScanner = forwardRef(({
   function drawDetection(ctx, r) {
     let points = [];
 
-    if (r?.position?.points?.length) {
+    if (Array.isArray(r?.position?.points) && r.position.points.length) {
       points = r.position.points;
     } else if (
       r?.position?.topLeft &&
@@ -350,17 +350,41 @@ const QRCodeScanner = forwardRef(({
       ctx.lineWidth = 3;
       ctx.strokeStyle = "#00FF00";
       ctx.beginPath();
-      ctx.moveTo(points[0].x, points[0].y);
-      for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
-      ctx.closePath();
-      ctx.stroke();
+      const first = points[0];
+      const firstX = Number(first.x);
+      const firstY = Number(first.y);
+      if (Number.isFinite(firstX) && Number.isFinite(firstY)) {
+        ctx.moveTo(firstX, firstY);
+        for (let i = 1; i < points.length; i++) {
+          const p = points[i];
+          if (!p || typeof p !== 'object') continue;
+          const x = Number(p.x);
+          const y = Number(p.y);
+          if (Number.isFinite(x) && Number.isFinite(y)) {
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
     }
   }
 
+  // Vérifie que la clé est sûre pour être utilisée comme propriété d'objet
+  const isSafeKey = (key) => {
+    return typeof key === 'string' &&
+      /^\w+$/.test(key) &&
+      key !== '__proto__' &&
+      key !== 'prototype' &&
+      key !== 'constructor';
+  };
+
   // Fonction pour chercher le médicament associé au GTIN et créer directement une medicine_box
   const searchMedicine = async (gtin) => {
+    // Valide que la clé est sûre
+    if (!isSafeKey(gtin)) return;
     // Vérifier si le médicament est déjà en cours de recherche ou s'il est dans la liste active
-    if (loadingGtin === gtin || (medicines[gtin] && gtins.includes(gtin))) return;
+    if (loadingGtin === gtin || (Object.prototype.hasOwnProperty.call(medicines, gtin) && gtins.includes(gtin))) return;
     
     setLoadingGtin(gtin);
     try {
@@ -384,18 +408,33 @@ const QRCodeScanner = forwardRef(({
           original_data: medicineData
         };
 
-        setMedicines(prev => ({ ...prev, [gtin]: medicineBox }));
+    setMedicines(prev => {
+      if (!isSafeKey(gtin)) return prev;
+      const updated = Object.assign(Object.create(null), prev);
+      updated[gtin] = medicineBox;
+      return updated;
+    });
         
         // Callback optionnel pour notifier le parent
         if (onMedicineFound) {
           onMedicineFound(medicineBox);
         }
       } else {
-        setMedicines(prev => ({ ...prev, [gtin]: null })); // Aucun résultat trouvé
+        setMedicines(prev => {
+          if (!isSafeKey(gtin)) return prev;
+          const updated = Object.assign(Object.create(null), prev);
+          updated[gtin] = null;
+          return updated;
+        }); // Aucun résultat trouvé
       }
     } catch (error) {
       console.error("Erreur lors de la recherche du médicament:", error);
-      setMedicines(prev => ({ ...prev, [gtin]: null }));
+      setMedicines(prev => {
+        if (!isSafeKey(gtin)) return prev;
+        const updated = Object.assign(Object.create(null), prev);
+        updated[gtin] = null;
+        return updated;
+      });
     } finally {
       setLoadingGtin(null);
     }
@@ -403,11 +442,15 @@ const QRCodeScanner = forwardRef(({
 
   // Fonction pour supprimer un médicament scanné
   const removeMedicine = (gtinToRemove) => {
+    if (!isSafeKey(gtinToRemove)) return;
     setGtins(prev => prev.filter(gtin => gtin !== gtinToRemove));
     setMedicines(prev => {
-      const newMedicines = { ...prev };
-      delete newMedicines[gtinToRemove];
-      return newMedicines;
+      if (!Object.prototype.hasOwnProperty.call(prev, gtinToRemove)) return prev;
+      const rest = Object.entries(prev).reduce((acc, [k, v]) => {
+        if (k !== gtinToRemove) acc[k] = v;
+        return acc;
+      }, Object.create(null));
+      return rest;
     });
     // S'assurer que le GTIN n'est plus en cours de chargement
     if (loadingGtin === gtinToRemove) {
@@ -648,7 +691,9 @@ const QRCodeScanner = forwardRef(({
         {gtins.length > 0 && (
           <ul className="list-group">
             {gtins.map((gtin) => {
-              const medicine = medicines[gtin];
+              const medicine = isSafeKey(gtin) && Object.prototype.hasOwnProperty.call(medicines, gtin)
+                ? medicines[gtin]
+                : undefined;
               const isLoading = loadingGtin === gtin;
               
               return (
