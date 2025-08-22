@@ -194,9 +194,8 @@ def clear_existing_data(table_name: str) -> None:
 
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                sql.SQL("DELETE FROM {}").format(identifier)
-            )
+            delete_query = sql.Composed([sql.SQL("DELETE FROM "), identifier])
+            cur.execute(delete_query)
             conn.commit()
 
 

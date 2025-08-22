@@ -447,7 +447,9 @@ const QRCodeScanner = forwardRef(({
     setMedicines(prev => {
       if (!Object.prototype.hasOwnProperty.call(prev, gtinToRemove)) return prev;
       const rest = Object.entries(prev).reduce((acc, [k, v]) => {
-        if (k !== gtinToRemove) acc[k] = v;
+        if (k !== gtinToRemove && isSafeKey(k)) {
+          Object.defineProperty(acc, k, { value: v, enumerable: true, configurable: true, writable: true });
+        }
         return acc;
       }, Object.create(null));
       return rest;
