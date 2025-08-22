@@ -76,6 +76,8 @@
   "back": "后退",
   "boxes": {
     "add_box": "添加框",
+    "add_manual": "手动添加",
+    "add_with_qr": "扫描二维码",
     "alert_threshold": "警报阈值",
     "cancel": "取消",
     "capacity": "盒子容量",
@@ -100,9 +102,11 @@
     "intake_conditions": "服用条件",
     "name": "姓名",
     "new_box": "新盒子",
+    "qr_code_help_text": "DataMatrix 码位于药品包装上，靠近条形码。它是一个黑白相间的小方块。",
     "remaining_qty": "剩余数量",
     "restock": "补货",
     "save": "节省",
+    "scan_qr_code": "扫描二维码",
     "start_typing": "开始输入...",
     "stock": {
       "alerts": {
@@ -125,22 +129,39 @@
   "calendar": {
     "add": "添加日历",
     "add_calendar": "添加日历",
+    "add_with_qr": "通过扫描二维码创建日历",
+    "calendar_name": "日历名称",
+    "calendar_name_placeholder": "输入日历的名称",
     "choose_image": "选择图像",
     "confirm_delete": "删除日历？",
     "confirm_delete_shared": "删除共享日历？",
     "confirm_rename": "重命名日历？",
+    "create_calendar_qr": "扫描二维码：{{calendarName}}",
+    "creating_calendar": "正在创作...",
     "daily_view": "日历",
     "day": "天",
     "drag_and_drop": "将图像拖到此处或单击以选择它",
+    "error_calendar_creation": "创建日历时出错",
+    "error_no_calendar_name": "请输入日历名称",
+    "error_no_medicines": "未扫描任何药物",
+    "error_partial_success": "日历已创建，但无法添加{{count}}种药物",
     "import_calendar": "导入日历“{{name}}”",
     "import_type": "添加模式",
     "import_type_file": "导入文件",
+    "import_type_file_description": "从导出的文件导入日历。",
     "import_type_manual": "曼努埃尔",
+    "import_type_manual_description": "创建一个空日历并手动添加药物。",
+    "import_type_qr_description": "扫描药盒上的 DataMatrix 代码即可自动创建您的时间表。",
     "label": "日历",
     "month": "月",
     "name": "日历名称",
     "new_name": "新名称",
+    "processing": "正在处理…",
     "reference_week": "参考周",
+    "scan_medicines": "扫描药物",
+    "scan_medicines_description": "扫描药盒上的 DataMatrix 码。扫描的每种药物都会自动添加到您的新药计划中。",
+    "scan_qr_option": "扫描二维码",
+    "scanner_button_hint": "使用扫描仪的“添加”按钮创建日历",
     "today": "今天",
     "week": "星期",
     "weekly_help": "单击日历中的某一天即可在窗口中查看相关药物。",
@@ -212,6 +233,10 @@
     "title3": "安全有保障"
   },
   "home": "欢迎",
+  "home_meta": {
+    "description": "轻松管理和分享您的药物摄入量。",
+    "title": "MediTime - 治疗计划器"
+  },
   "invalid_or_expired_link": "此共享日历链接无效或已过期。",
   "invitation": {
     "invalid_or_expired": "邀请无效或已过期",
@@ -388,6 +413,20 @@
   },
   "revoke_link": "撤销链接",
   "rights_reserved": "版权所有",
+  "scanner": {
+    "add": "添加",
+    "camera_error": "无法访问相机。",
+    "camera_instruction": "指向 DataMatrix 代码",
+    "cancel": "取消",
+    "close": "关闭",
+    "medicine_not_found": "未找到药物",
+    "quantity": "数量：{{quantity}}",
+    "remove_from_list": "从列表中删除",
+    "searching": "研究...",
+    "title": "扫描二维码",
+    "camera": "相机",
+    "select_camera": "选择相机"
+  },
   "security": {
     "current_email": "当前电子邮件：",
     "current_password": {
@@ -620,8 +659,29 @@
     "title": "为什么选择 MediTime？"
   },
   "yes": "是的",
-  "home_meta": {
-    "title": "MediTime - 治疗计划器",
-    "description": "轻松管理和分享您的药物摄入量。"
+  "image_upload": {
+    "title": "选择并预览文件",
+    "file_type_error": "仅接受图像文件（jpg、png、webp、gif）。",
+    "select_file_error": "请选择一个图像文件。",
+    "no_medicines_found": "图像中未发现药物。",
+    "analysis_error": "解析图像时出错。",
+    "file_analysis_error": "解析文件时出错",
+    "preview_alt": "预览",
+    "remove_image": "删除图片",
+    "file_selected": "选定文件",
+    "click_to_change": "单击更改文件",
+    "file_types": "JPG、PNG、WEBP、GIF",
+    "preview_error": "显示预览时出错",
+    "click_to_select_file": "单击或拖放以选择文件"
+  },
+  "medicine_review": {
+    "title": "药物审查",
+    "current_stock": "现有库存",
+    "maximum_stock": "库存上限",
+    "time_of_day": "片刻",
+    "select_option": "选择...",
+    "start_date": "开始",
+    "delete_condition": "删除此条件",
+    "finish": "结束"
   }
 }

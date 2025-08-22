@@ -76,6 +76,8 @@
   "back": "Indietro",
   "boxes": {
     "add_box": "Aggiungi una casella",
+    "add_manual": "Aggiungi manualmente",
+    "add_with_qr": "Scannerizza il codice QR",
     "alert_threshold": "Soglia di allerta",
     "cancel": "Cancellare",
     "capacity": "Capacità della scatola",
@@ -100,9 +102,11 @@
     "intake_conditions": "Condizioni di assunzione",
     "name": "Nome",
     "new_box": "Nuova scatola",
+    "qr_code_help_text": "Il codice DataMatrix si trova sulla confezione del farmaco, vicino al codice a barre. È un piccolo quadrato bianco e nero.",
     "remaining_qty": "Quantità rimanente",
     "restock": "Riassortimento",
     "save": "Salva",
+    "scan_qr_code": "Scannerizza il codice QR",
     "start_typing": "Inizia a digitare...",
     "stock": {
       "alerts": {
@@ -125,22 +129,39 @@
   "calendar": {
     "add": "Aggiungi un calendario",
     "add_calendar": "Aggiungi un calendario",
+    "add_with_qr": "Crea un calendario scansionando il QR",
+    "calendar_name": "Nome del calendario",
+    "calendar_name_placeholder": "Inserisci il nome del calendario",
     "choose_image": "Scegli un'immagine",
     "confirm_delete": "Eliminare il calendario?",
     "confirm_delete_shared": "Eliminare il calendario condiviso?",
     "confirm_rename": "Rinominare il calendario?",
+    "create_calendar_qr": "Scansiona QR: {{calendarName}}",
+    "creating_calendar": "Creazione in corso...",
     "daily_view": "Calendario giornaliero",
     "day": "Giorno",
     "drag_and_drop": "Trascina un'immagine qui o fai clic per selezionarla",
+    "error_calendar_creation": "Errore durante la creazione del calendario",
+    "error_no_calendar_name": "Inserisci un nome per il calendario",
+    "error_no_medicines": "Nessun farmaco scansionato",
+    "error_partial_success": "Calendario creato ma non è stato possibile aggiungere {{count}} farmaci",
     "import_calendar": "Importa il calendario \"{{name}}\"",
     "import_type": "Aggiungi modalità",
     "import_type_file": "Importazione di un file",
+    "import_type_file_description": "Importa un calendario da un file esportato.",
     "import_type_manual": "Manuel",
+    "import_type_manual_description": "Crea un calendario vuoto e aggiungi i farmaci manualmente.",
+    "import_type_qr_description": "Scansiona i codici DataMatrix presenti sulle confezioni dei tuoi farmaci per creare automaticamente il tuo programma.",
     "label": "Calendario",
     "month": "Mese",
     "name": "Nome del calendario",
     "new_name": "Nuovo nome",
+    "processing": "Elaborazione in corso…",
     "reference_week": "Settimana di riferimento",
+    "scan_medicines": "Scansiona i farmaci",
+    "scan_medicines_description": "Scansiona i codici DataMatrix sulle confezioni dei tuoi farmaci. Ogni farmaco scansionato verrà automaticamente aggiunto al tuo nuovo programma.",
+    "scan_qr_option": "Scanner di codici QR",
+    "scanner_button_hint": "Utilizzare il pulsante \"Aggiungi\" dello scanner per creare il calendario",
     "today": "Oggi",
     "week": "Settimana",
     "weekly_help": "Cliccando su un giorno nel calendario si possono visualizzare in una finestra i farmaci associati.",
@@ -212,6 +233,10 @@
     "title3": "Sicurezza assicurata"
   },
   "home": "Benvenuto",
+  "home_meta": {
+    "description": "Gestisci e condividi facilmente l'assunzione dei tuoi farmaci.",
+    "title": "MediTime - Pianificatore di trattamento"
+  },
   "invalid_or_expired_link": "Questo collegamento al calendario condiviso non è valido o è scaduto.",
   "invitation": {
     "invalid_or_expired": "Invito non valido o scaduto",
@@ -388,6 +413,20 @@
   },
   "revoke_link": "Revoca il collegamento",
   "rights_reserved": "Tutti i diritti riservati",
+  "scanner": {
+    "add": "Aggiungere",
+    "camera_error": "Impossibile accedere alla telecamera.",
+    "camera_instruction": "Indica il codice DataMatrix",
+    "cancel": "Cancellare",
+    "close": "Vicino",
+    "medicine_not_found": "Farmaco non trovato",
+    "quantity": "Quantità: {{quantità}}",
+    "remove_from_list": "Rimuovi dall'elenco",
+    "searching": "Ricerca...",
+    "title": "Scansiona un codice QR",
+    "camera": "Telecamera",
+    "select_camera": "Seleziona una telecamera"
+  },
   "security": {
     "current_email": "Email attuale:",
     "current_password": {
@@ -620,8 +659,29 @@
     "title": "Perché scegliere MediTime?"
   },
   "yes": "SÌ",
-  "home_meta": {
-    "title": "MediTime - Pianificatore di trattamento",
-    "description": "Gestisci e condividi facilmente l'assunzione dei tuoi farmaci."
+  "image_upload": {
+    "title": "Seleziona e visualizza in anteprima un file",
+    "file_type_error": "Sono accettati solo file immagine (jpg, png, webp, gif).",
+    "select_file_error": "Seleziona un file immagine.",
+    "no_medicines_found": "Nessun farmaco trovato nell'immagine.",
+    "analysis_error": "Errore durante l'analisi dell'immagine.",
+    "file_analysis_error": "Errore durante l'analisi del file",
+    "preview_alt": "Anteprima",
+    "remove_image": "Elimina immagine",
+    "file_selected": "File selezionato",
+    "click_to_change": "Clicca per cambiare file",
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "preview_error": "Errore durante la visualizzazione dell'anteprima",
+    "click_to_select_file": "Fare clic o trascinare e rilasciare per selezionare un file"
+  },
+  "medicine_review": {
+    "title": "Revisione dei farmaci",
+    "current_stock": "Scorte attuali",
+    "maximum_stock": "Massima scorta",
+    "time_of_day": "Momento",
+    "select_option": "Selezionare...",
+    "start_date": "Inizio",
+    "delete_condition": "Rimuovi questa condizione",
+    "finish": "Per finire"
   }
 }

@@ -73,24 +73,21 @@ Rules:
             raw_output = response.candidates[0].content.parts[0].text
         else:
             log_backend.warning("Gemini response structure unexpected", {"origin": "GEMINI_ANALYZE"})
-            return {
-                "error": "Gemini returned unexpected response structure"
-            }
+            return None
 
         cleaned = strip_json_markdown(raw_output)
 
         try:
             data = json.loads(cleaned)
-            return data
+            medicine_boxes = data.get("medicine_boxes", [])
+            return medicine_boxes
         except json.JSONDecodeError as json_error:
             log_backend.warning("Gemini returned non-JSON output", {
                 "origin": "GEMINI_ANALYZE",
                 "raw_output": raw_output,
                 "error": str(json_error)
             })
-            return {
-                "error": "Gemini response was not valid JSON",
-            }
+            return None
 
     except Exception as e:
         log_backend.exception("Error during Gemini analysis", {
@@ -98,10 +95,7 @@ Rules:
             "code": "GEMINI_ERROR",
             "error": str(e)
         })
-        return {
-            "error": "An error occurred while analyzing the medical document"
-        }
-
+        return None
 
 def strip_json_markdown(raw):
     if isinstance(raw, str):

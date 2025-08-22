@@ -76,6 +76,8 @@
   "back": "Zurück",
   "boxes": {
     "add_box": "Eine Box hinzufügen",
+    "add_manual": "Manuell hinzufügen",
+    "add_with_qr": "QR-Code scannen",
     "alert_threshold": "Alarmschwellenwert",
     "cancel": "Stornieren",
     "capacity": "Boxkapazität",
@@ -100,9 +102,11 @@
     "intake_conditions": "Einnahmebedingungen",
     "name": "Name",
     "new_box": "Neue Box",
+    "qr_code_help_text": "Der DataMatrix-Code befindet sich auf der Medikamentenverpackung in der Nähe des Barcodes. Es handelt sich um ein kleines schwarz-weißes Quadrat.",
     "remaining_qty": "Restmenge",
     "restock": "Auffüllen",
     "save": "Speichern",
+    "scan_qr_code": "QR-Code scannen",
     "start_typing": "Beginnen Sie mit der Eingabe...",
     "stock": {
       "alerts": {
@@ -125,22 +129,39 @@
   "calendar": {
     "add": "Einen Kalender hinzufügen",
     "add_calendar": "Einen Kalender hinzufügen",
+    "add_with_qr": "Erstellen Sie einen Kalender durch Scannen von QR",
+    "calendar_name": "Kalendername",
+    "calendar_name_placeholder": "Geben Sie den Namen des Kalenders ein",
     "choose_image": "Wählen Sie ein Bild",
     "confirm_delete": "Kalender löschen?",
     "confirm_delete_shared": "Freigegebenen Kalender löschen?",
     "confirm_rename": "Kalender umbenennen?",
+    "create_calendar_qr": "QR scannen: {{calendarName}}",
+    "creating_calendar": "Erstellung läuft ...",
     "daily_view": "Tageskalender",
     "day": "Tag",
     "drag_and_drop": "Ziehen Sie ein Bild hierher oder klicken Sie, um es auszuwählen",
+    "error_calendar_creation": "Fehler beim Erstellen des Kalenders",
+    "error_no_calendar_name": "Bitte geben Sie einen Kalendernamen ein",
+    "error_no_medicines": "Keine Medikamente gescannt",
+    "error_partial_success": "Kalender erstellt, aber {{count}} Medikamente konnten nicht hinzugefügt werden",
     "import_calendar": "Importieren Sie den Kalender \"{{name}}\"",
     "import_type": "Add-Modus",
     "import_type_file": "Importieren einer Datei",
+    "import_type_file_description": "Importieren Sie einen Kalender aus einer exportierten Datei.",
     "import_type_manual": "Manuel",
+    "import_type_manual_description": "Erstellen Sie einen leeren Kalender und fügen Sie Medikamente manuell hinzu.",
+    "import_type_qr_description": "Scannen Sie die DataMatrix-Codes auf Ihren Medikamentenpackungen, um Ihren Zeitplan automatisch zu erstellen.",
     "label": "Kalender",
     "month": "Monat",
     "name": "Kalendername",
     "new_name": "Neuer Name",
+    "processing": "Verarbeitung läuft…",
     "reference_week": "Referenzwoche",
+    "scan_medicines": "Medikamente scannen",
+    "scan_medicines_description": "Scannen Sie die DataMatrix-Codes auf Ihren Medikamentenpackungen. Jedes gescannte Medikament wird automatisch Ihrem neuen Plan hinzugefügt.",
+    "scan_qr_option": "QR-Codes scannen",
+    "scanner_button_hint": "Verwenden Sie die Schaltfläche „Hinzufügen“ auf dem Scanner, um den Kalender zu erstellen",
     "today": "Heute",
     "week": "Woche",
     "weekly_help": "Klicken Sie auf einen Tag im Kalender, um die zugehörigen Medikamente in einem Fenster anzuzeigen.",
@@ -212,6 +233,10 @@
     "title3": "Geschützte Sicherheit"
   },
   "home": "Willkommen",
+  "home_meta": {
+    "description": "Verwalten und teilen Sie Ihre Medikamenteneinnahme ganz einfach.",
+    "title": "MediTime - Behandlungsplaner"
+  },
   "invalid_or_expired_link": "Dieser freigegebene Kalenderlink ist ungültig oder abgelaufen.",
   "invitation": {
     "invalid_or_expired": "Ungültige oder abgelaufene Einladung",
@@ -388,6 +413,20 @@
   },
   "revoke_link": "Den Link widerrufen",
   "rights_reserved": "Alle Rechte vorbehalten",
+  "scanner": {
+    "add": "Hinzufügen",
+    "camera_error": "Zugriff auf die Kamera nicht möglich.",
+    "camera_instruction": "Zeigen Sie auf den DataMatrix-Code",
+    "cancel": "Stornieren",
+    "close": "Schließen",
+    "medicine_not_found": "Medikament nicht gefunden",
+    "quantity": "Menge: {{Menge}}",
+    "remove_from_list": "Aus der Liste entfernen",
+    "searching": "Forschung...",
+    "title": "Scannen Sie einen QR-Code",
+    "camera": "Kamera",
+    "select_camera": "Wählen Sie eine Kamera aus"
+  },
   "security": {
     "current_email": "Aktuelle E-Mail:",
     "current_password": {
@@ -620,8 +659,29 @@
     "title": "Warum MediTime wählen?"
   },
   "yes": "Ja",
-  "home_meta": {
-    "title": "MediTime - Behandlungsplaner",
-    "description": "Verwalten und teilen Sie Ihre Medikamenteneinnahme ganz einfach."
+  "image_upload": {
+    "title": "Auswählen und Vorschau einer Datei",
+    "file_type_error": "Es werden nur Bilddateien akzeptiert (jpg, png, webp, gif).",
+    "select_file_error": "Bitte wählen Sie eine Bilddatei aus.",
+    "no_medicines_found": "Im Bild wurden keine Medikamente gefunden.",
+    "analysis_error": "Fehler beim Parsen des Bildes.",
+    "file_analysis_error": "Fehler beim Parsen der Datei",
+    "preview_alt": "Vorschau",
+    "remove_image": "Bild löschen",
+    "file_selected": "Ausgewählte Datei",
+    "click_to_change": "Klicken Sie hier, um die Datei zu ändern",
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "preview_error": "Fehler beim Anzeigen der Vorschau",
+    "click_to_select_file": "Klicken oder ziehen Sie eine Datei, um sie auszuwählen"
+  },
+  "medicine_review": {
+    "title": "Arzneimittelüberprüfung",
+    "current_stock": "Aktueller Bestand",
+    "maximum_stock": "Lagerbestand maximal",
+    "time_of_day": "Moment",
+    "select_option": "Wählen...",
+    "start_date": "Anfang",
+    "delete_condition": "Entfernen Sie diese Bedingung",
+    "finish": "Zum Abschluss"
   }
 }
