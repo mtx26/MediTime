@@ -356,7 +356,7 @@ const QRCodeScanner = forwardRef(({
       if (Number.isFinite(firstX) && Number.isFinite(firstY)) {
         ctx.moveTo(firstX, firstY);
         for (let i = 1; i < points.length; i++) {
-          const p = points[i];
+          const p = Array.isArray(points) ? Array.prototype.at.call(points, i) : undefined;
           if (!p || typeof p !== 'object') continue;
           const x = Number(p.x);
           const y = Number(p.y);
@@ -411,7 +411,7 @@ const QRCodeScanner = forwardRef(({
     setMedicines(prev => {
       if (!isSafeKey(gtin)) return prev;
       const updated = Object.assign(Object.create(null), prev);
-      updated[gtin] = medicineBox;
+      Object.defineProperty(updated, gtin, { value: medicineBox, enumerable: true, configurable: true, writable: true });
       return updated;
     });
         
@@ -423,7 +423,7 @@ const QRCodeScanner = forwardRef(({
         setMedicines(prev => {
           if (!isSafeKey(gtin)) return prev;
           const updated = Object.assign(Object.create(null), prev);
-          updated[gtin] = null;
+          Object.defineProperty(updated, gtin, { value: null, enumerable: true, configurable: true, writable: true });
           return updated;
         }); // Aucun résultat trouvé
       }
@@ -432,7 +432,7 @@ const QRCodeScanner = forwardRef(({
       setMedicines(prev => {
         if (!isSafeKey(gtin)) return prev;
         const updated = Object.assign(Object.create(null), prev);
-        updated[gtin] = null;
+        Object.defineProperty(updated, gtin, { value: null, enumerable: true, configurable: true, writable: true });
         return updated;
       });
     } finally {
@@ -691,8 +691,8 @@ const QRCodeScanner = forwardRef(({
         {gtins.length > 0 && (
           <ul className="list-group">
             {gtins.map((gtin) => {
-              const medicine = isSafeKey(gtin) && Object.prototype.hasOwnProperty.call(medicines, gtin)
-                ? medicines[gtin]
+              const medicine = isSafeKey(gtin)
+                ? Object.getOwnPropertyDescriptor(medicines, gtin)?.value
                 : undefined;
               const isLoading = loadingGtin === gtin;
               

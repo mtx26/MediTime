@@ -38,7 +38,7 @@ export default function MedicineReview() {
   );
 
   const safeGet = (obj, key) => (
-    isSafeKey(key) && Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : undefined
+    isSafeKey(key) ? Object.getOwnPropertyDescriptor(obj, key)?.value : undefined
   );
 
   const isConditionFieldMissing = (field, cond) => {
@@ -193,9 +193,10 @@ export default function MedicineReview() {
         'noon': t('noon'),
         'evening': t('evening')
       };
-      return isSafeKey(value) && Object.prototype.hasOwnProperty.call(timeOptions, value)
-        ? timeOptions[value]
-        : value;
+      const safeValue = isSafeKey(value)
+        ? Object.getOwnPropertyDescriptor(timeOptions, value)?.value
+        : undefined;
+      return safeValue !== undefined ? safeValue : value;
     }
 
     return value;
