@@ -16,6 +16,79 @@ const getBorderClass = (box) => {
   return '';
 };
 
+const createAction = (icon, label, onClick, danger = false) => ({
+  label: (
+    <>
+      <i className={`bi bi-${icon} me-2`} /> {label}
+    </>
+  ),
+  onClick,
+  danger
+});
+
+const createSeparator = () => ({ separator: true });
+
+const createIconButton = (className, icon, text, onClick, ariaLabel, title) => (
+  <button
+    type="button"
+    className={className}
+    onClick={onClick}
+    aria-label={ariaLabel || text}
+    title={title || text}
+  >
+    <i className={`bi bi-${icon}`}></i> {text}
+  </button>
+);
+
+const createBadge = (bgColor, icon, text) => (
+  <span className={`badge bg-${bgColor}`}>
+    <i className={`bi bi-${icon}`} /> {text}
+  </span>
+);
+
+const createActionCard = (borderColor, iconClass, textColor, text, onClick, ariaLabel, hasTooltip, showTooltip, setShowTooltip, t) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="btn p-0 border-0 bg-transparent text-start flex-fill"
+    style={{ cursor: 'pointer' }}
+    aria-label={ariaLabel}
+    title={ariaLabel}
+  >
+    <div className={`card h-100 shadow border border-${borderColor}`}>
+      <div className={`card-body d-flex flex-column justify-content-center align-items-center p-3 ${hasTooltip ? 'position-relative' : ''}`}>
+        {hasTooltip && (
+          <button
+            type="button"
+            className="btn btn-link position-absolute top-0 end-0 m-1 p-1 text-info"
+            style={{ fontSize: '1.2rem' }}
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+          >
+            <i className="bi bi-info-circle"></i>
+            {showTooltip && (
+              <div
+                className="position-absolute bg-dark text-white p-2 rounded shadow"
+                style={{
+                  top: '100%',
+                  right: '0',
+                  width: '200px',
+                  fontSize: '0.8rem',
+                  zIndex: 1050
+                }}
+              >
+                {t('boxes.qr_code_help_text')}
+              </div>
+            )}
+          </button>
+        )}
+        <i className={`${iconClass} ${textColor} fs-1`}></i>
+        <p className={`${textColor} fw-bold mt-2 mb-0 text-center`}>{text}</p>
+      </div>
+    </div>
+  </button>
+);
+
 function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const location = useLocation();
   const params = useParams();
@@ -28,13 +101,11 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('');
   
-  // Fonction utilitaire pour gérer les alertes
   const showAlert = (message, type) => {
     setAlertMessage(message);
     setAlertType(type);
   };
 
-  // Fonction utilitaire pour gérer les réponses API
   const handleApiResponse = (res, successMessage = null) => {
     if (res.success) {
       showAlert('✅ ' + (successMessage || res.message), 'success');
@@ -44,29 +115,12 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     return res.success;
   };
 
-  // Fonction utilitaire pour créer des actions d'ActionSheet avec icônes
-  const createAction = (icon, label, onClick, danger = false) => ({
-    label: (
-      <>
-        <i className={`bi bi-${icon} me-2`} /> {label}
-      </>
-    ),
-    onClick,
-    danger
-  });
-
-  // Fonction utilitaire pour créer un séparateur
-  const createSeparator = () => ({ separator: true });
-
-  // Fonction pour générer les actions communes des ActionSheet
   const getCommonActions = (calendarType) => {
     const actions = [];
     
-    // Action commune : Export PDF
     actions.push(createAction('download', t('boxes.export_pdf'), () => calendarSource.downloadCalendarPdf(calendarId)));
     
     if (calendarType === 'personal') {
-      // Actions spécifiques au calendrier personnel
       actions.unshift(createAction('box-arrow-up', t('share'), () => navigate(`/${lng}/shared-calendars?calendar=${calendarId}`)));
       actions.push(
         createSeparator(),
@@ -74,7 +128,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       );
     }
     
-    // Actions communes : Paramètres et Suppression
     actions.push(
       createSeparator(),
       createAction('gear', t('settings.label'), () => navigate(`/${lng}/${basePath}/${calendarId}/settings`)),
@@ -96,50 +149,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     
     return actions;
   };
-
-  // Fonction utilitaire pour créer des cartes d'action
-  const createActionCard = (borderColor, iconClass, textColor, text, onClick, ariaLabel, hasTooltip = false) => (
-    <button
-      type="button"
-      onClick={onClick}
-      className="btn p-0 border-0 bg-transparent text-start flex-fill"
-      style={{ cursor: 'pointer' }}
-      aria-label={ariaLabel}
-      title={ariaLabel}
-    >
-      <div className={`card h-100 shadow border border-${borderColor}`}>
-        <div className={`card-body d-flex flex-column justify-content-center align-items-center p-3 ${hasTooltip ? 'position-relative' : ''}`}>
-          {hasTooltip && (
-            <button
-              type="button"
-              className="btn btn-link position-absolute top-0 end-0 m-1 p-1 text-info"
-              style={{ fontSize: '1.2rem' }}
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
-            >
-              <i className="bi bi-info-circle"></i>
-              {showTooltip && (
-                <div
-                  className="position-absolute bg-dark text-white p-2 rounded shadow"
-                  style={{
-                    top: '100%',
-                    right: '0',
-                    width: '200px',
-                    fontSize: '0.8rem',
-                    zIndex: 1050
-                  }}
-                >
-                  {t('boxes.qr_code_help_text')}
-                </div>
-              )}
-            </button>
-          )}
-          <i className={`${iconClass} ${textColor} fs-1`}></i>
-          <p className={`${textColor} fw-bold mt-2 mb-0 text-center`}>{text}</p>
-        </div>
-      </div>
-    </button>
-  );
   const [selectedModifyBox, setSelectedModifyBox] = useState(null);
   const [selectedDropBox, setSelectedDropBox] = useState({});
   const [modifyBoxName, setModifyBoxName] = useState({});
@@ -181,7 +190,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const conditions = Object.values(boxConditions[selectedModifyBox]).filter(
+    const boxConditionsForSelected = boxConditions[selectedModifyBox] || {};
+    const conditions = Object.values(boxConditionsForSelected).filter(
       (condition) => condition !== undefined
     );
     
@@ -190,7 +200,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       // Si l'ID commence par "temp_", c'est une nouvelle condition
       if (condition.id && condition.id.startsWith('temp_')) {
         // Ne pas envoyer l'ID pour les nouvelles conditions
-        const { id: _id, ...conditionWithoutId } = condition;
+        const { id, ...conditionWithoutId } = condition;
         return conditionWithoutId;
       }
       // Pour les conditions existantes, garder l'ID
@@ -227,7 +237,23 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     }
   };
 
-  // Ajouter des nouvelles boîtes (mode création) - maintenant reçoit directement des medicine_boxes
+  const processMedicineCreation = async (medicineBox) => {
+    try {
+      const res = await calendarSource.createBox(
+        calendarId,
+        medicineBox.name,
+        medicineBox.box_capacity,
+        medicineBox.stock_alert_threshold,
+        medicineBox.stock_quantity,
+        medicineBox.dose
+      );
+      return res.success;
+    } catch (error) {
+      console.error('Erreur création boîte:', error);
+      return false;
+    }
+  };
+
   const addScannedMedicines = async (medicineBoxes) => {
     if (!medicineBoxes || medicineBoxes.length === 0) {
       showAlert('⚠️ Ajouter des médicaments', 'warning');
@@ -238,32 +264,16 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     let errorCount = 0;
 
     for (const medicineBox of medicineBoxes) {
-      try {
-        const res = await calendarSource.createBox(
-          calendarId,
-          medicineBox.name,
-          medicineBox.box_capacity, // boxCapacity
-          medicineBox.stock_alert_threshold,
-          medicineBox.stock_quantity, // stockQuantity
-          medicineBox.dose // dose
-        );
-
-        if (res.success) {
-          successCount++;
-        } else {
-          errorCount++;
-          console.error('Erreur création boîte:', res.error);
-        }
-      } catch (error) {
+      const success = await processMedicineCreation(medicineBox);
+      if (success) {
+        successCount++;
+      } else {
         errorCount++;
-        console.error('Erreur lors de la création:', error);
       }
     }
 
-    // Fermer la modal
     setShowQRModal(false);
 
-    // Message de résultat avec fonction utilitaire
     if (errorCount === 0) {
       showAlert('✅ Ajouté', 'success');
       return { success: true, successCount, errorCount };
@@ -272,18 +282,17 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       return { success: false, successCount, errorCount };
     } else {
       showAlert(`⚠️ ${successCount} ajouté(s), ${errorCount} erreur(s)`, 'warning');
-      return { success: true, successCount, errorCount }; // Partiel = succès
+      return { success: true, successCount, errorCount };
     }
   };
 
-  // Mettre à jour une boîte existante (mode modification) - maintenant reçoit directement des medicine_boxes
   const updateScannedMedicine = async (medicineBoxes) => {
     if (!medicineBoxes || medicineBoxes.length === 0 || !currentEditingBoxId) {
       showAlert('⚠️ Ajouter un médicament', 'warning');
       return { success: false };
     }
 
-    const medicineBox = medicineBoxes[0]; // Prendre le premier médicament en mode single
+    const medicineBox = medicineBoxes[0];
     try {
       const box = {
         name: medicineBox.name,
@@ -296,7 +305,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       
       const res = await calendarSource.updateBox(calendarId, currentEditingBoxId, box);
       
-      // Fermer la modal et reset
       setShowQRModal(false);
       setCurrentEditingBoxId(null);
       setSingleScan(false);
@@ -315,14 +323,12 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     }
   };
 
-  // Ouvrir le scanner en mode ajout (multiple médicaments)
   const openAddMode = () => {
     setSingleScan(false);
     setCurrentEditingBoxId(null);
     setShowQRModal(true);
   };
 
-  // Ouvrir le scanner en mode modification (un seul médicament)
   const openUpdateMode = (boxId) => {
     setSingleScan(true);
     setCurrentEditingBoxId(boxId);
@@ -334,39 +340,32 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     handleApiResponse(res);
   };
 
+  const initializeBoxStates = (boxes) => {
+    const createStateFromBoxes = (field, defaultValue = {}) => 
+      boxes.reduce((acc, box) => ({ ...acc, [box.id]: box[field] }), defaultValue);
+
+    setModifyBoxName(createStateFromBoxes('name'));
+    setDose(createStateFromBoxes('dose'));
+    setModifyBoxCapacity(createStateFromBoxes('box_capacity'));
+    setModifyBoxStockAlertThreshold(createStateFromBoxes('stock_alert_threshold'));
+    setModifyBoxStockQuantity(createStateFromBoxes('stock_quantity'));
+    setBoxConditions(
+      boxes.reduce(
+        (acc, box) => ({
+          ...acc,
+          [box.id]: box.conditions.reduce(
+            (condAcc, condition) => ({ ...condAcc, [condition.id]: condition }),
+            {}
+          ),
+        }),
+        {}
+      )
+    );
+  };
+
   useEffect(() => {
     if (boxes.length > 0) {
-      setModifyBoxName(
-        boxes.reduce((acc, box) => ({ ...acc, [box.id]: box.name }), {})
-      );
-      setDose(boxes.reduce((acc, box) => ({ ...acc, [box.id]: box.dose }), {}));
-      setModifyBoxCapacity(
-        boxes.reduce((acc, box) => ({ ...acc, [box.id]: box.box_capacity }), {})
-      );
-      setModifyBoxStockAlertThreshold(
-        boxes.reduce(
-          (acc, box) => ({ ...acc, [box.id]: box.stock_alert_threshold }),
-          {}
-        )
-      );
-      setModifyBoxStockQuantity(
-        boxes.reduce(
-          (acc, box) => ({ ...acc, [box.id]: box.stock_quantity }),
-          {}
-        )
-      );
-      setBoxConditions(
-        boxes.reduce(
-          (acc, box) => ({
-            ...acc,
-            [box.id]: box.conditions.reduce(
-              (acc, condition) => ({ ...acc, [condition.id]: condition }),
-              {}
-            ),
-          }),
-          {}
-        )
-      );
+      initializeBoxStates(boxes);
     }
   }, [boxes]);
 
@@ -484,7 +483,11 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                 'text-success',
                 t('boxes.add_manual'),
                 () => addBox(),
-                t('boxes.add_manual')
+                t('boxes.add_manual'),
+                false,
+                showTooltip,
+                setShowTooltip,
+                t
               )}
               {createActionCard(
                 'primary',
@@ -493,7 +496,10 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                 t('boxes.add_with_qr'),
                 openAddMode,
                 t('boxes.add_with_qr'),
-                true
+                true,
+                showTooltip,
+                setShowTooltip,
+                t
               )}
             </div>
           </div>
@@ -540,7 +546,6 @@ function BoxCard({
 }) {
   const { t } = useTranslation();
 
-  // Fonction pour créer les actions de la BoxCard
   const getBoxActions = () => [
     {
       label: (
@@ -579,51 +584,24 @@ function BoxCard({
     },
   ];
 
-  // Fonction pour réinitialiser les états de modification
   const resetModificationStates = () => {
     setSelectedModifyBox(null);
     setModifyBoxName({ ...modifyBoxName, [box.id]: box.name });
-    setModifyBoxCapacity({
-      ...modifyBoxCapacity,
-      [box.id]: box.box_capacity,
-    });
-    setModifyBoxStockAlertThreshold({
-      ...modifyBoxStockAlertThreshold,
-      [box.id]: box.stock_alert_threshold,
-    });
-    setModifyBoxStockQuantity({
-      ...modifyBoxStockQuantity,
-      [box.id]: box.stock_quantity,
-    });
+    setModifyBoxCapacity({ ...modifyBoxCapacity, [box.id]: box.box_capacity });
+    setModifyBoxStockAlertThreshold({ ...modifyBoxStockAlertThreshold, [box.id]: box.stock_alert_threshold });
+    setModifyBoxStockQuantity({ ...modifyBoxStockQuantity, [box.id]: box.stock_quantity });
     setBoxConditions({
       ...boxConditions,
       [box.id]: box.conditions.reduce(
-        (acc, condition) => ({
-          ...acc,
-          [condition.id]: condition,
-        }),
+        (acc, condition) => ({ ...acc, [condition.id]: condition }),
         {}
       ),
     });
     setDose({ ...dose, [box.id]: box.dose });
   };
 
-  // Fonction utilitaire pour créer des boutons avec icônes
-  const createIconButton = (className, icon, text, onClick, ariaLabel, title) => (
-    <button
-      type="button"
-      className={className}
-      onClick={onClick}
-      aria-label={ariaLabel || text}
-      title={title || text}
-    >
-      <i className={`bi bi-${icon}`}></i> {text}
-    </button>
-  );
-
-  // Fonction pour ajouter une nouvelle condition
   const addNewCondition = () => {
-    const id = `temp_${uuidv4()}`; // Préfixe pour les nouvelles conditions
+    const id = `temp_${uuidv4()}`;
     setBoxConditions((prev) => ({
       ...prev,
       [box.id]: {
@@ -640,7 +618,6 @@ function BoxCard({
     setSelectedModifyBox(box.id);
   };
 
-  // Fonction pour supprimer une condition
   const deleteCondition = (conditionId) => {
     setBoxConditions((prev) => ({
       ...prev,
@@ -651,7 +628,6 @@ function BoxCard({
     }));
   };
 
-  // Fonction pour gérer le changement d'une condition
   const handleConditionChange = (conditionId, field, value) => {
     setBoxConditions((prev) => ({
       ...prev,
@@ -672,7 +648,6 @@ function BoxCard({
     evening: t('evening'),
   };
 
-  // Configuration des champs de conditions
   const getConditionFields = (condition) => [
     {
       label: t('boxes.condition.tablet_count'),
@@ -706,7 +681,6 @@ function BoxCard({
     }
   ];
 
-  // Fonction pour obtenir la valeur affichée d'un champ
   const getDisplayValue = (field, value, options = null) => {
     if (!value && value !== 0) return '-';
     
@@ -1029,13 +1003,6 @@ function BoxField({
 function StockBadge({ box }) {
   const { t } = useTranslation();
   
-  // Fonction utilitaire pour créer un badge
-  const createBadge = (bgColor, icon, text) => (
-    <span className={`badge bg-${bgColor}`}>
-      <i className={`bi bi-${icon}`} /> {text}
-    </span>
-  );
-  
   if (box.box_capacity === 0) return null;
 
   if (box.stock_quantity <= 0) {
@@ -1054,13 +1021,6 @@ function ConditionUnlessBadge({ conditions, boxId, setSelectedDropBox, setSelect
 
   const hasNoConditions =
     Object.values(conditions || {}).filter((c) => c !== undefined).length === 0;
-
-  // Fonction utilitaire pour créer un badge
-  const createBadge = (bgColor, icon, text) => (
-    <span className={`badge bg-${bgColor}`}>
-      <i className={`bi bi-${icon}`} /> {text}
-    </span>
-  );
 
   return hasNoConditions ? (
     <button 
