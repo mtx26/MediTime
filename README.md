@@ -18,6 +18,15 @@
 
 ---
 
+## Server Health (Netdata)
+
+![CPU](https://captain.captain.meditime-app.com/net-data-monitor/api/v1/badge.svg?chart=system.cpu&alarm=10min_cpu_usage&refresh=auto)
+![RAM](https://captain.captain.meditime-app.com/net-data-monitor/api/v1/badge.svg?chart=system.ram&alarm=ram_in_use&refresh=auto)
+![Disk backlog sda](https://captain.captain.meditime-app.com/net-data-monitor/api/v1/badge.svg?chart=disk_backlog.sda&alarm=10min_disk_backlog&refresh=auto)
+![Net enp0s3 RX](https://captain.captain.meditime-app.com/net-data-monitor/api/v1/badge.svg?chart=net.enp0s3&dimensions=received&refresh=auto)
+![Net enp0s3 TX](https://captain.captain.meditime-app.com/net-data-monitor/api/v1/badge.svg?chart=net.enp0s3&dimensions=sent&refresh=auto)
+
+
 ## 🚀 Key Features
 
 * 🔐 Supabase Authentication (Google, GitHub, Twitter, Facebook, Discord, Microsoft, Email)
