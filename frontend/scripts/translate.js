@@ -1,14 +1,20 @@
-const fs = require('fs');
-const path = require('path');
-const process = require('process');
-require('dotenv').config();
-const { Translate } = require('@google-cloud/translate').v2;
+import fs from 'fs';
+import path from 'path';
+import process from 'process';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import { v2 as Translate } from '@google-cloud/translate';
 
-const translate = new Translate({
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config();
+
+const translate = new Translate.Translate({
   key: process.env.VITE_GOOGLE_TRANSLATE_API_KEY,
 });
 
-const { LANGUAGES } = require('../src/config/languages');
+import { LANGUAGES } from '../src/config/languages.js';
 
 const baseDir = path.join(__dirname, '..', 'src');
 const sourceFile = path.join(baseDir, 'locales', 'fr', 'translation.json');

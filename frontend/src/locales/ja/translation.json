@@ -33,13 +33,14 @@
   "add": "追加",
   "admin": "管理者",
   "app": {
-    "name": "MediTime",
-    "shortName": "MediTime",
-    "description": "治療をスケジュールし、医療カレンダーを簡単に共有できます。",
-    "pageTitle": "MediTime - 医療治療管理",
     "access": "アプリケーションにアクセスする",
+    "description": "治療をスケジュールし、医療カレンダーを簡単に共有できます。",
     "login": "ログイン",
+    "name": "MediTime",
+    "pageTitle": "MediTime - 医療治療管理",
     "register": "アカウントを作成する",
+    "shortN": "メディタイム",
+    "shortName": "MediTime",
     "subtitle": "医療処置を簡単に管理、追跡、共有できます。",
     "title": "メディタイム"
   },
@@ -241,6 +242,21 @@
     "description": "薬の摂取量を簡単に管理、共有できます。",
     "title": "MediTime - 治療プランナー"
   },
+  "image_upload": {
+    "analysis_error": "画像の解析中にエラーが発生しました。",
+    "click_to_change": "ファイルを変更するにはクリックしてください",
+    "click_to_select_file": "クリックまたはドラッグアンドドロップでファイルを選択します",
+    "file_analysis_error": "ファイルの解析エラー",
+    "file_selected": "選択したファイル",
+    "file_type_error": "画像ファイルのみ受け入れられます（jpg、png、webp、gif）。",
+    "file_types": "JPG、PNG、WEBP、GIF",
+    "no_medicines_found": "画像内に薬剤は見つかりません。",
+    "preview_alt": "プレビュー",
+    "preview_error": "プレビューの表示中にエラーが発生しました",
+    "remove_image": "画像を削除",
+    "select_file_error": "画像ファイルを選択してください。",
+    "title": "ファイルを選択してプレビューする"
+  },
   "invalid_or_expired_link": "この共有カレンダーのリンクは無効か期限が切れています。",
   "invitation": {
     "invalid_or_expired": "無効または期限切れの招待",
@@ -263,6 +279,16 @@
   "logout": "ログアウト",
   "low_stock": "在庫が少ない",
   "manage_link": "リンクを管理する",
+  "medicine_review": {
+    "current_stock": "現在の在庫",
+    "delete_condition": "この条件を削除する",
+    "finish": "終了するには",
+    "maximum_stock": "在庫最大数",
+    "select_option": "選択...",
+    "start_date": "始まり",
+    "time_of_day": "一瞬",
+    "title": "薬物レビュー"
+  },
   "medicines": {
     "back_to_calendar": "カレンダーに戻る",
     "label": "薬物",
@@ -283,6 +309,20 @@
   "modify": "修飾子",
   "morning": "朝",
   "my_calendars": "私のカレンダー",
+  "navigation": {
+    "about": "について",
+    "calendar": "カレンダー",
+    "dashboard": "ダッシュボード",
+    "forgot-password": "パスワードを忘れた場合",
+    "help": "補佐官",
+    "home": "いらっしゃいませ",
+    "login": "ログイン",
+    "medicines": "薬物",
+    "profile": "プロフィール",
+    "register": "登録する",
+    "reset-password": "パスワードをリセットする",
+    "settings": "設定"
+  },
   "never": "一度もない",
   "next": "続く",
   "next_day": "翌日",
@@ -419,6 +459,7 @@
   "rights_reserved": "無断転載を禁じます",
   "scanner": {
     "add": "追加",
+    "camera": "カメラ",
     "camera_error": "カメラにアクセスできません。",
     "camera_instruction": "DataMatrixコードを指す",
     "cancel": "キャンセル",
@@ -427,9 +468,8 @@
     "quantity": "数量: {{数量}}",
     "remove_from_list": "リストから削除",
     "searching": "研究...",
-    "title": "QRコードをスキャンする",
-    "camera": "カメラ",
-    "select_camera": "カメラを選択"
+    "select_camera": "カメラを選択",
+    "title": "QRコードをスキャンする"
   },
   "security": {
     "current_email": "現在のメールアドレス:",
@@ -662,30 +702,5 @@
     "desc": "医療には即興の余地はありません。MediTimeは、あなたとあなたの大切な人の治療を日々記録するための、明確で直感的、そして安全なソリューションを提供します。",
     "title": "MediTimeを選ぶ理由"
   },
-  "yes": "はい",
-  "image_upload": {
-    "title": "ファイルを選択してプレビューする",
-    "file_type_error": "画像ファイルのみ受け入れられます（jpg、png、webp、gif）。",
-    "select_file_error": "画像ファイルを選択してください。",
-    "no_medicines_found": "画像内に薬剤は見つかりません。",
-    "analysis_error": "画像の解析中にエラーが発生しました。",
-    "file_analysis_error": "ファイルの解析エラー",
-    "preview_alt": "プレビュー",
-    "remove_image": "画像を削除",
-    "file_selected": "選択したファイル",
-    "click_to_change": "ファイルを変更するにはクリックしてください",
-    "file_types": "JPG、PNG、WEBP、GIF",
-    "preview_error": "プレビューの表示中にエラーが発生しました",
-    "click_to_select_file": "クリックまたはドラッグアンドドロップでファイルを選択します"
-  },
-  "medicine_review": {
-    "title": "薬物レビュー",
-    "current_stock": "現在の在庫",
-    "maximum_stock": "在庫最大数",
-    "time_of_day": "一瞬",
-    "select_option": "選択...",
-    "start_date": "始まり",
-    "delete_condition": "この条件を削除する",
-    "finish": "終了するには"
-  }
+  "yes": "はい"
 }

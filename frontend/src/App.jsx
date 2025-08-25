@@ -12,6 +12,7 @@ import { getToken } from './services/supabase/tokenUtils';
 import { performApiCall } from './services/api/apiUtils';
 import { useTranslation } from 'react-i18next';
 import I18nHead from './components/common/I18nHead';
+import StructuredData from './components/common/StructuredData';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -855,6 +856,7 @@ function App() {
         description={t('home_meta.description')} 
         path={path} 
       />
+      <StructuredData />
       <Navbar sharedProps={sharedProps} />
       <main className="flex-grow-1 d-flex flex-column pb-5 pb-lg-0">
         {userInfo && (

@@ -1,0 +1,43 @@
+{
+  "pages": [
+    {
+      "url": "/",
+      "title": "app.pageTitle",
+      "description": "app.description",
+      "sitelinks": [
+        {
+          "name": "navigation.login",
+          "url": "/login",
+          "description": "app.login"
+        },
+        {
+          "name": "navigation.register", 
+          "url": "/register",
+          "description": "app.register"
+        },
+        {
+          "name": "navigation.about",
+          "url": "/about",
+          "description": "about"
+        },
+        {
+          "name": "navigation.help",
+          "url": "/help", 
+          "description": "navigation.help"
+        }
+      ]
+    }
+  ],
+  "organization": {
+    "name": "app.name",
+    "url": "https://meditime-app.com",
+    "logo": "https://meditime-app.com/icons/icon-192x192.png",
+    "description": "app.description",
+    "social": [],
+    "contactPoint": {
+      "telephone": "",
+      "email": "",
+      "contactType": "customer support"
+    }
+  }
+}

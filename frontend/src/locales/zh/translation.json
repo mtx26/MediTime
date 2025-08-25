@@ -33,13 +33,14 @@
   "add": "添加",
   "admin": "行政",
   "app": {
-    "name": "MediTime",
-    "shortName": "MediTime",
-    "description": "安排您的治疗并轻松分享您的医疗日历。",
-    "pageTitle": "MediTime - 医疗治疗管理器",
     "access": "访问应用程序",
+    "description": "安排您的治疗并轻松分享您的医疗日历。",
     "login": "登录",
+    "name": "MediTime",
+    "pageTitle": "MediTime - 医疗治疗管理器",
     "register": "创建一个帐户",
+    "shortN": "医疗时间",
+    "shortName": "MediTime",
     "subtitle": "轻松管理、跟踪和分享您的医疗治疗。",
     "title": "医疗时间"
   },
@@ -241,6 +242,21 @@
     "description": "轻松管理和分享您的药物摄入量。",
     "title": "MediTime - 治疗计划器"
   },
+  "image_upload": {
+    "analysis_error": "解析图像时出错。",
+    "click_to_change": "单击更改文件",
+    "click_to_select_file": "单击或拖放以选择文件",
+    "file_analysis_error": "解析文件时出错",
+    "file_selected": "选定文件",
+    "file_type_error": "仅接受图像文件（jpg、png、webp、gif）。",
+    "file_types": "JPG、PNG、WEBP、GIF",
+    "no_medicines_found": "图像中未发现药物。",
+    "preview_alt": "预览",
+    "preview_error": "显示预览时出错",
+    "remove_image": "删除图片",
+    "select_file_error": "请选择一个图像文件。",
+    "title": "选择并预览文件"
+  },
   "invalid_or_expired_link": "此共享日历链接无效或已过期。",
   "invitation": {
     "invalid_or_expired": "邀请无效或已过期",
@@ -263,6 +279,16 @@
   "logout": "登出",
   "low_stock": "库存不足",
   "manage_link": "管理链接",
+  "medicine_review": {
+    "current_stock": "现有库存",
+    "delete_condition": "删除此条件",
+    "finish": "结束",
+    "maximum_stock": "库存上限",
+    "select_option": "选择...",
+    "start_date": "开始",
+    "time_of_day": "片刻",
+    "title": "药物审查"
+  },
   "medicines": {
     "back_to_calendar": "返回日历",
     "label": "药物",
@@ -283,6 +309,20 @@
   "modify": "修饰符",
   "morning": "早晨",
   "my_calendars": "我的日历",
+  "navigation": {
+    "about": "关于",
+    "calendar": "日历",
+    "dashboard": "仪表板",
+    "forgot-password": "忘记密码",
+    "help": "助手",
+    "home": "欢迎",
+    "login": "登录",
+    "medicines": "药物",
+    "profile": "轮廓",
+    "register": "登记",
+    "reset-password": "重置密码",
+    "settings": "设置"
+  },
   "never": "绝不",
   "next": "下列的",
   "next_day": "第二天",
@@ -419,6 +459,7 @@
   "rights_reserved": "版权所有",
   "scanner": {
     "add": "添加",
+    "camera": "相机",
     "camera_error": "无法访问相机。",
     "camera_instruction": "指向 DataMatrix 代码",
     "cancel": "取消",
@@ -427,9 +468,8 @@
     "quantity": "数量：{{quantity}}",
     "remove_from_list": "从列表中删除",
     "searching": "研究...",
-    "title": "扫描二维码",
-    "camera": "相机",
-    "select_camera": "选择相机"
+    "select_camera": "选择相机",
+    "title": "扫描二维码"
   },
   "security": {
     "current_email": "当前电子邮件：",
@@ -662,30 +702,5 @@
     "desc": "因为医疗保健不容即兴发挥。MediTime 为您提供清晰、直观、安全的解决方案，让您日复一日地追踪自己和亲人的治疗情况。",
     "title": "为什么选择 MediTime？"
   },
-  "yes": "是的",
-  "image_upload": {
-    "title": "选择并预览文件",
-    "file_type_error": "仅接受图像文件（jpg、png、webp、gif）。",
-    "select_file_error": "请选择一个图像文件。",
-    "no_medicines_found": "图像中未发现药物。",
-    "analysis_error": "解析图像时出错。",
-    "file_analysis_error": "解析文件时出错",
-    "preview_alt": "预览",
-    "remove_image": "删除图片",
-    "file_selected": "选定文件",
-    "click_to_change": "单击更改文件",
-    "file_types": "JPG、PNG、WEBP、GIF",
-    "preview_error": "显示预览时出错",
-    "click_to_select_file": "单击或拖放以选择文件"
-  },
-  "medicine_review": {
-    "title": "药物审查",
-    "current_stock": "现有库存",
-    "maximum_stock": "库存上限",
-    "time_of_day": "片刻",
-    "select_option": "选择...",
-    "start_date": "开始",
-    "delete_condition": "删除此条件",
-    "finish": "结束"
-  }
+  "yes": "是的"
 }

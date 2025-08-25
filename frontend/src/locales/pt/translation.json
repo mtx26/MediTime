@@ -33,13 +33,14 @@
   "add": "Adicionar",
   "admin": "Administrador",
   "app": {
-    "name": "MediTime",
-    "shortName": "MediTime",
-    "description": "Agende seus tratamentos e compartilhe seus calendários médicos com facilidade.",
-    "pageTitle": "MediTime - Gerenciador de Tratamentos Médicos",
     "access": "Acesse o aplicativo",
+    "description": "Agende seus tratamentos e compartilhe seus calendários médicos com facilidade.",
     "login": "Conecte-se",
+    "name": "MediTime",
+    "pageTitle": "MediTime - Gerenciador de Tratamentos Médicos",
     "register": "Criar uma conta",
+    "shortN": "MediTime",
+    "shortName": "MediTime",
     "subtitle": "Gerencie, acompanhe e compartilhe seus tratamentos médicos facilmente.",
     "title": "MediTime"
   },
@@ -241,6 +242,21 @@
     "description": "Gerencie e compartilhe facilmente sua ingestão de medicamentos.",
     "title": "MediTime - Planejador de Tratamento"
   },
+  "image_upload": {
+    "analysis_error": "Erro ao analisar a imagem.",
+    "click_to_change": "Clique para alterar o arquivo",
+    "click_to_select_file": "Clique ou arraste e solte para selecionar um arquivo",
+    "file_analysis_error": "Erro ao analisar o arquivo",
+    "file_selected": "Arquivo selecionado",
+    "file_type_error": "Somente arquivos de imagem são aceitos (jpg, png, webp, gif).",
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "no_medicines_found": "Nenhum medicamento encontrado na imagem.",
+    "preview_alt": "Visualização",
+    "preview_error": "Erro ao exibir a pré-visualização",
+    "remove_image": "Excluir imagem",
+    "select_file_error": "Selecione um arquivo de imagem.",
+    "title": "Selecione e visualize um arquivo"
+  },
   "invalid_or_expired_link": "Este link de calendário compartilhado é inválido ou expirou.",
   "invitation": {
     "invalid_or_expired": "Convite inválido ou expirado",
@@ -263,6 +279,16 @@
   "logout": "Sair",
   "low_stock": "Estoque baixo",
   "manage_link": "Gerenciar o link",
+  "medicine_review": {
+    "current_stock": "Estoque atual",
+    "delete_condition": "Remova esta condição",
+    "finish": "Para terminar",
+    "maximum_stock": "Estoque máximo",
+    "select_option": "Selecione...",
+    "start_date": "Começo",
+    "time_of_day": "Momento",
+    "title": "Revisão de Medicamentos"
+  },
   "medicines": {
     "back_to_calendar": "Voltar ao calendário",
     "label": "Drogas",
@@ -283,6 +309,20 @@
   "modify": "Modificador",
   "morning": "Manhã",
   "my_calendars": "Meus calendários",
+  "navigation": {
+    "about": "Sobre",
+    "calendar": "Calendário",
+    "dashboard": "Painel",
+    "forgot-password": "Senha esquecida",
+    "help": "Ajudante",
+    "home": "Bem-vindo",
+    "login": "Conecte-se",
+    "medicines": "Drogas",
+    "profile": "Perfil",
+    "register": "Registrar",
+    "reset-password": "Redefinir senha",
+    "settings": "Configurações"
+  },
   "never": "Nunca",
   "next": "Seguindo",
   "next_day": "No dia seguinte",
@@ -419,6 +459,7 @@
   "rights_reserved": "Todos os direitos reservados",
   "scanner": {
     "add": "Adicionar",
+    "camera": "Câmera",
     "camera_error": "Não é possível acessar a câmera.",
     "camera_instruction": "Aponte para o código DataMatrix",
     "cancel": "Cancelar",
@@ -427,9 +468,8 @@
     "quantity": "Quantidade: {{quantidade}}",
     "remove_from_list": "Remover da lista",
     "searching": "Pesquisar...",
-    "title": "Escaneie um código QR",
-    "camera": "Câmera",
-    "select_camera": "Selecione uma câmera"
+    "select_camera": "Selecione uma câmera",
+    "title": "Escaneie um código QR"
   },
   "security": {
     "current_email": "E-mail atual:",
@@ -662,30 +702,5 @@
     "desc": "Porque a saúde não deixa espaço para improvisação. O MediTime oferece uma solução clara, intuitiva e segura para acompanhar seus tratamentos e os de seus entes queridos, dia após dia.",
     "title": "Por que escolher o MediTime?"
   },
-  "yes": "Sim",
-  "image_upload": {
-    "title": "Selecione e visualize um arquivo",
-    "file_type_error": "Somente arquivos de imagem são aceitos (jpg, png, webp, gif).",
-    "select_file_error": "Selecione um arquivo de imagem.",
-    "no_medicines_found": "Nenhum medicamento encontrado na imagem.",
-    "analysis_error": "Erro ao analisar a imagem.",
-    "file_analysis_error": "Erro ao analisar o arquivo",
-    "preview_alt": "Visualização",
-    "remove_image": "Excluir imagem",
-    "file_selected": "Arquivo selecionado",
-    "click_to_change": "Clique para alterar o arquivo",
-    "file_types": "JPG, PNG, WEBP, GIF",
-    "preview_error": "Erro ao exibir a pré-visualização",
-    "click_to_select_file": "Clique ou arraste e solte para selecionar um arquivo"
-  },
-  "medicine_review": {
-    "title": "Revisão de Medicamentos",
-    "current_stock": "Estoque atual",
-    "maximum_stock": "Estoque máximo",
-    "time_of_day": "Momento",
-    "select_option": "Selecione...",
-    "start_date": "Começo",
-    "delete_condition": "Remova esta condição",
-    "finish": "Para terminar"
-  }
+  "yes": "Sim"
 }

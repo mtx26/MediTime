@@ -33,13 +33,14 @@
   "add": "Agregar",
   "admin": "Administración",
   "app": {
-    "name": "MediTime",
-    "shortName": "MediTime",
-    "description": "Planifica tus tratamientos y comparte tus calendarios médicos con facilidad.",
-    "pageTitle": "MediTime - Gestor de Tratamientos Médicos",
     "access": "Acceder a la aplicación",
+    "description": "Planifica tus tratamientos y comparte tus calendarios médicos con facilidad.",
     "login": "Acceso",
+    "name": "MediTime",
+    "pageTitle": "MediTime - Gestor de Tratamientos Médicos",
     "register": "Crear una cuenta",
+    "shortN": "MediTime",
+    "shortName": "MediTime",
     "subtitle": "Administre, rastree y comparta sus tratamientos médicos fácilmente.",
     "title": "MediTime"
   },
@@ -241,6 +242,21 @@
     "description": "Administre y comparta fácilmente su toma de medicamentos.",
     "title": "MediTime - Planificador de tratamientos"
   },
+  "image_upload": {
+    "analysis_error": "Error al analizar la imagen.",
+    "click_to_change": "Haga clic para cambiar el archivo",
+    "click_to_select_file": "Haga clic o arrastre y suelte para seleccionar un archivo",
+    "file_analysis_error": "Error al analizar el archivo",
+    "file_selected": "Archivo seleccionado",
+    "file_type_error": "Sólo se aceptan archivos de imagen (jpg, png, webp, gif).",
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "no_medicines_found": "No se encontró ningún medicamento en la imagen.",
+    "preview_alt": "Avance",
+    "preview_error": "Error al mostrar la vista previa",
+    "remove_image": "Eliminar imagen",
+    "select_file_error": "Seleccione un archivo de imagen.",
+    "title": "Seleccionar y obtener una vista previa de un archivo"
+  },
   "invalid_or_expired_link": "Este enlace de calendario compartido no es válido o ha expirado.",
   "invitation": {
     "invalid_or_expired": "Invitación no válida o vencida",
@@ -263,6 +279,16 @@
   "logout": "Cerrar sesión",
   "low_stock": "Stock bajo",
   "manage_link": "Administrar el enlace",
+  "medicine_review": {
+    "current_stock": "Stock actual",
+    "delete_condition": "Eliminar esta condición",
+    "finish": "Para terminar",
+    "maximum_stock": "Stock máximo",
+    "select_option": "Seleccionar...",
+    "start_date": "Comienzo",
+    "time_of_day": "Momento",
+    "title": "Revisión de medicamentos"
+  },
   "medicines": {
     "back_to_calendar": "Volver al calendario",
     "label": "Drogas",
@@ -283,6 +309,20 @@
   "modify": "Modificador",
   "morning": "Mañana",
   "my_calendars": "Mis calendarios",
+  "navigation": {
+    "about": "Acerca de",
+    "calendar": "Calendario",
+    "dashboard": "Panel",
+    "forgot-password": "Contraseña olvidada",
+    "help": "Ayudante",
+    "home": "Bienvenido",
+    "login": "Acceso",
+    "medicines": "Drogas",
+    "profile": "Perfil",
+    "register": "Registro",
+    "reset-password": "Restablecer contraseña",
+    "settings": "Ajustes"
+  },
   "never": "Nunca",
   "next": "Siguiente",
   "next_day": "Al día siguiente",
@@ -419,6 +459,7 @@
   "rights_reserved": "Reservados todos los derechos",
   "scanner": {
     "add": "Agregar",
+    "camera": "Cámara",
     "camera_error": "No se puede acceder a la cámara.",
     "camera_instruction": "Señale el código DataMatrix",
     "cancel": "Cancelar",
@@ -427,9 +468,8 @@
     "quantity": "Cantidad: {{cantidad}}",
     "remove_from_list": "Eliminar de la lista",
     "searching": "Investigación...",
-    "title": "Escanear un código QR",
-    "camera": "Cámara",
-    "select_camera": "Seleccione una cámara"
+    "select_camera": "Seleccione una cámara",
+    "title": "Escanear un código QR"
   },
   "security": {
     "current_email": "Correo electrónico actual:",
@@ -662,30 +702,5 @@
     "desc": "Porque la atención médica no admite improvisaciones. MediTime te ofrece una solución clara, intuitiva y segura para el seguimiento diario de tus tratamientos y los de tus seres queridos.",
     "title": "¿Por qué elegir MediTime?"
   },
-  "yes": "Sí",
-  "image_upload": {
-    "title": "Seleccionar y obtener una vista previa de un archivo",
-    "file_type_error": "Sólo se aceptan archivos de imagen (jpg, png, webp, gif).",
-    "select_file_error": "Seleccione un archivo de imagen.",
-    "no_medicines_found": "No se encontró ningún medicamento en la imagen.",
-    "analysis_error": "Error al analizar la imagen.",
-    "file_analysis_error": "Error al analizar el archivo",
-    "preview_alt": "Avance",
-    "remove_image": "Eliminar imagen",
-    "file_selected": "Archivo seleccionado",
-    "click_to_change": "Haga clic para cambiar el archivo",
-    "file_types": "JPG, PNG, WEBP, GIF",
-    "preview_error": "Error al mostrar la vista previa",
-    "click_to_select_file": "Haga clic o arrastre y suelte para seleccionar un archivo"
-  },
-  "medicine_review": {
-    "title": "Revisión de medicamentos",
-    "current_stock": "Stock actual",
-    "maximum_stock": "Stock máximo",
-    "time_of_day": "Momento",
-    "select_option": "Seleccionar...",
-    "start_date": "Comienzo",
-    "delete_condition": "Eliminar esta condición",
-    "finish": "Para terminar"
-  }
+  "yes": "Sí"
 }

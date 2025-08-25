@@ -33,13 +33,14 @@
   "add": "Ajouter",
   "admin": "Admin",
   "app": {
-    "name": "MediTime",
-    "shortName": "MediTime",
-    "description": "Planifiez vos traitements et partagez vos calendriers médicaux avec simplicité.",
-    "pageTitle": "MediTime - Gestionnaire de traitements médicaux",
     "access": "Accéder à l'application",
+    "description": "Planifiez vos traitements et partagez vos calendriers médicaux avec simplicité.",
     "login": "Se connecter",
+    "name": "MediTime",
+    "pageTitle": "MediTime - Gestionnaire de traitements médicaux",
     "register": "Créer un compte",
+    "shortN": "MediTime",
+    "shortName": "MediTime",
     "subtitle": "Gérez, suivez et partagez vos traitements médicaux facilement.",
     "title": "MediTime"
   },
@@ -242,19 +243,19 @@
     "title": "MediTime - Planificateur de traitements"
   },
   "image_upload": {
-    "title": "Sélectionner et prévisualiser un fichier",
-    "file_type_error": "Seuls les fichiers image sont acceptés (jpg, png, webp, gif).",
-    "select_file_error": "Veuillez sélectionner un fichier image.",
-    "no_medicines_found": "Aucun médicament trouvé dans l'image.",
     "analysis_error": "Erreur lors de l'analyse de l'image.",
-    "file_analysis_error": "Erreur lors de l'analyse du fichier",
-    "preview_alt": "Aperçu",
-    "remove_image": "Supprimer l'image",
-    "file_selected": "Fichier sélectionné",
     "click_to_change": "Cliquez pour changer de fichier",
+    "click_to_select_file": "Cliquez ou glissez-déposez pour sélectionner un fichier",
+    "file_analysis_error": "Erreur lors de l'analyse du fichier",
+    "file_selected": "Fichier sélectionné",
+    "file_type_error": "Seuls les fichiers image sont acceptés (jpg, png, webp, gif).",
     "file_types": "JPG, PNG, WEBP, GIF",
+    "no_medicines_found": "Aucun médicament trouvé dans l'image.",
+    "preview_alt": "Aperçu",
     "preview_error": "Erreur lors de l'affichage de la prévisualisation",
-    "click_to_select_file": "Cliquez ou glissez-déposez pour sélectionner un fichier"
+    "remove_image": "Supprimer l'image",
+    "select_file_error": "Veuillez sélectionner un fichier image.",
+    "title": "Sélectionner et prévisualiser un fichier"
   },
   "invalid_or_expired_link": "Ce lien de calendrier partagé est invalide ou a expiré.",
   "invitation": {
@@ -278,6 +279,16 @@
   "logout": "Déconnexion",
   "low_stock": "Stock faible",
   "manage_link": "Gérer le lien",
+  "medicine_review": {
+    "current_stock": "Stock actuel",
+    "delete_condition": "Supprimer cette condition",
+    "finish": "Terminer",
+    "maximum_stock": "Stock maximum",
+    "select_option": "Sélectionner...",
+    "start_date": "Début",
+    "time_of_day": "Moment",
+    "title": "Révision du médicament"
+  },
   "medicines": {
     "back_to_calendar": "Retour au calendrier",
     "label": "Médicaments",
@@ -296,18 +307,22 @@
     "title": "Disponible sur votre téléphone"
   },
   "modify": "Modifier",
-  "medicine_review": {
-    "title": "Révision du médicament",
-    "current_stock": "Stock actuel",
-    "maximum_stock": "Stock maximum",
-    "time_of_day": "Moment",
-    "select_option": "Sélectionner...",
-    "start_date": "Début",
-    "delete_condition": "Supprimer cette condition",
-    "finish": "Terminer"
-  },
   "morning": "Matin",
   "my_calendars": "Mes calendriers",
+  "navigation": {
+    "about": "À propos",
+    "calendar": "Calendrier",
+    "dashboard": "Tableau de bord",
+    "forgot-password": "Mot de passe oublié",
+    "help": "Aide",
+    "home": "Accueil",
+    "login": "Se connecter",
+    "medicines": "Médicaments",
+    "profile": "Profil",
+    "register": "S'inscrire",
+    "reset-password": "Réinitialiser le mot de passe",
+    "settings": "Paramètres"
+  },
   "never": "Jamais",
   "next": "Suivant",
   "next_day": "Jour suivant",
