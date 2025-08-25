@@ -33,6 +33,10 @@
   "add": "Add",
   "admin": "Admin",
   "app": {
+    "name": "MediTime",
+    "shortName": "MediTime",
+    "description": "Schedule your treatments and share your medical calendars with ease.",
+    "pageTitle": "MediTime - Medical Treatment Manager",
     "access": "Access the application",
     "login": "Log in",
     "register": "Create an account",

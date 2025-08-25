@@ -1,9 +1,9 @@
 {
   "name": "MediTime",
   "short_name": "MediTime",
-  "description": "Schedule your treatments and share your medical calendars with ease.",
-  "start_url": "/en/",
-  "lang": "en",
+  "description": "安排您的治疗并轻松分享您的医疗日历。",
+  "start_url": "/zh/",
+  "lang": "zh",
   "display": "standalone",
   "backgroundColor": "#FFFFFF",
   "themeColor": "#5FC3B4",

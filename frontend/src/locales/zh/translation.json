@@ -33,6 +33,10 @@
   "add": "添加",
   "admin": "行政",
   "app": {
+    "name": "MediTime",
+    "shortName": "MediTime",
+    "description": "安排您的治疗并轻松分享您的医疗日历。",
+    "pageTitle": "MediTime - 医疗治疗管理器",
     "access": "访问应用程序",
     "login": "登录",
     "register": "创建一个帐户",

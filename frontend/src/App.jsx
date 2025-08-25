@@ -11,7 +11,7 @@ import RealtimeManager from './components/realtime/RealtimeManager';
 import { getToken } from './services/supabase/tokenUtils';
 import { performApiCall } from './services/api/apiUtils';
 import { useTranslation } from 'react-i18next';
-import Seo from './seo/Seo';
+import I18nHead from './components/common/I18nHead';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,6 +27,7 @@ function App() {
   const { t, i18n } = useTranslation();
   const { lng } = useParams();
   const location = useLocation();
+  
   const [tokensList, setTokensList] = useState([]);
   const [calendarsData, setCalendarsData] = useState(null);
   const [notificationsData, setNotificationsData] = useState(null);
@@ -846,7 +847,11 @@ function App() {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Seo title={t('home_meta.title')} description={t('home_meta.description')} path={path} />
+      <I18nHead 
+        title={t('home_meta.title')} 
+        description={t('home_meta.description')} 
+        path={path} 
+      />
       <Navbar sharedProps={sharedProps} />
       <main className="flex-grow-1 d-flex flex-column pb-5 pb-lg-0">
         {userInfo && (

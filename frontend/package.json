@@ -1,6 +1,7 @@
 {
   "name": "medic",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "dependencies": {
     "@fullcalendar/bootstrap5": "^6.1.17",
@@ -33,7 +34,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run build:i18n && vite build",
+    "build:i18n": "node scripts/generate-i18n-manifests.js",
     "preview": "vite preview"
   },
   "devDependencies": {

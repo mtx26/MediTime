@@ -33,6 +33,10 @@
   "add": "Agregar",
   "admin": "Administración",
   "app": {
+    "name": "MediTime",
+    "shortName": "MediTime",
+    "description": "Planifica tus tratamientos y comparte tus calendarios médicos con facilidad.",
+    "pageTitle": "MediTime - Gestor de Tratamientos Médicos",
     "access": "Acceder a la aplicación",
     "login": "Acceso",
     "register": "Crear una cuenta",

@@ -33,6 +33,10 @@
   "add": "追加",
   "admin": "管理者",
   "app": {
+    "name": "MediTime",
+    "shortName": "MediTime",
+    "description": "治療をスケジュールし、医療カレンダーを簡単に共有できます。",
+    "pageTitle": "MediTime - 医療治療管理",
     "access": "アプリケーションにアクセスする",
     "login": "ログイン",
     "register": "アカウントを作成する",
