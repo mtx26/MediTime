@@ -80,6 +80,8 @@
   "back": "Back",
   "boxes": {
     "add_box": "Add a box",
+    "add_manual": "Add manually",
+    "add_with_qr": "Scanner QR code",
     "alert_threshold": "Alert threshold",
     "cancel": "Cancel",
     "capacity": "Box capacity",
@@ -104,9 +106,11 @@
     "intake_conditions": "Conditions of taking",
     "name": "Name",
     "new_box": "New box",
+    "qr_code_help_text": "The DataMatrix code is located on the medication packaging, near the barcode. It is a small black and white square.",
     "remaining_qty": "Remaining quantity",
     "restock": "Restocking",
     "save": "Save",
+    "scan_qr_code": "Scanner QR code",
     "start_typing": "Start typing...",
     "stock": {
       "alerts": {
@@ -129,22 +133,39 @@
   "calendar": {
     "add": "Add a calendar",
     "add_calendar": "Add a calendar",
+    "add_with_qr": "Create a calendar by scanning QR",
+    "calendar_name": "Calendar Name",
+    "calendar_name_placeholder": "Enter the name of the calendar",
     "choose_image": "Choose an image",
     "confirm_delete": "Delete the calendar?",
     "confirm_delete_shared": "Delete shared calendar?",
     "confirm_rename": "Rename the calendar?",
+    "create_calendar_qr": "Scan QR : {{calendarName}}",
+    "creating_calendar": "Creation in progress...",
     "daily_view": "Daily calendar",
     "day": "Day",
     "drag_and_drop": "Drag an image here or click to select it",
+    "error_calendar_creation": "Error creating calendar",
+    "error_no_calendar_name": "Please enter a calendar name",
+    "error_no_medicines": "No medication scanned",
+    "error_partial_success": "Calendar created but {{count}} medication(s) could not be added",
     "import_calendar": "Import the calendar \"{{name}}\"",
     "import_type": "Add mode",
     "import_type_file": "Importing a file",
+    "import_type_file_description": "Import a calendar from an exported file.",
     "import_type_manual": "Manuel",
+    "import_type_manual_description": "Create an empty calendar and add medications manually.",
+    "import_type_qr_description": "Scan the DataMatrix codes on your medication boxes to automatically create your schedule.",
     "label": "Calendar",
     "month": "Month",
     "name": "Calendar Name",
     "new_name": "New name",
+    "processing": "Processing in progress…",
     "reference_week": "Reference week",
+    "scan_medicines": "Scan medications",
+    "scan_medicines_description": "Scan the DataMatrix codes on your medication boxes. Each scanned medication will be automatically added to your new schedule.",
+    "scan_qr_option": "Scanner QR codes",
+    "scanner_button_hint": "Use the scanner's \"Add\" button to create the calendar",
     "today": "Today",
     "week": "Week",
     "weekly_help": "Click on a day in the calendar to see the associated medications in a window.",
@@ -217,8 +238,8 @@
   },
   "home": "Welcome",
   "home_meta": {
-    "title": "MediTime - Medicine schedule planner",
-    "description": "Plan and share your medication schedules easily."
+    "description": "Plan and share your medication schedules easily.",
+    "title": "MediTime - Medicine schedule planner"
   },
   "invalid_or_expired_link": "This shared calendar link is invalid or has expired.",
   "invitation": {
@@ -396,6 +417,20 @@
   },
   "revoke_link": "Revoke the link",
   "rights_reserved": "All rights reserved",
+  "scanner": {
+    "add": "Add",
+    "camera_error": "Unable to access the camera.",
+    "camera_instruction": "Point to the DataMatrix code",
+    "cancel": "Cancel",
+    "close": "Close",
+    "medicine_not_found": "Drug not found",
+    "quantity": "Quantity: {{quantity}}",
+    "remove_from_list": "Remove from list",
+    "searching": "Research...",
+    "title": "Scan a QR code",
+    "camera": "Camera",
+    "select_camera": "Select a camera"
+  },
   "security": {
     "current_email": "Current email:",
     "current_password": {
@@ -627,5 +662,30 @@
     "desc": "Because healthcare doesn't leave room for improvisation. MediTime offers you a clear, intuitive, and secure solution for tracking your treatments and those of your loved ones, day after day.",
     "title": "Why choose MediTime?"
   },
-  "yes": "Yes"
+  "yes": "Yes",
+  "image_upload": {
+    "title": "Select and preview a file",
+    "file_type_error": "Only image files are accepted (jpg, png, webp, gif).",
+    "select_file_error": "Please select an image file.",
+    "no_medicines_found": "No medication found in the image.",
+    "analysis_error": "Error parsing image.",
+    "file_analysis_error": "Error parsing file",
+    "preview_alt": "Preview",
+    "remove_image": "Delete image",
+    "file_selected": "Selected file",
+    "click_to_change": "Click to change file",
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "preview_error": "Error displaying preview",
+    "click_to_select_file": "Click or drag and drop to select a file"
+  },
+  "medicine_review": {
+    "title": "Drug Review",
+    "current_stock": "Current stock",
+    "maximum_stock": "Stock maximum",
+    "time_of_day": "Moment",
+    "select_option": "Select...",
+    "start_date": "Beginning",
+    "delete_condition": "Remove this condition",
+    "finish": "To end"
+  }
 }

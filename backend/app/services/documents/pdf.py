@@ -1,4 +1,5 @@
 from io import BytesIO
+from datetime import datetime, date
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
@@ -8,10 +9,40 @@ moment_map = {
     "morning": "matin",
     "noon": "midi",
     "evening": "soir",
+    "night": "nuit",
 }
 
+def _parse_date(val):
+    if not val:
+        return None
+    if isinstance(val, (datetime, date)):
+        return val
+    # Essais formats courants
+    for fmt in ("%Y-%m-%d",):
+        try:
+            return datetime.strptime(val, fmt).date()
+        except ValueError:
+            continue  # Format non valide, essayer le suivant
+    try:
+        return datetime.fromisoformat(val).date()
+    except (ValueError, TypeError):
+        return None
+
+def _fmt_date(val):
+    d = _parse_date(val)
+    return d.strftime("%d/%m/%Y") if d else None
+
+def _fmt_dose(dose):
+    if dose is None or dose == "":
+        return ""
+    s = str(dose).strip()
+    if any(u in s.lower() for u in ("mg", "µg", "mcg", "g", "ml", "u")):
+        return s
+    return f"{s} mg"
+
 def generate_medicine_conditions_pdf(calendar_id):
-    medicines_grouped = get_medicines_for_calendar(calendar_id)
+    # Nouvelle forme: liste triée de [{box_id: {name, dose, conditions}}, ...]
+    medicines_list = get_medicines_for_calendar(calendar_id)
 
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4)
@@ -21,17 +52,41 @@ def generate_medicine_conditions_pdf(calendar_id):
     elements.append(Paragraph("Conditions de prise des médicaments", styles['Heading1']))
     elements.append(Spacer(1, 12))
 
-    for name, med_data in medicines_grouped.items():
-        dose = med_data["dose"]
-        conditions = med_data["conditions"]
+    # On respecte l'ordre déjà trié par SQL (par name)
+    for item in medicines_list:
+        # item = {"<box_id>": {...}}
+        _, med_data = next(iter(item.items()))
+        name = med_data.get("name", "Sans nom")
+        dose_str = _fmt_dose(med_data.get("dose"))
+        conditions = med_data.get("conditions", []) or []
 
-        elements.append(Paragraph(f"<b>{name} ({dose} mg)</b>", styles['Heading3']))
+        title = f"<b>{name}{f' ({dose_str})' if dose_str else ''}</b>"
+        elements.append(Paragraph(title, styles['Heading3']))
+
+        if not conditions:
+            elements.append(Paragraph("- Aucune condition définie", styles['Normal']))
+            elements.append(Spacer(1, 10))
+            continue
 
         for cond in conditions:
-            moment = moment_map.get(cond['time_of_day'], cond['time_of_day'])
-            desc = f"- {cond['tablet_count']} comprimé(s) de {dose} mg tous les {cond['interval_days']} jour(s), le {moment}"
-            if cond['start_date']:
-                desc += f", à partir du {cond['start_date'].strftime('%d/%m/%Y')}"
+            tablet_count = cond.get("tablet_count")
+            interval_days = cond.get("interval_days")
+            moment_key = cond.get("time_of_day")
+            moment_txt = moment_map.get(moment_key, moment_key or "moment")
+            start_txt = _fmt_date(cond.get("start_date"))
+
+            parts = [f"- {tablet_count if tablet_count is not None else '?'} comprimé(s)"]
+            if dose_str:
+                parts.append(f"de {dose_str}")
+            if interval_days:
+                parts.append(f"tous les {interval_days} jour(s)")
+            if moment_txt:
+                parts.append(f", le {moment_txt}")
+
+            desc = " ".join(parts)
+            if start_txt:
+                desc += f", à partir du {start_txt}"
+
             elements.append(Paragraph(desc, styles['Normal']))
 
         elements.append(Spacer(1, 10))
@@ -39,4 +94,3 @@ def generate_medicine_conditions_pdf(calendar_id):
     doc.build(elements)
     buffer.seek(0)
     return buffer
-

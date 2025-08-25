@@ -18,6 +18,20 @@
 
 ---
 
+## Server Health (Netdata)
+
+![CPU](http://161.97.64.142:19999/api/v1/badge.svg?chart=system.cpu&after=-300&dimensions=system&label=CPU%20system&units=%25)
+![RAM](http://161.97.64.142:19999/api/v1/badge.svg?chart=system.ram&after=-300&dimensions=used&label=RAM%20used&units=MiB)
+![Load](http://161.97.64.142:19999/api/v1/badge.svg?chart=system.load&after=-300&dimensions=load1&label=Load%201m)
+![Uptime](http://161.97.64.142:19999/api/v1/badge.svg?chart=system.uptime&after=-300&dimensions=uptime&label=Uptime&units=s)
+
+![Disk writes](http://161.97.64.142:19999/api/v1/badge.svg?chart=disk.sda&after=-300&dimensions=writes&label=Disk%20writes&units=ops%2Fs)
+![Disk reads](http://161.97.64.142:19999/api/v1/badge.svg?chart=disk.sda&after=-300&dimensions=reads&label=Disk%20reads&units=ops%2Fs)
+
+![Net RX](http://161.97.64.142:19999/api/v1/badge.svg?chart=net.eth0&after=-300&dimensions=received&label=Net%20RX&units=Kb%2Fs)
+![Net TX](http://161.97.64.142:19999/api/v1/badge.svg?chart=net.eth0&after=-300&dimensions=sent&label=Net%20TX&units=Kb%2Fs)
+
+
 ## 🚀 Key Features
 
 * 🔐 Supabase Authentication (Google, GitHub, Twitter, Facebook, Discord, Microsoft, Email)

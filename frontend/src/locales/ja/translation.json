@@ -80,6 +80,8 @@
   "back": "戻る",
   "boxes": {
     "add_box": "ボックスを追加する",
+    "add_manual": "手動で追加",
+    "add_with_qr": "スキャナーQRコード",
     "alert_threshold": "アラートしきい値",
     "cancel": "キャンセル",
     "capacity": "ボックス容量",
@@ -104,9 +106,11 @@
     "intake_conditions": "受講条件",
     "name": "名前",
     "new_box": "新しい箱",
+    "qr_code_help_text": "DataMatrixコードは、医薬品のパッケージのバーコードの近くにあります。小さな白黒の四角形です。",
     "remaining_qty": "残り数量",
     "restock": "再入荷",
     "save": "保存",
+    "scan_qr_code": "スキャナーQRコード",
     "start_typing": "入力を開始してください...",
     "stock": {
       "alerts": {
@@ -129,22 +133,39 @@
   "calendar": {
     "add": "カレンダーを追加する",
     "add_calendar": "カレンダーを追加する",
+    "add_with_qr": "QRをスキャンしてカレンダーを作成する",
+    "calendar_name": "カレンダー名",
+    "calendar_name_placeholder": "カレンダーの名前を入力してください",
     "choose_image": "画像を選択",
     "confirm_delete": "カレンダーを削除しますか?",
     "confirm_delete_shared": "共有カレンダーを削除しますか?",
     "confirm_rename": "カレンダーの名前を変更しますか?",
+    "create_calendar_qr": "QRコードをスキャン: {{calendarName}}",
+    "creating_calendar": "作成中です...",
     "daily_view": "日めくりカレンダー",
     "day": "日",
     "drag_and_drop": "画像をここにドラッグするかクリックして選択してください",
+    "error_calendar_creation": "カレンダーの作成中にエラーが発生しました",
+    "error_no_calendar_name": "カレンダー名を入力してください",
+    "error_no_medicines": "薬はスキャンされていません",
+    "error_partial_success": "カレンダーは作成されましたが、{{count}} 個の薬を追加できませんでした",
     "import_calendar": "カレンダー「{{name}}」をインポートします",
     "import_type": "追加モード",
     "import_type_file": "ファイルのインポート",
+    "import_type_file_description": "エクスポートされたファイルからカレンダーをインポートします。",
     "import_type_manual": "マヌエル",
+    "import_type_manual_description": "空のカレンダーを作成し、手動で薬を追加します。",
+    "import_type_qr_description": "薬箱の DataMatrix コードをスキャンして、スケジュールを自動的に作成します。",
     "label": "カレンダー",
     "month": "月",
     "name": "カレンダー名",
     "new_name": "新しい名前",
+    "processing": "処理中です…",
     "reference_week": "参照週",
+    "scan_medicines": "薬をスキャンする",
+    "scan_medicines_description": "薬箱のDataMatrixコードをスキャンしてください。スキャンされた薬は新しいスケジュールに自動的に追加されます。",
+    "scan_qr_option": "QRコードスキャナー",
+    "scanner_button_hint": "スキャナの「追加」ボタンを使用してカレンダーを作成します",
     "today": "今日",
     "week": "週",
     "weekly_help": "カレンダーの日付をクリックすると、関連する薬がウィンドウに表示されます。",
@@ -216,6 +237,10 @@
     "title3": "安全保証"
   },
   "home": "いらっしゃいませ",
+  "home_meta": {
+    "description": "薬の摂取量を簡単に管理、共有できます。",
+    "title": "MediTime - 治療プランナー"
+  },
   "invalid_or_expired_link": "この共有カレンダーのリンクは無効か期限が切れています。",
   "invitation": {
     "invalid_or_expired": "無効または期限切れの招待",
@@ -392,6 +417,20 @@
   },
   "revoke_link": "リンクを取り消す",
   "rights_reserved": "無断転載を禁じます",
+  "scanner": {
+    "add": "追加",
+    "camera_error": "カメラにアクセスできません。",
+    "camera_instruction": "DataMatrixコードを指す",
+    "cancel": "キャンセル",
+    "close": "近い",
+    "medicine_not_found": "薬物は見つかりませんでした",
+    "quantity": "数量: {{数量}}",
+    "remove_from_list": "リストから削除",
+    "searching": "研究...",
+    "title": "QRコードをスキャンする",
+    "camera": "カメラ",
+    "select_camera": "カメラを選択"
+  },
   "security": {
     "current_email": "現在のメールアドレス:",
     "current_password": {
@@ -624,8 +663,29 @@
     "title": "MediTimeを選ぶ理由"
   },
   "yes": "はい",
-  "home_meta": {
-    "title": "MediTime - 治療プランナー",
-    "description": "薬の摂取量を簡単に管理、共有できます。"
+  "image_upload": {
+    "title": "ファイルを選択してプレビューする",
+    "file_type_error": "画像ファイルのみ受け入れられます（jpg、png、webp、gif）。",
+    "select_file_error": "画像ファイルを選択してください。",
+    "no_medicines_found": "画像内に薬剤は見つかりません。",
+    "analysis_error": "画像の解析中にエラーが発生しました。",
+    "file_analysis_error": "ファイルの解析エラー",
+    "preview_alt": "プレビュー",
+    "remove_image": "画像を削除",
+    "file_selected": "選択したファイル",
+    "click_to_change": "ファイルを変更するにはクリックしてください",
+    "file_types": "JPG、PNG、WEBP、GIF",
+    "preview_error": "プレビューの表示中にエラーが発生しました",
+    "click_to_select_file": "クリックまたはドラッグアンドドロップでファイルを選択します"
+  },
+  "medicine_review": {
+    "title": "薬物レビュー",
+    "current_stock": "現在の在庫",
+    "maximum_stock": "在庫最大数",
+    "time_of_day": "一瞬",
+    "select_option": "選択...",
+    "start_date": "始まり",
+    "delete_condition": "この条件を削除する",
+    "finish": "終了するには"
   }
 }

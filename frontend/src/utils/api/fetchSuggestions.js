@@ -12,6 +12,8 @@ export const fetchSuggestions = async (name, dose) => {
     url += `&dose=ilike.*${encodeURIComponent(dose)}*`;
   }
 
+  // Filtrer pour ne garder que les médicaments qui ont un code_fmd car c'est les vrai medoc
+  url += `&code_fmd=not.is.null`;
   url += `&limit=40`;
 
   const res = await fetch(url, {
