@@ -16,6 +16,7 @@ import WeekCalendarSelector from '../../components/calendar/WeekCalendarSelector
 import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
 import PillboxDisplay from '../../components/calendar/PillboxDisplay';
 import ActionSheet from '../../components/common/ActionSheet';
+import { func } from 'prop-types';
 
 function CalendarPage({
   personalCalendars,
@@ -43,10 +44,13 @@ function CalendarPage({
   const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
   const [alertType, setAlertType] = useState(''); // Type d'alerte
   const [alertMessage, setAlertMessage] = useState(''); // Message d'alerte
+  // Méthode de décrémentation du stock (pour affichage différencié)
+  const [stockDecrementMethod, setStockDecrementMethod] = useState('');
+  const [loadingStockMethod, setLoadingStockMethod] = useState(false);
 
   // 🔄 Références et chargement
   const dateModalRef = useRef(null);
-  const [loading, setLoading] = useState(undefined); // État de chargement du calendrier
+  const [loading, setLoading] = useState(true); // État de chargement du calendrier
 
   const [startDate, setStartDate] = useState(() => {
     const date = new Date();
@@ -113,16 +117,9 @@ function CalendarPage({
 
   // Fonction pour charger le calendrier lorsque l'utilisateur est connecté ou que le calendrier est un token
   useEffect(() => {
-    if (!calendarId) return;
+    if (!calendarId) return setLoading(true);
     if (calendarType === 'personal' || calendarType === 'sharedUser') {
-      if (!userInfo) {
-        setLoading(undefined);
-        return;
-      }
-      if (!userInfo) {
-        setLoading(undefined);
-        return;
-      }
+      if (!userInfo) return setLoading(true);
     }
     const load = async () => {
       const rep = await calendarSource.fetchSchedule(calendarId);
@@ -140,12 +137,30 @@ function CalendarPage({
           setIsLowStock(rep.ifLowStock);
           // TODO: Hook pour alerte stock faible en temps réel
         }
-        setLoading(!rep.success);
       }
+      setLoading(rep.success ? false : undefined);
     };
 
     load();
   }, [calendarId, calendarSource.fetchSchedule, userInfo]);
+
+  // Charger la méthode de décrémentation du stock (si disponible)
+  useEffect(() => {
+    const fetchMethod = async () => {
+      if (!calendarId) return setLoadingStockMethod(false);
+      if (calendarType === 'personal' || calendarType === 'sharedUser') {
+        if (!userInfo) return setLoading(true);
+      }
+      // On tente pour les calendriers personal et sharedUser en appelant l'API exposée
+      const rep = await calendarSource.fetchStockDecrementMethod(calendarId);
+      if (rep.success) {
+        setStockDecrementMethod(rep.method);
+      }
+      setLoadingStockMethod((rep.success ? false : undefined));
+    };
+
+    fetchMethod();
+  }, [calendarId, calendarType]);
 
   // 📍 Filtrage des événements pour un jour spécifique et tri par ordre alphabétique
   useEffect(() => {
@@ -173,7 +188,7 @@ function CalendarPage({
     }));
   }, [calendarEvents]);
 
-  if (loading === undefined && calendarId) {
+  if (loading === true && calendarId) {
     return (
       <div
         className="d-flex justify-content-center align-items-center"
@@ -186,7 +201,7 @@ function CalendarPage({
     );
   }
 
-  if (loading === true && calendarId) {
+  if ((loading === undefined || loadingStockMethod) && calendarId) {
     return (
       <div className="alert alert-danger text-center mt-5" role="alert">
         ❌ {t('invalid_or_expired_link')}
@@ -199,7 +214,7 @@ function CalendarPage({
 
       <div className="container mt-2">
         <div className="row justify-content-center">
-          <div className="col-12 col-lg-4 mb-4">
+          <div className="col-12 col-lg-4 mb-2">
             <div className="mb-3">
               {/* Alert system */}
               <AlertSystem
@@ -209,7 +224,6 @@ function CalendarPage({
                   setAlertMessage('');
                 }}
               />
-
               {/* Boutons de navigation et partage */}
               <div className="d-flex align-items-center gap-2 mb-3">
                 {/* Bouton Médicaments qui prend tout l'espace dispo */}
@@ -227,6 +241,24 @@ function CalendarPage({
                 {calendarType === 'personal' && (
                   <ActionSheet
                     actions={[
+                      // view toggle actions
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-grid-3x3-gap me-2" /> {t('pillbox.title')}
+                          </>
+                        ),
+                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/pillbox?date=${selectedDate}`),
+                      },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-calendar-day me-2" /> {t('day_view.title')}
+                          </>
+                        ),
+                        // TODO: implement daily view navigation
+                      },
+                      { separator: true },
                       {
                         label: (
                           <>
@@ -288,6 +320,24 @@ function CalendarPage({
                 {calendarType === 'sharedUser' && (
                   <ActionSheet
                     actions={[
+                      // view toggle for shared users too
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-grid-3x3-gap me-2" /> {t('pillbox.title')}
+                          </>
+                        ),
+                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/pillbox?date=${selectedDate}`),
+                      },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-calendar-day me-2" /> {t('day_view.title')}
+                          </>
+                        ),
+                        // TODO: implement daily view navigation
+                      },
+                      { separator: true },
                       {
                         label: (
                           <>
@@ -339,23 +389,25 @@ function CalendarPage({
               )}
 
             </div>
-
             {/* Bouton pour naviguer vers la semaine suivante ou precedente */}
-            {Object.keys(calendarTable).filter(
-              (key) => calendarTable[key].length > 0
-            ).length > 0 && (
-              <div className="mb-2">
-                <h4 className="mb-3 fw-bold">
-                  <i className="bi bi-calendar-date"></i> {t('calendar.reference_week')}
-                </h4>
-                <div className='shadow'>
-                  <WeekCalendarSelector
-                    selectedDate={startDate}
-                    onWeekSelect={onWeekSelect}
-                  />
-                </div>
+            {stockDecrementMethod === "weekly_pillbox" && (
+              <div className='d-block d-lg-none'>
+                <CalendarWeekSelector
+                  calendarTable={calendarTable}
+                  startDate={startDate}
+                  onWeekSelect={onWeekSelect}
+                  t={t}
+                />
               </div>
             )}
+            <div className='d-none d-lg-block'>
+              <CalendarWeekSelector
+                calendarTable={calendarTable}
+                startDate={startDate}
+                onWeekSelect={onWeekSelect}
+                t={t}
+              />
+            </div>
           </div>
 
           {/* Pilulier */}
@@ -363,22 +415,24 @@ function CalendarPage({
           .length > 0 && (
             <>
               {/* Pilulier - Vue mobile */}
-              <div className="d-block d-lg-none col-12 col-lg-8 mb-4">
-                <div className="mb-2">
-                  <h4 className="mb-3 fw-bold">
-                    <i className="bi bi-capsule"></i> {t('pillbox.title')}
-                  </h4>
-                  <button
-                    className="btn btn-outline-success w-100"
-                    onClick={() =>
-                      navigate(
-                        `/${lng}/${basePath}/${calendarId}/pillbox?date=${startDate}`
-                      )}
-                  >
-                    <i className="bi bi-capsule"></i> {t('pillbox.fill')}
-                  </button>
+              {stockDecrementMethod === "weekly_pillbox" && (
+                <div className="d-block d-lg-none col-12 col-lg-8 mb-4">
+                  <div className="mb-2">
+                    <h4 className="mb-3 fw-bold">
+                      <i className="bi bi-capsule"></i> {t('pillbox.title')}
+                    </h4>
+                    <button
+                      className="btn btn-outline-success w-100"
+                      onClick={() =>
+                        navigate(
+                          `/${lng}/${basePath}/${calendarId}/pillbox?date=${startDate}`
+                        )}
+                    >
+                      <i className="bi bi-capsule"></i> {t('pillbox.fill')}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Pilulier - Vue desktop */}
               <div className="d-none d-lg-block col-12 col-lg-8 mb-4">
@@ -533,24 +587,26 @@ function CalendarPage({
           </div>
 
           {/* Calendrier - Vue mobile uniquement */}
-          <div className="d-block d-md-none">
-            <h4 className="mb-3 fw-bold">
-              <i className="bi bi-calendar-week"></i> {t('calendar.daily_view')}
-            </h4>
+          {stockDecrementMethod  === "daily_midnight" && (
+            <div className="d-block d-md-none">
+              <h4 className="mb-3 fw-bold">
+                <i className="bi bi-calendar-week"></i> {t('calendar.daily_view')}
+              </h4>
 
-            <div className="card shadow">
-              <div className="card-body">
-                <WeeklyEventContent
-                  ifModal={false}
-                  selectedDate={selectedDate}
-                  eventsForDay={eventsForDay}
-                  onSelectDate={onSelectDate}
-                  onNext={() => navigateDay(1)}
-                  onPrev={() => navigateDay(-1)}
-                />
+              <div className="card shadow">
+                <div className="card-body">
+                  <WeeklyEventContent
+                    ifModal={false}
+                    selectedDate={selectedDate}
+                    eventsForDay={eventsForDay}
+                    onSelectDate={onSelectDate}
+                    onNext={() => navigateDay(1)}
+                    onPrev={() => navigateDay(-1)}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       ) : (
         <div className="alert alert-info mt-4 mb-0" role="alert">
@@ -560,6 +616,31 @@ function CalendarPage({
       )}
     </>
   );
+}
+
+function CalendarWeekSelector({
+  calendarTable,
+  startDate,
+  onWeekSelect,
+  t
+}) {
+  return (
+    Object.keys(calendarTable).filter(
+      (key) => calendarTable[key].length > 0
+    ).length > 0 && (
+      <div className="mb-2">
+        <h4 className="mb-3 fw-bold">
+          <i className="bi bi-calendar-date"></i> {t('calendar.reference_week')}
+        </h4>
+        <div className='shadow'>
+          <WeekCalendarSelector
+            selectedDate={startDate}
+            onWeekSelect={onWeekSelect}
+          />
+        </div>
+      </div>
+    )
+  )
 }
 
 export default CalendarPage;

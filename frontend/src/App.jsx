@@ -215,7 +215,7 @@ function App() {
     return await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/stock-decrement-method`,
       method: 'GET',
-      origin: 'STOCK_DECREMENT_METHOD_FETCH',
+      origin: 'PERSONNAL_STOCK_DECREMENT_METHOD_FETCH',
       uid,
       analyticsEvent: 'fetch_stock_decrement_method',
       analyticsData: { calendarId, uid },
@@ -228,7 +228,7 @@ function App() {
       url: `${API_URL}/api/calendars/${calendarId}/stock-decrement-method`,
       method: 'POST',
       body: { method },
-      origin: 'STOCK_DECREMENT_METHOD_UPDATE',
+      origin: 'PERSONNAL_STOCK_DECREMENT_METHOD_UPDATE',
       uid,
       analyticsEvent: 'update_stock_decrement_method',
       analyticsData: { calendarId, uid },
@@ -244,17 +244,6 @@ function App() {
       uid,
       analyticsEvent: 'restock_personal_box',
       analyticsData: { calendarId, boxId, uid },
-    });
-  }, []);
-
-  const fetchPersonalNotificationsEnabled = useCallback(async (calendarId) => {
-    return await performApiCall({
-      url: `${API_URL}/api/calendars/${calendarId}/notifications`,
-      method: 'GET',
-      origin: 'NOTIFICATIONS_ENABLED_FETCH',
-      uid,
-      analyticsEvent: 'fetch_personal_notifications_enabled',
-      analyticsData: { calendarId, uid },
     });
   }, []);
 
@@ -663,6 +652,17 @@ function App() {
     });
   }, []);
 
+  const fetchSharedUserStockDecrementMethod = useCallback(async (calendarId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/stock-decrement-method`,
+      method: 'GET',
+      origin: 'SHARED_USER_STOCK_DECREMENT_METHOD_FETCH',
+      uid,
+      analyticsEvent: 'fetch_shared_user_stock_decrement_method',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const analyzeImage = useCallback(async (file) => {
@@ -704,7 +704,6 @@ function App() {
       fetchPersonalStockDecrementMethod,
       updatePersonalStockDecrementMethod,
       personalRestockBox,
-      fetchPersonalNotificationsEnabled,
       analyzeImage,
     },
 
@@ -730,6 +729,7 @@ function App() {
       sharedUserRestockBox,
       fetchSharedUserNotificationsEnabled,
       updateSharedUserNotificationsEnabled,
+      fetchSharedUserStockDecrementMethod,
     },
 
     tokenCalendars: {

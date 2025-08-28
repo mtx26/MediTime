@@ -326,7 +326,7 @@ def download_pdf_calendar(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar
-@with_query_origin(default_origin="STOCK_DECREMENT_METHOD_FETCH")
+@with_query_origin(default_origin="PERSONNAL_STOCK_DECREMENT_METHOD_FETCH")
 def get_personnal_stock_decrement_method(calendar_id):
     try:
         with get_connection() as conn:
@@ -336,7 +336,7 @@ def get_personnal_stock_decrement_method(calendar_id):
                 if result is None:
                     return warning_response(
                         message=ERROR_CALENDAR_NOT_FOUND,
-                        code="STOCK_DECREMENT_METHOD_FETCH_ERROR",
+                        code="PERSONNAL_STOCK_DECREMENT_METHOD_FETCH_ERROR",
                         status_code=404,
                         log_extra={"calendar_id": calendar_id}
                     )
@@ -344,14 +344,14 @@ def get_personnal_stock_decrement_method(calendar_id):
 
         return success_response(
             message="méthode de diminution de stock récupérée",
-            code="STOCK_DECREMENT_METHOD_FETCH_SUCCESS",
+            code="PERSONNAL_STOCK_DECREMENT_METHOD_FETCH_SUCCESS",
             data={"method": method},
             log_extra={"calendar_id": calendar_id, "method": method}
         )
     except Exception as e:
         return error_response(
             message="erreur lors de la récupération de la méthode de diminution de stock",
-            code="STOCK_DECREMENT_METHOD_FETCH_ERROR",
+            code="PERSONNAL_STOCK_DECREMENT_METHOD_FETCH_ERROR",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -362,7 +362,7 @@ def get_personnal_stock_decrement_method(calendar_id):
 @measure_time()
 @require_auth
 @verify_calendar
-@with_query_origin(default_origin="STOCK_DECREMENT_METHOD_UPDATE")
+@with_query_origin(default_origin="PERSONNAL_STOCK_DECREMENT_METHOD_UPDATE")
 def update_personnal_stock_decrement_method(calendar_id):
     try:
 
@@ -372,7 +372,7 @@ def update_personnal_stock_decrement_method(calendar_id):
         if not method:
             return warning_response(
                 message="method manquant",
-                code="STOCK_DECREMENT_METHOD_UPDATE_ERROR",
+                code="PERSONNAL_STOCK_DECREMENT_METHOD_UPDATE_ERROR",
                 status_code=400,
                 log_extra={"calendar_id": calendar_id}
             )
@@ -381,13 +381,13 @@ def update_personnal_stock_decrement_method(calendar_id):
 
         return success_response(
             message="methode de diminution de stock mise à jour", 
-            code="STOCK_DECREMENT_METHOD_UPDATE_SUCCESS",
+            code="PERSONNAL_STOCK_DECREMENT_METHOD_UPDATE_SUCCESS",
             log_extra={"calendar_id": calendar_id, "method": method}
         )
     except Exception as e:
         return error_response(
             message="erreur lors de la mise à jour de la méthode de diminution de stock", 
-            code="STOCK_DECREMENT_METHOD_UPDATE_ERROR", 
+            code="PERSONNAL_STOCK_DECREMENT_METHOD_UPDATE_ERROR", 
             status_code=500, 
             error=str(e),
             log_extra={"calendar_id": calendar_id}
