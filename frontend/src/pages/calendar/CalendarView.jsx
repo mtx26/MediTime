@@ -160,7 +160,7 @@ function CalendarPage({
     };
 
     fetchMethod();
-  }, [calendarId, calendarType]);
+  }, [calendarId, calendarType, userInfo]);
 
   // 📍 Filtrage des événements pour un jour spécifique et tri par ordre alphabétique
   useEffect(() => {
