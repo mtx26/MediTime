@@ -13,97 +13,121 @@ export default function WeeklyEventContent({
   onNext,
   onPrev,
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const monday = getMondayFromDate(selectedDate);
   const weekDays = getWeekDaysISOStrings(monday);
   const isFirstDay = weekDays[0] === selectedDate;
   const isLastDay = weekDays[6] === selectedDate;
 
+  // Presentation: no expand/collapse state, always show details when present
+
   return (
     <>
-      <ArrowControls
-        onLeft={isFirstDay ? () => {} : onPrev}
-        onRight={isLastDay ? () => {} : onNext}
-      />
-      {!ifModal && (
-        <div className="mb-2 d-flex">
-          <WeekDayCircles selectedDate={selectedDate} onSelectDate={onSelectDate} />
-        </div>
-      )}
+      {/* Navigation arrows (kept for keyboard/assistive users) */}
+      <ArrowControls onLeft={isFirstDay ? () => {} : onPrev} onRight={isLastDay ? () => {} : onNext} />
 
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      {/* Week day selector (hidden in modal mode) */}
+      <div className="mb-2 d-flex justify-content-center">
+        <WeekDayCircles selectedDate={selectedDate} onSelectDate={onSelectDate} />
+      </div>
+
+      {/* Header: big date + prev/next tactile buttons */}
+      <div className="d-flex align-items-center justify-content-between mb-3">
         <button
-          className="btn btn-outline-secondary btn-sm"
+          className="btn btn-outline-secondary"
           onClick={onPrev}
           disabled={isFirstDay}
           aria-label={t('previous_day')}
           title={t('previous_day')}
+          style={{ minWidth: 40, padding: '0.25rem 0.35rem' }}
         >
-          <i className="bi bi-arrow-left"></i>
+          <i className="bi bi-arrow-left" aria-hidden="true"></i>
         </button>
 
-        <div className="text-center flex-grow-1 d-flex justify-content-center">
-          {ifModal ? (
-            <WeekDayCircles selectedDate={selectedDate} onSelectDate={onSelectDate} />
-          ) : (
-            <h6 className="mb-0">
-              <i className="bi bi-calendar-date me-2"></i>
-              {new Date(selectedDate).toLocaleDateString('fr-FR', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </h6>
-          )}
+        <div className="text-center flex-grow-1 px-2">
+          <div className="d-flex align-items-center justify-content-center">
+            <div>
+              <div className="text-muted" style={{ fontSize: 12, textTransform: 'capitalize' }}>
+                {new Date(selectedDate).toLocaleDateString(i18n.language || undefined, { weekday: 'long' })}
+              </div>
+              <div style={{ fontWeight: 600, fontSize: 16 }}>
+                {new Date(selectedDate).toLocaleDateString(i18n.language || undefined, {
+                  day: '2-digit',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </div>
+            </div>
+          </div>
         </div>
 
         <button
-          className="btn btn-outline-secondary btn-sm"
+          className="btn btn-outline-secondary"
           onClick={onNext}
           disabled={isLastDay}
           aria-label={t('next_day')}
           title={t('next_day')}
+          style={{ minWidth: 40, padding: '0.25rem 0.35rem' }}
         >
-          <i className="bi bi-arrow-right"></i>
+          <i className="bi bi-arrow-right" aria-hidden="true"></i>
         </button>
       </div>
 
+  {/* No expand/collapse control — show details by default */}
 
-      <div className="d-flex justify-content-between align-items-center mb-3">
-
-        <div className="flex-grow-1">
-          {eventsForDay.length > 0 ? (
-            <ul className="list-group">
-              {eventsForDay.map((event, index) => (
-                <li
+      {/* Events: card-style, mobile-first */}
+      <div>
+        {eventsForDay.length > 0 ? (
+          <div className="d-grid" style={{ gap: 8 }}>
+            {eventsForDay.map((event, index) => {
+              const time = new Date(event.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              return (
+                <div
                   key={index}
-                  className="list-group-item d-flex align-items-center justify-content-between"
+                  className="card"
+                  role="group"
+                  aria-label={`${event.title} ${time}`}
+                  style={{ borderRadius: 8, padding: 10 }}
                 >
-                  {event.title} {event.dose != null ? `${event.dose} mg` : ''}
-                  <div className="d-flex align-items-center">
-                    <span className="badge me-2 badge bg-secondary">
-                      {event.tablet_count}
-                    </span>
-                    <span
-                      className="badge"
-                      style={{ backgroundColor: event.color, color: 'white' }}
-                    >
-                      {new Date(event.start).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
+                  <div className="d-flex align-items-start">
+                    <div style={{ width: 64, flexShrink: 0 }} className="me-3">
+                      <div
+                        style={{
+                          backgroundColor: event.color || '#6c757d',
+                          color: 'white',
+                          padding: '6px 8px',
+                          borderRadius: 6,
+                          textAlign: 'center',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {time}
+                      </div>
+                    </div>
+
+                    <div className="flex-grow-1">
+                      <div style={{ fontWeight: 600 }}>{event.title}</div>
+                              {event.dose != null && (
+                                <div className="text-muted" style={{ fontSize: 13 }}>{event.dose} mg</div>
+                              )}
+                              {event.notes && (
+                                <div className="text-muted mt-1" style={{ fontSize: 13 }}>{event.notes}</div>
+                              )}
+                    </div>
+
+                    <div style={{ marginLeft: 12 }} className="text-end">
+                      <div className="badge bg-secondary" style={{ padding: '6px 8px' }}>
+                        {event.tablet_count}
+                      </div>
+                    </div>
                   </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-muted text-center mb-0">
-              {t('no_events_today')}
-            </p>
-          )}
-        </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-muted text-center mb-0">{t('no_events_today')}</p>
+        )}
       </div>
     </>
   );

@@ -535,7 +535,7 @@ function CalendarPage({
         .length > 0 ? (
         <div className="container mt-4">
           {/* Calendrier mensuel */}
-          <div className="container d-none d-md-block">
+          <div className="container d-none d-lg-block">
             <h4 className="mb-3 fw-bold">
               <i className="bi bi-calendar-week"></i> {t('calendar.weekly_view')}
             </h4>
@@ -588,7 +588,7 @@ function CalendarPage({
 
           {/* Calendrier - Vue mobile uniquement */}
           {stockDecrementMethod  === "daily_midnight" && (
-            <div className="d-block d-md-none">
+            <div className="d-block d-lg-none">
               <h4 className="mb-3 fw-bold">
                 <i className="bi bi-calendar-week"></i> {t('calendar.daily_view')}
               </h4>
