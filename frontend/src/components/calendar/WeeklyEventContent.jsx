@@ -106,13 +106,15 @@ export default function WeeklyEventContent({
                     </div>
 
                     <div className="flex-grow-1">
-                      <div style={{ fontWeight: 600 }}>{event.title}</div>
-                              {event.dose != null && (
-                                <div className="text-muted" style={{ fontSize: 13 }}>{event.dose} mg</div>
-                              )}
-                              {event.notes && (
-                                <div className="text-muted mt-1" style={{ fontSize: 13 }}>{event.notes}</div>
-                              )}
+                      <div style={{ fontWeight: 600 }}>
+                        {event.title}
+                      </div>
+                      {event.dose != null && (
+                        <div className="text-muted" style={{ fontSize: 13 }}>{event.dose} mg</div>
+                      )}
+                      {event.notes && (
+                        <div className="text-muted mt-1" style={{ fontSize: 13 }}>{event.notes}</div>
+                      )}
                     </div>
 
                     <div style={{ marginLeft: 12 }} className="text-end">
