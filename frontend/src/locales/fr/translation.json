@@ -211,6 +211,9 @@
     "title": "Commencez dès aujourd’hui"
   },
   "date": "Date",
+  "day_view": {
+    "title": "Vue journalière"
+  },
   "delete": "Supprimer",
   "delete_access": "Supprimer l'accès",
   "delete_access_confirm": "Supprimer l'accès ?",

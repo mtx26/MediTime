@@ -211,6 +211,9 @@
     "title": "Empieza hoy"
   },
   "date": "Fecha",
+  "day_view": {
+    "title": "Vista diaria"
+  },
   "delete": "BORRAR",
   "delete_access": "Eliminar el acceso",
   "delete_access_confirm": "¿Quitar el acceso?",
