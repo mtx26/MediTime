@@ -25,7 +25,8 @@ function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars })
     basePath = 'shared-token-calendar';
   }
 
-  const selectedDate = new URLSearchParams(location.search).get('date');
+  const selectedDateParam = new URLSearchParams(location.search).get('date');
+  const selectedDate = selectedDateParam ? new Date(selectedDateParam) : undefined;
 
   return (
     <ForcedLandscapeWrapper>

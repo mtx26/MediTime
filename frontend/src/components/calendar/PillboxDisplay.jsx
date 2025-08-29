@@ -4,6 +4,7 @@ import { UserContext } from '../../contexts/UserContext';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import isEqual from 'lodash/isEqual';
 import { useTranslation } from 'react-i18next';
+import { toISO } from '../../utils/calendar/dateUtils';
 import AlertSystem from '../common/AlertSystem';
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -54,7 +55,8 @@ export default function PillboxDisplay({
   useEffect(() => {
     const load = async () => {
       setLoading(undefined);
-      const rep = await calendarSource.fetchSchedule(calendarId, selectedDate);
+      const dateParam = selectedDate ? toISO(selectedDate) : undefined;
+      const rep = await calendarSource.fetchSchedule(calendarId, dateParam);
       if (rep.success && !isEqual(rep.table, calendarTable)) {
         setCalendarTable(rep.table);
       }

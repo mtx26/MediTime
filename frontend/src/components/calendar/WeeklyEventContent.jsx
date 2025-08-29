@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import ArrowControls from './ArrowControls';
 import WeekDayCircles from './WeekDayCircles';
-import { getMondayFromDate, getWeekDaysISOStrings } from '../../utils/calendar/dateUtils';
+import { getMondayDate, formatToLocalISODate, toISO } from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
@@ -13,21 +13,24 @@ export default function WeeklyEventContent({
   onNext,
   onPrev,
   getPastWeek,
-  getNextWeek
+  getNextWeek,
+  // optional: pass precomputed monday ISO string to avoid recomputing
+  monday: mondayProp,
 }) {
   const { t, i18n } = useTranslation();
-  const monday = getMondayFromDate(selectedDate);
-  const weekDays = getWeekDaysISOStrings(monday);
-  const isFirstDay = weekDays[0] === selectedDate;
-  const isLastDay = weekDays[6] === selectedDate;
-
-  useEffect(() => {
-    console.log('Navigating week', isFirstDay);
-  }, [isFirstDay]);
-
-  useEffect(() => {
-    console.log('Navigating week', isLastDay);
-  }, [isLastDay]);
+  // work with Date objects internally
+  const selDate = selectedDate instanceof Date ? selectedDate : new Date(selectedDate);
+  const mondayDate = mondayProp instanceof Date ? mondayProp : getMondayDate(selDate);
+  const weekDates = [...Array(7)].map((_, i) => {
+    const d = new Date(mondayDate);
+    d.setDate(d.getDate() + i);
+    d.setHours(0,0,0,0);
+    return d;
+  });
+  const selIso = toISO(selDate);
+  const weekIsos = weekDates.map((d) => formatToLocalISODate(d));
+  const isFirstDay = weekIsos[0] === selIso;
+  const isLastDay = weekIsos[6] === selIso;
 
   // Presentation: no expand/collapse state, always show details when present
 
@@ -38,7 +41,7 @@ export default function WeeklyEventContent({
 
       {/* Week day selector (hidden in modal mode) */}
       <div className="mb-2 d-flex justify-content-center">
-        <WeekDayCircles selectedDate={selectedDate} onSelectDate={onSelectDate} />
+  <WeekDayCircles selectedDate={selDate} onSelectDate={onSelectDate} monday={mondayDate} />
       </div>
 
       {/* Header: big date + prev/next tactile buttons */}
@@ -57,10 +60,10 @@ export default function WeeklyEventContent({
           <div className="d-flex align-items-center justify-content-center">
             <div>
               <div className="text-muted" style={{ fontSize: 12, textTransform: 'capitalize' }}>
-                {new Date(selectedDate).toLocaleDateString(i18n.language || undefined, { weekday: 'long' })}
+                {selDate.toLocaleDateString(i18n.language || undefined, { weekday: 'long' })}
               </div>
               <div style={{ fontWeight: 600, fontSize: 16 }}>
-                {new Date(selectedDate).toLocaleDateString(i18n.language || undefined, {
+                {selDate.toLocaleDateString(i18n.language || undefined, {
                   day: '2-digit',
                   month: 'long',
                   year: 'numeric',
@@ -145,11 +148,12 @@ export default function WeeklyEventContent({
 
 WeeklyEventContent.propTypes = {
   ifModal: PropTypes.bool.isRequired,
-  selectedDate: PropTypes.string.isRequired,
+  selectedDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
   eventsForDay: PropTypes.array.isRequired,
   onSelectDate: PropTypes.func.isRequired,
   onNext: PropTypes.func.isRequired,
   onPrev: PropTypes.func.isRequired,
   getPastWeek: PropTypes.func.isRequired,
   getNextWeek: PropTypes.func.isRequired,
+  monday: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
 };

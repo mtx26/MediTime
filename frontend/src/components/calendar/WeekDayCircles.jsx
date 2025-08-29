@@ -1,11 +1,19 @@
-import { getWeekDaysISOStrings, getMondayFromDate, formatToLocalISODate } from '../../utils/calendar/dateUtils';
+import { getMondayDate } from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
-export default function WeekDayCircles({ selectedDate, onSelectDate }) {
+export default function WeekDayCircles({ selectedDate, onSelectDate, monday: mondayProp }) {
   const { i18n } = useTranslation();
-  const today = formatToLocalISODate(new Date());
-  const monday = getMondayFromDate(selectedDate);
+  // normalise les dates à minuit pour comparaisons simples
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const mondayDate = mondayProp instanceof Date ? mondayProp : getMondayDate(selectedDate);
+  const weekDates = [...Array(7)].map((_, i) => {
+    const d = new Date(mondayDate);
+    d.setDate(d.getDate() + i);
+    d.setHours(0,0,0,0);
+    return d;
+  });
 
   return (
     <div
@@ -19,13 +27,13 @@ export default function WeekDayCircles({ selectedDate, onSelectDate }) {
         alignItems: 'center',
       }}
     >
-      {getWeekDaysISOStrings(monday).map((day, index) => {
-        const isSelected = day === selectedDate;
-        const isToday = day === today;
+      {weekDates.map((day, index) => {
+        const isSelected = day.getTime() === selectedDate.getTime();
+        const isToday = day.getTime() === today.getTime();
 
-  const baseClassStart = 'btn btn-sm rounded-pill d-inline-flex align-items-center justify-content-center shadow-sm';
-  const colorClass = isToday ? 'btn-success text-white' : isSelected ? 'btn-primary text-white' : 'btn-light text-dark';
-  const baseClass = `${baseClassStart} ${colorClass} ${isToday ? 'shadow-lg' : ''}`;
+        const baseClassStart = 'btn btn-sm rounded-pill d-inline-flex align-items-center justify-content-center shadow-sm';
+        const colorClass = isToday ? 'btn-success text-white' : isSelected ? 'btn-primary text-white' : 'btn-light text-dark';
+        const baseClass = `${baseClassStart} ${colorClass} ${isToday ? 'shadow-lg' : ''}`;
 
         const ariaLabel = `Aller au ${new Date(day).toLocaleDateString(i18n.language || undefined, {
           weekday: 'long',
@@ -52,20 +60,20 @@ export default function WeekDayCircles({ selectedDate, onSelectDate }) {
             role="button"
             tabIndex={0}
             aria-label={ariaLabel}
-            onClick={() => onSelectDate(formatToLocalISODate(day))}
+            onClick={() => onSelectDate(day)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                onSelectDate(formatToLocalISODate(day));
+                if (e.key === 'Enter' || e.key === ' ') {
+                onSelectDate(day);
               }
             }}
             style={pillStyle}
           >
             <div className="d-flex flex-column align-items-center justify-content-center">
               <div style={{ fontSize: 9, lineHeight: 1, textTransform: 'capitalize' }}>
-                {new Date(day).toLocaleDateString(i18n.language || undefined, { weekday: 'short' })}
+                {day.toLocaleDateString(i18n.language || undefined, { weekday: 'short' })}
               </div>
               <div style={{ fontWeight: 700, lineHeight: 1 }}>
-                {new Date(day).getDate()}
+                {day.getDate()}
               </div>
             </div>
           </button>
@@ -76,6 +84,7 @@ export default function WeekDayCircles({ selectedDate, onSelectDate }) {
 }
 
 WeekDayCircles.propTypes = {
-  selectedDate: PropTypes.string.isRequired,
+  selectedDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
   onSelectDate: PropTypes.func.isRequired,
+  monday: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
 };

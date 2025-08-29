@@ -6,7 +6,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../contexts/UserContext';
-import { formatToLocalISODate, getMondayFromDate } from '../../utils/calendar/dateUtils';
+import { getMondayDate, toISO } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import AlertSystem from '../../components/common/AlertSystem';
 import isEqual from 'lodash/isEqual';
@@ -33,9 +33,8 @@ function CalendarPage({
   const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
 
   const calendarRef = useRef(null);
-  const [selectedDate, setSelectedDate] = useState(
-    formatToLocalISODate(new Date())
-  ); // Date sélectionnée
+  // garder selectedDate comme objet Date pour manipulations faciles
+  const [selectedDate, setSelectedDate] = useState(new Date().setHours(0,0,0,0)); // Date JS
   const [eventsForDay, setEventsForDay] = useState([]); // Événements filtrés pour un jour spécifique
   const [calendarEvents, setCalendarEvents] = useState([]); // Événements du calendrier
   const [calendarTable, setCalendarTable] = useState([]); // Événements du calendrier
@@ -51,12 +50,14 @@ function CalendarPage({
   const dateModalRef = useRef(null);
   const [loading, setLoading] = useState(true); // État de chargement du calendrier
 
-  const [startDate, setStartDate] = useState(() => {
-    const date = new Date();
-    date.setDate(date.getDate() + 7); // semaine suivante
-    return getMondayFromDate(date);
-  });
+  // une seule source de vérité pour la date : `selectedDate`
+  // et on dérive le lundi correspondant depuis `selectedDate`
+  // monday as Date object derived from selectedDate Date
+  const monday = useMemo(() => getMondayDate(selectedDate), [selectedDate]);
+  // lundi initial recommandé (semaine suivante) utilisé pour l'init minimale
+  const initialMondayDate = useMemo(() => getMondayDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0)), []);
 
+  
   let calendarType = 'personal';
   let calendarId = params.calendarId;
   let basePath = 'calendar';
@@ -81,31 +82,36 @@ function CalendarPage({
   )[calendarType];
 
   // Fonction pour naviguer vers une date
-  const onSelectDate = (isoDate) => {
-    setSelectedDate(isoDate);
-    setEventsForDay(calendarEvents.filter((e) => e.start.startsWith(isoDate)));
+  const onSelectDate = (dateInput) => {
+    // accepte Date ou ISO string
+    const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    setSelectedDate(d);
+    setEventsForDay(calendarEvents.filter((e) => e.start.startsWith(toISO(d))));
   };
 
   // Fonction pour naviguer vers la semaine suivante ou precedente
   // accepte un second argument optionnel `desiredSelectedDate` (ISO string)
   // pour préserver le jour sélectionné lors du changement de semaine.
-  const onWeekSelect = async (monday, desiredSelectedDate) => {
-    const isoDate = formatToLocalISODate(monday);
-    setStartDate(isoDate);
+  const onWeekSelect = async (mondayDate, desiredSelectedDate) => {
+    const isoDate = toISO(mondayDate);
     const rep = await calendarSource.fetchSchedule(calendarId, isoDate);
     if (rep.success) {
       setCalendarEvents(rep.schedule);
       setCalendarTable(rep.table);
       calendarRef.current?.getApi().gotoDate(isoDate);
       // Si une date désirée est fournie, l'utiliser, sinon rester sur le lundi
-      onSelectDate(desiredSelectedDate ? desiredSelectedDate : isoDate);
+      if (desiredSelectedDate) {
+        onSelectDate(desiredSelectedDate);
+      } else {
+        onSelectDate(isoDate);
+      }
     }
   };
 
   // Fonction pour gérer le clic sur une date
   const handleDateClick = (info) => {
-    const clickedDate = info.dateStr;
-    setSelectedDate(clickedDate);
+    const clickedDate = info.dateStr; // YYYY-MM-DD
+    setSelectedDate(new Date(clickedDate));
     dateModalRef.current?.open();
   };
 
@@ -113,16 +119,15 @@ function CalendarPage({
   const navigateDay = (direction) => {
     const current = new Date(selectedDate);
     current.setDate(current.getDate() + direction);
-    const newDate = formatToLocalISODate(current);
-    setSelectedDate(newDate);
+    setSelectedDate(current);
   };
 
   const navigateWeek = (direction) => {
     const current = new Date(selectedDate);
     current.setDate(current.getDate() + direction);
-    const newSelectedDate = formatToLocalISODate(current);
-    const monday = getMondayFromDate(current);
-    onWeekSelect(monday, newSelectedDate);
+    const newSelectedDate = current;
+    const mondayDate = getMondayDate(newSelectedDate);
+    onWeekSelect(mondayDate, newSelectedDate);
   };
 
   // Fonction pour charger le calendrier lorsque l'utilisateur est connecté ou que le calendrier est un token
@@ -172,9 +177,21 @@ function CalendarPage({
     fetchMethod();
   }, [calendarId, calendarType, userInfo]);
 
+  // Si la méthode est weekly_pillbox et que l'utilisateur n'a pas choisi
+  // explicitement une date (on est encore sur aujourd'hui), on bascule
+  // la sélection sur le lundi initial (semaine suivante). Simple et non intrusif.
+  useEffect(() => {
+    if (stockDecrementMethod !== 'weekly_pillbox') return;
+    const today = new Date();
+    const sameDay = (a, b) => new Date(a).toDateString() === new Date(b).toDateString();
+    if (sameDay(selectedDate, today)) {
+      setSelectedDate(initialMondayDate);
+    }
+  }, [stockDecrementMethod, selectedDate, initialMondayDate]);
+
   // 📍 Filtrage des événements pour un jour spécifique et tri par ordre alphabétique
   useEffect(() => {
-    if (!selectedDate || !calendarEvents.length) return;
+  if (!selectedDate || !calendarEvents.length) return;
     const sortedEvents = calendarEvents.sort((a, b) => {
       const dateA = new Date(a.start);
       const dateB = new Date(b.start);
@@ -184,7 +201,7 @@ function CalendarPage({
       return dateA.getTime() - dateB.getTime();
     });
     const filtered = sortedEvents.filter((event) =>
-      event.start.startsWith(selectedDate)
+      event.start.startsWith(toISO(selectedDate))
     );
     setEventsForDay(filtered);
   }, [selectedDate, calendarEvents]);
@@ -258,7 +275,7 @@ function CalendarPage({
                             <i className="bi bi-grid-3x3-gap me-2" /> {t('pillbox.title')}
                           </>
                         ),
-                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/pillbox?date=${selectedDate}`),
+                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`),
                       },
                       {
                         label: (
@@ -337,7 +354,7 @@ function CalendarPage({
                             <i className="bi bi-grid-3x3-gap me-2" /> {t('pillbox.title')}
                           </>
                         ),
-                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/pillbox?date=${selectedDate}`),
+                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`),
                       },
                       {
                         label: (
@@ -404,7 +421,7 @@ function CalendarPage({
               <div className='d-block d-lg-none'>
                 <CalendarWeekSelector
                   calendarTable={calendarTable}
-                  startDate={startDate}
+                  monday={monday}
                   onWeekSelect={onWeekSelect}
                   t={t}
                 />
@@ -413,7 +430,7 @@ function CalendarPage({
             <div className='d-none d-lg-block'>
               <CalendarWeekSelector
                 calendarTable={calendarTable}
-                startDate={startDate}
+                monday={monday}
                 onWeekSelect={onWeekSelect}
                 t={t}
               />
@@ -434,9 +451,9 @@ function CalendarPage({
                     <button
                       className="btn btn-outline-success w-100"
                       onClick={() =>
-                        navigate(
-                          `/${lng}/${basePath}/${calendarId}/pillbox?date=${startDate}`
-                        )}
+                          navigate(
+                            `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(monday)}`
+                          )}
                     >
                       <i className="bi bi-capsule"></i> {t('pillbox.fill')}
                     </button>
@@ -452,7 +469,7 @@ function CalendarPage({
                 <div className='border rounded pb-3 shadow'>
                   <PillboxDisplay
                     type="calendar"
-                    selectedDate={startDate}
+                    selectedDate={monday}
                     calendarType={calendarType}
                     calendarId={calendarId}
                     basePath={basePath}
@@ -587,15 +604,15 @@ function CalendarPage({
 
             {/* Modal pour afficher les médicaments d'une date */}
             <DateModal
-              ref={dateModalRef}
-              selectedDate={selectedDate}
-              eventsForDay={eventsForDay}
-              onNext={() => navigateDay(1)}
-              onPrev={() => navigateDay(-1)}
-              onSelectDate={onSelectDate}
-              getPastWeek={() => navigateWeek(-1)}
-              getNextWeek={() => navigateWeek(1)}
-            />
+                ref={dateModalRef}
+                selectedDate={selectedDate}
+                eventsForDay={eventsForDay}
+                onNext={() => navigateDay(1)}
+                onPrev={() => navigateDay(-1)}
+                onSelectDate={onSelectDate}
+                getPastWeek={() => navigateWeek(-1)}
+                getNextWeek={() => navigateWeek(1)}
+              />
           </div>
 
           {/* Calendrier - Vue mobile uniquement */}
@@ -610,6 +627,7 @@ function CalendarPage({
                   <WeeklyEventContent
                     ifModal={false}
                     selectedDate={selectedDate}
+                    monday={monday}
                     eventsForDay={eventsForDay}
                     onSelectDate={onSelectDate}
                     onNext={() => navigateDay(1)}
@@ -634,7 +652,7 @@ function CalendarPage({
 
 function CalendarWeekSelector({
   calendarTable,
-  startDate,
+  monday,
   onWeekSelect,
   t
 }) {
@@ -648,7 +666,7 @@ function CalendarWeekSelector({
         </h4>
         <div className='shadow'>
           <WeekCalendarSelector
-            selectedDate={startDate}
+            selectedDate={monday}
             onWeekSelect={onWeekSelect}
           />
         </div>
