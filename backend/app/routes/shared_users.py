@@ -281,7 +281,7 @@ def handle_shared_user_notifications(calendar_id):
                 if not calendar:
                     return warning_response(
                         message="calendrier partagé non trouvé",
-                        code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
+                        code="CALENDAR_NOT_FOUND",
                         status_code=404,
                         log_extra={"calendar_id": calendar_id}
                     )
@@ -309,20 +309,9 @@ def handle_shared_user_notifications(calendar_id):
 @with_query_origin(default_origin="SHARED_USER_NOTIFICATIONS_ENABLED_UPDATE")
 def handle_shared_user_notifications_update(calendar_id):
     try:
-
-        payload = request.get_json(force=True)
-        notifications_enabled = payload.get("notifications-enabled")
-
-        if not notifications_enabled:
-            return warning_response(
-                message="Données manquantes",
-                code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
-                status_code=400,
-                log_extra={"calendar_id": calendar_id}
-            )
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("UPDATE shared_calendars SET notifications_enabled = %s WHERE calendar_id = %s", (notifications_enabled, calendar_id))
+                cursor.execute("UPDATE shared_calendars SET notifications_enabled = NOT notifications_enabled WHERE calendar_id = %s", (calendar_id,))
 
         return success_response(
             message="Notifications mises à jour",
