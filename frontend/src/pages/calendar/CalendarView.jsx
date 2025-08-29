@@ -6,7 +6,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../contexts/UserContext';
-import { formatToLocalISODate, getMondayFromDate } from '../../utils/calendar/dateUtils';
+import { getMondayDate, toISO } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import AlertSystem from '../../components/common/AlertSystem';
 import isEqual from 'lodash/isEqual';
@@ -33,9 +33,8 @@ function CalendarPage({
   const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
 
   const calendarRef = useRef(null);
-  const [selectedDate, setSelectedDate] = useState(
-    formatToLocalISODate(new Date())
-  ); // Date sélectionnée
+  // garder selectedDate comme objet Date pour manipulations faciles
+  const [selectedDate, setSelectedDate] = useState(new Date().setHours(0,0,0,0)); // Date JS
   const [eventsForDay, setEventsForDay] = useState([]); // Événements filtrés pour un jour spécifique
   const [calendarEvents, setCalendarEvents] = useState([]); // Événements du calendrier
   const [calendarTable, setCalendarTable] = useState([]); // Événements du calendrier
@@ -43,17 +42,31 @@ function CalendarPage({
   const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
   const [alertType, setAlertType] = useState(''); // Type d'alerte
   const [alertMessage, setAlertMessage] = useState(''); // Message d'alerte
+  // Méthode de décrémentation du stock (pour affichage différencié)
+  const [stockDecrementMethod, setStockDecrementMethod] = useState('');
+  const [loadingStockMethod, setLoadingStockMethod] = useState(false);
 
   // 🔄 Références et chargement
   const dateModalRef = useRef(null);
-  const [loading, setLoading] = useState(undefined); // État de chargement du calendrier
+  const [loading, setLoading] = useState(true); // État de chargement du calendrier
 
-  const [startDate, setStartDate] = useState(() => {
-    const date = new Date();
-    date.setDate(date.getDate() + 7); // semaine suivante
-    return getMondayFromDate(date);
-  });
+  // une seule source de vérité pour la date : `selectedDate`
+  // et on dérive le lundi correspondant depuis `selectedDate`
+  // monday as Date object derived from selectedDate Date
+  const [monday, setMonday] = useState(() => getMondayDate(selectedDate));
+  useEffect(() => {
+    // Compare les dates par valeur (timestamp) pour éviter une boucle
+    // causée par la création d'objets Date différents à chaque rendu.
+    const newMonday = getMondayDate(selectedDate);
+    if (!monday || newMonday.getTime() !== new Date(monday).getTime()) {
+      setMonday(newMonday);
+    }
+  }, [selectedDate]);
 
+  // lundi initial recommandé (semaine suivante) utilisé pour l'init minimale
+  const initialMondayDate = useMemo(() => getMondayDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0)), []);
+
+  
   let calendarType = 'personal';
   let calendarId = params.calendarId;
   let basePath = 'calendar';
@@ -78,28 +91,36 @@ function CalendarPage({
   )[calendarType];
 
   // Fonction pour naviguer vers une date
-  const onSelectDate = (isoDate) => {
-    setSelectedDate(isoDate);
-    setEventsForDay(calendarEvents.filter((e) => e.start.startsWith(isoDate)));
+  const onSelectDate = (dateInput) => {
+    // accepte Date ou ISO string
+    const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    setSelectedDate(d);
+    setEventsForDay(calendarEvents.filter((e) => e.start.startsWith(toISO(d))));
   };
 
   // Fonction pour naviguer vers la semaine suivante ou precedente
-  const onWeekSelect = async (monday) => {
-    const isoDate = formatToLocalISODate(monday);
-    setStartDate(isoDate);
+  // accepte un second argument optionnel `desiredSelectedDate` (ISO string)
+  // pour préserver le jour sélectionné lors du changement de semaine.
+  const onWeekSelect = async (mondayDate, desiredSelectedDate) => {
+    const isoDate = toISO(mondayDate);
     const rep = await calendarSource.fetchSchedule(calendarId, isoDate);
     if (rep.success) {
       setCalendarEvents(rep.schedule);
       setCalendarTable(rep.table);
       calendarRef.current?.getApi().gotoDate(isoDate);
-      onSelectDate(isoDate);
+      // Si une date désirée est fournie, l'utiliser, sinon rester sur le lundi
+      if (desiredSelectedDate) {
+        onSelectDate(desiredSelectedDate);
+      } else {
+        onSelectDate(isoDate);
+      }
     }
   };
 
   // Fonction pour gérer le clic sur une date
   const handleDateClick = (info) => {
-    const clickedDate = info.dateStr;
-    setSelectedDate(clickedDate);
+    const clickedDate = info.dateStr; // YYYY-MM-DD
+    setSelectedDate(new Date(clickedDate));
     dateModalRef.current?.open();
   };
 
@@ -107,22 +128,22 @@ function CalendarPage({
   const navigateDay = (direction) => {
     const current = new Date(selectedDate);
     current.setDate(current.getDate() + direction);
-    const newDate = formatToLocalISODate(current);
-    setSelectedDate(newDate);
+    setSelectedDate(current);
+  };
+
+  const navigateWeek = (direction) => {
+    const current = new Date(selectedDate);
+    current.setDate(current.getDate() + direction);
+    const newSelectedDate = current;
+    const mondayDate = getMondayDate(newSelectedDate);
+    onWeekSelect(mondayDate, newSelectedDate);
   };
 
   // Fonction pour charger le calendrier lorsque l'utilisateur est connecté ou que le calendrier est un token
   useEffect(() => {
-    if (!calendarId) return;
+    if (!calendarId) return setLoading(true);
     if (calendarType === 'personal' || calendarType === 'sharedUser') {
-      if (!userInfo) {
-        setLoading(undefined);
-        return;
-      }
-      if (!userInfo) {
-        setLoading(undefined);
-        return;
-      }
+      if (!userInfo) return setLoading(true);
     }
     const load = async () => {
       const rep = await calendarSource.fetchSchedule(calendarId);
@@ -140,17 +161,48 @@ function CalendarPage({
           setIsLowStock(rep.ifLowStock);
           // TODO: Hook pour alerte stock faible en temps réel
         }
-        setLoading(!rep.success);
       }
+      setLoading(rep.success ? false : undefined);
     };
 
     load();
   }, [calendarId, calendarSource.fetchSchedule, userInfo]);
 
+  // Charger la méthode de décrémentation du stock (si disponible)
+  useEffect(() => {
+    const fetchMethod = async () => {
+      if (!calendarId) return setLoadingStockMethod(false);
+      if (calendarType === 'personal' || calendarType === 'sharedUser') {
+        if (!userInfo) return setLoading(true);
+      }
+      // On tente pour les calendriers personal et sharedUser en appelant l'API exposée
+      const rep = await calendarSource.fetchStockDecrementMethod(calendarId);
+      if (rep.success) {
+        setStockDecrementMethod(rep.method);
+      }
+      setLoadingStockMethod((rep.success ? false : undefined));
+    };
+
+    fetchMethod();
+  }, [calendarId, calendarType, userInfo]);
+
+  // Si la méthode est weekly_pillbox et que l'utilisateur n'a pas choisi
+  // explicitement une date (on est encore sur aujourd'hui), on bascule
+  // la sélection sur le lundi initial (semaine suivante). Simple et non intrusif.
+  useEffect(() => {
+    if (stockDecrementMethod !== 'weekly_pillbox') return;
+    const today = new Date();
+    const sameDay = (a, b) => new Date(a).toDateString() === new Date(b).toDateString();
+    if (sameDay(selectedDate, today)) {
+      setSelectedDate(initialMondayDate);
+    }
+  }, [stockDecrementMethod, selectedDate, initialMondayDate]);
+
   // 📍 Filtrage des événements pour un jour spécifique et tri par ordre alphabétique
   useEffect(() => {
-    if (!selectedDate || !calendarEvents.length) return;
-    const sortedEvents = calendarEvents.sort((a, b) => {
+  if (!selectedDate || !calendarEvents.length) return;
+  // Copier avant de trier pour éviter de muter le tableau d'état `calendarEvents`
+  const sortedEvents = [...calendarEvents].sort((a, b) => {
       const dateA = new Date(a.start);
       const dateB = new Date(b.start);
       if (dateA.getTime() === dateB.getTime()) {
@@ -159,7 +211,7 @@ function CalendarPage({
       return dateA.getTime() - dateB.getTime();
     });
     const filtered = sortedEvents.filter((event) =>
-      event.start.startsWith(selectedDate)
+      event.start.startsWith(toISO(selectedDate))
     );
     setEventsForDay(filtered);
   }, [selectedDate, calendarEvents]);
@@ -173,7 +225,7 @@ function CalendarPage({
     }));
   }, [calendarEvents]);
 
-  if (loading === undefined && calendarId) {
+  if (loading === true && calendarId) {
     return (
       <div
         className="d-flex justify-content-center align-items-center"
@@ -186,7 +238,7 @@ function CalendarPage({
     );
   }
 
-  if (loading === true && calendarId) {
+  if ((loading === undefined || loadingStockMethod) && calendarId) {
     return (
       <div className="alert alert-danger text-center mt-5" role="alert">
         ❌ {t('invalid_or_expired_link')}
@@ -199,7 +251,7 @@ function CalendarPage({
 
       <div className="container mt-2">
         <div className="row justify-content-center">
-          <div className="col-12 col-lg-4 mb-4">
+          <div className="col-12 col-lg-4 mb-2">
             <div className="mb-3">
               {/* Alert system */}
               <AlertSystem
@@ -209,7 +261,6 @@ function CalendarPage({
                   setAlertMessage('');
                 }}
               />
-
               {/* Boutons de navigation et partage */}
               <div className="d-flex align-items-center gap-2 mb-3">
                 {/* Bouton Médicaments qui prend tout l'espace dispo */}
@@ -227,6 +278,24 @@ function CalendarPage({
                 {calendarType === 'personal' && (
                   <ActionSheet
                     actions={[
+                      // view toggle actions
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-grid-3x3-gap me-2" /> {t('pillbox.title')}
+                          </>
+                        ),
+                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`),
+                      },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-calendar-day me-2" /> {t('day_view.title')}
+                          </>
+                        ),
+                        // TODO: implement daily view navigation
+                      },
+                      { separator: true },
                       {
                         label: (
                           <>
@@ -288,6 +357,24 @@ function CalendarPage({
                 {calendarType === 'sharedUser' && (
                   <ActionSheet
                     actions={[
+                      // view toggle for shared users too
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-grid-3x3-gap me-2" /> {t('pillbox.title')}
+                          </>
+                        ),
+                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`),
+                      },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-calendar-day me-2" /> {t('day_view.title')}
+                          </>
+                        ),
+                        // TODO: implement daily view navigation
+                      },
+                      { separator: true },
                       {
                         label: (
                           <>
@@ -339,23 +426,25 @@ function CalendarPage({
               )}
 
             </div>
-
             {/* Bouton pour naviguer vers la semaine suivante ou precedente */}
-            {Object.keys(calendarTable).filter(
-              (key) => calendarTable[key].length > 0
-            ).length > 0 && (
-              <div className="mb-2">
-                <h4 className="mb-3 fw-bold">
-                  <i className="bi bi-calendar-date"></i> {t('calendar.reference_week')}
-                </h4>
-                <div className='shadow'>
-                  <WeekCalendarSelector
-                    selectedDate={startDate}
-                    onWeekSelect={onWeekSelect}
-                  />
-                </div>
+            {stockDecrementMethod === "weekly_pillbox" && (
+              <div className='d-block d-lg-none'>
+                <CalendarWeekSelector
+                  calendarTable={calendarTable}
+                  monday={monday}
+                  onWeekSelect={onWeekSelect}
+                  t={t}
+                />
               </div>
             )}
+            <div className='d-none d-lg-block'>
+              <CalendarWeekSelector
+                calendarTable={calendarTable}
+                monday={monday}
+                onWeekSelect={onWeekSelect}
+                t={t}
+              />
+            </div>
           </div>
 
           {/* Pilulier */}
@@ -363,22 +452,24 @@ function CalendarPage({
           .length > 0 && (
             <>
               {/* Pilulier - Vue mobile */}
-              <div className="d-block d-lg-none col-12 col-lg-8 mb-4">
-                <div className="mb-2">
-                  <h4 className="mb-3 fw-bold">
-                    <i className="bi bi-capsule"></i> {t('pillbox.title')}
-                  </h4>
-                  <button
-                    className="btn btn-outline-success w-100"
-                    onClick={() =>
-                      navigate(
-                        `/${lng}/${basePath}/${calendarId}/pillbox?date=${startDate}`
-                      )}
-                  >
-                    <i className="bi bi-capsule"></i> {t('pillbox.fill')}
-                  </button>
+              {stockDecrementMethod === "weekly_pillbox" && (
+                <div className="d-block d-lg-none col-12 col-lg-8 mb-4">
+                  <div className="mb-2">
+                    <h4 className="mb-3 fw-bold">
+                      <i className="bi bi-capsule"></i> {t('pillbox.title')}
+                    </h4>
+                    <button
+                      className="btn btn-outline-success w-100"
+                      onClick={() =>
+                          navigate(
+                            `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(monday)}`
+                          )}
+                    >
+                      <i className="bi bi-capsule"></i> {t('pillbox.fill')}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Pilulier - Vue desktop */}
               <div className="d-none d-lg-block col-12 col-lg-8 mb-4">
@@ -388,7 +479,7 @@ function CalendarPage({
                 <div className='border rounded pb-3 shadow'>
                   <PillboxDisplay
                     type="calendar"
-                    selectedDate={startDate}
+                    monday={monday}
                     calendarType={calendarType}
                     calendarId={calendarId}
                     basePath={basePath}
@@ -481,7 +572,7 @@ function CalendarPage({
         .length > 0 ? (
         <div className="container mt-4">
           {/* Calendrier mensuel */}
-          <div className="container d-none d-md-block">
+          <div className="container d-none d-lg-block">
             <h4 className="mb-3 fw-bold">
               <i className="bi bi-calendar-week"></i> {t('calendar.weekly_view')}
             </h4>
@@ -523,34 +614,41 @@ function CalendarPage({
 
             {/* Modal pour afficher les médicaments d'une date */}
             <DateModal
-              ref={dateModalRef}
-              selectedDate={selectedDate}
-              eventsForDay={eventsForDay}
-              onNext={() => navigateDay(1)}
-              onPrev={() => navigateDay(-1)}
-              onSelectDate={onSelectDate}
-            />
+                ref={dateModalRef}
+                selectedDate={selectedDate}
+                eventsForDay={eventsForDay}
+                onNext={() => navigateDay(1)}
+                onPrev={() => navigateDay(-1)}
+                onSelectDate={onSelectDate}
+                getPastWeek={() => navigateWeek(-1)}
+                getNextWeek={() => navigateWeek(1)}
+              />
           </div>
 
           {/* Calendrier - Vue mobile uniquement */}
-          <div className="d-block d-md-none">
-            <h4 className="mb-3 fw-bold">
-              <i className="bi bi-calendar-week"></i> {t('calendar.daily_view')}
-            </h4>
+          {stockDecrementMethod  === "daily_midnight" && (
+            <div className="d-block d-lg-none">
+              <h4 className="mb-3 fw-bold">
+                <i className="bi bi-calendar-week"></i> {t('calendar.daily_view')}
+              </h4>
 
-            <div className="card shadow">
-              <div className="card-body">
-                <WeeklyEventContent
-                  ifModal={false}
-                  selectedDate={selectedDate}
-                  eventsForDay={eventsForDay}
-                  onSelectDate={onSelectDate}
-                  onNext={() => navigateDay(1)}
-                  onPrev={() => navigateDay(-1)}
-                />
+              <div className="card shadow">
+                <div className="card-body">
+                  <WeeklyEventContent
+                    ifModal={false}
+                    selectedDate={selectedDate}
+                    monday={monday}
+                    eventsForDay={eventsForDay}
+                    onSelectDate={onSelectDate}
+                    onNext={() => navigateDay(1)}
+                    onPrev={() => navigateDay(-1)}
+                    getPastWeek={() => navigateWeek(-1)}
+                    getNextWeek={() => navigateWeek(1)}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       ) : (
         <div className="alert alert-info mt-4 mb-0" role="alert">
@@ -560,6 +658,31 @@ function CalendarPage({
       )}
     </>
   );
+}
+
+function CalendarWeekSelector({
+  calendarTable,
+  monday,
+  onWeekSelect,
+  t
+}) {
+  return (
+    Object.keys(calendarTable).filter(
+      (key) => calendarTable[key].length > 0
+    ).length > 0 && (
+      <div className="mb-2">
+        <h4 className="mb-3 fw-bold">
+          <i className="bi bi-calendar-date"></i> {t('calendar.reference_week')}
+        </h4>
+        <div className='shadow'>
+          <WeekCalendarSelector
+            selectedDate={monday}
+            onWeekSelect={onWeekSelect}
+          />
+        </div>
+      </div>
+    )
+  )
 }
 
 export default CalendarPage;

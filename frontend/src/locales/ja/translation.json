@@ -211,6 +211,9 @@
     "title": "今すぐ始めましょう"
   },
   "date": "日付",
+  "day_view": {
+    "title": "日次ビュー"
+  },
   "delete": "消去",
   "delete_access": "アクセスを削除",
   "delete_access_confirm": "アクセスを削除しますか?",

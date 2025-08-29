@@ -340,3 +340,38 @@ def handle_shared_user_notifications_update(calendar_id):
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
+
+@api.route("/shared/users/calendars/<calendar_id>/stock-decrement-method", methods=["GET"])
+@measure_time()
+@require_auth
+@verify_calendar_share
+@with_query_origin(default_origin="SHARED_USER_STOCK_DECREMENT_METHOD_FETCH")
+def get_shared_user_stock_decrement_method(calendar_id):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT stock_decrement_method FROM calendars WHERE id = %s", (calendar_id,))
+                result = cursor.fetchone()
+                if result is None:
+                    return warning_response(
+                        message=ERROR_CALENDAR_NOT_FOUND,
+                        code="SHARED_USER_STOCK_DECREMENT_METHOD_FETCH_ERROR",
+                        status_code=404,
+                        log_extra={"calendar_id": calendar_id}
+                    )
+                method = result.get("stock_decrement_method")
+
+        return success_response(
+            message="méthode de diminution de stock récupérée",
+            code="SHARED_USER_STOCK_DECREMENT_METHOD_FETCH_SUCCESS",
+            data={"method": method},
+            log_extra={"calendar_id": calendar_id, "method": method}
+        )
+    except Exception as e:
+        return error_response(
+            message="erreur lors de la récupération de la méthode de diminution de stock",
+            code="SHARED_USER_STOCK_DECREMENT_METHOD_FETCH_ERROR",
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
 const DateModal = forwardRef(
-  ({ selectedDate, eventsForDay, onNext, onPrev, onSelectDate }, ref) => {
+  ({ selectedDate, eventsForDay, onNext, onPrev, onSelectDate, getPastWeek, getNextWeek }, ref) => {
     const { t } = useTranslation();
     const [visible, setVisible] = useState(false);
 
@@ -53,6 +53,8 @@ const DateModal = forwardRef(
                   onSelectDate={onSelectDate}
                   onNext={onNext}
                   onPrev={onPrev}
+                  getPastWeek={getPastWeek}
+                  getNextWeek={getNextWeek}
                 />
               </div>
               <div className="modal-footer">
@@ -83,4 +85,6 @@ DateModal.propTypes = {
   onNext: PropTypes.func.isRequired,
   onPrev: PropTypes.func.isRequired,
   onSelectDate: PropTypes.func.isRequired,
+  getPastWeek: PropTypes.func.isRequired,
+  getNextWeek: PropTypes.func.isRequired,
 };

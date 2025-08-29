@@ -211,6 +211,9 @@
     "title": "Starten Sie noch heute"
   },
   "date": "Datum",
+  "day_view": {
+    "title": "Tagesansicht"
+  },
   "delete": "LÖSCHEN",
   "delete_access": "Zugriff entfernen",
   "delete_access_confirm": "Zugriff entfernen?",

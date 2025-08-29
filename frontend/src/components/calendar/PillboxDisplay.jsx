@@ -4,6 +4,7 @@ import { UserContext } from '../../contexts/UserContext';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import isEqual from 'lodash/isEqual';
 import { useTranslation } from 'react-i18next';
+import { toISO } from '../../utils/calendar/dateUtils';
 import AlertSystem from '../common/AlertSystem';
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -16,7 +17,7 @@ const pill_count = {
 
 export default function PillboxDisplay({
   type,
-  selectedDate,
+  monday,
   calendarType,
   calendarId,
   basePath,
@@ -54,7 +55,8 @@ export default function PillboxDisplay({
   useEffect(() => {
     const load = async () => {
       setLoading(undefined);
-      const rep = await calendarSource.fetchSchedule(calendarId, selectedDate);
+      const mondayISO = monday ? toISO(monday) : undefined;
+      const rep = await calendarSource.fetchSchedule(calendarId, mondayISO);
       if (rep.success && !isEqual(rep.table, calendarTable)) {
         setCalendarTable(rep.table);
       }
@@ -65,7 +67,7 @@ export default function PillboxDisplay({
     if ((calendarType === 'sharedUser' || calendarType === 'personal') && !userInfo) return;
 
     load();
-  }, [calendarId, calendarSource.fetchSchedule, userInfo, selectedDate]);
+  }, [calendarId, calendarSource.fetchSchedule, userInfo, monday]);
 
   useEffect(() => {
     const time_order = ['morning', 'noon', 'evening'];

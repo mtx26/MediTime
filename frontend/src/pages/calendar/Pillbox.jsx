@@ -3,6 +3,7 @@ import React from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import ForcedLandscapeWrapper from '../../components/common/ForcedLandscapeWrapper';
 import PillboxDisplay from '../../components/calendar/PillboxDisplay';
+import { getMondayDate } from '../../utils/calendar/dateUtils';
 
 function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const location = useLocation();
@@ -25,13 +26,15 @@ function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars })
     basePath = 'shared-token-calendar';
   }
 
-  const selectedDate = new URLSearchParams(location.search).get('date');
+  const selectedDateParam = new URLSearchParams(location.search).get('date');
+  const selectedDate = selectedDateParam ? new Date(selectedDateParam) : undefined;
+  const monday = selectedDate ? getMondayDate(selectedDate) : undefined;
 
   return (
     <ForcedLandscapeWrapper>
       <PillboxDisplay
         type="pillbox"
-        selectedDate={selectedDate}
+        monday={monday}
         calendarType={calendarType}
         calendarId={calendarId}
         basePath={basePath}
