@@ -15,7 +15,8 @@ export default function WeekCalendarSelector({ selectedDate, onWeekSelect }) {
   const { t } = useTranslation();
 
   const handleChange = (date) => {
-    onWeekSelect(date);
+    const monday = getMondayFromDate(date);
+    onWeekSelect(monday);
   };
 
   return (

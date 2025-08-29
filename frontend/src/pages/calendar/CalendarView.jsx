@@ -16,7 +16,6 @@ import WeekCalendarSelector from '../../components/calendar/WeekCalendarSelector
 import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
 import PillboxDisplay from '../../components/calendar/PillboxDisplay';
 import ActionSheet from '../../components/common/ActionSheet';
-import { func } from 'prop-types';
 
 function CalendarPage({
   personalCalendars,
@@ -88,7 +87,9 @@ function CalendarPage({
   };
 
   // Fonction pour naviguer vers la semaine suivante ou precedente
-  const onWeekSelect = async (monday) => {
+  // accepte un second argument optionnel `desiredSelectedDate` (ISO string)
+  // pour préserver le jour sélectionné lors du changement de semaine.
+  const onWeekSelect = async (monday, desiredSelectedDate) => {
     const isoDate = formatToLocalISODate(monday);
     setStartDate(isoDate);
     const rep = await calendarSource.fetchSchedule(calendarId, isoDate);
@@ -96,7 +97,8 @@ function CalendarPage({
       setCalendarEvents(rep.schedule);
       setCalendarTable(rep.table);
       calendarRef.current?.getApi().gotoDate(isoDate);
-      onSelectDate(isoDate);
+      // Si une date désirée est fournie, l'utiliser, sinon rester sur le lundi
+      onSelectDate(desiredSelectedDate ? desiredSelectedDate : isoDate);
     }
   };
 
@@ -113,6 +115,14 @@ function CalendarPage({
     current.setDate(current.getDate() + direction);
     const newDate = formatToLocalISODate(current);
     setSelectedDate(newDate);
+  };
+
+  const navigateWeek = (direction) => {
+    const current = new Date(selectedDate);
+    current.setDate(current.getDate() + direction);
+    const newSelectedDate = formatToLocalISODate(current);
+    const monday = getMondayFromDate(current);
+    onWeekSelect(monday, newSelectedDate);
   };
 
   // Fonction pour charger le calendrier lorsque l'utilisateur est connecté ou que le calendrier est un token
@@ -583,6 +593,8 @@ function CalendarPage({
               onNext={() => navigateDay(1)}
               onPrev={() => navigateDay(-1)}
               onSelectDate={onSelectDate}
+              getPastWeek={() => navigateWeek(-1)}
+              getNextWeek={() => navigateWeek(1)}
             />
           </div>
 
@@ -602,6 +614,8 @@ function CalendarPage({
                     onSelectDate={onSelectDate}
                     onNext={() => navigateDay(1)}
                     onPrev={() => navigateDay(-1)}
+                    getPastWeek={() => navigateWeek(-1)}
+                    getNextWeek={() => navigateWeek(1)}
                   />
                 </div>
               </div>

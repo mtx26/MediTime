@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ArrowControls from './ArrowControls';
 import WeekDayCircles from './WeekDayCircles';
 import { getMondayFromDate, getWeekDaysISOStrings } from '../../utils/calendar/dateUtils';
@@ -12,6 +12,8 @@ export default function WeeklyEventContent({
   onSelectDate,
   onNext,
   onPrev,
+  getPastWeek,
+  getNextWeek
 }) {
   const { t, i18n } = useTranslation();
   const monday = getMondayFromDate(selectedDate);
@@ -19,12 +21,20 @@ export default function WeeklyEventContent({
   const isFirstDay = weekDays[0] === selectedDate;
   const isLastDay = weekDays[6] === selectedDate;
 
+  useEffect(() => {
+    console.log('Navigating week', isFirstDay);
+  }, [isFirstDay]);
+
+  useEffect(() => {
+    console.log('Navigating week', isLastDay);
+  }, [isLastDay]);
+
   // Presentation: no expand/collapse state, always show details when present
 
   return (
     <>
       {/* Navigation arrows (kept for keyboard/assistive users) */}
-      <ArrowControls onLeft={isFirstDay ? () => {} : onPrev} onRight={isLastDay ? () => {} : onNext} />
+      <ArrowControls onLeft={isFirstDay ? getPastWeek : onPrev} onRight={isLastDay ? getNextWeek : onNext} />
 
       {/* Week day selector (hidden in modal mode) */}
       <div className="mb-2 d-flex justify-content-center">
@@ -35,8 +45,7 @@ export default function WeeklyEventContent({
       <div className="d-flex align-items-center justify-content-between mb-3">
         <button
           className="btn btn-outline-secondary"
-          onClick={onPrev}
-          disabled={isFirstDay}
+          onClick={isFirstDay ? getPastWeek : onPrev}
           aria-label={t('previous_day')}
           title={t('previous_day')}
           style={{ minWidth: 40, padding: '0.25rem 0.35rem' }}
@@ -63,8 +72,7 @@ export default function WeeklyEventContent({
 
         <button
           className="btn btn-outline-secondary"
-          onClick={onNext}
-          disabled={isLastDay}
+          onClick={isLastDay ? getNextWeek : onNext}
           aria-label={t('next_day')}
           title={t('next_day')}
           style={{ minWidth: 40, padding: '0.25rem 0.35rem' }}
@@ -142,4 +150,6 @@ WeeklyEventContent.propTypes = {
   onSelectDate: PropTypes.func.isRequired,
   onNext: PropTypes.func.isRequired,
   onPrev: PropTypes.func.isRequired,
+  getPastWeek: PropTypes.func.isRequired,
+  getNextWeek: PropTypes.func.isRequired,
 };
