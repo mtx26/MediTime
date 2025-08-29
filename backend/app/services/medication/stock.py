@@ -75,9 +75,10 @@ def check_low_stock_and_notify():
                 # Récupérer tous les utilisateurs partagés avec notifications activées
                 cursor.execute(
                     """
-                    SELECT calendar_id, receiver_uid
-                    FROM shared_calendars
-                    WHERE notifications_enabled = TRUE AND calendar_id IN %s
+                    SELECT sc.calendar_id, sc.receiver_uid
+                    FROM shared_calendars sc
+                    JOIN shared_calendar_settings scs ON scs.shared_calendar_id = sc.id
+                    WHERE scs.notifications_enabled = TRUE AND sc.calendar_id IN %s
                     """,
                     (calendar_ids,)
                 )
@@ -169,9 +170,10 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
                 # Récupération des utilisateurs partagés
                 cursor.execute(
                     """
-                    SELECT receiver_uid
-                    FROM shared_calendars
-                    WHERE calendar_id = %s AND notifications_enabled = TRUE
+                    SELECT sc.receiver_uid
+                    FROM shared_calendars sc
+                    JOIN shared_calendar_settings scs ON scs.shared_calendar_id = sc.id
+                    WHERE sc.calendar_id = %s AND scs.notifications_enabled = TRUE
                     """,
                     (calendar_id,)
                 )

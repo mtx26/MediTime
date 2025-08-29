@@ -220,9 +220,9 @@ def update_stock_decrement_method(calendar_id, method):
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
-                UPDATE calendars
+                UPDATE calendar_settings
                 SET stock_decrement_method = %s
-                WHERE id = %s
+                WHERE calendar_id = %s
             """, (method, calendar_id,))
             conn.commit()
         
