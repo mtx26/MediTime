@@ -53,7 +53,16 @@ function CalendarPage({
   // une seule source de vérité pour la date : `selectedDate`
   // et on dérive le lundi correspondant depuis `selectedDate`
   // monday as Date object derived from selectedDate Date
-  const monday = useMemo(() => getMondayDate(selectedDate), [selectedDate]);
+  const [monday, setMonday] = useState(() => getMondayDate(selectedDate));
+  useEffect(() => {
+    // Compare les dates par valeur (timestamp) pour éviter une boucle
+    // causée par la création d'objets Date différents à chaque rendu.
+    const newMonday = getMondayDate(selectedDate);
+    if (!monday || newMonday.getTime() !== new Date(monday).getTime()) {
+      setMonday(newMonday);
+    }
+  }, [selectedDate]);
+
   // lundi initial recommandé (semaine suivante) utilisé pour l'init minimale
   const initialMondayDate = useMemo(() => getMondayDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0)), []);
 
@@ -192,7 +201,8 @@ function CalendarPage({
   // 📍 Filtrage des événements pour un jour spécifique et tri par ordre alphabétique
   useEffect(() => {
   if (!selectedDate || !calendarEvents.length) return;
-    const sortedEvents = calendarEvents.sort((a, b) => {
+  // Copier avant de trier pour éviter de muter le tableau d'état `calendarEvents`
+  const sortedEvents = [...calendarEvents].sort((a, b) => {
       const dateA = new Date(a.start);
       const dateB = new Date(b.start);
       if (dateA.getTime() === dateB.getTime()) {
@@ -469,7 +479,7 @@ function CalendarPage({
                 <div className='border rounded pb-3 shadow'>
                   <PillboxDisplay
                     type="calendar"
-                    selectedDate={monday}
+                    monday={monday}
                     calendarType={calendarType}
                     calendarId={calendarId}
                     basePath={basePath}

@@ -17,7 +17,7 @@ const pill_count = {
 
 export default function PillboxDisplay({
   type,
-  selectedDate,
+  monday,
   calendarType,
   calendarId,
   basePath,
@@ -55,8 +55,8 @@ export default function PillboxDisplay({
   useEffect(() => {
     const load = async () => {
       setLoading(undefined);
-      const dateParam = selectedDate ? toISO(selectedDate) : undefined;
-      const rep = await calendarSource.fetchSchedule(calendarId, dateParam);
+      const mondayISO = monday ? toISO(monday) : undefined;
+      const rep = await calendarSource.fetchSchedule(calendarId, mondayISO);
       if (rep.success && !isEqual(rep.table, calendarTable)) {
         setCalendarTable(rep.table);
       }
@@ -67,7 +67,7 @@ export default function PillboxDisplay({
     if ((calendarType === 'sharedUser' || calendarType === 'personal') && !userInfo) return;
 
     load();
-  }, [calendarId, calendarSource.fetchSchedule, userInfo, selectedDate]);
+  }, [calendarId, calendarSource.fetchSchedule, userInfo, monday]);
 
   useEffect(() => {
     const time_order = ['morning', 'noon', 'evening'];
