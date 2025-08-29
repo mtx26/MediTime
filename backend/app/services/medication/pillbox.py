@@ -12,10 +12,11 @@ def use_pillulier(calendar_id, start_date):
                 # 1 requête : récupère la méthode + les boîtes éligibles
                 cursor.execute("""
                     SELECT
-                        c.stock_decrement_method,
+                        cs.stock_decrement_method,
                         mb.id AS box_id,
                         mb.stock_quantity
                     FROM calendars c
+                    LEFT JOIN calendar_settings cs ON cs.calendar_id = c.id
                     LEFT JOIN medicine_boxes mb
                       ON mb.calendar_id = c.id
                      AND mb.box_capacity > 0

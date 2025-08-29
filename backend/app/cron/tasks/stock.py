@@ -19,8 +19,9 @@ def decrease_stock():
                         '[]'::jsonb
                       ) AS boxes
                     FROM calendars c
+                    JOIN calendar_settings cs ON cs.calendar_id = c.id
                     LEFT JOIN medicine_boxes mb ON mb.calendar_id = c.id
-                    WHERE c.stock_decrement_method = 'daily_midnight'
+                    WHERE cs.stock_decrement_method = 'daily_midnight'
                     GROUP BY c.id
                 """)
                 rows = cursor.fetchall()

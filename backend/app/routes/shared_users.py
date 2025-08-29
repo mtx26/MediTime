@@ -39,17 +39,19 @@ def handle_shared_calendars():
                         u.display_name AS owner_name,
                         u.email AS owner_email,
                         COALESCE(u.photo_url, 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg') AS owner_photo_url,
+                        scs.notifications_enabled,
                         COUNT(mb.id) AS "boxesCount",
                         COALESCE(BOOL_OR(mb.stock_quantity <= mb.stock_alert_threshold), FALSE) AS "ifLowStock"
                     FROM shared_calendars sc
                     JOIN calendars c            ON sc.calendar_id = c.id
                     JOIN users u                ON c.owner_uid = u.id
+                    JOIN shared_calendar_settings scs ON scs.shared_calendar_id = sc.id
                     LEFT JOIN medicine_boxes mb ON mb.calendar_id = c.id
                     WHERE sc.receiver_uid = %s
                       AND sc.accepted = TRUE
                     GROUP BY
                         sc.calendar_id, sc.access, c.id, c.name, c.owner_uid,
-                        u.display_name, u.email, u.photo_url
+                        u.display_name, u.email, u.photo_url, scs.notifications_enabled
                 """, (uid,))
                 rows = cursor.fetchall()
 
@@ -276,12 +278,17 @@ def handle_shared_user_notifications(calendar_id):
         
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT notifications_enabled FROM shared_calendars WHERE calendar_id = %s", (calendar_id,))
+                cursor.execute("""
+                    SELECT scs.notifications_enabled 
+                    FROM shared_calendar_settings scs 
+                    JOIN shared_calendars sc ON scs.shared_calendar_id = sc.id 
+                    WHERE sc.calendar_id = %s AND sc.receiver_uid = %s
+                """, (calendar_id, g.uid))
                 calendar = cursor.fetchone()
                 if not calendar:
                     return warning_response(
                         message="calendrier partagé non trouvé",
-                        code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
+                        code="CALENDAR_NOT_FOUND",
                         status_code=404,
                         log_extra={"calendar_id": calendar_id}
                     )
@@ -309,20 +316,16 @@ def handle_shared_user_notifications(calendar_id):
 @with_query_origin(default_origin="SHARED_USER_NOTIFICATIONS_ENABLED_UPDATE")
 def handle_shared_user_notifications_update(calendar_id):
     try:
-
-        payload = request.get_json(force=True)
-        notifications_enabled = payload.get("notifications-enabled")
-
-        if not notifications_enabled:
-            return warning_response(
-                message="Données manquantes",
-                code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
-                status_code=400,
-                log_extra={"calendar_id": calendar_id}
-            )
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("UPDATE shared_calendars SET notifications_enabled = %s WHERE calendar_id = %s", (notifications_enabled, calendar_id))
+                # Mise à jour directe en une seule requête
+                cursor.execute("""
+                    UPDATE shared_calendar_settings 
+                    SET notifications_enabled = NOT notifications_enabled 
+                    FROM shared_calendars sc 
+                    WHERE shared_calendar_settings.shared_calendar_id = sc.id 
+                      AND sc.calendar_id = %s
+                """, (calendar_id,))
 
         return success_response(
             message="Notifications mises à jour",

@@ -27,12 +27,14 @@ def handle_calendars():
                 cursor.execute("""
                     SELECT 
                         c.*, 
+                        cs.stock_decrement_method,
                         COUNT(mb.id) AS count
                     FROM calendars c
+                    LEFT JOIN calendar_settings cs ON cs.calendar_id = c.id
                     LEFT JOIN medicine_boxes mb 
                         ON mb.calendar_id = c.id
                     WHERE c.owner_uid = %s
-                    GROUP BY c.id
+                    GROUP BY c.id, cs.stock_decrement_method
                 """, (uid,))
                 calendars = cursor.fetchall()
 
@@ -331,7 +333,7 @@ def get_personnal_stock_decrement_method(calendar_id):
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT stock_decrement_method FROM calendars WHERE id = %s", (calendar_id,))
+                cursor.execute("SELECT cs.stock_decrement_method FROM calendar_settings cs WHERE cs.calendar_id = %s", (calendar_id,))
                 result = cursor.fetchone()
                 if result is None:
                     return warning_response(
