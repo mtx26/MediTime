@@ -49,7 +49,7 @@ const QRCodeScanner = forwardRef(({
   const [loadingGtin, setLoadingGtin] = useState(null); // GTIN en cours de recherche
   
   // Nouveaux états pour les contrôles de caméra
-  const [zoom, setZoom] = useState(1.5); // Zoom par défaut à 1.5
+  const [zoom, setZoom] = useState(1); // Zoom par défaut à 1
   const [availableCameras, setAvailableCameras] = useState([]);
   const [selectedCamera, setSelectedCamera] = useState(null);
   const [showControls, setShowControls] = useState(false);
@@ -57,7 +57,7 @@ const QRCodeScanner = forwardRef(({
   const streamRef = useRef(null);
   const isLoadingRef = useRef(false);
   const lastScanTimeRef = useRef(0);
-  const scanIntervalMs = 150; // Intervalle entre les scans en ms (réduit la consommation)
+  const scanIntervalMs = 100; // Intervalle entre les scans en ms (réduit la consommation)
 
   // Pour éviter de pousser 20x le même code d'affilée
   const lastSeenRef = useRef({ text: "", t: 0 });
@@ -274,6 +274,7 @@ const QRCodeScanner = forwardRef(({
     lastScanTimeRef.current = now;
 
     try {
+      // ✅ ÉTAPE 3: Ajouter redimensionnement canvas
       const w = video.videoWidth || 0;
       const h = video.videoHeight || 0;
 
@@ -282,25 +283,30 @@ const QRCodeScanner = forwardRef(({
         if (canvas.width !== w) canvas.width = w;
         if (canvas.height !== h) canvas.height = h;
 
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(video, 0, 0, w, h);
+        // 🚀 SOLUTION: Créer un canvas temporaire caché pour le traitement
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = w;
+        tempCanvas.height = h;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Dessiner sur le canvas temporaire CACHÉ (pas visible = pas de lag)
+        tempCtx.drawImage(video, 0, 0, w, h);
 
-        // On récupère un ImageData pour le décodage
-        const imageData = ctx.getImageData(0, 0, w, h);
-
-        // Tentative de décodage
+        // ✅ ÉTAPE 7: Gestion détections
+        const imageData = tempCtx.getImageData(0, 0, w, h);
         const results = await readBarcodes(imageData, readerOptions);
 
-        // Clear overlay avant de redessiner
-        ctx.drawImage(video, 0, 0, w, h);
+        // Canvas visible pour overlay seulement
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, w, h); // Clear seulement l'overlay
 
         if (results && results.length) {
           const r = results[0];
 
-          // Tracé contour si dispo
+          // Dessiner la détection seulement
           drawDetection(ctx, r);
 
-          // Anti-spam très basique (augmenté pour réduire la consommation)
+          // Anti-spam
           const sameAsLast = r.text === lastSeenRef.current.text && (now - lastSeenRef.current.t < 2000);
           lastSeenRef.current = { text: r.text, t: now };
 
@@ -309,7 +315,6 @@ const QRCodeScanner = forwardRef(({
             if (gtin && isSafeKey(gtin)) {
               setGtins((prev) => {
                 if (prev.includes(gtin)) return prev;
-                // Nouveau GTIN détecté, chercher le médicament
                 searchMedicine(gtin);
                 const newGtins = singleScan ? [gtin] : [...prev, gtin];
                 return newGtins;
