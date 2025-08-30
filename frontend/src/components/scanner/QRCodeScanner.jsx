@@ -45,13 +45,14 @@ const QRCodeScanner = forwardRef(({
   const rafRef = useRef(null);
   const [error, setError] = useState("");
   const [gtins, setGtins] = useState([]); // liste des GTIN uniques (01)
-    const [medicines, setMedicines] = useState(() => Object.create(null)); // cache des médicaments trouvés par GTIN - contient directement les medicine_boxes
+  const [medicines, setMedicines] = useState(() => Object.create(null)); // cache des médicaments trouvés par GTIN - contient directement les medicine_boxes
   const [loadingGtin, setLoadingGtin] = useState(null); // GTIN en cours de recherche
   
   // Nouveaux états pour les contrôles de caméra
   const [zoom, setZoom] = useState(1); // Zoom par défaut à 1
   const [availableCameras, setAvailableCameras] = useState([]);
   const [selectedCamera, setSelectedCamera] = useState(null);
+  const [isFrontCamera, setIsFrontCamera] = useState(false); // Pour détecter si c'est une caméra frontale
   const [showControls, setShowControls] = useState(false);
   const hideControlsTimeoutRef = useRef(null);
   const streamRef = useRef(null);
@@ -106,16 +107,31 @@ const QRCodeScanner = forwardRef(({
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const cameras = devices.filter(device => device.kind === 'videoinput');
-        setAvailableCameras(cameras);
         
-        // Sélectionner la caméra arrière par défaut si disponible
-        if (cameras.length > 0 && !selectedCamera) {
-          const backCamera = cameras.find(camera => 
-            camera.label.toLowerCase().includes('back') || 
-            camera.label.toLowerCase().includes('rear') ||
-            camera.label.toLowerCase().includes('environment')
-          );
-          setSelectedCamera(backCamera || cameras[0]);
+        // Trier les caméras pour privilégier la caméra arrière
+        const sortedCameras = cameras.sort((a, b) => {
+          const aType = getCameraType(a);
+          const bType = getCameraType(b);
+          
+          // Privilégier les caméras arrière
+          if (aType === 'back' && bType !== 'back') return -1; // a avant b
+          if (aType !== 'back' && bType === 'back') return 1;  // b avant a
+          return 0; // même priorité
+        });
+        
+        setAvailableCameras(sortedCameras);
+        
+        // Sélectionner la première caméra (privilégie automatiquement 'back')
+        if (sortedCameras.length > 0 && !selectedCamera) {
+          const defaultCamera = sortedCameras[0];
+          setSelectedCamera(defaultCamera);
+          
+          // Déterminer le type de caméra
+          const cameraType = getCameraType(defaultCamera);
+          const isFront = cameraType === 'front';
+          
+          console.log('Caméra par défaut:', defaultCamera.label, 'type:', cameraType); // Debug
+          setIsFrontCamera(isFront);
         }
       } catch (error) {
         console.error('Erreur lors de l\'énumération des caméras:', error);
@@ -220,6 +236,32 @@ const QRCodeScanner = forwardRef(({
     return stop;
   }, [show, modal, selectedCamera]); // Retiré zoom des dépendances pour éviter les rechargements
 
+  // Fonction helper pour déterminer le type de caméra
+  const getCameraType = (camera) => {
+    const label = camera.label.toLowerCase();
+    
+    // Détecter caméra arrière explicitement
+    if (label.includes('back') || label.includes('rear') || 
+        label.includes('environment') || label.includes('arrière')) {
+      return 'back';
+    }
+    
+    // Détecter caméra frontale explicitement
+    if (label.includes('front') || label.includes('user') || 
+        label.includes('facing') || label.includes('avant')) {
+      return 'front';
+    }
+    
+    // Détecter caméras PC (considérées comme frontales)
+    if (label.includes('integrated') || label.includes('webcam') || 
+        label.includes('built-in')) {
+      return 'front';
+    }
+    
+    // Par défaut, considérer comme frontale
+    return 'front';
+  };
+
   // Fonction pour changer le zoom (zoom numérique CSS)
   const handleZoomChange = (newZoom) => {
     setZoom(newZoom);
@@ -228,22 +270,51 @@ const QRCodeScanner = forwardRef(({
   // Fonction pour changer de caméra
   const handleCameraChange = (camera) => {
     setSelectedCamera(camera);
+    
+    // Utiliser la fonction helper simplifiée
+    const cameraType = getCameraType(camera);
+    const isFront = cameraType === 'front';
+    
+    console.log('Changement caméra:', camera.label, 'type:', cameraType); // Debug
+    setIsFrontCamera(isFront);
   };
 
   // Fonction pour obtenir un nom de caméra court
   const getCameraDisplayName = (camera, index) => {
     if (!camera.label) return `Caméra ${index + 1}`;
     
+    const type = getCameraType(camera);
     const label = camera.label.toLowerCase();
-    if (label.includes('back') || label.includes('rear') || label.includes('environment')) {
-      return 'Arrière';
-    } else if (label.includes('front') || label.includes('user') || label.includes('facing')) {
-      return 'Avant';
-    } else if (label.includes('external')) {
-      return 'Externe';
+    
+    // Si le label contient des mots génériques, utiliser notre traduction
+    const hasGenericTerms = ['front', 'back', 'rear', 'facing'].some(term => 
+      label.includes(term)
+    );
+    
+    if (hasGenericTerms) {
+      return type === 'front' ? 'Avant' : 
+             type === 'back' ? 'Arrière' : 
+             camera.label;
     } else {
-      // Prendre les premiers mots du nom de la caméra
-      return camera.label.split(' ').slice(0, 2).join(' ').substring(0, 15);
+      // C'est un vrai nom de caméra, nettoyer le nom (retirer les termes génériques et ce qui suit)
+      // Trouver le premier terme générique qui apparaît et couper là
+      let cleanName = camera.label;
+      const lowerLabel = camera.label.toLowerCase();
+      const genericTerms = ['usb', 'camera', 'webcam', 'cam', 'device', 'video'];
+      
+      let earliestIndex = -1;
+      for (const term of genericTerms) {
+        const termIndex = lowerLabel.indexOf(term);
+        if (termIndex !== -1 && (earliestIndex === -1 || termIndex < earliestIndex)) {
+          earliestIndex = termIndex;
+        }
+      }
+      
+      if (earliestIndex !== -1) {
+        cleanName = camera.label.substring(0, earliestIndex).trim();
+      }
+      
+      return cleanName || camera.label;
     }
   };
 
@@ -581,7 +652,7 @@ const QRCodeScanner = forwardRef(({
             className="w-100 h-100 bg-dark"
             style={{ 
               objectFit: "cover",
-              transform: `scale(${zoom})`,
+              transform: `scale(${zoom}) ${isFrontCamera ? 'scaleX(-1)' : ''}`, // Inverser horizontalement pour caméra frontale
               transformOrigin: "center center"
             }}
           />
@@ -590,7 +661,7 @@ const QRCodeScanner = forwardRef(({
             className="position-absolute top-0 start-0 w-100 h-100"
             style={{ 
               objectFit: "cover",
-              transform: `scale(${zoom})`,
+              transform: `scale(${zoom}) ${isFrontCamera ? 'scaleX(-1)' : ''}`, // Inverser horizontalement pour caméra frontale
               transformOrigin: "center center"
             }}
           />
@@ -636,6 +707,22 @@ const QRCodeScanner = forwardRef(({
                   autoHideControls(); // Réinitialiser le timer
                 }}
               />
+            </div>
+            
+            {/* Bouton pour inverser manuellement */}
+            <div className="mb-2 text-center">
+              <button
+                type="button"
+                className={`btn btn-sm w-100 ${isFrontCamera ? 'btn-warning' : 'btn-outline-light'}`}
+                onClick={() => {
+                  setIsFrontCamera(!isFrontCamera);
+                  autoHideControls();
+                }}
+                style={{ fontSize: '11px', padding: '2px 8px' }}
+              >
+                <i className="bi bi-arrow-left-right me-1"></i>
+                {isFrontCamera ? 'Inversé' : 'Normal'}
+              </button>
             </div>
             
             {/* Sélection de caméra */}
