@@ -242,7 +242,7 @@ const QRCodeScanner = forwardRef(({
     
     // Détecter caméra arrière explicitement
     if (label.includes('back') || label.includes('rear') || 
-        label.includes('environment') || label.includes('arrière')) {
+        label.includes('environment') || label.includes('arriere')) {
       return 'back';
     }
     
@@ -281,7 +281,7 @@ const QRCodeScanner = forwardRef(({
 
   // Fonction pour obtenir un nom de caméra court
   const getCameraDisplayName = (camera, index) => {
-    if (!camera.label) return `Caméra ${index + 1}`;
+    if (!camera.label) return t('scanner.camera') + ` ${index + 1}`;
     
     const type = getCameraType(camera);
     const label = camera.label.toLowerCase();
@@ -292,8 +292,8 @@ const QRCodeScanner = forwardRef(({
     );
     
     if (hasGenericTerms) {
-      return type === 'front' ? 'Avant' : 
-             type === 'back' ? 'Arrière' : 
+      return type === 'front' ? t('scanner.camera_front') : 
+             type === 'back' ? t('scanner.camera_back') : 
              camera.label;
     } else {
       // C'est un vrai nom de caméra, nettoyer le nom (retirer les termes génériques et ce qui suit)
@@ -693,7 +693,7 @@ const QRCodeScanner = forwardRef(({
             <div className="mb-2 text-center">
               <label className="form-label text-white small mb-1 d-block">
                 <i className="bi bi-zoom-in me-1"></i>
-                Zoom: {zoom}x
+                {t('scanner.controls.zoom')}: {zoom}x
               </label>
               <input
                 type="range"
@@ -721,7 +721,7 @@ const QRCodeScanner = forwardRef(({
                 style={{ fontSize: '11px', padding: '2px 8px' }}
               >
                 <i className="bi bi-arrow-left-right me-1"></i>
-                {isFrontCamera ? 'Inversé' : 'Normal'}
+                {isFrontCamera ? t('scanner.camera_inverted') : t('scanner.camera_normal')}
               </button>
             </div>
             
@@ -730,7 +730,7 @@ const QRCodeScanner = forwardRef(({
               <div className="text-center">
                 <label className="form-label text-white small mb-1 d-block">
                   <i className="bi bi-camera me-1"></i>
-                  Caméra
+                  {t('scanner.controls.camera')}
                 </label>
                 <select
                   className="form-select form-select-sm"

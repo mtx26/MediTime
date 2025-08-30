@@ -472,7 +472,17 @@
     "remove_from_list": "Удалить из списка",
     "searching": "Исследовать...",
     "select_camera": "Выберите камеру",
-    "title": "Отсканируйте QR-код"
+    "title": "Отсканируйте QR-код",
+    "zoom": "Масштаб: {{zoom}}x",
+    "camera_front": "До",
+    "camera_back": "Назад",
+    "camera_normal": "Нормальный",
+    "camera_inverted": "Обеспечить регресс",
+    "controls": {
+      "zoom": "Увеличить",
+      "camera": "Камера",
+      "flip": "Обеспечить регресс"
+    }
   },
   "security": {
     "current_email": "Текущий адрес электронной почты:",

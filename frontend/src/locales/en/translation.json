@@ -472,7 +472,17 @@
     "remove_from_list": "Remove from list",
     "searching": "Research...",
     "select_camera": "Select a camera",
-    "title": "Scan a QR code"
+    "title": "Scan a QR code",
+    "zoom": "Zoom : {{zoom}}x",
+    "camera_front": "Before",
+    "camera_back": "Back",
+    "camera_normal": "Normal",
+    "camera_inverted": "Reverse",
+    "controls": {
+      "zoom": "Zoom",
+      "camera": "Camera",
+      "flip": "Reverse"
+    }
   },
   "security": {
     "current_email": "Current email:",

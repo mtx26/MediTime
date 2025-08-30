@@ -472,7 +472,17 @@
     "remove_from_list": "リストから削除",
     "searching": "研究...",
     "select_camera": "カメラを選択",
-    "title": "QRコードをスキャンする"
+    "title": "QRコードをスキャンする",
+    "zoom": "ズーム: {{zoom}}x",
+    "camera_front": "前に",
+    "camera_back": "戻る",
+    "camera_normal": "普通",
+    "camera_inverted": "逆行する",
+    "controls": {
+      "zoom": "ズーム",
+      "camera": "カメラ",
+      "flip": "逆行する"
+    }
   },
   "security": {
     "current_email": "現在のメールアドレス:",

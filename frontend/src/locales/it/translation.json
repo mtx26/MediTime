@@ -472,7 +472,17 @@
     "remove_from_list": "Rimuovi dall'elenco",
     "searching": "Ricerca...",
     "select_camera": "Seleziona una telecamera",
-    "title": "Scansiona un codice QR"
+    "title": "Scansiona un codice QR",
+    "zoom": "Zoom: {{zoom}}x",
+    "camera_front": "Prima",
+    "camera_back": "Indietro",
+    "camera_normal": "Normale",
+    "camera_inverted": "Inversione",
+    "controls": {
+      "zoom": "Zoom",
+      "camera": "Telecamera",
+      "flip": "Inversione"
+    }
   },
   "security": {
     "current_email": "Email attuale:",

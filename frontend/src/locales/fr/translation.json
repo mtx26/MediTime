@@ -472,7 +472,17 @@
     "remove_from_list": "Retirer de la liste",
     "searching": "Recherche en cours...",
     "select_camera": "Sélectionner une caméra",
-    "title": "Scanner de médicaments"
+    "title": "Scanner de médicaments",
+    "zoom": "Zoom : {{zoom}}x",
+    "camera_front": "Avant",
+    "camera_back": "Arrière",
+    "camera_normal": "Normal",
+    "camera_inverted": "Inversé",
+    "controls": {
+      "zoom": "Zoom",
+      "camera": "Caméra",
+      "flip": "Inverser"
+    }
   },
   "security": {
     "current_email": "Email actuel :",

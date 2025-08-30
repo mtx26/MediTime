@@ -472,7 +472,17 @@
     "remove_from_list": "从列表中删除",
     "searching": "研究...",
     "select_camera": "选择相机",
-    "title": "扫描二维码"
+    "title": "扫描二维码",
+    "zoom": "缩放：{{zoom}}x",
+    "camera_front": "前",
+    "camera_back": "后退",
+    "camera_normal": "普通的",
+    "camera_inverted": "撤销",
+    "controls": {
+      "zoom": "飞涨",
+      "camera": "相机",
+      "flip": "撤销"
+    }
   },
   "security": {
     "current_email": "当前电子邮件：",

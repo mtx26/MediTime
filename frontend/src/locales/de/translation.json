@@ -472,7 +472,17 @@
     "remove_from_list": "Aus der Liste entfernen",
     "searching": "Forschung...",
     "select_camera": "Wählen Sie eine Kamera aus",
-    "title": "Scannen Sie einen QR-Code"
+    "title": "Scannen Sie einen QR-Code",
+    "zoom": "Zoom: {{zoom}}x",
+    "camera_front": "Vor",
+    "camera_back": "Zurück",
+    "camera_normal": "Normal",
+    "camera_inverted": "Umkehren",
+    "controls": {
+      "zoom": "Zoom",
+      "camera": "Kamera",
+      "flip": "Umkehren"
+    }
   },
   "security": {
     "current_email": "Aktuelle E-Mail:",
