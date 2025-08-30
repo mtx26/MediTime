@@ -40,14 +40,6 @@ const createIconButton = (className, icon, text, onClick, ariaLabel, title) => (
   </button>
 );
 
-const isSafeKey = (key) => (
-  typeof key === 'string' &&
-  /^\w+$/.test(key) &&
-  key !== '__proto__' &&
-  key !== 'prototype' &&
-  key !== 'constructor'
-);
-
 const createBadge = (bgColor, icon, text) => (
   <span className={`badge bg-${bgColor}`}>
     <i className={`bi bi-${icon}`} /> {text}
@@ -198,26 +190,12 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const boxConditionsForSelected = isSafeKey(selectedModifyBox)
-      ? Object.getOwnPropertyDescriptor(boxConditions, selectedModifyBox)?.value || {}
-      : {};
+    
+    const boxConditionsForSelected = boxConditions[selectedModifyBox] || {};
+    
     const conditions = Object.values(boxConditionsForSelected).filter(
       (condition) => condition !== undefined
     );
-    
-    // Séparer les nouvelles conditions des conditions existantes
-    const processedConditions = conditions.map(condition => {
-      // Si l'ID commence par "temp_", c'est une nouvelle condition
-      if (condition.id && condition.id.startsWith('temp_')) {
-        // Ne pas envoyer l'ID pour les nouvelles conditions
-        const conditionWithoutId = Object.fromEntries(
-          Object.entries(condition).filter(([key]) => key !== 'id')
-        );
-        return conditionWithoutId;
-      }
-      // Pour les conditions existantes, garder l'ID
-      return condition;
-    });
     
     const box = {
       name: modifyBoxName[selectedModifyBox],
@@ -225,8 +203,9 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       box_capacity: modifyBoxCapacity[selectedModifyBox],
       stock_alert_threshold: modifyBoxStockAlertThreshold[selectedModifyBox],
       stock_quantity: modifyBoxStockQuantity[selectedModifyBox],
-      conditions: processedConditions,
+      conditions: conditions,
     };
+    
     const res = await calendarSource.updateBox(
       calendarId,
       selectedModifyBox,
@@ -442,9 +421,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                     modifyBoxName={modifyBoxName}
                     setModifyBoxCapacity={setModifyBoxCapacity}
                     modifyBoxCapacity={modifyBoxCapacity}
-                    setModifyBoxStockAlertThreshold={
-                      setModifyBoxStockAlertThreshold
-                    }
+                    setModifyBoxStockAlertThreshold={setModifyBoxStockAlertThreshold}
                     modifyBoxStockAlertThreshold={modifyBoxStockAlertThreshold}
                     setModifyBoxStockQuantity={setModifyBoxStockQuantity}
                     modifyBoxStockQuantity={modifyBoxStockQuantity}
@@ -468,9 +445,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                   modifyBoxName={modifyBoxName}
                   setModifyBoxCapacity={setModifyBoxCapacity}
                   modifyBoxCapacity={modifyBoxCapacity}
-                  setModifyBoxStockAlertThreshold={
-                    setModifyBoxStockAlertThreshold
-                  }
+                  setModifyBoxStockAlertThreshold={setModifyBoxStockAlertThreshold}
                   modifyBoxStockAlertThreshold={modifyBoxStockAlertThreshold}
                   setModifyBoxStockQuantity={setModifyBoxStockQuantity}
                   modifyBoxStockQuantity={modifyBoxStockQuantity}
@@ -613,21 +588,25 @@ function BoxCard({
   };
 
   const addNewCondition = () => {
-    const id = `temp_${uuidv4()}`;
-    setBoxConditions((prev) => ({
-      ...prev,
-      [box.id]: {
-        ...prev[box.id],
-        [id]: {
-          id,
-          tablet_count: 1,
-          interval_days: 1,
-          start_date: null,
-          time_of_day: 'morning',
+    const id = uuidv4();
+    
+    setBoxConditions((prev) => {
+      const newState = {
+        ...prev,
+        [box.id]: {
+          ...(prev[box.id] || {}),
+          [id]: {
+            id,
+            tablet_count: 1,
+            interval_days: 1,
+            start_date: null,
+            time_of_day: 'morning',
+          },
         },
-      },
-    }));
-    setSelectedModifyBox(box.id);
+      };
+      
+      return newState;
+    });
   };
 
   const deleteCondition = (conditionId) => {
