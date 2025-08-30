@@ -518,7 +518,7 @@ const QRCodeScanner = forwardRef(({
             style={{ display: show ? 'block' : 'none' }} 
             tabIndex="-1"
           >
-            <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-dialog modal-dialog-centered modal-lg" style={{ maxWidth: '500px' }}>
               <div className="modal-content">
                 <div className="modal-header">
                   <h5 className="modal-title">
@@ -753,8 +753,8 @@ const QRCodeScanner = forwardRef(({
               className="btn btn-success w-100"
               onClick={handleAddAll}
             >
-              <i className="bi bi-plus-circle me-2"></i>
-              {t('scanner.add')}
+              <i className={`bi bi-${singleScan ? 'pencil' : 'plus-circle'} me-2`}></i>
+              {singleScan ? t('modify') : t('scanner.add')}
             </button>
           ) : (
             <button
