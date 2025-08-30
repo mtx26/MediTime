@@ -11,20 +11,6 @@
   "accept": "Accept",
   "accepted": "Accepted",
   "access": "Access",
-  "navigation": {
-    "home": "Home",
-    "login": "Login",
-    "register": "Sign Up",
-    "dashboard": "Dashboard", 
-    "medicines": "Medicines",
-    "calendar": "Calendar",
-    "profile": "Profile",
-    "settings": "Settings",
-    "help": "Help",
-    "about": "About",
-    "reset-password": "Reset Password",
-    "forgot-password": "Forgot Password"
-  },
   "account": {
     "crop": {
       "title": "Crop the photo",
@@ -47,14 +33,14 @@
   "add": "Add",
   "admin": "Admin",
   "app": {
+    "access": "Access the application",
+    "description": "Schedule your treatments and share your medical calendars with ease.",
+    "login": "Log in",
     "name": "MediTime",
+    "pageTitle": "MediTime - Medical Treatment Manager",
+    "register": "Create an account",
     "shortN": "MediTime",
     "shortName": "MediTime",
-    "description": "Schedule your treatments and share your medical calendars with ease.",
-    "pageTitle": "MediTime - Medical Treatment Manager",
-    "access": "Access the application",
-    "login": "Log in",
-    "register": "Create an account",
     "subtitle": "Manage, track and share your medical treatments easily.",
     "title": "MediTime"
   },
@@ -225,6 +211,9 @@
     "title": "Get started today"
   },
   "date": "Date",
+  "day_view": {
+    "title": "Daily view"
+  },
   "delete": "DELETE",
   "delete_access": "Remove access",
   "delete_access_confirm": "Remove access?",
@@ -256,6 +245,21 @@
     "description": "Plan and share your medication schedules easily.",
     "title": "MediTime - Medicine schedule planner"
   },
+  "image_upload": {
+    "analysis_error": "Error parsing image.",
+    "click_to_change": "Click to change file",
+    "click_to_select_file": "Click or drag and drop to select a file",
+    "file_analysis_error": "Error parsing file",
+    "file_selected": "Selected file",
+    "file_type_error": "Only image files are accepted (jpg, png, webp, gif).",
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "no_medicines_found": "No medication found in the image.",
+    "preview_alt": "Preview",
+    "preview_error": "Error displaying preview",
+    "remove_image": "Delete image",
+    "select_file_error": "Please select an image file.",
+    "title": "Select and preview a file"
+  },
   "invalid_or_expired_link": "This shared calendar link is invalid or has expired.",
   "invitation": {
     "invalid_or_expired": "Invalid or expired invitation",
@@ -278,6 +282,16 @@
   "logout": "Logout",
   "low_stock": "Low stock",
   "manage_link": "Manage the link",
+  "medicine_review": {
+    "current_stock": "Current stock",
+    "delete_condition": "Remove this condition",
+    "finish": "To end",
+    "maximum_stock": "Stock maximum",
+    "select_option": "Select...",
+    "start_date": "Beginning",
+    "time_of_day": "Moment",
+    "title": "Drug Review"
+  },
   "medicines": {
     "back_to_calendar": "Back to calendar",
     "label": "Drugs",
@@ -298,6 +312,20 @@
   "modify": "Modifier",
   "morning": "Morning",
   "my_calendars": "My calendars",
+  "navigation": {
+    "about": "About",
+    "calendar": "Calendar",
+    "dashboard": "Dashboard",
+    "forgot-password": "Forgot Password",
+    "help": "Help",
+    "home": "Home",
+    "login": "Login",
+    "medicines": "Medicines",
+    "profile": "Profile",
+    "register": "Sign Up",
+    "reset-password": "Reset Password",
+    "settings": "Settings"
+  },
   "never": "Never",
   "next": "Following",
   "next_day": "Next day",
@@ -434,6 +462,7 @@
   "rights_reserved": "All rights reserved",
   "scanner": {
     "add": "Add",
+    "camera": "Camera",
     "camera_error": "Unable to access the camera.",
     "camera_instruction": "Point to the DataMatrix code",
     "cancel": "Cancel",
@@ -442,9 +471,8 @@
     "quantity": "Quantity: {{quantity}}",
     "remove_from_list": "Remove from list",
     "searching": "Research...",
-    "title": "Scan a QR code",
-    "camera": "Camera",
-    "select_camera": "Select a camera"
+    "select_camera": "Select a camera",
+    "title": "Scan a QR code"
   },
   "security": {
     "current_email": "Current email:",
@@ -677,30 +705,5 @@
     "desc": "Because healthcare doesn't leave room for improvisation. MediTime offers you a clear, intuitive, and secure solution for tracking your treatments and those of your loved ones, day after day.",
     "title": "Why choose MediTime?"
   },
-  "yes": "Yes",
-  "image_upload": {
-    "title": "Select and preview a file",
-    "file_type_error": "Only image files are accepted (jpg, png, webp, gif).",
-    "select_file_error": "Please select an image file.",
-    "no_medicines_found": "No medication found in the image.",
-    "analysis_error": "Error parsing image.",
-    "file_analysis_error": "Error parsing file",
-    "preview_alt": "Preview",
-    "remove_image": "Delete image",
-    "file_selected": "Selected file",
-    "click_to_change": "Click to change file",
-    "file_types": "JPG, PNG, WEBP, GIF",
-    "preview_error": "Error displaying preview",
-    "click_to_select_file": "Click or drag and drop to select a file"
-  },
-  "medicine_review": {
-    "title": "Drug Review",
-    "current_stock": "Current stock",
-    "maximum_stock": "Stock maximum",
-    "time_of_day": "Moment",
-    "select_option": "Select...",
-    "start_date": "Beginning",
-    "delete_condition": "Remove this condition",
-    "finish": "To end"
-  }
+  "yes": "Yes"
 }

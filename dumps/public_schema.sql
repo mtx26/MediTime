@@ -22,6 +22,38 @@ COMMENT ON SCHEMA "public" IS 'standard public schema';
 
 
 
+CREATE OR REPLACE FUNCTION "public"."ensure_calendar_settings"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
+    AS $$
+BEGIN
+  INSERT INTO public.calendar_settings (calendar_id)  -- valeurs par défaut déjà en DEFAULT
+  VALUES (NEW.id)
+  ON CONFLICT (calendar_id) DO NOTHING;
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."ensure_calendar_settings"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."ensure_shared_calendar_settings"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
+    AS $$
+BEGIN
+  INSERT INTO public.shared_calendar_settings (shared_calendar_id)
+  VALUES (NEW.id)
+  ON CONFLICT (shared_calendar_id) DO NOTHING;
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."ensure_shared_calendar_settings"() OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."touch_updated_at"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -39,14 +71,24 @@ SET default_tablespace = '';
 SET default_table_access_method = "heap";
 
 
+CREATE TABLE IF NOT EXISTS "public"."calendar_settings" (
+    "calendar_id" "uuid" NOT NULL,
+    "stock_decrement_method" "text" DEFAULT 'weekly_pillbox'::"text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "calendar_settings_stock_decrement_method_chk" CHECK (("stock_decrement_method" = ANY (ARRAY['weekly_pillbox'::"text", 'daily_midnight'::"text"])))
+);
+
+
+ALTER TABLE "public"."calendar_settings" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."calendars" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "owner_uid" "uuid" NOT NULL,
     "name" "text" NOT NULL,
-    "stock_decrement_method" "text" DEFAULT 'weekly_pillbox'::"text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"(),
-    CONSTRAINT "calendars_stock_decrement_mode_check" CHECK (("stock_decrement_method" = ANY (ARRAY['weekly_pillbox'::"text", 'daily_midnight'::"text"])))
+    "updated_at" timestamp with time zone DEFAULT "now"()
 );
 
 
@@ -154,6 +196,17 @@ CREATE TABLE IF NOT EXISTS "public"."notifications" (
 ALTER TABLE "public"."notifications" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."shared_calendar_settings" (
+    "shared_calendar_id" "uuid" NOT NULL,
+    "notifications_enabled" boolean DEFAULT true NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."shared_calendar_settings" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."shared_calendars" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "calendar_id" "uuid" NOT NULL,
@@ -161,7 +214,6 @@ CREATE TABLE IF NOT EXISTS "public"."shared_calendars" (
     "access" "text" DEFAULT 'edit'::"text" NOT NULL,
     "accepted" boolean DEFAULT false NOT NULL,
     "accepted_at" timestamp with time zone,
-    "notifications_enabled" boolean DEFAULT true NOT NULL,
     "token" "uuid" DEFAULT "gen_random_uuid"(),
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"()
@@ -202,6 +254,11 @@ CREATE TABLE IF NOT EXISTS "public"."users" (
 
 
 ALTER TABLE "public"."users" OWNER TO "postgres";
+
+
+ALTER TABLE ONLY "public"."calendar_settings"
+    ADD CONSTRAINT "calendar_settings_pkey" PRIMARY KEY ("calendar_id");
+
 
 
 ALTER TABLE ONLY "public"."shared_calendars"
@@ -249,6 +306,11 @@ ALTER TABLE ONLY "public"."notifications"
 
 
 
+ALTER TABLE ONLY "public"."shared_calendar_settings"
+    ADD CONSTRAINT "shared_calendar_settings_pkey" PRIMARY KEY ("shared_calendar_id");
+
+
+
 ALTER TABLE ONLY "public"."shared_calendars"
     ADD CONSTRAINT "shared_calendars_token_key" UNIQUE ("token");
 
@@ -272,7 +334,19 @@ CREATE UNIQUE INDEX "invitations_token_idx" ON "public"."invitations" USING "btr
 
 
 
+CREATE OR REPLACE TRIGGER "trg_ensure_calendar_settings" AFTER INSERT ON "public"."calendars" FOR EACH ROW EXECUTE FUNCTION "public"."ensure_calendar_settings"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_ensure_shared_calendar_settings" AFTER INSERT ON "public"."shared_calendars" FOR EACH ROW EXECUTE FUNCTION "public"."ensure_shared_calendar_settings"();
+
+
+
 CREATE OR REPLACE TRIGGER "trg_touch_updated_at_bis_medicaments_afmps" BEFORE UPDATE ON "public"."medicaments_afmps" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_calendar_settings" BEFORE UPDATE ON "public"."calendar_settings" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
 
 
 
@@ -300,6 +374,10 @@ CREATE OR REPLACE TRIGGER "trg_touch_updated_at_notifications" BEFORE UPDATE ON 
 
 
 
+CREATE OR REPLACE TRIGGER "trg_touch_updated_at_shared_calendar_settings" BEFORE UPDATE ON "public"."shared_calendar_settings" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
 CREATE OR REPLACE TRIGGER "trg_touch_updated_at_shared_calendars" BEFORE UPDATE ON "public"."shared_calendars" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
 
 
@@ -309,6 +387,11 @@ CREATE OR REPLACE TRIGGER "trg_touch_updated_at_shared_tokens" BEFORE UPDATE ON 
 
 
 CREATE OR REPLACE TRIGGER "trg_touch_updated_at_users" BEFORE UPDATE ON "public"."users" FOR EACH ROW EXECUTE FUNCTION "public"."touch_updated_at"();
+
+
+
+ALTER TABLE ONLY "public"."calendar_settings"
+    ADD CONSTRAINT "calendar_settings_calendar_id_fkey" FOREIGN KEY ("calendar_id") REFERENCES "public"."calendars"("id") ON DELETE CASCADE;
 
 
 
@@ -362,6 +445,11 @@ ALTER TABLE ONLY "public"."notifications"
 
 
 
+ALTER TABLE ONLY "public"."shared_calendar_settings"
+    ADD CONSTRAINT "shared_calendar_settings_shared_calendar_id_fkey" FOREIGN KEY ("shared_calendar_id") REFERENCES "public"."shared_calendars"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."shared_tokens"
     ADD CONSTRAINT "shared_tokens_calendar_id_fkey" FOREIGN KEY ("calendar_id") REFERENCES "public"."calendars"("id") ON DELETE CASCADE;
 
@@ -384,9 +472,27 @@ GRANT USAGE ON SCHEMA "public" TO "service_role";
 
 
 
+GRANT ALL ON FUNCTION "public"."ensure_calendar_settings"() TO "anon";
+GRANT ALL ON FUNCTION "public"."ensure_calendar_settings"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."ensure_calendar_settings"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."ensure_shared_calendar_settings"() TO "anon";
+GRANT ALL ON FUNCTION "public"."ensure_shared_calendar_settings"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."ensure_shared_calendar_settings"() TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "public"."touch_updated_at"() TO "anon";
 GRANT ALL ON FUNCTION "public"."touch_updated_at"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."touch_updated_at"() TO "service_role";
+
+
+
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."calendar_settings" TO "anon";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."calendar_settings" TO "authenticated";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."calendar_settings" TO "service_role";
 
 
 
@@ -429,6 +535,12 @@ GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public".
 GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."notifications" TO "anon";
 GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."notifications" TO "authenticated";
 GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."notifications" TO "service_role";
+
+
+
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."shared_calendar_settings" TO "anon";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."shared_calendar_settings" TO "authenticated";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."shared_calendar_settings" TO "service_role";
 
 
 
