@@ -8,8 +8,6 @@ import { useTranslation } from "react-i18next";
 import ActionSheet from '../../components/common/ActionSheet';
 import { useSearchParams, useNavigate, useParams } from "react-router-dom";
 
-//TODO: changer l'affichage general pour simplifier les choses
-
 const VITE_URL = import.meta.env.VITE_VITE_URL;
 
 function SharedList({

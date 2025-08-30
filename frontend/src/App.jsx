@@ -211,6 +211,7 @@ function App() {
     });
   }, []);
 
+  // Fonction pour récupérer la méthode de décrément de stock
   const fetchPersonalStockDecrementMethod = useCallback(async (calendarId) => {
     return await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/stock-decrement-method`,
@@ -221,8 +222,8 @@ function App() {
       analyticsData: { calendarId, uid },
     });
   }, []);
-  
-  
+
+  // Fonction pour mettre à jour la méthode de décrément de stock
   const updatePersonalStockDecrementMethod = useCallback(async (calendarId, method) => {
     return await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/stock-decrement-method`,
@@ -235,7 +236,7 @@ function App() {
     });
   }, []);
 
-
+  // Fonction pour restocker une boîte
   const personalRestockBox = useCallback(async (calendarId, boxId) => {
     return await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/boxes/${boxId}/restock`,
@@ -618,6 +619,7 @@ function App() {
     });
   }, []);
 
+  // Fonction pour restocker une boîte
   const sharedUserRestockBox = useCallback(async (calendarId, boxId) => {
     return await performApiCall({
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/boxes/${boxId}/restock`,
@@ -629,6 +631,7 @@ function App() {
     });
   }, []);
 
+  // Fonction pour récupérer les notifications activées
   const fetchSharedUserNotificationsEnabled = useCallback(async (calendarId) => {
     return await performApiCall({
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/notifications`,
@@ -640,6 +643,7 @@ function App() {
     });
   }, []);
 
+  // Fonction pour mettre à jour les notifications activées
   const updateSharedUserNotificationsEnabled = useCallback(async (calendarId, enabled) => {
     return await performApiCall({
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/notifications`,
@@ -652,6 +656,7 @@ function App() {
     });
   }, []);
 
+  // Fonction pour récupérer la méthode de décrément de stock
   const fetchSharedUserStockDecrementMethod = useCallback(async (calendarId) => {
     return await performApiCall({
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/stock-decrement-method`,
@@ -675,6 +680,18 @@ function App() {
         origin: 'DOCUMENT_ANALYZE',
         uid,
         analyticsEvent: 'DOCUMENT_ANALYZE',
+        analyticsData: { uid },
+      });
+    }, []);
+
+    const saveAnalysisResult = useCallback(async (calendarName, boxes) => {
+      return await performApiCall({
+        url: `${API_URL}/api/documents/analyze/save`,
+        method: 'POST',
+        body: { calendarName, boxes },
+        origin: 'DOCUMENT_ANALYZE_SAVE',
+        uid,
+        analyticsEvent: 'DOCUMENT_ANALYZE_SAVE',
         analyticsData: { uid },
       });
     }, []);
@@ -705,6 +722,7 @@ function App() {
       updatePersonalStockDecrementMethod,
       personalRestockBox,
       analyzeImage,
+      saveAnalysisResult,
     },
 
     sharedUserCalendars: {

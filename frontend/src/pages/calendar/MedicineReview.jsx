@@ -1,8 +1,9 @@
 import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
+import ArrowControls from '../../components/calendar/ArrowControls';
 
 const DEFAULT_CONDITION = {
   time_of_day: '',
@@ -11,10 +12,14 @@ const DEFAULT_CONDITION = {
   tablet_count: '',
 };
 
-export default function MedicineReview() {
+export default function MedicineReview({ personalCalendars }) {
   const location = useLocation();
+  const params = useParams();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const medicineBoxes = location.state?.importedMedicines ?? [];
+  const calendarName = location.state?.calendarName;
+  const lng = params.lng;
 
   const [medicines, setMedicines] = useState(medicineBoxes);
   const [editMode, setEditMode] = useState(false);
@@ -117,6 +122,13 @@ export default function MedicineReview() {
   const goNext = () => {
     if (index < medicines.length - 1) setIndex(index + 1);
     setEditMode(false);
+  };
+
+  const handleSave = async () => {
+    const rep = await personalCalendars.saveAnalysisResult(calendarName, medicines);
+    if (rep.success) {
+      navigate(`/${lng}/calendar/${rep.calendar_id}`);
+    }
   };
 
   useEffect(() => {
@@ -465,6 +477,10 @@ export default function MedicineReview() {
           )}
 
         <hr />
+        <ArrowControls
+          onLeft={goPrev}
+          onRight={index < medicines.length - 1 ? goNext : handleSave}
+        />
         <div className="d-flex justify-content-between gap-3">
           <button 
             className="btn btn-secondary" 
@@ -481,7 +497,7 @@ export default function MedicineReview() {
           </div>
           <button
             className={`btn ${index < medicines.length - 1 ? "btn-primary" : "btn-success"}`}
-            onClick={goNext}
+            onClick={index < medicines.length - 1 ? goNext : handleSave}
             disabled={!isCurrentValid()}
             title={index < medicines.length - 1 ? t('next') : t('medicine_review.finish')}
             aria-label={t('next')}
