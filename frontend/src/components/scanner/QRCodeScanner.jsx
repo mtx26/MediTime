@@ -573,14 +573,6 @@ const QRCodeScanner = forwardRef(({
             maxWidth: "400px",
             width: "100%"
           }}
-          onMouseEnter={showControlsTemporary}
-          onMouseLeave={() => {
-            if (hideControlsTimeoutRef.current) {
-              clearTimeout(hideControlsTimeoutRef.current);
-            }
-            setShowControls(false);
-          }}
-          onTouchStart={showControlsTemporary}
         >
           <video
             ref={videoRef}
@@ -605,12 +597,25 @@ const QRCodeScanner = forwardRef(({
           
           {/* Contrôles discrets */}
           <div 
-            className={`scanner-controls position-absolute top-0 end-0 p-2 transition-opacity ${showControls ? 'opacity-100' : 'opacity-25'}`}
+            className={`scanner-controls position-absolute top-0 end-0 p-2 transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'}`}
             style={{ 
-              background: 'rgba(0,0,0,0.7)', 
-              borderRadius: '0 8px 0 8px',
-              transition: 'opacity 0.3s ease',
-              backdropFilter: 'blur(4px)'
+              background: 'rgba(0,0,0,0.8)', 
+              borderRadius: '0 8px 0 12px',
+              transition: 'all 0.3s ease',
+              backdropFilter: 'blur(6px)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              minWidth: '140px',
+              pointerEvents: showControls ? 'auto' : 'none'
+            }}
+            onMouseEnter={() => {
+              if (showControls && hideControlsTimeoutRef.current) {
+                clearTimeout(hideControlsTimeoutRef.current);
+              }
+            }}
+            onMouseLeave={() => {
+              if (showControls) {
+                autoHideControls();
+              }
             }}
           >
             {/* Contrôle de zoom */}
@@ -659,22 +664,54 @@ const QRCodeScanner = forwardRef(({
             )}
           </div>
           
-          {/* Bouton pour afficher/masquer les contrôles sur mobile */}
+          {/* Bouton discret pour ouvrir/fermer les contrôles */}
           <button
-            className="btn btn-sm btn-secondary position-absolute bottom-0 end-0 m-2 d-md-none"
-            onClick={() => {
+            type="button"
+            className="btn position-absolute"
+            onClick={(e) => {
+              e.stopPropagation();
               if (showControls) {
                 setShowControls(false);
                 if (hideControlsTimeoutRef.current) {
                   clearTimeout(hideControlsTimeoutRef.current);
                 }
               } else {
-                showControlsTemporary();
+                setShowControls(true);
+                autoHideControls();
               }
             }}
-            style={{ opacity: 0.7 }}
+            style={{ 
+              top: '8px',
+              left: '8px', // Déplacé à gauche pour éviter le conflit avec le menu
+              width: '36px',
+              height: '36px',
+              padding: '0',
+              background: 'rgba(0,0,0,0.7)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '50%',
+              color: 'white',
+              fontSize: '16px',
+              backdropFilter: 'blur(4px)',
+              transition: 'all 0.2s ease',
+              cursor: 'pointer',
+              zIndex: 1000
+            }}
+            onMouseDown={(e) => {
+              e.target.style.transform = 'scale(0.95)';
+            }}
+            onMouseUp={(e) => {
+              e.target.style.transform = 'scale(1)';
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = 'rgba(0,0,0,0.85)';
+              e.target.style.borderColor = 'rgba(255,255,255,0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'rgba(0,0,0,0.7)';
+              e.target.style.borderColor = 'rgba(255,255,255,0.3)';
+            }}
           >
-            <i className="bi bi-gear"></i>
+            <i className={`bi ${showControls ? 'bi-x' : 'bi-gear'}`}></i>
           </button>
         </div>
 
