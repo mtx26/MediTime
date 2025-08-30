@@ -285,13 +285,17 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
     const medicineBox = medicineBoxes[0];
     try {
+      // Récupérer les conditions actuelles du médicament
+      const currentBox = boxes.find(box => box.id === currentEditingBoxId);
+      const currentConditions = currentBox ? currentBox.conditions : [];
+      
       const box = {
         name: medicineBox.name,
         dose: medicineBox.dose,
         box_capacity: medicineBox.box_capacity,
         stock_alert_threshold: medicineBox.stock_alert_threshold,
         stock_quantity: medicineBox.stock_quantity,
-        conditions: [],
+        conditions: currentConditions, // Conserver les conditions existantes
       };
       
       const res = await calendarSource.updateBox(calendarId, currentEditingBoxId, box);
