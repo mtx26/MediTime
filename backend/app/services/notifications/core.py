@@ -14,7 +14,7 @@ from html import escape
 
 # ========= Constantes =========
 ORIGIN = "NOTIFICATIONS"
-DEFAULT_CHANNELS: Tuple[str, ...] = ("push", "email", "web")
+DEFAULT_CHANNELS: Tuple[str, ...] = ("email", "web") ### push
 DEFAULT_USER_NAME = "un utilisateur"
 VIEW_CALENDAR_LABEL = "Voir le calendrier"
 
