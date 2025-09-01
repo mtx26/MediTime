@@ -1,4 +1,4 @@
-import { useContext, useCallback } from 'react';
+import { useContext, useCallback, useMemo } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import { UserContext } from '../../contexts/UserContext';
@@ -112,9 +112,14 @@ const fetchSharedCalendars = async (
   }
 };
 
-export const useRealtimeCalendars = (setCalendarsData, setLoadingStates) => {
+export const useRealtimeCalendars = (setCalendarsData, setLoadingStates, calendarsData = []) => {
   const { userInfo } = useContext(UserContext);
   const uid = userInfo?.uid;
+
+  const calendarsIds = useMemo(() => {
+    if (!calendarsData || calendarsData.length === 0) return '';
+    return calendarsData.map(calendar => calendar.id).join(',');
+  }, [calendarsData]);
 
   const fetchData = useCallback(() => {
     if (!uid) return;
@@ -137,8 +142,20 @@ export const useRealtimeCalendars = (setCalendarsData, setLoadingStates) => {
         event: 'DELETE',
         table: 'calendars',
       },
+      {
+        channelName: `medicine-boxes-insert-watch`,
+        table: 'medicine_boxes',
+        event: '*',
+        filter: `calendar_id=in.(${calendarsIds})`,
+      },
+      {
+        channelName: 'medicine-boxes-delete-watch',
+        event: 'DELETE',
+        table: 'medicine_boxes',
+
+      },
     ],
-    deps: [uid],
+    deps: [uid, calendarsIds],
   });
 };
 
