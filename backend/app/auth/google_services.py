@@ -15,28 +15,37 @@ def init_firebase():
     """Initialise Firebase Admin SDK à partir du JSON dans l'env."""
     try:
         if firebase_admin._apps:
-            log_backend.info("Firebase déjà initialisé", {"origin": "FIREBASE_INIT"})
+            log_backend.info("Firebase déjà initialisé", {
+                "origin": "FIREBASE_INIT",
+                "code": "FIREBASE_INIT_ALREADY_INITIALIZED"
+            })
             return
 
         service_account_raw = Config.GOOGLE_APPLICATION_CREDENTIALS
 
         if not service_account_raw:
             log_backend.error("Aucune clé de service Firebase trouvée dans .env", {
-                "origin": "FIREBASE_INIT"
+                "origin": "FIREBASE_INIT",
+                "code": "FIREBASE_INIT_MISSING_CREDENTIALS"
             })
             raise RuntimeError("GOOGLE_APPLICATION_CREDENTIALS manquant")
 
         service_account_dict = json.loads(service_account_raw)
-        
+        project_id = service_account_dict.get("project_id")
+
         cred = credentials.Certificate(service_account_dict)
+
         firebase_admin.initialize_app(cred)
         log_backend.info("Firebase initialisé avec succès", {
-            "origin": "FIREBASE_INIT"
+            "origin": "FIREBASE_INIT",
+            "code": "FIREBASE_INIT_SUCCESS",
+            "project_id": project_id
         })
         
     except Exception as e:
         log_backend.error("Erreur lors de l'initialisation de Firebase", {
             "origin": "FIREBASE_INIT",
+            "code": "FIREBASE_INIT_ERROR",
             "error": str(e)
         })
         raise RuntimeError("Initialisation Firebase échouée")
@@ -61,7 +70,8 @@ def init_vertex_ai():
 
         log_backend.info("Vertex AI initialisé avec succès", {
             "origin": "VERTEX_INIT",
-            "project": project_id,
+            "code": "VERTEX_INIT_SUCCESS",
+            "project_id": project_id,
             "location": location
         })
 
