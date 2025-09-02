@@ -161,10 +161,16 @@ export const useRealtimeCalendars = (setCalendarsData, setLoadingStates, calenda
 
 export const useRealtimeSharedCalendars = (
   setSharedCalendarsData,
-  setLoadingStates
+  setLoadingStates,
+  sharedCalendarsData = []
 ) => {
   const { userInfo } = useContext(UserContext);
   const uid = userInfo?.uid;
+
+  const sharedCalendarsIds = useMemo(() => {
+    if (!sharedCalendarsData || sharedCalendarsData.length === 0) return '';
+    return sharedCalendarsData.map(sharedCalendar => sharedCalendar.id).join(',');
+  }, [sharedCalendarsData]);
 
   const fetchData = useCallback(() => {
     if (!uid) return;
@@ -186,7 +192,18 @@ export const useRealtimeSharedCalendars = (
         event: 'DELETE',
         table: 'shared_calendars',
       },
+      {
+        channelName: 'shared-medicine-boxes-insert-watch',
+        table: 'medicine_boxes',
+        event: '*',
+        filter: `calendar_id=in.(${sharedCalendarsIds})`,
+      },
+      {
+        channelName: 'shared-medicine-boxes-delete-watch',
+        event: 'DELETE',
+        table: 'medicine_boxes',
+      },
     ],
-    deps: [uid],
+    deps: [uid, sharedCalendarsIds],
   });
 };

@@ -14,6 +14,7 @@ export default function RealtimeManager({
   setTokensList,
   setLoadingStates,
   calendarsData,
+  sharedCalendarsData,
 }) {
   const location = useLocation();
 
@@ -47,7 +48,8 @@ export default function RealtimeManager({
   );
   useRealtimeSharedCalendars(
     isRealtimeEnabled ? setSharedCalendarsData : null,
-    setLoadingStates
+    setLoadingStates,
+    sharedCalendarsData
   );
   useRealtimeNotifications(
     isRealtimeEnabled ? setNotificationsData : null,
@@ -65,4 +67,5 @@ RealtimeManager.propTypes = {
   setTokensList: PropTypes.func.isRequired,
   setLoadingStates: PropTypes.func.isRequired,
   calendarsData: PropTypes.array,
+  sharedCalendarsData: PropTypes.array,
 };

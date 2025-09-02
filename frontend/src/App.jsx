@@ -885,6 +885,7 @@ function App() {
             setTokensList={setTokensList}
             setLoadingStates={setLoadingStates}
             calendarsData={calendarsData}
+            sharedCalendarsData={sharedCalendarsData}
           />
         )}
 
