@@ -12,7 +12,7 @@ def run_scheduler():
         # Configuration du cron pour test à 13:52
         scheduler.add_job(
             decrease_stock,
-            CronTrigger(hour=13, minute=51),  # Test à 13:52
+            CronTrigger(hour=0, minute=0),  # Test à 00:00
             id='daily_stock_decrease',
             name='Diminution quotidienne des stocks',
             max_instances=1,  # Empêche les exécutions multiples
