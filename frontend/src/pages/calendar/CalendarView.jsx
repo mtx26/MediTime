@@ -428,7 +428,7 @@ function CalendarPage({
             </div>
             {/* Bouton pour naviguer vers la semaine suivante ou precedente */}
             {stockDecrementMethod === "weekly_pillbox" && (
-              <div className='d-block d-lg-none'>
+              <div className='d-flex d-lg-none justify-content-center align-items-center'>
                 <CalendarWeekSelector
                   calendarTable={calendarTable}
                   monday={monday}
@@ -437,7 +437,7 @@ function CalendarPage({
                 />
               </div>
             )}
-            <div className='d-none d-lg-block'>
+            <div className='d-none d-lg-flex justify-content-center align-items-center'>
               <CalendarWeekSelector
                 calendarTable={calendarTable}
                 monday={monday}

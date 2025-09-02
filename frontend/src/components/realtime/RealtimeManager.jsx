@@ -13,6 +13,8 @@ export default function RealtimeManager({
   setNotificationsData,
   setTokensList,
   setLoadingStates,
+  calendarsData,
+  sharedCalendarsData,
 }) {
   const location = useLocation();
 
@@ -41,11 +43,13 @@ export default function RealtimeManager({
   // ✅ Appel des hooks (OK car toujours dans un composant monté dans <Router>)
   useRealtimeCalendars(
     isRealtimeEnabled ? setCalendarsData : null,
-    setLoadingStates
+    setLoadingStates,
+    calendarsData
   );
   useRealtimeSharedCalendars(
     isRealtimeEnabled ? setSharedCalendarsData : null,
-    setLoadingStates
+    setLoadingStates,
+    sharedCalendarsData
   );
   useRealtimeNotifications(
     isRealtimeEnabled ? setNotificationsData : null,
@@ -62,4 +66,6 @@ RealtimeManager.propTypes = {
   setNotificationsData: PropTypes.func.isRequired,
   setTokensList: PropTypes.func.isRequired,
   setLoadingStates: PropTypes.func.isRequired,
+  calendarsData: PropTypes.array,
+  sharedCalendarsData: PropTypes.array,
 };

@@ -118,6 +118,7 @@ const useRealtimeBoxes = (
         channelName: `${baseChannel}-${calendarId}`,
         table: 'medicine_boxes',
         filter: `calendar_id=eq.${calendarId}`,
+        event: '*',
       },
       {
         channelName: `${deleteChannel}-${calendarId}`,
