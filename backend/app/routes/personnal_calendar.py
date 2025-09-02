@@ -333,7 +333,7 @@ def get_personnal_stock_decrement_method(calendar_id):
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT cs.stock_decrement_method FROM calendar_settings cs WHERE cs.calendar_id = %s", (calendar_id,))
+                cursor.execute("SELECT stock_decrement_method FROM calendar_settings WHERE calendar_id = %s", (calendar_id,))
                 result = cursor.fetchone()
                 if result is None:
                     return warning_response(
