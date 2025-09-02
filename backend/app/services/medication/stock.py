@@ -54,8 +54,11 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
         calendar_id: ID du calendrier à vérifier.
     """
     log_backend.info(
-        "🔍 Vérification des stocks faibles pour le calendrier",
-        {"origin": "STOCK", "code": "STOCK_CHECK_CALENDAR_INIT", "calendar_id": calendar_id},
+        "Vérification des stocks faibles", {
+            "origin": "STOCK",
+            "code": "STOCK_CHECK_CALENDAR_INIT",
+            "calendar_id": calendar_id
+        }
     )
 
     try:
@@ -89,10 +92,6 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
                 shared_uids = {row["receiver_uid"] for row in cursor.fetchall()}
 
         if not results:
-            log_backend.info(
-                "Aucun stock faible trouvé pour le calendrier",
-                {"origin": "STOCK", "code": "STOCK_CHECK_CALENDAR_EMPTY", "calendar_id": calendar_id},
-            )
             return
 
         grouped: dict[str, list[dict]] = defaultdict(list)
@@ -121,7 +120,7 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
             try:
                 notify_and_record(user_id=uid, body_or_list=notifs, notification_type="low_stock")
                 log_backend.info(
-                    "✅ Notifications de stock faible envoyées pour le calendrier",
+                    "Notifications de stock faible envoyées pour le calendrier",
                     {
                         "origin": "STOCK",
                         "code": "STOCK_CHECK_CALENDAR_SUCCESS",
