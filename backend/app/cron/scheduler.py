@@ -1,6 +1,5 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-import time
 from app.cron.tasks.stock import decrease_stock
 from app.utils.logging import log_backend
 
@@ -26,11 +25,7 @@ def run_scheduler():
             "origin": "CRON",
             "code": "APSCHEDULER_INIT_SUCCESS"
         })
-
-        # Garder le thread principal en vie
-        while True:
-            time.sleep(60)  # Vérification toutes les minutes
-    
+        
     except Exception as e:
         log_backend.error("Erreur dans APScheduler", {
             "origin": "CRON",
