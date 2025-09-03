@@ -1,23 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useTranslation } from 'react-i18next';
-import { UserContext } from '../../contexts/UserContext';
-// import AlertSystem from '../../components/common/AlertSystem';
-// import { log } from '../../utils/logger';
-// import { getValidRedirect } from '../../utils/redirect';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   GoogleHandleLogin,
   registerWithEmail,
@@ -28,13 +10,28 @@ import {
   FacebookHandleLogin,
   MicrosoftHandleLogin
 } from '../../services/auth/authService';
+import AlertSystem from '../../components/common/AlertSystem';
+import { log } from '../../utils/logger';
+import { useTranslation } from 'react-i18next';
+import { UserContext } from '../../contexts/UserContext';
+import { getValidRedirect } from '../../utils/redirect';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  StyleSheet, 
+  ScrollView,
+  Alert,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Icon from 'react-native-vector-icons/Feather';
 
 function Auth() {
   const { userInfo } = useContext(UserContext);
   const { t } = useTranslation();
-  const navigation = useNavigation();
-  const route = useRoute();
-  
   // 👤 Authentification utilisateur
   const [email, setEmail] = useState(''); // État pour l'adresse e-mail
   const [password, setPassword] = useState(''); // État pour le mot de passe
@@ -47,15 +44,18 @@ function Auth() {
   const [alertType, setAlertType] = useState('info'); // État pour le type d'alerte (par défaut : info)
   const [duration, setDuration] = useState(2000); // État pour la durée de l'alerte
 
+  const location = useLocation();
+  const { lng } = useParams();
+  const navigate = useNavigate();
   const [redirect, setRedirect] = useState();
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  
   useEffect(() => {
-    const { screen } = route.params || {};
-    setActiveTab(screen === 'register' ? 'register' : 'login');
-    // setRedirect(getValidRedirect(route.params?.redirect));
-  }, [route.params]);
-
+    const last = location.pathname.split('/').pop();
+    setActiveTab(last === 'register' ? 'register' : 'login');
+    setRedirect(
+      getValidRedirect(new URLSearchParams(location.search).get('redirect'))
+    );
+  }, [location.pathname, location.search]);
+  
   const switchTab = (tab) => {
     if (tab !== activeTab) setActiveTab(tab);
   };
@@ -69,12 +69,15 @@ function Auth() {
       setAlertType('danger');
       return;
     }
-    // log.info('Connexion réussie', {
-    //   id: 'LOGIN-SUCCESS',
-    //   origin: 'Auth.js',
-    //   user: userInfo?.uid,
-    // });
-    navigation.navigate('AuthCallback', { redirect });
+    log.info('Connexion réussie', {
+      id: 'LOGIN-SUCCESS',
+      origin: 'Auth.jsx',
+      user: userInfo?.uid,
+    });
+    const callbackUrl =
+      `/${lng}/auth/callback` +
+      (redirect ? `?redirect=${encodeURIComponent(redirect)}` : '');
+    navigate(callbackUrl, { replace: true });
   };
 
   const handleRegister = async () => {
@@ -86,14 +89,15 @@ function Auth() {
       setAlertType('danger');
       return;
     }
-    // log.info('Inscription réussie', {
-    //   id: 'REGISTER-SUCCESS',
-    //   origin: 'Auth.js',
-    //   user: userInfo?.uid,
-    // });
+    log.info('Inscription réussie', {
+      id: 'REGISTER-SUCCESS',
+      origin: 'Auth.jsx',
+      user: userInfo?.uid,
+    });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       if (activeTab === 'login') {
         await handleLogin();
@@ -101,213 +105,268 @@ function Auth() {
         await handleRegister();
       }
     } catch (err) {
-      // log.error('Supabase auth error', {
-      //   id: 'AUTH-ERROR',
-      //   origin: 'Auth.js',
-      //   stack: err.stack,
-      // });
+      log.error('Supabase auth error', {
+        id: 'AUTH-ERROR',
+        origin: 'Auth.jsx',
+        stack: err.stack,
+      });
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoidingView}
+    <div className="container d-flex justify-content-center align-items-center my-5">
+      <div
+        className="card shadow-sm w-100"
+        style={{ maxWidth: '500px', borderRadius: '1rem' }}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Logo/Header */}
-          <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              <Ionicons name="medical" size={64} color="#007AFF" />
-            </View>
-            <Text style={styles.title}>MediTime</Text>
-            <Text style={styles.subtitle}>Gérez vos médicaments facilement</Text>
-          </View>
-
-          {/* Form */}
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Ionicons name="mail-outline" size={20} color="#6c757d" style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Adresse email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color="#6c757d" style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Mot de passe"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              <TouchableOpacity
-                style={styles.passwordToggle}
-                onPress={() => setShowPassword(!showPassword)}
+        <div className="card-body p-4">
+          {/* Tabs */}
+          <ul className="nav nav-pills nav-justified mb-4">
+            <li className="nav-item">
+              <button
+                className={` shadow-sm nav-link ${activeTab === 'login' ? 'active' : ''}`}
+                onClick={() => switchTab('login')}
+                aria-label={t('auth.login')}
+                title={t('auth.login')}
               >
-                <Ionicons
-                  name={showPassword ? 'eye-off' : 'eye'}
-                  size={20}
-                  color="#6c757d"
+                <i className="bi bi-box-arrow-in-right"></i>
+                <span> {t('auth.login')}</span>
+              </button>
+            </li>
+            <li className="nav-item">
+              <button
+                className={` shadow-sm nav-link ${activeTab === 'register' ? 'active' : ''}`}
+                onClick={() => switchTab('register')}
+                aria-label={t('auth.register')}
+                title={t('auth.register')}
+              >
+                <i className="bi bi-person-plus"></i>
+                <span> {t('auth.register')}</span>
+              </button>
+            </li>
+          </ul>
+
+          {/* Auth Form */}
+          <div className="text-center mb-3">
+            <p>
+              {activeTab === 'login'
+                ? t('auth.login_with')
+                : t('auth.register_with')}
+            </p>
+            <div className="gap-1 d-flex justify-content-center align-items-center flex-wrap">
+              <div className="d-flex flex-column align-items-center">
+                <div className="px-2">
+                  <button
+                    className="btn btn-outline-danger rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
+                    onClick={() => GoogleHandleLogin(redirect)}
+                    aria-label={t('auth.with_google')}
+                    title={t('auth.with_google')}
+                  >
+                    <i className="bi bi-google fs-4"></i>
+                  </button>
+                </div>
+                <span>{t('auth.provider.google')}</span>
+              </div>
+              <div className="d-flex flex-column align-items-center">
+                <div className="px-2">
+                  <button
+                    className="btn btn-outline-secondary rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
+                    onClick={() => GithubHandleLogin(redirect)}
+                    aria-label={t('auth.with_github')}
+                    title={t('auth.with_github')}
+                  >
+                    <i className="bi bi-github fs-4"></i>
+                  </button>
+                </div>
+                <span>{t('auth.provider.github')}</span>
+              </div>
+              <div className="d-flex flex-column align-items-center">
+                <div className="px-2">
+                  <button
+                    className="btn btn-outline-primary rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
+                    onClick={() => DiscordHandleLogin(redirect)}
+                    aria-label={t('auth.with_discord')}
+                    title={t('auth.with_discord')}
+                  >
+                    <i className="bi bi-discord fs-4"></i>
+                  </button>
+                </div>
+                <span>{t('auth.provider.discord')}</span>
+              </div>
+              <div className="d-flex flex-column align-items-center">
+                <div className="px-2">
+                  <button
+                    className="btn btn-outline-info rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
+                    onClick={() => TwitterHandleLogin(redirect)}
+                    aria-label={t('auth.with_twitter')}
+                    title={t('auth.with_twitter')}
+                  >
+                    <i className="bi bi-twitter fs-4"></i>
+                  </button>
+                </div>
+                <span>{t('auth.provider.twitter')}</span>
+              </div>
+              <div className="d-flex flex-column align-items-center">
+                <div className="px-2">
+                  <button
+                    className="btn btn-outline-primary rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
+                    onClick={() => FacebookHandleLogin(redirect)}
+                    aria-label={t('auth.with_facebook')}
+                    title={t('auth.with_facebook')}
+                  >
+                    <i className="bi bi-facebook fs-4"></i>
+                  </button>
+                </div>
+                <span>{t('auth.provider.facebook')}</span>
+              </div>
+              {/*
+              <div className="d-flex flex-column align-items-center">
+                <div className="px-2">
+                  <button
+                    className="btn btn-outline-dark rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
+                    onClick={() => MicrosoftHandleLogin(redirect)}
+                    aria-label={t('auth.with_microsoft')}
+                    title={t('auth.with_microsoft')}
+                  >
+                    <i className="bi bi-microsoft fs-4"></i>
+                  </button>
+                </div>
+                <span>{t('auth.provider.microsoft')}</span>
+              </div>
+              */}
+            </div>
+            <p className="text-center mt-3 mb-0 text-muted">{t('auth.or_with_email')}</p>
+          </div>
+
+          <AlertSystem
+            type={alertType}
+            message={alertMessage}
+            onClose={() => setAlertMessage(null)}
+            duration={duration}
+          />
+
+            <form onSubmit={handleSubmit}>
+            {activeTab === 'register' && (
+              <div className="mb-3">
+                <label htmlFor="name" className="form-label">
+                  {t('auth.name')}
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="name"
+                  aria-label={t('auth.name')}
+                  required
+                  value={name}
+                  autoComplete={activeTab === 'login' ? 'name' : 'new-name'}
+                  onChange={(e) => setName(e.target.value)}
                 />
-              </TouchableOpacity>
-            </View>
+              </div>
+            )}
 
-            <TouchableOpacity
-              style={styles.forgotPassword}
-              onPress={() => navigation.navigate('ForgotPassword')}
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                {t('auth.email')}
+              </label>
+              <input
+                type="email"
+                className="form-control"
+                id="email"
+                aria-label={t('auth.email')}
+                required
+                value={email}
+                autoComplete={activeTab === 'login' ? 'email' : 'new-email'}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="mb-3 position-relative">
+              <label htmlFor="password" className="form-label">
+                {t('auth.password')}
+              </label>
+              <input
+                type={passwordVisible ? 'text' : 'password'}
+                className="form-control"
+                id="password"
+                aria-label={t('auth.password')}
+                required
+                value={password}
+                autoComplete={activeTab === 'login' ? 'current-password' : 'new-password'}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <i
+                className={`bi bi-${passwordVisible ? 'eye-slash' : 'eye'} position-absolute`}
+                role="button"
+                tabIndex="0"
+                aria-label={
+                  passwordVisible
+                    ? t('auth.hide_password')
+                    : t('auth.show_password')
+                }
+                style={{
+                  top: '38px',
+                  right: '15px',
+                  cursor: 'pointer',
+                  color: '#6c757d',
+                }}
+                onClick={() => setPasswordVisible(!passwordVisible)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setPasswordVisible(!passwordVisible);
+                  }
+                }}
+              ></i>
+            </div>
+
+            {activeTab === 'login' && (
+              <div className="mb-3 text-end">
+                <Link to={`/${lng}/reset-password`} className="text-decoration-none">
+                  {t('auth.forgot_password')}
+                </Link>
+              </div>
+            )}
+
+            {activeTab === 'register' && (
+              <div
+                className="form-check mb-3 text-left"
+                style={{ cursor: 'pointer' }}
+              >
+                <input
+                  className="form-check-input"
+                  style={{ cursor: 'pointer' }}
+                  type="checkbox"
+                  required
+                  id="terms"
+                  name="terms"
+                  aria-label={t('auth.accept_terms_aria')}
+                />
+                <label
+                  className="form-check-label"
+                  style={{ cursor: 'pointer' }}
+                  htmlFor="terms"
+                >
+                  {t('auth.accept_terms')}
+                  <Link to={`/${lng}/terms`} className="text-decoration-none">
+                    {t('auth.terms_link')}
+                  </Link>
+                </label>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="btn btn-outline-primary w-100 shadow-sm"
+              aria-label={activeTab === 'login' ? t('auth.login') : t('auth.register')}
+              title={activeTab === 'login' ? t('auth.login') : t('auth.register')}
             >
-              <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.loginButton, loading && styles.loginButtonDisabled]}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              <Text style={styles.loginButtonText}>
-                {loading ? 'Connexion...' : 'Se connecter'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Register Link */}
-          <View style={styles.registerContainer}>
-            <Text style={styles.registerText}>Pas encore de compte ? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.registerLink}>S'inscrire</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+              {activeTab === 'login' ? t('auth.login') : t('auth.register')}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logoContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#212529',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6c757d',
-    textAlign: 'center',
-  },
-  form: {
-    marginBottom: 30,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 12,
-    marginBottom: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    height: 48,
-    fontSize: 16,
-    color: '#212529',
-  },
-  passwordToggle: {
-    padding: 4,
-  },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: 24,
-  },
-  forgotPasswordText: {
-    color: '#007AFF',
-    fontSize: 14,
-  },
-  loginButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 12,
-    height: 52,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loginButtonDisabled: {
-    backgroundColor: '#a6b6c7',
-  },
-  loginButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  registerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  registerText: {
-    color: '#6c757d',
-    fontSize: 16,
-  },
-  registerLink: {
-    color: '#007AFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
-
-export default LoginScreen;
+export default Auth;
