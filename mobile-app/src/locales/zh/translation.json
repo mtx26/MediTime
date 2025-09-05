@@ -1,0 +1,719 @@
+{
+  "Actions": "行动",
+  "Fri": "星期五",
+  "Mon": "周一",
+  "Sat": "周六",
+  "Sun": "星期日",
+  "Thu": "周四",
+  "Tue": "周二",
+  "Wed": "周三",
+  "about": "关于",
+  "accept": "接受",
+  "accepted": "公认",
+  "access": "使用权",
+  "account": {
+    "crop": {
+      "title": "裁剪照片",
+      "use": "使用此图像"
+    },
+    "display_name": {
+      "label": "伪",
+      "placeholder": "输入您的用户名"
+    },
+    "image_size_error": "图片大小不得超过 5MB",
+    "instructions": "您可以在这里更改您的个人信息。",
+    "label": "帐户",
+    "profile_alt": "轮廓",
+    "save_changes": "保存更改"
+  },
+  "accounts": "账户",
+  "activation": "激活",
+  "activation_toggle_aria": "启用或禁用链接",
+  "actual_stock": "现有库存",
+  "add": "添加",
+  "admin": "行政",
+  "app": {
+    "access": "访问应用程序",
+    "description": "安排您的治疗并轻松分享您的医疗日历。",
+    "login": "登录",
+    "name": "MediTime",
+    "pageTitle": "MediTime - 医疗治疗管理器",
+    "register": "创建一个帐户",
+    "shortN": "医疗时间",
+    "shortName": "MediTime",
+    "subtitle": "轻松管理、跟踪和分享您的医疗治疗。",
+    "title": "医疗时间"
+  },
+  "auth": {
+    "accept_terms": "我接受",
+    "accept_terms_aria": "接受条款和条件",
+    "email": "电子邮件",
+    "forgot_password": "忘记密码了吗？",
+    "hide_password": "隐藏密码",
+    "login": "登录",
+    "login_with": "连接：",
+    "name": "姓名",
+    "or_with_email": "或通过电子邮件：",
+    "password": "密码",
+    "provider": {
+      "discord": "不和谐",
+      "facebook": "Facebook",
+      "github": "Github",
+      "google": "谷歌",
+      "twitter": "叽叽喳喳"
+    },
+    "register": "登记",
+    "register_with": "注册方式：",
+    "show_password": "显示密码",
+    "terms_link": "一般条件",
+    "verification_sent": "📩 验证链接已发送至您的电子邮件地址。",
+    "with_discord": "与 Discord 连接",
+    "with_facebook": "使用 Facebook 登录",
+    "with_github": "与 Github 连接",
+    "with_google": "使用 Google 登录",
+    "with_twitter": "与 Twitter 建立联系"
+  },
+  "auth_callback": {
+    "loading": "正在连接...",
+    "session_error": "OAuth 后会话恢复失败",
+    "success": "通过回调成功连接"
+  },
+  "back": "后退",
+  "boxes": {
+    "add_box": "添加框",
+    "add_manual": "手动添加",
+    "add_with_qr": "扫描二维码",
+    "alert_threshold": "警报阈值",
+    "cancel": "取消",
+    "capacity": "盒子容量",
+    "condition": {
+      "add": "添加条件",
+      "delete": "删除",
+      "interval_days": "天间隔",
+      "none": "无条件服用",
+      "start_date": "开始日期",
+      "tablet_count": "药片数量",
+      "time_of_day": "服用时间"
+    },
+    "day": "天",
+    "days": "天",
+    "delete": "删除",
+    "dose": "剂量",
+    "each": "每个",
+    "edit": "修改",
+    "every": "所有",
+    "export_pdf": "出口",
+    "from": "从",
+    "intake_conditions": "服用条件",
+    "name": "姓名",
+    "new_box": "新盒子",
+    "qr_code_help_text": "DataMatrix 码位于药品包装上，靠近条形码。它是一个黑白相间的小方块。",
+    "remaining_qty": "剩余数量",
+    "restock": "补货",
+    "save": "节省",
+    "scan_qr_code": "扫描二维码",
+    "start_typing": "开始输入...",
+    "stock": {
+      "alerts": {
+        "line": "{{name}} ({{dose}} mg) — {{count}} 单位库存",
+        "line_negative": "{{name}} ({{dose}} 毫克) — {{count}} 单位（缺货）",
+        "line_plural": "{{name}} ({{dose}} mg) — 库存有 {{count}} 件",
+        "title": "🔔 库存警报："
+      },
+      "badge": {
+        "high": "高库存",
+        "low": "库存不足",
+        "out": "缺货"
+      }
+    },
+    "tablet": "压缩",
+    "tablets": "平板电脑",
+    "title": "药箱",
+    "view_notice": "查看说明"
+  },
+  "calendar": {
+    "add": "添加日历",
+    "add_calendar": "添加日历",
+    "add_with_qr": "通过扫描二维码创建日历",
+    "calendar_name": "日历名称",
+    "calendar_name_placeholder": "输入日历的名称",
+    "choose_image": "选择图像",
+    "confirm_delete": "删除日历？",
+    "confirm_delete_shared": "删除共享日历？",
+    "confirm_rename": "重命名日历？",
+    "create_calendar_qr": "扫描二维码：{{calendarName}}",
+    "creating_calendar": "正在创作...",
+    "daily_view": "日历",
+    "day": "天",
+    "drag_and_drop": "将图像拖到此处或单击以选择它",
+    "error_calendar_creation": "创建日历时出错",
+    "error_no_calendar_name": "请输入日历名称",
+    "error_no_medicines": "未扫描任何药物",
+    "error_partial_success": "日历已创建，但无法添加{{count}}种药物",
+    "import_calendar": "导入日历“{{name}}”",
+    "import_type": "添加模式",
+    "import_type_file": "导入文件",
+    "import_type_file_description": "从导出的文件导入日历。",
+    "import_type_manual": "曼努埃尔",
+    "import_type_manual_description": "创建一个空日历并手动添加药物。",
+    "import_type_qr_description": "扫描药盒上的 DataMatrix 代码即可自动创建您的时间表。",
+    "label": "日历",
+    "month": "月",
+    "name": "日历名称",
+    "new_name": "新名称",
+    "processing": "正在处理…",
+    "reference_week": "参考周",
+    "scan_medicines": "扫描药物",
+    "scan_medicines_description": "扫描药盒上的 DataMatrix 码。扫描的每种药物都会自动添加到您的新药计划中。",
+    "scan_qr_option": "扫描二维码",
+    "scanner_button_hint": "使用扫描仪的“添加”按钮创建日历",
+    "today": "今天",
+    "week": "星期",
+    "weekly_help": "单击日历中的某一天即可在窗口中查看相关药物。",
+    "weekly_view": "按周日历"
+  },
+  "calendar_completed": "行事历成功完成！",
+  "calendar_settings": {
+    "label": "日历设置",
+    "notifications": {
+      "disabled": "已禁用通知",
+      "enabled": "已启用通知",
+      "label": "通知"
+    },
+    "sharing": {
+      "label": "共享"
+    },
+    "stock": {
+      "daily": {
+        "description": "库存每天都会自动减少。",
+        "label": "每日（午夜）"
+      },
+      "label": "库存数量",
+      "weekly": {
+        "description": "当您重新填充药盒时，库存将每周手动减少。",
+        "label": "每周（药盒）"
+      }
+    }
+  },
+  "calendars": "日历",
+  "cancel": "取消",
+  "choose_date": "选择日期",
+  "close": "关闭",
+  "confirm_calendar_completion": "确认计划完成情况",
+  "contact": "接触",
+  "copy_link": "复制链接",
+  "copy_link_error": "复制链接时出错。",
+  "create_share_link": "创建共享链接",
+  "critical_stock": "股票破裂",
+  "cta": {
+    "button": "我创建了我的帐户",
+    "desc": "免费创建您的帐户并简化全家人的医疗管理。",
+    "title": "立即开始"
+  },
+  "date": "日期",
+  "day_view": {
+    "title": "每日视图"
+  },
+  "delete": "删除",
+  "delete_access": "删除访问权限",
+  "delete_access_confirm": "删除访问权限？",
+  "delete_calendar_confirm": "删除此日历吗？",
+  "delete_link": "删除链接",
+  "delete_link_confirm": "删除链接？",
+  "done": "完成的",
+  "evening": "晚上",
+  "expiration": "到期",
+  "expiration_date": "链接到期日期",
+  "expired": "已到期",
+  "expires_at": "到期日期",
+  "fcm": {
+    "sw_error": "[FCM] 软件错误",
+    "sw_registered": "[FCM] 短波已录制",
+    "token_registered": "[FCM] 在后端注册的令牌",
+    "token_send_error": "[FCM] 发送令牌时出错"
+  },
+  "features": {
+    "desc1": "安排您的拍摄，接收提醒并安心。",
+    "desc2": "让您所爱的人或照顾者能够每天为您提供支持。",
+    "desc3": "您的数据受到 Supabase 和 Firebase 等可信技术的保护。",
+    "title1": "智能日历",
+    "title2": "协作共享",
+    "title3": "安全有保障"
+  },
+  "home": "欢迎",
+  "home_meta": {
+    "description": "轻松管理和分享您的药物摄入量。",
+    "title": "MediTime - 治疗计划器"
+  },
+  "image_upload": {
+    "analysis_error": "解析图像时出错。",
+    "click_to_change": "单击更改文件",
+    "click_to_select_file": "单击或拖放以选择文件",
+    "file_analysis_error": "解析文件时出错",
+    "file_selected": "选定文件",
+    "file_type_error": "仅接受图像文件（jpg、png、webp、gif）。",
+    "file_types": "JPG、PNG、WEBP、GIF",
+    "no_medicines_found": "图像中未发现药物。",
+    "preview_alt": "预览",
+    "preview_error": "显示预览时出错",
+    "remove_image": "删除图片",
+    "select_file_error": "请选择一个图像文件。",
+    "title": "选择并预览文件"
+  },
+  "invalid_or_expired_link": "此共享日历链接无效或已过期。",
+  "invitation": {
+    "invalid_or_expired": "邀请无效或已过期",
+    "title": "邀请"
+  },
+  "link": "关联",
+  "link_already_exists": "此日历的链接已存在。",
+  "link_copied": "🔗 链接已复制！",
+  "link_expiration": "链接过期",
+  "link_will_be_generated": "将生成一个链接",
+  "loading": "加载中...",
+  "loading_calendar": "正在加载日历...",
+  "loading_calendars": "正在加载日历...",
+  "loading_medicines": "正在加载药物...",
+  "loading_notifications": "正在加载通知...",
+  "loading_settings": "正在加载设置...",
+  "loading_share": "正在加载分享...",
+  "locale": "zh-CN",
+  "login": "登录",
+  "logout": "登出",
+  "low_stock": "库存不足",
+  "manage_link": "管理链接",
+  "medicine_review": {
+    "current_stock": "现有库存",
+    "delete_condition": "删除此条件",
+    "finish": "结束",
+    "maximum_stock": "库存上限",
+    "select_option": "选择...",
+    "start_date": "开始",
+    "time_of_day": "片刻",
+    "title": "药物审查"
+  },
+  "medicines": {
+    "back_to_calendar": "返回日历",
+    "label": "药物",
+    "list_empty": "❌ 此计划尚未添加任何药物。",
+    "list_title": "药品清单"
+  },
+  "mg": "毫克",
+  "mobile": {
+    "android": "在<strong>Android 设备</strong>上，浏览器底部会自动显示<em>“添加到主屏幕”</em>消息。点击即可安装 MediTime。",
+    "desc": "MediTime 是一款移动应用。将其添加到主屏幕即可快速访问。",
+    "feature1": "通过浏览器轻松安装",
+    "feature2": "流畅的触摸界面",
+    "feature3": "从主屏幕快速访问",
+    "ios": "在<strong>iPhone</strong>上，在 Safari 中打开 MediTime，点击<i class=\"bi bi-share mx-1\"></i>然后<em>“在主屏幕上”</em> 。",
+    "other": "MediTime 也可在计算机或平板电脑上访问。",
+    "title": "可在您的手机上使用"
+  },
+  "modify": "修饰符",
+  "morning": "早晨",
+  "my_calendars": "我的日历",
+  "navigation": {
+    "about": "关于",
+    "calendar": "日历",
+    "dashboard": "仪表板",
+    "forgot-password": "忘记密码",
+    "help": "助手",
+    "home": "欢迎",
+    "login": "登录",
+    "medicines": "药物",
+    "profile": "轮廓",
+    "register": "登记",
+    "reset-password": "重置密码",
+    "settings": "设置"
+  },
+  "never": "绝不",
+  "next": "下列的",
+  "next_day": "第二天",
+  "no_calendar_found": "未找到日历",
+  "no_calendar_found_cta": "您可以从主页创建日历。",
+  "no_events_today": "这天没有活动。",
+  "no_expiration": "无有效期",
+  "no_low_stock": "暂无紧急库存药品。",
+  "no_medicines": "没有可显示的药物。",
+  "no_notifications": "没有新通知",
+  "no_personal_calendars": "您没有个人日历。",
+  "no_shared_calendars": "您没有共享日历。",
+  "noon": "中午",
+  "not_found": {
+    "message": "未找到页面。",
+    "title": "错误 404"
+  },
+  "notif": {
+    "calendar_invite": "<0></0> 邀请您加入日历 <1>{{name} </1>",
+    "calendar_joined": "您已加入 <0></0> 年的日历 <1>{{name}</1>",
+    "invite_accepted": "<0></0> 接受了您加入日历的邀请 <1>{{name} </1>",
+    "invite_rejected": "<0></0> 拒绝了您加入日历的邀请 <1>{{name}}",
+    "low_stock": "<0>{{name}} 即将售罄（剩余 <0>{{qty}}）。",
+    "share_removed_by_owner": "<0></0> 已停止与您共享日历 <1>{{name}}",
+    "share_removed_by_you": "<0></0> 删除了日历 <1>{{name}}"
+  },
+  "notification": {
+    "email_toggle": "启用电子邮件通知",
+    "instructions": "根据您的喜好启用或禁用电子邮件或推送通知。",
+    "push_toggle": "启用 Web 推送通知"
+  },
+  "notifications": "通知",
+  "open": "打开",
+  "open_notifications": "打开通知",
+  "owner": "所有者",
+  "pending": "等候接听",
+  "permissions": "权限",
+  "pillbox": {
+    "fill": "制作药盒",
+    "title": "药盒"
+  },
+  "previous": "以前的",
+  "previous_day": "前一天",
+  "privacy": {
+    "label": "保密性",
+    "last_update": "最后更新：2025年6月9日",
+    "section1": {
+      "content": "MediTime 是一款旨在方便管理药物治疗的网页应用。它允许用户创建个性化日历、接收提醒，并与亲人或医疗保健专业人士分享日程安排。该项目由 Matis Gillet（别名 mtx_26）个人开发，不用于任何商业用途。",
+      "title": "1. 我们是谁？"
+    },
+    "section2": {
+      "personal_data": {
+        "email": "电子邮件、姓名、照片：通过身份验证（Supabase Auth）。",
+        "title": "个人数据",
+        "uid": "唯一标识符：为每个用户自动生成。"
+      },
+      "tech_data": {
+        "device": "设备和浏览器信息（用于调试和匿名统计）。",
+        "title": "技术数据",
+        "tokens": "推送通知令牌（如果启用）。"
+      },
+      "title": "2. 收集哪些数据？",
+      "treatment_data": {
+        "boxes": "箱子信息（数量、库存、包装）。",
+        "history": "日历编辑和共享历史。",
+        "medicines": "药物名称、剂量、服用频率、服用时间。",
+        "title": "与处理相关的数据"
+      }
+    },
+    "section3": {
+      "no_ads": "不会出售、共享或使用任何数据用于广告目的。",
+      "reminders": "如果用户启用了通知，则发送提醒或警报。",
+      "sharing": "允许与其他用户安全共享。",
+      "stability": "提高应用程序的稳定性和安全性。",
+      "sync": "查看并同步治疗计划。",
+      "title": "3. 这些数据如何使用？"
+    },
+    "section4": {
+      "firebase": "Firebase（仅用于推送通知和匿名统计）。",
+      "location": "数据库位于欧盟或符合 GDPR 的地区。",
+      "supabase": "Supabase（PostgreSQL 和身份验证）。",
+      "title": "4. 数据存储在哪里？"
+    },
+    "section5": {
+      "auth": "数据访问受到身份验证的保护。",
+      "encryption": "所有日历共享均经过加密并由用户控制。",
+      "passwords": "标识符永远不会被看到或以明文形式存储。",
+      "title": "5.共享和安全"
+    },
+    "section6": {
+      "access": "查看或导出您的数据。",
+      "contact": "行使这些权利：",
+      "delete": "请求永久删除。",
+      "disable": "关闭通知。",
+      "intro": "根据 GDPR，您可以随时：",
+      "revoke": "撤销对共享日历的访问权限。",
+      "title": "6. 您的权利"
+    },
+    "section7": {
+      "developer": "负责开发者：Matis Gillet",
+      "title": "7.联系方式"
+    },
+    "title": "隐私政策 – MediTime"
+  },
+  "profile": "我的个人资料",
+  "public_links": "公共链接",
+  "reactivate_link": "重新激活链接",
+  "read_only": "只读",
+  "read_write": "阅读+编辑",
+  "recipient_email": "收件人的电子邮件",
+  "regenerate": "再生",
+  "regenerate_link_confirm": "重新生成此链接吗？",
+  "register": "登记",
+  "reject": "解雇",
+  "rename": "重命名",
+  "reset_password": {
+    "instructions": "输入您的电子邮件地址以接收重置链接。",
+    "send_link": "发送链接",
+    "success": "重置链接已发送至您的电子邮件地址。",
+    "title": "重置密码"
+  },
+  "reset_password_confirm": {
+    "cannot_change": "无法更改密码：会话无效。",
+    "instructions": "输入您的 MediTime 帐户的新密码。",
+    "invalid_link": "重置链接无效或已过期。",
+    "invalid_session": "会话无效。请重新请求链接。",
+    "new_password_label": "新密码",
+    "save_password": "保存密码",
+    "saving": "登记...",
+    "success": "您的密码已成功更改。",
+    "title": "新密码"
+  },
+  "revoke_link": "撤销链接",
+  "rights_reserved": "版权所有",
+  "scanner": {
+    "add": "添加",
+    "camera": "相机",
+    "camera_error": "无法访问相机。",
+    "camera_instruction": "指向 DataMatrix 代码",
+    "cancel": "取消",
+    "close": "关闭",
+    "medicine_not_found": "未找到药物",
+    "quantity": "数量：{{quantity}}",
+    "remove_from_list": "从列表中删除",
+    "searching": "研究...",
+    "select_camera": "选择相机",
+    "title": "扫描二维码",
+    "zoom": "缩放：{{zoom}}x",
+    "camera_front": "前",
+    "camera_back": "后退",
+    "camera_normal": "普通的",
+    "camera_inverted": "撤销",
+    "controls": {
+      "zoom": "飞涨",
+      "camera": "相机",
+      "flip": "撤销"
+    }
+  },
+  "security": {
+    "current_email": "当前电子邮件：",
+    "current_password": {
+      "label": "当前密码",
+      "placeholder": "输入当前密码",
+      "required": "需要旧密码。"
+    },
+    "google_warning": "已使用 Google 登录。您无法更改您的电子邮件地址或密码。",
+    "instructions": "检查与您的帐户关联的电子邮件地址，并在必要时更改您的密码。",
+    "new_password": {
+      "placeholder": "输入新密码"
+    },
+    "password_updated": "✅ 密码已成功更新。",
+    "title": "帐户管理",
+    "update_password": "更新密码"
+  },
+  "send_invitation": "发送邀请",
+  "send_sms": "通过短信发送",
+  "settings": {
+    "account": "我的账户",
+    "label": "设置",
+    "language": "应用程序语言",
+    "language_note": "所选语言将应用于整个界面。",
+    "preferences": "偏好设置",
+    "preferences_desc": "个性化您在 MediTime 上的体验。",
+    "security": "安全"
+  },
+  "share": "分享",
+  "share_calendar": "共享日历",
+  "shared": "共享",
+  "shared_by": "日历共享者",
+  "shared_by_token": "通过令牌共享的日历",
+  "shared_calendar": "分享 {{name}}",
+  "shared_calendar_management": "管理共享日历",
+  "shared_calendars": "共享日历",
+  "shared_link_label": "共享日历链接",
+  "shared_users": "共享用户",
+  "stock": "库存",
+  "stock_alert": "库存警报",
+  "stock_alert_tooltip": "查看关键库存药物",
+  "stock_alerts": "缺货药品",
+  "supabase-error": {
+    "access_denied": "拒绝访问",
+    "already_confirmed": "已确认",
+    "anonymous_provider_disabled": "匿名连接已禁用",
+    "bad_code_verifier": "验证码无效",
+    "bad_json": "无效的 JSON",
+    "bad_jwt": "JWT 无效",
+    "bad_oauth_callback": "回调OAuth不正确",
+    "bad_oauth_state": "OAuth 状态无效",
+    "broken_link": "链接无效",
+    "captcha_failed": "验证码失败",
+    "confirmation_required": "需要确认",
+    "conflict": "数据冲突",
+    "email_address_invalid": "电子邮件地址无效",
+    "email_address_not_authorized": "电子邮件未授权",
+    "email_change_not_allowed": "禁止更改电子邮件",
+    "email_conflict_identity_not_deletable": "身份不可删除（电子邮件冲突）",
+    "email_exists": "电子邮件已被使用",
+    "email_not_confirmed": "电子邮件未确认",
+    "email_provider_disabled": "电子邮件订阅已禁用",
+    "expired_code": "代码已过期",
+    "flow_state_expired": "过期流状态",
+    "flow_state_not_found": "未找到流状态",
+    "hook_payload_invalid_content_type": "钩子内容类型无效",
+    "hook_payload_over_size_limit": "钩子有效载荷太大",
+    "hook_timeout": "超出挂钩等待时间",
+    "hook_timeout_after_retry": "重试后超出钩子超时",
+    "identities_conflict": "身份冲突",
+    "identity_already_exists": "现有身份",
+    "identity_not_found": "未找到身份",
+    "insufficient_aal": "身份验证级别不足",
+    "invalid_app_id": "App ID无效",
+    "invalid_code": "无效代码",
+    "invalid_credentials": "凭证无效",
+    "invalid_email": "电子邮件无效",
+    "invalid_invite_token": "邀请令牌无效",
+    "invalid_login_credentials": "凭证不正确",
+    "invalid_phone_number": "无效的电话号码",
+    "invalid_provider": "无效供应商",
+    "invalid_refresh_token": "刷新令牌无效",
+    "invalid_token": "令牌无效",
+    "invite_not_found": "未找到邀请",
+    "manual_linking_disabled": "手动链接已禁用",
+    "mfa_challenge_expired": "MFA 挑战已过期",
+    "mfa_factor_name_conflict": "冲突的 MFA 因素名称",
+    "mfa_factor_not_found": "未找到 MFA 因素",
+    "mfa_ip_address_mismatch": "用于 MFA 的不同 IP 地址",
+    "mfa_phone_enroll_not_enabled": "已禁用电话 MFA 注册",
+    "mfa_phone_verify_not_enabled": "已禁用电话 MFA 验证",
+    "mfa_totp_enroll_not_enabled": "MFA TOTP 注册已禁用",
+    "mfa_totp_verify_not_enabled": "TOTP MFA 验证已禁用",
+    "mfa_verification_failed": "MFA 验证失败",
+    "mfa_verification_rejected": "MFA 验证被拒绝",
+    "mfa_verified_factor_exists": "已存在经过验证的 MFA 因素",
+    "mfa_web_authn_enroll_not_enabled": "MFA WebAuthn 注册已禁用",
+    "mfa_web_authn_verify_not_enabled": "WebAuthn MFA 验证已禁用",
+    "missing_email": "缺少电子邮件",
+    "missing_password": "缺少密码",
+    "no_authorization": "缺少授权",
+    "not_admin": "需要管理员权限",
+    "oauth_callback_error": "OAuth 错误",
+    "oauth_provider_not_supported": "不受支持的 OAuth 提供程序",
+    "otp_disabled": "OTP 已禁用",
+    "otp_expired": "OTP 已过期",
+    "over_email_send_rate_limit": "发送的电子邮件过多",
+    "over_request_rate_limit": "请求过多",
+    "over_sms_send_rate_limit": "短信发送过多",
+    "password_reset_required": "需要重置密码",
+    "phone_exists": "电话已在使用中",
+    "phone_not_confirmed": "电话号码未确认",
+    "phone_number_exists": "号码已被使用",
+    "phone_provider_disabled": "电话注册已禁用",
+    "provider_disabled": "提供商已禁用",
+    "provider_email_needs_verification": "需要验证供应商电子邮件",
+    "reauthentication_needed": "需要重新验证",
+    "reauthentication_not_valid": "重新认证无效",
+    "reauthentication_required": "需要重新验证",
+    "refresh_token_already_used": "刷新令牌已被使用",
+    "refresh_token_not_found": "未找到刷新令牌",
+    "request_timeout": "请求超时",
+    "same_password": "相同的密码",
+    "saml_assertion_no_email": "SAML 断言中没有电子邮件",
+    "saml_assertion_no_user_id": "SAML 断言中没有用户 ID",
+    "saml_entity_id_mismatch": "不同的 SAML 实体 ID",
+    "saml_idp_already_exists": "现有的 SAML IdP",
+    "saml_idp_not_found": "未找到 SAML IdP",
+    "saml_metadata_fetch_failed": "SAML 元数据检索失败",
+    "saml_provider_disabled": "SAML 提供商已禁用",
+    "saml_relay_state_expired": "SAML 中继状态已过期",
+    "saml_relay_state_not_found": "未找到 SAML 中继状态",
+    "session_expired": "会话已过期",
+    "session_not_found": "未找到会话",
+    "signup_disabled": "已禁用注册",
+    "single_identity_not_deletable": "唯一、不可删除的身份",
+    "sms_send_failed": "短信发送失败",
+    "sso_domain_already_exists": "现有的 SSO 域",
+    "sso_provider_not_found": "未找到 SSO 提供程序",
+    "too_many_enrolled_mfa_factors": "太多 MFA 因素",
+    "unauthorized_client": "未经授权的客户",
+    "unexpected_audience": "意想不到的观众",
+    "unexpected_error": "意外错误",
+    "unexpected_failure": "意外失败",
+    "user_already_exists": "现有用户",
+    "user_banned": "被禁用户",
+    "user_not_found": "未找到用户",
+    "user_sso_managed": "由 SSO 管理的用户",
+    "validation_failed": "验证失败",
+    "weak_password": "弱密码"
+  },
+  "terms": {
+    "label": "使用条款",
+    "last_update": "最后更新：2025年6月9日",
+    "section1": {
+      "p1": "这些条件的目的是定义由 Matis Gillet（别名 mtx_26）亲自开发的 MediTime 应用程序的使用条款，不带有任何盈利动机。",
+      "p2": "通过使用该应用程序，您无条件接受这些条件。",
+      "title": "1.目的"
+    },
+    "section2": {
+      "disclaimer": "该应用程序按“原样”提供，不保证持续可用性或医疗准确性。",
+      "intro": "MediTime 允许其用户：",
+      "list": {
+        "item1": "创建和管理用药时间表；",
+        "item2": "接收治疗提醒（通知）；",
+        "item3": "与其他人共享日历（链接或帐户）。"
+      },
+      "title": "2.功能"
+    },
+    "section3": {
+      "conclusion": "每个用户都应对其帐户和数据的保密性负责。",
+      "intro": "访问 MediTime 需要：",
+      "list": {
+        "item1": "通过 Supabase Auth 注册；",
+        "item2": "接受这些条款和条件以及隐私政策。"
+      },
+      "title": "3. 访问和注册"
+    },
+    "section4": {
+      "content": "除非另有说明，MediTime 的源代码、设计和内容均为 Matis Gillet 的财产。未经授权，禁止任何复制、分发或修改。",
+      "title": "4.知识产权"
+    },
+    "section5": {
+      "list": {
+        "item1": "忘记服用的后果；",
+        "item2": "显示数据有错误；",
+        "item3": "由于不安全的使用而导致数据丢失或泄露。"
+      },
+      "p1": "本应用程序并非旨在替代医疗建议。用户对其所显示信息的使用负全部责任。",
+      "p2": "在任何情况下，MediTime 或其开发者均不承担以下责任：",
+      "title": "5. 职责"
+    },
+    "section6": {
+      "conclusion": "删除是最终决定，无法撤消。",
+      "intro": "您可以随时：",
+      "list": {
+        "item1": "通过电子邮件请求删除您的帐户和数据；",
+        "item2": "撤销对共享日历的访问权限。"
+      },
+      "title": "6. 账户删除"
+    },
+    "section7": {
+      "content": "本条款和条件可能随时修改。重大变更将通过应用程序或电子邮件通知您。",
+      "title": "7.修改"
+    },
+    "section8": {
+      "intro": "对于这些条件的任何疑问：",
+      "title": "8.联系方式"
+    },
+    "title": "一般使用条款 – MediTime"
+  },
+  "testimonials": {
+    "author": "Andrée C. 和她的孙子们",
+    "quote": "我每周都会给妈妈补充药盒，但有了 MediTime，一切都变得简单多了。我可以一眼看到她所有的用药清单，我和她都能收到提醒。我们轻松多了。",
+    "title": "他们信任我们"
+  },
+  "threshold": "临界点",
+  "title": {
+    "delete_file": "删除文件"
+  },
+  "unknown_user": "未知用户",
+  "user": "用户",
+  "verify_email": {
+    "instructions": "向您的电子邮件地址发送新的验证链接。",
+    "no_user": "没有用户登录。",
+    "resend_link": "重新发送验证链接",
+    "title": "电子邮件地址验证"
+  },
+  "why": {
+    "desc": "因为医疗保健不容即兴发挥。MediTime 为您提供清晰、直观、安全的解决方案，让您日复一日地追踪自己和亲人的治疗情况。",
+    "title": "为什么选择 MediTime？"
+  },
+  "yes": "是的"
+}

@@ -1,0 +1,26 @@
+node_modules/
+.expo/
+.expo-shared/
+*.log
+*.tmp
+*.temp
+
+# iOS
+ios/build/
+ios/Pods/
+ios/*.pbxuser
+ios/*.mode1v3
+ios/*.mode2v3
+ios/*.perspectivev3
+ios/*.xcuserstate
+ios/project.xcworkspace/
+
+# Android
+android/build/
+android/.gradle/
+android/app/build/
+
+# Misc
+.DS_Store
+*.p12
+*.mobileprovision

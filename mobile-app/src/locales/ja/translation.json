@@ -1,0 +1,719 @@
+{
+  "Actions": "アクション",
+  "Fri": "金曜日",
+  "Mon": "月曜日",
+  "Sat": "土曜日",
+  "Sun": "日曜日",
+  "Thu": "木曜日",
+  "Tue": "火曜日",
+  "Wed": "水曜日",
+  "about": "について",
+  "accept": "受け入れる",
+  "accepted": "承認済み",
+  "access": "アクセス",
+  "account": {
+    "crop": {
+      "title": "写真を切り抜く",
+      "use": "この画像を使用する"
+    },
+    "display_name": {
+      "label": "擬似",
+      "placeholder": "ユーザー名を入力してください"
+    },
+    "image_size_error": "画像サイズは5MBを超えてはいけません",
+    "instructions": "ここで個人情報を変更できます。",
+    "label": "アカウント",
+    "profile_alt": "プロフィール",
+    "save_changes": "変更を保存"
+  },
+  "accounts": "アカウント",
+  "activation": "アクティベーション",
+  "activation_toggle_aria": "リンクを有効または無効にする",
+  "actual_stock": "現在の在庫",
+  "add": "追加",
+  "admin": "管理者",
+  "app": {
+    "access": "アプリケーションにアクセスする",
+    "description": "治療をスケジュールし、医療カレンダーを簡単に共有できます。",
+    "login": "ログイン",
+    "name": "MediTime",
+    "pageTitle": "MediTime - 医療治療管理",
+    "register": "アカウントを作成する",
+    "shortN": "メディタイム",
+    "shortName": "MediTime",
+    "subtitle": "医療処置を簡単に管理、追跡、共有できます。",
+    "title": "メディタイム"
+  },
+  "auth": {
+    "accept_terms": "私は受け入れます",
+    "accept_terms_aria": "利用規約に同意する",
+    "email": "電子メールアドレス",
+    "forgot_password": "パスワードをお忘れですか？",
+    "hide_password": "パスワードを非表示にする",
+    "login": "ログイン",
+    "login_with": "接続:",
+    "name": "フルネーム",
+    "or_with_email": "またはメールで:",
+    "password": "パスワード",
+    "provider": {
+      "discord": "不和",
+      "facebook": "フェイスブック",
+      "github": "ギットハブ",
+      "google": "グーグル",
+      "twitter": "ツイッター"
+    },
+    "register": "登録",
+    "register_with": "登録方法:",
+    "show_password": "パスワードを表示",
+    "terms_link": "一般条件",
+    "verification_sent": "📩 確認リンクがあなたのメールアドレスに送信されました。",
+    "with_discord": "Discordに接続する",
+    "with_facebook": "Facebookでログイン",
+    "with_github": "Githubとの接続",
+    "with_google": "Googleでログイン",
+    "with_twitter": "Twitterでつながる"
+  },
+  "auth_callback": {
+    "loading": "接続中...",
+    "session_error": "OAuth後のセッション回復に失敗しました",
+    "success": "コールバックによる接続成功"
+  },
+  "back": "戻る",
+  "boxes": {
+    "add_box": "ボックスを追加する",
+    "add_manual": "手動で追加",
+    "add_with_qr": "スキャナーQRコード",
+    "alert_threshold": "アラートしきい値",
+    "cancel": "キャンセル",
+    "capacity": "ボックス容量",
+    "condition": {
+      "add": "条件を追加する",
+      "delete": "消去",
+      "interval_days": "日間隔",
+      "none": "受講条件なし",
+      "start_date": "開始日",
+      "tablet_count": "錠剤の数",
+      "time_of_day": "撮影時間"
+    },
+    "day": "日",
+    "days": "日数",
+    "delete": "消去",
+    "dose": "用量",
+    "each": "それぞれ",
+    "edit": "変更するには",
+    "every": "すべての",
+    "export_pdf": "輸出",
+    "from": "から",
+    "intake_conditions": "受講条件",
+    "name": "名前",
+    "new_box": "新しい箱",
+    "qr_code_help_text": "DataMatrixコードは、医薬品のパッケージのバーコードの近くにあります。小さな白黒の四角形です。",
+    "remaining_qty": "残り数量",
+    "restock": "再入荷",
+    "save": "保存",
+    "scan_qr_code": "スキャナーQRコード",
+    "start_typing": "入力を開始してください...",
+    "stock": {
+      "alerts": {
+        "line": "{{name}} ({{dose}} mg) — 在庫数 {{count}} 個",
+        "line_negative": "{{name}} ({{dose}} mg) — {{count}} 個 (在庫切れ)",
+        "line_plural": "{{name}} ({{dose}} mg) — 在庫数 {{count}} 個",
+        "title": "🔔 株価アラート:"
+      },
+      "badge": {
+        "high": "在庫が多い",
+        "low": "在庫が少ない",
+        "out": "在庫切れ"
+      }
+    },
+    "tablet": "圧縮された",
+    "tablets": "錠剤",
+    "title": "薬箱",
+    "view_notice": "説明書をご覧ください"
+  },
+  "calendar": {
+    "add": "カレンダーを追加する",
+    "add_calendar": "カレンダーを追加する",
+    "add_with_qr": "QRをスキャンしてカレンダーを作成する",
+    "calendar_name": "カレンダー名",
+    "calendar_name_placeholder": "カレンダーの名前を入力してください",
+    "choose_image": "画像を選択",
+    "confirm_delete": "カレンダーを削除しますか?",
+    "confirm_delete_shared": "共有カレンダーを削除しますか?",
+    "confirm_rename": "カレンダーの名前を変更しますか?",
+    "create_calendar_qr": "QRコードをスキャン: {{calendarName}}",
+    "creating_calendar": "作成中です...",
+    "daily_view": "日めくりカレンダー",
+    "day": "日",
+    "drag_and_drop": "画像をここにドラッグするかクリックして選択してください",
+    "error_calendar_creation": "カレンダーの作成中にエラーが発生しました",
+    "error_no_calendar_name": "カレンダー名を入力してください",
+    "error_no_medicines": "薬はスキャンされていません",
+    "error_partial_success": "カレンダーは作成されましたが、{{count}} 個の薬を追加できませんでした",
+    "import_calendar": "カレンダー「{{name}}」をインポートします",
+    "import_type": "追加モード",
+    "import_type_file": "ファイルのインポート",
+    "import_type_file_description": "エクスポートされたファイルからカレンダーをインポートします。",
+    "import_type_manual": "マヌエル",
+    "import_type_manual_description": "空のカレンダーを作成し、手動で薬を追加します。",
+    "import_type_qr_description": "薬箱の DataMatrix コードをスキャンして、スケジュールを自動的に作成します。",
+    "label": "カレンダー",
+    "month": "月",
+    "name": "カレンダー名",
+    "new_name": "新しい名前",
+    "processing": "処理中です…",
+    "reference_week": "参照週",
+    "scan_medicines": "薬をスキャンする",
+    "scan_medicines_description": "薬箱のDataMatrixコードをスキャンしてください。スキャンされた薬は新しいスケジュールに自動的に追加されます。",
+    "scan_qr_option": "QRコードスキャナー",
+    "scanner_button_hint": "スキャナの「追加」ボタンを使用してカレンダーを作成します",
+    "today": "今日",
+    "week": "週",
+    "weekly_help": "カレンダーの日付をクリックすると、関連する薬がウィンドウに表示されます。",
+    "weekly_view": "週ごとのカレンダー"
+  },
+  "calendar_completed": "カレンダーが無事完成しました！",
+  "calendar_settings": {
+    "label": "カレンダー設定",
+    "notifications": {
+      "disabled": "通知が無効になっています",
+      "enabled": "通知が有効",
+      "label": "通知"
+    },
+    "sharing": {
+      "label": "共有"
+    },
+    "stock": {
+      "daily": {
+        "description": "毎日深夜に自動的に在庫が減ります。",
+        "label": "毎日（深夜）"
+      },
+      "label": "在庫数",
+      "weekly": {
+        "description": "毎週薬箱を補充すると、在庫は手動で減らされます。",
+        "label": "週刊（ピルボックス）"
+      }
+    }
+  },
+  "calendars": "カレンダー",
+  "cancel": "キャンセル",
+  "choose_date": "日付を選択",
+  "close": "近い",
+  "confirm_calendar_completion": "スケジュールの完了を確認する",
+  "contact": "接触",
+  "copy_link": "リンクをコピー",
+  "copy_link_error": "リンクのコピー中にエラーが発生しました。",
+  "create_share_link": "共有リンクを作成する",
+  "critical_stock": "破裂した株式",
+  "cta": {
+    "button": "アカウントを作成します",
+    "desc": "無料でアカウントを作成し、家族全員の医療管理を簡素化しましょう。",
+    "title": "今すぐ始めましょう"
+  },
+  "date": "日付",
+  "day_view": {
+    "title": "日次ビュー"
+  },
+  "delete": "消去",
+  "delete_access": "アクセスを削除",
+  "delete_access_confirm": "アクセスを削除しますか?",
+  "delete_calendar_confirm": "このカレンダーを削除しますか?",
+  "delete_link": "リンクを削除する",
+  "delete_link_confirm": "リンクを削除しますか?",
+  "done": "終了した",
+  "evening": "夕方",
+  "expiration": "有効期限",
+  "expiration_date": "リンクの有効期限",
+  "expired": "期限切れ",
+  "expires_at": "有効期限",
+  "fcm": {
+    "sw_error": "[FCM] SWエラー",
+    "sw_registered": "[FCM] SW録音",
+    "token_registered": "[FCM] バックエンド側で登録されたトークン",
+    "token_send_error": "[FCM] トークンの送信エラー"
+  },
+  "features": {
+    "desc1": "撮影をスケジュールし、リマインダーを受け取って、安心して撮影しましょう。",
+    "desc2": "愛する人や介護者に、日常的にサポートを受けられるようアクセス権を与えます。",
+    "desc3": "データは Supabase や Firebase などの信頼できるテクノロジーによって保護されます。",
+    "title1": "スマートカレンダー",
+    "title2": "共同共有",
+    "title3": "安全保証"
+  },
+  "home": "いらっしゃいませ",
+  "home_meta": {
+    "description": "薬の摂取量を簡単に管理、共有できます。",
+    "title": "MediTime - 治療プランナー"
+  },
+  "image_upload": {
+    "analysis_error": "画像の解析中にエラーが発生しました。",
+    "click_to_change": "ファイルを変更するにはクリックしてください",
+    "click_to_select_file": "クリックまたはドラッグアンドドロップでファイルを選択します",
+    "file_analysis_error": "ファイルの解析エラー",
+    "file_selected": "選択したファイル",
+    "file_type_error": "画像ファイルのみ受け入れられます（jpg、png、webp、gif）。",
+    "file_types": "JPG、PNG、WEBP、GIF",
+    "no_medicines_found": "画像内に薬剤は見つかりません。",
+    "preview_alt": "プレビュー",
+    "preview_error": "プレビューの表示中にエラーが発生しました",
+    "remove_image": "画像を削除",
+    "select_file_error": "画像ファイルを選択してください。",
+    "title": "ファイルを選択してプレビューする"
+  },
+  "invalid_or_expired_link": "この共有カレンダーのリンクは無効か期限が切れています。",
+  "invitation": {
+    "invalid_or_expired": "無効または期限切れの招待",
+    "title": "招待"
+  },
+  "link": "リンク",
+  "link_already_exists": "このカレンダーへのリンクは既に存在します。",
+  "link_copied": "🔗 リンクをコピーしました!",
+  "link_expiration": "リンクの有効期限",
+  "link_will_be_generated": "リンクが生成されます",
+  "loading": "読み込み中...",
+  "loading_calendar": "カレンダーを読み込んでいます...",
+  "loading_calendars": "カレンダーを読み込んでいます...",
+  "loading_medicines": "薬を読み込んでいます...",
+  "loading_notifications": "通知を読み込んでいます...",
+  "loading_settings": "設定を読み込んでいます...",
+  "loading_share": "共有を読み込んでいます...",
+  "locale": "ja-JP",
+  "login": "ログイン",
+  "logout": "ログアウト",
+  "low_stock": "在庫が少ない",
+  "manage_link": "リンクを管理する",
+  "medicine_review": {
+    "current_stock": "現在の在庫",
+    "delete_condition": "この条件を削除する",
+    "finish": "終了するには",
+    "maximum_stock": "在庫最大数",
+    "select_option": "選択...",
+    "start_date": "始まり",
+    "time_of_day": "一瞬",
+    "title": "薬物レビュー"
+  },
+  "medicines": {
+    "back_to_calendar": "カレンダーに戻る",
+    "label": "薬物",
+    "list_empty": "❌ このスケジュールにはまだ薬が追加されていません。",
+    "list_title": "医薬品リスト"
+  },
+  "mg": "ミリグラム",
+  "mobile": {
+    "android": "<strong>Android</strong>では、ブラウザの下部に<em>「ホーム画面に追加」という</em>メッセージが自動的に表示されます。タップして MediTime をインストールしてください。",
+    "desc": "MediTimeはモバイルアプリとして動作します。ホーム画面に追加してすぐにアクセスしましょう。",
+    "feature1": "ブラウザから簡単にインストール",
+    "feature2": "スムーズなタッチインターフェース",
+    "feature3": "ホーム画面からのクイックアクセス",
+    "ios": "<strong>iPhone</strong>の場合は、Safari で MediTime を開き、 をタップします<i class=\"bi bi-share mx-1\"></i>次に<em>「ホーム画面で」を選択します</em>。",
+    "other": "MediTime はコンピューターやタブレットでもアクセスできます。",
+    "title": "携帯電話で利用可能"
+  },
+  "modify": "修飾子",
+  "morning": "朝",
+  "my_calendars": "私のカレンダー",
+  "navigation": {
+    "about": "について",
+    "calendar": "カレンダー",
+    "dashboard": "ダッシュボード",
+    "forgot-password": "パスワードを忘れた場合",
+    "help": "補佐官",
+    "home": "いらっしゃいませ",
+    "login": "ログイン",
+    "medicines": "薬物",
+    "profile": "プロフィール",
+    "register": "登録する",
+    "reset-password": "パスワードをリセットする",
+    "settings": "設定"
+  },
+  "never": "一度もない",
+  "next": "続く",
+  "next_day": "翌日",
+  "no_calendar_found": "カレンダーが見つかりません",
+  "no_calendar_found_cta": "ホームページからカレンダーを作成できます。",
+  "no_events_today": "この日はイベントはありません。",
+  "no_expiration": "有効期限なし",
+  "no_low_stock": "医薬品の在庫が不足しています。",
+  "no_medicines": "表示する薬剤はありません。",
+  "no_notifications": "新しい通知はありません",
+  "no_personal_calendars": "個人用カレンダーがありません。",
+  "no_shared_calendars": "共有カレンダーがありません。",
+  "noon": "正午",
+  "not_found": {
+    "message": "ページが見つかりません。",
+    "title": "エラー404"
+  },
+  "notif": {
+    "calendar_invite": "<0></0> さんがカレンダー <1>{{name}></1> に参加するよう招待しています",
+    "calendar_joined": "<0></0> のカレンダー <1>{{name}></1> に参加しました",
+    "invite_accepted": "<0></0> はカレンダー <1>{{name}></1> への招待を承認しました",
+    "invite_rejected": "<0></0> さんはカレンダー <1>{{name} への参加招待を辞退しました。</1>",
+    "low_stock": "<0>{{name}></0> はほぼ売り切れです (残り <0>{{qty}></0>)。",
+    "share_removed_by_owner": "<0></0> さんがカレンダー <1>{{name}></1> のあなたとの共有を停止しました",
+    "share_removed_by_you": "<0></0> がカレンダー <1>{{name}></1> を削除しました"
+  },
+  "notification": {
+    "email_toggle": "メール通知を有効にする",
+    "instructions": "好みに応じて電子メールまたはプッシュ通知を有効または無効にします。",
+    "push_toggle": "ウェブプッシュ通知を有効にする"
+  },
+  "notifications": "通知",
+  "open": "開ける",
+  "open_notifications": "通知を開く",
+  "owner": "所有者",
+  "pending": "保留中",
+  "permissions": "権限",
+  "pillbox": {
+    "fill": "トーチカを作る",
+    "title": "トーチカ"
+  },
+  "previous": "前の",
+  "previous_day": "前日",
+  "privacy": {
+    "label": "機密保持",
+    "last_update": "最終更新日: 2025年6月9日",
+    "section1": {
+      "content": "MediTimeは、投薬治療の管理を容易にするために設計されたウェブアプリケーションです。ユーザーは、パーソナライズされたカレンダーを作成したり、リマインダーを受信したり、愛する人や医療専門家とスケジュールを共有したりできます。このプロジェクトは、Matis Gillet（別名mtx_26）によって個人的に開発されており、商業目的ではありません。",
+      "title": "1. 私たちは誰ですか?"
+    },
+    "section2": {
+      "personal_data": {
+        "email": "電子メール、名前、写真: 認証経由 (Supabase Auth)。",
+        "title": "個人データ",
+        "uid": "一意の識別子: ユーザーごとに自動的に生成されます。"
+      },
+      "tech_data": {
+        "device": "デバイスとブラウザの情報（デバッグと匿名化された統計用）。",
+        "title": "技術データ",
+        "tokens": "プッシュ通知トークン (有効な場合)。"
+      },
+      "title": "2. どのようなデータが収集されますか?",
+      "treatment_data": {
+        "boxes": "箱に関する情報（数量、在庫、梱包）。",
+        "history": "カレンダーの編集と共有履歴。",
+        "medicines": "薬剤名、投与量、頻度、服用時間。",
+        "title": "処理に関連するデータ"
+      }
+    },
+    "section3": {
+      "no_ads": "データは販売、共有、または広告目的で使用されることはありません。",
+      "reminders": "ユーザーが通知を有効にしている場合は、リマインダーまたはアラートを送信します。",
+      "sharing": "他のユーザーとの安全な共有を許可します。",
+      "stability": "アプリケーションの安定性とセキュリティを向上します。",
+      "sync": "治療スケジュールを表示および同期します。",
+      "title": "3. このデータはどのように使用されますか?"
+    },
+    "section4": {
+      "firebase": "Firebase (プッシュ通知と匿名統計のみ)。",
+      "location": "データベースは欧州連合または GDPR 準拠地域にあります。",
+      "supabase": "Supabase (PostgreSQL と認証)。",
+      "title": "4. データはどこに保存されますか?"
+    },
+    "section5": {
+      "auth": "データへのアクセスは認証によって保護されます。",
+      "encryption": "すべてのカレンダー共有は暗号化され、ユーザーによって制御されます。",
+      "passwords": "識別子は表示されることも、クリアテキストで保存されることもありません。",
+      "title": "5. 共有とセキュリティ"
+    },
+    "section6": {
+      "access": "データを表示またはエクスポートします。",
+      "contact": "これらの権利を行使するには:",
+      "delete": "永久削除をリクエストします。",
+      "disable": "通知をオフにします。",
+      "intro": "GDPR に従い、いつでも次のことができます。",
+      "revoke": "共有カレンダーへのアクセスを取り消します。",
+      "title": "6. あなたの権利"
+    },
+    "section7": {
+      "developer": "担当開発者：\nマティス・ジレット",
+      "title": "7. 連絡先"
+    },
+    "title": "プライバシーポリシー – MediTime"
+  },
+  "profile": "私のプロフィール",
+  "public_links": "公開リンク",
+  "reactivate_link": "リンクを再有効化する",
+  "read_only": "読み取り専用",
+  "read_write": "読書 + 編集",
+  "recipient_email": "受信者のメールアドレス",
+  "regenerate": "再生",
+  "regenerate_link_confirm": "このリンクを再生成しますか?",
+  "register": "登録",
+  "reject": "却下する",
+  "rename": "名前を変更",
+  "reset_password": {
+    "instructions": "リセット リンクを受け取るには、メール アドレスを入力してください。",
+    "send_link": "リンクを送信",
+    "success": "リセット リンクがあなたのメール アドレスに送信されました。",
+    "title": "パスワードをリセットする"
+  },
+  "reset_password_confirm": {
+    "cannot_change": "パスワードを変更できません: 無効なセッションです。",
+    "instructions": "MediTime アカウントの新しいパスワードを入力してください。",
+    "invalid_link": "リセット リンクが無効または期限切れです。",
+    "invalid_session": "無効なセッションです。リンクを再度リクエストしてください。",
+    "new_password_label": "新しいパスワード",
+    "save_password": "パスワードを保存",
+    "saving": "登録...",
+    "success": "パスワードが正常に変更されました。",
+    "title": "新しいパスワード"
+  },
+  "revoke_link": "リンクを取り消す",
+  "rights_reserved": "無断転載を禁じます",
+  "scanner": {
+    "add": "追加",
+    "camera": "カメラ",
+    "camera_error": "カメラにアクセスできません。",
+    "camera_instruction": "DataMatrixコードを指す",
+    "cancel": "キャンセル",
+    "close": "近い",
+    "medicine_not_found": "薬物は見つかりませんでした",
+    "quantity": "数量: {{数量}}",
+    "remove_from_list": "リストから削除",
+    "searching": "研究...",
+    "select_camera": "カメラを選択",
+    "title": "QRコードをスキャンする",
+    "zoom": "ズーム: {{zoom}}x",
+    "camera_front": "前に",
+    "camera_back": "戻る",
+    "camera_normal": "普通",
+    "camera_inverted": "逆行する",
+    "controls": {
+      "zoom": "ズーム",
+      "camera": "カメラ",
+      "flip": "逆行する"
+    }
+  },
+  "security": {
+    "current_email": "現在のメールアドレス:",
+    "current_password": {
+      "label": "現在のパスワード",
+      "placeholder": "現在のパスワードを入力してください",
+      "required": "古いパスワードが必要です。"
+    },
+    "google_warning": "Googleでログインしています。メールアドレスやパスワードは変更できません。",
+    "instructions": "アカウントに関連付けられているメールアドレスを確認し、必要に応じてパスワードを変更してください。",
+    "new_password": {
+      "placeholder": "新しいパスワードを入力してください"
+    },
+    "password_updated": "✅ パスワードが正常に更新されました。",
+    "title": "アカウント管理",
+    "update_password": "パスワードを更新する"
+  },
+  "send_invitation": "招待状を送る",
+  "send_sms": "SMSで送信",
+  "settings": {
+    "account": "私のアカウント",
+    "label": "設定",
+    "language": "アプリケーション言語",
+    "language_note": "選択した言語はインターフェース全体に適用されます。",
+    "preferences": "設定",
+    "preferences_desc": "MediTime での体験をカスタマイズします。",
+    "security": "安全"
+  },
+  "share": "共有",
+  "share_calendar": "カレンダーを共有する",
+  "shared": "共有",
+  "shared_by": "カレンダーを共有",
+  "shared_by_token": "トークンで共有されたカレンダー",
+  "shared_calendar": "{{name}}を共有しています",
+  "shared_calendar_management": "共有カレンダーの管理",
+  "shared_calendars": "共有カレンダー",
+  "shared_link_label": "共有カレンダーのリンク",
+  "shared_users": "共有ユーザー",
+  "stock": "ストック",
+  "stock_alert": "株価アラート",
+  "stock_alert_tooltip": "重要な在庫医薬品を見る",
+  "stock_alerts": "在庫切れの薬",
+  "supabase-error": {
+    "access_denied": "アクセスが拒否されました",
+    "already_confirmed": "すでに確認済み",
+    "anonymous_provider_disabled": "匿名接続が無効になっています",
+    "bad_code_verifier": "無効な確認コード",
+    "bad_json": "無効なJSON",
+    "bad_jwt": "JWTが無効です",
+    "bad_oauth_callback": "コールバックOAuthが正しくありません",
+    "bad_oauth_state": "無効なOAuthステータス",
+    "broken_link": "無効なリンク",
+    "captcha_failed": "キャプチャに失敗しました",
+    "confirmation_required": "確認が必要です",
+    "conflict": "データの競合",
+    "email_address_invalid": "無効なメールアドレス",
+    "email_address_not_authorized": "メールが承認されていません",
+    "email_change_not_allowed": "メールアドレスの変更は禁止されています",
+    "email_conflict_identity_not_deletable": "削除できない ID (競合するメール)",
+    "email_exists": "メールアドレスはすでに使用されています",
+    "email_not_confirmed": "メールアドレスが確認されていません",
+    "email_provider_disabled": "メール購読が無効になっています",
+    "expired_code": "コードの有効期限が切れました",
+    "flow_state_expired": "期限切れのフロー状態",
+    "flow_state_not_found": "フロー状態が見つかりません",
+    "hook_payload_invalid_content_type": "フックコンテンツタイプが無効です",
+    "hook_payload_over_size_limit": "フックのペイロードが大きすぎます",
+    "hook_timeout": "フックの待機時間が超過しました",
+    "hook_timeout_after_retry": "再試行後にフックのタイムアウトを超えました",
+    "identities_conflict": "アイデンティティの衝突",
+    "identity_already_exists": "既存のアイデンティティ",
+    "identity_not_found": "身元が見つかりません",
+    "insufficient_aal": "認証レベルが不十分です",
+    "invalid_app_id": "アプリIDが無効です",
+    "invalid_code": "コード無効",
+    "invalid_credentials": "無効な資格情報",
+    "invalid_email": "メールアドレスが無効です",
+    "invalid_invite_token": "無効な招待トークン",
+    "invalid_login_credentials": "資格情報が正しくありません",
+    "invalid_phone_number": "無効な電話番号",
+    "invalid_provider": "無効なサプライヤー",
+    "invalid_refresh_token": "リフレッシュトークンが無効です",
+    "invalid_token": "無効なトークン",
+    "invite_not_found": "招待状が見つかりません",
+    "manual_linking_disabled": "手動リンクが無効",
+    "mfa_challenge_expired": "MFAチャレンジの期限が切れました",
+    "mfa_factor_name_conflict": "競合する MFA 要素名",
+    "mfa_factor_not_found": "MFA 要素が見つかりません",
+    "mfa_ip_address_mismatch": "MFA用の異なるIPアドレス",
+    "mfa_phone_enroll_not_enabled": "電話によるMFA登録が無効になっています",
+    "mfa_phone_verify_not_enabled": "電話によるMFA認証が無効になっています",
+    "mfa_totp_enroll_not_enabled": "MFA TOTP登録が無効になっています",
+    "mfa_totp_verify_not_enabled": "TOTP MFA 認証が無効になっています",
+    "mfa_verification_failed": "MFA認証に失敗しました",
+    "mfa_verification_rejected": "MFA認証が拒否されました",
+    "mfa_verified_factor_exists": "すでに検証済みのMFA要素",
+    "mfa_web_authn_enroll_not_enabled": "MFA WebAuthn登録が無効です",
+    "mfa_web_authn_verify_not_enabled": "WebAuthn MFA認証が無効になっています",
+    "missing_email": "見つからないメール",
+    "missing_password": "パスワードがありません",
+    "no_authorization": "承認がありません",
+    "not_admin": "管理者アクセスが必要です",
+    "oauth_callback_error": "OAuthエラー",
+    "oauth_provider_not_supported": "サポートされていないOAuthプロバイダー",
+    "otp_disabled": "OTPが無効",
+    "otp_expired": "OTPの有効期限が切れました",
+    "over_email_send_rate_limit": "送信したメールが多すぎる",
+    "over_request_rate_limit": "リクエストが多すぎます",
+    "over_sms_send_rate_limit": "送信したテキストメッセージが多すぎる",
+    "password_reset_required": "パスワードのリセットが必要です",
+    "phone_exists": "電話はすでに使用中です",
+    "phone_not_confirmed": "電話番号は確認されていません",
+    "phone_number_exists": "番号はすでに使用されています",
+    "phone_provider_disabled": "電話登録は無効です",
+    "provider_disabled": "プロバイダーが無効になっています",
+    "provider_email_needs_verification": "サプライヤーのメールアドレスを確認する",
+    "reauthentication_needed": "再認証が必要です",
+    "reauthentication_not_valid": "無効な再認証",
+    "reauthentication_required": "再認証が必要です",
+    "refresh_token_already_used": "リフレッシュトークンはすでに使用されています",
+    "refresh_token_not_found": "リフレッシュトークンが見つかりません",
+    "request_timeout": "リクエストのタイムアウトを超えました",
+    "same_password": "同じパスワード",
+    "saml_assertion_no_email": "SAMLアサーションにメールがありません",
+    "saml_assertion_no_user_id": "SAMLアサーションにユーザーIDがありません",
+    "saml_entity_id_mismatch": "異なるSAMLエンティティID",
+    "saml_idp_already_exists": "既存のSAML IdP",
+    "saml_idp_not_found": "SAML IdPが見つかりません",
+    "saml_metadata_fetch_failed": "SAMLメタデータの取得に失敗しました",
+    "saml_provider_disabled": "SAML プロバイダーが無効",
+    "saml_relay_state_expired": "SAMLリレーステータスの期限切れ",
+    "saml_relay_state_not_found": "SAMLリレー状態が見つかりません",
+    "session_expired": "セッションが期限切れです",
+    "session_not_found": "セッションが見つかりません",
+    "signup_disabled": "登録が無効になっています",
+    "single_identity_not_deletable": "ユニークで削除不可能なID",
+    "sms_send_failed": "SMSの送信に失敗しました",
+    "sso_domain_already_exists": "既存のSSOドメイン",
+    "sso_provider_not_found": "SSOプロバイダーが見つかりません",
+    "too_many_enrolled_mfa_factors": "MFA要素が多すぎる",
+    "unauthorized_client": "不正な顧客",
+    "unexpected_audience": "予想外の観客",
+    "unexpected_error": "予期しないエラー",
+    "unexpected_failure": "予期せぬ失敗",
+    "user_already_exists": "既存ユーザー",
+    "user_banned": "禁止されたユーザー",
+    "user_not_found": "ユーザーが見つかりません",
+    "user_sso_managed": "SSO によって管理されるユーザー",
+    "validation_failed": "検証に失敗しました",
+    "weak_password": "弱いパスワード"
+  },
+  "terms": {
+    "label": "利用規約",
+    "last_update": "最終更新日: 2025年6月9日",
+    "section1": {
+      "p1": "これらの条件の目的は、営利目的ではなく、Matis Gillet (別名 mtx_26) が個人的に開発した MediTime アプリケーションの使用条件を定義することです。",
+      "p2": "アプリケーションを使用することにより、これらの条件を無条件に承諾したことになります。",
+      "title": "1. 目的"
+    },
+    "section2": {
+      "disclaimer": "アプリケーションは「現状のまま」提供され、継続的な利用可能性や医学的正確性は保証されません。",
+      "intro": "MediTime では、ユーザーは次のことが可能です。",
+      "list": {
+        "item1": "投薬スケジュールを作成および管理します。",
+        "item2": "治療リマインダー（通知）を受け取る。",
+        "item3": "カレンダーを他の人と共有します (リンクまたはアカウント)。"
+      },
+      "title": "2. 機能性"
+    },
+    "section3": {
+      "conclusion": "各ユーザーは自身のアカウントとデータの機密性を保持する責任を負います。",
+      "intro": "MediTime にアクセスするには以下が必要です:",
+      "list": {
+        "item1": "Supabase Auth 経由での登録。",
+        "item2": "これらの利用規約およびプライバシー ポリシーに同意します。"
+      },
+      "title": "3. アクセスと登録"
+    },
+    "section4": {
+      "content": "MediTimeのソースコード、デザイン、およびコンテンツは、特に明記されていない限り、Matis Gilletの所有物です。許可なく複製、配布、または改変することは禁止されています。",
+      "title": "4. 知的財産"
+    },
+    "section5": {
+      "list": {
+        "item1": "服用を忘れた場合の結果;",
+        "item2": "データの表示エラー。",
+        "item3": "安全でない使用によるデータの損失または漏洩から。"
+      },
+      "p1": "このアプリケーションは医師のアドバイスに代わるものではありません。表示される情報の使用については、ユーザーが単独で責任を負います。",
+      "p2": "いかなる状況においても、MediTime またはその開発者は責任を負いません。",
+      "title": "5. 責任"
+    },
+    "section6": {
+      "conclusion": "削除は最終的なものであり、元に戻すことはできません。",
+      "intro": "いつでも次のことができます:",
+      "list": {
+        "item1": "電子メールによるリクエストを通じてアカウントとデータを削除します。",
+        "item2": "共有カレンダーへのアクセスを取り消します。"
+      },
+      "title": "6. アカウントの削除"
+    },
+    "section7": {
+      "content": "本利用規約は随時変更される場合があります。重要な変更があった場合は、アプリまたはメールでお知らせいたします。",
+      "title": "7. 変更"
+    },
+    "section8": {
+      "intro": "これらの条件に関するご質問は、",
+      "title": "8. 連絡先"
+    },
+    "title": "利用規約 – MediTime"
+  },
+  "testimonials": {
+    "author": "アンドレ・Cと孫たち",
+    "quote": "母の薬箱は今でも毎週補充していますが、MediTimeのおかげでずっと楽になりました。薬のリストが一目でわかるし、リマインダーも届きますし、母もリマインダーを受け取れます。おかげで、ずっと楽になりました。",
+    "title": "彼らは私たちを信頼している"
+  },
+  "threshold": "しきい値",
+  "title": {
+    "delete_file": "ファイルを削除する"
+  },
+  "unknown_user": "不明なユーザー",
+  "user": "ユーザー",
+  "verify_email": {
+    "instructions": "新しい確認リンクをあなたのメールアドレスに送信します。",
+    "no_user": "ログインしているユーザーはいません。",
+    "resend_link": "確認リンクを再送信",
+    "title": "メールアドレスの確認"
+  },
+  "why": {
+    "desc": "医療には即興の余地はありません。MediTimeは、あなたとあなたの大切な人の治療を日々記録するための、明確で直感的、そして安全なソリューションを提供します。",
+    "title": "MediTimeを選ぶ理由"
+  },
+  "yes": "はい"
+}

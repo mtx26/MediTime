@@ -1,0 +1,719 @@
+{
+  "Actions": "Azioni",
+  "Fri": "Venerdì",
+  "Mon": "Lunedi",
+  "Sat": "SABATO",
+  "Sun": "Domenica",
+  "Thu": "GIOVEDÌ",
+  "Tue": "Martedì",
+  "Wed": "Mercoledì",
+  "about": "Di",
+  "accept": "Accettare",
+  "accepted": "Accettato",
+  "access": "Accesso",
+  "account": {
+    "crop": {
+      "title": "Ritaglia la foto",
+      "use": "Usa questa immagine"
+    },
+    "display_name": {
+      "label": "Pseudo",
+      "placeholder": "Inserisci il tuo nome utente"
+    },
+    "image_size_error": "La dimensione dell'immagine non deve superare i 5 MB",
+    "instructions": "Puoi modificare i tuoi dati personali qui.",
+    "label": "Account",
+    "profile_alt": "Profilo",
+    "save_changes": "Salva le modifiche"
+  },
+  "accounts": "Conti",
+  "activation": "Attivazione",
+  "activation_toggle_aria": "Abilitare o disabilitare il collegamento",
+  "actual_stock": "Scorte attuali",
+  "add": "Aggiungere",
+  "admin": "Amministratore",
+  "app": {
+    "access": "Accedi all'applicazione",
+    "description": "Pianifica i tuoi trattamenti e condividi i tuoi calendari medici con facilità.",
+    "login": "Login",
+    "name": "MediTime",
+    "pageTitle": "MediTime - Gestore di Trattamenti Medici",
+    "register": "Creare un account",
+    "shortN": "MediTime",
+    "shortName": "MediTime",
+    "subtitle": "Gestisci, monitora e condividi facilmente i tuoi trattamenti medici.",
+    "title": "MediTime"
+  },
+  "auth": {
+    "accept_terms": "Accetto il",
+    "accept_terms_aria": "Accetta i termini e le condizioni",
+    "email": "Indirizzo e-mail",
+    "forgot_password": "Hai dimenticato la password?",
+    "hide_password": "Nascondi password",
+    "login": "Login",
+    "login_with": "Connettiti con:",
+    "name": "Nome e cognome",
+    "or_with_email": "o tramite e-mail:",
+    "password": "Password",
+    "provider": {
+      "discord": "Discordia",
+      "facebook": "Facebook",
+      "github": "Github",
+      "google": "Google",
+      "twitter": "Cinguettio"
+    },
+    "register": "Registrazione",
+    "register_with": "Registrati con:",
+    "show_password": "Mostra password",
+    "terms_link": "condizioni generali",
+    "verification_sent": "📩 Un link di verifica è stato inviato al tuo indirizzo email.",
+    "with_discord": "Connettiti con Discord",
+    "with_facebook": "Accedi con Facebook",
+    "with_github": "Connessione con Github",
+    "with_google": "Accedi con Google",
+    "with_twitter": "Connettiti con Twitter"
+  },
+  "auth_callback": {
+    "loading": "Connessione in corso...",
+    "session_error": "Il ripristino della sessione non è riuscito dopo OAuth",
+    "success": "Connessione riuscita tramite callback"
+  },
+  "back": "Indietro",
+  "boxes": {
+    "add_box": "Aggiungi una casella",
+    "add_manual": "Aggiungi manualmente",
+    "add_with_qr": "Scannerizza il codice QR",
+    "alert_threshold": "Soglia di allerta",
+    "cancel": "Cancellare",
+    "capacity": "Capacità della scatola",
+    "condition": {
+      "add": "Aggiungi una condizione",
+      "delete": "ELIMINARE",
+      "interval_days": "Intervallo di giorno",
+      "none": "Nessuna condizione di assunzione",
+      "start_date": "Data di inizio",
+      "tablet_count": "Numero di compresse",
+      "time_of_day": "Tempo di assunzione"
+    },
+    "day": "giorno",
+    "days": "giorni",
+    "delete": "ELIMINARE",
+    "dose": "Dose",
+    "each": "ogni",
+    "edit": "Per modificare",
+    "every": "tutti i",
+    "export_pdf": "Esportare",
+    "from": "Dal",
+    "intake_conditions": "Condizioni di assunzione",
+    "name": "Nome",
+    "new_box": "Nuova scatola",
+    "qr_code_help_text": "Il codice DataMatrix si trova sulla confezione del farmaco, vicino al codice a barre. È un piccolo quadrato bianco e nero.",
+    "remaining_qty": "Quantità rimanente",
+    "restock": "Riassortimento",
+    "save": "Salva",
+    "scan_qr_code": "Scannerizza il codice QR",
+    "start_typing": "Inizia a digitare...",
+    "stock": {
+      "alerts": {
+        "line": "{{name}} ({{dose}} mg) — {{count}} unità in magazzino",
+        "line_negative": "{{name}} ({{dose}} mg) — {{count}} unità (esaurito)",
+        "line_plural": "{{name}} ({{dose}} mg) — {{count}} unità in magazzino",
+        "title": "🔔 Avvisi sulle azioni:"
+      },
+      "badge": {
+        "high": "Elevato stock",
+        "low": "Scorte basse",
+        "out": "Esaurito"
+      }
+    },
+    "tablet": "compresso",
+    "tablets": "compresse",
+    "title": "Scatole di medicinali",
+    "view_notice": "Vedi le istruzioni"
+  },
+  "calendar": {
+    "add": "Aggiungi un calendario",
+    "add_calendar": "Aggiungi un calendario",
+    "add_with_qr": "Crea un calendario scansionando il QR",
+    "calendar_name": "Nome del calendario",
+    "calendar_name_placeholder": "Inserisci il nome del calendario",
+    "choose_image": "Scegli un'immagine",
+    "confirm_delete": "Eliminare il calendario?",
+    "confirm_delete_shared": "Eliminare il calendario condiviso?",
+    "confirm_rename": "Rinominare il calendario?",
+    "create_calendar_qr": "Scansiona QR: {{calendarName}}",
+    "creating_calendar": "Creazione in corso...",
+    "daily_view": "Calendario giornaliero",
+    "day": "Giorno",
+    "drag_and_drop": "Trascina un'immagine qui o fai clic per selezionarla",
+    "error_calendar_creation": "Errore durante la creazione del calendario",
+    "error_no_calendar_name": "Inserisci un nome per il calendario",
+    "error_no_medicines": "Nessun farmaco scansionato",
+    "error_partial_success": "Calendario creato ma non è stato possibile aggiungere {{count}} farmaci",
+    "import_calendar": "Importa il calendario \"{{name}}\"",
+    "import_type": "Aggiungi modalità",
+    "import_type_file": "Importazione di un file",
+    "import_type_file_description": "Importa un calendario da un file esportato.",
+    "import_type_manual": "Manuel",
+    "import_type_manual_description": "Crea un calendario vuoto e aggiungi i farmaci manualmente.",
+    "import_type_qr_description": "Scansiona i codici DataMatrix presenti sulle confezioni dei tuoi farmaci per creare automaticamente il tuo programma.",
+    "label": "Calendario",
+    "month": "Mese",
+    "name": "Nome del calendario",
+    "new_name": "Nuovo nome",
+    "processing": "Elaborazione in corso…",
+    "reference_week": "Settimana di riferimento",
+    "scan_medicines": "Scansiona i farmaci",
+    "scan_medicines_description": "Scansiona i codici DataMatrix sulle confezioni dei tuoi farmaci. Ogni farmaco scansionato verrà automaticamente aggiunto al tuo nuovo programma.",
+    "scan_qr_option": "Scanner di codici QR",
+    "scanner_button_hint": "Utilizzare il pulsante \"Aggiungi\" dello scanner per creare il calendario",
+    "today": "Oggi",
+    "week": "Settimana",
+    "weekly_help": "Cliccando su un giorno nel calendario si possono visualizzare in una finestra i farmaci associati.",
+    "weekly_view": "Calendario per settimana"
+  },
+  "calendar_completed": "Calendario completato con successo!",
+  "calendar_settings": {
+    "label": "Impostazioni del calendario",
+    "notifications": {
+      "disabled": "Notifiche disabilitate",
+      "enabled": "Notifiche abilitate",
+      "label": "Notifiche"
+    },
+    "sharing": {
+      "label": "Condivisione"
+    },
+    "stock": {
+      "daily": {
+        "description": "Le scorte verranno automaticamente diminuite ogni giorno a mezzanotte.",
+        "label": "Giornaliero (mezzanotte)"
+      },
+      "label": "Conteggio delle scorte",
+      "weekly": {
+        "description": "La scorta verrà diminuita manualmente ogni settimana quando rifornirai il tuo portapillole.",
+        "label": "Settimanale (Pillbox)"
+      }
+    }
+  },
+  "calendars": "Calendari",
+  "cancel": "Cancellare",
+  "choose_date": "Scegli una data",
+  "close": "Vicino",
+  "confirm_calendar_completion": "Confermare il completamento della pianificazione",
+  "contact": "Contatto",
+  "copy_link": "Copia il collegamento",
+  "copy_link_error": "Errore durante la copia del collegamento.",
+  "create_share_link": "Crea un collegamento di condivisione",
+  "critical_stock": "Rottura di stock",
+  "cta": {
+    "button": "creo il mio account",
+    "desc": "Crea gratuitamente il tuo account e semplifica la gestione medica per tutta la famiglia.",
+    "title": "Inizia oggi"
+  },
+  "date": "Data",
+  "day_view": {
+    "title": "Vista giornaliera"
+  },
+  "delete": "ELIMINARE",
+  "delete_access": "Rimuovi accesso",
+  "delete_access_confirm": "Rimuovere l'accesso?",
+  "delete_calendar_confirm": "Vuoi eliminare questo calendario?",
+  "delete_link": "Elimina il collegamento",
+  "delete_link_confirm": "Eliminare il collegamento?",
+  "done": "Finito",
+  "evening": "Sera",
+  "expiration": "Scadenza",
+  "expiration_date": "Data di scadenza del collegamento",
+  "expired": "Scaduto",
+  "expires_at": "Scade il",
+  "fcm": {
+    "sw_error": "[FCM] Errore SW",
+    "sw_registered": "[FCM] SW registrato",
+    "token_registered": "[FCM] Token registrato sul lato backend",
+    "token_send_error": "[FCM] Errore durante l'invio del token"
+  },
+  "features": {
+    "desc1": "Pianifica i tuoi scatti, ricevi promemoria e vivi in tutta tranquillità.",
+    "desc2": "Offri ai tuoi cari o a chi si prende cura di te un supporto quotidiano.",
+    "desc3": "I tuoi dati sono protetti con tecnologie affidabili come Supabase e Firebase.",
+    "title1": "Calendario intelligente",
+    "title2": "Condivisione collaborativa",
+    "title3": "Sicurezza assicurata"
+  },
+  "home": "Benvenuto",
+  "home_meta": {
+    "description": "Gestisci e condividi facilmente l'assunzione dei tuoi farmaci.",
+    "title": "MediTime - Pianificatore di trattamento"
+  },
+  "image_upload": {
+    "analysis_error": "Errore durante l'analisi dell'immagine.",
+    "click_to_change": "Clicca per cambiare file",
+    "click_to_select_file": "Fare clic o trascinare e rilasciare per selezionare un file",
+    "file_analysis_error": "Errore durante l'analisi del file",
+    "file_selected": "File selezionato",
+    "file_type_error": "Sono accettati solo file immagine (jpg, png, webp, gif).",
+    "file_types": "JPG, PNG, WEBP, GIF",
+    "no_medicines_found": "Nessun farmaco trovato nell'immagine.",
+    "preview_alt": "Anteprima",
+    "preview_error": "Errore durante la visualizzazione dell'anteprima",
+    "remove_image": "Elimina immagine",
+    "select_file_error": "Seleziona un file immagine.",
+    "title": "Seleziona e visualizza in anteprima un file"
+  },
+  "invalid_or_expired_link": "Questo collegamento al calendario condiviso non è valido o è scaduto.",
+  "invitation": {
+    "invalid_or_expired": "Invito non valido o scaduto",
+    "title": "Invito"
+  },
+  "link": "Collegamento",
+  "link_already_exists": "Esiste già un collegamento per questo calendario.",
+  "link_copied": "🔗 Link copiato!",
+  "link_expiration": "Scadenza del collegamento",
+  "link_will_be_generated": "Verrà generato un collegamento per",
+  "loading": "Caricamento...",
+  "loading_calendar": "Caricamento calendario...",
+  "loading_calendars": "Caricamento calendari...",
+  "loading_medicines": "Caricamento farmaci in corso...",
+  "loading_notifications": "Caricamento notifiche in corso...",
+  "loading_settings": "Caricamento delle impostazioni...",
+  "loading_share": "Caricamento condivisione...",
+  "locale": "it-IT",
+  "login": "Login",
+  "logout": "Esci",
+  "low_stock": "Scorte basse",
+  "manage_link": "Gestisci il collegamento",
+  "medicine_review": {
+    "current_stock": "Scorte attuali",
+    "delete_condition": "Rimuovi questa condizione",
+    "finish": "Per finire",
+    "maximum_stock": "Massima scorta",
+    "select_option": "Selezionare...",
+    "start_date": "Inizio",
+    "time_of_day": "Momento",
+    "title": "Revisione dei farmaci"
+  },
+  "medicines": {
+    "back_to_calendar": "Torna al calendario",
+    "label": "Droghe",
+    "list_empty": "❌ Non sono ancora stati aggiunti farmaci per questo programma.",
+    "list_title": "Elenco dei medicinali"
+  },
+  "mg": "mg",
+  "mobile": {
+    "android": "Su <strong>Android</strong> , il messaggio <em>&quot;Aggiungi alla schermata Home&quot;</em> appare automaticamente in fondo al browser. Toccalo per installare MediTime.",
+    "desc": "MediTime funziona come app mobile. Aggiungila alla schermata iniziale per un accesso rapido.",
+    "feature1": "Installazione facile dal browser",
+    "feature2": "Interfaccia touch fluida",
+    "feature3": "Accesso rapido dalla schermata iniziale",
+    "ios": "Su <strong>iPhone</strong> , apri MediTime in Safari, tocca<i class=\"bi bi-share mx-1\"></i> quindi <em>“Nella schermata iniziale”</em> .",
+    "other": "MediTime è accessibile anche tramite computer o tablet.",
+    "title": "Disponibile sul tuo telefono"
+  },
+  "modify": "Modificatore",
+  "morning": "Mattina",
+  "my_calendars": "I miei calendari",
+  "navigation": {
+    "about": "Di",
+    "calendar": "Calendario",
+    "dashboard": "Pannello di controllo",
+    "forgot-password": "Password dimenticata",
+    "help": "Assistente",
+    "home": "Benvenuto",
+    "login": "Login",
+    "medicines": "Droghe",
+    "profile": "Profilo",
+    "register": "Registro",
+    "reset-password": "Reimposta password",
+    "settings": "Impostazioni"
+  },
+  "never": "Mai",
+  "next": "Seguente",
+  "next_day": "Il giorno dopo",
+  "no_calendar_found": "Nessun calendario trovato",
+  "no_calendar_found_cta": "È possibile creare un calendario dalla home page.",
+  "no_events_today": "Nessun evento in questo giorno.",
+  "no_expiration": "Nessuna scadenza",
+  "no_low_stock": "Non vi è alcun farmaco in stock critico.",
+  "no_medicines": "Nessun farmaco da visualizzare.",
+  "no_notifications": "Nessuna nuova notifica",
+  "no_personal_calendars": "Non hai un calendario personale.",
+  "no_shared_calendars": "Non hai un calendario condiviso.",
+  "noon": "Mezzogiorno",
+  "not_found": {
+    "message": "Pagina non trovata.",
+    "title": "Errore 404"
+  },
+  "notif": {
+    "calendar_invite": "<0></0> ti invita a unirti al calendario <1>{{name}}</1>",
+    "calendar_joined": "Ti sei unito al calendario <1>{{name}}</1> di <0></0>",
+    "invite_accepted": "<0></0> ha accettato il tuo invito a partecipare al calendario <1>{{name}}</1>",
+    "invite_rejected": "<0></0> ha rifiutato il tuo invito a partecipare al calendario <1>{{name}}</1>",
+    "low_stock": "<0>{{name}}</0> è quasi esaurito (<0>{{qty}}</0> rimanenti).",
+    "share_removed_by_owner": "<0></0> ha smesso di condividere il calendario <1>{{name}}</1> con te",
+    "share_removed_by_you": "<0></0> ha rimosso il calendario <1>{{name}}</1>"
+  },
+  "notification": {
+    "email_toggle": "Abilita le notifiche e-mail",
+    "instructions": "Abilita o disabilita le notifiche e-mail o push in base alle tue preferenze.",
+    "push_toggle": "Abilita le notifiche push web"
+  },
+  "notifications": "Notifiche",
+  "open": "Aprire",
+  "open_notifications": "Apri notifiche",
+  "owner": "Proprietario",
+  "pending": "In attesa",
+  "permissions": "Permessi",
+  "pillbox": {
+    "fill": "Costruisci la casamatta",
+    "title": "Pillbox"
+  },
+  "previous": "Precedente",
+  "previous_day": "Giorno precedente",
+  "privacy": {
+    "label": "Riservatezza",
+    "last_update": "Ultimo aggiornamento: 9 giugno 2025",
+    "section1": {
+      "content": "MediTime è un'applicazione web progettata per facilitare la gestione dei trattamenti farmacologici. Permette agli utenti di creare calendari personalizzati, ricevere promemoria e condividere i programmi con i propri cari o con gli operatori sanitari. Il progetto è sviluppato personalmente da Matis Gillet (alias mtx_26), senza scopi commerciali.",
+      "title": "1. Chi siamo?"
+    },
+    "section2": {
+      "personal_data": {
+        "email": "Email, nome, foto: tramite autenticazione (Supabase Auth).",
+        "title": "Dati personali",
+        "uid": "Identificatore univoco: generato automaticamente per ciascun utente."
+      },
+      "tech_data": {
+        "device": "Informazioni sul dispositivo e sul browser (per il debug e per statistiche anonime).",
+        "title": "Dati tecnici",
+        "tokens": "Token di notifica push (se abilitati)."
+      },
+      "title": "2. Quali dati vengono raccolti?",
+      "treatment_data": {
+        "boxes": "Informazioni sulle scatole (quantità, stock, imballaggio).",
+        "history": "Cronologia delle modifiche e delle condivisioni del calendario.",
+        "medicines": "Nomi dei farmaci, dosaggi, frequenze, orari di assunzione.",
+        "title": "Dati relativi al trattamento"
+      }
+    },
+    "section3": {
+      "no_ads": "Nessun dato viene venduto, condiviso o utilizzato per scopi pubblicitari.",
+      "reminders": "Invia promemoria o avvisi se l'utente ha abilitato le notifiche.",
+      "sharing": "Consenti la condivisione sicura con altri utenti.",
+      "stability": "Migliorare la stabilità e la sicurezza dell'applicazione.",
+      "sync": "Visualizza e sincronizza le pianificazioni dei trattamenti.",
+      "title": "3. Come vengono utilizzati questi dati?"
+    },
+    "section4": {
+      "firebase": "Firebase (solo per notifiche push e statistiche anonime).",
+      "location": "I database sono ubicati nell'Unione Europea o in aree conformi al GDPR.",
+      "supabase": "Supabase (PostgreSQL e autenticazione).",
+      "title": "4. Dove vengono archiviati i dati?"
+    },
+    "section5": {
+      "auth": "L'accesso ai dati è protetto tramite autenticazione.",
+      "encryption": "Tutte le condivisioni del calendario sono crittografate e controllate dall'utente.",
+      "passwords": "Gli identificatori non sono mai visibili né memorizzati in testo normale.",
+      "title": "5. Condivisione e sicurezza"
+    },
+    "section6": {
+      "access": "Visualizza o esporta i tuoi dati.",
+      "contact": "Per esercitare tali diritti:",
+      "delete": "Richiederne la cancellazione definitiva.",
+      "disable": "Disattiva le notifiche.",
+      "intro": "In conformità con il GDPR, puoi in qualsiasi momento:",
+      "revoke": "Revoca l'accesso ai calendari condivisi.",
+      "title": "6. I tuoi diritti"
+    },
+    "section7": {
+      "developer": "Sviluppatore responsabile:\nMatis Gillet",
+      "title": "7. Contatto"
+    },
+    "title": "Informativa sulla privacy – MediTime"
+  },
+  "profile": "Il mio profilo",
+  "public_links": "Link pubblici",
+  "reactivate_link": "Riattivare il collegamento",
+  "read_only": "Solo lettura",
+  "read_write": "Lettura + Revisione",
+  "recipient_email": "E-mail del destinatario",
+  "regenerate": "Rigenerare",
+  "regenerate_link_confirm": "Rigenerare questo collegamento?",
+  "register": "Registrazione",
+  "reject": "Congedare",
+  "rename": "Rinominare",
+  "reset_password": {
+    "instructions": "Inserisci il tuo indirizzo email per ricevere un link di reimpostazione.",
+    "send_link": "Invia il link",
+    "success": "Un link per il ripristino è stato inviato al tuo indirizzo email.",
+    "title": "Reimposta password"
+  },
+  "reset_password_confirm": {
+    "cannot_change": "Impossibile modificare la password: sessione non valida.",
+    "instructions": "Inserisci una nuova password per il tuo account MediTime.",
+    "invalid_link": "Link di reimpostazione non valido o scaduto.",
+    "invalid_session": "Sessione non valida. Richiedi nuovamente un collegamento.",
+    "new_password_label": "Nuova password",
+    "save_password": "Salva la password",
+    "saving": "Registrazione...",
+    "success": "La tua password è stata modificata con successo.",
+    "title": "Nuova password"
+  },
+  "revoke_link": "Revoca il collegamento",
+  "rights_reserved": "Tutti i diritti riservati",
+  "scanner": {
+    "add": "Aggiungere",
+    "camera": "Telecamera",
+    "camera_error": "Impossibile accedere alla telecamera.",
+    "camera_instruction": "Indica il codice DataMatrix",
+    "cancel": "Cancellare",
+    "close": "Vicino",
+    "medicine_not_found": "Farmaco non trovato",
+    "quantity": "Quantità: {{quantità}}",
+    "remove_from_list": "Rimuovi dall'elenco",
+    "searching": "Ricerca...",
+    "select_camera": "Seleziona una telecamera",
+    "title": "Scansiona un codice QR",
+    "zoom": "Zoom: {{zoom}}x",
+    "camera_front": "Prima",
+    "camera_back": "Indietro",
+    "camera_normal": "Normale",
+    "camera_inverted": "Inversione",
+    "controls": {
+      "zoom": "Zoom",
+      "camera": "Telecamera",
+      "flip": "Inversione"
+    }
+  },
+  "security": {
+    "current_email": "Email attuale:",
+    "current_password": {
+      "label": "Password attuale",
+      "placeholder": "Inserisci la password corrente",
+      "required": "È richiesta la vecchia password."
+    },
+    "google_warning": "Accedi con Google. Non puoi cambiare email o password.",
+    "instructions": "Controlla l'indirizzo email associato al tuo account e, se necessario, modifica la password.",
+    "new_password": {
+      "placeholder": "Inserisci la nuova password"
+    },
+    "password_updated": "✅ Password aggiornata con successo.",
+    "title": "Gestione dell'account",
+    "update_password": "Aggiorna password"
+  },
+  "send_invitation": "Invia un invito",
+  "send_sms": "Invia tramite SMS",
+  "settings": {
+    "account": "Il mio conto",
+    "label": "Impostazioni",
+    "language": "Lingua dell'applicazione",
+    "language_note": "La lingua selezionata verrà applicata all'intera interfaccia.",
+    "preferences": "Preferenze",
+    "preferences_desc": "Personalizza la tua esperienza su MediTime.",
+    "security": "Sicurezza"
+  },
+  "share": "Condividere",
+  "share_calendar": "Condividi il calendario",
+  "shared": "Condiviso",
+  "shared_by": "Calendario condiviso da",
+  "shared_by_token": "Calendario condiviso da un token",
+  "shared_calendar": "Condivisione {{name}}",
+  "shared_calendar_management": "Gestione dei calendari condivisi",
+  "shared_calendars": "Calendari condivisi",
+  "shared_link_label": "Collegamento al calendario condiviso",
+  "shared_users": "Utenti condivisi",
+  "stock": "Azione",
+  "stock_alert": "Avviso di borsa",
+  "stock_alert_tooltip": "Vedi i farmaci di scorta critici",
+  "stock_alerts": "Farmaci esauriti",
+  "supabase-error": {
+    "access_denied": "Accesso negato",
+    "already_confirmed": "Già confermato",
+    "anonymous_provider_disabled": "Connessioni anonime disabilitate",
+    "bad_code_verifier": "Codice di verifica non valido",
+    "bad_json": "JSON non valido",
+    "bad_jwt": "JWT invalido",
+    "bad_oauth_callback": "Callback OAuth non corretto",
+    "bad_oauth_state": "Stato OAuth non valido",
+    "broken_link": "Collegamento non valido",
+    "captcha_failed": "Captcha fallito",
+    "confirmation_required": "Conferma richiesta",
+    "conflict": "conflitto di dati",
+    "email_address_invalid": "Indirizzo email non valido",
+    "email_address_not_authorized": "Email non autorizzata",
+    "email_change_not_allowed": "Vietata la modifica dell'email",
+    "email_conflict_identity_not_deletable": "Identità non eliminabile (email in conflitto)",
+    "email_exists": "Email già in uso",
+    "email_not_confirmed": "Email non confermata",
+    "email_provider_disabled": "Abbonamenti e-mail disabilitati",
+    "expired_code": "Codice scaduto",
+    "flow_state_expired": "Stato di flusso scaduto",
+    "flow_state_not_found": "Stato del flusso non trovato",
+    "hook_payload_invalid_content_type": "Tipo di contenuto hook non valido",
+    "hook_payload_over_size_limit": "Carico utile del gancio troppo grande",
+    "hook_timeout": "Tempo di attesa del gancio superato",
+    "hook_timeout_after_retry": "Timeout di hook superato dopo il nuovo tentativo",
+    "identities_conflict": "Conflitto di identità",
+    "identity_already_exists": "Identità esistente",
+    "identity_not_found": "Identità non trovata",
+    "insufficient_aal": "Livello di autenticazione insufficiente",
+    "invalid_app_id": "ID app non valido",
+    "invalid_code": "Codice non valido",
+    "invalid_credentials": "Credenziali non valide",
+    "invalid_email": "Email non valida",
+    "invalid_invite_token": "Token di invito non valido",
+    "invalid_login_credentials": "Credenziali errate",
+    "invalid_phone_number": "Numero di telefono non valido",
+    "invalid_provider": "Fornitore non valido",
+    "invalid_refresh_token": "Token di aggiornamento non valido",
+    "invalid_token": "Token non valido",
+    "invite_not_found": "Invito non trovato",
+    "manual_linking_disabled": "Collegamento manuale disabilitato",
+    "mfa_challenge_expired": "Sfida MFA scaduta",
+    "mfa_factor_name_conflict": "Nome del fattore MFA in conflitto",
+    "mfa_factor_not_found": "Fattore MFA non trovato",
+    "mfa_ip_address_mismatch": "Indirizzo IP diverso per MFA",
+    "mfa_phone_enroll_not_enabled": "Registrazione MFA telefonica disabilitata",
+    "mfa_phone_verify_not_enabled": "Verifica MFA del telefono disabilitata",
+    "mfa_totp_enroll_not_enabled": "Registrazione MFA TOTP disabilitata",
+    "mfa_totp_verify_not_enabled": "Verifica TOTP MFA disabilitata",
+    "mfa_verification_failed": "Verifica MFA non riuscita",
+    "mfa_verification_rejected": "Verifica MFA rifiutata",
+    "mfa_verified_factor_exists": "Fattore MFA verificato già esistente",
+    "mfa_web_authn_enroll_not_enabled": "Registrazione MFA WebAuthn disabilitata",
+    "mfa_web_authn_verify_not_enabled": "Verifica MFA WebAuthn disabilitata",
+    "missing_email": "Email mancante",
+    "missing_password": "Password mancante",
+    "no_authorization": "Autorizzazione mancante",
+    "not_admin": "Accesso amministratore richiesto",
+    "oauth_callback_error": "Errore OAuth",
+    "oauth_provider_not_supported": "Provider OAuth non supportato",
+    "otp_disabled": "OTP disabilitato",
+    "otp_expired": "OTP scaduto",
+    "over_email_send_rate_limit": "Troppe email inviate",
+    "over_request_rate_limit": "Troppe richieste",
+    "over_sms_send_rate_limit": "Troppi messaggi di testo inviati",
+    "password_reset_required": "È necessario reimpostare la password",
+    "phone_exists": "Telefono già in uso",
+    "phone_not_confirmed": "Numero di telefono non confermato",
+    "phone_number_exists": "Numero già in uso",
+    "phone_provider_disabled": "Registrazioni telefoniche disabilitate",
+    "provider_disabled": "Provider disabilitato",
+    "provider_email_needs_verification": "Email del fornitore da verificare",
+    "reauthentication_needed": "Nuova autenticazione richiesta",
+    "reauthentication_not_valid": "Riautenticazione non valida",
+    "reauthentication_required": "Nuova autenticazione richiesta",
+    "refresh_token_already_used": "Token di aggiornamento già utilizzato",
+    "refresh_token_not_found": "Token di aggiornamento non trovato",
+    "request_timeout": "Timeout della richiesta superato",
+    "same_password": "Stessa password",
+    "saml_assertion_no_email": "Nessuna email nell'asserzione SAML",
+    "saml_assertion_no_user_id": "Nessun ID utente nell'asserzione SAML",
+    "saml_entity_id_mismatch": "ID entità SAML diverso",
+    "saml_idp_already_exists": "IdP SAML esistente",
+    "saml_idp_not_found": "IdP SAML non trovato",
+    "saml_metadata_fetch_failed": "Recupero metadati SAML non riuscito",
+    "saml_provider_disabled": "Fornitore SAML disabilitato",
+    "saml_relay_state_expired": "Stato del relè SAML scaduto",
+    "saml_relay_state_not_found": "Stato del relay SAML non trovato",
+    "session_expired": "Sessione scaduta",
+    "session_not_found": "Sessione non trovata",
+    "signup_disabled": "Registrazioni disabilitate",
+    "single_identity_not_deletable": "Identità unica e non cancellabile",
+    "sms_send_failed": "Invio SMS non riuscito",
+    "sso_domain_already_exists": "Dominio SSO esistente",
+    "sso_provider_not_found": "Provider SSO non trovato",
+    "too_many_enrolled_mfa_factors": "Troppi fattori MFA",
+    "unauthorized_client": "Cliente non autorizzato",
+    "unexpected_audience": "Pubblico inaspettato",
+    "unexpected_error": "Errore imprevisto",
+    "unexpected_failure": "Guasto imprevisto",
+    "user_already_exists": "Utente esistente",
+    "user_banned": "Utente bannato",
+    "user_not_found": "Utente non trovato",
+    "user_sso_managed": "Utente gestito da SSO",
+    "validation_failed": "Convalida fallita",
+    "weak_password": "Password debole"
+  },
+  "terms": {
+    "label": "Termini di utilizzo",
+    "last_update": "Ultimo aggiornamento: 9 giugno 2025",
+    "section1": {
+      "p1": "Le presenti condizioni hanno lo scopo di definire le modalità di utilizzo dell'applicazione MediTime, sviluppata personalmente da Matis Gillet (alias mtx_26), senza fini di lucro.",
+      "p2": "Utilizzando l'applicazione, accetti incondizionatamente le presenti condizioni.",
+      "title": "1. Scopo"
+    },
+    "section2": {
+      "disclaimer": "L'Applicazione viene fornita \"così com'è\" senza alcuna garanzia di continua disponibilità o accuratezza medica.",
+      "intro": "MediTime consente ai suoi utenti di:",
+      "list": {
+        "item1": "Creare e gestire programmi di somministrazione dei farmaci;",
+        "item2": "Ricevere promemoria sui trattamenti (notifiche);",
+        "item3": "Condividi i calendari con altre persone (link o account)."
+      },
+      "title": "2. Funzionalità"
+    },
+    "section3": {
+      "conclusion": "Ogni utente è responsabile della riservatezza del proprio account e dei propri dati.",
+      "intro": "Per accedere a MediTime è necessario:",
+      "list": {
+        "item1": "Registrazione tramite Supabase Auth;",
+        "item2": "Accettazione dei presenti T&C e dell'informativa sulla privacy."
+      },
+      "title": "3. Accesso e registrazione"
+    },
+    "section4": {
+      "content": "Il codice sorgente, il design e il contenuto di MediTime sono di proprietà di Matis Gillet, salvo diversa indicazione. Qualsiasi riproduzione, distribuzione o modifica senza autorizzazione è vietata.",
+      "title": "4. Proprietà intellettuale"
+    },
+    "section5": {
+      "list": {
+        "item1": "Conseguenze della dimenticanza di prendere;",
+        "item2": "Errori nella visualizzazione dei dati;",
+        "item3": "Dalla perdita o divulgazione dei dati dovuta all'uso non protetto."
+      },
+      "p1": "L'applicazione non intende sostituire il parere medico. L'utente rimane l'unico responsabile dell'utilizzo delle informazioni visualizzate.",
+      "p2": "In nessun caso MediTime o il suo sviluppatore possono essere ritenuti responsabili:",
+      "title": "5. Responsabilità"
+    },
+    "section6": {
+      "conclusion": "L'eliminazione è definitiva e non può essere annullata.",
+      "intro": "In qualsiasi momento puoi:",
+      "list": {
+        "item1": "Elimina il tuo account e i tuoi dati tramite una richiesta via email;",
+        "item2": "Revoca l'accesso ai calendari condivisi."
+      },
+      "title": "6. Eliminazione dell'account"
+    },
+    "section7": {
+      "content": "I presenti Termini e Condizioni possono essere modificati in qualsiasi momento. Sarete informati di eventuali modifiche significative tramite l'app o via e-mail.",
+      "title": "7. Modifiche"
+    },
+    "section8": {
+      "intro": "Per qualsiasi domanda riguardante queste condizioni:",
+      "title": "8. Contatto"
+    },
+    "title": "Condizioni Generali d'Uso – MediTime"
+  },
+  "testimonials": {
+    "author": "Andrée C. e i suoi nipoti",
+    "quote": "Continuo a riempire il portapillole di mia madre ogni settimana, ma con MediTime è diventato molto più semplice. Posso vedere l'elenco completo dei suoi farmaci a colpo d'occhio, ricevo promemoria e anche lei. Siamo molto più rilassati.",
+    "title": "Si fidano di noi"
+  },
+  "threshold": "Soglia",
+  "title": {
+    "delete_file": "Elimina il file"
+  },
+  "unknown_user": "Utente sconosciuto",
+  "user": "Utente",
+  "verify_email": {
+    "instructions": "Invia un nuovo link di verifica al tuo indirizzo email.",
+    "no_user": "Nessun utente ha effettuato l'accesso.",
+    "resend_link": "Invia nuovamente il link di verifica",
+    "title": "Verifica dell'indirizzo email"
+  },
+  "why": {
+    "desc": "Perché l'assistenza sanitaria non lascia spazio all'improvvisazione. MediTime ti offre una soluzione chiara, intuitiva e sicura per monitorare i tuoi trattamenti e quelli dei tuoi cari, giorno dopo giorno.",
+    "title": "Perché scegliere MediTime?"
+  },
+  "yes": "SÌ"
+}
