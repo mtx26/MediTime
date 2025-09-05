@@ -155,7 +155,7 @@ SUPABASE_PROJECT_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your_supabase_anon_key_here
 SUPABASE_JWT_SECRET=your_jwt_secret_here
 
-# 🔥 Firebase Admin SDK
+# 🔥 Google Console
 GOOGLE_APPLICATION_CREDENTIALS=your_service_account_json_content_here
 GOOGLE_CLOUD_LOCATION=us-central1
 
@@ -192,8 +192,8 @@ FRONTEND_URL=https://your-frontend-url.com
 - `PG_HOST`, `PG_DATABASE`, `PG_USER`, `PG_PASSWORD`, `PG_PORT` : Configuration PostgreSQL via Supabase
 - `SUPABASE_PROJECT_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_JWT_SECRET` : Configuration Supabase
 
-#### 🔥 Firebase Admin
-- `GOOGLE_APPLICATION_CREDENTIALS` : Contenu JSON des clés de service Firebase
+#### 🔥 Google Console
+- `GOOGLE_APPLICATION_CREDENTIALS` : Contenu JSON des clés de service Google Console
 - `GOOGLE_CLOUD_LOCATION` : Région Google Cloud
 
 #### ☁️ Services externes
