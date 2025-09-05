@@ -2,8 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { log } from '../../utils/logger';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '@env';
 
 const fetchTokenMedicines = async (
   token,

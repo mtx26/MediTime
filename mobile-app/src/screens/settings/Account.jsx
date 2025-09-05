@@ -6,8 +6,7 @@ import { log } from '../../utils/logger';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '../../utils/files/cropImage';
 import { updateUserInfo } from '../../services/auth/authService';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '@env';
 
 const Account = ({ sharedProps }) => {
   const { t } = useTranslation();

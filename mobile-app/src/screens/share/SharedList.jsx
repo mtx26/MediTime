@@ -7,8 +7,9 @@ import { formatToLocalISODate } from "../../utils/calendar/dateUtils";
 import { useTranslation } from "react-i18next";
 import ActionSheet from '../../components/common/ActionSheet';
 import { useSearchParams, useNavigate, useParams } from "react-router-dom";
+import { APP_URL } from '@env';
 
-const VITE_URL = import.meta.env.VITE_VITE_URL;
+const VITE_URL = APP_URL;
 
 function SharedList({
   tokenCalendars,

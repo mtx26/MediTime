@@ -3,8 +3,7 @@ import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import { UserContext } from '../../contexts/UserContext';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '@env';
 
 const fetchCalendars = async (uid, setCalendarsData, setLoadingStates) => {
   try {

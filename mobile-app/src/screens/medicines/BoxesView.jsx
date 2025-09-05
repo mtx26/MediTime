@@ -8,6 +8,7 @@ import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 import QRCodeScanner from '../../components/scanner/QRCodeScanner';
+import { API_URL } from '@env';
 
 const getBorderClass = (box) => {
   if (box.box_capacity === 0) return '';
@@ -692,7 +693,7 @@ function BoxCard({
   };
 
   const openNotice = (box_id) => {
-    const url = `${import.meta.env.VITE_API_URL}/api/proxy/pdf/${box_id}`;
+    const url = `${API_URL}/api/proxy/pdf/${box_id}`;
     window.open(url, '_blank');
   };
 

@@ -3,9 +3,9 @@ import { supabase } from '../supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import { performApiCall } from '../../services/api/apiUtils';
 import { getGlobalReloadUser } from '../../contexts/UserContext';
+import { API_URL } from '@env';
 
 // URL de l'API
-const API_URL = import.meta.env.VITE_API_URL;
 
 function buildCallbackUrl(redirect) {
   const lang = window.location.pathname.split('/')[1] || '';

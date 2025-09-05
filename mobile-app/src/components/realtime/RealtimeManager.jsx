@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom';
+import { useRoute } from '@react-navigation/native';
 import {
   useRealtimeCalendars,
   useRealtimeSharedCalendars,
@@ -16,29 +16,32 @@ export default function RealtimeManager({
   calendarsData,
   sharedCalendarsData,
 }) {
-  const location = useLocation();
-
-  // Liste blanche des routes où on active le realtime
-  const enabledRoutes = [
-    '/calendars',
-    '/calendar/',
-    '/shared-user-calendar/',
-    '/shared-token-calendar/',
-    '/notifications',
-    '/account',
-    '/settings',
-    '/shared-calendars',
-    '/accept-invite',
-    '/add-calendar',
-  ];
-
-  // strip possible language prefix (e.g. /fr) before matching routes
-  const pathWithoutLang =
-    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-
-  const isRealtimeEnabled = enabledRoutes.some((route) =>
-    pathWithoutLang.startsWith(route)
-  );
+  let route;
+  let isRealtimeEnabled = false;
+  
+  try {
+    route = useRoute();
+    // Si on a une route valide, on vérifie si elle est dans la liste autorisée
+    const enabledRoutes = [
+      'Calendars',
+      'Calendar',
+      'SharedUserCalendar',
+      'SharedTokenCalendar',
+      'Notifications',
+      'Account',
+      'Settings',
+      'SharedCalendars',
+      'AcceptInvite',
+      'AddCalendar',
+    ];
+    
+    const currentRouteName = route?.name || '';
+    isRealtimeEnabled = enabledRoutes.includes(currentRouteName);
+  } catch (error) {
+    // Si useRoute échoue (composant pas dans un navigator), on désactive le realtime
+    route = null;
+    isRealtimeEnabled = false;
+  }
 
   // ✅ Appel des hooks (OK car toujours dans un composant monté dans <Router>)
   useRealtimeCalendars(

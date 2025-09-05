@@ -3,8 +3,7 @@ import { UserContext } from '../../contexts/UserContext';
 import { log } from '../../utils/logger';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '@env';
 
 export const useRealtimeTokens = (setTokensList, setLoadingStates) => {
   const { userInfo } = useContext(UserContext);

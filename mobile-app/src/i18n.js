@@ -1,32 +1,44 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
 import { enabledLanguageCodes, DEFAULT_LANG } from './config/languages.js';
 
-const translationFiles = import.meta.glob('./locales/*/translation.json', { eager: true });
+// Import all translation files explicitly
+import enTranslation from './locales/en/translation.json';
+import frTranslation from './locales/fr/translation.json';
+import esTranslation from './locales/es/translation.json';
+import deTranslation from './locales/de/translation.json';
+import itTranslation from './locales/it/translation.json';
+import jaTranslation from './locales/ja/translation.json';
+import zhTranslation from './locales/zh/translation.json';
+import ptTranslation from './locales/pt/translation.json';
+import ruTranslation from './locales/ru/translation.json';
 
+// Create resources object with all available translations
+const allTranslations = {
+  en: enTranslation,
+  fr: frTranslation,
+  es: esTranslation,
+  de: deTranslation,
+  it: itTranslation,
+  ja: jaTranslation,
+  zh: zhTranslation,
+  pt: ptTranslation,
+  ru: ruTranslation,
+};
+
+// Filter to only include enabled languages
 const resources = {};
-
-for (const path in translationFiles) {
-  const match = path.match(/\.\/locales\/(.*?)\/translation\.json$/);
-  if (match) {
-    const lang = match[1];
-    if (enabledLanguageCodes.includes(lang)) {
-      resources[lang] = { translation: translationFiles[path].default };
-    }
+enabledLanguageCodes.forEach(lang => {
+  if (allTranslations[lang]) {
+    resources[lang] = { translation: allTranslations[lang] };
   }
-}
+});
 
 i18n
-  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
     fallbackLng: DEFAULT_LANG,
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
-    },
     interpolation: {
       escapeValue: false,
     },

@@ -2,11 +2,13 @@
  * Configuration centralisée pour l'internationalisation des métadonnées
  */
 
+import { APP_URL } from '@env';
+
 // Fonction pour obtenir l'URL de base (compatible Node.js et navigateur)
 const getBaseUrl = () => {
   if (typeof window !== 'undefined') {
-    // En mode navigateur, utilise Vite env
-    return import.meta.env?.VITE_VITE_URL || 'https://meditime.app';
+    // En mode navigateur, utilise React Native env
+    return APP_URL || 'https://meditime.app';
   } else {
     // En mode Node.js, utilise process.env ou fallback
     return process.env.VITE_VITE_URL || 'https://meditime.app';

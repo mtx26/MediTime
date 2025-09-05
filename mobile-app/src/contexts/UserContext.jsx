@@ -1,17 +1,30 @@
 import { createContext, useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../services/supabase/supabaseClient';
 import { log } from '../utils/logger';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UserContext = createContext(null);
 let globalReloadUser = () => {};
 
 export const UserProvider = ({ children }) => {
-  const [userInfo, setUserInfo] = useState(
-    () => JSON.parse(localStorage.getItem('userInfo')) || null
-  );
+  const [userInfo, setUserInfo] = useState(null);
   const tokenRef = useRef(null);
+
+  // Charger les données utilisateur depuis AsyncStorage au démarrage
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const storedUserInfo = await AsyncStorage.getItem('userInfo');
+        if (storedUserInfo) {
+          setUserInfo(JSON.parse(storedUserInfo));
+        }
+      } catch (error) {
+        log.error('Erreur lors du chargement des données utilisateur:', error);
+      }
+    };
+    loadUserData();
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -81,7 +94,7 @@ export const UserProvider = ({ children }) => {
         };
 
         setUserInfo(userInfo);
-        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
         return;
       }
 
@@ -98,7 +111,7 @@ export const UserProvider = ({ children }) => {
       };
 
       setUserInfo(info);
-      localStorage.setItem('userInfo', JSON.stringify(info));
+      await AsyncStorage.setItem('userInfo', JSON.stringify(info));
     } catch (error) {
       log.error('[UserContext] Erreur lors de reloadUser', {
         error,
@@ -114,7 +127,7 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (event === 'TOKEN_REFRESHED' && session) {
           if (tokenRef.current && tokenRef.current !== session.access_token) {
             log.info('[UserContext] Token mis à jour, appel reloadUser');
@@ -122,7 +135,7 @@ export const UserProvider = ({ children }) => {
           }
         } else if (event === 'SIGNED_OUT') {
           setUserInfo(null);
-          localStorage.removeItem('userInfo');
+          await AsyncStorage.removeItem('userInfo');
           tokenRef.current = null;
         }
       }

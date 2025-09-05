@@ -1,6 +1,7 @@
-const isDev = import.meta.env.DEV;
+import { API_URL } from '@env';
+
+const isDev = __DEV__;
 const forceLog = true; // ← reste utile en local
-const API_URL = import.meta.env.VITE_API_URL;
 
 if (!API_URL) console.error('API_URL is not defined');
 
