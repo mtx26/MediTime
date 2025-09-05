@@ -1,182 +1,402 @@
 import React, { useContext } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Dimensions,
+  Platform,
+} from 'react-native';
 import { UserContext } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-function HomePage() {
-  const navigate = useNavigate();
-  const { lng } = useParams();
+const { width } = Dimensions.get('window');
+
+function HomePage({ navigation }) {
   const { userInfo } = useContext(UserContext);
   const { t } = useTranslation();
   
-  const handleAccess = () => navigate(`/${lng}/calendars`);
-  const handleLogin = () => navigate(`/${lng}/login`);
-  const handleRegister = () => navigate(`/${lng}/register`);
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isAndroid = /android/i.test(navigator.userAgent);
+  const handleAccess = () => navigation.navigate('MainTabs');
+  const handleLogin = () => navigation.navigate('Login');
+  const handleRegister = () => navigation.navigate('Register');
 
   return (
-    <>
-      <header className="hero hero bg-light border-bottom shadow-sm py-5 rounded-3">
-        <div className="container text-center">
-          <div className='d-flex align-items-center justify-content-center gap-1'>
-            <i className="bi bi-capsule display-1 text-primary" aria-hidden="true"></i>
-            <h1 className="mt-3 fw-bold text-primary">{t('app.title')}</h1>
-          </div>
-          <p className="lead text-muted">{t('app.subtitle')}</p>
-          <div className="mt-4 d-flex flex-column flex-md-row justify-content-center gap-3">
-            {userInfo ? (
-              <button
-                className="btn btn-primary btn-lg px-4"
-                onClick={handleAccess}
-                aria-label={t('app.access')}
-                title={t('app.access')}
-              >
-                {t('app.access')}
-              </button>
-            ) : (
-              <>
-                <button
-                  className="btn btn-primary btn-lg px-4 shadow rounded-3"
-                  onClick={handleLogin}
-                  aria-label={t('app.login')}
-                  title={t('app.login')}
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Hero Section */}
+        <View style={styles.hero}>
+          <View style={styles.heroContent}>
+            <View style={styles.titleContainer}>
+              <Icon name="medication" size={48} color="#007AFF" />
+              <Text style={styles.title}>{t('app.title')}</Text>
+            </View>
+            <Text style={styles.subtitle}>{t('app.subtitle')}</Text>
+            
+            <View style={styles.buttonContainer}>
+              {userInfo ? (
+                <TouchableOpacity
+                  style={styles.primaryButton}
+                  onPress={handleAccess}
+                  activeOpacity={0.8}
                 >
-                  {t('app.login')}
-                </button>
-                <button
-                  className="btn btn-outline-primary btn-lg px-4 shadow rounded-3"
-                  onClick={handleRegister}
-                  aria-label={t('app.register')}
-                  title={t('app.register')}
-                >
-                  {t('app.register')}
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+                  <Text style={styles.primaryButtonText}>{t('app.access')}</Text>
+                </TouchableOpacity>
+              ) : (
+                <>
+                  <TouchableOpacity
+                    style={styles.primaryButton}
+                    onPress={handleLogin}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.primaryButtonText}>{t('app.login')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.secondaryButton}
+                    onPress={handleRegister}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.secondaryButtonText}>{t('app.register')}</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </View>
+        </View>
 
-      <section className="container py-5">
-        <div className="row text-center mb-5">
-          <div className="col-md-4">
-            <i className="bi bi-calendar-check display-4 text-primary" aria-hidden="true"></i>
-            <h3 className="mt-3">{t('features.title1')}</h3>
-            <p>{t('features.desc1')}</p>
-          </div>
-          <div className="col-md-4">
-            <i className="bi bi-people display-4 text-primary" aria-hidden="true"></i>
-            <h3 className="mt-3">{t('features.title2')}</h3>
-            <p>{t('features.desc2')}</p>
-          </div>
-          <div className="col-md-4">
-            <i className="bi bi-lock-fill display-4 text-primary" aria-hidden="true"></i>
-            <h3 className="mt-3">{t('features.title3')}</h3>
-            <p>{t('features.desc3')}</p>
-          </div>
-        </div>
+        {/* Features Section */}
+        <View style={styles.section}>
+          <View style={styles.featuresContainer}>
+            <View style={styles.feature}>
+              <Icon name="event-available" size={40} color="#007AFF" />
+              <Text style={styles.featureTitle}>{t('features.title1')}</Text>
+              <Text style={styles.featureDesc}>{t('features.desc1')}</Text>
+            </View>
+            <View style={styles.feature}>
+              <Icon name="people" size={40} color="#007AFF" />
+              <Text style={styles.featureTitle}>{t('features.title2')}</Text>
+              <Text style={styles.featureDesc}>{t('features.desc2')}</Text>
+            </View>
+            <View style={styles.feature}>
+              <Icon name="lock" size={40} color="#007AFF" />
+              <Text style={styles.featureTitle}>{t('features.title3')}</Text>
+              <Text style={styles.featureDesc}>{t('features.desc3')}</Text>
+            </View>
+          </View>
 
-        <div className="text-center">
-          <h2 className="fw-bold text-primary">{t('why.title')}</h2>
-          <p className="text-muted mx-auto" style={{ maxWidth: '800px' }}>
-            {t('why.desc')}
-          </p>
-        </div>
-      </section>
+          <View style={styles.whySection}>
+            <Text style={styles.sectionTitle}>{t('why.title')}</Text>
+            <Text style={styles.sectionDesc}>{t('why.desc')}</Text>
+          </View>
+        </View>
 
-      <section className="bg-light py-5">
-        <div className="container text-center">
-          <h2 className="fw-bold text-primary mb-4">{t('testimonials.title')}</h2>
-          <blockquote className="blockquote mx-auto" style={{ maxWidth: '700px' }}>
-            <p className="mb-3 fst-italic">{t('testimonials.quote')}</p>
-            <footer className="blockquote-footer">{t('testimonials.author')}</footer>
-          </blockquote>
-        </div>
-      </section>
+        {/* Testimonials Section */}
+        <View style={styles.testimonialSection}>
+          <Text style={styles.sectionTitle}>{t('testimonials.title')}</Text>
+          <View style={styles.testimonial}>
+            <Text style={styles.quote}>"{t('testimonials.quote')}"</Text>
+            <Text style={styles.author}>— {t('testimonials.author')}</Text>
+          </View>
+        </View>
 
-      <section className="bg-white border-top py-5">
-        <div className="container text-center">
-          <div className="row align-items-center">
-            <div className="col-md-6 mb-4 mb-md-0">
-              <i className="bi bi-phone display-1 text-primary" aria-hidden="true"></i>
-            </div>
-            <div className="col-md-6">
-              <h2 className="fw-bold text-primary mb-3">{t('mobile.title')}</h2>
-              <p className="text-muted">{t('mobile.desc')}</p>
-              <ul className="list-unstyled text-start d-inline-block mt-3">
-                <li>
-                  <i className="bi bi-check-circle-fill text-primary me-2"></i>
-                  {t('mobile.feature1')}
-                </li>
-                <li>
-                  <i className="bi bi-check-circle-fill text-primary me-2"></i>
-                  {t('mobile.feature2')}
-                </li>
-                <li>
-                  <i className="bi bi-check-circle-fill text-primary me-2"></i>
-                  {t('mobile.feature3')}
-                </li>
-              </ul>
+        {/* Mobile Section */}
+        <View style={styles.section}>
+          <View style={styles.mobileSection}>
+            <Icon name="smartphone" size={80} color="#007AFF" />
+            <View style={styles.mobileContent}>
+              <Text style={styles.sectionTitle}>{t('mobile.title')}</Text>
+              <Text style={styles.sectionDesc}>{t('mobile.desc')}</Text>
+              
+              <View style={styles.featureList}>
+                <View style={styles.featureItem}>
+                  <Icon name="check-circle" size={20} color="#007AFF" />
+                  <Text style={styles.featureItemText}>{t('mobile.feature1')}</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Icon name="check-circle" size={20} color="#007AFF" />
+                  <Text style={styles.featureItemText}>{t('mobile.feature2')}</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Icon name="check-circle" size={20} color="#007AFF" />
+                  <Text style={styles.featureItemText}>{t('mobile.feature3')}</Text>
+                </View>
+              </View>
 
-              {isIOS && (
-                <div
-                  className="alert alert-info mt-4"
-                  dangerouslySetInnerHTML={{ __html: t('mobile.ios') }}
-                />
+              {Platform.OS === 'ios' && (
+                <View style={styles.alert}>
+                  <Text style={styles.alertText}>{t('mobile.ios')}</Text>
+                </View>
               )}
 
-              {isAndroid && (
-                <div
-                  className="alert alert-info mt-4"
-                  dangerouslySetInnerHTML={{ __html: t('mobile.android') }}
-                />
+              {Platform.OS === 'android' && (
+                <View style={styles.alert}>
+                  <Text style={styles.alertText}>{t('mobile.android')}</Text>
+                </View>
               )}
+            </View>
+          </View>
+        </View>
 
-              {!isIOS && !isAndroid && (
-                <div className="alert alert-secondary mt-4">
-                  {t('mobile.other')}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
+        {/* CTA Section */}
+        <View style={styles.ctaSection}>
+          <Text style={styles.ctaTitle}>{t('cta.title')}</Text>
+          <Text style={styles.ctaDesc}>{t('cta.desc')}</Text>
+          <TouchableOpacity
+            style={styles.ctaButton}
+            onPress={handleRegister}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.ctaButtonText}>{t('cta.button')}</Text>
+          </TouchableOpacity>
+        </View>
 
-      <section className="bg-primary text-white py-5">
-        <div className="container text-center">
-          <h2 className="fw-bold">{t('cta.title')}</h2>
-          <p className="lead mb-4">{t('cta.desc')}</p>
-          <button
-            className="btn btn-light btn-lg px-4"
-            onClick={handleRegister}
-            aria-label={t('app.register')}
-            title={t('app.register')}
-          >
-            {t('cta.button')}
-          </button>
-        </div>
-      </section>
-
-      <section className="bg-white border-top py-4">
-        <div className="container text-center">
-          <a
-            href={`/${lng}/privacy`}
-            className="text-muted text-decoration-none small me-3"
-          >
-            {t('privacy.label')}
-          </a>
-          <span className="text-muted small">|</span>
-          <a
-            href={`/${lng}/terms`}
-            className="text-muted   text-decoration-none small ms-3"
-          >
-            {t('terms.label')}
-          </a>
-        </div>
-      </section>
-    </>
+        {/* Footer */}
+        <View style={styles.footer}>
+          <TouchableOpacity onPress={() => navigation.navigate('Privacy')}>
+            <Text style={styles.footerLink}>{t('privacy.label')}</Text>
+          </TouchableOpacity>
+          <Text style={styles.footerSeparator}>|</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Terms')}>
+            <Text style={styles.footerLink}>{t('terms.label')}</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  hero: {
+    backgroundColor: '#f8f9fa',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  heroContent: {
+    alignItems: 'center',
+    maxWidth: width - 40,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#007AFF',
+    marginLeft: 12,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#6c757d',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 24,
+  },
+  buttonContainer: {
+    flexDirection: 'column',
+    gap: 12,
+    width: '100%',
+    maxWidth: 300,
+  },
+  primaryButton: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  primaryButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#007AFF',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  secondaryButtonText: {
+    color: '#007AFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  section: {
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  featuresContainer: {
+    marginBottom: 40,
+  },
+  feature: {
+    alignItems: 'center',
+    marginBottom: 32,
+    paddingHorizontal: 16,
+  },
+  featureTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333333',
+    marginTop: 12,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  featureDesc: {
+    fontSize: 14,
+    color: '#6c757d',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  whySection: {
+    alignItems: 'center',
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#007AFF',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  sectionDesc: {
+    fontSize: 16,
+    color: '#6c757d',
+    textAlign: 'center',
+    lineHeight: 24,
+    maxWidth: width - 80,
+  },
+  testimonialSection: {
+    backgroundColor: '#f8f9fa',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  testimonial: {
+    maxWidth: width - 80,
+    alignItems: 'center',
+  },
+  quote: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    color: '#333333',
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 24,
+  },
+  author: {
+    fontSize: 14,
+    color: '#6c757d',
+    textAlign: 'center',
+  },
+  mobileSection: {
+    alignItems: 'center',
+  },
+  mobileContent: {
+    alignItems: 'center',
+    marginTop: 24,
+    maxWidth: width - 40,
+  },
+  featureList: {
+    marginTop: 16,
+    alignSelf: 'stretch',
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    paddingHorizontal: 16,
+  },
+  featureItemText: {
+    fontSize: 14,
+    color: '#333333',
+    marginLeft: 8,
+    flex: 1,
+  },
+  alert: {
+    backgroundColor: '#d1ecf1',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 16,
+    alignSelf: 'stretch',
+  },
+  alertText: {
+    fontSize: 14,
+    color: '#0c5460',
+    textAlign: 'center',
+  },
+  ctaSection: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  ctaTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  ctaDesc: {
+    fontSize: 16,
+    color: '#ffffff',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 24,
+  },
+  ctaButton: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  ctaButtonText: {
+    color: '#007AFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  footer: {
+    backgroundColor: '#ffffff',
+    borderTopWidth: 1,
+    borderTopColor: '#e9ecef',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footerLink: {
+    fontSize: 12,
+    color: '#6c757d',
+    textDecorationLine: 'none',
+  },
+  footerSeparator: {
+    fontSize: 12,
+    color: '#6c757d',
+    marginHorizontal: 12,
+  },
+});
 
 export default HomePage;

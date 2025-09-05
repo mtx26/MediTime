@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { View, StyleSheet, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-// import AppNavigator from './src/navigation/AppNavigator';
+import AppNavigator from './src/navigation/AppNavigator';
 import { UserProvider, UserContext } from './src/contexts/UserContext';
 import './src/i18n';
 import React, { useState, useEffect, useContext, useCallback } from 'react';
@@ -799,8 +799,7 @@ function AppContent() {
             sharedCalendarsData={sharedCalendarsData}
           />
           <View style={styles.contentContainer}>
-            {/*<AppNavigator />*/}
-              <Text>Mobile App - Under Construction</Text>
+            <AppNavigator sharedProps={sharedProps} />
           </View>
         </View>
         <StatusBar style="auto" />
@@ -823,15 +822,15 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#ffffff',
   },
   mainContainer: {
     flex: 1,
     flexDirection: 'column',
+    backgroundColor: '#ffffff',
   },
   contentContainer: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 20,
+    backgroundColor: '#ffffff',
   },
 });
