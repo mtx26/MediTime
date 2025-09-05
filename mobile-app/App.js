@@ -12,11 +12,6 @@ import { performApiCall } from './src/services/api/apiUtils';
 import { useTranslation } from 'react-i18next';
 import { API_URL } from '@env';
 
-// Note: FileReader n'est pas disponible dans React Native
-// Utilisez expo-image-manipulator ou react-native-fs pour la conversion de fichiers
-// const fileToBase64 = (file) => {
-//   // Implementation spécifique à React Native nécessaire
-// };
 
 // Composant interne qui utilise le UserContext
 function AppContent() {

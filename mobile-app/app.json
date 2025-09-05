@@ -9,21 +9,26 @@
     "splash": {
       "image": "./assets/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#5FC3B4"
+      "backgroundColor": "#5FC3B4",
+      "imageUrl": "./assets/icon.png"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.meditime.app"
+      "bundleIdentifier": "com.meditime.app",
+      "icon": "./assets/icon.png",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#5FC3B4"
+        "backgroundColor": "#5FC3B4",
+        "monochromeImage": "./assets/icon.png"
       },
-      "package": "com.meditime.app"
+      "package": "com.meditime.app",
+      "icon": "./assets/icon.png"
     },
     "web": {
       "favicon": "./assets/icon.png"
@@ -37,7 +42,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "your-project-id-here"
+        "projectId": "meditime-mobile-app"
       }
     }
   }
