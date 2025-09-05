@@ -34,10 +34,10 @@
   "admin": "Administración",
   "app": {
     "access": "Acceder a la aplicación",
-    "description": "Planifica tus tratamientos y comparte tus calendarios médicos con facilidad.",
+    "description": "Planifique sus tratamientos y comparta sus calendarios médicos con facilidad.",
     "login": "Acceso",
     "name": "MediTime",
-    "pageTitle": "MediTime - Gestor de Tratamientos Médicos",
+    "pageTitle": "MediTime - Gestor de tratamientos médicos",
     "register": "Crear una cuenta",
     "shortN": "MediTime",
     "shortName": "MediTime",
@@ -50,7 +50,7 @@
     "email": "Dirección de correo electrónico",
     "forgot_password": "¿Olvidaste tu contraseña?",
     "hide_password": "Ocultar contraseña",
-    "login": "Acceso",
+    "login": "Conexión",
     "login_with": "Conectar con:",
     "name": "Nombre completo",
     "or_with_email": "o con correo electrónico:",
@@ -62,7 +62,7 @@
       "google": "Google",
       "twitter": "Gorjeo"
     },
-    "register": "Registro",
+    "register": "Inscripción",
     "register_with": "Regístrate con:",
     "show_password": "Mostrar contraseña",
     "terms_link": "condiciones generales",
@@ -100,9 +100,9 @@
     "delete": "BORRAR",
     "dose": "Dosis",
     "each": "cada",
-    "edit": "Para modificar",
+    "edit": "Modificador",
     "every": "mucho",
-    "export_pdf": "Exportar",
+    "export_pdf": "Exportador",
     "from": "Desde",
     "intake_conditions": "Condiciones de toma",
     "name": "Nombre",
@@ -116,13 +116,13 @@
     "stock": {
       "alerts": {
         "line": "{{name}} ({{dose}} mg) — {{count}} unidad en stock",
-        "line_negative": "{{nombre}} ({{dosis}} mg) — {{cantidad}} unidades (agotado)",
-        "line_plural": "{{nombre}} ({{dosis}} mg) — {{cantidad}} unidades en stock",
+        "line_negative": "{{name}} ({{dose}} mg) — {{count}} unidades (agotado)",
+        "line_plural": "{{name}} ({{dose}} mg) — {{count}} unidades en stock",
         "title": "🔔 Alertas de stock:"
       },
       "badge": {
         "high": "Alto stock",
-        "low": "Stock bajo",
+        "low": "Stock base",
         "out": "Agotado"
       }
     },
@@ -185,7 +185,7 @@
     },
     "stock": {
       "daily": {
-        "description": "El stock se reducirá automáticamente cada día.",
+        "description": "El stock se reducirá automáticamente todos los días a medianoche.",
         "label": "Diariamente (Medianoche)"
       },
       "label": "Recuento de existencias",
@@ -218,18 +218,18 @@
   "delete_access": "Eliminar el acceso",
   "delete_access_confirm": "¿Quitar el acceso?",
   "delete_calendar_confirm": "¿Borrar este calendario?",
-  "delete_link": "Eliminar el enlace",
+  "delete_link": "Eliminar enlace",
   "delete_link_confirm": "¿Borrar el enlace?",
   "done": "Finalizado",
   "evening": "Noche",
-  "expiration": "Expiración",
+  "expiration": "Vencimiento",
   "expiration_date": "Fecha de expiración del enlace",
   "expired": "Venció",
   "expires_at": "Caduca el",
   "fcm": {
-    "sw_error": "[FCM] Error de software",
+    "sw_error": "[FCM] Error SW",
     "sw_registered": "[FCM] SW grabado",
-    "token_registered": "[FCM] Token registrado en el backend",
+    "token_registered": "[FCM] Token guardado en el backend",
     "token_send_error": "[FCM] Error al enviar el token"
   },
   "features": {
@@ -265,7 +265,7 @@
     "invalid_or_expired": "Invitación no válida o vencida",
     "title": "Invitación"
   },
-  "link": "Enlace",
+  "link": "Derecho de retención",
   "link_already_exists": "Ya existe un enlace para este calendario.",
   "link_copied": "🔗 ¡Enlace copiado!",
   "link_expiration": "Caducidad del enlace",
@@ -278,7 +278,7 @@
   "loading_settings": "Cargando configuración...",
   "loading_share": "Cargando compartir...",
   "locale": "es-ES",
-  "login": "Acceso",
+  "login": "Conexión",
   "logout": "Cerrar sesión",
   "low_stock": "Stock bajo",
   "manage_link": "Administrar el enlace",
@@ -300,12 +300,12 @@
   },
   "mg": "mg",
   "mobile": {
-    "android": "En <strong>Android</strong> , aparece automáticamente el mensaje <em>&quot;Añadir a la pantalla de inicio&quot;</em> en la parte inferior del navegador. Púlsalo para instalar MediTime.",
+    "android": "En Android, aparece automáticamente el mensaje \"Añadir a la pantalla de inicio\" en la parte inferior del navegador. Púlsalo para instalar MediTime.",
     "desc": "MediTime funciona como una aplicación móvil. Añádela a tu pantalla de inicio para acceder rápidamente.",
     "feature1": "Fácil instalación desde el navegador",
     "feature2": "Interfaz táctil suave",
     "feature3": "Acceso rápido desde la pantalla de inicio",
-    "ios": "En <strong>iPhone</strong> , abre MediTime en Safari, toca<i class=\"bi bi-share mx-1\"></i> luego <em>“En la pantalla de inicio”</em> .",
+    "ios": "En iPhone, abra MediTime en Safari, toque el ícono de compartir y luego \"En la pantalla de inicio\".",
     "other": "También se puede acceder a MediTime en computadora o tableta.",
     "title": "Disponible en tu teléfono"
   },
@@ -389,7 +389,7 @@
       },
       "title": "2. ¿Qué datos se recopilan?",
       "treatment_data": {
-        "boxes": "Información sobre las cajas (cantidad, stock, embalaje).",
+        "boxes": "Información sobre cajas (cantidad, stock, embalaje).",
         "history": "Editar calendario y compartir historial.",
         "medicines": "Nombres de los medicamentos, dosis, frecuencias y horarios de toma.",
         "title": "Datos relacionados con el tratamiento"
@@ -438,7 +438,7 @@
   "recipient_email": "Correo electrónico del destinatario",
   "regenerate": "Regenerado",
   "regenerate_link_confirm": "¿Regenerar este enlace?",
-  "register": "Registro",
+  "register": "Inscripción",
   "reject": "Despedir",
   "rename": "Rebautizar",
   "reset_password": {
@@ -461,18 +461,18 @@
   "revoke_link": "Revocar el enlace",
   "rights_reserved": "Reservados todos los derechos",
   "scanner": {
-    "add": "Agregar",
+    "add": "Agregar todos los medicamentos",
     "camera": "Cámara",
     "camera_error": "No se puede acceder a la cámara.",
-    "camera_instruction": "Señale el código DataMatrix",
+    "camera_instruction": "Apunte la cámara a un código DataMatrix",
     "cancel": "Cancelar",
     "close": "Cerca",
     "medicine_not_found": "Medicamento no encontrado",
     "quantity": "Cantidad: {{cantidad}}",
     "remove_from_list": "Eliminar de la lista",
-    "searching": "Investigación...",
+    "searching": "Investigación en curso...",
     "select_camera": "Seleccione una cámara",
-    "title": "Escanear un código QR",
+    "title": "escáner de drogas",
     "zoom": "Zoom: {{zoom}}x",
     "camera_front": "Antes",
     "camera_back": "Atrás",
@@ -668,7 +668,7 @@
     "section5": {
       "list": {
         "item1": "Consecuencias de olvidar tomar;",
-        "item2": "Errores en la visualización de datos;",
+        "item2": "Errores en la visualización de los datos;",
         "item3": "Por pérdida o divulgación de datos debido a un uso no seguro."
       },
       "p1": "La aplicación no pretende sustituir el consejo médico. El usuario es el único responsable del uso de la información mostrada.",
@@ -685,7 +685,7 @@
       "title": "6. Eliminación de cuenta"
     },
     "section7": {
-      "content": "Estos Términos y Condiciones pueden modificarse en cualquier momento. Se le notificará de cualquier cambio significativo a través de la aplicación o por correo electrónico.",
+      "content": "Estos Términos y Condiciones pueden modificarse en cualquier momento. Se le notificará sobre cualquier cambio significativo a través de la aplicación o por correo electrónico.",
       "title": "7. Modificaciones"
     },
     "section8": {

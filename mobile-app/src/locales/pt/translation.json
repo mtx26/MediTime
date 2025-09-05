@@ -34,10 +34,10 @@
   "admin": "Administrador",
   "app": {
     "access": "Acesse o aplicativo",
-    "description": "Agende seus tratamentos e compartilhe seus calendários médicos com facilidade.",
+    "description": "Planeje seus tratamentos e compartilhe seus calendários médicos com facilidade.",
     "login": "Conecte-se",
     "name": "MediTime",
-    "pageTitle": "MediTime - Gerenciador de Tratamentos Médicos",
+    "pageTitle": "MediTime - Gerente de Tratamento Médico",
     "register": "Criar uma conta",
     "shortN": "MediTime",
     "shortName": "MediTime",
@@ -50,7 +50,7 @@
     "email": "Endereço de email",
     "forgot_password": "Esqueceu sua senha?",
     "hide_password": "Ocultar senha",
-    "login": "Conecte-se",
+    "login": "Conexão",
     "login_with": "Conecte-se com:",
     "name": "Nome completo",
     "or_with_email": "ou com e-mail:",
@@ -62,7 +62,7 @@
       "google": "Google",
       "twitter": "Twitter"
     },
-    "register": "Registro",
+    "register": "Inscrição",
     "register_with": "Registre-se com:",
     "show_password": "Mostrar senha",
     "terms_link": "condições gerais",
@@ -100,9 +100,9 @@
     "delete": "EXCLUIR",
     "dose": "Dose",
     "each": "cada",
-    "edit": "Para modificar",
+    "edit": "Modificador",
     "every": "todos os",
-    "export_pdf": "Exportar",
+    "export_pdf": "Exportador",
     "from": "Do",
     "intake_conditions": "Condições de tomada",
     "name": "Nome",
@@ -122,7 +122,7 @@
       },
       "badge": {
         "high": "Alto estoque",
-        "low": "Estoque baixo",
+        "low": "Estoque base",
         "out": "Fora de estoque"
       }
     },
@@ -185,7 +185,7 @@
     },
     "stock": {
       "daily": {
-        "description": "O estoque será diminuído automaticamente todos os dias à meia-noite.",
+        "description": "O estoque será reduzido automaticamente todos os dias à meia-noite.",
         "label": "Diariamente (meia-noite)"
       },
       "label": "Contagem de estoque",
@@ -218,18 +218,18 @@
   "delete_access": "Remover acesso",
   "delete_access_confirm": "Remover acesso?",
   "delete_calendar_confirm": "Excluir este calendário?",
-  "delete_link": "Excluir o link",
+  "delete_link": "Remover link",
   "delete_link_confirm": "Excluir o link?",
   "done": "Finalizado",
   "evening": "Noite",
-  "expiration": "Termo",
+  "expiration": "Vencimento",
   "expiration_date": "Data de expiração do link",
   "expired": "Expirado",
   "expires_at": "Expira em",
   "fcm": {
-    "sw_error": "[FCM] Erro de SW",
+    "sw_error": "[FCM] Erro SW",
     "sw_registered": "[FCM] SW gravado",
-    "token_registered": "[FCM] Token registrado no backend",
+    "token_registered": "[FCM] Token salvo no backend",
     "token_send_error": "[FCM] Erro ao enviar token"
   },
   "features": {
@@ -265,7 +265,7 @@
     "invalid_or_expired": "Convite inválido ou expirado",
     "title": "Convite"
   },
-  "link": "Link",
+  "link": "Penhor",
   "link_already_exists": "Já existe um link para este calendário.",
   "link_copied": "🔗 Link copiado!",
   "link_expiration": "Expiração do link",
@@ -278,7 +278,7 @@
   "loading_settings": "Carregando configurações...",
   "loading_share": "Carregando compartilhamento...",
   "locale": "pt-BR",
-  "login": "Conecte-se",
+  "login": "Conexão",
   "logout": "Sair",
   "low_stock": "Estoque baixo",
   "manage_link": "Gerenciar o link",
@@ -300,12 +300,12 @@
   },
   "mg": "mg",
   "mobile": {
-    "android": "No <strong>Android</strong> , a mensagem <em>&quot;Adicionar à Tela Inicial&quot;</em> aparece automaticamente na parte inferior do navegador. Toque nela para instalar o MediTime.",
+    "android": "No Android, a mensagem \"Adicionar à Tela Inicial\" aparece automaticamente na parte inferior do navegador. Toque nela para instalar o MediTime.",
     "desc": "O MediTime funciona como um aplicativo móvel. Adicione-o à sua tela inicial para acesso rápido.",
     "feature1": "Fácil instalação pelo navegador",
     "feature2": "Interface de toque suave",
     "feature3": "Acesso rápido na tela inicial",
-    "ios": "No <strong>iPhone</strong> , abra o MediTime no Safari, toque em<i class=\"bi bi-share mx-1\"></i> então <em>“Na tela inicial”</em> .",
+    "ios": "No iPhone, abra o MediTime no Safari, toque no ícone de compartilhamento e depois em \"Na tela inicial\".",
     "other": "O MediTime também pode ser acessado no computador ou tablet.",
     "title": "Disponível no seu telefone"
   },
@@ -338,14 +338,14 @@
   "no_notifications": "Nenhuma nova notificação",
   "no_personal_calendars": "Você não tem um calendário pessoal.",
   "no_shared_calendars": "Você não tem um calendário compartilhado.",
-  "noon": "Meio-dia",
+  "noon": "Midi",
   "not_found": {
     "message": "Página não encontrada.",
     "title": "Erro 404"
   },
   "notif": {
     "calendar_invite": "<0></0> convida você a participar do calendário <1>{{name}}</1>",
-    "calendar_joined": "Você entrou no calendário <1>{{name}}</1> de <0></0>",
+    "calendar_joined": "Você se juntou ao calendário <1>{{name}}</1> de <0></0>",
     "invite_accepted": "<0></0> aceitou seu convite para participar do calendário <1>{{name}}</1>",
     "invite_rejected": "<0></0> recusou seu convite para participar do calendário <1>{{name}}</1>",
     "low_stock": "<0>{{name}}</0> está quase esgotado (<0>{{qty}}</0> restante).",
@@ -389,7 +389,7 @@
       },
       "title": "2. Quais dados são coletados?",
       "treatment_data": {
-        "boxes": "Informações sobre as caixas (quantidade, estoque, embalagem).",
+        "boxes": "Informações sobre caixas (quantidade, estoque, embalagem).",
         "history": "Histórico de edição e compartilhamento de calendário.",
         "medicines": "Nomes de medicamentos, dosagens, frequências e horários de administração.",
         "title": "Dados relacionados ao processamento"
@@ -438,7 +438,7 @@
   "recipient_email": "E-mail do destinatário",
   "regenerate": "Regenerado",
   "regenerate_link_confirm": "Regenerar este link?",
-  "register": "Registro",
+  "register": "Inscrição",
   "reject": "Liberar",
   "rename": "Renomear",
   "reset_password": {
@@ -461,18 +461,18 @@
   "revoke_link": "Revogar o link",
   "rights_reserved": "Todos os direitos reservados",
   "scanner": {
-    "add": "Adicionar",
+    "add": "Adicionar todos os medicamentos",
     "camera": "Câmera",
     "camera_error": "Não é possível acessar a câmera.",
-    "camera_instruction": "Aponte para o código DataMatrix",
+    "camera_instruction": "Aponte a câmera para um código DataMatrix",
     "cancel": "Cancelar",
     "close": "Fechar",
     "medicine_not_found": "Medicamento não encontrado",
     "quantity": "Quantidade: {{quantidade}}",
     "remove_from_list": "Remover da lista",
-    "searching": "Pesquisar...",
+    "searching": "Pesquisa em andamento...",
     "select_camera": "Selecione uma câmera",
-    "title": "Escaneie um código QR",
+    "title": "Scanner de drogas",
     "zoom": "Zoom: {{zoom}}x",
     "camera_front": "Antes",
     "camera_back": "Voltar",
@@ -663,7 +663,7 @@
     },
     "section4": {
       "content": "O código-fonte, o design e o conteúdo do MediTime são propriedade de Matis Gillet, salvo indicação em contrário. Qualquer reprodução, distribuição ou modificação sem autorização é proibida.",
-      "title": "4. Propriedade intelectual"
+      "title": "4. Propriedade Intelectual"
     },
     "section5": {
       "list": {
@@ -679,13 +679,13 @@
       "conclusion": "A exclusão é final e não pode ser desfeita.",
       "intro": "Você pode a qualquer momento:",
       "list": {
-        "item1": "Excluir sua conta e dados por meio de solicitação por e-mail;",
+        "item1": "Excluir sua conta e dados por meio de uma solicitação por e-mail;",
         "item2": "Revogar acesso a calendários compartilhados."
       },
       "title": "6. Exclusão de conta"
     },
     "section7": {
-      "content": "Estes Termos e Condições podem ser alterados a qualquer momento. Você será notificado sobre alterações significativas pelo aplicativo ou por e-mail.",
+      "content": "Estes Termos e Condições podem ser alterados a qualquer momento. Você será notificado sobre alterações significativas por meio do aplicativo ou por e-mail.",
       "title": "7. Modificações"
     },
     "section8": {

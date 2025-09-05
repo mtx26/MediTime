@@ -34,13 +34,13 @@
   "admin": "行政",
   "app": {
     "access": "访问应用程序",
-    "description": "安排您的治疗并轻松分享您的医疗日历。",
+    "description": "轻松规划您的治疗并分享您的医疗日历。",
     "login": "登录",
-    "name": "MediTime",
-    "pageTitle": "MediTime - 医疗治疗管理器",
+    "name": "医疗时间",
+    "pageTitle": "MediTime - 医疗管理师",
     "register": "创建一个帐户",
     "shortN": "医疗时间",
-    "shortName": "MediTime",
+    "shortName": "医疗时间",
     "subtitle": "轻松管理、跟踪和分享您的医疗治疗。",
     "title": "医疗时间"
   },
@@ -50,7 +50,7 @@
     "email": "电子邮件",
     "forgot_password": "忘记密码了吗？",
     "hide_password": "隐藏密码",
-    "login": "登录",
+    "login": "连接",
     "login_with": "连接：",
     "name": "姓名",
     "or_with_email": "或通过电子邮件：",
@@ -62,7 +62,7 @@
       "google": "谷歌",
       "twitter": "叽叽喳喳"
     },
-    "register": "登记",
+    "register": "题词",
     "register_with": "注册方式：",
     "show_password": "显示密码",
     "terms_link": "一般条件",
@@ -100,9 +100,9 @@
     "delete": "删除",
     "dose": "剂量",
     "each": "每个",
-    "edit": "修改",
+    "edit": "修饰符",
     "every": "所有",
-    "export_pdf": "出口",
+    "export_pdf": "出口商",
     "from": "从",
     "intake_conditions": "服用条件",
     "name": "姓名",
@@ -115,14 +115,14 @@
     "start_typing": "开始输入...",
     "stock": {
       "alerts": {
-        "line": "{{name}} ({{dose}} mg) — {{count}} 单位库存",
-        "line_negative": "{{name}} ({{dose}} 毫克) — {{count}} 单位（缺货）",
-        "line_plural": "{{name}} ({{dose}} mg) — 库存有 {{count}} 件",
+        "line": "{{name}} ({{dose}} mg) — {{count}} 库存单位",
+        "line_negative": "{{name}} ({{dose}} mg) — {{count}} 单位（缺货）",
+        "line_plural": "{{name}} ({{dose}} mg) — {{count}} 库存单位",
         "title": "🔔 库存警报："
       },
       "badge": {
         "high": "高库存",
-        "low": "库存不足",
+        "low": "股票基础",
         "out": "缺货"
       }
     },
@@ -164,7 +164,7 @@
     "processing": "正在处理…",
     "reference_week": "参考周",
     "scan_medicines": "扫描药物",
-    "scan_medicines_description": "扫描药盒上的 DataMatrix 码。扫描的每种药物都会自动添加到您的新药计划中。",
+    "scan_medicines_description": "扫描药盒上的 DataMatrix 码。每一种扫描到的药物都会自动添加到您的新药计划中。",
     "scan_qr_option": "扫描二维码",
     "scanner_button_hint": "使用扫描仪的“添加”按钮创建日历",
     "today": "今天",
@@ -185,7 +185,7 @@
     },
     "stock": {
       "daily": {
-        "description": "库存每天都会自动减少。",
+        "description": "库存将在每天午夜自动减少。",
         "label": "每日（午夜）"
       },
       "label": "库存数量",
@@ -227,9 +227,9 @@
   "expired": "已到期",
   "expires_at": "到期日期",
   "fcm": {
-    "sw_error": "[FCM] 软件错误",
+    "sw_error": "[FCM] SW 错误",
     "sw_registered": "[FCM] 短波已录制",
-    "token_registered": "[FCM] 在后端注册的令牌",
+    "token_registered": "[FCM] 令牌已保存在后端",
     "token_send_error": "[FCM] 发送令牌时出错"
   },
   "features": {
@@ -265,7 +265,7 @@
     "invalid_or_expired": "邀请无效或已过期",
     "title": "邀请"
   },
-  "link": "关联",
+  "link": "留置权",
   "link_already_exists": "此日历的链接已存在。",
   "link_copied": "🔗 链接已复制！",
   "link_expiration": "链接过期",
@@ -278,7 +278,7 @@
   "loading_settings": "正在加载设置...",
   "loading_share": "正在加载分享...",
   "locale": "zh-CN",
-  "login": "登录",
+  "login": "连接",
   "logout": "登出",
   "low_stock": "库存不足",
   "manage_link": "管理链接",
@@ -300,12 +300,12 @@
   },
   "mg": "毫克",
   "mobile": {
-    "android": "在<strong>Android 设备</strong>上，浏览器底部会自动显示<em>“添加到主屏幕”</em>消息。点击即可安装 MediTime。",
+    "android": "在安卓设备上，浏览器底部会自动显示“添加到主屏幕”的消息。点击即可安装 MediTime。",
     "desc": "MediTime 是一款移动应用。将其添加到主屏幕即可快速访问。",
     "feature1": "通过浏览器轻松安装",
     "feature2": "流畅的触摸界面",
     "feature3": "从主屏幕快速访问",
-    "ios": "在<strong>iPhone</strong>上，在 Safari 中打开 MediTime，点击<i class=\"bi bi-share mx-1\"></i>然后<em>“在主屏幕上”</em> 。",
+    "ios": "在 iPhone 上，在 Safari 中打开 MediTime，点击共享图标，然后点击“在主屏幕上”。",
     "other": "MediTime 也可在计算机或平板电脑上访问。",
     "title": "可在您的手机上使用"
   },
@@ -338,19 +338,19 @@
   "no_notifications": "没有新通知",
   "no_personal_calendars": "您没有个人日历。",
   "no_shared_calendars": "您没有共享日历。",
-  "noon": "中午",
+  "noon": "米迪",
   "not_found": {
     "message": "未找到页面。",
     "title": "错误 404"
   },
   "notif": {
-    "calendar_invite": "<0></0> 邀请您加入日历 <1>{{name} </1>",
-    "calendar_joined": "您已加入 <0></0> 年的日历 <1>{{name}</1>",
-    "invite_accepted": "<0></0> 接受了您加入日历的邀请 <1>{{name} </1>",
-    "invite_rejected": "<0></0> 拒绝了您加入日历的邀请 <1>{{name}}",
-    "low_stock": "<0>{{name}} 即将售罄（剩余 <0>{{qty}}）。",
-    "share_removed_by_owner": "<0></0> 已停止与您共享日历 <1>{{name}}",
-    "share_removed_by_you": "<0></0> 删除了日历 <1>{{name}}"
+    "calendar_invite": "<0></0> 邀请您加入日历 <1>{{name}}</1>",
+    "calendar_joined": "您已加入 <0></0> 的日历 <1>{{name}}</1>",
+    "invite_accepted": "<0></0> 接受了您的邀请，加入日历 <1>{{name}}</1>",
+    "invite_rejected": "<0></0> 拒绝了您加入日历的邀请 <1>{{name}}</1>",
+    "low_stock": "<0>{{name}}</0> 几乎售罄（剩余 <0>{{qty}}</0>）。",
+    "share_removed_by_owner": "<0></0> 已停止与您共享日历 <1>{{name}}</1>",
+    "share_removed_by_you": "<0></0> 删除了日历 <1>{{name}}</1>"
   },
   "notification": {
     "email_toggle": "启用电子邮件通知",
@@ -438,7 +438,7 @@
   "recipient_email": "收件人的电子邮件",
   "regenerate": "再生",
   "regenerate_link_confirm": "重新生成此链接吗？",
-  "register": "登记",
+  "register": "题词",
   "reject": "解雇",
   "rename": "重命名",
   "reset_password": {
@@ -461,18 +461,18 @@
   "revoke_link": "撤销链接",
   "rights_reserved": "版权所有",
   "scanner": {
-    "add": "添加",
+    "add": "添加所有药物",
     "camera": "相机",
     "camera_error": "无法访问相机。",
-    "camera_instruction": "指向 DataMatrix 代码",
+    "camera_instruction": "将相机对准 DataMatrix 代码",
     "cancel": "取消",
     "close": "关闭",
     "medicine_not_found": "未找到药物",
     "quantity": "数量：{{quantity}}",
     "remove_from_list": "从列表中删除",
-    "searching": "研究...",
+    "searching": "研究正在进行中...",
     "select_camera": "选择相机",
-    "title": "扫描二维码",
+    "title": "毒品扫描仪",
     "zoom": "缩放：{{zoom}}x",
     "camera_front": "前",
     "camera_back": "后退",
@@ -516,7 +516,7 @@
   "shared": "共享",
   "shared_by": "日历共享者",
   "shared_by_token": "通过令牌共享的日历",
-  "shared_calendar": "分享 {{name}}",
+  "shared_calendar": "共享 {{name}}",
   "shared_calendar_management": "管理共享日历",
   "shared_calendars": "共享日历",
   "shared_link_label": "共享日历链接",
@@ -548,7 +548,7 @@
     "expired_code": "代码已过期",
     "flow_state_expired": "过期流状态",
     "flow_state_not_found": "未找到流状态",
-    "hook_payload_invalid_content_type": "钩子内容类型无效",
+    "hook_payload_invalid_content_type": "无效的钩子内容类型",
     "hook_payload_over_size_limit": "钩子有效载荷太大",
     "hook_timeout": "超出挂钩等待时间",
     "hook_timeout_after_retry": "重试后超出钩子超时",
@@ -578,7 +578,7 @@
     "mfa_totp_verify_not_enabled": "TOTP MFA 验证已禁用",
     "mfa_verification_failed": "MFA 验证失败",
     "mfa_verification_rejected": "MFA 验证被拒绝",
-    "mfa_verified_factor_exists": "已存在经过验证的 MFA 因素",
+    "mfa_verified_factor_exists": "已存在已验证的 MFA 因素",
     "mfa_web_authn_enroll_not_enabled": "MFA WebAuthn 注册已禁用",
     "mfa_web_authn_verify_not_enabled": "WebAuthn MFA 验证已禁用",
     "missing_email": "缺少电子邮件",
@@ -668,7 +668,7 @@
     "section5": {
       "list": {
         "item1": "忘记服用的后果；",
-        "item2": "显示数据有错误；",
+        "item2": "数据显示错误；",
         "item3": "由于不安全的使用而导致数据丢失或泄露。"
       },
       "p1": "本应用程序并非旨在替代医疗建议。用户对其所显示信息的使用负全部责任。",
@@ -696,7 +696,7 @@
   },
   "testimonials": {
     "author": "Andrée C. 和她的孙子们",
-    "quote": "我每周都会给妈妈补充药盒，但有了 MediTime，一切都变得简单多了。我可以一眼看到她所有的用药清单，我和她都能收到提醒。我们轻松多了。",
+    "quote": "我每周都会给妈妈补充药盒，但有了 MediTime，一切都变得简单多了。我可以一目了然地看到她所有的用药清单，我和她都能收到提醒。我们轻松多了。",
     "title": "他们信任我们"
   },
   "threshold": "临界点",

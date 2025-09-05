@@ -14,7 +14,7 @@
   "account": {
     "crop": {
       "title": "Beschneiden Sie das Foto",
-      "use": "Dieses Bild verwenden"
+      "use": "Verwenden Sie dieses Bild"
     },
     "display_name": {
       "label": "Pseudo",
@@ -34,7 +34,7 @@
   "admin": "Administrator",
   "app": {
     "access": "Zugriff auf die Anwendung",
-    "description": "Planen Sie Ihre Behandlungen und teilen Sie Ihre medizinischen Kalender mit Leichtigkeit.",
+    "description": "Planen Sie Ihre Behandlungen und teilen Sie Ihre medizinischen Kalender ganz einfach.",
     "login": "Einloggen",
     "name": "MediTime",
     "pageTitle": "MediTime - Medizinischer Behandlungsmanager",
@@ -50,7 +50,7 @@
     "email": "E-Mail-Adresse",
     "forgot_password": "Passwort vergessen?",
     "hide_password": "Passwort verbergen",
-    "login": "Login",
+    "login": "Verbindung",
     "login_with": "Verbinden mit:",
     "name": "Vollständiger Name",
     "or_with_email": "oder per E-Mail:",
@@ -62,7 +62,7 @@
       "google": "Google",
       "twitter": "Twitter"
     },
-    "register": "Anmeldung",
+    "register": "Inschrift",
     "register_with": "Registrieren mit:",
     "show_password": "Passwort anzeigen",
     "terms_link": "Allgemeine Geschäftsbedingungen",
@@ -100,10 +100,10 @@
     "delete": "LÖSCHEN",
     "dose": "Dosis",
     "each": "jede",
-    "edit": "Ändern",
+    "edit": "Modifikator",
     "every": "alle",
-    "export_pdf": "Export",
-    "from": "Von der",
+    "export_pdf": "Exporteur",
+    "from": "Aus dem",
     "intake_conditions": "Einnahmebedingungen",
     "name": "Name",
     "new_box": "Neue Box",
@@ -115,14 +115,14 @@
     "start_typing": "Beginnen Sie mit der Eingabe...",
     "stock": {
       "alerts": {
-        "line": "{{name}} ({{dose}} mg) — {{count}} Einheit auf Lager",
-        "line_negative": "{{name}} ({{dose}} mg) – {{count}} Einheiten (Vorrat überschritten)",
-        "line_plural": "{{name}} ({{dose}} mg) — {{count}} Einheiten auf Lager",
+        "line": "{{Name}} ({{Dosis}} mg) — {{Anzahl}} Einheit auf Lager",
+        "line_negative": "{{Name}} ({{Dosis}} mg) — {{Anzahl}} Einheiten (nicht vorrätig)",
+        "line_plural": "{{Name}} ({{Dosis}} mg) — {{Anzahl}} Einheiten auf Lager",
         "title": "🔔 Lagerbenachrichtigungen:"
       },
       "badge": {
         "high": "Hoher Lagerbestand",
-        "low": "Geringer Lagerbestand",
+        "low": "Lagerbas",
         "out": "Produkt nicht vorrätig"
       }
     },
@@ -151,7 +151,7 @@
     "error_no_medicines": "Keine Medikamente gescannt",
     "error_partial_success": "Kalender erstellt, aber {{count}} Medikamente konnten nicht hinzugefügt werden",
     "import_calendar": "Importieren Sie den Kalender \"{{name}}\"",
-    "import_type": "Add-Modus",
+    "import_type": "Modus „Hinzufügen“",
     "import_type_file": "Importieren einer Datei",
     "import_type_file_description": "Importieren Sie einen Kalender aus einer exportierten Datei.",
     "import_type_manual": "Manuel",
@@ -166,7 +166,7 @@
     "scan_medicines": "Medikamente scannen",
     "scan_medicines_description": "Scannen Sie die DataMatrix-Codes auf Ihren Medikamentenpackungen. Jedes gescannte Medikament wird automatisch Ihrem neuen Plan hinzugefügt.",
     "scan_qr_option": "QR-Codes scannen",
-    "scanner_button_hint": "Verwenden Sie die Schaltfläche „Hinzufügen“ auf dem Scanner, um den Kalender zu erstellen",
+    "scanner_button_hint": "Verwenden Sie die Schaltfläche \"Hinzufügen\" des Scanners, um den Kalender zu erstellen",
     "today": "Heute",
     "week": "Woche",
     "weekly_help": "Klicken Sie auf einen Tag im Kalender, um die zugehörigen Medikamente in einem Fenster anzuzeigen.",
@@ -185,7 +185,7 @@
     },
     "stock": {
       "daily": {
-        "description": "Der Bestand wird täglich automatisch reduziert.",
+        "description": "Der Lagerbestand wird täglich um Mitternacht automatisch reduziert.",
         "label": "Täglich (Mitternacht)"
       },
       "label": "Bestandszählung",
@@ -204,10 +204,10 @@
   "copy_link": "Link kopieren",
   "copy_link_error": "Fehler beim Kopieren des Links.",
   "create_share_link": "Erstellen eines Freigabelinks",
-  "critical_stock": "Aktienbruch",
+  "critical_stock": "Rupture de stock",
   "cta": {
     "button": "Ich erstelle mein Konto",
-    "desc": "Erstellen Sie kostenlos Ihr Konto und vereinfachen Sie die medizinische Verwaltung für die ganze Familie.",
+    "desc": "Erstellen Sie Ihr Konto kostenlos und vereinfachen Sie die medizinische Verwaltung für die ganze Familie.",
     "title": "Starten Sie noch heute"
   },
   "date": "Datum",
@@ -218,7 +218,7 @@
   "delete_access": "Zugriff entfernen",
   "delete_access_confirm": "Zugriff entfernen?",
   "delete_calendar_confirm": "Diesen Kalender löschen?",
-  "delete_link": "Löschen des Links",
+  "delete_link": "Link entfernen",
   "delete_link_confirm": "Link löschen?",
   "done": "Fertig",
   "evening": "Abend",
@@ -227,18 +227,18 @@
   "expired": "Abgelaufen",
   "expires_at": "Läuft ab am",
   "fcm": {
-    "sw_error": "[FCM] SW-Fehler",
+    "sw_error": "[FCM] Erreur SW",
     "sw_registered": "[FCM] SW aufgezeichnet",
-    "token_registered": "[FCM] Token auf der Backend-Seite registriert",
+    "token_registered": "[FCM] Token auf der Backend-Seite gespeichert",
     "token_send_error": "[FCM] Fehler beim Senden des Tokens"
   },
   "features": {
     "desc1": "Planen Sie Ihre Aufnahmen, erhalten Sie Erinnerungen und seien Sie beruhigt.",
-    "desc2": "Geben Sie Ihren Angehörigen oder Betreuern Zugriff, damit diese Sie täglich unterstützen können.",
+    "desc2": "Geben Sie Ihren Angehörigen oder Pflegekräften Zugriff, damit diese Sie täglich unterstützen können.",
     "desc3": "Ihre Daten werden mit vertrauenswürdigen Technologien wie Supabase und Firebase geschützt.",
     "title1": "Intelligenter Kalender",
     "title2": "Gemeinsames Teilen",
-    "title3": "Geschützte Sicherheit"
+    "title3": "Sicherheit gewährleistet"
   },
   "home": "Willkommen",
   "home_meta": {
@@ -265,7 +265,7 @@
     "invalid_or_expired": "Ungültige oder abgelaufene Einladung",
     "title": "Einladung"
   },
-  "link": "Link",
+  "link": "Pfandrecht",
   "link_already_exists": "Für diesen Kalender existiert bereits ein Link.",
   "link_copied": "🔗 Link kopiert!",
   "link_expiration": "Linkablauf",
@@ -273,12 +273,12 @@
   "loading": "Laden...",
   "loading_calendar": "Kalender wird geladen...",
   "loading_calendars": "Kalender werden geladen...",
-  "loading_medicines": "Medikamente werden geladen …",
+  "loading_medicines": "Medikamente werden geladen ...",
   "loading_notifications": "Benachrichtigungen werden geladen …",
   "loading_settings": "Einstellungen werden geladen...",
   "loading_share": "Teilen wird geladen...",
   "locale": "de-DE",
-  "login": "Login",
+  "login": "Verbindung",
   "logout": "Ausloggen",
   "low_stock": "Geringer Lagerbestand",
   "manage_link": "Verwalten des Links",
@@ -300,12 +300,12 @@
   },
   "mg": "mg",
   "mobile": {
-    "android": "Unter <strong>Android</strong> wird unten im Browser automatisch die Meldung <em>„Zum Home-Bildschirm hinzufügen“</em> angezeigt. Tippen Sie darauf, um MediTime zu installieren.",
+    "android": "Unter Android wird unten im Browser automatisch die Meldung „Zum Home-Bildschirm hinzufügen“ angezeigt. Tippen Sie darauf, um MediTime zu installieren.",
     "desc": "MediTime funktioniert als mobile App. Fügen Sie es für schnellen Zugriff zu Ihrem Startbildschirm hinzu.",
     "feature1": "Einfache Installation über den Browser",
     "feature2": "Reibungslose Touch-Oberfläche",
-    "feature3": "Schneller Zugriff vom Startbildschirm",
-    "ios": "Öffnen Sie auf <strong>dem iPhone</strong> MediTime in Safari und tippen Sie auf<i class=\"bi bi-share mx-1\"></i> dann <em>„Auf dem Startbildschirm“</em> .",
+    "feature3": "Schnellzugriff vom Startbildschirm",
+    "ios": "Öffnen Sie auf dem iPhone MediTime in Safari, tippen Sie auf das Freigabesymbol und dann auf „Auf dem Home-Bildschirm“.",
     "other": "MediTime ist auch auf dem Computer oder Tablet zugänglich.",
     "title": "Verfügbar auf Ihrem Telefon"
   },
@@ -338,7 +338,7 @@
   "no_notifications": "Keine neuen Benachrichtigungen",
   "no_personal_calendars": "Sie haben keinen persönlichen Kalender.",
   "no_shared_calendars": "Sie haben keinen freigegebenen Kalender.",
-  "noon": "Mittag",
+  "noon": "Midi",
   "not_found": {
     "message": "Seite nicht gefunden.",
     "title": "Fehler 404"
@@ -373,7 +373,7 @@
     "label": "Vertraulichkeit",
     "last_update": "Zuletzt aktualisiert: 9. Juni 2025",
     "section1": {
-      "content": "MediTime ist eine Webanwendung, die die Verwaltung von Medikamenteneinnahme erleichtert. Sie ermöglicht es Nutzern, personalisierte Kalender zu erstellen, Erinnerungen zu erhalten und Zeitpläne mit Angehörigen oder medizinischem Fachpersonal zu teilen. Das Projekt wurde von Matis Gillet (alias mtx_26) persönlich entwickelt und verfolgt keinen kommerziellen Zweck.",
+      "content": "MediTime ist eine Webanwendung, die die Verwaltung von Medikamenteneinnahme erleichtert. Sie ermöglicht es Nutzern, personalisierte Kalender zu erstellen, Erinnerungen zu erhalten und Termine mit Angehörigen oder medizinischem Fachpersonal zu teilen. Das Projekt wurde von Matis Gillet (alias mtx_26) persönlich entwickelt und verfolgt keinen kommerziellen Zweck.",
       "title": "1. Wer sind wir?"
     },
     "section2": {
@@ -389,7 +389,7 @@
       },
       "title": "2. Welche Daten werden erhoben?",
       "treatment_data": {
-        "boxes": "Angaben zu den Kartons (Menge, Bestand, Verpackung).",
+        "boxes": "Informationen zu den Kartons (Menge, Bestand, Verpackung).",
         "history": "Kalender bearbeiten und Verlauf teilen.",
         "medicines": "Medikamentennamen, Dosierungen, Häufigkeiten, Einnahmezeiten.",
         "title": "Daten im Zusammenhang mit der Verarbeitung"
@@ -398,7 +398,7 @@
     "section3": {
       "no_ads": "Es werden keine Daten verkauft, weitergegeben oder für Werbezwecke verwendet.",
       "reminders": "Senden Sie Erinnerungen oder Benachrichtigungen, wenn der Benutzer Benachrichtigungen aktiviert hat.",
-      "sharing": "Ermöglichen Sie sicheres Teilen mit anderen Benutzern.",
+      "sharing": "Ermöglichen Sie die sichere Freigabe für andere Benutzer.",
       "stability": "Verbessern Sie die Stabilität und Sicherheit der Anwendung.",
       "sync": "Behandlungspläne anzeigen und synchronisieren.",
       "title": "3. Wie werden diese Daten verwendet?"
@@ -412,7 +412,7 @@
     "section5": {
       "auth": "Der Zugriff auf die Daten ist durch Authentifizierung geschützt.",
       "encryption": "Die gesamte Kalenderfreigabe ist verschlüsselt und benutzergesteuert.",
-      "passwords": "Kennungen sind nie sichtbar oder im Klartext gespeichert.",
+      "passwords": "Kennungen sind niemals sichtbar oder im Klartext gespeichert.",
       "title": "5. Weitergabe und Sicherheit"
     },
     "section6": {
@@ -425,20 +425,20 @@
       "title": "6. Ihre Rechte"
     },
     "section7": {
-      "developer": "Verantwortlicher Entwickler: Matis Gillet",
+      "developer": "Verantwortlicher Entwickler:\nMatis Gillet",
       "title": "7. Kontakt"
     },
     "title": "Datenschutzrichtlinie – MediTime"
   },
   "profile": "Mein Profil",
   "public_links": "Öffentliche Links",
-  "reactivate_link": "Den Link erneut aktivieren",
+  "reactivate_link": "Reaktivieren Sie den Link",
   "read_only": "Nur lesen",
   "read_write": "Lesen + Bearbeiten",
   "recipient_email": "E-Mail des Empfängers",
   "regenerate": "Regenerieren",
   "regenerate_link_confirm": "Diesen Link neu generieren?",
-  "register": "Anmeldung",
+  "register": "Inschrift",
   "reject": "Zurückweisen",
   "rename": "Umbenennen",
   "reset_password": {
@@ -461,18 +461,18 @@
   "revoke_link": "Den Link widerrufen",
   "rights_reserved": "Alle Rechte vorbehalten",
   "scanner": {
-    "add": "Hinzufügen",
+    "add": "Alle Medikamente hinzufügen",
     "camera": "Kamera",
-    "camera_error": "Zugriff auf die Kamera nicht möglich.",
-    "camera_instruction": "Zeigen Sie auf den DataMatrix-Code",
+    "camera_error": "Auf die Kamera kann nicht zugegriffen werden.",
+    "camera_instruction": "Richten Sie die Kamera auf einen DataMatrix-Code",
     "cancel": "Stornieren",
     "close": "Schließen",
     "medicine_not_found": "Medikament nicht gefunden",
     "quantity": "Menge: {{Menge}}",
     "remove_from_list": "Aus der Liste entfernen",
-    "searching": "Forschung...",
+    "searching": "Forschung läuft …",
     "select_camera": "Wählen Sie eine Kamera aus",
-    "title": "Scannen Sie einen QR-Code",
+    "title": "Drogenscanner",
     "zoom": "Zoom: {{zoom}}x",
     "camera_front": "Vor",
     "camera_back": "Zurück",
@@ -512,15 +512,15 @@
     "security": "Sicherheit"
   },
   "share": "Aktie",
-  "share_calendar": "Den Kalender freigeben",
+  "share_calendar": "Teilen Sie den Kalender",
   "shared": "Geteilt",
   "shared_by": "Kalender geteilt von",
-  "shared_by_token": "Kalender, der über ein Token freigegeben wird",
-  "shared_calendar": "{{name}} teilen",
+  "shared_by_token": "Kalender, der von einem Token freigegeben wird",
+  "shared_calendar": "Teilen {{name}}",
   "shared_calendar_management": "Gemeinsam genutzte Kalender verwalten",
   "shared_calendars": "Freigegebene Kalender",
   "shared_link_label": "Link zum freigegebenen Kalender",
-  "shared_users": "Gemeinsam genutzte Benutzer",
+  "shared_users": "Gemeinsame Benutzer",
   "stock": "Aktie",
   "stock_alert": "Lageralarm",
   "stock_alert_tooltip": "Wichtige Medikamente auf Lager ansehen",
@@ -583,7 +583,7 @@
     "mfa_web_authn_verify_not_enabled": "WebAuthn MFA-Verifizierung deaktiviert",
     "missing_email": "Fehlende E-Mail",
     "missing_password": "Fehlendes Passwort",
-    "no_authorization": "Fehlende Autorisierung",
+    "no_authorization": "Fehlende Berechtigung",
     "not_admin": "Administratorzugriff erforderlich",
     "oauth_callback_error": "OAuth-Fehler",
     "oauth_provider_not_supported": "Nicht unterstützter OAuth-Anbieter",
@@ -643,7 +643,7 @@
       "title": "1. Zweck"
     },
     "section2": {
-      "disclaimer": "Die Anwendung wird „wie besehen“ bereitgestellt, ohne Garantie für fortlaufende Verfügbarkeit oder medizinische Genauigkeit.",
+      "disclaimer": "Die Anwendung wird „wie besehen“ bereitgestellt, ohne Garantie für die fortlaufende Verfügbarkeit oder medizinische Genauigkeit.",
       "intro": "MediTime ermöglicht seinen Benutzern:",
       "list": {
         "item1": "Erstellen und verwalten Sie Medikamentenpläne;",
@@ -662,16 +662,16 @@
       "title": "3. Zugang und Registrierung"
     },
     "section4": {
-      "content": "Quellcode, Design und Inhalt von MediTime sind Eigentum von Matis Gillet, sofern nicht anders angegeben. Jegliche unbefugte Vervielfältigung, Verbreitung oder Änderung ist untersagt.",
+      "content": "Der Quellcode, das Design und der Inhalt von MediTime sind Eigentum von Matis Gillet, sofern nicht anders angegeben. Jegliche unbefugte Vervielfältigung, Verbreitung oder Änderung ist untersagt.",
       "title": "4. Geistiges Eigentum"
     },
     "section5": {
       "list": {
         "item1": "Folgen einer vergessenen Einnahme;",
-        "item2": "Fehler bei der Datenanzeige;",
+        "item2": "Fehler bei der Anzeige von Daten;",
         "item3": "Vor Verlust oder Offenlegung von Daten aufgrund ungesicherter Nutzung."
       },
-      "p1": "Die Anwendung ersetzt keinen medizinischen Rat. Der Benutzer bleibt allein für die Verwendung der angezeigten Informationen verantwortlich.",
+      "p1": "Die Anwendung ersetzt keinen medizinischen Rat. Die alleinige Verantwortung für die Verwendung der angezeigten Informationen liegt beim Benutzer.",
       "p2": "MediTime oder sein Entwickler können unter keinen Umständen haftbar gemacht werden für:",
       "title": "5. Verantwortlichkeiten"
     },
@@ -679,13 +679,13 @@
       "conclusion": "Die Löschung ist endgültig und kann nicht rückgängig gemacht werden.",
       "intro": "Sie können jederzeit:",
       "list": {
-        "item1": "Löschen Sie Ihr Konto und Ihre Daten per E-Mail-Anfrage;",
+        "item1": "Löschen Sie Ihr Konto und Ihre Daten per E-Mail-Anfrage.",
         "item2": "Widerrufen Sie den Zugriff auf freigegebene Kalender."
       },
       "title": "6. Kontolöschung"
     },
     "section7": {
-      "content": "Diese Allgemeinen Geschäftsbedingungen können jederzeit geändert werden. Über wesentliche Änderungen werden Sie über die App oder per E-Mail informiert.",
+      "content": "Diese Allgemeinen Geschäftsbedingungen können jederzeit geändert werden. Über wesentliche Änderungen werden Sie über die Anwendung oder per E-Mail informiert.",
       "title": "7. Änderungen"
     },
     "section8": {
@@ -707,12 +707,12 @@
   "user": "Benutzer",
   "verify_email": {
     "instructions": "Senden Sie einen neuen Bestätigungslink an Ihre E-Mail-Adresse.",
-    "no_user": "Es sind keine Benutzer angemeldet.",
+    "no_user": "Keine Benutzer angemeldet.",
     "resend_link": "Bestätigungslink erneut senden",
-    "title": "Bestätigung der E-Mail-Adresse"
+    "title": "E-Mail-Adressüberprüfung"
   },
   "why": {
-    "desc": "Weil im Gesundheitswesen kein Raum für Improvisation ist. MediTime bietet Ihnen eine klare, intuitive und sichere Lösung für die tägliche Nachverfolgung Ihrer Behandlungen und der Ihrer Angehörigen.",
+    "desc": "Weil im Gesundheitswesen kein Raum für Improvisation ist, bietet MediTime Ihnen eine klare, intuitive und sichere Lösung für die tägliche Nachverfolgung Ihrer Behandlungen und der Ihrer Angehörigen.",
     "title": "Warum MediTime wählen?"
   },
   "yes": "Ja"

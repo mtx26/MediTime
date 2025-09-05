@@ -2,9 +2,9 @@
   "Actions": "Actions",
   "Fri": "Friday",
   "Mon": "Monday",
-  "Sat": "Saturday",
+  "Sat": "SATURDAY",
   "Sun": "Sunday",
-  "Thu": "Thursday",
+  "Thu": "THURSDAY",
   "Tue": "Tuesday",
   "Wed": "Wednesday",
   "about": "About",
@@ -34,7 +34,7 @@
   "admin": "Admin",
   "app": {
     "access": "Access the application",
-    "description": "Schedule your treatments and share your medical calendars with ease.",
+    "description": "Plan your treatments and share your medical calendars with ease.",
     "login": "Log in",
     "name": "MediTime",
     "pageTitle": "MediTime - Medical Treatment Manager",
@@ -50,7 +50,7 @@
     "email": "E-mail address",
     "forgot_password": "Forgot your password?",
     "hide_password": "Hide password",
-    "login": "Login",
+    "login": "Connexion",
     "login_with": "Connect with:",
     "name": "Full name",
     "or_with_email": "or with email:",
@@ -62,7 +62,7 @@
       "google": "Google",
       "twitter": "Twitter"
     },
-    "register": "Registration",
+    "register": "Inscription",
     "register_with": "Register with:",
     "show_password": "Show password",
     "terms_link": "general conditions",
@@ -100,9 +100,9 @@
     "delete": "DELETE",
     "dose": "Dose",
     "each": "each",
-    "edit": "To modify",
+    "edit": "Modifier",
     "every": "all the",
-    "export_pdf": "Export",
+    "export_pdf": "Exporter",
     "from": "From the",
     "intake_conditions": "Conditions of taking",
     "name": "Name",
@@ -122,7 +122,7 @@
       },
       "badge": {
         "high": "High stock",
-        "low": "Low stock",
+        "low": "Stock bas",
         "out": "Out of stock"
       }
     },
@@ -185,7 +185,7 @@
     },
     "stock": {
       "daily": {
-        "description": "The stock will be decreased automatically every day.",
+        "description": "The stock will be automatically reduced every day at midnight.",
         "label": "Daily (Midnight)"
       },
       "label": "Stock count",
@@ -218,18 +218,18 @@
   "delete_access": "Remove access",
   "delete_access_confirm": "Remove access?",
   "delete_calendar_confirm": "Delete this calendar?",
-  "delete_link": "Delete the link",
+  "delete_link": "Remove link",
   "delete_link_confirm": "Delete the link?",
   "done": "Finished",
   "evening": "Evening",
-  "expiration": "Expiry",
+  "expiration": "Expiration",
   "expiration_date": "Link expiration date",
   "expired": "Expired",
   "expires_at": "Expires on",
   "fcm": {
-    "sw_error": "[FCM] SW error",
+    "sw_error": "[FCM] Erreur SW",
     "sw_registered": "[FCM] SW recorded",
-    "token_registered": "[FCM] Token registered on the backend side",
+    "token_registered": "[FCM] Token saved on the backend side",
     "token_send_error": "[FCM] Error sending token"
   },
   "features": {
@@ -242,8 +242,8 @@
   },
   "home": "Welcome",
   "home_meta": {
-    "description": "Plan and share your medication schedules easily.",
-    "title": "MediTime - Medicine schedule planner"
+    "description": "Easily manage and share your medication intake.",
+    "title": "MediTime - Treatment Planner"
   },
   "image_upload": {
     "analysis_error": "Error parsing image.",
@@ -265,7 +265,7 @@
     "invalid_or_expired": "Invalid or expired invitation",
     "title": "Invitation"
   },
-  "link": "Link",
+  "link": "Lien",
   "link_already_exists": "A link already exists for this calendar.",
   "link_copied": "🔗 Link copied!",
   "link_expiration": "Link Expiration",
@@ -278,7 +278,7 @@
   "loading_settings": "Loading settings...",
   "loading_share": "Loading share...",
   "locale": "en-US",
-  "login": "Login",
+  "login": "Connexion",
   "logout": "Logout",
   "low_stock": "Low stock",
   "manage_link": "Manage the link",
@@ -300,12 +300,12 @@
   },
   "mg": "mg",
   "mobile": {
-    "android": "On <strong>Android</strong> , an <em>&quot;Add to Home Screen&quot;</em> message automatically appears at the bottom of the browser. Tap it to install MediTime.",
+    "android": "On Android, an \"Add to Home Screen\" message automatically appears at the bottom of the browser. Tap it to install MediTime.",
     "desc": "MediTime works as a mobile app. Add it to your home screen for quick access.",
     "feature1": "Easy installation from the browser",
     "feature2": "Smooth touch interface",
     "feature3": "Quick access from the home screen",
-    "ios": "On <strong>iPhone</strong> , open MediTime in Safari, tap<i class=\"bi bi-share mx-1\"></i> then <em>“On the home screen”</em> .",
+    "ios": "On iPhone, open MediTime in Safari, tap the share icon, then \"On Home Screen.\"",
     "other": "MediTime is also accessible on computer or tablet.",
     "title": "Available on your phone"
   },
@@ -316,14 +316,14 @@
     "about": "About",
     "calendar": "Calendar",
     "dashboard": "Dashboard",
-    "forgot-password": "Forgot Password",
-    "help": "Help",
-    "home": "Home",
-    "login": "Login",
-    "medicines": "Medicines",
+    "forgot-password": "Forgotten password",
+    "help": "Aide",
+    "home": "Welcome",
+    "login": "Log in",
+    "medicines": "Drugs",
     "profile": "Profile",
-    "register": "Sign Up",
-    "reset-password": "Reset Password",
+    "register": "Register",
+    "reset-password": "Reset password",
     "settings": "Settings"
   },
   "never": "Never",
@@ -338,7 +338,7 @@
   "no_notifications": "No new notifications",
   "no_personal_calendars": "You don't have a personal calendar.",
   "no_shared_calendars": "You don't have a shared calendar.",
-  "noon": "Noon",
+  "noon": "Midi",
   "not_found": {
     "message": "Page not found.",
     "title": "Error 404"
@@ -389,7 +389,7 @@
       },
       "title": "2. What data is collected?",
       "treatment_data": {
-        "boxes": "Information on the boxes (quantity, stock, packaging).",
+        "boxes": "Information on boxes (quantity, stock, packaging).",
         "history": "Calendar edit and share history.",
         "medicines": "Drug names, dosages, frequencies, times of taking.",
         "title": "Data related to processing"
@@ -438,7 +438,7 @@
   "recipient_email": "Recipient's email",
   "regenerate": "Regenerate",
   "regenerate_link_confirm": "Regenerate this link?",
-  "register": "Registration",
+  "register": "Inscription",
   "reject": "Dismiss",
   "rename": "Rename",
   "reset_password": {
@@ -461,18 +461,18 @@
   "revoke_link": "Revoke the link",
   "rights_reserved": "All rights reserved",
   "scanner": {
-    "add": "Add",
+    "add": "Add all medications",
     "camera": "Camera",
     "camera_error": "Unable to access the camera.",
-    "camera_instruction": "Point to the DataMatrix code",
+    "camera_instruction": "Point the camera at a DataMatrix code",
     "cancel": "Cancel",
     "close": "Close",
     "medicine_not_found": "Drug not found",
     "quantity": "Quantity: {{quantity}}",
     "remove_from_list": "Remove from list",
-    "searching": "Research...",
+    "searching": "Research in progress...",
     "select_camera": "Select a camera",
-    "title": "Scan a QR code",
+    "title": "Drug scanner",
     "zoom": "Zoom : {{zoom}}x",
     "camera_front": "Before",
     "camera_back": "Back",
@@ -572,7 +572,7 @@
     "mfa_factor_name_conflict": "Conflicting MFA factor name",
     "mfa_factor_not_found": "MFA factor not found",
     "mfa_ip_address_mismatch": "Different IP address for MFA",
-    "mfa_phone_enroll_not_enabled": "MFA registration by phone disabled",
+    "mfa_phone_enroll_not_enabled": "Phone MFA registration disabled",
     "mfa_phone_verify_not_enabled": "Phone MFA verification disabled",
     "mfa_totp_enroll_not_enabled": "MFA TOTP registration disabled",
     "mfa_totp_verify_not_enabled": "TOTP MFA verification disabled",
@@ -663,12 +663,12 @@
     },
     "section4": {
       "content": "The source code, design, and content of MediTime are the property of Matis Gillet, unless otherwise stated. Any reproduction, distribution, or modification without authorization is prohibited.",
-      "title": "4. Intellectual property"
+      "title": "4. Intellectual Property"
     },
     "section5": {
       "list": {
         "item1": "Consequences of forgetting to take;",
-        "item2": "Errors in displaying data;",
+        "item2": "Errors in the display of data;",
         "item3": "From loss or disclosure of data due to unsecured use."
       },
       "p1": "The application is not intended to replace medical advice. The user remains solely responsible for the use of the information displayed.",
@@ -676,7 +676,7 @@
       "title": "5. Responsibilities"
     },
     "section6": {
-      "conclusion": "The deletion is final and cannot be undone.",
+      "conclusion": "Deletion is final and cannot be undone.",
       "intro": "You can at any time:",
       "list": {
         "item1": "Delete your account and data via an email request;",
@@ -685,7 +685,7 @@
       "title": "6. Account Deletion"
     },
     "section7": {
-      "content": "These Terms and Conditions may be modified at any time. You will be notified of significant changes via the app or by email.",
+      "content": "These Terms and Conditions may be modified at any time. You will be notified of significant changes via the application or by email.",
       "title": "7. Modifications"
     },
     "section8": {
@@ -696,7 +696,7 @@
   },
   "testimonials": {
     "author": "Andrée C. and her grandchildren",
-    "quote": "I still refill my mom's pill box every week, but with MediTime, it's become much simpler. I can see her entire medication list at a glance, I receive reminders, and so does she. We're much more relaxed.",
+    "quote": "I still refill my mom's pillbox every week, but with MediTime, it's become much simpler. I can see her entire medication list at a glance, I receive reminders, and so does she. We're much more relaxed.",
     "title": "They trust us"
   },
   "threshold": "Threshold",

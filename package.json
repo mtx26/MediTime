@@ -1,0 +1,22 @@
+{
+  "name": "meditime-scripts",
+  "version": "1.0.0",
+  "description": "Scripts de traduction et utilitaires pour MediTime",
+  "type": "module",
+  "scripts": {
+    "translate:frontend": "node scripts/translate.js --project=frontend",
+    "translate:mobile": "node scripts/translate.js --project=mobile",
+    "translate:check-frontend": "node scripts/translate.js --project=frontend --check-only",
+    "translate:check-mobile": "node scripts/translate.js --project=mobile --check-only",
+    "translate:fill-frontend": "node scripts/translate.js --project=frontend --fill-missing",
+    "translate:fill-mobile": "node scripts/translate.js --project=mobile --fill-missing"
+  },
+  "dependencies": {
+    "@google-cloud/translate": "^8.0.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {},
+  "keywords": ["translate", "i18n", "meditime"],
+  "author": "MediTime Team",
+  "license": "MIT"
+}

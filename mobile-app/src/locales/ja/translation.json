@@ -34,13 +34,13 @@
   "admin": "管理者",
   "app": {
     "access": "アプリケーションにアクセスする",
-    "description": "治療をスケジュールし、医療カレンダーを簡単に共有できます。",
+    "description": "治療を計画し、医療カレンダーを簡単に共有できます。",
     "login": "ログイン",
-    "name": "MediTime",
-    "pageTitle": "MediTime - 医療治療管理",
+    "name": "メディタイム",
+    "pageTitle": "MediTime - 医療治療マネージャー",
     "register": "アカウントを作成する",
     "shortN": "メディタイム",
-    "shortName": "MediTime",
+    "shortName": "メディタイム",
     "subtitle": "医療処置を簡単に管理、追跡、共有できます。",
     "title": "メディタイム"
   },
@@ -50,7 +50,7 @@
     "email": "電子メールアドレス",
     "forgot_password": "パスワードをお忘れですか？",
     "hide_password": "パスワードを非表示にする",
-    "login": "ログイン",
+    "login": "接続",
     "login_with": "接続:",
     "name": "フルネーム",
     "or_with_email": "またはメールで:",
@@ -62,7 +62,7 @@
       "google": "グーグル",
       "twitter": "ツイッター"
     },
-    "register": "登録",
+    "register": "碑文",
     "register_with": "登録方法:",
     "show_password": "パスワードを表示",
     "terms_link": "一般条件",
@@ -100,9 +100,9 @@
     "delete": "消去",
     "dose": "用量",
     "each": "それぞれ",
-    "edit": "変更するには",
+    "edit": "修飾子",
     "every": "すべての",
-    "export_pdf": "輸出",
+    "export_pdf": "輸出業者",
     "from": "から",
     "intake_conditions": "受講条件",
     "name": "名前",
@@ -116,13 +116,13 @@
     "stock": {
       "alerts": {
         "line": "{{name}} ({{dose}} mg) — 在庫数 {{count}} 個",
-        "line_negative": "{{name}} ({{dose}} mg) — {{count}} 個 (在庫切れ)",
+        "line_negative": "{{name}} ({{dose}} mg) — {{count}} 単位 (在庫切れ)",
         "line_plural": "{{name}} ({{dose}} mg) — 在庫数 {{count}} 個",
         "title": "🔔 株価アラート:"
       },
       "badge": {
         "high": "在庫が多い",
-        "low": "在庫が少ない",
+        "low": "ストックベース",
         "out": "在庫切れ"
       }
     },
@@ -172,7 +172,7 @@
     "weekly_help": "カレンダーの日付をクリックすると、関連する薬がウィンドウに表示されます。",
     "weekly_view": "週ごとのカレンダー"
   },
-  "calendar_completed": "カレンダーが無事完成しました！",
+  "calendar_completed": "カレンダーが完成しました！",
   "calendar_settings": {
     "label": "カレンダー設定",
     "notifications": {
@@ -190,7 +190,7 @@
       },
       "label": "在庫数",
       "weekly": {
-        "description": "毎週薬箱を補充すると、在庫は手動で減らされます。",
+        "description": "毎週薬箱を補充するたびに、在庫は手動で減らされます。",
         "label": "週刊（ピルボックス）"
       }
     }
@@ -218,7 +218,7 @@
   "delete_access": "アクセスを削除",
   "delete_access_confirm": "アクセスを削除しますか?",
   "delete_calendar_confirm": "このカレンダーを削除しますか?",
-  "delete_link": "リンクを削除する",
+  "delete_link": "リンクを削除",
   "delete_link_confirm": "リンクを削除しますか?",
   "done": "終了した",
   "evening": "夕方",
@@ -227,13 +227,13 @@
   "expired": "期限切れ",
   "expires_at": "有効期限",
   "fcm": {
-    "sw_error": "[FCM] SWエラー",
+    "sw_error": "[FCM] エラー SW",
     "sw_registered": "[FCM] SW録音",
-    "token_registered": "[FCM] バックエンド側で登録されたトークン",
+    "token_registered": "[FCM] バックエンド側に保存されたトークン",
     "token_send_error": "[FCM] トークンの送信エラー"
   },
   "features": {
-    "desc1": "撮影をスケジュールし、リマインダーを受け取って、安心して撮影しましょう。",
+    "desc1": "撮影のスケジュールを立て、リマインダーを受け取って、安心して撮影できます。",
     "desc2": "愛する人や介護者に、日常的にサポートを受けられるようアクセス権を与えます。",
     "desc3": "データは Supabase や Firebase などの信頼できるテクノロジーによって保護されます。",
     "title1": "スマートカレンダー",
@@ -265,7 +265,7 @@
     "invalid_or_expired": "無効または期限切れの招待",
     "title": "招待"
   },
-  "link": "リンク",
+  "link": "リエン",
   "link_already_exists": "このカレンダーへのリンクは既に存在します。",
   "link_copied": "🔗 リンクをコピーしました!",
   "link_expiration": "リンクの有効期限",
@@ -278,7 +278,7 @@
   "loading_settings": "設定を読み込んでいます...",
   "loading_share": "共有を読み込んでいます...",
   "locale": "ja-JP",
-  "login": "ログイン",
+  "login": "接続",
   "logout": "ログアウト",
   "low_stock": "在庫が少ない",
   "manage_link": "リンクを管理する",
@@ -300,12 +300,12 @@
   },
   "mg": "ミリグラム",
   "mobile": {
-    "android": "<strong>Android</strong>では、ブラウザの下部に<em>「ホーム画面に追加」という</em>メッセージが自動的に表示されます。タップして MediTime をインストールしてください。",
+    "android": "Androidでは、ブラウザの下部に「ホーム画面に追加」というメッセージが自動的に表示されます。タップしてMediTimeをインストールしてください。",
     "desc": "MediTimeはモバイルアプリとして動作します。ホーム画面に追加してすぐにアクセスしましょう。",
     "feature1": "ブラウザから簡単にインストール",
     "feature2": "スムーズなタッチインターフェース",
     "feature3": "ホーム画面からのクイックアクセス",
-    "ios": "<strong>iPhone</strong>の場合は、Safari で MediTime を開き、 をタップします<i class=\"bi bi-share mx-1\"></i>次に<em>「ホーム画面で」を選択します</em>。",
+    "ios": "iPhone では、Safari で MediTime を開き、共有アイコンをタップして、「ホーム画面」をタップします。",
     "other": "MediTime はコンピューターやタブレットでもアクセスできます。",
     "title": "携帯電話で利用可能"
   },
@@ -338,19 +338,19 @@
   "no_notifications": "新しい通知はありません",
   "no_personal_calendars": "個人用カレンダーがありません。",
   "no_shared_calendars": "共有カレンダーがありません。",
-  "noon": "正午",
+  "noon": "ミディ",
   "not_found": {
     "message": "ページが見つかりません。",
     "title": "エラー404"
   },
   "notif": {
-    "calendar_invite": "<0></0> さんがカレンダー <1>{{name}></1> に参加するよう招待しています",
-    "calendar_joined": "<0></0> のカレンダー <1>{{name}></1> に参加しました",
-    "invite_accepted": "<0></0> はカレンダー <1>{{name}></1> への招待を承認しました",
-    "invite_rejected": "<0></0> さんはカレンダー <1>{{name} への参加招待を辞退しました。</1>",
-    "low_stock": "<0>{{name}></0> はほぼ売り切れです (残り <0>{{qty}></0>)。",
-    "share_removed_by_owner": "<0></0> さんがカレンダー <1>{{name}></1> のあなたとの共有を停止しました",
-    "share_removed_by_you": "<0></0> がカレンダー <1>{{name}></1> を削除しました"
+    "calendar_invite": "<0></0> がカレンダー <1>{{name}}</1> に参加するよう招待しています",
+    "calendar_joined": "あなたは <0></0> のカレンダー <1>{{name}}</1> に参加しました",
+    "invite_accepted": "<0></0> はカレンダーへの参加招待を承諾しました <1>{{name}}</1>",
+    "invite_rejected": "<0></0> はカレンダーへの参加招待を辞退しました <1>{{name}}</1>",
+    "low_stock": "<0>{{name}}</0> はほぼ売り切れです (残り <0>{{qty}}</0>)。",
+    "share_removed_by_owner": "<0></0> はカレンダー <1>{{name}}</1> のあなたとの共有を停止しました",
+    "share_removed_by_you": "<0></0> はカレンダー <1>{{name}}</1> を削除しました"
   },
   "notification": {
     "email_toggle": "メール通知を有効にする",
@@ -373,7 +373,7 @@
     "label": "機密保持",
     "last_update": "最終更新日: 2025年6月9日",
     "section1": {
-      "content": "MediTimeは、投薬治療の管理を容易にするために設計されたウェブアプリケーションです。ユーザーは、パーソナライズされたカレンダーを作成したり、リマインダーを受信したり、愛する人や医療専門家とスケジュールを共有したりできます。このプロジェクトは、Matis Gillet（別名mtx_26）によって個人的に開発されており、商業目的ではありません。",
+      "content": "MediTimeは、投薬治療の管理を容易にするために設計されたウェブアプリケーションです。ユーザーは、パーソナライズされたカレンダーを作成したり、リマインダーを受け取ったり、愛する人や医療専門家とスケジュールを共有したりできます。このプロジェクトは、Matis Gillet（別名mtx_26）によって個人的に開発されており、商業目的ではありません。",
       "title": "1. 私たちは誰ですか?"
     },
     "section2": {
@@ -438,7 +438,7 @@
   "recipient_email": "受信者のメールアドレス",
   "regenerate": "再生",
   "regenerate_link_confirm": "このリンクを再生成しますか?",
-  "register": "登録",
+  "register": "碑文",
   "reject": "却下する",
   "rename": "名前を変更",
   "reset_password": {
@@ -461,18 +461,18 @@
   "revoke_link": "リンクを取り消す",
   "rights_reserved": "無断転載を禁じます",
   "scanner": {
-    "add": "追加",
+    "add": "すべての薬を追加する",
     "camera": "カメラ",
     "camera_error": "カメラにアクセスできません。",
-    "camera_instruction": "DataMatrixコードを指す",
+    "camera_instruction": "カメラをDataMatrixコードに向ける",
     "cancel": "キャンセル",
     "close": "近い",
     "medicine_not_found": "薬物は見つかりませんでした",
     "quantity": "数量: {{数量}}",
     "remove_from_list": "リストから削除",
-    "searching": "研究...",
+    "searching": "研究進行中…",
     "select_camera": "カメラを選択",
-    "title": "QRコードをスキャンする",
+    "title": "薬物スキャナー",
     "zoom": "ズーム: {{zoom}}x",
     "camera_front": "前に",
     "camera_back": "戻る",
@@ -516,7 +516,7 @@
   "shared": "共有",
   "shared_by": "カレンダーを共有",
   "shared_by_token": "トークンで共有されたカレンダー",
-  "shared_calendar": "{{name}}を共有しています",
+  "shared_calendar": "{{name}} の共有",
   "shared_calendar_management": "共有カレンダーの管理",
   "shared_calendars": "共有カレンダー",
   "shared_link_label": "共有カレンダーのリンク",
@@ -570,9 +570,9 @@
     "manual_linking_disabled": "手動リンクが無効",
     "mfa_challenge_expired": "MFAチャレンジの期限が切れました",
     "mfa_factor_name_conflict": "競合する MFA 要素名",
-    "mfa_factor_not_found": "MFA 要素が見つかりません",
+    "mfa_factor_not_found": "MFA要素が見つかりません",
     "mfa_ip_address_mismatch": "MFA用の異なるIPアドレス",
-    "mfa_phone_enroll_not_enabled": "電話によるMFA登録が無効になっています",
+    "mfa_phone_enroll_not_enabled": "電話のMFA登録が無効になっています",
     "mfa_phone_verify_not_enabled": "電話によるMFA認証が無効になっています",
     "mfa_totp_enroll_not_enabled": "MFA TOTP登録が無効になっています",
     "mfa_totp_verify_not_enabled": "TOTP MFA 認証が無効になっています",
@@ -638,7 +638,7 @@
     "label": "利用規約",
     "last_update": "最終更新日: 2025年6月9日",
     "section1": {
-      "p1": "これらの条件の目的は、営利目的ではなく、Matis Gillet (別名 mtx_26) が個人的に開発した MediTime アプリケーションの使用条件を定義することです。",
+      "p1": "これらの条件の目的は、営利目的なしに、Matis Gillet (別名 mtx_26) が個人的に開発した MediTime アプリケーションの使用条件を定義することです。",
       "p2": "アプリケーションを使用することにより、これらの条件を無条件に承諾したことになります。",
       "title": "1. 目的"
     },
@@ -668,7 +668,7 @@
     "section5": {
       "list": {
         "item1": "服用を忘れた場合の結果;",
-        "item2": "データの表示エラー。",
+        "item2": "データの表示におけるエラー。",
         "item3": "安全でない使用によるデータの損失または漏洩から。"
       },
       "p1": "このアプリケーションは医師のアドバイスに代わるものではありません。表示される情報の使用については、ユーザーが単独で責任を負います。",
@@ -685,7 +685,7 @@
       "title": "6. アカウントの削除"
     },
     "section7": {
-      "content": "本利用規約は随時変更される場合があります。重要な変更があった場合は、アプリまたはメールでお知らせいたします。",
+      "content": "本利用規約は随時変更される場合があります。重要な変更については、アプリまたはメールでお知らせいたします。",
       "title": "7. 変更"
     },
     "section8": {
@@ -696,7 +696,7 @@
   },
   "testimonials": {
     "author": "アンドレ・Cと孫たち",
-    "quote": "母の薬箱は今でも毎週補充していますが、MediTimeのおかげでずっと楽になりました。薬のリストが一目でわかるし、リマインダーも届きますし、母もリマインダーを受け取れます。おかげで、ずっと楽になりました。",
+    "quote": "母の薬箱は今でも毎週補充していますが、MediTimeのおかげでずっと簡単になりました。薬のリストが一目でわかるし、リマインダーも届きますし、母もリマインダーを受け取れます。おかげで、ずっと楽になりました。",
     "title": "彼らは私たちを信頼している"
   },
   "threshold": "しきい値",

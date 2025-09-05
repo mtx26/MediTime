@@ -8,22 +8,70 @@ import { v2 as Translate } from '@google-cloud/translate';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config();
+// Chargement de la configuration dotenv depuis le répertoire MediTime
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const translate = new Translate.Translate({
   key: process.env.VITE_GOOGLE_TRANSLATE_API_KEY,
 });
 
-import { LANGUAGES } from '../src/config/languages.js';
-
-const baseDir = path.join(__dirname, '..', 'src');
-const sourceFile = path.join(baseDir, 'locales', 'fr', 'translation.json');
-const outputBase = path.join(baseDir, 'locales');
-
+// Déterminer le type de projet à partir des arguments
 const args = process.argv.slice(2);
+const projectType = args.find(arg => arg.startsWith('--project='))?.split('=')[1] || 'frontend';
 const checkOnly = args.includes('--check-only');
 const localOnly = args.includes('--local-only');
 const forceTranslate = args.includes('--force');
+
+// Configuration des chemins selon le type de projet
+function getProjectPaths(type) {
+  const basePath = path.join(__dirname, '..');
+  
+  switch (type) {
+    case 'mobile':
+    case 'mobile-app':
+      return {
+        configPath: path.join(basePath, 'mobile-app', 'src', 'config', 'languages.js'),
+        localesBase: path.join(basePath, 'mobile-app', 'src', 'locales'),
+        sourceFile: path.join(basePath, 'mobile-app', 'src', 'locales', 'fr', 'translation.json')
+      };
+    case 'frontend':
+    default:
+      return {
+        configPath: path.join(basePath, 'frontend', 'src', 'config', 'languages.js'),
+        localesBase: path.join(basePath, 'frontend', 'src', 'locales'),
+        sourceFile: path.join(basePath, 'frontend', 'src', 'locales', 'fr', 'translation.json')
+      };
+  }
+}
+
+// Import dynamique de la configuration des langues
+async function loadLanguagesConfig(configPath) {
+  try {
+    if (fs.existsSync(configPath)) {
+      const { LANGUAGES } = await import(`file://${configPath}`);
+      return LANGUAGES;
+    } else {
+      console.warn(`⚠️  Fichier de configuration des langues non trouvé: ${configPath}`);
+      console.warn('Utilisation de la configuration par défaut.');
+      return [
+        { code: 'fr', locale: 'Français' },
+        { code: 'en', locale: 'English' },
+        { code: 'es', locale: 'Español' },
+        { code: 'de', locale: 'Deutsch' },
+        { code: 'it', locale: 'Italiano' }
+      ];
+    }
+  } catch (error) {
+    console.error(`❌ Erreur lors du chargement de la configuration: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+const { configPath, localesBase, sourceFile } = getProjectPaths(projectType);
+
+console.log(`🚀 Traduction pour le projet: ${projectType}`);
+console.log(`📁 Répertoire locales: ${localesBase}`);
+console.log(`📄 Fichier source: ${sourceFile}`);
 
 // 📄 Charge JSON depuis un fichier
 function loadJSON(filePath) {
@@ -105,18 +153,31 @@ async function translateObject(obj, targetLang) {
 
 // 🚀 Traitement principal
 (async () => {
-  const source = loadJSON(sourceFile);
-  for (const lang of LANGUAGES) {
-    await processLanguage(lang, source);
+  try {
+    // Vérifier que le fichier source existe
+    if (!fs.existsSync(sourceFile)) {
+      console.error(`❌ Fichier source non trouvé: ${sourceFile}`);
+      process.exit(1);
+    }
+
+    const LANGUAGES = await loadLanguagesConfig(configPath);
+    const source = loadJSON(sourceFile);
+    
+    for (const lang of LANGUAGES) {
+      await processLanguage(lang, source);
+    }
+    console.log('✨ Script terminé.');
+  } catch (error) {
+    console.error(`❌ Erreur fatale: ${error.message}`);
+    process.exit(1);
   }
-  console.log('✨ Script terminé.');
 })();
 
 async function processLanguage(lang, source) {
   const { code, locale } = lang;
   if (code === 'fr') return;
 
-  const outputFile = path.join(outputBase, code, 'translation.json');
+  const outputFile = path.join(localesBase, code, 'translation.json');
   const target = fs.existsSync(outputFile) ? loadJSON(outputFile) : {};
 
   if (checkOnly) return logMissing(source, target, code, locale);
