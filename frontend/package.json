@@ -10,7 +10,7 @@
     "@fullcalendar/react": "^6.1.17",
     "@google-cloud/translate": "^9.1.0",
     "@mui/icons-material": "^7.1.1",
-    "@mui/material": "^7.1.1",
+    "@mui/material": "^7.3.2",
     "@popperjs/core": "^2.11.8",
     "@radix-ui/react-popover": "^1.1.12",
     "@supabase/supabase-js": "^2.50.2",
