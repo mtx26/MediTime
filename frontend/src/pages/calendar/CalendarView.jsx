@@ -189,6 +189,7 @@ function CalendarPage({
   // Si la méthode est weekly_pillbox et que l'utilisateur n'a pas choisi
   // explicitement une date (on est encore sur aujourd'hui), on bascule
   // la sélection sur le lundi initial (semaine suivante). Simple et non intrusif.
+  // Ce useEffect ne se déclenche qu'une fois lors du chargement de stockDecrementMethod
   useEffect(() => {
     if (stockDecrementMethod !== 'weekly_pillbox') return;
     const today = new Date();
@@ -196,7 +197,7 @@ function CalendarPage({
     if (sameDay(selectedDate, today)) {
       setSelectedDate(initialMondayDate);
     }
-  }, [stockDecrementMethod, selectedDate, initialMondayDate]);
+  }, [stockDecrementMethod, initialMondayDate]); // Retiré selectedDate des dépendances pour éviter la boucle
 
   // 📍 Filtrage des événements pour un jour spécifique et tri par ordre alphabétique
   useEffect(() => {
