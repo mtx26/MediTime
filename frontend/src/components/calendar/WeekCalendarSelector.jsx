@@ -28,8 +28,8 @@ export default function WeekCalendarSelector({ selectedDate, onWeekSelect, monda
 
   return (
     <Calendar
-  onClickDay={handleChange}
-  value={selDate}
+      onClickDay={handleChange}
+      value={selDate}
       locale={t('locale')}
       tileClassName={({ date, view }) => {
         if (view === 'month') {

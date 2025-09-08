@@ -7,6 +7,11 @@ export default function WeekDayCircles({ selectedDate, onSelectDate, monday: mon
   // normalise les dates à minuit pour comparaisons simples
   const today = new Date();
   today.setHours(0,0,0,0);
+  
+  // Normaliser selectedDate pour la comparaison
+  const normalizedSelectedDate = new Date(selectedDate);
+  normalizedSelectedDate.setHours(0,0,0,0);
+  
   const mondayDate = mondayProp instanceof Date ? mondayProp : getMondayDate(selectedDate);
   const weekDates = [...Array(7)].map((_, i) => {
     const d = new Date(mondayDate);
@@ -28,7 +33,7 @@ export default function WeekDayCircles({ selectedDate, onSelectDate, monday: mon
       }}
     >
       {weekDates.map((day, index) => {
-        const isSelected = day.getTime() === selectedDate.getTime();
+        const isSelected = day.getTime() === normalizedSelectedDate.getTime();
         const isToday = day.getTime() === today.getTime();
 
         const baseClassStart = 'btn btn-sm rounded-pill d-inline-flex align-items-center justify-content-center shadow-sm';

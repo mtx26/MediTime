@@ -41,7 +41,7 @@ export default function WeeklyEventContent({
 
       {/* Week day selector (hidden in modal mode) */}
       <div className="mb-2 d-flex justify-content-center">
-  <WeekDayCircles selectedDate={selDate} onSelectDate={onSelectDate} monday={mondayDate} />
+        <WeekDayCircles selectedDate={selDate} onSelectDate={onSelectDate} monday={mondayDate} />
       </div>
 
       {/* Header: big date + prev/next tactile buttons */}
