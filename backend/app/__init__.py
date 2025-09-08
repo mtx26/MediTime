@@ -9,6 +9,7 @@ from app.auth.google_services import init_firebase, init_vertex_ai
 # from app.vertex import test_analyze_medical_document
 from flask_cors import CORS
 from app.cron import start_cron
+import os
 
 def create_app():
     app = Flask(__name__)
@@ -22,7 +23,10 @@ def create_app():
     register_routes(app)
     init_firebase()
     init_vertex_ai()
-    start_cron()
+
+    # 🕒 Lancement du scheduler uniquement dans le process principal
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
+        start_cron()
 
     # Importation des médicaments AFMPS dans la base de données
     # import_afmps_to_bis("C:/Users/mtx_2/Documents/Code/Medic/MediTime/backend/app/scripts/A.csv")
