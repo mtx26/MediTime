@@ -1,4 +1,6 @@
 
+\restrict lVYGvcilboXiu79zweBjS0n7pAnUhPsQicNOBVMBKD0HHt1JxbPGcSOmJgb6dPQ
+
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -461,7 +463,7 @@ ALTER TABLE ONLY "public"."shared_tokens"
 
 
 ALTER TABLE ONLY "public"."users"
-    ADD CONSTRAINT "users_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+    ADD CONSTRAINT "users_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id");
 
 
 
@@ -591,5 +593,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT SELECT,INS
 
 
 
+
+\unrestrict lVYGvcilboXiu79zweBjS0n7pAnUhPsQicNOBVMBKD0HHt1JxbPGcSOmJgb6dPQ
 
 RESET ALL;
