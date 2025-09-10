@@ -8,7 +8,7 @@ import { log } from './utils/logger';
 import { UserContext } from './contexts/UserContext';
 import { formatToLocalISODate } from './utils/calendar/dateUtils';
 import RealtimeManager from './components/realtime/RealtimeManager';
-import { getToken } from './services/supabase/tokenUtils';
+import { getToken } from './services/firebase/tokenUtils';
 import { performApiCall } from './services/api/apiUtils';
 import { useTranslation } from 'react-i18next';
 import I18nHead from './components/common/I18nHead';

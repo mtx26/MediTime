@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import { log } from '../../utils/logger';
 
 // 🔐 Configuration Firebase
@@ -16,6 +17,7 @@ const firebaseConfig = {
 // 🚀 Initialisation
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 let messaging;
 let onMessageFn;
 
@@ -62,4 +64,4 @@ const getMessagingModule = async () => {
 };
 
 // 📤 Exportation
-export { db, analyticsPromise, getMessagingModule };
+export { db, auth, analyticsPromise, getMessagingModule };

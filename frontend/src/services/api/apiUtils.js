@@ -1,5 +1,5 @@
 // apiUtils.js
-import { getToken } from '../supabase/tokenUtils.js';
+import { getToken } from '../firebase/tokenUtils.js';
 import { log } from '../../utils/logger';
 
 function withQuery(url, params) {

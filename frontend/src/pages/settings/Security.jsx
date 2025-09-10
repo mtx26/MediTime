@@ -1,8 +1,7 @@
 import React, { useState, useContext } from 'react';
-import { updateUserPassword } from '../../services/auth/authService';
+import { updateUserPassword, reauthenticateUser } from '../../services/auth/authService';
 import { UserContext } from '../../contexts/UserContext';
 import AlertSystem from '../../components/common/AlertSystem';
-import { supabase } from '../../services/supabase/supabaseClient';
 import { useTranslation } from 'react-i18next';
 
 const Security = ({ sharedProps }) => {
@@ -20,15 +19,10 @@ const Security = ({ sharedProps }) => {
   const [alertMessage, setAlertMessage] = useState(null); // État pour le message d'alerte
   const [alertType, setAlertType] = useState('info'); // État pour le type d'alerte (par défaut : info)
 
-  const isGoogleUser = userInfo?.provider === 'google';
-
   const reauthenticate = async () => {
     if (!userInfo || !oldPassword)
       throw new Error(t('security.current_password.required'));
-    const { error } = await supabase.auth.updateUser({
-      password: oldPassword,
-    });
-    if (error) throw new Error(error.message);
+    await reauthenticateUser(oldPassword);
   };
 
   const handleUpdatePassword = async (e) => {
@@ -69,12 +63,7 @@ const Security = ({ sharedProps }) => {
         <p>{userInfo.email}</p>
       </div>
 
-      {isGoogleUser ? (
-        <div className="alert alert-info">
-          {t('security.google_warning')}
-        </div>
-      ) : (
-        <form onSubmit={handleUpdatePassword}>
+      <form onSubmit={handleUpdatePassword}>
           {/* Champ Username visible */}
           <div className="mb-3">
             <label htmlFor="email" className="form-label">
@@ -181,7 +170,6 @@ const Security = ({ sharedProps }) => {
             {t('security.update_password')}
           </button>
         </form>
-      )}
     </div>
   );
 };

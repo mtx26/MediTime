@@ -1,11 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '../../utils/files/cropImage';
 import { updateUserInfo } from '../../services/auth/authService';
+import { getToken } from '../../services/firebase/tokenUtils';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -37,15 +37,13 @@ const Account = ({ sharedProps }) => {
   }, [displayName, userInfo?.displayName]);
 
   const uploadPhoto = async (file) => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const token = await getToken();
     const formData = new FormData();
     formData.append('photo', file);
     const response = await fetch(`${API_URL}/api/user/photo`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${session.access_token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: formData,
     });

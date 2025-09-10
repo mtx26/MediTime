@@ -1,25 +1,19 @@
 from functools import wraps
 from flask import request, jsonify, g
-import jwt
-from app.config.config import Config
+from firebase_admin import auth as firebase_auth
 from app.utils.logging import log_backend as logger
 
 
 def decode_token(token):
-    """Décode un token JWT Supabase et retourne l'utilisateur (payload) ou None."""
+    """Vérifie et décode un token Firebase. Retourne le payload ou None."""
     if not token:
         return None
 
     try:
-        return jwt.decode(
-            token,
-            Config.SUPABASE_JWT_SECRET or "",
-            algorithms=["HS256"],
-            options={"verify_aud": False}
-        )
-    except jwt.ExpiredSignatureError:
+        return firebase_auth.verify_id_token(token)
+    except firebase_auth.ExpiredIdTokenError:
         logger.warning("Token expiré", {"origin": "TOKEN_ERROR", "uid": "unknown"})
-    except jwt.InvalidTokenError:
+    except firebase_auth.InvalidIdTokenError:
         logger.warning("Token invalide", {"origin": "TOKEN_ERROR", "uid": "unknown"})
     except Exception as e:
         logger.warning("Erreur lors de la vérification du token", {
@@ -41,7 +35,7 @@ def require_auth(f):
             return jsonify({"error": "Token invalide", "code": "TOKEN_INVALID"}), 401
 
         g.user = user
-        g.uid = user.get("sub")
+        g.uid = user.get("uid") or user.get("sub")
         return f(*args, **kwargs)
 
     return decorated_function

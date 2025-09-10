@@ -1,21 +1,19 @@
 import { useContext, useCallback, useMemo } from 'react';
-import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import { UserContext } from '../../contexts/UserContext';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
+import { getToken } from '../../services/firebase/tokenUtils';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const fetchCalendars = async (uid, setCalendarsData, setLoadingStates) => {
   try {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) throw new Error('Session Supabase non trouvée');
+    const token = await getToken();
+    if (!token) throw new Error('Token Firebase non trouvé');
 
     const res = await fetch(`${API_URL}/api/calendars`, {
       headers: {
-        Authorization: `Bearer ${session.access_token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -66,14 +64,12 @@ const fetchSharedCalendars = async (
   setLoadingStates
 ) => {
   try {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) throw new Error('Session Supabase non trouvée');
+    const token = await getToken();
+    if (!token) throw new Error('Token Firebase non trouvé');
 
     const res = await fetch(`${API_URL}/api/shared/users/calendars`, {
       headers: {
-        Authorization: `Bearer ${session.access_token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
