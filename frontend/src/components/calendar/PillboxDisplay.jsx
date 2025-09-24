@@ -168,10 +168,9 @@ export default function PillboxDisplay({
                     <div key={day} className="col">
                       <div className="d-flex flex-column h-100">
                         <h6 className="mb-1">{t(day)}</h6>
-                        <div style={{ fontSize: 12, marginBottom: 4, color: '#888' }}>
+                        <div className='text-secondary rounded mb-2' >
                           {weekDates[idx] && (
                             weekDates[idx].toLocaleDateString(t('locale'), {
-                              year: 'numeric',
                               month: 'numeric',
                               day: 'numeric',
                             })
