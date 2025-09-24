@@ -38,6 +38,17 @@ export default function PillboxDisplay({
   const [alertType, setAlertType] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
 
+  // Calculer les dates de la semaine à partir du lundi fourni
+  const weekDates = React.useMemo(() => {
+    if (!monday) return [];
+    const base = new Date(monday);
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(base);
+      d.setDate(base.getDate() + i);
+      return d;
+    });
+  }, [monday]);
+
   const calendarSource = getCalendarSourceMap(
     personalCalendars,
     sharedUserCalendars,
@@ -153,10 +164,19 @@ export default function PillboxDisplay({
                   <h4 className="mb-0"><strong>{orderedMeds[selectedMedIndex].title}</strong></h4>
                 </div>
                 <div className="row row-cols-7 g-3 align-items-stretch text-center">
-                  {days.map((day) => (
+                  {days.map((day, idx) => (
                     <div key={day} className="col">
                       <div className="d-flex flex-column h-100">
-                        <h6 className="mb-2">{t(day)}</h6>
+                        <h6 className="mb-1">{t(day)}</h6>
+                        <div style={{ fontSize: 12, marginBottom: 4, color: '#888' }}>
+                          {weekDates[idx] && (
+                            weekDates[idx].toLocaleDateString(t('locale'), {
+                              year: 'numeric',
+                              month: 'numeric',
+                              day: 'numeric',
+                            })
+                          )}
+                        </div>
                         <div className="shadow-sm border rounded bg-light p-2 flex-grow-1 d-flex align-items-center justify-content-center">
                           {orderedMeds[selectedMedIndex].cells[day] !== undefined && (
                             <div className="w-100 ratio ratio-1x1">
