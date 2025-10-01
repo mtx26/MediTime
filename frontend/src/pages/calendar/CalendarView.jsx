@@ -35,6 +35,7 @@ function CalendarPage({
   const calendarRef = useRef(null);
   // garder selectedDate comme objet Date pour manipulations faciles
   const [selectedDate, setSelectedDate] = useState(new Date().setHours(0,0,0,0)); // Date JS
+  console.log(selectedDate);
   const [eventsForDay, setEventsForDay] = useState([]); // Événements filtrés pour un jour spécifique
   const [calendarEvents, setCalendarEvents] = useState([]); // Événements du calendrier
   const [calendarTable, setCalendarTable] = useState([]); // Événements du calendrier
@@ -294,7 +295,7 @@ function CalendarPage({
                             <i className="bi bi-calendar-day me-2" /> {t('day_view.title')}
                           </>
                         ),
-                        // TODO: implement daily view navigation
+                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/daily?date=${toISO(selectedDate)}`),
                       },
                       { separator: true },
                       {
@@ -373,7 +374,7 @@ function CalendarPage({
                             <i className="bi bi-calendar-day me-2" /> {t('day_view.title')}
                           </>
                         ),
-                        // TODO: implement daily view navigation
+                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/daily?date=${toISO(selectedDate)}`),
                       },
                       { separator: true },
                       {
@@ -615,15 +616,15 @@ function CalendarPage({
 
             {/* Modal pour afficher les médicaments d'une date */}
             <DateModal
-                ref={dateModalRef}
-                selectedDate={selectedDate}
-                eventsForDay={eventsForDay}
-                onNext={() => navigateDay(1)}
-                onPrev={() => navigateDay(-1)}
-                onSelectDate={onSelectDate}
-                getPastWeek={() => navigateWeek(-1)}
-                getNextWeek={() => navigateWeek(1)}
-              />
+              ref={dateModalRef}
+              selectedDate={selectedDate}
+              eventsForDay={eventsForDay}
+              onNext={() => navigateDay(1)}
+              onPrev={() => navigateDay(-1)}
+              onSelectDate={onSelectDate}
+              getPastWeek={() => navigateWeek(-1)}
+              getNextWeek={() => navigateWeek(1)}
+            />
           </div>
 
           {/* Calendrier - Vue mobile uniquement */}

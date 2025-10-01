@@ -18,6 +18,7 @@ const AcceptInvitePage = lazy(() => import('../pages/calendar/AcceptInvitePage')
 
 const CalendarView = lazy(() => import('../pages/calendar/CalendarView'));
 const PillboxPage = lazy(() => import('../pages/calendar/Pillbox'));
+const DailyCalendarPage = lazy(() => import('../pages/calendar/DailyCalendarPage'));
 const CalendarList = lazy(() => import('../pages/calendar/CalendarList'));
 const SharedList = lazy(() => import('../pages/share/SharedList'));
 const StockAlertsPage = lazy(() => import('../pages/calendar/StockAlertsPage'));
@@ -213,6 +214,19 @@ function AppRoutes({ sharedProps }) {
               element={
                 <RouteWithLoader
                   element={<PillboxPage {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
+        <Route
+          path="daily"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<DailyCalendarPage {...sharedProps} />}
                   isLoading={sharedProps.loadingStates.isInitialLoading}
                 />
               }
