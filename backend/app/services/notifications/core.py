@@ -179,12 +179,24 @@ def save_notifications(user_id: str, notification_type: str, items: List[Notific
                 shared_calendar_id = item.get("shared_calendar_id") or None
                 calendar_id = item.get("calendar_id") or None
                 sender_uid = item.get("sender_uid") or None
+                medication_id = item.get("medication_id") or None
                 cur.execute(
                     """
                     INSERT INTO notifications (
-                        user_id, type, read, timestamp, sender_uid, calendar_id, content, shared_calendar_id
+                        user_id, type, read, timestamp, sender_uid, calendar_id, content, medication_id, shared_calendar_id
                     )
-                    VALUES (%s, %s, %s, NOW(), %s, %s, %s::jsonb, %s)
+                    VALUES (%s, %s, %s, NOW(), %s, %s, %s::jsonb, %s, %s)
+                    ON CONFLICT (medication_id)
+                    DO UPDATE SET
+                        user_id = EXCLUDED.user_id,
+                        type = EXCLUDED.type,
+                        read = EXCLUDED.read,
+                        timestamp = NOW(),
+                        sender_uid = EXCLUDED.sender_uid,
+                        calendar_id = EXCLUDED.calendar_id,
+                        content = EXCLUDED.content,
+                        shared_calendar_id = EXCLUDED.shared_calendar_id,
+                        updated_at = NOW()
                     """,
                     (
                         user_id,
@@ -193,6 +205,7 @@ def save_notifications(user_id: str, notification_type: str, items: List[Notific
                         sender_uid,
                         calendar_id,
                         json.dumps(content),
+                        medication_id,
                         shared_calendar_id
                     ),
                 )
