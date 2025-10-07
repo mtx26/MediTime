@@ -55,12 +55,14 @@ def handle_notifications():
       u.email                                AS sender_email,
       COALESCE(u.photo_url, %s)              AS sender_photo_url,
       mb.name                                AS medication_name,
-      mb.stock_quantity                      AS medication_qty
+      mb.stock_quantity                      AS medication_qty,
+      sc.accepted                            AS accepted
 
     FROM notifications n
-    LEFT JOIN calendars      c  ON c.id  = n.calendar_id
-    LEFT JOIN users          u  ON u.id  = n.sender_uid
-    LEFT JOIN medicine_boxes mb ON mb.id = n.medication_id
+    LEFT JOIN calendars c                    ON c.id  = n.calendar_id
+    LEFT JOIN users u                        ON u.id  = n.sender_uid
+    LEFT JOIN shared_calendars sc            ON sc.calendar_id = n.calendar_id
+    LEFT JOIN medicine_boxes mb              ON mb.id = n.medication_id
 
     WHERE n.user_id = %s
 
