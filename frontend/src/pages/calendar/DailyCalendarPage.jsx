@@ -1,6 +1,6 @@
 
 import React, { useRef, useState, useEffect, useContext, useMemo, use } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation, useNavigate, data } from 'react-router-dom';
 import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
 import { toISO, toDate, getMondayDate } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
@@ -16,8 +16,9 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
   const location = useLocation();
   const params = useParams();
   const { t } = useTranslation();
+  const today = new Date().setHours(0,0,0,0);
 
-  const selectedDateParam = new URLSearchParams(location.search).get('date');
+  const selectedDateParam = new URLSearchParams(location.search).get('date') || today; // Date sélectionnée en paramètre ou aujourd'hui par défaut
 
   // 🔐 Contexte d'authentification
   const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
@@ -25,6 +26,16 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
   const calendarRef = useRef(null);
   // garder selectedDate comme objet Date pour manipulations faciles
   const [selectedDate, setSelectedDate] = useState(); // Date JS
+
+  useEffect(() => {
+  if (selectedDateParam) {
+    const parsedDate = toDate(selectedDateParam);
+    setSelectedDate(parsedDate);
+  } else {
+    setSelectedDate(new Date().setHours(0,0,0,0));
+  }
+}, [selectedDateParam]);
+
   const [eventsForDay, setEventsForDay] = useState([]); // Événements filtrés pour un jour spécifique
   const [calendarEvents, setCalendarEvents] = useState([]); // Événements du calendrier
   const [calendarTable, setCalendarTable] = useState([]); // Événements du calendrier
@@ -37,14 +48,18 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
   // une seule source de vérité pour la date : `selectedDate`
   // et on dérive le lundi correspondant depuis `selectedDate`
   // monday as Date object derived from selectedDate Date
-  const [monday, setMonday] = useState(() => getMondayDate(selectedDate));
+  const [monday, setMonday] = useState(getMondayDate(selectedDate));
+  console.log(monday);
+
   useEffect(() => {
     // Compare les dates par valeur (timestamp) pour éviter une boucle
     // causée par la création d'objets Date différents à chaque rendu.
+    if (!selectedDate) return;
     const newMonday = getMondayDate(selectedDate);
     if (!monday || newMonday.getTime() !== new Date(monday).getTime()) {
       setMonday(newMonday);
     }
+    console.log(newMonday);
   }, [selectedDate]);
 
 
@@ -119,8 +134,9 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
       if (calendarType === 'personal' || calendarType === 'sharedUser') {
         if (!userInfo) return setLoading(true);
       }
+      if (!monday) return;
       const load = async () => {
-        const rep = await calendarSource.fetchSchedule(calendarId);
+        const rep = await calendarSource.fetchSchedule(calendarId, monday ? toISO(monday) : undefined);
         if (rep.success) {
           if (!isEqual(rep.schedule, calendarEvents)) {
             setCalendarEvents(rep.schedule);
@@ -137,7 +153,7 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
       };
   
       load();
-    }, [calendarId, calendarSource.fetchSchedule, userInfo]);
+    }, [calendarId, calendarSource.fetchSchedule, userInfo, monday]);
 
     useEffect(() => {
       if (!selectedDate || !calendarEvents.length) return;
@@ -155,16 +171,6 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
       );
       setEventsForDay(filtered);
     }, [selectedDate, calendarEvents]);
-    
-    useEffect(() => {
-      if (selectedDateParam) {
-        const parsedDate = toDate(selectedDateParam);
-        setSelectedDate(parsedDate);
-      } else if (!selectedDate) {
-        // Si pas de param date et selectedDate pas encore défini, utiliser aujourd'hui
-        setSelectedDate(new Date());
-      }
-    }, [selectedDateParam]);
 
   if ((loading === true && calendarId)) {
     return (
@@ -203,18 +209,19 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
           <i className="bi bi-chevron-right ms-2"></i>
         </button>
       )}
-      
-      <WeeklyEventContent
-        ifModal={false}
-        selectedDate={selectedDate}
-        monday={monday}
-        eventsForDay={eventsForDay}
-        onSelectDate={onSelectDate}
-        onNext={() => navigateDay(1)}
-        onPrev={() => navigateDay(-1)}
-        getPastWeek={() => navigateWeek(-1)}
-        getNextWeek={() => navigateWeek(1)}
-      />
+      <div className='container border shadow rounded my-4 p-3' style={{maxWidth: '800px'}}>
+        <WeeklyEventContent
+          ifModal={false}
+          selectedDate={selectedDate}
+          monday={monday}
+          eventsForDay={eventsForDay}
+          onSelectDate={onSelectDate}
+          onNext={() => navigateDay(1)}
+          onPrev={() => navigateDay(-1)}
+          getPastWeek={() => navigateWeek(-1)}
+          getNextWeek={() => navigateWeek(1)}
+        />
+      </div>
     </div>
   );
 }

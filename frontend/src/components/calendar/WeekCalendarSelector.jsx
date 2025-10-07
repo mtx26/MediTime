@@ -3,7 +3,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import {
   getMondayDate,
-  formatToLocalISODate,
+  toISO,
 } from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +18,7 @@ export default function WeekCalendarSelector({ selectedDate, onWeekSelect, monda
     d.setHours(0,0,0,0);
     return d;
   });
-  const todayIso = formatToLocalISODate(new Date());
+  const todayIso = toISO(new Date());
   const { t } = useTranslation();
 
   const handleChange = (date) => {
@@ -33,12 +33,12 @@ export default function WeekCalendarSelector({ selectedDate, onWeekSelect, monda
       locale={t('locale')}
       tileClassName={({ date, view }) => {
         if (view === 'month') {
-          const date_iso = formatToLocalISODate(date);
+          const date_iso = toISO(date);
 
           if (todayIso === date_iso) {
             return 'bg-success text-white';
           }
-          if (weekDates.map(d => formatToLocalISODate(d)).includes(date_iso)) {
+          if (weekDates.map(d => toISO(d)).includes(date_iso)) {
             return 'bg-primary text-white';
           }
         }

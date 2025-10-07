@@ -6,7 +6,7 @@ import Footer from './components/common/Footer';
 import AppRoutes from './routes/AppRouter';
 import { log } from './utils/logger';
 import { UserContext } from './contexts/UserContext';
-import { formatToLocalISODate } from './utils/calendar/dateUtils';
+import { toISO } from './utils/calendar/dateUtils';
 import RealtimeManager from './components/realtime/RealtimeManager';
 import { getToken } from './services/supabase/tokenUtils';
 import { performApiCall } from './services/api/apiUtils';
@@ -96,7 +96,7 @@ function App() {
 
   // Fonction pour obtenir le calendrier lier au calendarId
   const fetchPersonalCalendarSchedule = useCallback(async (calendarId, startDate = null) => {
-    const start = startDate || formatToLocalISODate(new Date());
+    const start = startDate || toISO(new Date());
 
     const result = await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/schedule?startDate=${start}`,
@@ -199,7 +199,7 @@ function App() {
 
   // fonction pour diminuer le stock du pillulier
   const useMedicinesForPersonalPillbox   = useCallback(async (calendarId, startDate = null) => {
-    const start = startDate || formatToLocalISODate(new Date());
+    const start = startDate || toISO(new Date());
     return await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/pilluliers/used`,
       method: 'POST',
@@ -252,7 +252,7 @@ function App() {
 
   // Fonction pour recupérer un calendrier partagé par un token
   const fetchTokenCalendarSchedule = useCallback(async (token, startDate = null) => {
-    const start = startDate || formatToLocalISODate(new Date());
+    const start = startDate || toISO(new Date());
 
     const result = await performApiCall({
       url: `${API_URL}/api/tokens/${token}/schedule?startDate=${start}`,
@@ -506,7 +506,7 @@ function App() {
   // Fonction pour recup le calendrier partagé par un utilisateur
   const fetchSharedUserCalendarSchedule = useCallback(
     async (calendarId, startDate = null) => {
-      const start = startDate || formatToLocalISODate(new Date());
+      const start = startDate || toISO(new Date());
   
       const response = await performApiCall({
         url: `${API_URL}/api/shared/users/calendars/${calendarId}/schedule?startDate=${start}`,
@@ -607,7 +607,7 @@ function App() {
 
   // Fonction pour diminuer le stock du pillulier
   const useMedicinesForSharedUserPillbox = useCallback(async (calendarId, startDate = null) => {
-    const start = startDate || formatToLocalISODate(new Date());
+    const start = startDate || toISO(new Date());
     return await performApiCall({
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/pilluliers/used`,
       method: 'POST',

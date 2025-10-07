@@ -3,7 +3,7 @@ import { UserContext } from "../../contexts/UserContext";
 import PropTypes from "prop-types";
 import AlertSystem from "../../components/common/AlertSystem";
 import HoveredUserProfile from "../../components/common/HoveredUserProfile";
-import { formatToLocalISODate } from "../../utils/calendar/dateUtils";
+import { toISO } from "../../utils/calendar/dateUtils";
 import { useTranslation } from "react-i18next";
 import ActionSheet from '../../components/common/ActionSheet';
 import { useSearchParams, useNavigate, useParams } from "react-router-dom";
@@ -42,7 +42,7 @@ function SharedList({
   const [selectedCalendarId, setSelectedCalendarId] = useState(null);
 
   // 📅 Date du jour
-  const today = formatToLocalISODate(new Date()); // Date du jour au format 'YYYY-MM-DD'
+  const today = toISO(new Date()); // Date du jour au format 'YYYY-MM-DD'
 
   // 📄 Copie du lien
   const handleCopyLink = async (token) => {
@@ -653,14 +653,14 @@ function TokenList({
                           type="date"
                           className="form-control w-auto"
                           style={{ minWidth: "130px" }}
-                          value={formatToLocalISODate(token.expires_at)}
+                          value={toISO(token.expires_at)}
                           onChange={(e) =>
                             handleUpdateTokenExpiration(
                               token.id,
-                              formatToLocalISODate(e.target.value),
+                              toISO(e.target.value),
                             )
                           }
-                          min={formatToLocalISODate(today)}
+                          min={toISO(today)}
                         />
                       )}
                     </div>

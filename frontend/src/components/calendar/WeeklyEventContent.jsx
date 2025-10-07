@@ -1,7 +1,7 @@
 import React from 'react';
 import ArrowControls from './ArrowControls';
 import WeekDayCircles from './WeekDayCircles';
-import { getMondayDate, formatToLocalISODate, toISO } from '../../utils/calendar/dateUtils';
+import { getMondayDate, toISO } from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +28,7 @@ export default function WeeklyEventContent({
     return d;
   });
   const selIso = toISO(selDate);
-  const weekIsos = weekDates.map((d) => formatToLocalISODate(d));
+  const weekIsos = weekDates.map((d) => toISO(d));
   const isFirstDay = weekIsos[0] === selIso;
   const isLastDay = weekIsos[6] === selIso;
 
