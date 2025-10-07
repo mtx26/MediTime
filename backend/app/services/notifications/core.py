@@ -177,18 +177,21 @@ def save_notifications(user_id: str, notification_type: str, items: List[Notific
                 title, body_html, _ = build_notification_text(notification_type, item)
                 content = {**item, "title": title, "body": body_html}
                 shared_calendar_id = item.get("shared_calendar_id") or None
+                calendar_id = item.get("calendar_id") or None
+                sender_uid = item.get("sender_uid") or None
                 cur.execute(
                     """
                     INSERT INTO notifications (
-                        user_id, type, read, timestamp, sender_uid, content, shared_calendar_id
+                        user_id, type, read, timestamp, sender_uid, calendar_id, content, shared_calendar_id
                     )
-                    VALUES (%s, %s, %s, NOW(), %s, %s::jsonb, %s)
+                    VALUES (%s, %s, %s, NOW(), %s, %s, %s::jsonb, %s)
                     """,
                     (
                         user_id,
                         notification_type,
                         False,
-                        item.get("sender_uid"),
+                        sender_uid,
+                        calendar_id,
                         json.dumps(content),
                         shared_calendar_id
                     ),

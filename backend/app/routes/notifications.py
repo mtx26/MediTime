@@ -44,9 +44,9 @@ def handle_notifications():
       n.type                                 AS notification_type,
       n.read                                 AS read,
       n.timestamp                            AS timestamp,
+      n.calendar_id                          AS calendar_id,
 
       -- Champs tirés du JSONB "content"
-      (n.content->>'calendar_id')::uuid      AS calendar_id,
       n.content->>'link'                     AS link,
       n.content->>'medication_qty'           AS medication_qty,
 
@@ -58,12 +58,11 @@ def handle_notifications():
       mb.name                                AS medication_name
 
     FROM notifications n
-    LEFT JOIN calendars      c  ON c.id  = NULLIF(n.content->>'calendar_id','')::uuid
+    LEFT JOIN calendars      c  ON c.id  = n.calendar_id
     LEFT JOIN users          u  ON u.id  = n.sender_uid
     LEFT JOIN medicine_boxes mb ON mb.id = NULLIF(n.content->>'medication_id','')::uuid
 
     WHERE n.user_id = %s
-      AND (n.content ? 'calendar_id')          -- même comportement que ton `if not calendar_id: continue`
 
     ORDER BY n.timestamp DESC, n.created_at DESC;
     """
@@ -72,6 +71,7 @@ def handle_notifications():
         with get_connection() as conn, conn.cursor() as cursor:
             cursor.execute(sql, (DEFAULT_PHOTO, uid))
             rows = cursor.fetchall()
+            print(rows)
 
         # Pas d'appends: on renvoie les lignes enrichies directement
         return success_response(
