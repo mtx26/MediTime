@@ -82,10 +82,10 @@ def _delete_invite_notification(cursor, receiver_uid: str, calendar_id: str, own
         DELETE FROM notifications
         WHERE user_id = %s
           AND type = %s
-          AND content @> %s::jsonb
+          AND calendar_id = %s
           AND sender_uid = %s
         """,
-        (receiver_uid, "calendar_invitation", json.dumps({"calendar_id": calendar_id}), owner_uid),
+        (receiver_uid, "calendar_invitation", calendar_id, owner_uid),
     )
 
 

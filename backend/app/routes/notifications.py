@@ -44,36 +44,50 @@ def handle_notifications():
       n.type                                 AS notification_type,
       n.read                                 AS read,
       n.timestamp                            AS timestamp,
+      n.calendar_id                          AS calendar_id,
 
       -- Champs tirés du JSONB "content"
-      (n.content->>'calendar_id')::uuid      AS calendar_id,
       n.content->>'link'                     AS link,
-      n.content->>'medication_qty'           AS medication_qty,
 
       -- Enrichissements par jointures
       c.name                                 AS calendar_name,
       u.display_name                         AS sender_name,
       u.email                                AS sender_email,
       COALESCE(u.photo_url, %s)              AS sender_photo_url,
-      mb.name                                AS medication_name
+      mb.name                                AS medication_name,
+      mb.stock_quantity                      AS medication_qty,
+      sc.accepted                            AS accepted
 
     FROM notifications n
-    LEFT JOIN calendars      c  ON c.id  = NULLIF(n.content->>'calendar_id','')::uuid
-    LEFT JOIN users          u  ON u.id  = n.sender_uid
-    LEFT JOIN medicine_boxes mb ON mb.id = NULLIF(n.content->>'medication_id','')::uuid
+    LEFT JOIN calendars c                    ON c.id  = n.calendar_id
+    LEFT JOIN users u                        ON u.id  = n.sender_uid
+    LEFT JOIN shared_calendars sc            ON sc.calendar_id = n.calendar_id
+    LEFT JOIN medicine_boxes mb              ON mb.id = n.medication_id
 
     WHERE n.user_id = %s
-      AND (n.content ? 'calendar_id')          -- même comportement que ton `if not calendar_id: continue`
 
     ORDER BY n.timestamp DESC, n.created_at DESC;
     """
 
     try:
         with get_connection() as conn, conn.cursor() as cursor:
+            # Nettoyage des notifications de stock obsolètes
+            cursor.execute("""
+                DELETE FROM notifications
+                WHERE medication_id IS NOT NULL
+                AND type = 'low_stock'
+                AND EXISTS (
+                    SELECT 1 FROM medicine_boxes mb
+                    WHERE mb.id = notifications.medication_id
+                    AND mb.stock_quantity > mb.stock_alert_threshold
+                )
+            """)
+            conn.commit()
+
+            # Récupération des notifications
             cursor.execute(sql, (DEFAULT_PHOTO, uid))
             rows = cursor.fetchall()
 
-        # Pas d'appends: on renvoie les lignes enrichies directement
         return success_response(
             message="notifications récupérées",
             code="NOTIFICATIONS_FETCH_SUCCESS",

@@ -1,3 +1,5 @@
+import React from 'react';
+import { useParams } from 'react-router-dom';
 import HoveredUserProfile from './HoveredUserProfile';
 import { useTranslation, Trans } from 'react-i18next';
 
@@ -7,6 +9,8 @@ export default function NotificationLine({
   navigate,
 }) {
   const { t } = useTranslation();
+  const { lng } = useParams();
+
   const isUnread = !notif.read;
   const timestamp = new Date(notif.timestamp).toLocaleString(t('locale'), {
     year: 'numeric',
@@ -69,6 +73,21 @@ export default function NotificationLine({
             values={{ name: notif.calendar_name }}
             components={[user, <strong />]}
           />
+        );
+        actions = (
+          <div className="mt-2">
+            <button
+              aria-label={t('open')}
+              title={t('open')}
+              className="btn btn-sm btn-outline-success me-2"
+              onClick={async (e) => {
+                e.stopPropagation();
+                navigate(`/${lng}/shared-user-calendar/${notif.calendar_id}`);
+              }}
+            >
+              <i className="bi bi-arrow-right-circle me-2 text-success"></i> {t('open')}
+            </button>
+          </div>
         );
       }
       break;
