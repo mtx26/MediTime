@@ -186,17 +186,6 @@ def save_notifications(user_id: str, notification_type: str, items: List[Notific
                         user_id, type, read, timestamp, sender_uid, calendar_id, content, medication_id, shared_calendar_id
                     )
                     VALUES (%s, %s, %s, NOW(), %s, %s, %s::jsonb, %s, %s)
-                    ON CONFLICT (medication_id)
-                    DO UPDATE SET
-                        user_id = EXCLUDED.user_id,
-                        type = EXCLUDED.type,
-                        read = EXCLUDED.read,
-                        timestamp = NOW(),
-                        sender_uid = EXCLUDED.sender_uid,
-                        calendar_id = EXCLUDED.calendar_id,
-                        content = EXCLUDED.content,
-                        shared_calendar_id = EXCLUDED.shared_calendar_id,
-                        updated_at = NOW()
                     """,
                     (
                         user_id,

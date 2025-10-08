@@ -71,7 +71,7 @@ def handle_notifications():
 
     try:
         with get_connection() as conn, conn.cursor() as cursor:
-            # Nettoyage des notifications de stock obsolètes
+            # netoyage des low_stock pour lesquelles le stock est redevenu suffisant
             cursor.execute("""
                 DELETE FROM notifications
                 WHERE medication_id IS NOT NULL
@@ -83,6 +83,7 @@ def handle_notifications():
                 )
             """)
             conn.commit()
+
 
             # Récupération des notifications
             cursor.execute(sql, (DEFAULT_PHOTO, uid))
