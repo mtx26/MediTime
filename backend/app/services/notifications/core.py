@@ -1,29 +1,47 @@
-# app/services/notifications.py
+
+# ===============================
+# Service de notifications MediTime
+# ===============================
+# Gère la création, l'envoi et l'enregistrement des notifications (web, email, push, SMS)
+# Fournit des helpers pour enrichir les notifications, générer les contenus, et orchestrer l'envoi selon les canaux.
+#
+# Dépendances : FCM, email, SMS, base de données, configuration frontend
+#
+# Auteur : mtx26 / MediTime
+# ===============================
+
 import json
 import traceback
 from typing import List, Tuple, Dict, Any
 
-from app.auth.fcm import send_fcm_notification
-from app.db.connection import get_connection
-from app.services.calendar import fetch_calendar, fetch_medicine_name
-from app.services.notifications.messaging import send_email, send_sms
-from app.services.user import fetch_user
-from app.utils.logging import log_backend
-from app.config import Config
-from html import escape
+from app.auth.fcm import send_fcm_notification  # Envoi de notifications push via Firebase
+from app.db.connection import get_connection    # Connexion à la base de données
+from app.services.calendar import fetch_calendar, fetch_medicine_name  # Récupération calendrier/médicament
+from app.services.notifications.messaging import send_email, send_sms  # Envoi email/SMS
+from app.services.user import fetch_user       # Récupération utilisateur
+from app.utils.logging import log_backend      # Logger backend
+from app.config import Config                  # Configuration globale
+from html import escape                        # Sécurisation HTML
+
 
 # ========= Constantes =========
-ORIGIN = "NOTIFICATIONS"
-DEFAULT_CHANNELS: Tuple[str, ...] = ("email", "web") ### push
-DEFAULT_USER_NAME = "un utilisateur"
-VIEW_CALENDAR_LABEL = "Voir le calendrier"
+ORIGIN = "NOTIFICATIONS"  # Origine pour le logging
+DEFAULT_CHANNELS: Tuple[str, ...] = ("email", "web")  # Canaux par défaut (web = historique, email)
+DEFAULT_USER_NAME = "un utilisateur"  # Nom par défaut si utilisateur inconnu
+VIEW_CALENDAR_LABEL = "Voir le calendrier"  # Libellé CTA générique
+
 
 # ========= Types =========
-NotificationDict = Dict[str, Any]
+NotificationDict = Dict[str, Any]  # Alias pour la structure d'une notification
+
 
 
 # ========= Helpers de données =========
 def fetch_user_name(user_id: str | None) -> str:
+    """
+    Récupère le nom d'affichage d'un utilisateur à partir de son ID.
+    Retourne un nom par défaut si l'utilisateur n'existe pas ou si l'ID est None.
+    """
     if not user_id:
         return DEFAULT_USER_NAME
     user = fetch_user(user_id)
@@ -31,6 +49,10 @@ def fetch_user_name(user_id: str | None) -> str:
 
 
 def fetch_calendar_name(calendar_id: str | None) -> str | None:
+    """
+    Récupère le nom d'un calendrier à partir de son ID.
+    Retourne None si l'ID est absent, ou "unknown" si le calendrier n'existe pas.
+    """
     if not calendar_id:
         return None
     calendar = fetch_calendar(calendar_id)
@@ -38,7 +60,10 @@ def fetch_calendar_name(calendar_id: str | None) -> str | None:
 
 
 def enrich_notification(notification: NotificationDict) -> NotificationDict:
-    """Ajoute les noms du calendrier et de l’expéditeur au payload."""
+    """
+    Ajoute les noms du calendrier et de l’expéditeur au dictionnaire de notification.
+    Permet d'avoir des contenus plus riches pour l'affichage et l'envoi.
+    """
     try:
         notification["calendar_name"] = fetch_calendar_name(notification.get("calendar_id"))
         notification["sender_name"] = fetch_user_name(notification.get("sender_uid"))
@@ -55,16 +80,27 @@ def enrich_notification(notification: NotificationDict) -> NotificationDict:
         )
     return notification
 
+
 def _h(text: Any) -> str:
-    """Escape sûr pour tout contenu inséré dans le HTML."""
+    """
+    Sécurise une chaîne pour l'insertion dans du HTML (anti XSS).
+    Utilisé pour tous les contenus dynamiques dans les emails/notifications.
+    """
     return escape("" if text is None else str(text))
 
 def _p(html_inner: str) -> str:
+    """
+    Enveloppe un contenu HTML dans une balise <p> stylisée.
+    """
     return f"<p style='margin:4px 0'>{html_inner}</p>"
+
 
 # ========= Construction des contenus =========
 def _format_medication_list(medications: List[NotificationDict]) -> str:
-    """Liste de médicaments avec emoji et badge de stock."""
+    """
+    Génère une liste HTML de médicaments avec emoji et badge de stock (pour emails/notifications).
+    Affiche "épuisé" si le stock est à 0, sinon le nombre restant.
+    """
     if not medications:
         return ""
     lis = []
@@ -82,47 +118,60 @@ def _format_medication_list(medications: List[NotificationDict]) -> str:
         lis.append(f"<li>💊 <b>{name}</b> — {badge}</li>")
     return "<ul style='margin:8px 0; padding-left:20px;'>" + "".join(lis) + "</ul>"
 
+
 def build_notification_text(notification_type: str, context: NotificationDict) -> Tuple[str, str, str]:
+    """
+    Génère le titre, le corps HTML et le libellé du bouton d'action pour une notification donnée.
+    Utilisé pour tous les canaux (web, email, push, SMS).
+    """
     sender = _h(context.get("sender_name") or DEFAULT_USER_NAME)
     cal = _h(context.get("calendar_name") or "ce calendrier")
 
     match notification_type:
         case "calendar_invitation":
+            # Invitation à rejoindre un calendrier partagé
             title = "📆 Invitation à un calendrier"
             body = _p(f"<b>{sender}</b> vous invite à rejoindre le calendrier « <b>{cal}</b> ».")
             return (title, body, "Accepter l'invitation")
 
         case "calendar_invitation_registration":
+            # Invitation à s'inscrire pour accéder à un calendrier
             title = "📆 Invitation à un calendrier"
             body = _p(f"<b>{sender}</b> vous invite à vous inscrire pour accéder au calendrier « <b>{cal}</b> ».")
             return (title, body, "S'inscrire et accepter l'invitation")
         
         case "calendar_invitation_registration_deleted":
+            # Annulation d'une invitation à s'inscrire
             title = "📆 Invitation au calendrier annulée"
             body = _p(f"<b>{sender}</b> a annulé votre invitation à vous inscrire pour accéder au calendrier « <b>{cal}</b> ».")
             return (title, body, "s'inscrire")
 
         case "calendar_invitation_accepted":
+            # Confirmation d'acceptation d'une invitation
             title = "✅ Invitation acceptée"
             body = _p(f"<b>{sender}</b> a accepté votre invitation pour « <b>{cal}</b> ».")
             return (title, body, VIEW_CALENDAR_LABEL)
 
         case "calendar_invitation_rejected":
+            # Refus d'une invitation
             title = "❌ Invitation refusée"
             body = _p(f"<b>{sender}</b> a refusé votre invitation pour « <b>{cal}</b> ».")
             return (title, body, VIEW_CALENDAR_LABEL)
 
         case "calendar_shared_deleted_by_owner":
+            # Le propriétaire a arrêté le partage
             title = "🔒 Partage annulé"
             body = _p(f"<b>{sender}</b> a arrêté de partager « <b>{cal}</b> » avec vous.")
             return (title, body, "Ouvrir le site")
 
         case "calendar_shared_deleted_by_receiver":
+            # Le destinataire a retiré le calendrier de son compte
             title = "📤 Partage retiré"
             body = _p(f"<b>{sender}</b> a retiré le calendrier « <b>{cal}</b> » de son compte.")
             return (title, body, VIEW_CALENDAR_LABEL)
 
         case "low_stock":
+            # Stock faible ou épuisé pour un ou plusieurs médicaments
             title = f"⚠️ Stock faible – calendrier « {cal} »"
             if context.get("medications"):
                 body = _p(f"Certains médicaments du calendrier <b>« {cal} »</b> sont en stock critique :") \
@@ -139,6 +188,7 @@ def build_notification_text(notification_type: str, context: NotificationDict) -
             return (title, body, VIEW_CALENDAR_LABEL)
 
         case _:
+            # Cas générique : notification simple ou groupée
             count = context.get("notification_count")
             if count and count > 1:
                 title = "🔔 Nouvelles notifications"
@@ -149,7 +199,12 @@ def build_notification_text(notification_type: str, context: NotificationDict) -
             body = _p("Vous avez reçu une nouvelle notification dans MediTime.")
             return (title, body, "Voir les notifications")
 
+
 def generate_email_content(notification_type: str, context: NotificationDict) -> Tuple[str, str, str]:
+    """
+    Génère le sujet, le corps texte et le HTML complet pour un email de notification.
+    Utilise les templates standards MediTime.
+    """
     title, body_html, cta_label = build_notification_text(notification_type, context)
     link = f"{Config.FRONTEND_URL}{context.get('link') or f'/notifications'}"
     html = f"""
@@ -168,9 +223,13 @@ def generate_email_content(notification_type: str, context: NotificationDict) ->
     return f"MediTime – {title}", body_html, html
 
 
+
 # ========= Persistance Web =========
 def save_notifications(user_id: str, notification_type: str, items: List[NotificationDict]) -> None:
-    """Enregistre chaque notification côté web (historique)."""
+    """
+    Enregistre chaque notification dans la base de données (historique web).
+    Utilisé pour l'affichage dans l'interface utilisateur (onglet notifications).
+    """
     try:
         with get_connection() as conn, conn.cursor() as cur:
             for item in items:
@@ -186,17 +245,6 @@ def save_notifications(user_id: str, notification_type: str, items: List[Notific
                         user_id, type, read, timestamp, sender_uid, calendar_id, content, medication_id, shared_calendar_id
                     )
                     VALUES (%s, %s, %s, NOW(), %s, %s, %s::jsonb, %s, %s)
-                    ON CONFLICT (medication_id)
-                    DO UPDATE SET
-                        user_id = EXCLUDED.user_id,
-                        type = EXCLUDED.type,
-                        read = EXCLUDED.read,
-                        timestamp = NOW(),
-                        sender_uid = EXCLUDED.sender_uid,
-                        calendar_id = EXCLUDED.calendar_id,
-                        content = EXCLUDED.content,
-                        shared_calendar_id = EXCLUDED.shared_calendar_id,
-                        updated_at = NOW()
                     """,
                     (
                         user_id,
@@ -217,14 +265,22 @@ def save_notifications(user_id: str, notification_type: str, items: List[Notific
         )
 
 
+
 # ========= Envois par canal =========
 def _get_fcm_tokens(user_id: str) -> List[str]:
+    """
+    Récupère la liste des tokens FCM pour un utilisateur (pour notifications push).
+    """
     with get_connection() as conn, conn.cursor() as cur:
         cur.execute("SELECT token FROM fcm_tokens WHERE uid = %s", (user_id,))
         return [r["token"] for r in cur.fetchall()]
 
 
 def send_push_notification(user_id: str, context: NotificationDict, notification_type: str) -> None:
+    """
+    Envoie une notification push via FCM à l'utilisateur (si tokens disponibles).
+    Le corps est converti en texte brut pour compatibilité mobile.
+    """
     title, body_html, _ = build_notification_text(notification_type, context)
     tokens = _get_fcm_tokens(user_id)
     if tokens:
@@ -236,6 +292,10 @@ def send_push_notification(user_id: str, context: NotificationDict, notification
 
 
 def send_email_notification(user: NotificationDict, context: NotificationDict, notification_type: str) -> None:
+    """
+    Envoie un email à l'utilisateur (si email renseigné).
+    Utilise le template standard MediTime.
+    """
     email = user.get("email")
     if not email:
         log_backend.warning("Aucun email pour l'utilisateur", {"origin": ORIGIN, "code": "NO_EMAIL", "uid": user.get("id")})
@@ -245,6 +305,10 @@ def send_email_notification(user: NotificationDict, context: NotificationDict, n
 
 
 def send_sms_notification(user: NotificationDict, context: NotificationDict, notification_type: str) -> None:
+    """
+    Envoie un SMS à l'utilisateur (si numéro renseigné).
+    Utilise une version texte courte de la notification.
+    """
     phone = user.get("phone")
     if not phone:
         log_backend.warning("Aucun numéro de téléphone", {"origin": ORIGIN, "code": "NO_PHONE_NUMBER", "uid": user.get("id")})
@@ -256,7 +320,10 @@ def send_sms_notification(user: NotificationDict, context: NotificationDict, not
 
 
 def _html_to_plain(html: str) -> str:
-    """Ultra simple: enlève les balises basiques pour du texte push/SMS."""
+    """
+    Conversion ultra simple du HTML vers du texte brut (pour push/SMS).
+    Retire les balises <b>, <p>, <span> et remplace les entités de base.
+    """
     return (
         html.replace("<b>", "")
         .replace("</b>", "")
@@ -270,10 +337,14 @@ def _html_to_plain(html: str) -> str:
     )
 
 
+
 # ========= Orchestration =========
 def send_grouped_notifications(user_id: str, items: List[NotificationDict], notification_type: str, channels: List[str]) -> None:
     """
-    Envoie push/email/SMS une seule fois (groupé) et enregistre côté web si demandé.
+    Orchestration principale :
+    - Envoie push/email/SMS une seule fois (groupé) selon les préférences utilisateur et les canaux demandés
+    - Enregistre côté web si demandé
+    - Agrège les notifications similaires (ex : stock faible sur plusieurs médicaments)
     """
     try:
         user = fetch_user(user_id) or {}
@@ -281,13 +352,15 @@ def send_grouped_notifications(user_id: str, items: List[NotificationDict], noti
         push_enabled = user.get("push_enabled")
         sms_enabled = user.get("sms_enabled")
 
-        # Charge utile groupée
+        # Construction du contexte groupé
         context = items[0].copy()
         if notification_type == "low_stock":
+            # Pour le stock faible, on regroupe tous les médicaments concernés
             context["medications"] = [
                 {"name": fetch_medicine_name(n.get("medication_id")), "qty": n.get("medication_qty") or 0} for n in items
             ]
         elif len(items) > 1:
+            # Pour d'autres cas, on indique le nombre de notifications groupées
             context["notification_count"] = len(items)
 
         if "web" in channels:
@@ -307,7 +380,12 @@ def send_grouped_notifications(user_id: str, items: List[NotificationDict], noti
 
 
 def notify_and_record(user_id: str, body_or_list: NotificationDict | List[NotificationDict], notification_type: str, channels: List[str] = list(DEFAULT_CHANNELS)) -> None:
-    """Gère 1..n notifications pour un utilisateur + enregistrement Web par défaut."""
+    """
+    Point d'entrée principal :
+    - Gère 1 ou plusieurs notifications pour un utilisateur
+    - Enrichit les notifications (ajout noms, etc.)
+    - Orchestration de l'envoi et de l'enregistrement web
+    """
     try:
         items = body_or_list if isinstance(body_or_list, list) else [body_or_list]
         enriched_items = [enrich_notification(n) for n in items]
@@ -319,11 +397,12 @@ def notify_and_record(user_id: str, body_or_list: NotificationDict | List[Notifi
         )
 
 
+
 # ========= E-mail direct (hors préférences utilisateur) =========
 def email_address_direct(to_email: str, notification_type: str, context: NotificationDict) -> None:
     """
-    Envoie un e-mail à une adresse arbitraire en réutilisant les templates standard.
-    Pas d’enregistrement en base, pas de push/SMS.
+    Envoie un e-mail à une adresse arbitraire (ex : support, test, etc.) en réutilisant les templates standard.
+    Ne tient pas compte des préférences utilisateur, pas d’enregistrement en base, pas de push/SMS.
     """
     try:
         enriched_context = enrich_notification(context.copy())

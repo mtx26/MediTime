@@ -40,28 +40,28 @@ def handle_notifications():
 
     sql = """
     SELECT
-      n.id                                   AS notification_id,
-      n.type                                 AS notification_type,
-      n.read                                 AS read,
-      n.timestamp                            AS timestamp,
-      n.calendar_id                          AS calendar_id,
+        n.id                                   AS notification_id,
+        n.type                                 AS notification_type,
+        n.read                                 AS read,
+        n.timestamp                            AS timestamp,
+        n.calendar_id                          AS calendar_id,
 
-      -- Champs tirés du JSONB "content"
-      n.content->>'link'                     AS link,
+        -- Champs tirés du JSONB "content"
+        n.content->>'link'                     AS link,
 
-      -- Enrichissements par jointures
-      c.name                                 AS calendar_name,
-      u.display_name                         AS sender_name,
-      u.email                                AS sender_email,
-      COALESCE(u.photo_url, %s)              AS sender_photo_url,
-      mb.name                                AS medication_name,
-      mb.stock_quantity                      AS medication_qty,
-      sc.accepted                            AS accepted
+        -- Enrichissements par jointures
+        c.name                                 AS calendar_name,
+        u.display_name                         AS sender_name,
+        u.email                                AS sender_email,
+        COALESCE(u.photo_url, %s)              AS sender_photo_url,
+        mb.name                                AS medication_name,
+        mb.stock_quantity                      AS medication_qty,
+        sc.accepted                            AS accepted
 
     FROM notifications n
     LEFT JOIN calendars c                    ON c.id  = n.calendar_id
     LEFT JOIN users u                        ON u.id  = n.sender_uid
-    LEFT JOIN shared_calendars sc            ON sc.calendar_id = n.calendar_id
+    LEFT JOIN shared_calendars sc            ON sc.id = n.shared_calendar_id
     LEFT JOIN medicine_boxes mb              ON mb.id = n.medication_id
 
     WHERE n.user_id = %s
@@ -71,7 +71,7 @@ def handle_notifications():
 
     try:
         with get_connection() as conn, conn.cursor() as cursor:
-            # Nettoyage des notifications de stock obsolètes
+            # netoyage des low_stock pour lesquelles le stock est redevenu suffisant
             cursor.execute("""
                 DELETE FROM notifications
                 WHERE medication_id IS NOT NULL
@@ -87,6 +87,12 @@ def handle_notifications():
             # Récupération des notifications
             cursor.execute(sql, (DEFAULT_PHOTO, uid))
             rows = cursor.fetchall()
+
+        # DEBUG : print les notifications récupérées
+        import sys
+        print("[DEBUG] Notifications renvoyées:", file=sys.stderr)
+        for notif in rows:
+            print(notif, file=sys.stderr)
 
         return success_response(
             message="notifications récupérées",

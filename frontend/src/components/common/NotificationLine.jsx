@@ -54,15 +54,15 @@ export default function NotificationLine({
         actions = (
           <div className="mt-2">
             <button
-              aria-label={t('open')}
-              title={t('open')}
+              aria-label={t('accept')}
+              title={t('accept')}
               className="btn btn-sm btn-outline-success me-2"
               onClick={async (e) => {
                 e.stopPropagation();
                 navigate(notif.link);
               }}
             >
-              <i className="bi bi-arrow-right-circle me-2 text-success"></i> {t('open')}
+              <i className="bi bi-arrow-right-circle me-2 text-success"></i> {t('accept')}
             </button>
           </div>
         );
