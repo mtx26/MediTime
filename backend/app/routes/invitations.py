@@ -325,9 +325,12 @@ def handle_accept_login_invitation(token):
                     WHERE token = %s
                       AND receiver_uid = %s
                       AND accepted = FALSE
+                    RETURNING id
                     """,
                     (token, uid),
                 )
+                row = cursor.fetchone()
+                id = row.get("id")
                 conn.commit()
 
         link = f"/shared-calendars?calendar={calendar_id}"
@@ -339,6 +342,7 @@ def handle_accept_login_invitation(token):
                 "link": link,
                 "calendar_id": calendar_id,
                 "sender_uid": uid,
+                "shared_calendar_id" : id,
             },
             notification_type="calendar_invitation_accepted",
         )
@@ -540,9 +544,12 @@ def accept_registration_invitation(token):
                         accepted_at
                     )
                     VALUES (%s, %s, TRUE, NOW())
+                    RETURNING id
                     """,
                     (uid, calendar_id),
                 )
+                row = cursor.fetchone()
+                id = row.get("id")
                 conn.commit()
 
         notify_and_record(
@@ -551,6 +558,7 @@ def accept_registration_invitation(token):
                 "calendar_id": calendar_id,
                 "link": f"/shared-calendars?calendar={calendar_id}",
                 "sender_uid": uid,
+                "shared_calendar_id" : id,
             },
             notification_type="calendar_invitation_accepted",
         )
