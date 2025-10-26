@@ -229,6 +229,7 @@ def save_notifications(user_id: str, notification_type: str, items: List[Notific
     """
     Enregistre chaque notification dans la base de données (historique web).
     Utilisé pour l'affichage dans l'interface utilisateur (onglet notifications).
+    verif pour chaque mod si il y'a la nécessité de nettoyer les anciennes notif pour chaque type (low_stock, calendar_invitation_accepted, calendar_shared_deleted_by_owner, calendar_invitation)
     """
     try:
         with get_connection() as conn, conn.cursor() as cur:
@@ -239,6 +240,43 @@ def save_notifications(user_id: str, notification_type: str, items: List[Notific
                 calendar_id = item.get("calendar_id") or None
                 sender_uid = item.get("sender_uid") or None
                 medication_id = item.get("medication_id") or None
+                
+                # Nettoyage simple: supprimer la plus ancienne notif correspondante selon le type
+                if notification_type == "low_stock" and sender_uid and calendar_id and medication_id:
+                    cur.execute(
+                        """
+                        DELETE FROM notifications
+                        WHERE user_id = %s
+                          AND type = %s
+                          AND sender_uid = %s
+                          AND calendar_id = %s
+                          AND medication_id = %s
+                        """,
+                        (user_id, notification_type, sender_uid, calendar_id, medication_id),
+                    )
+                elif (notification_type == "calendar_invitation_accepted" or notification_type == "calendar_shared_deleted_by_owner") and sender_uid and calendar_id:
+                    cur.execute(
+                        """
+                        DELETE FROM notifications
+                        WHERE user_id = %s
+                          AND type = %s
+                          AND sender_uid = %s
+                          AND calendar_id = %s
+                        """,
+                        (user_id, notification_type, sender_uid, calendar_id),
+                    )
+                elif notification_type == "calendar_invitation" and sender_uid and shared_calendar_id and calendar_id:
+                    cur.execute(
+                        """
+                        DELETE FROM notifications
+                        WHERE user_id = %s
+                          AND type = %s
+                          AND sender_uid = %s
+                          AND shared_calendar_id = %s
+                          AND calendar_id = %s
+                        """,
+                        (user_id, notification_type, sender_uid, shared_calendar_id, calendar_id),
+                    )
                 cur.execute(
                     """
                     INSERT INTO notifications (
