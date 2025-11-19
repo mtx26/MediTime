@@ -2,7 +2,7 @@ from flask import request, g
 from app.utils.auth import require_auth
 from . import api
 from app.utils.responses import success_response, error_response, warning_response
-from app.services.calendar import verify_calendar_share
+from app.services.calendar import verify_calendar_share, add_pillbox_prepared
 from app.services.medication import get_boxes, update_box, create_box, delete_box, restock_box
 from app.services.medication import use_pillulier
 from datetime import datetime, timezone
@@ -153,19 +153,28 @@ def handle_use_shared_users_pillulier(calendar_id):
         else:
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
-        result = use_pillulier(calendar_id, start_date)
-        if not result:
-            return warning_response(
-                message="erreur lors de l'utilisation du pilulier",
-                code="USE_PILLULIER_ERROR",
-                status_code=500,
+        
+        if add_pillbox_prepared(calendar_id, g.uid, start_date):
+            result = use_pillulier(calendar_id, start_date)
+            if not result:
+                return warning_response(
+                    message="erreur lors de l'utilisation du pilulier",
+                    code="USE_PILLULIER_ERROR",
+                    status_code=500,
+                    log_extra={"calendar_id": calendar_id}
+                )
+            return success_response(
+                message="pilulier utilisé avec succès",
+                code="PILLULIER_USED",
                 log_extra={"calendar_id": calendar_id}
             )
-        return success_response(
-            message="pilulier utilisé avec succès",
-            code="PILLULIER_USED",
-            log_extra={"calendar_id": calendar_id}
-        )
+        else:
+            return warning_response(
+                message="le pilulier a déjà été utilisé cette semaine",
+                code="PILLULIER_ALREADY_USED_THIS_WEEK",
+                status_code=400,
+                log_extra={"calendar_id": calendar_id}
+            )
     except Exception as e:
         return error_response(
             message="erreur lors de l'utilisation du pilulier",

@@ -1,7 +1,7 @@
 from flask import request, g
 from app.utils.auth import require_auth
 from . import api
-from app.services.calendar import verify_calendar
+from app.services.calendar import verify_calendar, add_pillbox_prepared
 from app.services.medication import update_box, create_box, delete_box, get_boxes, restock_box
 from app.utils.responses import success_response, error_response, warning_response
 from app.services.medication import use_pillulier
@@ -139,6 +139,7 @@ def handle_delete_box(calendar_id, box_id):
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
+# Route pour utiliser le pillulier d'un calendrier
 @api.route("/calendars/<calendar_id>/pilluliers/used", methods=["POST"])
 @measure_time()
 @require_auth
@@ -154,27 +155,35 @@ def handle_use_pillulier(calendar_id):
         else:
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
-        result = use_pillulier(calendar_id, start_date)
+        if add_pillbox_prepared(calendar_id, g.uid, start_date):
+            result = use_pillulier(calendar_id, start_date)
 
-        if result == False:
-            return warning_response(
-                message="aucun médicament à utiliser",
-                code="NO_MEDICATION_TO_USE",
-                status_code=404,
+            if result == False:
+                return warning_response(
+                    message="aucun médicament à utiliser",
+                    code="NO_MEDICATION_TO_USE",
+                    status_code=404,
+                    log_extra={"calendar_id": calendar_id}
+                )
+            elif result is None:
+                return warning_response(
+                    message="mode de décompte non supporté",
+                    code="UNSUPPORTED_DECREMENT_MODE",
+                    status_code=400,
+                    log_extra={"calendar_id": calendar_id}
+                )
+            return success_response(
+                message="médicaments utilisés",
+                code="PILLULIER_MEDICATION_USED",
                 log_extra={"calendar_id": calendar_id}
             )
-        elif result is None:
+        else:
             return warning_response(
-                message="mode de décompte non supporté",
-                code="UNSUPPORTED_DECREMENT_MODE",
+                message="le pillulier a déjà été utilisé pour cette période",
+                code="PILLULIER_ALREADY_USED",
                 status_code=400,
                 log_extra={"calendar_id": calendar_id}
             )
-        return success_response(
-            message="médicaments utilisés",
-            code="PILLULIER_MEDICATION_USED",
-            log_extra={"calendar_id": calendar_id}
-        )
     except Exception as e:
         return error_response(
             message="erreur lors de l'utilisation du pillulier",

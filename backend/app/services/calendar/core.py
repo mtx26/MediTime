@@ -206,6 +206,9 @@ def fetch_calendar(calendar_id):
             return calendar
 
 def fetch_medicine_name(medication_id):
+    """
+    Récupère le nom d'un médicament à partir de son ID.
+    """
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("SELECT name FROM medicine_boxes WHERE id = %s", (medication_id,))
@@ -226,4 +229,43 @@ def update_stock_decrement_method(calendar_id, method):
             """, (method, calendar_id,))
             conn.commit()
         
+def add_pillbox_prepared(calendar_id, uid, base_date):
+    """Enregistre la préparation du pillulier pour la semaine de base_date.
+
+    Table utilisée: pillbox_preparations (calendar_id, prepared_at, prepared_by, ...)
+    Il n'y a PAS de colonne week_start_date: on contrôle la semaine via prepared_at.
+
+    Retour:
+        True si une nouvelle préparation est insérée (aucune entrée cette semaine)
+        False si déjà une préparation dans l'intervalle [lundi, lundi+7j)
+    """
+    if not isinstance(base_date, date):
+        base_date = date.today()
+
+    monday = base_date - timedelta(days=base_date.weekday())
+    next_monday = monday + timedelta(days=7)
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                WITH ins AS (
+                    INSERT INTO pillbox_preparations (calendar_id, prepared_by)
+                    SELECT %s, %s
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM pillbox_preparations
+                        WHERE calendar_id = %s
+                          AND prepared_at >= %s
+                          AND prepared_at < %s
+                    )
+                    RETURNING 1 AS inserted
+                )
+                SELECT COALESCE((SELECT inserted FROM ins), 0) AS result;
+                """,
+                (calendar_id, uid, calendar_id, monday, next_monday)
+            )
+            row = cursor.fetchone() or {"result": 0}
+            conn.commit()
+            return row.get("result", 0) == 1
     
