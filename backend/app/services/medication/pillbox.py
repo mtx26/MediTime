@@ -1,7 +1,7 @@
 from app.db.connection import get_connection
 from .stock import process_box_decrement, check_low_stock_and_notify_for_calendar
 
-def use_pillulier(calendar_id, start_date):
+def use_pillbox(calendar_id, start_date):
     """
     Diminue le stock de tous les médicaments du calendrier spécifié
     si le mode de décompte est weekly_pillbox.

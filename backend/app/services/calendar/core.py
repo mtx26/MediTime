@@ -229,19 +229,18 @@ def update_stock_decrement_method(calendar_id, method):
             """, (method, calendar_id,))
             conn.commit()
         
-def add_pillbox_prepared(calendar_id, uid, base_date):
-    """Enregistre la préparation du pillulier pour la semaine de base_date.
+def add_pillbox_uses(calendar_id, uid, base_date):
+    """Enregistre l'utilisation du pillulier pour la semaine de base_date.
 
-    Table utilisée: pillbox_preparations (calendar_id, prepared_at, prepared_by, ...)
+    Table utilisée: pillbox_uses (calendar_id, prepared_at, prepared_by, ...)
     Il n'y a PAS de colonne week_start_date: on contrôle la semaine via prepared_at.
 
     Retour:
         True si une nouvelle préparation est insérée (aucune entrée cette semaine)
         False si déjà une préparation dans l'intervalle [lundi, lundi+7j)
     """
-    if not isinstance(base_date, date):
-        base_date = date.today()
-
+    print("Adding pillbox use...", calendar_id, uid, base_date)
+    
     monday = base_date - timedelta(days=base_date.weekday())
     next_monday = monday + timedelta(days=7)
 
@@ -250,11 +249,11 @@ def add_pillbox_prepared(calendar_id, uid, base_date):
             cursor.execute(
                 """
                 WITH ins AS (
-                    INSERT INTO pillbox_preparations (calendar_id, prepared_by)
-                    SELECT %s, %s
+                    INSERT INTO pillbox_uses (calendar_id, prepared_at, prepared_by)
+                    SELECT %s, %s, %s
                     WHERE NOT EXISTS (
                         SELECT 1
-                        FROM pillbox_preparations
+                        FROM pillbox_uses
                         WHERE calendar_id = %s
                           AND prepared_at >= %s
                           AND prepared_at < %s
@@ -263,9 +262,34 @@ def add_pillbox_prepared(calendar_id, uid, base_date):
                 )
                 SELECT COALESCE((SELECT inserted FROM ins), 0) AS result;
                 """,
-                (calendar_id, uid, calendar_id, monday, next_monday)
+                (calendar_id, base_date, uid, calendar_id, monday, next_monday)
             )
             row = cursor.fetchone() or {"result": 0}
             conn.commit()
             return row.get("result", 0) == 1
     
+def get_if_pillbox_is_used(calendar_id, base_date):
+    """
+    Récupère les enregistrements d'utilisation du pillulier pour un calendrier donné pour une date de base.
+    
+    retunrne True si utilisé cette semaine, False sinon
+    """
+
+    monday = base_date - timedelta(days=base_date.weekday())
+    next_monday = monday + timedelta(days=7)
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT 1 AS result
+                FROM pillbox_uses
+                WHERE calendar_id = %s
+                  AND prepared_at >= %s
+                  AND prepared_at < %s
+                LIMIT 1;
+                """,
+                (calendar_id, monday, next_monday)
+            )
+            row = cursor.fetchone() or {"result": 0}
+            return row.get("result", 0) == 1

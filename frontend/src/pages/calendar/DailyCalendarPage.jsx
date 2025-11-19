@@ -49,7 +49,6 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
   // et on dérive le lundi correspondant depuis `selectedDate`
   // monday as Date object derived from selectedDate Date
   const [monday, setMonday] = useState(getMondayDate(selectedDate));
-  console.log(monday);
 
   useEffect(() => {
     // Compare les dates par valeur (timestamp) pour éviter une boucle

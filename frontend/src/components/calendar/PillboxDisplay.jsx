@@ -6,6 +6,7 @@ import isEqual from 'lodash/isEqual';
 import { useTranslation } from 'react-i18next';
 import { toISO } from '../../utils/calendar/dateUtils';
 import AlertSystem from '../common/AlertSystem';
+import { set } from 'lodash';
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const pill_count = {
@@ -24,6 +25,8 @@ export default function PillboxDisplay({
   personalCalendars,
   sharedUserCalendars,
   tokenCalendars,
+  isPillboxUsed,
+  setIsPillboxUsed,
 }) {
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
@@ -128,11 +131,19 @@ export default function PillboxDisplay({
             }}
             onConfirm={async() => {
               if (type === 'calendar') {
-                await calendarSource.decreaseStock(calendarId);
-                setSuccessMessage(true);
+                const rep = await calendarSource.decreaseStock(calendarId);
+                if (rep.success) {
+                  const rep2 = await calendarSource.fetchIfPillboxUsed(calendarId, toISO(monday));
+                  console.log('Pillbox usage after calendar completion:', rep2);
+                  setIsPillboxUsed(rep2.isPillboxUsed);
+                }
               } else if (type === 'pillbox') {
-                calendarSource.decreaseStock(calendarId);
+                const rep = await calendarSource.decreaseStock(calendarId);
                 navigate(`/${lng}/${basePath}/${calendarId}`);
+                if (rep.success) {
+                  const rep2 = await calendarSource.fetchIfPillboxUsed(calendarId, toISO(monday));
+                  setIsPillboxUsed(rep2.isPillboxUsed);
+                }
               }
               setShowConfirmation(false);
             }}
@@ -141,7 +152,7 @@ export default function PillboxDisplay({
       )}
 
       <div className="container-fluid text-center w-100 mt-3">
-        {successMessage ? (
+        {isPillboxUsed ? (
           <div className="alert alert-success mt-4" role="alert">
             ✅ {t('calendar_completed')}
           </div>

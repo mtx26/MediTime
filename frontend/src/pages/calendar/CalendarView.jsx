@@ -35,12 +35,12 @@ function CalendarPage({
   const calendarRef = useRef(null);
   // garder selectedDate comme objet Date pour manipulations faciles
   const [selectedDate, setSelectedDate] = useState(new Date().setHours(0,0,0,0)); // Date JS
-  console.log(selectedDate);
   const [eventsForDay, setEventsForDay] = useState([]); // Événements filtrés pour un jour spécifique
   const [calendarEvents, setCalendarEvents] = useState([]); // Événements du calendrier
   const [calendarTable, setCalendarTable] = useState([]); // Événements du calendrier
   const [calendarName, setCalendarName] = useState(''); // Nom du calendrier
   const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
+  const [isPillboxUsed, setIsPillboxUsed] = useState(false); // Indicateur d'utilisation de la boîte à pilules
   const [alertType, setAlertType] = useState(''); // Type d'alerte
   const [alertMessage, setAlertMessage] = useState(''); // Message d'alerte
   // Méthode de décrémentation du stock (pour affichage différencié)
@@ -116,6 +116,11 @@ function CalendarPage({
         onSelectDate(isoDate);
       }
     }
+    const rep2 = await calendarSource.fetchIfPillboxUsed(calendarId, isoDate);
+    if (rep2.success) {
+      console.log('Pillbox usage fetched on week select:', rep2);
+      setIsPillboxUsed(rep2.isPillboxUsed);
+    }
   };
 
   // Fonction pour gérer le clic sur une date
@@ -168,6 +173,29 @@ function CalendarPage({
 
     load();
   }, [calendarId, calendarSource.fetchSchedule, userInfo]);
+
+  // Get if pillbox is used
+  useEffect(() => {
+    const fetchPillboxUsage = async () => {
+      if (!calendarId) return;
+      if (calendarType === 'personal' || calendarType === 'sharedUser') {
+        if (!userInfo) return;
+      }
+      const rep = await calendarSource.fetchIfPillboxUsed(calendarId);
+      if (rep.success) {
+        console.log('Pillbox usage fetched:', rep);
+        setIsPillboxUsed(rep.isPillboxUsed);
+      }
+    };
+
+    fetchPillboxUsage();
+  }, [calendarId, calendarType, calendarSource.fetchIfPillboxUsed, userInfo]);
+
+  useEffect(() => {
+    console.log(isPillboxUsed);
+    console.log(toISO(selectedDate));
+    console.log(toISO(monday));
+  }, [isPillboxUsed, selectedDate, monday]);
 
   // Charger la méthode de décrémentation du stock (si disponible)
   useEffect(() => {
@@ -434,6 +462,7 @@ function CalendarPage({
                 <CalendarWeekSelector
                   calendarTable={calendarTable}
                   monday={monday}
+                  selectedDate={selectedDate}
                   onWeekSelect={onWeekSelect}
                   t={t}
                 />
@@ -443,6 +472,7 @@ function CalendarPage({
               <CalendarWeekSelector
                 calendarTable={calendarTable}
                 monday={monday}
+                selectedDate={selectedDate}
                 onWeekSelect={onWeekSelect}
                 t={t}
               />
@@ -488,6 +518,8 @@ function CalendarPage({
                     personalCalendars={personalCalendars}
                     sharedUserCalendars={sharedUserCalendars}
                     tokenCalendars={tokenCalendars}
+                    isPillboxUsed={isPillboxUsed}
+                    setIsPillboxUsed={setIsPillboxUsed}
                   />
                 </div>
               </div>
@@ -665,6 +697,7 @@ function CalendarPage({
 function CalendarWeekSelector({
   calendarTable,
   monday,
+  selectedDate,
   onWeekSelect,
   t
 }) {
@@ -678,8 +711,9 @@ function CalendarWeekSelector({
         </h4>
         <div className='shadow'>
           <WeekCalendarSelector
-            selectedDate={monday}
+            selectedDate={selectedDate}
             onWeekSelect={onWeekSelect}
+            monday={monday}
           />
         </div>
       </div>

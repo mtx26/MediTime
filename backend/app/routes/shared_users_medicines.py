@@ -2,9 +2,9 @@ from flask import request, g
 from app.utils.auth import require_auth
 from . import api
 from app.utils.responses import success_response, error_response, warning_response
-from app.services.calendar import verify_calendar_share, add_pillbox_prepared
+from app.services.calendar import verify_calendar_share, add_pillbox_uses, get_if_pillbox_is_used
 from app.services.medication import get_boxes, update_box, create_box, delete_box, restock_box
-from app.services.medication import use_pillulier
+from app.services.medication import use_pillbox
 from datetime import datetime, timezone
 from app.utils.measure import measure_time
 from app.utils import with_query_origin
@@ -137,48 +137,83 @@ def handle_delete_shared_box(calendar_id, box_id):
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
-@api.route("/shared/users/calendars/<calendar_id>/pilluliers/used", methods=["POST"])
+# Route pour get si une pillbox est utilisé
+@api.route("/shared/users/calendars/<calendar_id>/pillbox/used", methods=["GET"])
 @measure_time()
 @require_auth
 @verify_calendar_share
-@with_query_origin(default_origin="USE_PILLULIER")
-def handle_use_shared_users_pillulier(calendar_id):
+@with_query_origin(default_origin="GET_PILLBOX_USED")
+def handle_get_if_shared_pillbox_used(calendar_id):
     try:
-
-        payload = request.get_json(force=True)
-        start_date = payload.get("startDate")
+        start_date = request.args.get("startDate")
 
         if not start_date:
             start_date = datetime.now(timezone.utc).date()
         else:
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
-        
-        if add_pillbox_prepared(calendar_id, g.uid, start_date):
-            result = use_pillulier(calendar_id, start_date)
+        if_pillbox_used = get_if_pillbox_is_used(calendar_id, start_date)
+
+        return success_response(
+            message="statut d'utilisation du pillbox récupéré",
+            code="PILLBOX_USED_STATUS_FETCHED",
+            data={"if_pillbox_used": if_pillbox_used},
+            log_extra={"calendar_id": calendar_id}
+        )
+
+    except Exception as e:
+        return error_response(
+            message="erreur lors de la récupération du statut d'utilisation du pillbox",
+            code="GET_PILLBOX_USED_STATUS_ERROR",
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
+    
+
+# Route pour utiliser le pillbox d'un calendrier partagé
+@api.route("/shared/users/calendars/<calendar_id>/pillbox/used", methods=["POST"])
+@measure_time()
+@require_auth
+@verify_calendar_share
+@with_query_origin(default_origin="USE_PILLBOX")
+def handle_use_shared_users_pillbox(calendar_id):
+    try:
+
+        payload = request.get_json(force=True)
+        start_date = payload.get("startDate")
+        print("Using pillbox for calendar:", calendar_id, "by user:", g.uid, "on date:", start_date)
+
+        if not start_date:
+            start_date = datetime.now(timezone.utc).date()
+        else:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+
+        if add_pillbox_uses(calendar_id, g.uid, start_date):
+            result = use_pillbox(calendar_id, start_date)
             if not result:
                 return warning_response(
                     message="erreur lors de l'utilisation du pilulier",
-                    code="USE_PILLULIER_ERROR",
+                    code="USE_PILLBOX_ERROR",
                     status_code=500,
                     log_extra={"calendar_id": calendar_id}
                 )
             return success_response(
                 message="pilulier utilisé avec succès",
-                code="PILLULIER_USED",
+                code="PILLBOX_USED",
                 log_extra={"calendar_id": calendar_id}
             )
         else:
             return warning_response(
                 message="le pilulier a déjà été utilisé cette semaine",
-                code="PILLULIER_ALREADY_USED_THIS_WEEK",
+                code="PILLBOX_ALREADY_USED_THIS_WEEK",
                 status_code=400,
                 log_extra={"calendar_id": calendar_id}
             )
     except Exception as e:
         return error_response(
             message="erreur lors de l'utilisation du pilulier",
-            code="USE_PILLULIER_ERROR",
+            code="USE_PILLBOX_ERROR",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}

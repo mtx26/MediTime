@@ -197,16 +197,29 @@ function App() {
     });
   }, []);
 
+  // Fonction pour récupérer si le pillbox d'un calendrier a été utilisé
+  const fetchIfPersonalPillboxUsed = useCallback(async (calendarId, startDate = null) => {
+    const start = startDate || toISO(new Date());
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/pillbox/used?startDate=${start}`,
+      method: 'GET',
+      origin: 'GET_PILLBOX_USED',
+      uid,
+      analyticsEvent: 'fetch_if_pillbox_used',
+      analyticsData: { calendarId, uid, startDate: start },
+    });
+  }, []);
+
   // fonction pour diminuer le stock du pillulier
   const useMedicinesForPersonalPillbox   = useCallback(async (calendarId, startDate = null) => {
     const start = startDate || toISO(new Date());
     return await performApiCall({
-      url: `${API_URL}/api/calendars/${calendarId}/pilluliers/used`,
+      url: `${API_URL}/api/calendars/${calendarId}/pillbox/used`,
       method: 'POST',
       body: { startDate: start },
-      origin: 'USE_PILLULIER',
+      origin: 'USE_PILLBOX',
       uid,
-      analyticsEvent: 'use_pillulier_medication',
+      analyticsEvent: 'use_pillbox_medication',
       analyticsData: { calendarId, uid, startDate: start },
     });
   }, []);
@@ -605,16 +618,29 @@ function App() {
     });
   }, []);
 
+  // Fonction pour récupérer si le pillbox d'un calendrier partagé a été utilisé
+  const fetchIfSharedUserPillboxUsed = useCallback(async (calendarId, startDate = null) => {
+    const start = startDate || toISO(new Date());
+    return await performApiCall({
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/pillbox/used?startDate=${start}`,
+      method: 'GET',
+      origin: 'GET_PILLBOX_USED',
+      uid,
+      analyticsEvent: 'fetch_if_shared_user_pillbox_used',
+      analyticsData: { calendarId, uid, startDate: start },
+    });
+  }, []);
+
   // Fonction pour diminuer le stock du pillulier
   const useMedicinesForSharedUserPillbox = useCallback(async (calendarId, startDate = null) => {
     const start = startDate || toISO(new Date());
     return await performApiCall({
-      url: `${API_URL}/api/shared/users/calendars/${calendarId}/pilluliers/used`,
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/pillbox/used`,
       method: 'POST',
       body: { startDate: start },
-      origin: 'USE_PILLULIER',
+      origin: 'USE_PILLBOX',
       uid,
-      analyticsEvent: 'use_shared_user_pillulier_medication',
+      analyticsEvent: 'use_shared_user_pillbox_medication',
       analyticsData: { calendarId, startDate: start },
     });
   }, []);
@@ -717,6 +743,7 @@ function App() {
       createPersonalBox,
       deletePersonalBox,
       downloadPersonalCalendarPdf,
+      fetchIfPersonalPillboxUsed,
       useMedicinesForPersonalPillbox,
       fetchPersonalStockDecrementMethod,
       updatePersonalStockDecrementMethod,
@@ -743,6 +770,7 @@ function App() {
       updateSharedUserBox,
       createSharedUserBox,
       deleteSharedUserBox,
+      fetchIfSharedUserPillboxUsed,
       useMedicinesForSharedUserPillbox,
       sharedUserRestockBox,
       fetchSharedUserNotificationsEnabled,

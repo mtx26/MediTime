@@ -14,6 +14,7 @@ export const getCalendarSourceMap = (
     deleteBox: personalCalendars.deletePersonalBox,
     downloadCalendarPdf: personalCalendars.downloadPersonalCalendarPdf,
     deleteCalendar: personalCalendars.deleteCalendar,
+    fetchIfPillboxUsed: personalCalendars.fetchIfPersonalPillboxUsed,
     decreaseStock: personalCalendars.useMedicinesForPersonalPillbox,
     restockBox: personalCalendars.personalRestockBox,
     fetchNotificationsEnabled: null, // TODO: notification pour calendars
@@ -29,6 +30,7 @@ export const getCalendarSourceMap = (
     deleteBox: sharedUserCalendars.deleteSharedUserBox,
     downloadCalendarPdf: personalCalendars.downloadPersonalCalendarPdf,
     deleteCalendar: null,
+    fetchIfPillboxUsed: sharedUserCalendars.fetchIfSharedUserPillboxUsed,
     decreaseStock: sharedUserCalendars.useMedicinesForSharedUserPillbox,
     restockBox: sharedUserCalendars.sharedUserRestockBox,
     fetchNotificationsEnabled: sharedUserCalendars.fetchSharedUserNotificationsEnabled,
@@ -45,6 +47,7 @@ export const getCalendarSourceMap = (
     deleteBox: null,
     downloadCalendarPdf: null,
     deleteCalendar: null,
+    fetchIfPillboxUsed: null,
     decreaseStock: null,
     restockBox: null,
     fetchNotificationsEnabled: null,

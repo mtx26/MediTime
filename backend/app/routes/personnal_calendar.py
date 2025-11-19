@@ -3,8 +3,7 @@ from app.utils import require_auth
 from datetime import datetime, timezone
 from flask import request, g, Response
 from app.db.connection import get_connection
-from app.services.calendar import generate_calendar_schedule, update_stock_decrement_method
-from app.services.calendar import verify_calendar
+from app.services.calendar import generate_calendar_schedule, update_stock_decrement_method, verify_calendar
 from app.utils.responses import success_response, error_response, warning_response
 from app.utils.logging import log_backend
 from app.services.documents import generate_medicine_conditions_pdf

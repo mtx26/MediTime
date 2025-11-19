@@ -88,12 +88,6 @@ def handle_notifications():
             cursor.execute(sql, (DEFAULT_PHOTO, uid))
             rows = cursor.fetchall()
 
-        # DEBUG : print les notifications récupérées
-        import sys
-        print("[DEBUG] Notifications renvoyées:", file=sys.stderr)
-        for notif in rows:
-            print(notif, file=sys.stderr)
-
         return success_response(
             message="notifications récupérées",
             code="NOTIFICATIONS_FETCH_SUCCESS",
