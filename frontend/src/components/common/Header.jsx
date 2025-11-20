@@ -28,7 +28,7 @@ function buildReturnToCalendarList(pathParts) {
 function buildReturnToCalendar(pathParts) {
   const isDetailPage =
     pathParts.length === 3 &&
-    ['medicines', 'boxes', 'pillbox', 'settings', 'stock-alerts'].includes(
+    ['medicines', 'boxes', 'pillbox', 'settings', 'stock-alerts', 'daily'].includes(
       pathParts[2]
     );
   return {
