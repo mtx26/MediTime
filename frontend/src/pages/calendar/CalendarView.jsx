@@ -16,7 +16,6 @@ import WeekCalendarSelector from '../../components/calendar/WeekCalendarSelector
 import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
 import PillboxDisplay from '../../components/calendar/PillboxDisplay';
 import ActionSheet from '../../components/common/ActionSheet';
-import { set } from 'lodash';
 
 function CalendarPage({
   personalCalendars,
