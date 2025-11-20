@@ -37,7 +37,6 @@ def get_boxes(calendar_id):
     return boxes or []
 
 def update_box(box_id, calendar_id, box):
-    print(f"Updating box {box_id} for calendar {calendar_id} with data: {box}")
     name = box.get("name")
     dose = box.get("dose")
     box_capacity = box.get("box_capacity")

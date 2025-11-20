@@ -58,7 +58,6 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
     if (!monday || newMonday.getTime() !== new Date(monday).getTime()) {
       setMonday(newMonday);
     }
-    console.log(newMonday);
   }, [selectedDate]);
 
 

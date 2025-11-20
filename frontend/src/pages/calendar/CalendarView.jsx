@@ -88,7 +88,6 @@ function CalendarPage({
   const onWeekSelect = async (newSelectedDate) => {
     onSelectDate(newSelectedDate);
     const isoDate = toISO(newSelectedDate);
-    console.log(isoDate);
     const rep = await calendarSource.fetchSchedule(calendarId, isoDate);
     if (rep.success) {
       setCalendarEvents(rep.schedule);
@@ -98,7 +97,7 @@ function CalendarPage({
 
     const rep2 = await calendarSource.fetchIfPillboxUsed(calendarId, isoDate);
     if (rep2.success) {
-      setIsPillboxUsed(rep2.isPillboxUsed);
+      setIsPillboxUsed(rep2.if_pillbox_used);
     }
   };
 
@@ -163,20 +162,12 @@ function CalendarPage({
       }
       const rep = await calendarSource.fetchIfPillboxUsed(calendarId, toISO(selectedDate));
       if (rep.success) {
-        console.log('Pillbox usage fetched:', rep);
         setIsPillboxUsed(rep.if_pillbox_used);
       }
     };
 
     fetchPillboxUsage();
   }, [calendarId, calendarType, calendarSource.fetchIfPillboxUsed, selectedDate, userInfo]);
-
-  useEffect(() => {
-    console.log(isPillboxUsed);
-    console.log(selectedDate);
-    console.log(initialNextDate);
-    console.log(stockDecrementMethod);
-  }, [isPillboxUsed, selectedDate, initialNextDate, stockDecrementMethod]);
 
   // Charger la méthode de décrémentation du stock (si disponible)
   useEffect(() => {
@@ -475,9 +466,10 @@ function CalendarPage({
                     <button
                       className="btn btn-outline-success w-100"
                       onClick={() =>
-                          navigate(
-                            `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`
-                          )}
+                        navigate(`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`)
+                      }
+                      aria-label={t('pillbox.fill')}
+                      title={t('pillbox.fill')}
                     >
                       <i className="bi bi-capsule"></i> {t('pillbox.fill')}
                     </button>

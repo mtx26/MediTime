@@ -715,5 +715,8 @@
     "desc": "Porque a saúde não deixa espaço para improvisação. O MediTime oferece uma solução clara, intuitiva e segura para acompanhar seus tratamentos e os de seus entes queridos, dia após dia.",
     "title": "Por que escolher o MediTime?"
   },
-  "yes": "Sim"
+  "yes": "Sim",
+  "calendar_completed_this_week": "Caixa de comprimidos cheia para esta semana!",
+  "retry": "Tente novamente",
+  "pillbox_error_message": "Ocorreu um erro ao validar o compartimento de comprimidos. Tente novamente."
 }

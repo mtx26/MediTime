@@ -715,5 +715,8 @@
     "desc": "因为医疗保健不容即兴发挥。MediTime 为您提供清晰、直观、安全的解决方案，让您日复一日地追踪自己和亲人的治疗情况。",
     "title": "为什么选择 MediTime？"
   },
-  "yes": "是的"
+  "yes": "是的",
+  "calendar_completed_this_week": "这周药盒已满！",
+  "retry": "再试一次",
+  "pillbox_error_message": "验证药盒时出错，请重试。"
 }

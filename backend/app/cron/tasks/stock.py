@@ -30,7 +30,6 @@ def decrease_stock():
                     );
                 """)
                 rows = cursor.fetchall()
-                print(rows)
 
                 current_date = datetime.now(timezone.utc).date()
 

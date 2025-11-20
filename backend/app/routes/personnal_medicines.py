@@ -155,7 +155,7 @@ def handle_get_if_pillbox_used(calendar_id):
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
         if_pillbox_used = get_if_pillbox_is_used(calendar_id, start_date)
-        print(if_pillbox_used)
+        
         return success_response(
             message="statut d'utilisation du pillbox récupéré",
             code="PILLBOX_USED_STATUS_FETCHED",
