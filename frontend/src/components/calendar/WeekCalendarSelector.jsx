@@ -8,10 +8,10 @@ import {
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
-export default function WeekCalendarSelector({ selectedDate, onWeekSelect, monday }) {
+export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
   // Accept Date or ISO; normalize to Date for calendar operations
   const selDate = selectedDate instanceof Date ? selectedDate : new Date(selectedDate);
-  const mondayDate = monday instanceof Date ? monday : new Date(monday || getMondayDate(selDate));
+  const mondayDate = getMondayDate(selDate);
   const weekDates = [...Array(7)].map((_, i) => {
     const d = new Date(mondayDate);
     d.setDate(d.getDate() + i); 
@@ -22,8 +22,7 @@ export default function WeekCalendarSelector({ selectedDate, onWeekSelect, monda
   const { t } = useTranslation();
 
   const handleChange = (date) => {
-    const mondayDate = getMondayDate(date);
-    onWeekSelect(mondayDate);
+    onWeekSelect(date);
   };
 
   return (

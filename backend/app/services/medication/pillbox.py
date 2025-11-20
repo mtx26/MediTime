@@ -1,5 +1,6 @@
 from app.db.connection import get_connection
 from .stock import process_box_decrement, check_low_stock_and_notify_for_calendar
+from datetime import timedelta
 
 def use_pillbox(calendar_id, start_date):
     """
@@ -9,6 +10,8 @@ def use_pillbox(calendar_id, start_date):
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
+                monday = start_date - timedelta(days=start_date.weekday())
+
                 # 1 requête : récupère la méthode + les boîtes éligibles
                 cursor.execute("""
                     SELECT
@@ -40,7 +43,7 @@ def use_pillbox(calendar_id, start_date):
                     return True
 
                 for box_id, qty in boxes:
-                    process_box_decrement(cursor, box_id, qty, start_date, days=7)
+                    process_box_decrement(cursor, box_id, qty, monday, days=7)
 
                 conn.commit()
 

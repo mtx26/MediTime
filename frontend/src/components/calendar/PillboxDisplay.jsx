@@ -4,9 +4,8 @@ import { UserContext } from '../../contexts/UserContext';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import isEqual from 'lodash/isEqual';
 import { useTranslation } from 'react-i18next';
-import { toISO } from '../../utils/calendar/dateUtils';
+import { getMondayDate, toISO } from '../../utils/calendar/dateUtils';
 import AlertSystem from '../common/AlertSystem';
-import { set } from 'lodash';
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const pill_count = {
@@ -18,7 +17,7 @@ const pill_count = {
 
 export default function PillboxDisplay({
   type,
-  monday,
+  selectedDate,
   calendarType,
   calendarId,
   basePath,
@@ -36,21 +35,20 @@ export default function PillboxDisplay({
   const [selectedMedIndex, setSelectedMedIndex] = useState(0);
   const [orderedMeds, setOrderedMeds] = useState([]);
   const [loading, setLoading] = useState(undefined);
-  const [successMessage, setSuccessMessage] = useState(false);
   const [message, setMessage] = useState('');
   const [alertType, setAlertType] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   // Calculer les dates de la semaine à partir du lundi fourni
   const weekDates = React.useMemo(() => {
-    if (!monday) return [];
-    const base = new Date(monday);
+    if (!selectedDate) return [];
+    const base = new Date(getMondayDate(selectedDate));
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(base);
       d.setDate(base.getDate() + i);
       return d;
     });
-  }, [monday]);
+  }, [selectedDate]);
 
   const calendarSource = getCalendarSourceMap(
     personalCalendars,
@@ -69,8 +67,7 @@ export default function PillboxDisplay({
   useEffect(() => {
     const load = async () => {
       setLoading(undefined);
-      const mondayISO = monday ? toISO(monday) : undefined;
-      const rep = await calendarSource.fetchSchedule(calendarId, mondayISO);
+      const rep = await calendarSource.fetchSchedule(calendarId, toISO(selectedDate));
       if (rep.success && !isEqual(rep.table, calendarTable)) {
         setCalendarTable(rep.table);
       }
@@ -81,7 +78,7 @@ export default function PillboxDisplay({
     if ((calendarType === 'sharedUser' || calendarType === 'personal') && !userInfo) return;
 
     load();
-  }, [calendarId, calendarSource.fetchSchedule, userInfo, monday]);
+  }, [calendarId, calendarSource.fetchSchedule, userInfo, selectedDate]);
 
   useEffect(() => {
     const time_order = ['morning', 'noon', 'evening'];
@@ -130,20 +127,16 @@ export default function PillboxDisplay({
               setShowConfirmation(false);
             }}
             onConfirm={async() => {
-              if (type === 'calendar') {
-                const rep = await calendarSource.decreaseStock(calendarId);
-                if (rep.success) {
-                  const rep2 = await calendarSource.fetchIfPillboxUsed(calendarId, toISO(monday));
-                  console.log('Pillbox usage after calendar completion:', rep2);
-                  setIsPillboxUsed(rep2.isPillboxUsed);
-                }
-              } else if (type === 'pillbox') {
-                const rep = await calendarSource.decreaseStock(calendarId);
+              const rep = await calendarSource.decreaseStock(calendarId, toISO(selectedDate));
+
+              // Navigation propre au pillbox (effectuée même si rep.success est false, comme avant)
+              if (type === 'pillbox') {
                 navigate(`/${lng}/${basePath}/${calendarId}`);
-                if (rep.success) {
-                  const rep2 = await calendarSource.fetchIfPillboxUsed(calendarId, toISO(monday));
-                  setIsPillboxUsed(rep2.isPillboxUsed);
-                }
+              }
+
+              if (rep.success) {
+                const rep2 = await calendarSource.fetchIfPillboxUsed(calendarId, toISO(selectedDate));
+                setIsPillboxUsed(rep2.isPillboxUsed);
               }
               setShowConfirmation(false);
             }}

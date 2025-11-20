@@ -142,7 +142,7 @@ def handle_delete_shared_box(calendar_id, box_id):
 @measure_time()
 @require_auth
 @verify_calendar_share
-@with_query_origin(default_origin="GET_PILLBOX_USED")
+@with_query_origin(default_origin="GET_SHARED_PILLBOX_USED")
 def handle_get_if_shared_pillbox_used(calendar_id):
     try:
         start_date = request.args.get("startDate")
@@ -153,6 +153,7 @@ def handle_get_if_shared_pillbox_used(calendar_id):
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
         if_pillbox_used = get_if_pillbox_is_used(calendar_id, start_date)
+        print(if_pillbox_used)
 
         return success_response(
             message="statut d'utilisation du pillbox récupéré",
@@ -182,7 +183,6 @@ def handle_use_shared_users_pillbox(calendar_id):
 
         payload = request.get_json(force=True)
         start_date = payload.get("startDate")
-        print("Using pillbox for calendar:", calendar_id, "by user:", g.uid, "on date:", start_date)
 
         if not start_date:
             start_date = datetime.now(timezone.utc).date()

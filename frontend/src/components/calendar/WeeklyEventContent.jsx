@@ -14,15 +14,12 @@ export default function WeeklyEventContent({
   onPrev,
   getPastWeek,
   getNextWeek,
-  // optional: pass precomputed monday ISO string to avoid recomputing
-  monday: mondayProp,
 }) {
   const { t, i18n } = useTranslation();
   // work with Date objects internally
   const selDate = selectedDate instanceof Date ? selectedDate : new Date(selectedDate);
-  const mondayDate = mondayProp instanceof Date ? mondayProp : getMondayDate(selDate);
   const weekDates = [...Array(7)].map((_, i) => {
-    const d = new Date(mondayDate);
+    const d = new Date(getMondayDate(selDate));
     d.setDate(d.getDate() + i);
     d.setHours(0,0,0,0);
     return d;
@@ -41,7 +38,7 @@ export default function WeeklyEventContent({
 
       {/* Week day selector (hidden in modal mode) */}
       <div className="mb-2 d-flex justify-content-center">
-        <WeekDayCircles selectedDate={selDate} onSelectDate={onSelectDate} monday={mondayDate} />
+        <WeekDayCircles selectedDate={selDate} onSelectDate={onSelectDate} />
       </div>
 
       {/* Header: big date + prev/next tactile buttons */}
@@ -155,5 +152,4 @@ WeeklyEventContent.propTypes = {
   onPrev: PropTypes.func.isRequired,
   getPastWeek: PropTypes.func.isRequired,
   getNextWeek: PropTypes.func.isRequired,
-  monday: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
 };

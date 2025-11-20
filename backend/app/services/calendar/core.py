@@ -239,7 +239,6 @@ def add_pillbox_uses(calendar_id, uid, base_date):
         True si une nouvelle préparation est insérée (aucune entrée cette semaine)
         False si déjà une préparation dans l'intervalle [lundi, lundi+7j)
     """
-    print("Adding pillbox use...", calendar_id, uid, base_date)
     
     monday = base_date - timedelta(days=base_date.weekday())
     next_monday = monday + timedelta(days=7)
