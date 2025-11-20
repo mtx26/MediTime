@@ -24,8 +24,6 @@ export default function PillboxDisplay({
   personalCalendars,
   sharedUserCalendars,
   tokenCalendars,
-  isPillboxUsed,
-  setIsPillboxUsed,
 }) {
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
@@ -37,6 +35,7 @@ export default function PillboxDisplay({
   const [loading, setLoading] = useState(undefined);
   const [message, setMessage] = useState('');
   const [alertType, setAlertType] = useState('');
+  const [isPillboxUsed, setIsPillboxUsed] = useState(false); // Indicateur d'utilisation de la boîte à pilules
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [pillboxError, setPillboxError] = useState(false);
 
@@ -93,6 +92,23 @@ export default function PillboxDisplay({
     setOrderedMeds(allMeds);
     setSelectedMedIndex(0);
   }, [calendarTable]);
+
+  // Get if pillbox is used
+  useEffect(() => {
+    const fetchPillboxUsage = async () => {
+      if (!calendarId) return;
+      if (!selectedDate) return
+      if (calendarType === 'personal' || calendarType === 'sharedUser') {
+        if (!userInfo) return;
+      }
+      const rep = await calendarSource.fetchIfPillboxUsed(calendarId, toISO(selectedDate));
+      if (rep.success) {
+        setIsPillboxUsed(rep.if_pillbox_used);
+      }
+    };
+
+    fetchPillboxUsage();
+  }, [calendarId, calendarType, calendarSource.fetchIfPillboxUsed, selectedDate, userInfo]);
 
   if (loading === undefined) {
     return (

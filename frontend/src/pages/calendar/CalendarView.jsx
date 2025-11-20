@@ -41,7 +41,6 @@ function CalendarPage({
   const [calendarTable, setCalendarTable] = useState([]); // Événements du calendrier
   const [calendarName, setCalendarName] = useState(''); // Nom du calendrier
   const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
-  const [isPillboxUsed, setIsPillboxUsed] = useState(false); // Indicateur d'utilisation de la boîte à pilules
   const [alertType, setAlertType] = useState(''); // Type d'alerte
   const [alertMessage, setAlertMessage] = useState(''); // Message d'alerte
   // Méthode de décrémentation du stock (pour affichage différencié)
@@ -93,11 +92,6 @@ function CalendarPage({
       setCalendarEvents(rep.schedule);
       setCalendarTable(rep.table);
       calendarRef.current?.getApi().gotoDate(isoDate);
-    }
-
-    const rep2 = await calendarSource.fetchIfPillboxUsed(calendarId, isoDate);
-    if (rep2.success) {
-      setIsPillboxUsed(rep2.if_pillbox_used);
     }
   };
 
@@ -151,23 +145,6 @@ function CalendarPage({
 
     load();
   }, [calendarId, calendarSource.fetchSchedule, userInfo, selectedDate]);
-
-  // Get if pillbox is used
-  useEffect(() => {
-    const fetchPillboxUsage = async () => {
-      if (!calendarId) return;
-      if (!selectedDate) return
-      if (calendarType === 'personal' || calendarType === 'sharedUser') {
-        if (!userInfo) return;
-      }
-      const rep = await calendarSource.fetchIfPillboxUsed(calendarId, toISO(selectedDate));
-      if (rep.success) {
-        setIsPillboxUsed(rep.if_pillbox_used);
-      }
-    };
-
-    fetchPillboxUsage();
-  }, [calendarId, calendarType, calendarSource.fetchIfPillboxUsed, selectedDate, userInfo]);
 
   // Charger la méthode de décrémentation du stock (si disponible)
   useEffect(() => {
@@ -492,8 +469,6 @@ function CalendarPage({
                     personalCalendars={personalCalendars}
                     sharedUserCalendars={sharedUserCalendars}
                     tokenCalendars={tokenCalendars}
-                    isPillboxUsed={isPillboxUsed}
-                    setIsPillboxUsed={setIsPillboxUsed}
                   />
                 </div>
               </div>
