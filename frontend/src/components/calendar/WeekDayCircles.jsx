@@ -2,7 +2,7 @@ import { getMondayDate } from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
-export default function WeekDayCircles({ selectedDate, onSelectDate, monday: mondayProp }) {
+export default function WeekDayCircles({ selectedDate, onSelectDate }) {
   const { i18n } = useTranslation();
   // normalise les dates à minuit pour comparaisons simples
   const today = new Date();
@@ -12,7 +12,7 @@ export default function WeekDayCircles({ selectedDate, onSelectDate, monday: mon
   const normalizedSelectedDate = new Date(selectedDate);
   normalizedSelectedDate.setHours(0,0,0,0);
   
-  const mondayDate = mondayProp instanceof Date ? mondayProp : getMondayDate(selectedDate);
+  const mondayDate = getMondayDate(selectedDate);
   const weekDates = [...Array(7)].map((_, i) => {
     const d = new Date(mondayDate);
     d.setDate(d.getDate() + i);
@@ -91,5 +91,4 @@ export default function WeekDayCircles({ selectedDate, onSelectDate, monday: mon
 WeekDayCircles.propTypes = {
   selectedDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
   onSelectDate: PropTypes.func.isRequired,
-  monday: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
 };
