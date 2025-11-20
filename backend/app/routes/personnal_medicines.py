@@ -140,7 +140,7 @@ def handle_delete_box(calendar_id, box_id):
         )
 
 # Route pour getter si le pillbox d'un calendrier a été utilisé
-@api.route("/calendars/<calendar_id>/pillboxs/used", methods=["GET"])
+@api.route("/calendars/<calendar_id>/pillbox/used", methods=["GET"])
 @measure_time()
 @require_auth
 @verify_calendar
@@ -155,7 +155,7 @@ def handle_get_if_pillbox_used(calendar_id):
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
         if_pillbox_used = get_if_pillbox_is_used(calendar_id, start_date)
-        
+
         return success_response(
             message="statut d'utilisation du pillbox récupéré",
             code="PILLBOX_USED_STATUS_FETCHED",
@@ -173,7 +173,7 @@ def handle_get_if_pillbox_used(calendar_id):
         )
 
 # Route pour utiliser le pillbox d'un calendrier
-@api.route("/calendars/<calendar_id>/pillboxs/used", methods=["POST"])
+@api.route("/calendars/<calendar_id>/pillbox/used", methods=["POST"])
 @measure_time()
 @require_auth
 @verify_calendar

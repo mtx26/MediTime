@@ -201,7 +201,7 @@ function App() {
   const fetchIfPersonalPillboxUsed = useCallback(async (calendarId, startDate = null) => {
     const start = startDate || toISO(new Date());
     return await performApiCall({
-      url: `${API_URL}/api/calendars/${calendarId}/pillboxs/used?startDate=${start}`,
+      url: `${API_URL}/api/calendars/${calendarId}/pillbox/used?startDate=${start}`,
       method: 'GET',
       origin: 'GET_PILLBOX_USED',
       uid,
@@ -214,7 +214,7 @@ function App() {
   const useMedicinesForPersonalPillbox   = useCallback(async (calendarId, startDate = null) => {
     const start = startDate || toISO(new Date());
     return await performApiCall({
-      url: `${API_URL}/api/calendars/${calendarId}/pillboxs/used`,
+      url: `${API_URL}/api/calendars/${calendarId}/pillbox/used`,
       method: 'POST',
       body: { startDate: start },
       origin: 'USE_PILLBOX',
@@ -622,7 +622,7 @@ function App() {
   const fetchIfSharedUserPillboxUsed = useCallback(async (calendarId, startDate = null) => {
     const start = startDate || toISO(new Date());
     return await performApiCall({
-      url: `${API_URL}/api/shared/users/calendars/${calendarId}/pillboxs/used?startDate=${start}`,
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/pillbox/used?startDate=${start}`,
       method: 'GET',
       origin: 'GET_PILLBOX_USED',
       uid,
@@ -635,7 +635,7 @@ function App() {
   const useMedicinesForSharedUserPillbox = useCallback(async (calendarId, startDate = null) => {
     const start = startDate || toISO(new Date());
     return await performApiCall({
-      url: `${API_URL}/api/shared/users/calendars/${calendarId}/pillboxs/used`,
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/pillbox/used`,
       method: 'POST',
       body: { startDate: start },
       origin: 'USE_PILLBOX',
