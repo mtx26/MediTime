@@ -167,7 +167,7 @@ function SelectCalendar({
                     <div className="text-muted small">
                       {t('medicines.label')}:
                       <span className="fw-semibold ms-1">
-                        {calendarData.boxesCount ?? '...'}
+                        {calendarData.boxes_count ?? '...'}
                       </span>
                     </div>
                     {calendarData.ifLowStock && (
@@ -368,7 +368,7 @@ function SelectCalendar({
                       <div className="text-muted small">
                         {t('medicines.label')}:
                         <span className="fw-semibold ms-1">
-                          {calendarData.boxesCount ?? '...'}
+                          {calendarData.boxes_count ?? '...'}
                         </span>
                       </div>
                       <div className="text-muted small d-flex align-items-center ">

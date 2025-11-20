@@ -1,10 +1,10 @@
 from flask import request, g
 from app.utils.auth import require_auth
 from . import api
-from app.services.calendar import verify_calendar
+from app.services.calendar import verify_calendar, add_pillbox_uses, get_if_pillbox_is_used
 from app.services.medication import update_box, create_box, delete_box, get_boxes, restock_box
 from app.utils.responses import success_response, error_response, warning_response
-from app.services.medication import use_pillulier
+from app.services.medication import use_pillbox
 from datetime import datetime, timezone
 from app.utils.measure import measure_time
 from app.utils import with_query_origin
@@ -139,46 +139,88 @@ def handle_delete_box(calendar_id, box_id):
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
-@api.route("/calendars/<calendar_id>/pilluliers/used", methods=["POST"])
+# Route pour getter si le pillbox d'un calendrier a été utilisé
+@api.route("/calendars/<calendar_id>/pillbox/used", methods=["GET"])
 @measure_time()
 @require_auth
 @verify_calendar
-@with_query_origin(default_origin="USE_PILLULIER")
-def handle_use_pillulier(calendar_id):
+@with_query_origin(default_origin="GET_PILLBOX_USED")
+def handle_get_if_pillbox_used(calendar_id):
+    try:
+        start_date = request.args.get("startDate")
+
+        if not start_date:
+            start_date = datetime.now(timezone.utc).date()
+        else:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+
+        if_pillbox_used = get_if_pillbox_is_used(calendar_id, start_date)
+
+        return success_response(
+            message="statut d'utilisation du pillbox récupéré",
+            code="PILLBOX_USED_STATUS_FETCHED",
+            data={"if_pillbox_used": if_pillbox_used},
+            log_extra={"calendar_id": calendar_id}
+        )
+
+    except Exception as e:
+        return error_response(
+            message="erreur lors de la récupération du statut d'utilisation du pillbox",
+            code="GET_PILLBOX_USED_STATUS_ERROR",
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
+
+# Route pour utiliser le pillbox d'un calendrier
+@api.route("/calendars/<calendar_id>/pillbox/used", methods=["POST"])
+@measure_time()
+@require_auth
+@verify_calendar
+@with_query_origin(default_origin="USE_PILLBOX")
+def handle_use_pillbox(calendar_id):
     try:
         payload = request.get_json(force=True)
-        start_date = payload.get("startTime")
+        start_date = payload.get("startDate")
         
         if not start_date:
             start_date = datetime.now(timezone.utc).date()
         else:
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
-        result = use_pillulier(calendar_id, start_date)
+        if add_pillbox_uses(calendar_id, g.uid, start_date):
+            result = use_pillbox(calendar_id, start_date)
 
-        if result == False:
-            return warning_response(
-                message="aucun médicament à utiliser",
-                code="NO_MEDICATION_TO_USE",
-                status_code=404,
+            if result == False:
+                return warning_response(
+                    message="aucun médicament à utiliser",
+                    code="NO_MEDICATION_TO_USE",
+                    status_code=404,
+                    log_extra={"calendar_id": calendar_id}
+                )
+            elif result is None:
+                return warning_response(
+                    message="mode de décompte non supporté",
+                    code="UNSUPPORTED_DECREMENT_MODE",
+                    status_code=400,
+                    log_extra={"calendar_id": calendar_id}
+                )
+            return success_response(
+                message="médicaments utilisés",
+                code="PILLBOX_MEDICATION_USED",
                 log_extra={"calendar_id": calendar_id}
             )
-        elif result is None:
+        else:
             return warning_response(
-                message="mode de décompte non supporté",
-                code="UNSUPPORTED_DECREMENT_MODE",
+                message="le pillbox a déjà été utilisé pour cette période",
+                code="PILLBOX_ALREADY_USED",
                 status_code=400,
                 log_extra={"calendar_id": calendar_id}
             )
-        return success_response(
-            message="médicaments utilisés",
-            code="PILLULIER_MEDICATION_USED",
-            log_extra={"calendar_id": calendar_id}
-        )
     except Exception as e:
         return error_response(
-            message="erreur lors de l'utilisation du pillulier",
-            code="USE_PILLULIER_MEDICATION_ERROR",
+            message="erreur lors de l'utilisation du pillbox",
+            code="USE_PILLBOX_MEDICATION_ERROR",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}

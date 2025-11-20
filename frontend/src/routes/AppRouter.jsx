@@ -314,6 +314,19 @@ function AppRoutes({ sharedProps }) {
           }
         />
         <Route
+          path="daily"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<DailyCalendarPage {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
+        <Route
           path="settings"
           element={
             <PrivateRoute

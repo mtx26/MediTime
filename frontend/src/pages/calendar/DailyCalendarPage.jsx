@@ -45,24 +45,6 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
   // 🔄 Références et chargement
   const [loading, setLoading] = useState(true); // État de chargement du calendrier
 
-  // une seule source de vérité pour la date : `selectedDate`
-  // et on dérive le lundi correspondant depuis `selectedDate`
-  // monday as Date object derived from selectedDate Date
-  const [monday, setMonday] = useState(getMondayDate(selectedDate));
-  console.log(monday);
-
-  useEffect(() => {
-    // Compare les dates par valeur (timestamp) pour éviter une boucle
-    // causée par la création d'objets Date différents à chaque rendu.
-    if (!selectedDate) return;
-    const newMonday = getMondayDate(selectedDate);
-    if (!monday || newMonday.getTime() !== new Date(monday).getTime()) {
-      setMonday(newMonday);
-    }
-    console.log(newMonday);
-  }, [selectedDate]);
-
-
 	  let calendarType = 'personal';
     let calendarId = params.calendarId;
     let basePath = 'calendar';
@@ -97,19 +79,13 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
     // Fonction pour naviguer vers la semaine suivante ou precedente
     // accepte un second argument optionnel `desiredSelectedDate` (ISO string)
     // pour préserver le jour sélectionné lors du changement de semaine.
-    const onWeekSelect = async (mondayDate, desiredSelectedDate) => {
-      const isoDate = toISO(mondayDate);
+    const onWeekSelect = async (newSelectedDate) => {
+      onSelectDate(newSelectedDate);
+      const isoDate = toISO(newSelectedDate);
       const rep = await calendarSource.fetchSchedule(calendarId, isoDate);
       if (rep.success) {
         setCalendarEvents(rep.schedule);
         setCalendarTable(rep.table);
-        calendarRef.current?.getApi().gotoDate(isoDate);
-        // Si une date désirée est fournie, l'utiliser, sinon rester sur le lundi
-        if (desiredSelectedDate) {
-          onSelectDate(desiredSelectedDate);
-        } else {
-          onSelectDate(isoDate);
-        }
       }
     };
   
@@ -124,8 +100,7 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
       const current = new Date(selectedDate);
       current.setDate(current.getDate() + direction);
       const newSelectedDate = current;
-      const mondayDate = getMondayDate(newSelectedDate);
-      onWeekSelect(mondayDate, newSelectedDate);
+      onWeekSelect(newSelectedDate);
     };
   
     // Fonction pour charger le calendrier lorsque l'utilisateur est connecté ou que le calendrier est un token
@@ -134,9 +109,9 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
       if (calendarType === 'personal' || calendarType === 'sharedUser') {
         if (!userInfo) return setLoading(true);
       }
-      if (!monday) return;
+      if (!selectedDate) return;
       const load = async () => {
-        const rep = await calendarSource.fetchSchedule(calendarId, monday ? toISO(monday) : undefined);
+        const rep = await calendarSource.fetchSchedule(calendarId, selectedDate ? toISO(selectedDate) : undefined);
         if (rep.success) {
           if (!isEqual(rep.schedule, calendarEvents)) {
             setCalendarEvents(rep.schedule);
@@ -153,7 +128,7 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
       };
   
       load();
-    }, [calendarId, calendarSource.fetchSchedule, userInfo, monday]);
+    }, [calendarId, calendarSource.fetchSchedule, userInfo, selectedDate]);
 
     useEffect(() => {
       if (!selectedDate || !calendarEvents.length) return;
@@ -213,7 +188,6 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
         <WeeklyEventContent
           ifModal={false}
           selectedDate={selectedDate}
-          monday={monday}
           eventsForDay={eventsForDay}
           onSelectDate={onSelectDate}
           onNext={() => navigateDay(1)}

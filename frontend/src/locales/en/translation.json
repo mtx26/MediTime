@@ -715,5 +715,8 @@
     "desc": "Because healthcare doesn't leave room for improvisation. MediTime offers you a clear, intuitive, and secure solution for tracking your treatments and those of your loved ones, day after day.",
     "title": "Why choose MediTime?"
   },
-  "yes": "Yes"
+  "yes": "Yes",
+  "calendar_completed_this_week": "Pillbox full for this week!",
+  "retry": "Try again",
+  "pillbox_error_message": "An error occurred while validating the pillbox. Please try again."
 }

@@ -40,8 +40,8 @@ def handle_shared_calendars():
                         u.email AS owner_email,
                         COALESCE(u.photo_url, 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg') AS owner_photo_url,
                         scs.notifications_enabled,
-                        COUNT(mb.id) AS "boxesCount",
-                        COALESCE(BOOL_OR(mb.stock_quantity <= mb.stock_alert_threshold), FALSE) AS "ifLowStock"
+                        COUNT(mb.id) AS "boxes_count",
+                        COALESCE(BOOL_OR(mb.stock_quantity <= mb.stock_alert_threshold AND mb.stock_alert_threshold > 0 AND mb.box_capacity > 0), FALSE) AS "ifLowStock"
                     FROM shared_calendars sc
                     JOIN calendars c            ON sc.calendar_id = c.id
                     JOIN users u                ON c.owner_uid = u.id

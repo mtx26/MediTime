@@ -715,5 +715,8 @@
     "desc": "Porque la atención médica no admite improvisaciones. MediTime te ofrece una solución clara, intuitiva y segura para el seguimiento diario de tus tratamientos y los de tus seres queridos.",
     "title": "¿Por qué elegir MediTime?"
   },
-  "yes": "Sí"
+  "yes": "Sí",
+  "calendar_completed_this_week": "¡Pastillas llenas para esta semana!",
+  "retry": "Intentar otra vez",
+  "pillbox_error_message": "Se ha producido un error al validar el pastillero. Inténtelo de nuevo."
 }

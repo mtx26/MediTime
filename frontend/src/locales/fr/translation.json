@@ -173,6 +173,7 @@
     "weekly_view": "Calendrier par semaine"
   },
   "calendar_completed": "Calendrier complété avec succès !",
+  "calendar_completed_this_week": "Pilulier complété pour cette semaine !",
   "calendar_settings": {
     "label": "Paramètres du calendrier",
     "notifications": {
@@ -715,5 +716,7 @@
     "desc": "Parce que la santé ne laisse pas de place à l’improvisation. MediTime vous offre une solution claire, intuitive et sécurisée pour suivre vos traitements et ceux de vos proches, jour après jour.",
     "title": "Pourquoi choisir MediTime ?"
   },
-  "yes": "Oui"
+  "yes": "Oui",
+  "retry": "Réessayer",
+  "pillbox_error_message": "Une erreur est survenue lors de la validation du pilulier. Veuillez réessayer."
 }

@@ -715,5 +715,8 @@
     "desc": "Weil im Gesundheitswesen kein Raum für Improvisation ist. MediTime bietet Ihnen eine klare, intuitive und sichere Lösung für die tägliche Nachverfolgung Ihrer Behandlungen und der Ihrer Angehörigen.",
     "title": "Warum MediTime wählen?"
   },
-  "yes": "Ja"
+  "yes": "Ja",
+  "calendar_completed_this_week": "Pillendose für diese Woche voll!",
+  "retry": "Versuchen Sie es erneut",
+  "pillbox_error_message": "Bei der Überprüfung der Pillendose ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
 }
