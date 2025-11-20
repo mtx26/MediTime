@@ -27,7 +27,8 @@ def handle_calendars():
                     SELECT 
                         c.*, 
                         cs.stock_decrement_method,
-                        COUNT(mb.id) AS count
+                        COUNT(mb.id) AS boxes_count,
+                        COALESCE(BOOL_OR(mb.stock_quantity <= mb.stock_alert_threshold AND mb.stock_alert_threshold > 0 AND mb.box_capacity > 0), FALSE) AS "ifLowStock"
                     FROM calendars c
                     LEFT JOIN calendar_settings cs ON cs.calendar_id = c.id
                     LEFT JOIN medicine_boxes mb 
@@ -43,10 +44,6 @@ def handle_calendars():
                         code="CALENDAR_FETCH_SUCCESS",
                         data={"calendars": []},
                     )
-
-                for calendar in calendars:
-                    calendar["boxesCount"] = calendar.get("count", 0)
-                    calendar["ifLowStock"] = check_if_stock_is_low(calendar["id"])
 
         return success_response(
             message="calendriers récupérés",
