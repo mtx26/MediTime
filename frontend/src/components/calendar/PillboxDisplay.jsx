@@ -165,22 +165,31 @@ export default function PillboxDisplay({
 
       <div className="container-fluid text-center w-100 mt-3">
         {isPillboxUsed ? (
-          <div className="alert alert-success mt-4" role="alert">
-            ✅ {t('calendar_completed_this_week')}
+          <div className="card mb-3 border-0 bg-gradient animate__animated animate__fadeIn" style={{background: 'linear-gradient(90deg, #e0ffe0 0%, #b2f7b2 100%)'}}>
+            <div className="card-body d-flex align-items-center justify-content-center">
+              <i className="bi bi-check-circle-fill text-success fs-2 me-3 animate__animated animate__pulse"></i>
+              <span className="fs-5 fw-bold">{t('calendar_completed_this_week')}</span>
+            </div>
           </div>
         ) : (
           <>
-            {pillboxError ? (
-              <div className="alert alert-danger mt-4 gap-2 d-flex justify-content-center" role="alert">
-                ❌ {t('pillbox_error_message')}
-                <button 
-                  className='btn btn-sm btn-danger'
-                  onClick={() => setPillboxError(false)}
-                  aria-label={t('retry')}
-                  title={t('retry')}
-                >
-                  {t('retry')}
-                </button>
+            {!pillboxError ? (
+              <div className="card shadow-sm mb-3 border-danger animate__animated animate__shakeX">
+                <div className="card-body d-flex align-items-center justify-content-center">
+                  <i className="bi bi-exclamation-triangle-fill text-danger fs-2 me-3"></i>
+                  <span className="fs-5">{t('pillbox_error_message')}</span>
+                  <button 
+                    className='btn btn-sm border-0 bg-transparent d-flex align-items-center gap-2 px-0'
+                    onClick={() => setPillboxError(false)}
+                    aria-label={t('retry')}
+                    title={t('retry')}
+                  >
+                    <span className="d-flex align-items-center justify-content-center">
+                      <i className="bi bi-arrow-clockwise fs-4 text-danger"></i>
+                    </span>
+                    <span className="text-danger fw-bold">{t('retry')}</span>
+                  </button>
+                </div>
               </div>
             ) : (
               <>
