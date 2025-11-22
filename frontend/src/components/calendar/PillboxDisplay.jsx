@@ -165,17 +165,17 @@ export default function PillboxDisplay({
 
       <div className="container-fluid text-center w-100 mt-3">
         {isPillboxUsed ? (
-          <div className="card mb-3 border-0 bg-gradient animate__animated animate__fadeIn" style={{background: 'linear-gradient(90deg, #e0ffe0 0%, #b2f7b2 100%)'}}>
-            <div className="card-body d-flex align-items-center justify-content-center">
+          <div className="mb-3 p-3">
+            <div className="d-flex align-items-center justify-content-center">
               <i className="bi bi-check-circle-fill text-success fs-2 me-3 animate__animated animate__pulse"></i>
               <span className="fs-5 fw-bold">{t('calendar_completed_this_week')}</span>
             </div>
           </div>
         ) : (
           <>
-            {!pillboxError ? (
-              <div className="card shadow-sm mb-3 border-danger animate__animated animate__shakeX">
-                <div className="card-body d-flex align-items-center justify-content-center">
+            {pillboxError ? (
+              <div className="mb-3 p-3">
+                <div className="d-flex align-items-center justify-content-center">
                   <i className="bi bi-exclamation-triangle-fill text-danger fs-2 me-3"></i>
                   <span className="fs-5">{t('pillbox_error_message')}</span>
                   <button 
