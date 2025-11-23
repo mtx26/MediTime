@@ -31,7 +31,6 @@ const Stock = ({ personalCalendars }) => {
 
   useEffect(() => {
     const initialize = async () => {
-      setLoading(undefined);
       const rep = await personalCalendars.fetchPersonalStockDecrementMethod(calendarId);
       if (rep.success) {
         setSelectedMethod(rep.method);

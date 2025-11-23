@@ -261,6 +261,28 @@ function App() {
     });
   }, []);
 
+  const fetchPersonalNotificationsEnabled = useCallback(async (calendarId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/notifications`,
+      method: 'GET',
+      origin: 'PERSONAL_NOTIFICATIONS_ENABLED_FETCH',
+      uid,
+      analyticsEvent: 'fetch_personal_notifications_enabled',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
+
+  const updatePersonalNotificationsEnabled = useCallback(async (calendarId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/notifications`,
+      method: 'PUT',
+      origin: 'PERSONAL_NOTIFICATIONS_ENABLED_UPDATE',
+      uid,
+      analyticsEvent: 'update_personal_notifications_enabled',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Fonction pour recupérer un calendrier partagé par un token
@@ -670,15 +692,14 @@ function App() {
   }, []);
 
   // Fonction pour mettre à jour les notifications activées
-  const updateSharedUserNotificationsEnabled = useCallback(async (calendarId, enabled) => {
+  const updateSharedUserNotificationsEnabled = useCallback(async (calendarId) => {
     return await performApiCall({
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/notifications`,
       method: 'PUT',
-      body: { "notifications-enabled": enabled },
       origin: 'SHARED_USER_NOTIFICATIONS_ENABLED_UPDATE',
       uid,
       analyticsEvent: 'update_shared_user_notifications_enabled',
-      analyticsData: { calendarId, uid, enabled },
+      analyticsData: { calendarId, uid },
     });
   }, []);
 
@@ -748,6 +769,8 @@ function App() {
       fetchPersonalStockDecrementMethod,
       updatePersonalStockDecrementMethod,
       personalRestockBox,
+      fetchPersonalNotificationsEnabled,
+      updatePersonalNotificationsEnabled,
       analyzeImage,
       saveAnalysisResult,
     },

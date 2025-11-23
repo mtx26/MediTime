@@ -391,3 +391,72 @@ def update_personnal_stock_decrement_method(calendar_id):
             log_extra={"calendar_id": calendar_id}
         )
 
+@api.route("/calendars/<calendar_id>/notifications", methods=["GET"])
+@measure_time()
+@require_auth
+@verify_calendar
+@with_query_origin(default_origin="PERSONAL_NOTIFICATIONS_ENABLED_FETCH")
+def fetch_personal_notifications_enabled(calendar_id):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT notifications_enabled 
+                    FROM calendar_settings 
+                    WHERE calendar_id = %s
+                """, (calendar_id,))
+                result = cursor.fetchone()
+                print(result)
+                if result is None:
+                    return warning_response(
+                        message=ERROR_CALENDAR_NOT_FOUND,
+                        code="PERSONAL_NOTIFICATIONS_ENABLED_FETCH_ERROR",
+                        status_code=404,
+                        log_extra={"calendar_id": calendar_id}
+                    )
+                enabled = result.get("notifications_enabled", False)
+
+        return success_response(
+            message="paramètre de notifications récupéré",
+            code="PERSONAL_NOTIFICATIONS_ENABLED_FETCH_SUCCESS",
+            data={"notifications-enabled": enabled},
+            log_extra={"calendar_id": calendar_id}
+        )
+    except Exception as e:
+        return error_response(
+            message="erreur lors de la récupération du paramètre de notifications",
+            code="PERSONAL_NOTIFICATIONS_ENABLED_FETCH_ERROR",
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
+    
+@api.route("/calendars/<calendar_id>/notifications", methods=["PUT"])
+@measure_time()
+@require_auth
+@verify_calendar
+@with_query_origin(default_origin="PERSONAL_NOTIFICATIONS_ENABLED_UPDATE")
+def update_personal_notifications_enabled(calendar_id):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE calendar_settings
+                    SET notifications_enabled = NOT notifications_enabled
+                    WHERE calendar_id = %s
+                """, (calendar_id,))
+                conn.commit()
+
+        return success_response(
+            message="paramètre de notifications mis à jour", 
+            code="PERSONAL_NOTIFICATIONS_ENABLED_UPDATE_SUCCESS",
+            log_extra={"calendar_id": calendar_id}
+        )
+    except Exception as e:
+        return error_response(
+            message="erreur lors de la mise à jour du paramètre de notifications", 
+            code="PERSONAL_NOTIFICATIONS_ENABLED_UPDATE_ERROR", 
+            status_code=500, 
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )

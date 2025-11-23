@@ -17,8 +17,8 @@ export const getCalendarSourceMap = (
     fetchIfPillboxUsed: personalCalendars.fetchIfPersonalPillboxUsed,
     decreaseStock: personalCalendars.useMedicinesForPersonalPillbox,
     restockBox: personalCalendars.personalRestockBox,
-    fetchNotificationsEnabled: null, // TODO: notification pour calendars
-    updateNotificationsEnabled: null,
+    fetchNotificationsEnabled: personalCalendars.fetchPersonalNotificationsEnabled,
+    updateNotificationsEnabled: personalCalendars.updatePersonalNotificationsEnabled,
     fetchStockDecrementMethod: personalCalendars.fetchPersonalStockDecrementMethod,
     },
   sharedUser: {
