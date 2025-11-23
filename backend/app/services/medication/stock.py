@@ -72,7 +72,7 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
                     (calendar_id,)
                 )
                 notif_row = cursor.fetchone()
-                owner_notif_enabled = notif_row.get("notifications_enabled", True)
+                owner_notif_enabled = notif_row.get("notifications_enabled")
 
                 cursor.execute(
                     """
