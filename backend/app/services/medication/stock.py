@@ -64,6 +64,16 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
+                # Vérifier si les notifications sont activées pour ce calendrier (propriétaire)
+                cursor.execute(
+                    """
+                    SELECT notifications_enabled FROM calendar_settings WHERE calendar_id = %s
+                    """,
+                    (calendar_id,)
+                )
+                notif_row = cursor.fetchone()
+                owner_notif_enabled = notif_row.get("notifications_enabled")
+
                 cursor.execute(
                     """
                     SELECT m.id, m.name, m.stock_quantity, m.stock_alert_threshold, c.owner_uid
@@ -108,10 +118,11 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
                 "sender_uid": Config.SYSTEM_UID,
             }
 
-            # Notifier le propriétaire
-            grouped[uid_owner].append(notif)
+            # Notifier le propriétaire seulement si notifications_enabled
+            if owner_notif_enabled:
+                grouped[uid_owner].append(notif)
 
-            # Notifier chaque utilisateur partagé
+            # Notifier chaque utilisateur partagé (toujours)
             for shared_uid in shared_uids:
                 grouped[shared_uid].append(notif)
 

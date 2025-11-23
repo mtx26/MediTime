@@ -69,7 +69,7 @@ function CalendarSettingsPage({
         }
         break;
       case 'notifications':
-        if (calendarType === 'sharedUser') {
+        if (calendarType !== 'token') {
           return <Notifications {...sharedProps} />;
         }
         break;
@@ -106,7 +106,7 @@ function CalendarSettingsPage({
                   </>
                 )}
 
-                {calendarType === 'sharedUser' && (
+                {calendarType !== 'token' && (
                   <>
                     <Link
                       className={`nav-link text-start ${activeTab === 'notifications' ? 'active' : ''}`}

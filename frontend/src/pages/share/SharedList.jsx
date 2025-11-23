@@ -373,6 +373,7 @@ function SharedList({
               setEmailsToInvite={setEmailsToInvite}
               navigate={navigate}
               personalCalendars={personalCalendars}
+              promptDeleteCalendar={promptDeleteCalendar}
             />
           ))}
       </div>
@@ -388,6 +389,7 @@ const calendarActions = ({
   setAlertMessage,
   setAlertId,
   setOnConfirmAction,
+  promptDeleteCalendar,
   t,
   lng,
 }) => {
@@ -439,7 +441,7 @@ function CalendarCard({
   handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today,
   VITE_URL, selectedModifyToken, setSelectedModifyToken, tokenCalendars,
   handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction,
-  emailsToInvite, setEmailsToInvite, navigate, personalCalendars,
+  emailsToInvite, setEmailsToInvite, navigate, personalCalendars, promptDeleteCalendar,
 }) {
   const { t } = useTranslation();
   const { lng } = useParams();
@@ -463,6 +465,7 @@ function CalendarCard({
                 setAlertMessage,
                 setAlertId,
                 setOnConfirmAction,
+                promptDeleteCalendar,
                 t,
                 lng,
               })}
@@ -509,9 +512,9 @@ function TokenList({
   const { t } = useTranslation();
   const { lng } = useParams();
   return (
-    <>
-      {(data.tokens || []).map((token) => (
-        <div className="card p-3 mb-3" key={token.id}>
+    data.tokens.length !== 0 ? (
+      (data.tokens || []).map((token) => (
+        <div className="card p-3 mb-3 shadow" key={token.id}>
           <ul className="list-group">
             <h5 className="mb-3 d-flex justify-content-between align-items-center">
               <div>
@@ -702,41 +705,39 @@ function TokenList({
             </div>
           </ul>
         </div>
-      ))}
-      {/* Ajouter un nouveau lien de partage */}
-      {data.tokens.length === 0 && (
-        <div className="card p-3 mb-3">
-          <h5 className="mb-3 d-flex align-items-center">
-            <i className="bi bi-link-45deg me-2"></i>
-            {t("public_links")} :
-          </h5>
-          {/* Alert */}
-          {alertId === "newLink-" + calendarId && (
-            <AlertSystem
-              type={alertType}
-              message={alertMessage}
-              onClose={() => {
-                setAlertMessage("");
-                setOnConfirmAction(null);
-                setAlertId(null);
-              }}
-              onConfirm={async () => {
-                if (onConfirmAction) await onConfirmAction();
-              }}
-            />
-          )}
-          <button
-            className="btn btn-outline-dark w-100"
-            onClick={() => handleCreateToken(calendarId)}
-            aria-label={t("create_share_link")}
-            title={t("create_share_link")}
-          >
-            <i className="bi bi-plus-lg me-2"></i>
-            {t("create_share_link")}
-          </button>
-        </div>
-      )}
-    </>
+      ))
+    ) : (
+      <div className="card p-3 mb-3 shadow">
+        <h5 className="mb-3 d-flex align-items-center">
+          <i className="bi bi-link-45deg me-2"></i>
+          {t("public_links")} :
+        </h5>
+        {/* Alert */}
+        {alertId === "newLink-" + calendarId && (
+          <AlertSystem
+            type={alertType}
+            message={alertMessage}
+            onClose={() => {
+              setAlertMessage("");
+              setOnConfirmAction(null);
+              setAlertId(null);
+            }}
+            onConfirm={async () => {
+              if (onConfirmAction) await onConfirmAction();
+            }}
+          />
+        )}
+        <button
+          className="btn btn-outline-dark w-100"
+          onClick={() => handleCreateToken(calendarId)}
+          aria-label={t("create_share_link")}
+          title={t("create_share_link")}
+        >
+          <i className="bi bi-plus-lg me-2"></i>
+          {t("create_share_link")}
+        </button>
+      </div>
+    )
   );
 }
 
@@ -758,7 +759,7 @@ function UserList({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="card p-3 mb-3">
+    <div className="card p-3 mb-3 shadow">
       <ul className="list-group">
         <h5>
           <i className="bi bi-person"></i>
@@ -1033,6 +1034,7 @@ CalendarCard.propTypes = {
   setEmailsToInvite: PropTypes.func.isRequired,
   navigate: PropTypes.func.isRequired,
   personalCalendars: PropTypes.object.isRequired,
+  promptDeleteCalendar: PropTypes.func.isRequired,
 };
 
 TokenList.propTypes = {

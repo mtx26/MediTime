@@ -353,7 +353,7 @@ function CalendarPage({
                             <i className="bi bi-calendar-day me-2" /> {t('day_view.title')}
                           </>
                         ),
-                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/daily?date=${toISO(selectedDate)}`),
+                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/daily?date=${toISO(new Date().setHours(0,0,0,0))}`),
                       },
                       { separator: true },
                       {

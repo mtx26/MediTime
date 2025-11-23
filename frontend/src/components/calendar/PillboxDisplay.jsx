@@ -165,21 +165,30 @@ export default function PillboxDisplay({
 
       <div className="container-fluid text-center w-100 mt-3">
         {isPillboxUsed ? (
-          <div className="alert alert-success mt-4" role="alert">
-            ✅ {t('calendar_completed_this_week')}
+          <div className="mb-3 p-3">
+            <div className="card-body d-flex flex-column justify-content-center align-items-center p-4">
+              <i className="bi bi-check-circle text-success fs-1"></i>
+              <span className="text-success fw-bold mt-2 mb-0 text-center">{t('calendar_completed_this_week')}</span>
+            </div>
           </div>
         ) : (
           <>
             {pillboxError ? (
-              <div className="alert alert-danger mt-4 gap-2 d-flex justify-content-center" role="alert">
-                ❌ {t('pillbox_error_message')}
-                <button 
-                  className='btn btn-sm btn-danger'
+              <div className="card-body d-flex flex-column justify-content-center align-items-center p-2">
+                <button
+                  className='btn'
                   onClick={() => setPillboxError(false)}
                   aria-label={t('retry')}
                   title={t('retry')}
                 >
-                  {t('retry')}
+                  <div className="d-flex flex-column align-items-center">
+                    <i className="bi bi-exclamation-triangle text-danger fs-1 mb-2"></i>
+                    <span className="text-danger fw-bold mb-2 text-center">{t('pillbox_error_message')}</span>
+                    <span className="d-flex align-items-center justify-content-center mb-2">
+                      <i className="bi bi-arrow-clockwise fs-4 text-danger me-2"></i>
+                      <span className="text-danger fw-bold">{t('retry')}</span>
+                    </span>
+                  </div>
                 </button>
               </div>
             ) : (

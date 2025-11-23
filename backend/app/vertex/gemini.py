@@ -43,7 +43,7 @@ Here is the required format:
       "dose": "Dosage per unit, without unit (e.g. '40', '500'), or null if not specified",
       "conditions": [
         {
-          "time_of_day": "morning" | "noon" | "evening",
+          "time_of_day": "morning" , "noon" or "evening" (only in english),
           "interval_days": Number of days between each intake (e.g. 1),
           "start_date": "YYYY-MM-DD" or null if not specified,
           "tablet_count": Number of tablets taken at that time
