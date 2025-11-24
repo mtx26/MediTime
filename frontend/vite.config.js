@@ -1,4 +1,4 @@
-import { defineConfig, splitVendorChunkPlugin } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import purgeCss from 'vite-plugin-purgecss';
 import viteCompression from 'vite-plugin-compression';
@@ -6,7 +6,6 @@ import viteCompression from 'vite-plugin-compression';
 export default defineConfig({
   plugins: [
     react(),
-    splitVendorChunkPlugin(),
     purgeCss(),
     viteCompression({ algorithm: 'brotliCompress' }),
     viteCompression({ algorithm: 'gzip' })
