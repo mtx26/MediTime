@@ -1,6 +1,5 @@
 import base64
 import json
-import re
 import io
 from PIL import Image as PILImage
 import pillow_heif
