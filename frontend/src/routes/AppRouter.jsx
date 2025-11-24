@@ -1,4 +1,5 @@
 import React, { useContext, lazy, Suspense } from 'react';
+import PropTypes from 'prop-types';
 import { Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
 
 import { UserContext } from '../contexts/UserContext';
@@ -22,6 +23,7 @@ const DailyCalendarPage = lazy(() => import('../pages/calendar/DailyCalendarPage
 const CalendarList = lazy(() => import('../pages/calendar/CalendarList'));
 const SharedList = lazy(() => import('../pages/share/SharedList'));
 const StockAlertsPage = lazy(() => import('../pages/calendar/StockAlertsPage'));
+const PillboxUses = lazy(() => import('../pages/calendar/PillboxUses'));
 
 const MedicinesList = lazy(() => import('../pages/medicines/MedicinesList'));
 const BoxesView = lazy(() => import('../pages/medicines/BoxesView'));
@@ -259,6 +261,19 @@ function AppRoutes({ sharedProps }) {
             />
           }
         />
+        <Route
+          path="pillbox-uses"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<PillboxUses {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
       </Route>
       <Route
         path="calendars"
@@ -352,6 +367,19 @@ function AppRoutes({ sharedProps }) {
             />
           }
         />
+        <Route
+          path="pillbox-uses"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<PillboxUses {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
       </Route>
       <Route path="shared-token-calendar/:sharedToken">
         <Route index element={<CalendarView {...sharedProps} />} />
@@ -370,5 +398,13 @@ function AppRoutes({ sharedProps }) {
     </Suspense>
   );
 }
+
+AppRoutes.propTypes = {
+  sharedProps: PropTypes.shape({
+    loadingStates: PropTypes.shape({
+      isInitialLoading: PropTypes.bool,
+    }),
+  }),
+};
 
 export default AppRoutes;

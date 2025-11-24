@@ -27,6 +27,7 @@
     "save_changes": "Salva le modifiche"
   },
   "accounts": "Conti",
+  "actions": "Azioni",
   "activation": "Attivazione",
   "activation_toggle_aria": "Abilitare o disabilitare il collegamento",
   "actual_stock": "Scorte attuali",
@@ -173,6 +174,7 @@
     "weekly_view": "Calendario per settimana"
   },
   "calendar_completed": "Calendario completato con successo!",
+  "calendar_completed_this_week": "Questa settimana il bunker è pieno!",
   "calendar_settings": {
     "label": "Impostazioni del calendario",
     "notifications": {
@@ -204,6 +206,7 @@
   "copy_link": "Copia il collegamento",
   "copy_link_error": "Errore durante la copia del collegamento.",
   "create_share_link": "Crea un collegamento di condivisione",
+  "created_at": "Creato il",
   "critical_stock": "Rottura di stock",
   "cta": {
     "button": "creo il mio account",
@@ -275,6 +278,7 @@
   "loading_calendars": "Caricamento calendari...",
   "loading_medicines": "Caricamento farmaci in corso...",
   "loading_notifications": "Caricamento notifiche in corso...",
+  "loading_pillbox_uses": "Caricamento cronologia fortini...",
   "loading_settings": "Caricamento delle impostazioni...",
   "loading_share": "Caricamento condivisione...",
   "locale": "it-IT",
@@ -367,6 +371,10 @@
     "fill": "Costruisci la casamatta",
     "title": "Pillbox"
   },
+  "pillbox_error_message": "Si è verificato un errore durante la convalida del fortino. Riprova.",
+  "pillbox_stock_decreased_successfully": "Le azioni di Pillbox sono diminuite con successo",
+  "pillbox_uses": "Storia della casamatta",
+  "prepared_by": "Preparato da",
   "previous": "Precedente",
   "previous_day": "Giorno precedente",
   "privacy": {
@@ -458,31 +466,33 @@
     "success": "La tua password è stata modificata con successo.",
     "title": "Nuova password"
   },
+  "restore": "Ripristinare",
+  "retry": "Riprova",
   "revoke_link": "Revoca il collegamento",
   "rights_reserved": "Tutti i diritti riservati",
   "scanner": {
     "add": "Aggiungere",
     "camera": "Telecamera",
+    "camera_back": "Indietro",
     "camera_error": "Impossibile accedere alla telecamera.",
+    "camera_front": "Prima",
     "camera_instruction": "Indica il codice DataMatrix",
+    "camera_inverted": "Inversione",
+    "camera_normal": "Normale",
     "cancel": "Cancellare",
     "close": "Vicino",
+    "controls": {
+      "camera": "Telecamera",
+      "flip": "Inversione",
+      "zoom": "Zoom"
+    },
     "medicine_not_found": "Farmaco non trovato",
     "quantity": "Quantità: {{quantità}}",
     "remove_from_list": "Rimuovi dall'elenco",
     "searching": "Ricerca...",
     "select_camera": "Seleziona una telecamera",
     "title": "Scansiona un codice QR",
-    "zoom": "Zoom: {{zoom}}x",
-    "camera_front": "Prima",
-    "camera_back": "Indietro",
-    "camera_normal": "Normale",
-    "camera_inverted": "Inversione",
-    "controls": {
-      "zoom": "Zoom",
-      "camera": "Telecamera",
-      "flip": "Inversione"
-    }
+    "zoom": "Zoom: {{zoom}}x"
   },
   "security": {
     "current_email": "Email attuale:",
@@ -711,13 +721,11 @@
     "resend_link": "Invia nuovamente il link di verifica",
     "title": "Verifica dell'indirizzo email"
   },
+  "week": "Settimana",
   "why": {
     "desc": "Perché l'assistenza sanitaria non lascia spazio all'improvvisazione. MediTime ti offre una soluzione chiara, intuitiva e sicura per monitorare i tuoi trattamenti e quelli dei tuoi cari, giorno dopo giorno.",
     "title": "Perché scegliere MediTime?"
   },
   "yes": "SÌ",
-  "calendar_completed_this_week": "Questa settimana il bunker è pieno!",
-  "retry": "Riprova",
-  "pillbox_error_message": "Si è verificato un errore durante la convalida del fortino. Riprova.",
-  "pillbox_stock_decreased_successfully": "Le azioni di Pillbox sono diminuite con successo"
+  "you_have_no_pillbox_use_history": "Non hai alcuna cronologia di utilizzo per l'organizzatore di pillole."
 }

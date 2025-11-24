@@ -27,6 +27,7 @@
     "save_changes": "Сохранить изменения"
   },
   "accounts": "Счета",
+  "actions": "Действия",
   "activation": "Активация",
   "activation_toggle_aria": "Включить или отключить ссылку",
   "actual_stock": "Текущий запас",
@@ -173,6 +174,7 @@
     "weekly_view": "Календарь по неделям"
   },
   "calendar_completed": "Календарь успешно завершен!",
+  "calendar_completed_this_week": "На этой неделе дот полон!",
   "calendar_settings": {
     "label": "Настройки календаря",
     "notifications": {
@@ -204,6 +206,7 @@
   "copy_link": "Копировать ссылку",
   "copy_link_error": "Ошибка копирования ссылки.",
   "create_share_link": "Создать ссылку для обмена",
+  "created_at": "Создано на",
   "critical_stock": "Разрыв запаса",
   "cta": {
     "button": "Я создаю свою учетную запись",
@@ -275,6 +278,7 @@
   "loading_calendars": "Загрузка календарей...",
   "loading_medicines": "Загрузка лекарств...",
   "loading_notifications": "Загрузка уведомлений...",
+  "loading_pillbox_uses": "Загрузка истории дота...",
   "loading_settings": "Загрузка настроек...",
   "loading_share": "Загрузка акции...",
   "locale": "ru-RU",
@@ -367,6 +371,10 @@
     "fill": "Сделать дот",
     "title": "Дот"
   },
+  "pillbox_error_message": "Произошла ошибка при проверке дота. Попробуйте ещё раз.",
+  "pillbox_stock_decreased_successfully": "Запас дотов успешно уменьшен",
+  "pillbox_uses": "История дота",
+  "prepared_by": "Подготовлен",
   "previous": "Предыдущий",
   "previous_day": "Предыдущий день",
   "privacy": {
@@ -458,31 +466,33 @@
     "success": "Ваш пароль был успешно изменен.",
     "title": "Новый пароль"
   },
+  "restore": "Восстановить",
+  "retry": "Попробуйте еще раз",
   "revoke_link": "Отменить ссылку",
   "rights_reserved": "Все права защищены",
   "scanner": {
     "add": "Добавлять",
     "camera": "Камера",
+    "camera_back": "Назад",
     "camera_error": "Невозможно получить доступ к камере.",
+    "camera_front": "До",
     "camera_instruction": "Укажите код DataMatrix",
+    "camera_inverted": "Обеспечить регресс",
+    "camera_normal": "Нормальный",
     "cancel": "Отмена",
     "close": "Закрывать",
+    "controls": {
+      "camera": "Камера",
+      "flip": "Обеспечить регресс",
+      "zoom": "Увеличить"
+    },
     "medicine_not_found": "Препарат не найден",
     "quantity": "Количество: {{quantity}}",
     "remove_from_list": "Удалить из списка",
     "searching": "Исследовать...",
     "select_camera": "Выберите камеру",
     "title": "Отсканируйте QR-код",
-    "zoom": "Масштаб: {{zoom}}x",
-    "camera_front": "До",
-    "camera_back": "Назад",
-    "camera_normal": "Нормальный",
-    "camera_inverted": "Обеспечить регресс",
-    "controls": {
-      "zoom": "Увеличить",
-      "camera": "Камера",
-      "flip": "Обеспечить регресс"
-    }
+    "zoom": "Масштаб: {{zoom}}x"
   },
   "security": {
     "current_email": "Текущий адрес электронной почты:",
@@ -711,13 +721,11 @@
     "resend_link": "Отправить ссылку для подтверждения повторно",
     "title": "Проверка адреса электронной почты"
   },
+  "week": "Неделя",
   "why": {
     "desc": "Потому что здравоохранение не оставляет места для импровизации. MediTime предлагает вам четкое, интуитивно понятное и безопасное решение для отслеживания вашего лечения и лечения ваших близких изо дня в день.",
     "title": "Почему стоит выбрать MediTime?"
   },
   "yes": "Да",
-  "calendar_completed_this_week": "На этой неделе дот полон!",
-  "retry": "Попробуйте еще раз",
-  "pillbox_error_message": "Произошла ошибка при проверке дота. Попробуйте ещё раз.",
-  "pillbox_stock_decreased_successfully": "Запас дотов успешно уменьшен"
+  "you_have_no_pillbox_use_history": "У вас нет истории использования органайзера для таблеток."
 }

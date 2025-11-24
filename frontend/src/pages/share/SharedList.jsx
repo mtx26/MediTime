@@ -315,7 +315,7 @@ function SharedList({
   }
 
   return (
-    <div className="container py-4">
+    <div className="container" style={{ maxWidth: '800px' }}>
       <div className="mb-2 pb-2">
         <div
           className="d-flex flex-nowrap gap-2 p-1 overflow-auto"
@@ -454,7 +454,7 @@ function CalendarCard({
   return (
     <div>
       <div className="card-body">
-          <h2 className="mb-4 fw-bold justify-content-between d-flex align-items-center">
+          <h4 className="mb-4 fw-bold justify-content-between d-flex align-items-center">
             <span>
               <i className="bi bi-people-fill me-2"></i>
               {t("shared_calendar", { name: data.calendar_name })}
@@ -473,7 +473,7 @@ function CalendarCard({
                 lng,
               })}
             />
-          </h2>
+          </h4>
         {alertId === calendarId && (
           <AlertSystem
             type={alertType}
@@ -768,7 +768,7 @@ function UserList({
     <div className="card p-3 mb-3 shadow">
       <ul className="list-group">
         <h5>
-          <i className="bi bi-person"></i>
+          <i className="bi bi-person me-2"></i>
           {t("shared_users")}:
         </h5>
         {/* Liste des utilisateurs partagés */}

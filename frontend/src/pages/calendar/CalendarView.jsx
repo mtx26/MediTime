@@ -45,7 +45,7 @@ function CalendarPage({
   const [alertDuration, setAlertDuration] = useState(2000); // Durée d'affichage de l'alerte
 
   // Méthode de décrémentation du stock (pour affichage différencié)
-  const [stockDecrementMethod, setStockDecrementMethod] = useState('');
+  const [stockDecrementMethod, setStockDecrementMethod] = useState(false);
   const [loadingStockMethod, setLoadingStockMethod] = useState(false);
 
   // 🔄 Références et chargement
@@ -219,7 +219,15 @@ function CalendarPage({
     }));
   }, [calendarEvents]);
 
-  if (loading === true && calendarId) {
+  if ((loading === undefined || loadingStockMethod === undefined) && calendarId) {
+    return (
+      <div className="alert alert-danger text-center mt-5" role="alert">
+        ❌ {t('invalid_or_expired_link')}
+      </div>
+    );
+  }
+
+  if ((loading === true || loadingStockMethod === true) && calendarId) {
     return (
       <div
         className="d-flex justify-content-center align-items-center"
@@ -228,14 +236,6 @@ function CalendarPage({
         <div className="spinner-border text-primary">
           <span className="visually-hidden">{t('loading_calendar')}</span>
         </div>
-      </div>
-    );
-  }
-
-  if ((loading === undefined || loadingStockMethod) && calendarId) {
-    return (
-      <div className="alert alert-danger text-center mt-5" role="alert">
-        ❌ {t('invalid_or_expired_link')}
       </div>
     );
   }
@@ -321,6 +321,15 @@ function CalendarPage({
                         linkTo: `/${lng}/${basePath}/${calendarId}/stock-alerts`,
                         title: t('stock'),
                       },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-clock-history me-2" /> {t('pillbox_uses')}
+                          </>
+                        ),
+                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox-uses`,
+                        title: t('pillbox_uses'),
+                      },
                       { separator: true },
                       {
                         label: (
@@ -383,6 +392,15 @@ function CalendarPage({
                         ),
                         onClick: () => calendarSource.downloadCalendarPdf(calendarId),
                         title: t('boxes.export_pdf'),
+                      },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-clock-history me-2" /> {t('pillbox_uses')}
+                          </>
+                        ),
+                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox-uses`,
+                        title: t('pillbox_uses'),
                       },
                       { separator: true },
                       {

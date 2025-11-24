@@ -406,7 +406,6 @@ def fetch_personal_notifications_enabled(calendar_id):
                     WHERE calendar_id = %s
                 """, (calendar_id,))
                 result = cursor.fetchone()
-                print(result)
                 if result is None:
                     return warning_response(
                         message=ERROR_CALENDAR_NOT_FOUND,

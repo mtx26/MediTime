@@ -27,6 +27,7 @@
     "save_changes": "変更を保存"
   },
   "accounts": "アカウント",
+  "actions": "アクション",
   "activation": "アクティベーション",
   "activation_toggle_aria": "リンクを有効または無効にする",
   "actual_stock": "現在の在庫",
@@ -173,6 +174,7 @@
     "weekly_view": "週ごとのカレンダー"
   },
   "calendar_completed": "カレンダーが無事完成しました！",
+  "calendar_completed_this_week": "今週はピルボックスがいっぱいです！",
   "calendar_settings": {
     "label": "カレンダー設定",
     "notifications": {
@@ -204,6 +206,7 @@
   "copy_link": "リンクをコピー",
   "copy_link_error": "リンクのコピー中にエラーが発生しました。",
   "create_share_link": "共有リンクを作成する",
+  "created_at": "作成日",
   "critical_stock": "破裂した株式",
   "cta": {
     "button": "アカウントを作成します",
@@ -275,6 +278,7 @@
   "loading_calendars": "カレンダーを読み込んでいます...",
   "loading_medicines": "薬を読み込んでいます...",
   "loading_notifications": "通知を読み込んでいます...",
+  "loading_pillbox_uses": "ピルボックス履歴を読み込んでいます...",
   "loading_settings": "設定を読み込んでいます...",
   "loading_share": "共有を読み込んでいます...",
   "locale": "ja-JP",
@@ -367,6 +371,10 @@
     "fill": "トーチカを作る",
     "title": "トーチカ"
   },
+  "pillbox_error_message": "ピルボックスの検証中にエラーが発生しました。もう一度お試しください。",
+  "pillbox_stock_decreased_successfully": "ピルボックスの在庫が正常に減少しました",
+  "pillbox_uses": "トーチカの歴史",
+  "prepared_by": "によって準備された",
   "previous": "前の",
   "previous_day": "前日",
   "privacy": {
@@ -458,31 +466,33 @@
     "success": "パスワードが正常に変更されました。",
     "title": "新しいパスワード"
   },
+  "restore": "復元する",
+  "retry": "もう一度やり直してください",
   "revoke_link": "リンクを取り消す",
   "rights_reserved": "無断転載を禁じます",
   "scanner": {
     "add": "追加",
     "camera": "カメラ",
+    "camera_back": "戻る",
     "camera_error": "カメラにアクセスできません。",
+    "camera_front": "前に",
     "camera_instruction": "DataMatrixコードを指す",
+    "camera_inverted": "逆行する",
+    "camera_normal": "普通",
     "cancel": "キャンセル",
     "close": "近い",
+    "controls": {
+      "camera": "カメラ",
+      "flip": "逆行する",
+      "zoom": "ズーム"
+    },
     "medicine_not_found": "薬物は見つかりませんでした",
     "quantity": "数量: {{数量}}",
     "remove_from_list": "リストから削除",
     "searching": "研究...",
     "select_camera": "カメラを選択",
     "title": "QRコードをスキャンする",
-    "zoom": "ズーム: {{zoom}}x",
-    "camera_front": "前に",
-    "camera_back": "戻る",
-    "camera_normal": "普通",
-    "camera_inverted": "逆行する",
-    "controls": {
-      "zoom": "ズーム",
-      "camera": "カメラ",
-      "flip": "逆行する"
-    }
+    "zoom": "ズーム: {{zoom}}x"
   },
   "security": {
     "current_email": "現在のメールアドレス:",
@@ -711,13 +721,11 @@
     "resend_link": "確認リンクを再送信",
     "title": "メールアドレスの確認"
   },
+  "week": "週",
   "why": {
     "desc": "医療には即興の余地はありません。MediTimeは、あなたとあなたの大切な人の治療を日々記録するための、明確で直感的、そして安全なソリューションを提供します。",
     "title": "MediTimeを選ぶ理由"
   },
   "yes": "はい",
-  "calendar_completed_this_week": "今週はピルボックスがいっぱいです！",
-  "retry": "もう一度やり直してください",
-  "pillbox_error_message": "ピルボックスの検証中にエラーが発生しました。もう一度お試しください。",
-  "pillbox_stock_decreased_successfully": "ピルボックスの在庫が正常に減少しました"
+  "you_have_no_pillbox_use_history": "ピルオーガナイザーの使用履歴がありません。"
 }

@@ -27,6 +27,7 @@
     "save_changes": "Enregistrer les modifications"
   },
   "accounts": "Comptes",
+  "actions": "Actions",
   "activation": "Activation",
   "activation_toggle_aria": "Activer ou désactiver le lien",
   "actual_stock": "Stock actuel",
@@ -205,6 +206,7 @@
   "copy_link": "Copier le lien",
   "copy_link_error": "Erreur lors de la copie du lien.",
   "create_share_link": "Créer un lien de partage",
+  "created_at": "Créé le",
   "critical_stock": "Rupture de stock",
   "cta": {
     "button": "Je crée mon compte",
@@ -276,6 +278,7 @@
   "loading_calendars": "Chargement des calendriers...",
   "loading_medicines": "Chargement des médicaments...",
   "loading_notifications": "Chargement des notifications...",
+  "loading_pillbox_uses": "Chargement de l'historique du pilulier...",
   "loading_settings": "Chargement des paramètres...",
   "loading_share": "Chargement du partage...",
   "locale": "fr-FR",
@@ -368,6 +371,10 @@
     "fill": "Faire le pilulier",
     "title": "Pilulier"
   },
+  "pillbox_error_message": "Une erreur est survenue lors de la validation du pilulier. Veuillez réessayer.",
+  "pillbox_stock_decreased_successfully": "Stock du pilulier décrémenté avec succès",
+  "pillbox_uses": "Historique du pilulier",
+  "prepared_by": "Préparé par",
   "previous": "Précédent",
   "previous_day": "Jour précédent",
   "privacy": {
@@ -459,31 +466,33 @@
     "success": "Votre mot de passe a bien été modifié.",
     "title": "Nouveau mot de passe"
   },
+  "restore": "Restaurer",
+  "retry": "Réessayer",
   "revoke_link": "Révoquer le lien",
   "rights_reserved": "Tous droits réservés",
   "scanner": {
     "add": "Ajouter tous les médicaments",
     "camera": "Caméra",
+    "camera_back": "Arrière",
     "camera_error": "Impossible d'accéder à la caméra.",
+    "camera_front": "Avant",
     "camera_instruction": "Pointez la caméra vers un code DataMatrix",
+    "camera_inverted": "Inversé",
+    "camera_normal": "Normal",
     "cancel": "Annuler",
     "close": "Fermer",
+    "controls": {
+      "camera": "Caméra",
+      "flip": "Inverser",
+      "zoom": "Zoom"
+    },
     "medicine_not_found": "Médicament non trouvé",
     "quantity": "Quantité : {{quantity}}",
     "remove_from_list": "Retirer de la liste",
     "searching": "Recherche en cours...",
     "select_camera": "Sélectionner une caméra",
     "title": "Scanner de médicaments",
-    "zoom": "Zoom : {{zoom}}x",
-    "camera_front": "Avant",
-    "camera_back": "Arrière",
-    "camera_normal": "Normal",
-    "camera_inverted": "Inversé",
-    "controls": {
-      "zoom": "Zoom",
-      "camera": "Caméra",
-      "flip": "Inverser"
-    }
+    "zoom": "Zoom : {{zoom}}x"
   },
   "security": {
     "current_email": "Email actuel :",
@@ -712,12 +721,11 @@
     "resend_link": "Renvoyer le lien de vérification",
     "title": "Vérification de l'adresse email"
   },
+  "week": "Semaine",
   "why": {
     "desc": "Parce que la santé ne laisse pas de place à l’improvisation. MediTime vous offre une solution claire, intuitive et sécurisée pour suivre vos traitements et ceux de vos proches, jour après jour.",
     "title": "Pourquoi choisir MediTime ?"
   },
   "yes": "Oui",
-  "retry": "Réessayer",
-  "pillbox_stock_decreased_successfully": "Stock du pilulier décrémenté avec succès",
-  "pillbox_error_message": "Une erreur est survenue lors de la validation du pilulier. Veuillez réessayer."
+  "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier."
 }

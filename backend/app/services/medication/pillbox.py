@@ -1,11 +1,14 @@
 from app.db.connection import get_connection
-from .stock import process_box_decrement, check_low_stock_and_notify_for_calendar
+from .stock import process_box_decrement, process_box_increment, check_low_stock_and_notify_for_calendar
 from datetime import timedelta
 
 def use_pillbox(calendar_id, start_date):
     """
     Diminue le stock de tous les médicaments du calendrier spécifié
     si le mode de décompte est weekly_pillbox.
+    Args:
+        calendar_id: ID du calendrier.
+        start_date: date de la semaine (DD-MM-YYYY).
     """
     try:
         with get_connection() as conn:
@@ -16,39 +19,97 @@ def use_pillbox(calendar_id, start_date):
                 cursor.execute("""
                     SELECT
                         cs.stock_decrement_method,
-                        mb.id AS box_id,
-                        mb.stock_quantity
+                        COALESCE(
+                            jsonb_agg(
+                                jsonb_build_object('box_id', mb.id, 'stock_quantity', mb.stock_quantity)
+                            ) FILTER (WHERE mb.id IS NOT NULL),
+                            '[]'::jsonb
+                        ) as boxes
                     FROM calendars c
                     LEFT JOIN calendar_settings cs ON cs.calendar_id = c.id
                     LEFT JOIN medicine_boxes mb
                       ON mb.calendar_id = c.id
                      AND mb.box_capacity > 0
                     WHERE c.id = %s
+                    GROUP BY c.id, cs.stock_decrement_method
                 """, (calendar_id,))
-                rows = cursor.fetchall()
+                row = cursor.fetchone()
 
                 # Calendrier inexistant
-                if not rows:
+                if not row:
                     return False
 
-                method = rows[0].get("stock_decrement_method")
+                method = row.get("stock_decrement_method")
                 if method != "weekly_pillbox":
                     return None
 
                 # Boîtes à traiter
-                boxes = [(r.get("box_id"), r.get("stock_quantity")) for r in rows if r.get("box_id")]
+                boxes = row.get("boxes")
 
                 # Même comportement qu'avant : si aucune boîte -> True immédiat (pas de notif)
                 if not boxes:
                     return True
 
-                for box_id, qty in boxes:
-                    process_box_decrement(cursor, box_id, qty, monday, days=7)
+                for box in boxes:
+                    process_box_decrement(cursor, box['box_id'], box['stock_quantity'], monday, days=7)
 
                 conn.commit()
 
         # Notifications faibles ensuite, comme avant
         check_low_stock_and_notify_for_calendar(calendar_id)
+        return True
+
+    except Exception:
+        return False
+
+def restore_pillbox(calendar_id, start_date):
+    """
+    Restaure le stock de tous les médicaments du calendrier spécifié
+    pour une semaine donnée (inverse de use_pillbox).
+    Args:
+        calendar_id: ID du calendrier.
+        start_date: date de la semaine (DD-MM-YYYY).
+    """
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                monday = start_date - timedelta(days=start_date.weekday())
+
+                # Récupère les boîtes sous forme de liste JSON
+                # Si le calendrier n'existe pas, aucune ligne n'est retournée.
+                # Si le calendrier existe mais n'a pas de boîtes, 'boxes' sera une liste vide [].
+                cursor.execute("""
+                    SELECT
+                        COALESCE(
+                            jsonb_agg(
+                                jsonb_build_object('box_id', mb.id, 'stock_quantity', mb.stock_quantity)
+                            ) FILTER (WHERE mb.id IS NOT NULL),
+                            '[]'::jsonb
+                        ) as boxes
+                    FROM calendars c
+                    LEFT JOIN medicine_boxes mb
+                      ON mb.calendar_id = c.id
+                     AND mb.box_capacity > 0
+                    WHERE c.id = %s
+                    GROUP BY c.id
+                """, (calendar_id,))
+
+                row = cursor.fetchone()
+
+                # Calendrier inexistant
+                if not row:
+                    return False
+
+                boxes = row.get("boxes")
+
+                if not boxes:
+                    return True
+
+                for box in boxes:
+                    process_box_increment(cursor, box['box_id'], box['stock_quantity'], monday, days=7)
+
+                conn.commit()
+
         return True
 
     except Exception:
