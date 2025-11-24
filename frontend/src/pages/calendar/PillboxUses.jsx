@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 import { getMondayDate } from '../../utils/calendar/dateUtils';
@@ -19,7 +20,6 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
-  let basePath = 'calendar';
 
   const pathWithoutLang =
     location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
@@ -27,11 +27,9 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
   if (pathWithoutLang.startsWith('/shared-user-calendar')) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
-    basePath = 'shared-user-calendar';
   } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
     calendarType = 'token';
     calendarId = params.sharedToken;
-    basePath = 'shared-token-calendar';
   }
 
   const calendarSource = getCalendarSourceMap(
@@ -149,6 +147,12 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
       )}
     </div>
   );
+};
+
+PillboxUses.propTypes = {
+  personalCalendars: PropTypes.array,
+  sharedUserCalendars: PropTypes.array,
+  tokenCalendars: PropTypes.array,
 };
 
 export default PillboxUses;

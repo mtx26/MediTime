@@ -93,7 +93,7 @@ def restore_pillbox(calendar_id, start_date):
                     WHERE c.id = %s
                     GROUP BY c.id
                 """, (calendar_id,))
-                
+
                 row = cursor.fetchone()
 
                 # Calendrier inexistant

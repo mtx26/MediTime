@@ -1,5 +1,5 @@
 // CalendarPage.jsx
-import React, { useEffect, useContext, useRef, useState, useMemo, use } from 'react';
+import React, { useEffect, useContext, useRef, useState, useMemo } from 'react';
 import { useNavigate, useParams, useLocation, Link } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';

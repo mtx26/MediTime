@@ -1,4 +1,5 @@
 import React, { useContext, lazy, Suspense } from 'react';
+import PropTypes from 'prop-types';
 import { Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
 
 import { UserContext } from '../contexts/UserContext';
@@ -397,5 +398,13 @@ function AppRoutes({ sharedProps }) {
     </Suspense>
   );
 }
+
+AppRoutes.propTypes = {
+  sharedProps: PropTypes.shape({
+    loadingStates: PropTypes.shape({
+      isInitialLoading: PropTypes.bool,
+    }),
+  }),
+};
 
 export default AppRoutes;
