@@ -15,7 +15,7 @@ def create_app():
     app.config.from_object(Config)
     Compress(app)
 
-    # 🌍 Active CORS avec cookies si jamais Firebase envoie une session (optionnel)
+    # 🌍 Active CORS avec cookies
     CORS(app, supports_credentials=True)
 
     # 🔧 Enregistrement des routes et services

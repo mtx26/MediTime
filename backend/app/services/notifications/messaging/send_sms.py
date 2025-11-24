@@ -1,4 +1,3 @@
-from twilio.rest import Client
 from app.config import Config
 from app.utils.logging import log_backend
 
