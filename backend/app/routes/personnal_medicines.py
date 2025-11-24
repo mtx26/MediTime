@@ -1,7 +1,7 @@
 from flask import request, g
 from app.utils.auth import require_auth
 from . import api
-from app.services.calendar import verify_calendar, add_pillbox_uses, get_if_pillbox_is_used, get_pillbox_uses
+from app.services.calendar import verify_calendar, add_pillbox_uses, get_if_pillbox_is_used, get_pillbox_uses, delete_pillbox_use
 from app.services.medication import update_box, create_box, delete_box, get_boxes, restock_box
 from app.utils.responses import success_response, error_response, warning_response
 from app.services.medication import use_pillbox
@@ -226,6 +226,28 @@ def handle_use_pillbox(calendar_id):
             log_extra={"calendar_id": calendar_id}
         )
     
+# Route pour annuler l'utilisation du pillbox d'un calendrier
+@api.route("/calendars/<calendar_id>/pillbox/uses/<use_id>", methods=["DELETE"])
+@measure_time()
+@require_auth
+@verify_calendar
+@with_query_origin(default_origin="CANCEL_PILLBOX_USE")
+def handle_cancel_pillbox_use(calendar_id, use_id):
+    try:
+        delete_pillbox_use(calendar_id, use_id)
+        return success_response(
+            message="utilisation du pillbox annulée",
+            code="PILLBOX_USE_CANCELED",
+            log_extra={"calendar_id": calendar_id, "use_id": use_id}
+        )
+    except Exception as e:
+        return error_response(
+            message="erreur lors de l'annulation de l'utilisation du pillbox",
+            code="CANCEL_PILLBOX_USE_ERROR",
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id, "use_id": use_id}
+        )
 
 # Route pour recuperer les usages de pillbox d'un calendrier
 @api.route("/calendars/<calendar_id>/pillbox/uses", methods=["GET"])
@@ -251,7 +273,8 @@ def handle_get_pillbox_uses(calendar_id):
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
-    
+
+# Route pour réapprovisionner une boite de médicaments
 @api.route("/calendars/<calendar_id>/boxes/<box_id>/restock", methods=["POST"])
 @measure_time()
 @require_auth

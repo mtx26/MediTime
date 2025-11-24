@@ -27,6 +27,7 @@
     "save_changes": "Änderungen speichern"
   },
   "accounts": "Konten",
+  "actions": "Aktionen",
   "activation": "Aktivierung",
   "activation_toggle_aria": "Aktivieren oder Deaktivieren des Links",
   "actual_stock": "Aktueller Bestand",
@@ -173,6 +174,7 @@
     "weekly_view": "Kalender nach Woche"
   },
   "calendar_completed": "Kalender erfolgreich abgeschlossen!",
+  "calendar_completed_this_week": "Pillendose für diese Woche voll!",
   "calendar_settings": {
     "label": "Kalendereinstellungen",
     "notifications": {
@@ -204,6 +206,7 @@
   "copy_link": "Link kopieren",
   "copy_link_error": "Fehler beim Kopieren des Links.",
   "create_share_link": "Erstellen eines Freigabelinks",
+  "created_at": "Erstellt am",
   "critical_stock": "Aktienbruch",
   "cta": {
     "button": "Ich erstelle mein Konto",
@@ -275,6 +278,7 @@
   "loading_calendars": "Kalender werden geladen...",
   "loading_medicines": "Medikamente werden geladen …",
   "loading_notifications": "Benachrichtigungen werden geladen …",
+  "loading_pillbox_uses": "Lade die Geschichte der Bunker...",
   "loading_settings": "Einstellungen werden geladen...",
   "loading_share": "Teilen wird geladen...",
   "locale": "de-DE",
@@ -367,6 +371,10 @@
     "fill": "Machen Sie die Pillendose",
     "title": "Bunker"
   },
+  "pillbox_error_message": "Bei der Überprüfung der Pillendose ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+  "pillbox_stock_decreased_successfully": "Pillbox-Aktienkurs erfolgreich gesenkt",
+  "pillbox_uses": "Geschichte des Bunkers",
+  "prepared_by": "Hergestellt von",
   "previous": "Vorherige",
   "previous_day": "Vorheriger Tag",
   "privacy": {
@@ -458,31 +466,33 @@
     "success": "Ihr Passwort wurde erfolgreich geändert.",
     "title": "Neues Passwort"
   },
+  "restore": "Wiederherstellen",
+  "retry": "Versuchen Sie es erneut",
   "revoke_link": "Den Link widerrufen",
   "rights_reserved": "Alle Rechte vorbehalten",
   "scanner": {
     "add": "Hinzufügen",
     "camera": "Kamera",
+    "camera_back": "Zurück",
     "camera_error": "Zugriff auf die Kamera nicht möglich.",
+    "camera_front": "Vor",
     "camera_instruction": "Zeigen Sie auf den DataMatrix-Code",
+    "camera_inverted": "Umkehren",
+    "camera_normal": "Normal",
     "cancel": "Stornieren",
     "close": "Schließen",
+    "controls": {
+      "camera": "Kamera",
+      "flip": "Umkehren",
+      "zoom": "Zoom"
+    },
     "medicine_not_found": "Medikament nicht gefunden",
     "quantity": "Menge: {{Menge}}",
     "remove_from_list": "Aus der Liste entfernen",
     "searching": "Forschung...",
     "select_camera": "Wählen Sie eine Kamera aus",
     "title": "Scannen Sie einen QR-Code",
-    "zoom": "Zoom: {{zoom}}x",
-    "camera_front": "Vor",
-    "camera_back": "Zurück",
-    "camera_normal": "Normal",
-    "camera_inverted": "Umkehren",
-    "controls": {
-      "zoom": "Zoom",
-      "camera": "Kamera",
-      "flip": "Umkehren"
-    }
+    "zoom": "Zoom: {{zoom}}x"
   },
   "security": {
     "current_email": "Aktuelle E-Mail:",
@@ -711,13 +721,11 @@
     "resend_link": "Bestätigungslink erneut senden",
     "title": "Bestätigung der E-Mail-Adresse"
   },
+  "week": "Woche",
   "why": {
     "desc": "Weil im Gesundheitswesen kein Raum für Improvisation ist. MediTime bietet Ihnen eine klare, intuitive und sichere Lösung für die tägliche Nachverfolgung Ihrer Behandlungen und der Ihrer Angehörigen.",
     "title": "Warum MediTime wählen?"
   },
   "yes": "Ja",
-  "calendar_completed_this_week": "Pillendose für diese Woche voll!",
-  "retry": "Versuchen Sie es erneut",
-  "pillbox_error_message": "Bei der Überprüfung der Pillendose ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
-  "pillbox_stock_decreased_successfully": "Pillbox-Aktienkurs erfolgreich gesenkt"
+  "you_have_no_pillbox_use_history": "Für den Pillenorganizer liegen keine Nutzungsdaten vor."
 }

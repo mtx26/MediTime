@@ -224,6 +224,18 @@ function App() {
     });
   }, []);
 
+  // Fonction pour annuler l'utilisation du pillbox d'un calendrier
+  const cancelUsePersonalPillbox = useCallback(async (calendarId, useId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/pillbox/uses/${useId}`,
+      method: 'DELETE',
+      origin: 'CANCEL_PILLBOX_USE',
+      uid,
+      analyticsEvent: 'cancel_use_personal_pillbox',
+      analyticsData: { calendarId, useId, uid },
+    });
+  }, []);
+
   // Fonction pour recuperer la list des utilisations du pillbox
   const fetchPersonalPillboxUses = useCallback(async (calendarId) => {
     return await performApiCall({
@@ -679,6 +691,18 @@ function App() {
     });
   }, []);
 
+  // Fonction pour annuler l'utilisation du pillbox d'un calendrier partagé
+  const cancelUseSharedUserPillbox = useCallback(async (calendarId, useId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/pillbox/uses/${useId}`,
+      method: 'DELETE',
+      origin: 'CANCEL_PILLBOX_USE',
+      uid,
+      analyticsEvent: 'cancel_use_shared_user_pillbox',
+      analyticsData: { calendarId, useId, uid },
+    });
+  }, []);
+
   // Fonction pour récupérer la liste des utilisations du pillbox
   const fetchSharedUserPillboxUses = useCallback(async (calendarId) => {
     return await performApiCall({
@@ -790,6 +814,7 @@ function App() {
       downloadPersonalCalendarPdf,
       fetchIfPersonalPillboxUsed,
       useMedicinesForPersonalPillbox,
+      cancelUsePersonalPillbox,
       fetchPersonalPillboxUses,
       fetchPersonalStockDecrementMethod,
       updatePersonalStockDecrementMethod,
@@ -820,6 +845,7 @@ function App() {
       deleteSharedUserBox,
       fetchIfSharedUserPillboxUsed,
       useMedicinesForSharedUserPillbox,
+      cancelUseSharedUserPillbox,
       fetchSharedUserPillboxUses,
       sharedUserRestockBox,
       fetchSharedUserNotificationsEnabled,

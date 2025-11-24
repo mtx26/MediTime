@@ -27,6 +27,7 @@
     "save_changes": "Salvar alterações"
   },
   "accounts": "Contas",
+  "actions": "Ações",
   "activation": "Ativação",
   "activation_toggle_aria": "Habilitar ou desabilitar o link",
   "actual_stock": "Estoque atual",
@@ -173,6 +174,7 @@
     "weekly_view": "Calendário por semana"
   },
   "calendar_completed": "Calendário concluído com sucesso!",
+  "calendar_completed_this_week": "Caixa de comprimidos cheia para esta semana!",
   "calendar_settings": {
     "label": "Configurações do calendário",
     "notifications": {
@@ -204,6 +206,7 @@
   "copy_link": "Copiar link",
   "copy_link_error": "Erro ao copiar link.",
   "create_share_link": "Criar um link de compartilhamento",
+  "created_at": "Criado em",
   "critical_stock": "Ruptura de estoque",
   "cta": {
     "button": "Eu crio minha conta",
@@ -275,6 +278,7 @@
   "loading_calendars": "Carregando calendários...",
   "loading_medicines": "Carregando medicamentos...",
   "loading_notifications": "Carregando notificações...",
+  "loading_pillbox_uses": "Carregando histórico do casamata...",
   "loading_settings": "Carregando configurações...",
   "loading_share": "Carregando compartilhamento...",
   "locale": "pt-BR",
@@ -367,6 +371,10 @@
     "fill": "Faça a caixa de comprimidos",
     "title": "Caixa de comprimidos"
   },
+  "pillbox_error_message": "Ocorreu um erro ao validar o compartimento de comprimidos. Tente novamente.",
+  "pillbox_stock_decreased_successfully": "As ações da Pillbox foram reduzidas com sucesso.",
+  "pillbox_uses": "História do bunker",
+  "prepared_by": "Preparado pela",
   "previous": "Anterior",
   "previous_day": "Dia anterior",
   "privacy": {
@@ -458,31 +466,33 @@
     "success": "Sua senha foi alterada com sucesso.",
     "title": "Nova Senha"
   },
+  "restore": "Restaurar",
+  "retry": "Tente novamente",
   "revoke_link": "Revogar o link",
   "rights_reserved": "Todos os direitos reservados",
   "scanner": {
     "add": "Adicionar",
     "camera": "Câmera",
+    "camera_back": "Voltar",
     "camera_error": "Não é possível acessar a câmera.",
+    "camera_front": "Antes",
     "camera_instruction": "Aponte para o código DataMatrix",
+    "camera_inverted": "Reverter",
+    "camera_normal": "Normal",
     "cancel": "Cancelar",
     "close": "Fechar",
+    "controls": {
+      "camera": "Câmera",
+      "flip": "Reverter",
+      "zoom": "Ampliação"
+    },
     "medicine_not_found": "Medicamento não encontrado",
     "quantity": "Quantidade: {{quantidade}}",
     "remove_from_list": "Remover da lista",
     "searching": "Pesquisar...",
     "select_camera": "Selecione uma câmera",
     "title": "Escaneie um código QR",
-    "zoom": "Zoom: {{zoom}}x",
-    "camera_front": "Antes",
-    "camera_back": "Voltar",
-    "camera_normal": "Normal",
-    "camera_inverted": "Reverter",
-    "controls": {
-      "zoom": "Ampliação",
-      "camera": "Câmera",
-      "flip": "Reverter"
-    }
+    "zoom": "Zoom: {{zoom}}x"
   },
   "security": {
     "current_email": "E-mail atual:",
@@ -711,13 +721,11 @@
     "resend_link": "Reenviar link de verificação",
     "title": "Verificação de endereço de e-mail"
   },
+  "week": "Semana",
   "why": {
     "desc": "Porque a saúde não deixa espaço para improvisação. O MediTime oferece uma solução clara, intuitiva e segura para acompanhar seus tratamentos e os de seus entes queridos, dia após dia.",
     "title": "Por que escolher o MediTime?"
   },
   "yes": "Sim",
-  "calendar_completed_this_week": "Caixa de comprimidos cheia para esta semana!",
-  "retry": "Tente novamente",
-  "pillbox_error_message": "Ocorreu um erro ao validar o compartimento de comprimidos. Tente novamente.",
-  "pillbox_stock_decreased_successfully": "As ações da Pillbox foram reduzidas com sucesso."
+  "you_have_no_pillbox_use_history": "Você não possui histórico de uso para o organizador de comprimidos."
 }

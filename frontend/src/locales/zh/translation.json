@@ -27,6 +27,7 @@
     "save_changes": "保存更改"
   },
   "accounts": "账户",
+  "actions": "行动",
   "activation": "激活",
   "activation_toggle_aria": "启用或禁用链接",
   "actual_stock": "现有库存",
@@ -173,6 +174,7 @@
     "weekly_view": "按周日历"
   },
   "calendar_completed": "行事历成功完成！",
+  "calendar_completed_this_week": "这周药盒已满！",
   "calendar_settings": {
     "label": "日历设置",
     "notifications": {
@@ -204,6 +206,7 @@
   "copy_link": "复制链接",
   "copy_link_error": "复制链接时出错。",
   "create_share_link": "创建共享链接",
+  "created_at": "创建于",
   "critical_stock": "股票破裂",
   "cta": {
     "button": "我创建了我的帐户",
@@ -275,6 +278,7 @@
   "loading_calendars": "正在加载日历...",
   "loading_medicines": "正在加载药物...",
   "loading_notifications": "正在加载通知...",
+  "loading_pillbox_uses": "正在加载药盒历史记录……",
   "loading_settings": "正在加载设置...",
   "loading_share": "正在加载分享...",
   "locale": "zh-CN",
@@ -367,6 +371,10 @@
     "fill": "制作药盒",
     "title": "药盒"
   },
+  "pillbox_error_message": "验证药盒时出错，请重试。",
+  "pillbox_stock_decreased_successfully": "Pillbox股票成功减持",
+  "pillbox_uses": "碉堡的历史",
+  "prepared_by": "编制",
   "previous": "以前的",
   "previous_day": "前一天",
   "privacy": {
@@ -458,31 +466,33 @@
     "success": "您的密码已成功更改。",
     "title": "新密码"
   },
+  "restore": "恢复",
+  "retry": "再试一次",
   "revoke_link": "撤销链接",
   "rights_reserved": "版权所有",
   "scanner": {
     "add": "添加",
     "camera": "相机",
+    "camera_back": "后退",
     "camera_error": "无法访问相机。",
+    "camera_front": "前",
     "camera_instruction": "指向 DataMatrix 代码",
+    "camera_inverted": "撤销",
+    "camera_normal": "普通的",
     "cancel": "取消",
     "close": "关闭",
+    "controls": {
+      "camera": "相机",
+      "flip": "撤销",
+      "zoom": "飞涨"
+    },
     "medicine_not_found": "未找到药物",
     "quantity": "数量：{{quantity}}",
     "remove_from_list": "从列表中删除",
     "searching": "研究...",
     "select_camera": "选择相机",
     "title": "扫描二维码",
-    "zoom": "缩放：{{zoom}}x",
-    "camera_front": "前",
-    "camera_back": "后退",
-    "camera_normal": "普通的",
-    "camera_inverted": "撤销",
-    "controls": {
-      "zoom": "飞涨",
-      "camera": "相机",
-      "flip": "撤销"
-    }
+    "zoom": "缩放：{{zoom}}x"
   },
   "security": {
     "current_email": "当前电子邮件：",
@@ -711,13 +721,11 @@
     "resend_link": "重新发送验证链接",
     "title": "电子邮件地址验证"
   },
+  "week": "星期",
   "why": {
     "desc": "因为医疗保健不容即兴发挥。MediTime 为您提供清晰、直观、安全的解决方案，让您日复一日地追踪自己和亲人的治疗情况。",
     "title": "为什么选择 MediTime？"
   },
   "yes": "是的",
-  "calendar_completed_this_week": "这周药盒已满！",
-  "retry": "再试一次",
-  "pillbox_error_message": "验证药盒时出错，请重试。",
-  "pillbox_stock_decreased_successfully": "Pillbox股票成功减持"
+  "you_have_no_pillbox_use_history": "您的药盒没有使用记录。"
 }

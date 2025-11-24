@@ -325,3 +325,32 @@ def get_pillbox_uses(calendar_id):
             )
             rows = cursor.fetchall() or []
             return rows
+
+def delete_pillbox_use(calendar_id, use_id):
+    """
+    Supprime un enregistrement d'utilisation du pillulier pour un calendrier donné.
+    """
+    from app.services.medication.pillbox import restore_pillbox
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            # recuperer la dare de l'enregistrement pour vérification et suppression cette enregistrement
+            cursor.execute(
+                "SELECT prepared_at FROM pillbox_uses WHERE id = %s AND calendar_id = %s",
+                (use_id, calendar_id)
+            )
+            row = cursor.fetchone()
+            if not row:
+                return False
+            
+            prepared_at = row.get('prepared_at')
+
+            # Supprimer l'enregistrement
+            cursor.execute(
+                "DELETE FROM pillbox_uses WHERE id = %s",
+                (use_id,)
+            )
+            conn.commit()
+            
+    # Restaurer le stock des médicaments utilisés pour cette semaine
+    restore_pillbox(calendar_id, prepared_at)

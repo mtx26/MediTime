@@ -321,6 +321,15 @@ function CalendarPage({
                         linkTo: `/${lng}/${basePath}/${calendarId}/stock-alerts`,
                         title: t('stock'),
                       },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-clock-history me-2" /> {t('pillbox_uses')}
+                          </>
+                        ),
+                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox-uses`,
+                        title: t('pillbox_uses'),
+                      },
                       { separator: true },
                       {
                         label: (
@@ -383,6 +392,15 @@ function CalendarPage({
                         ),
                         onClick: () => calendarSource.downloadCalendarPdf(calendarId),
                         title: t('boxes.export_pdf'),
+                      },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-clock-history me-2" /> {t('pillbox_uses')}
+                          </>
+                        ),
+                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox-uses`,
+                        title: t('pillbox_uses'),
                       },
                       { separator: true },
                       {

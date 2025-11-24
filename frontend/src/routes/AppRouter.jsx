@@ -366,6 +366,19 @@ function AppRoutes({ sharedProps }) {
             />
           }
         />
+        <Route
+          path="pillbox-uses"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<PillboxUses {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
       </Route>
       <Route path="shared-token-calendar/:sharedToken">
         <Route index element={<CalendarView {...sharedProps} />} />

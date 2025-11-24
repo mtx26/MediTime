@@ -2,7 +2,7 @@ from flask import request, g
 from app.utils.auth import require_auth
 from . import api
 from app.utils.responses import success_response, error_response, warning_response
-from app.services.calendar import verify_calendar_share, add_pillbox_uses, get_if_pillbox_is_used, get_pillbox_uses
+from app.services.calendar import verify_calendar_share, add_pillbox_uses, get_if_pillbox_is_used, get_pillbox_uses, delete_pillbox_use
 from app.services.medication import get_boxes, update_box, create_box, delete_box, restock_box
 from app.services.medication import use_pillbox
 from datetime import datetime, timezone
@@ -216,6 +216,29 @@ def handle_use_shared_users_pillbox(calendar_id):
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
+        )
+    
+# Route pour annuler l'utilisation du pillbox d'un calendrier
+@api.route("/shared/users/calendars/<calendar_id>/pillbox/uses/<use_id>", methods=["DELETE"])
+@measure_time()
+@require_auth
+@verify_calendar_share
+@with_query_origin(default_origin="CANCEL_PILLBOX_USE")
+def handle_cancel_shared_users_pillbox_use(calendar_id, use_id):
+    try:
+        delete_pillbox_use(calendar_id, use_id)
+        return success_response(
+            message="utilisation du pillbox annulée",
+            code="PILLBOX_USE_CANCELED",
+            log_extra={"calendar_id": calendar_id, "use_id": use_id}
+        )
+    except Exception as e:
+        return error_response(
+            message="erreur lors de l'annulation de l'utilisation du pillbox",
+            code="CANCEL_PILLBOX_USE_ERROR",
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id, "use_id": use_id}
         )
     
 # Route pour recuperer les usages de pillbox d'un calendrier

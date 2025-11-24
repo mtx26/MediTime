@@ -27,6 +27,7 @@
     "save_changes": "Guardar cambios"
   },
   "accounts": "Cuentas",
+  "actions": "Comportamiento",
   "activation": "Activación",
   "activation_toggle_aria": "Habilitar o deshabilitar el enlace",
   "actual_stock": "Stock actual",
@@ -173,6 +174,7 @@
     "weekly_view": "Calendario por semana"
   },
   "calendar_completed": "¡Calendario completado exitosamente!",
+  "calendar_completed_this_week": "¡Pastillas llenas para esta semana!",
   "calendar_settings": {
     "label": "Configuración del calendario",
     "notifications": {
@@ -204,6 +206,7 @@
   "copy_link": "Copiar enlace",
   "copy_link_error": "Error al copiar el enlace.",
   "create_share_link": "Crear un enlace para compartir",
+  "created_at": "Creado el",
   "critical_stock": "Ruptura de existencias",
   "cta": {
     "button": "Creo mi cuenta",
@@ -275,6 +278,7 @@
   "loading_calendars": "Cargando calendarios...",
   "loading_medicines": "Cargando medicamentos...",
   "loading_notifications": "Cargando notificaciones...",
+  "loading_pillbox_uses": "Cargando el historial del pastillero...",
   "loading_settings": "Cargando configuración...",
   "loading_share": "Cargando compartir...",
   "locale": "es-ES",
@@ -367,6 +371,10 @@
     "fill": "Hacer el pastillero",
     "title": "Fortín"
   },
+  "pillbox_error_message": "Se ha producido un error al validar el pastillero. Inténtelo de nuevo.",
+  "pillbox_stock_decreased_successfully": "Las existencias de pastillero se redujeron con éxito",
+  "pillbox_uses": "Historia del pastillero",
+  "prepared_by": "Preparado por",
   "previous": "Anterior",
   "previous_day": "Día anterior",
   "privacy": {
@@ -458,31 +466,33 @@
     "success": "Su contraseña ha sido cambiada exitosamente",
     "title": "Nueva contraseña"
   },
+  "restore": "Restaurar",
+  "retry": "Intentar otra vez",
   "revoke_link": "Revocar el enlace",
   "rights_reserved": "Reservados todos los derechos",
   "scanner": {
     "add": "Agregar",
     "camera": "Cámara",
+    "camera_back": "Atrás",
     "camera_error": "No se puede acceder a la cámara.",
+    "camera_front": "Antes",
     "camera_instruction": "Señale el código DataMatrix",
+    "camera_inverted": "Contrarrestar",
+    "camera_normal": "Normal",
     "cancel": "Cancelar",
     "close": "Cerca",
+    "controls": {
+      "camera": "Cámara",
+      "flip": "Contrarrestar",
+      "zoom": "Zoom"
+    },
     "medicine_not_found": "Medicamento no encontrado",
     "quantity": "Cantidad: {{cantidad}}",
     "remove_from_list": "Eliminar de la lista",
     "searching": "Investigación...",
     "select_camera": "Seleccione una cámara",
     "title": "Escanear un código QR",
-    "zoom": "Zoom: {{zoom}}x",
-    "camera_front": "Antes",
-    "camera_back": "Atrás",
-    "camera_normal": "Normal",
-    "camera_inverted": "Contrarrestar",
-    "controls": {
-      "zoom": "Zoom",
-      "camera": "Cámara",
-      "flip": "Contrarrestar"
-    }
+    "zoom": "Zoom: {{zoom}}x"
   },
   "security": {
     "current_email": "Correo electrónico actual:",
@@ -711,13 +721,11 @@
     "resend_link": "Reenviar enlace de verificación",
     "title": "Verificación de la dirección de correo electrónico"
   },
+  "week": "Semana",
   "why": {
     "desc": "Porque la atención médica no admite improvisaciones. MediTime te ofrece una solución clara, intuitiva y segura para el seguimiento diario de tus tratamientos y los de tus seres queridos.",
     "title": "¿Por qué elegir MediTime?"
   },
   "yes": "Sí",
-  "calendar_completed_this_week": "¡Pastillas llenas para esta semana!",
-  "retry": "Intentar otra vez",
-  "pillbox_error_message": "Se ha producido un error al validar el pastillero. Inténtelo de nuevo.",
-  "pillbox_stock_decreased_successfully": "Las existencias de pastillero se redujeron con éxito"
+  "you_have_no_pillbox_use_history": "No tienes historial de uso del pastillero."
 }
