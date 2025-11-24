@@ -224,6 +224,7 @@ export default function MedicineReview({ personalCalendars }) {
         </>
       ),
       onClick: () => setEditMode(true),
+      title: t('modify'),
     },
   ];
 

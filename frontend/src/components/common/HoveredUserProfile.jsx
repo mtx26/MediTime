@@ -44,7 +44,6 @@ export default function HoveredUserProfile({
           onPointerLeave={handleMouseLeave}
           className="bg-transparent border-0 p-0 m-0 d-inline-flex align-items-center gap-1 text-start"
           aria-label="Afficher le profil de l'utilisateur"
-          title="Afficher le profil de l'utilisateur"
           style={{
             textDecoration: open ? 'underline' : 'none',
             color: open ? '#0d6efd' : 'inherit',

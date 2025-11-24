@@ -16,15 +16,6 @@ const getBorderClass = (box) => {
   return '';
 };
 
-const createAction = (icon, label, onClick, danger = false) => ({
-  label: (
-    <>
-      <i className={`bi bi-${icon} me-2`} /> {label}
-    </>
-  ),
-  onClick,
-  danger
-});
 
 const createSeparator = () => ({ separator: true });
 
@@ -117,36 +108,90 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   const getCommonActions = (calendarType) => {
     const actions = [];
-    
-    actions.push(createAction('download', t('boxes.export_pdf'), () => calendarSource.downloadCalendarPdf(calendarId)));
-    
+
+    // Export PDF (action métier)
+    actions.push({
+      label: (
+        <>
+          <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+        </>
+      ),
+      onClick: () => calendarSource.downloadCalendarPdf(calendarId),
+      title: t('boxes.export_pdf'),
+    });
+
+    // Actions spécifiques aux calendriers personnels
     if (calendarType === 'personal') {
-      actions.unshift(createAction('box-arrow-up', t('share'), () => navigate(`/${lng}/shared-calendars?calendar=${calendarId}`)));
+      actions.unshift({
+        label: (
+          <>
+            <i className="bi bi-box-arrow-up me-2" /> {t('share')}
+          </>
+        ),
+        linkTo: `/${lng}/shared-calendars?calendar=${calendarId}`,
+        title: t('share'),
+      });
       actions.push(
-        createSeparator(),
-        createAction('exclamation-triangle', t('stock'), () => navigate(`/${lng}/${basePath}/${calendarId}/stock-alerts`))
+        { separator: true },
+        {
+          label: (
+            <>
+              <i className="bi bi-exclamation-triangle me-2" /> {t('stock')}
+            </>
+          ),
+          linkTo: `/${lng}/${basePath}/${calendarId}/stock-alerts`,
+          title: t('stock'),
+        }
       );
     }
-    
+
+    // Paramètres
     actions.push(
-      createSeparator(),
-      createAction('gear', t('settings.label'), () => navigate(`/${lng}/${basePath}/${calendarId}/settings`)),
-      createSeparator()
+      { separator: true },
+      {
+        label: (
+          <>
+            <i className="bi bi-gear me-2" /> {t('settings.label')}
+          </>
+        ),
+        linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
+        title: t('settings.label')
+      },
+      { separator: true }
     );
-    
+
+    // Suppression calendrier (action métier)
     if (calendarType === 'personal') {
-      actions.push(createAction('trash', t('delete'), async () => {
-        const rep = await personalCalendars.deleteCalendar(calendarId);
-        if (rep.success) {
-          navigate(`/${lng}/calendars`);
-        } else {
-          showAlert(rep.error, 'danger');
-        }
-      }, true));
+      actions.push({
+        label: (
+          <>
+            <i className="bi bi-trash me-2" /> {t('delete')}
+          </>
+        ),
+        onClick: async () => {
+          const rep = await personalCalendars.deleteCalendar(calendarId);
+          if (rep.success) {
+            navigate(`/${lng}/calendars`);
+          } else {
+            showAlert(rep.error, 'danger');
+          }
+        },
+        title: t('delete'),
+        danger: true
+      });
     } else if (calendarType === 'sharedUser') {
-      actions.push(createAction('trash3', t('delete'), () => sharedUserCalendars.deleteSharedCalendar(calendarId), true));
+      actions.push({
+        label: (
+          <>
+            <i className="bi bi-trash3 me-2" /> {t('delete')}
+          </>
+        ),
+        onClick: () => sharedUserCalendars.deleteSharedCalendar(calendarId),
+        title: t('delete'),
+        danger: true
+      });
     }
-    
+
     return actions;
   };
   const [selectedModifyBox, setSelectedModifyBox] = useState(null);
@@ -545,6 +590,7 @@ function BoxCard({
         </>
       ),
       onClick: () => openUpdateMode(box.id),
+      title: t('boxes.scan_qr_code'),
     },
     { separator: true },
     {
@@ -554,6 +600,7 @@ function BoxCard({
         </>
       ),
       onClick: () => setSelectedModifyBox(box.id),
+      title: t('boxes.edit'),
     },
     {
       label: (
@@ -562,6 +609,7 @@ function BoxCard({
         </>
       ),
       onClick: () => openNotice(box.id),
+      title: t('boxes.view_notice'),
     },
     { separator: true },
     {
@@ -571,6 +619,7 @@ function BoxCard({
         </>
       ),
       onClick: () => deleteBox(box.id),
+      title: t('boxes.delete'),
       danger: true,
     },
   ];

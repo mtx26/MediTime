@@ -38,7 +38,8 @@ function NotificationsPage({ notifications, sharedUserCalendars }) {
                   <i className="bi bi-gear-fill me-2"></i> {t('settings.label')}
                 </>
               ),
-              onClick: () => navigate(`/${lng}/settings?tab=notifications`),
+              linkTo: `/${lng}/settings?tab=notifications`,
+              title: t('settings.label')
             },
           ]}
         />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import HoveredUserProfile from './HoveredUserProfile';
 import { useTranslation, Trans } from 'react-i18next';
 
@@ -53,17 +53,17 @@ export default function NotificationLine({
         );
         actions = (
           <div className="mt-2">
-            <button
+            <Link
               aria-label={t('accept')}
               title={t('accept')}
               className="btn btn-sm btn-outline-success me-2"
-              onClick={async (e) => {
+              to={notif.link}
+              onClick={(e) => {
                 e.stopPropagation();
-                navigate(notif.link);
               }}
             >
               <i className="bi bi-arrow-right-circle me-2 text-success"></i> {t('accept')}
-            </button>
+            </Link>
           </div>
         );
       } else {
@@ -76,17 +76,17 @@ export default function NotificationLine({
         );
         actions = (
           <div className="mt-2">
-            <button
+            <Link
               aria-label={t('open')}
               title={t('open')}
               className="btn btn-sm btn-outline-success me-2"
-              onClick={async (e) => {
+              to={`/${lng}/shared-user-calendar/${notif.calendar_id}`}
+              onClick={(e) => {
                 e.stopPropagation();
-                navigate(`/${lng}/shared-user-calendar/${notif.calendar_id}`);
               }}
             >
               <i className="bi bi-arrow-right-circle me-2 text-success"></i> {t('open')}
-            </button>
+            </Link>
           </div>
         );
       }

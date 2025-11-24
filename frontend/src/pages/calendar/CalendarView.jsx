@@ -1,6 +1,6 @@
 // CalendarPage.jsx
 import React, { useEffect, useContext, useRef, useState, useMemo } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, Link } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -245,15 +245,15 @@ function CalendarPage({
               {/* Boutons de navigation et partage */}
               <div className="d-flex align-items-center gap-2 mb-3">
                 {/* Bouton Médicaments qui prend tout l'espace dispo */}
-                <button
+                <Link
                   className="btn btn-outline-secondary flex-grow-1 me-auto"
-                  onClick={() => navigate(`/${lng}/${basePath}/${calendarId}/boxes`)}
+                  to={`/${lng}/${basePath}/${calendarId}/boxes`}
                   aria-label={t('medicines.label')}
                   title={t('medicines.label')}
                 >
                   <i className="bi bi-capsule"></i>
                   <span> {t('medicines.label')}</span>
-                </button>
+                </Link>
 
                 {/* Bouton pour afficher le menu déroulant */}
                 {calendarType === 'personal' && (
@@ -266,7 +266,8 @@ function CalendarPage({
                             <i className="bi bi-grid-3x3-gap me-2" /> {t('pillbox.title')}
                           </>
                         ),
-                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`),
+                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`,
+                        title: t('pillbox.title'),
                       },
                       {
                         label: (
@@ -274,7 +275,8 @@ function CalendarPage({
                             <i className="bi bi-calendar-day me-2" /> {t('day_view.title')}
                           </>
                         ),
-                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/daily?date=${toISO(new Date().setHours(0,0,0,0))}`),
+                        linkTo: `/${lng}/${basePath}/${calendarId}/daily?date=${toISO(new Date().setHours(0,0,0,0))}`,
+                        title: t('day_view.title'),
                       },
                       { separator: true },
                       {
@@ -283,8 +285,8 @@ function CalendarPage({
                             <i className="bi bi-box-arrow-up me-2" /> {t('share')}
                           </>
                         ),
-                        onClick: () =>
-                          navigate(`/${lng}/shared-calendars?calendar=${calendarId}`),
+                        linkTo: `/${lng}/shared-calendars?calendar=${calendarId}`,
+                        title: t('share'),
                       },
                       { separator: true },
                       {
@@ -294,6 +296,7 @@ function CalendarPage({
                           </>
                         ),
                         onClick: () => calendarSource.downloadCalendarPdf(calendarId),
+                        title: t('boxes.export_pdf'),
                       },
                       {
                         label: (
@@ -301,8 +304,8 @@ function CalendarPage({
                             <i className="bi bi-exclamation-triangle me-2" /> {t('stock')}
                           </>
                         ),
-                        onClick: () =>
-                          navigate(`/${lng}/${basePath}/${calendarId}/stock-alerts`),
+                        linkTo: `/${lng}/${basePath}/${calendarId}/stock-alerts`,
+                        title: t('stock'),
                       },
                       { separator: true },
                       {
@@ -311,9 +314,8 @@ function CalendarPage({
                             <i className="bi bi-gear me-2" /> {t('settings.label')}
                           </>
                         ),
-                        onClick: () =>
-                          navigate(`/${lng}/${basePath}/${calendarId}/settings`),
-                      },
+                        linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
+                        title: t('settings.label'),},
                       { separator: true },
                       {
                         label: (
@@ -330,6 +332,7 @@ function CalendarPage({
                             setAlertMessage(rep.error);
                           }
                         },
+                        title: t('delete'),
                         danger: true,
                       },
                     ]}
@@ -345,7 +348,8 @@ function CalendarPage({
                             <i className="bi bi-grid-3x3-gap me-2" /> {t('pillbox.title')}
                           </>
                         ),
-                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`),
+                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`,
+                        title: t('pillbox.title'),
                       },
                       {
                         label: (
@@ -353,7 +357,8 @@ function CalendarPage({
                             <i className="bi bi-calendar-day me-2" /> {t('day_view.title')}
                           </>
                         ),
-                        onClick: () => navigate(`/${lng}/${basePath}/${calendarId}/daily?date=${toISO(new Date().setHours(0,0,0,0))}`),
+                        linkTo: `/${lng}/${basePath}/${calendarId}/daily?date=${toISO(new Date().setHours(0,0,0,0))}`,
+                        title: t('day_view.title'),
                       },
                       { separator: true },
                       {
@@ -363,6 +368,7 @@ function CalendarPage({
                           </>
                         ),
                         onClick: () => calendarSource.downloadCalendarPdf(calendarId),
+                        title: t('boxes.export_pdf'),
                       },
                       { separator: true },
                       {
@@ -371,9 +377,8 @@ function CalendarPage({
                             <i className="bi bi-gear me-2" /> {t('settings.label')}
                           </>
                         ),
-                        onClick: () =>
-                          navigate(`/${lng}/${basePath}/${calendarId}/settings`),
-                      },
+                        linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
+                        title: t('settings.label'),},
                       { separator: true },
                       {
                         label: (
@@ -382,6 +387,7 @@ function CalendarPage({
                           </>
                         ),
                         onClick: () => sharedUserCalendars.deleteSharedCalendar(calendarId),
+                        title: t('delete'),
                         danger: true,
                       },
                     ]}
@@ -390,20 +396,19 @@ function CalendarPage({
               </div>
               {/* Affichage alert stock */}
               {isLowStock && (
-                <button
-                  type="button"
+                <Link
                   className="alert w-100 alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow"
-                  onClick={() =>
-                    navigate(`/${lng}/${basePath}/${calendarId}/stock-alerts`)}
+                  to={`/${lng}/${basePath}/${calendarId}/stock-alerts`}
                   title={t('stock_alert_tooltip')}
                   aria-label={t('stock_alert')}
+                  style={{ textDecoration: 'none' }}
                 >
                   <div className="d-flex align-items-center">
                     <i className="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
                     <span className="fw-semibold">{t('stock_alert')}</span>
                   </div>
                   <i className="bi bi-chevron-right ms-2"></i>
-                </button>
+                </Link>
               )}
 
             </div>
@@ -439,16 +444,14 @@ function CalendarPage({
                     <h4 className="mb-3 fw-bold">
                       <i className="bi bi-capsule"></i> {t('pillbox.title')}
                     </h4>
-                    <button
+                    <Link
                       className="btn btn-outline-success w-100"
-                      onClick={() =>
-                        navigate(`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`)
-                      }
+                      to={`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`}
                       aria-label={t('pillbox.fill')}
                       title={t('pillbox.fill')}
                     >
                       <i className="bi bi-capsule"></i> {t('pillbox.fill')}
-                    </button>
+                    </Link>
                   </div>
                 </div>
               )}
