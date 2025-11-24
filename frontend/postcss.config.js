@@ -1,6 +1,8 @@
+import purgecss from '@fullhuman/postcss-purgecss';
+
 export default {
-  plugins: {
-    '@fullhuman/postcss-purgecss': {
+  plugins: [
+    purgecss({
       content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
       defaultExtractor: (content) => content.match(/[\w-/:]+(?<!:)/g) || [],
       safelist: {
@@ -8,6 +10,6 @@ export default {
         deep: [],
         greedy: [],
       },
-    },
-  },
+    }),
+  ],
 };
