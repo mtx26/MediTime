@@ -1,5 +1,5 @@
 // CalendarPage.jsx
-import React, { useEffect, useContext, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useContext, useRef, useState, useMemo, use } from 'react';
 import { useNavigate, useParams, useLocation, Link } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -45,7 +45,7 @@ function CalendarPage({
   const [alertDuration, setAlertDuration] = useState(2000); // Durée d'affichage de l'alerte
 
   // Méthode de décrémentation du stock (pour affichage différencié)
-  const [stockDecrementMethod, setStockDecrementMethod] = useState('');
+  const [stockDecrementMethod, setStockDecrementMethod] = useState(false);
   const [loadingStockMethod, setLoadingStockMethod] = useState(false);
 
   // 🔄 Références et chargement
@@ -219,7 +219,15 @@ function CalendarPage({
     }));
   }, [calendarEvents]);
 
-  if (loading === true && calendarId) {
+  if ((loading === undefined || loadingStockMethod === undefined) && calendarId) {
+    return (
+      <div className="alert alert-danger text-center mt-5" role="alert">
+        ❌ {t('invalid_or_expired_link')}
+      </div>
+    );
+  }
+
+  if ((loading === true || loadingStockMethod === true) && calendarId) {
     return (
       <div
         className="d-flex justify-content-center align-items-center"
@@ -228,14 +236,6 @@ function CalendarPage({
         <div className="spinner-border text-primary">
           <span className="visually-hidden">{t('loading_calendar')}</span>
         </div>
-      </div>
-    );
-  }
-
-  if ((loading === undefined || loadingStockMethod) && calendarId) {
-    return (
-      <div className="alert alert-danger text-center mt-5" role="alert">
-        ❌ {t('invalid_or_expired_link')}
       </div>
     );
   }
