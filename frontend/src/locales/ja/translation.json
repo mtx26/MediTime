@@ -718,5 +718,6 @@
   "yes": "はい",
   "calendar_completed_this_week": "今週はピルボックスがいっぱいです！",
   "retry": "もう一度やり直してください",
-  "pillbox_error_message": "ピルボックスの検証中にエラーが発生しました。もう一度お試しください。"
+  "pillbox_error_message": "ピルボックスの検証中にエラーが発生しました。もう一度お試しください。",
+  "pillbox_stock_decreased_successfully": "ピルボックスの在庫が正常に減少しました"
 }
