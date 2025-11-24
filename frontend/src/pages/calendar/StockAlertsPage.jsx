@@ -115,6 +115,7 @@ function StockAlertsPage({
                 </>
               ),
               onClick: () => sendStockAlertsSMS(),
+              title: t('send_sms'),
             } 
           ]}
         />

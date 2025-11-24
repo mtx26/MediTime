@@ -1,17 +1,12 @@
 import React, { useContext } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 
 function HomePage() {
-  const navigate = useNavigate();
   const { lng } = useParams();
   const { userInfo } = useContext(UserContext);
   const { t } = useTranslation();
-  
-  const handleAccess = () => navigate(`/${lng}/calendars`);
-  const handleLogin = () => navigate(`/${lng}/login`);
-  const handleRegister = () => navigate(`/${lng}/register`);
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isAndroid = /android/i.test(navigator.userAgent);
 
@@ -26,32 +21,32 @@ function HomePage() {
           <p className="lead text-muted">{t('app.subtitle')}</p>
           <div className="mt-4 d-flex flex-column flex-md-row justify-content-center gap-3">
             {userInfo ? (
-              <button
+              <Link
+                to={`/${lng}/calendars`}
                 className="btn btn-primary btn-lg px-4"
-                onClick={handleAccess}
                 aria-label={t('app.access')}
                 title={t('app.access')}
               >
                 {t('app.access')}
-              </button>
+              </Link>
             ) : (
               <>
-                <button
+                <Link
+                  to={`/${lng}/login`}
                   className="btn btn-primary btn-lg px-4 shadow rounded-3"
-                  onClick={handleLogin}
                   aria-label={t('app.login')}
                   title={t('app.login')}
                 >
                   {t('app.login')}
-                </button>
-                <button
+                </Link>
+                <Link
+                  to={`/${lng}/register`}
                   className="btn btn-outline-primary btn-lg px-4 shadow rounded-3"
-                  onClick={handleRegister}
                   aria-label={t('app.register')}
                   title={t('app.register')}
                 >
                   {t('app.register')}
-                </button>
+                </Link>
               </>
             )}
           </div>
@@ -147,14 +142,14 @@ function HomePage() {
         <div className="container text-center">
           <h2 className="fw-bold">{t('cta.title')}</h2>
           <p className="lead mb-4">{t('cta.desc')}</p>
-          <button
+          <Link
+            to={`/${lng}/register`}
             className="btn btn-light btn-lg px-4"
-            onClick={handleRegister}
             aria-label={t('app.register')}
             title={t('app.register')}
           >
             {t('cta.button')}
-          </button>
+          </Link>
         </div>
       </section>
 

@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
@@ -71,12 +72,32 @@ function ActionSheet({ actions, buttonSize, minimal = false }) {
           zIndex: 1055,
         }}
       >
-        {actions.map((action, index) =>
-          action.separator ? (
-            <li key={`separator-${index}`}>
-              <hr className="dropdown-divider" />
-            </li>
-          ) : (
+        {actions.map((action, index) => {
+          if (action.separator) {
+            return (
+              <li key={`separator-${index}`}>
+                <hr className="dropdown-divider" />
+              </li>
+            );
+          }
+
+          if (action.linkTo) {
+            return (
+              <li key={index}>
+                <Link
+                  to={action.linkTo}
+                  onClick={() => setShow(false)}
+                  className={`dropdown-item ${action.danger ? 'text-danger' : ''}`}
+                  title={action.title}
+                  aria-label={action.title}
+                >
+                  {action.label}
+                </Link>
+              </li>
+            );
+          }
+
+          return (
             <li key={index}>
               <button
                 className={`dropdown-item btn btn-outline-dark ${action.danger ? 'text-danger' : ''}`}
@@ -84,12 +105,14 @@ function ActionSheet({ actions, buttonSize, minimal = false }) {
                   action.onClick?.();
                   setShow(false);
                 }}
+                title={action.title}
+                aria-label={action.title}
               >
                 {action.label}
               </button>
             </li>
-          )
-        )}
+          );
+        })}
       </ul>
     )}
   </span>
@@ -103,7 +126,9 @@ ActionSheet.propTypes = {
   actions: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.node,
+      title: PropTypes.string,
       onClick: PropTypes.func,
+      linkTo: PropTypes.string,
       danger: PropTypes.bool,
       separator: PropTypes.bool,
     })

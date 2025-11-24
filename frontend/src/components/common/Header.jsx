@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useState, useRef, useCallback } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { handleLogout } from '../../services/auth/authService';
-import { useNavigate } from 'react-router-dom';
 import HoveredUserProfile from './HoveredUserProfile';
 import NotificationLine from './NotificationLine';
 import PropTypes from 'prop-types';
@@ -333,14 +332,15 @@ function Navbar({ sharedProps }) {
                       <hr className="dropdown-divider" />
                     </li>
                     <li className="text-center">
-                      <button
+                      <Link
                         className="btn btn-sm btn-outline-primary w-100"
                         aria-label="Ouvrir les notifications"
                         title="Ouvrir les notifications"
-                        onClick={() => navigate(`/${lng}/notifications`)}
+                        to={`/${lng}/notifications`}
+                        onClick={() => setShowNotifDropdown(false)}
                       >
                         <i className="bi bi-bell"></i> {t('open_notifications')}
-                      </button>
+                      </Link>
                     </li>
                   </ul>
                 )}

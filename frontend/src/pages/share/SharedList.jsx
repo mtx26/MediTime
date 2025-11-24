@@ -6,7 +6,7 @@ import HoveredUserProfile from "../../components/common/HoveredUserProfile";
 import { toISO } from "../../utils/calendar/dateUtils";
 import { useTranslation } from "react-i18next";
 import ActionSheet from '../../components/common/ActionSheet';
-import { useSearchParams, useNavigate, useParams } from "react-router-dom";
+import { useSearchParams, useNavigate, useParams, Link } from "react-router-dom";
 
 const VITE_URL = import.meta.env.VITE_VITE_URL;
 
@@ -322,19 +322,19 @@ function SharedList({
           style={{ scrollBehavior: 'smooth' }}
         >
           {(personalCalendars?.calendarsData || []).map((calendar) => (
-            <button
+            <Link
               key={calendar.id}
+              to={`?calendar=${calendar.id}`}
               className={`btn rounded-pill px-3 py-1 fw-semibold shadow-sm text-nowrap ${
                 selectedCalendarId === calendar.id ? 'btn-primary' : 'btn-outline-primary'
               }`}
               onClick={() => {
                 setSelectedCalendarId(calendar.id);
-                setSearchParams({ calendar: calendar.id });
               }}
               title={calendar.name}
             >
               {calendar.name.length > 20 ? calendar.name.slice(0, 17) + '…' : calendar.name}
-            </button>
+            </Link>
           ))}
         </div>
       </div>
@@ -400,7 +400,8 @@ const calendarActions = ({
           <i className="bi bi-eye me-2"></i> {t("open")}
         </>
       ),
-      onClick: () => navigate(`/${lng}/calendar/${calendarId}`),
+      linkTo: `/${lng}/calendar/${calendarId}`,
+      title: t("open"),
     },
     {
       label: (
@@ -408,7 +409,8 @@ const calendarActions = ({
           <i className="bi bi-capsule me-2"></i> {t("medicines.label")}
         </>
       ),
-      onClick: () => navigate(`/${lng}/calendar/${calendarId}/boxes`),
+      linkTo: `/${lng}/calendar/${calendarId}/boxes`,
+      title: t("medicines.label"),
     },
     { separator: true },
     {
@@ -429,6 +431,7 @@ const calendarActions = ({
           t,
           lng,
         }),
+        title: t("delete"),
       danger: true,
     },
   ];
@@ -530,6 +533,7 @@ function TokenList({
                       </>
                     ),
                     onClick: () => setSelectedModifyToken(token.id),
+                    title: t('modify')
                   },
                   {
                     label: (
@@ -546,6 +550,7 @@ function TokenList({
                         await handleCreateToken(calendarId);
                       });
                     },
+                    title: t('regenerate')
                   },
                   { separator: true },
                   {
@@ -555,6 +560,7 @@ function TokenList({
                       </>
                     ),
                     onClick: () => deleteTokenConfirmAction(token.id),
+                    title: t('delete'),
                     danger: true,
                   },
                 ]}
@@ -829,6 +835,7 @@ function UserList({
                         </>
                       ),
                       onClick: () => deleteLoginInvitationConfirmAction(user.token),
+                      title: t('delete'),
                       danger: true,
                     },
                   ]}
@@ -899,6 +906,7 @@ function UserList({
                           </>
                         ),
                         onClick: () => deleteRegistrationInvitationConfirmAction(invitation.token),
+                        title: t('delete'),
                         danger: true,
                       },
                     ]}

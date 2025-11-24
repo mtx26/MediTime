@@ -1,6 +1,6 @@
 
 import React, { useRef, useState, useEffect, useContext, useMemo, use } from 'react';
-import { useParams, useLocation, useNavigate, data } from 'react-router-dom';
+import { useParams, useLocation, useNavigate, data, Link } from 'react-router-dom';
 import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
 import { toISO, toDate, getMondayDate } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
@@ -169,20 +169,19 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
     <div className="daily-calendar-page">
       {/* Affichage alert stock */}
       {isLowStock && (
-        <button
-          type="button"
+        <Link
           className="alert w-100 alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow"
-          onClick={() =>
-            navigate(`/${params.lng || 'fr'}/${basePath}/${calendarId}/stock-alerts`)}
+          to={`/${params.lng || 'fr'}/${basePath}/${calendarId}/stock-alerts`}
           title={t('stock_alert_tooltip')}
           aria-label={t('stock_alert')}
+          style={{ textDecoration: 'none' }}
         >
           <div className="d-flex align-items-center">
             <i className="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
             <span className="fw-semibold">{t('stock_alert')}</span>
           </div>
           <i className="bi bi-chevron-right ms-2"></i>
-        </button>
+        </Link>
       )}
       <div className='container border shadow rounded my-4 p-3' style={{maxWidth: '800px'}}>
         <WeeklyEventContent

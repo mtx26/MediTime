@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import AlertSystem from '../../components/common/AlertSystem';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 import ActionSheet from '../../components/common/ActionSheet';
@@ -10,7 +10,6 @@ function SelectCalendar({
   personalCalendars,
   sharedUserCalendars
 }) {
-  const navigate = useNavigate();
   const { lng } = useParams();
   const { t } = useTranslation();
 
@@ -171,23 +170,23 @@ function SelectCalendar({
                       </span>
                     </div>
                     {calendarData.ifLowStock && (
-                      <button className="btn p-0" onClick={() => navigate(`/${lng}/calendar/${calendarData.id}/stock-alerts`)}>
+                      <Link className="btn p-0" to={`/${lng}/calendar/${calendarData.id}/stock-alerts`}>
                         <span className="badge bg-warning d-flex align-items-center gap-1">
                           <i className='bi bi-exclamation-triangle-fill'></i>{t('stock_alert')}
                         </span>
-                      </button>
+                      </Link>
                     )}
                   </div>
 
                   {/* Bouton Ouvrir */}
-                  <button
+                  <Link
                     className="btn btn-outline-success"
                     title={t('open')}
                     aria-label={t('open')}
-                    onClick={() => navigate(`/${lng}/calendar/${calendarData.id}`)}
+                    to={`/${lng}/calendar/${calendarData.id}`}
                   >
                     {t('open')}
-                  </button>
+                  </Link>
 
                   {/* ActionSheet */}
                   <ActionSheet
@@ -199,6 +198,7 @@ function SelectCalendar({
                           </>
                         ),
                         onClick: () => setRenameMode(calendarData.id),
+                        title: t('rename')
                       },
                       { separator: true },
                       {
@@ -207,7 +207,8 @@ function SelectCalendar({
                             <i className="bi bi-box-arrow-up me-2"></i> {t('share')}
                           </>
                         ),
-                        onClick: () => navigate(`/${lng}/shared-calendars?calendar=${calendarData.id}`),
+                        linkTo: `/${lng}/shared-calendars?calendar=${calendarData.id}`,
+                        title: t('share'),
                       },
                       { separator: true },
                       {
@@ -216,7 +217,8 @@ function SelectCalendar({
                             <i className="bi bi-capsule me-2"></i> {t('medicines.label')}
                           </>
                         ),
-                        onClick: () => navigate(`/${lng}/calendar/${calendarData.id}/boxes`),
+                        linkTo: `/${lng}/calendar/${calendarData.id}/boxes`,
+                        title: t('medicines.label'),
                       },
                       {
                         label: (
@@ -225,6 +227,7 @@ function SelectCalendar({
                           </>
                         ),
                         onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
+                        title: t('boxes.export_pdf'),
                       },
                       {
                         label: (
@@ -232,8 +235,8 @@ function SelectCalendar({
                             <i className="bi bi-exclamation-triangle-fill me-2"></i> {t('stock')}
                           </>
                         ),
-                        onClick: () =>
-                          navigate(`/${lng}/calendar/${calendarData.id}/stock-alerts`),
+                        linkTo: `/${lng}/calendar/${calendarData.id}/stock-alerts`,
+                        title: t('stock'),
                       },
                       { separator: true },
                       {
@@ -242,8 +245,8 @@ function SelectCalendar({
                             <i className="bi bi-gear me-2"></i> {t('settings.label')}
                           </>
                         ),
-                        onClick: () =>
-                          navigate(`/${lng}/calendar/${calendarData.id}/settings`),
+                        linkTo: `/${lng}/calendar/${calendarData.id}/settings`,
+                        title: t('settings.label'),
                       },
                       { separator: true },
                       {
@@ -253,6 +256,7 @@ function SelectCalendar({
                           </>
                         ),
                         onClick: () => handleDeleteCalendarClick(calendarData.id),
+                        title: t('delete'),
                         danger: true,
                       },
                     ]}
@@ -309,12 +313,12 @@ function SelectCalendar({
               </div>
             ))
           )}
-          <button
+          <Link
             className={`text-center btn btn-outline-primary ${personalCalendars.calendarsData.length > 0 ? 'rounded-0 rounded-bottom' : ''}`}
-            onClick={() => navigate(`/${lng}/add-calendar`)}
+            to={`/${lng}/add-calendar`}
           >
             <i className="bi bi-calendar-plus me-2"></i> {t('calendar.add_calendar')}
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -389,24 +393,22 @@ function SelectCalendar({
                         />
                       </div>
                       {calendarData.ifLowStock && (
-                        <button className="btn p-0" onClick={() => navigate(`/${lng}/shared-user-calendar/${calendarData.id}/stock-alerts`)}>
+                        <Link className="btn p-0" to={`/${lng}/shared-user-calendar/${calendarData.id}/stock-alerts`}>
                           <span className="badge bg-warning d-flex align-items-center gap-1">
                             <i className='bi bi-exclamation-triangle-fill'></i>{t('stock_alert')}
                           </span>
-                        </button>
+                        </Link>
                       )}
                     </div>
 
-                    <button
+                    <Link
                       className="btn btn-outline-success"
                       title={t('open')}
                       aria-label={t('open')}
-                      onClick={() =>
-                        navigate(`/${lng}/shared-user-calendar/${calendarData.id}`)
-                      }
+                      to={`/${lng}/shared-user-calendar/${calendarData.id}`}
                     >
                       {t('open')}
-                    </button>
+                    </Link>
                     <ActionSheet
                       actions={[
                         {
@@ -415,9 +417,8 @@ function SelectCalendar({
                               <i className="bi bi-capsule me-2"></i> {t('medicines.label')}
                             </>
                           ),
-                          onClick: () => {
-                            navigate(`/${lng}/shared-user-calendar/${calendarData.id}/boxes`);
-                          },
+                          linkTo: `/${lng}/shared-user-calendar/${calendarData.id}/boxes`,
+                          title: t('medicines.label'),
                         },
                         {
                           label: (
@@ -426,6 +427,7 @@ function SelectCalendar({
                             </>
                           ),
                           onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
+                          title: t('boxes.export_pdf'),
                         },
                         {
                           label: (
@@ -433,9 +435,8 @@ function SelectCalendar({
                               <i className="bi bi-exclamation-triangle-fill me-2"></i> {t('stock')}
                             </>
                           ),
-                          onClick: () => {
-                            navigate(`/${lng}/shared-user-calendar/${calendarData.id}/stock-alerts`);
-                          },
+                          linkTo: `/${lng}/shared-user-calendar/${calendarData.id}/stock-alerts`,
+                          title: t('stock'),
                         },
                         { separator: true },
                         {
@@ -444,9 +445,8 @@ function SelectCalendar({
                               <i className="bi bi-gear me-2"></i> {t('settings.label')}
                             </>
                           ),
-                          onClick: () => {
-                            navigate(`/${lng}/shared-user-calendar/${calendarData.id}/settings`);
-                          },
+                          linkTo: `/${lng}/shared-user-calendar/${calendarData.id}/settings`,
+                          title: t('settings.label'),
                         },
                         { separator: true },
                         {
@@ -456,6 +456,7 @@ function SelectCalendar({
                             </>
                           ),
                           onClick: () => handleDeleteSharedCalendarClick(calendarData.id),
+                          title: t('delete'),
                           danger: true,
                         },
                       ]}
