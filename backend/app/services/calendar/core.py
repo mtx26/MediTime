@@ -344,13 +344,17 @@ def delete_pillbox_use(calendar_id, use_id):
                 return False
             
             prepared_at = row.get('prepared_at')
+            prepared_at = prepared_at.date()
 
-            # Supprimer l'enregistrement
-            cursor.execute(
-                "DELETE FROM pillbox_uses WHERE id = %s",
-                (use_id,)
-            )
+            if restore_pillbox(calendar_id, prepared_at):
+                # Supprimer l'enregistrement
+                cursor.execute(
+                    "DELETE FROM pillbox_uses WHERE id = %s",
+                    (use_id,)
+                )
+            else:
+                return False
             conn.commit()
             
-    # Restaurer le stock des médicaments utilisés pour cette semaine
-    restore_pillbox(calendar_id, prepared_at)
+            # Restaurer le stock des médicaments utilisés pour cette semaine
+    return True

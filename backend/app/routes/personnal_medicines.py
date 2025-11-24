@@ -234,12 +234,19 @@ def handle_use_pillbox(calendar_id):
 @with_query_origin(default_origin="CANCEL_PILLBOX_USE")
 def handle_cancel_pillbox_use(calendar_id, use_id):
     try:
-        delete_pillbox_use(calendar_id, use_id)
-        return success_response(
-            message="utilisation du pillbox annulée",
-            code="PILLBOX_USE_CANCELED",
-            log_extra={"calendar_id": calendar_id, "use_id": use_id}
-        )
+        if delete_pillbox_use(calendar_id, use_id):
+            return success_response(
+                message="utilisation du pillbox annulée",
+                code="PILLBOX_USE_CANCELED",
+                log_extra={"calendar_id": calendar_id, "use_id": use_id}
+            )
+        else:
+            return warning_response(
+                message="utilisation du pillbox non trouvée",
+                code="PILLBOX_USE_NOT_FOUND",
+                status_code=404,
+                log_extra={"calendar_id": calendar_id, "use_id": use_id}
+            )
     except Exception as e:
         return error_response(
             message="erreur lors de l'annulation de l'utilisation du pillbox",
