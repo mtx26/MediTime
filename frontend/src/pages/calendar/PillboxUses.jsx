@@ -50,10 +50,6 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
     return `${monday.toLocaleDateString(lng, options)} - ${sunday.toLocaleDateString(lng, options)}`;
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString(lng);
-  };
-
   const fetchData = async () => {
     if (!calendarId) return setLoading(true);
     if (calendarType === 'personal' || calendarType === 'sharedUser') {
@@ -122,7 +118,6 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
               <tr>
                 <th>{t('week')}</th>
                 <th>{t('prepared_by')}</th>
-                <th>{t('created_at')}</th>
                 <th className="text-end">{t('actions')}</th>
               </tr>
             </thead>
@@ -136,7 +131,6 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
                       trigger={<span>{use.prepared_by.display_name}</span>}
                     />
                   </td>
-                  <td>{formatDate(use.created_at)}</td>
                   <td className="text-end">
                     <button
                       className="btn btn-sm btn-outline-primary"
