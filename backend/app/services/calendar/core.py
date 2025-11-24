@@ -292,3 +292,36 @@ def get_if_pillbox_is_used(calendar_id, base_date):
             )
             row = cursor.fetchone() or {"result": 0}
             return row.get("result", 0) == 1
+        
+def get_pillbox_uses(calendar_id):
+    """
+    Récupère les enregistrements d'utilisation du pillulier pour un calendrier donné.
+    
+    retourne une liste d'objets avec les infos de chaque enregistrement
+    """
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT 
+                    pu.id,
+                    pu.calendar_id,
+                    pu.prepared_at,
+                    pu.created_at,
+                    pu.updated_at,
+                    jsonb_build_object(
+                        'id', u.id,
+                        'email', u.email,
+                        'display_name', u.display_name,
+                        'photo_url', u.photo_url
+                    ) as prepared_by
+                FROM pillbox_uses pu
+                JOIN users u ON pu.prepared_by = u.id
+                WHERE pu.calendar_id = %s
+                ORDER BY pu.prepared_at DESC;
+                """,
+                (calendar_id,)
+            )
+            rows = cursor.fetchall() or []
+            return rows

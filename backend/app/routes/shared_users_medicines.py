@@ -2,7 +2,7 @@ from flask import request, g
 from app.utils.auth import require_auth
 from . import api
 from app.utils.responses import success_response, error_response, warning_response
-from app.services.calendar import verify_calendar_share, add_pillbox_uses, get_if_pillbox_is_used
+from app.services.calendar import verify_calendar_share, add_pillbox_uses, get_if_pillbox_is_used, get_pillbox_uses
 from app.services.medication import get_boxes, update_box, create_box, delete_box, restock_box
 from app.services.medication import use_pillbox
 from datetime import datetime, timezone
@@ -217,8 +217,32 @@ def handle_use_shared_users_pillbox(calendar_id):
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )
-        
+    
+# Route pour recuperer les usages de pillbox d'un calendrier
+@api.route("/shared/users/calendars/<calendar_id>/pillbox/uses", methods=["GET"])
+@measure_time()
+@require_auth
+@verify_calendar_share
+@with_query_origin(default_origin="GET_PILLBOX_USES")
+def handle_get_shared_users_pillbox_uses(calendar_id):
+    try:
+        pillbox_uses = get_pillbox_uses(calendar_id)
+        return success_response(
+            message="usages du pilulier récupérés",
+            code="PILLBOX_USES_FETCHED",
+            data={"pillbox_uses": pillbox_uses},
+            log_extra={"calendar_id": calendar_id, "uses_count": len(pillbox_uses)}
+        )
+    except Exception as e:
+        return error_response(
+            message="erreur lors de la récupération des usages du pilulier",
+            code="GET_PILLBOX_USES_ERROR",
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
 
+# Route pour réapprovisionner une boite de médicaments
 @api.route("/shared/users/calendars/<calendar_id>/boxes/<box_id>/restock", methods=["POST"])
 @measure_time()
 @require_auth

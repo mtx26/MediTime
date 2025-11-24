@@ -22,6 +22,7 @@ const DailyCalendarPage = lazy(() => import('../pages/calendar/DailyCalendarPage
 const CalendarList = lazy(() => import('../pages/calendar/CalendarList'));
 const SharedList = lazy(() => import('../pages/share/SharedList'));
 const StockAlertsPage = lazy(() => import('../pages/calendar/StockAlertsPage'));
+const PillboxUses = lazy(() => import('../pages/calendar/PillboxUses'));
 
 const MedicinesList = lazy(() => import('../pages/medicines/MedicinesList'));
 const BoxesView = lazy(() => import('../pages/medicines/BoxesView'));
@@ -253,6 +254,19 @@ function AppRoutes({ sharedProps }) {
               element={
                 <RouteWithLoader
                   element={<StockAlertsPage {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
+        <Route
+          path="pillbox-uses"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<PillboxUses {...sharedProps} />}
                   isLoading={sharedProps.loadingStates.isInitialLoading}
                 />
               }

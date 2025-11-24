@@ -224,6 +224,18 @@ function App() {
     });
   }, []);
 
+  // Fonction pour recuperer la list des utilisations du pillbox
+  const fetchPersonalPillboxUses = useCallback(async (calendarId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/pillbox/uses`,
+      method: 'GET',
+      origin: 'GET_PILLBOX_USES',
+      uid,
+      analyticsEvent: 'fetch_personal_pillbox_uses',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
+
   // Fonction pour récupérer la méthode de décrément de stock
   const fetchPersonalStockDecrementMethod = useCallback(async (calendarId) => {
     return await performApiCall({
@@ -667,6 +679,18 @@ function App() {
     });
   }, []);
 
+  // Fonction pour récupérer la liste des utilisations du pillbox
+  const fetchSharedUserPillboxUses = useCallback(async (calendarId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/pillbox/uses`,
+      method: 'GET',
+      origin: 'GET_PILLBOX_USES',
+      uid,
+      analyticsEvent: 'fetch_shared_user_pillbox_uses',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
+
   // Fonction pour restocker une boîte
   const sharedUserRestockBox = useCallback(async (calendarId, boxId) => {
     return await performApiCall({
@@ -766,6 +790,7 @@ function App() {
       downloadPersonalCalendarPdf,
       fetchIfPersonalPillboxUsed,
       useMedicinesForPersonalPillbox,
+      fetchPersonalPillboxUses,
       fetchPersonalStockDecrementMethod,
       updatePersonalStockDecrementMethod,
       personalRestockBox,
@@ -795,6 +820,7 @@ function App() {
       deleteSharedUserBox,
       fetchIfSharedUserPillboxUsed,
       useMedicinesForSharedUserPillbox,
+      fetchSharedUserPillboxUses,
       sharedUserRestockBox,
       fetchSharedUserNotificationsEnabled,
       updateSharedUserNotificationsEnabled,
