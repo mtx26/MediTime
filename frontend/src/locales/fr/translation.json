@@ -718,5 +718,6 @@
   },
   "yes": "Oui",
   "retry": "Réessayer",
+  "pillbox_stock_decreased_successfully": "Stock du pilulier décrémenté avec succès",
   "pillbox_error_message": "Une erreur est survenue lors de la validation du pilulier. Veuillez réessayer."
 }

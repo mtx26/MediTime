@@ -718,5 +718,6 @@
   "yes": "Yes",
   "calendar_completed_this_week": "Pillbox full for this week!",
   "retry": "Try again",
-  "pillbox_error_message": "An error occurred while validating the pillbox. Please try again."
+  "pillbox_error_message": "An error occurred while validating the pillbox. Please try again.",
+  "pillbox_stock_decreased_successfully": "Pillbox stock successfully decremented"
 }

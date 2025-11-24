@@ -148,7 +148,7 @@ export default function PillboxDisplay({
 
               // Navigation propre au pillbox (effectuée même si rep.success est false, comme avant)
               if (type === 'pillbox') {
-                navigate(`/${lng}/${basePath}/${calendarId}`);
+                navigate(`/${lng}/${basePath}/${calendarId}?success=${encodeURIComponent(t('pillbox_stock_decreased_successfully'))}`);
               }
 
               if (rep.success) {

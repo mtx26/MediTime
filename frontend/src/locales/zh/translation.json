@@ -718,5 +718,6 @@
   "yes": "是的",
   "calendar_completed_this_week": "这周药盒已满！",
   "retry": "再试一次",
-  "pillbox_error_message": "验证药盒时出错，请重试。"
+  "pillbox_error_message": "验证药盒时出错，请重试。",
+  "pillbox_stock_decreased_successfully": "Pillbox股票成功减持"
 }

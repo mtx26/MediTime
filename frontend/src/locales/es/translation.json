@@ -718,5 +718,6 @@
   "yes": "Sí",
   "calendar_completed_this_week": "¡Pastillas llenas para esta semana!",
   "retry": "Intentar otra vez",
-  "pillbox_error_message": "Se ha producido un error al validar el pastillero. Inténtelo de nuevo."
+  "pillbox_error_message": "Se ha producido un error al validar el pastillero. Inténtelo de nuevo.",
+  "pillbox_stock_decreased_successfully": "Las existencias de pastillero se redujeron con éxito"
 }

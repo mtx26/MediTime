@@ -42,6 +42,8 @@ function CalendarPage({
   const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
   const [alertType, setAlertType] = useState(''); // Type d'alerte
   const [alertMessage, setAlertMessage] = useState(''); // Message d'alerte
+  const [alertDuration, setAlertDuration] = useState(2000); // Durée d'affichage de l'alerte
+
   // Méthode de décrémentation du stock (pour affichage différencié)
   const [stockDecrementMethod, setStockDecrementMethod] = useState('');
   const [loadingStockMethod, setLoadingStockMethod] = useState(false);
@@ -181,9 +183,9 @@ function CalendarPage({
 
   // 📍 Filtrage des événements pour un jour spécifique et tri par ordre alphabétique
   useEffect(() => {
-  if (!selectedDate || !calendarEvents.length) return;
-  // Copier avant de trier pour éviter de muter le tableau d'état `calendarEvents`
-  const sortedEvents = [...calendarEvents].sort((a, b) => {
+    if (!selectedDate || !calendarEvents.length) return;
+    // Copier avant de trier pour éviter de muter le tableau d'état `calendarEvents`
+    const sortedEvents = [...calendarEvents].sort((a, b) => {
       const dateA = new Date(a.start);
       const dateB = new Date(b.start);
       if (dateA.getTime() === dateB.getTime()) {
@@ -196,6 +198,17 @@ function CalendarPage({
     );
     setEventsForDay(filtered);
   }, [selectedDate, calendarEvents]);
+
+    // Afficher un message de succès si présent dans l'URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const successMsg = searchParams.get('success');
+    if (successMsg) {
+      setAlertType('success');
+      setAlertMessage(successMsg);
+      setAlertDuration(4000);
+    }
+  }, [location.search, calendarId]);
 
   // 📍 Mémoisation des événements pour le calendrier
   const memoizedEvents = useMemo(() => {
@@ -241,6 +254,7 @@ function CalendarPage({
                 onClose={() => {
                   setAlertMessage('');
                 }}
+                duration={alertDuration}
               />
               {/* Boutons de navigation et partage */}
               <div className="d-flex align-items-center gap-2 mb-3">
