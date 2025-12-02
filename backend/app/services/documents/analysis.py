@@ -2,7 +2,16 @@ from app.db.connection import get_connection
 import json
 
 def save_analysis_result(owner_uid: str, calendar_name: str, boxes: list) -> str:
+    """Enregistre le résultat de l'analyse d'un document en créant un calendrier et ses boîtes de médicaments.
+    
+    Paramètres:
+    - owner_uid (str): L'UID du propriétaire du calendrier.
+    - calendar_name (str): Le nom du calendrier.
+    - boxes (list): La liste des boîtes de médicaments.
 
+    Retour:
+    - str: L'ID du calendrier créé.
+    """
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""

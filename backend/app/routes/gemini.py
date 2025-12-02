@@ -12,6 +12,11 @@ from app.services.documents import save_analysis_result
 @require_auth
 @with_query_origin(default_origin="DOCUMENT_ANALYZE")
 def handle_analyze_medical_document():
+    """Analyse un document médical en utilisant le modèle Gemini.
+
+    Payload:
+    - str: Image encodée en base64 du document médical à analyser.
+    """
     try:
         base64_image = request.json.get("image")
 
@@ -51,6 +56,12 @@ def handle_analyze_medical_document():
 @require_auth
 @with_query_origin(default_origin="DOCUMENT_ANALYZE_SAVE")
 def handle_save_analysis_result():
+    """Enregistre le résultat de l'analyse d'un document médical dans un calendrier.
+
+    Payload:
+    - str: calendarName - Nom du calendrier où enregistrer le résultat.
+    - list: boxes - Liste des boîtes contenant les informations extraites du document médical.
+    """
     try:
         owner_uid = g.uid
         payload = request.get_json(force=True) or {}

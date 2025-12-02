@@ -13,12 +13,18 @@ env = os.environ.get("ENV", "production")
 
 
 # 🔍 Détection de Railway via variable unique
-def is_railway():
+def is_railway() -> bool:
+    """Détecte si l'application s'exécute sur Railway via une variable d'environnement spécifique.
+
+    Retour:
+    - bool: True si sur Railway, False sinon.
+    """
     return os.environ.get("RAILWAY_ENVIRONMENT", "").lower() == "true"
 
 
 # === Logger Contextualisé ===
 class ContextualAdapter(logging.LoggerAdapter):
+    """Adapter de logger pour ajouter un contexte personnalisé aux messages de log."""
     def process(self, msg, kwargs):
         source = self.extra.get("source", "UNKNOWN")
         extra = kwargs.pop("extra", {}) or {}
@@ -44,6 +50,7 @@ class ContextualAdapter(logging.LoggerAdapter):
 
 # === Formatter avec ou sans couleur
 class ColoredFileFormatter(logging.Formatter):
+    """Formatter de fichier avec coloration conditionnelle selon la source et le niveau de log."""
     def format(self, record):
         raw = super().format(record)
         msg_lower = record.getMessage().lower()
@@ -55,7 +62,17 @@ class ColoredFileFormatter(logging.Formatter):
         return color_line(raw, source=source, level=record.levelname)
 
 
-def color_line(text, source=None, level=None):
+def color_line(text: str, source: str | None = None, level: str | None = None) -> str:
+    """Applique une coloration ANSI au texte selon la source ou le niveau de log.
+
+    Paramètres:
+    - text (str): Texte à colorer.
+    - source (str | None): Source du log (ex: BACKEND, FRONTEND).
+    - level (str | None): Niveau de log (ex: ERROR, WARNING).
+
+    Retour:
+    - str: Texte coloré avec codes ANSI.
+    """
     if is_railway():
         return text  # Pas de couleur sur Railway
 
@@ -103,6 +120,7 @@ frontend_logger = ContextualAdapter(base_logger, {"source": "FRONTEND"})
 
 # === Wrapper dynamique
 class DynamicLogWrapper:
+    """Wrapper dynamique pour les loggers, permettant d'ajouter du contexte aux appels de log."""
     def __init__(self, base_logger):
         self.base_logger = base_logger
 

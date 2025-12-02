@@ -4,7 +4,15 @@ from email.utils import formataddr
 from app.utils.logging import log_backend
 from app.config import Config
 
-def send_email(to, subject, html_content, plain=None):
+def send_email(to: str, subject: str, html_content: str, plain: str = None):
+    """Envoie un email formaté avec en-tête et pied de page.
+
+    Paramètres:
+    - to (str): Adresse email du destinataire.
+    - subject (str): Sujet de l'email.
+    - html_content (str): Contenu HTML de l'email.
+    - plain (str, optional): Contenu texte brut de l'email. Par défaut None.
+    """
     try:
         html = f"""
             <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 24px;">

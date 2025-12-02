@@ -15,16 +15,33 @@ from app.utils.measure import measure_time
 import json
 from app.utils import with_query_origin
 
-# ---------------------------
-# Helpers communs (DB & notifs)
-# ---------------------------
 
-def _get_user_by_email(cursor, email: str):
+def _get_user_by_email(cursor, email: str) -> dict | None:
+    """Récupère un utilisateur par son email.
+
+    Paramètres:
+    - cursor: Curseur de la base de données.
+    - email: Adresse email de l'utilisateur à récupérer.
+
+    Retour:
+    - dict ou None: Dictionnaire contenant les informations de l'utilisateur si trouvé, sinon None.
+    """
     cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
     return cursor.fetchone()
 
 
-def _insert_registration_invitation(cursor, calendar_id: str, email: str):
+def _insert_registration_invitation(cursor, calendar_id: str, email: str) -> str | None:
+    """Insère une invitation d'enregistrement dans la base de données.
+
+    Paramètres:
+    - cursor: Curseur de la base de données.
+    - calendar_id: ID du calendrier à partager.
+    - email: Adresse email de l'invité.
+
+    Retour:
+    - str: Token de l'invitation créée.
+    """
+
     cursor.execute(
         """
         INSERT INTO invitations (calendar_id, invited_email)
@@ -37,7 +54,17 @@ def _insert_registration_invitation(cursor, calendar_id: str, email: str):
     return row.get("token") if row else None
 
 
-def _create_shared_calendar_invite(cursor, receiver_uid: str, calendar_id: str):
+def _create_shared_calendar_invite(cursor, receiver_uid: str, calendar_id: str) -> tuple[str | None, int | None]:
+    """Crée une invitation de partage de calendrier dans la base de données.
+    
+    Paramètres:
+    - cursor: Curseur de la base de données.
+    - receiver_uid: ID de l'utilisateur receveur de l'invitation.
+    - calendar_id: ID du calendrier à partager.
+
+    Retour:
+    - tuple: (token de l'invitation, ID de l'invitation créée).
+    """
     cursor.execute(
         """
         INSERT INTO shared_calendars (receiver_uid, calendar_id, accepted, access)
@@ -51,6 +78,16 @@ def _create_shared_calendar_invite(cursor, receiver_uid: str, calendar_id: str):
 
 
 def _delete_shared_calendar_by_token(cursor, token: str) -> bool:
+    """Supprime une invitation de partage de calendrier par son token.
+
+    Paramètres:
+    - cursor: Curseur de la base de données.
+    - token: Token de l'invitation à supprimer.
+
+    Retour:
+    - bool: True si la suppression a réussi, False sinon.
+    """
+
     cursor.execute(
         "DELETE FROM shared_calendars WHERE token = %s RETURNING 1",
         (token,),
@@ -58,7 +95,17 @@ def _delete_shared_calendar_by_token(cursor, token: str) -> bool:
     return cursor.fetchone() is not None
 
 
-def _delete_invitation_returning_calendar_owner(cursor, token: str):
+def _delete_invitation_returning_calendar_owner(cursor, token: str) -> tuple[str | None, str | None]:
+    """Supprime une invitation d'enregistrement par son token et retourne l'ID du calendrier et du propriétaire.
+
+    Paramètres:
+    - cursor: Curseur de la base de données.
+    - token: Token de l'invitation à supprimer.
+
+    Retour:
+    - tuple: (ID du calendrier, ID du propriétaire) si l'invitation a été trouvée et supprimée, sinon (None, None).
+    """
+
     cursor.execute(
         """
         DELETE FROM invitations i
@@ -76,7 +123,14 @@ def _delete_invitation_returning_calendar_owner(cursor, token: str):
 
 
 def _delete_invite_notification(cursor, receiver_uid: str, calendar_id: str, owner_uid: str):
-    # On supprime la notif d’invitation liée à ce calendrier (contenu contient au moins calendar_id)
+    """Supprime la notification d'invitation de calendrier pour un utilisateur.
+
+    Paramètres:
+    - cursor: Curseur de la base de données.
+    - receiver_uid: ID de l'utilisateur receveur de la notification.
+    - calendar_id: ID du calendrier lié à la notification.
+    - owner_uid: ID de l'utilisateur qui a envoyé l'invitation.
+    """
     cursor.execute(
         """
         DELETE FROM notifications
@@ -89,15 +143,20 @@ def _delete_invite_notification(cursor, receiver_uid: str, calendar_id: str, own
     )
 
 
-# ---------------------------------------------
-# Route : envoyer une invitation pour un partage
-# ---------------------------------------------
 @api.route("/invitations/<calendar_id>", methods=["POST"])
 @measure_time()
 @require_auth
 @verify_calendar
 @with_query_origin(default_origin="INVITATION_SEND")
-def handle_send_invitation(calendar_id):
+def handle_send_invitation(calendar_id: str):
+    """Envoie une invitation à un utilisateur pour partager un calendrier.
+    
+    Paramètres:
+    - str: calendar_id - ID du calendrier à partager.
+
+    Payload:
+    - str: email - Adresse email de l'utilisateur à inviter.
+    """
     owner_uid = g.uid if hasattr(g, "uid") else None  # défini avant try pour except éventuel
     try:
         payload = request.get_json(force=True)
@@ -193,14 +252,16 @@ def handle_send_invitation(calendar_id):
         )
 
 
-# --------------------------------
-# Récupération d'une login-invite
-# --------------------------------
 @api.route("/invitations/login/<token>", methods=["GET"])
 @measure_time()
 @require_auth
 @with_query_origin(default_origin="GET_INVITATION_LOGIN")
-def handle_login_invitation(token):
+def handle_login_invitation(token: str):
+    """Récupère une invitation de partage de calendrier par son token.
+    
+    Paramètres:
+    - str: token - Token de l'invitation à récupérer.
+    """
     uid = g.uid if hasattr(g, "uid") else None
     try:
         with get_connection() as conn:
@@ -246,15 +307,18 @@ def handle_login_invitation(token):
         )
 
 
-# --------------------------------------------------------
-# Suppression d'un utilisateur partagé (par le propriétaire)
-# --------------------------------------------------------
 @api.route("/invitations/login/<token>", methods=["DELETE"])
 @measure_time()
 @require_auth
 @verify_login_invitation_owner
 @with_query_origin(default_origin="DELETE_INVITATION_LOGIN")
-def delete_login_invitation(token):
+def delete_login_invitation(token: str):
+    """Supprime une invitation de partage de calendrier par son token.
+    
+    Paramètres:
+    - str: token - Token de l'invitation à supprimer.
+
+    """
     owner_uid = g.uid if hasattr(g, "uid") else None
     calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
     receiver_uid = g.receiver_uid if hasattr(g, "receiver_uid") else None
@@ -302,15 +366,18 @@ def delete_login_invitation(token):
         )
 
 
-# ---------------------------------------------
-# Acceptation d'une login-invite (par le receveur)
-# ---------------------------------------------
 @api.route("/invitations/login/accept/<token>", methods=["POST"])
 @measure_time()
 @require_auth
 @verify_login_invitation_receiver
 @with_query_origin(default_origin="INVITATION_LOGIN_ACCEPT")
-def handle_accept_login_invitation(token):
+def handle_accept_login_invitation(token: str):
+    """Accepte une invitation de partage de calendrier par son token.
+
+    Paramètres:
+    - str: token - Token de l'invitation à accepter.
+
+    """
     uid = g.uid if hasattr(g, "uid") else None
     calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
     owner_uid = g.owner_uid if hasattr(g, "owner_uid") else None
@@ -364,15 +431,18 @@ def handle_accept_login_invitation(token):
         )
 
 
-# ---------------------------------------------
-# Rejet d'une login-invite (par le receveur)
-# ---------------------------------------------
 @api.route("/invitations/login/reject/<token>", methods=["POST"])
 @measure_time()
 @require_auth
 @verify_login_invitation_receiver
 @with_query_origin(default_origin="INVITATION_LOGIN_REJECT")
-def handle_reject_login_invitation(token):
+def handle_reject_login_invitation(token: str):
+    """Rejette une invitation de partage de calendrier par son token.
+
+    Paramètres:
+    - str: token - Token de l'invitation à rejeter.
+
+    """
     uid = g.uid if hasattr(g, "uid") else None
     calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
     owner_uid = g.owner_uid if hasattr(g, "owner_uid") else None
@@ -414,14 +484,17 @@ def handle_reject_login_invitation(token):
         )
 
 
-# --------------------------------
-# Récupération d'une registration
-# --------------------------------
 @api.route("/invitations/registration/<token>", methods=["GET"])
 @measure_time()
 @require_auth
 @with_query_origin(default_origin="GET_INVITATION_REGISTRATION")
-def handle_registration_invitation(token):
+def handle_registration_invitation(token: str):
+    """Récupère une invitation de partage de calendrier par son token.
+    
+    Paramètres:
+    - str: token - Token de l'invitation à récupérer.
+
+    """
     try:
         user = g.user
         email = user.get("email")
@@ -468,15 +541,18 @@ def handle_registration_invitation(token):
         )
 
 
-# -------------------------------------------------------------
-# Suppression d'une registration-invite (par le propriétaire)
-# -------------------------------------------------------------
 @api.route("/invitations/registration/<token>", methods=["DELETE"])
 @measure_time()
 @require_auth
 @verify_registration_invitation_owner
 @with_query_origin(default_origin="DELETE_INVITATION_REGISTRATION")
-def delete_registration_invitation(token):
+def delete_registration_invitation(token: str):
+    """Supprime une invitation d'enregistrement par son token.
+    
+    Paramètres:
+    - str: token - Token de l'invitation à supprimer.
+
+    """
     uid = g.uid if hasattr(g, "uid") else None
     calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
     invited_email = g.invited_email if hasattr(g, "invited_email") else None
@@ -514,14 +590,17 @@ def delete_registration_invitation(token):
         )
 
 
-# -----------------------------------
-# Acceptation d'une registration
-# -----------------------------------
 @api.route("/invitations/registration/accept/<token>", methods=["POST"])
 @measure_time()
 @require_auth
 @with_query_origin(default_origin="ACCEPT_INVITATION_REGISTRATION")
-def accept_registration_invitation(token):
+def accept_registration_invitation(token: str):
+    """Accepte une invitation d'enregistrement par son token.
+
+    Paramètres:
+    - str: token - Token de l'invitation à accepter.
+
+    """
     uid = g.uid if hasattr(g, "uid") else None
     try:
         with get_connection() as conn:
@@ -579,14 +658,17 @@ def accept_registration_invitation(token):
         )
 
 
-# -----------------------------------
-# Rejet d'une registration
-# -----------------------------------
 @api.route("/invitations/registration/reject/<token>", methods=["POST"])
 @measure_time()
 @require_auth
 @with_query_origin(default_origin="REJECT_INVITATION_REGISTRATION")
-def reject_registration_invitation(token):
+def reject_registration_invitation(token: str):
+    """Rejette une invitation d'enregistrement par son token.
+
+    Paramètres:
+    - str: token - Token de l'invitation à rejeter.
+
+    """
     uid = g.uid if hasattr(g, "uid") else None
     try:
         with get_connection() as conn:

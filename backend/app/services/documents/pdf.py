@@ -12,7 +12,16 @@ moment_map = {
     "night": "nuit",
 }
 
-def _parse_date(val):
+def _parse_date(val: str | date | datetime | None) -> date | None:
+    """Parse une chaîne de caractères en date.
+    Peut gérer les objets date et datetime en les retournant tels quels.
+
+    Paramètres:
+    - val (str | date | datetime | None): La valeur à parser en date.
+
+    Retour:
+    - date | None: La date parsée ou None si la conversion échoue.
+    """
     if not val:
         return None
     if isinstance(val, (datetime, date)):
@@ -28,11 +37,27 @@ def _parse_date(val):
     except (ValueError, TypeError):
         return None
 
-def _fmt_date(val):
+def _fmt_date(val: str | date | datetime | None) -> str | None:
+    """Formate une date en chaîne au format JJ/MM/AAAA.
+
+    Paramètres:
+    - val (str | date | datetime | None): La valeur à formater.
+
+    Retour:
+    - str | None: La date formatée ou None si la conversion échoue.
+    """
     d = _parse_date(val)
     return d.strftime("%d/%m/%Y") if d else None
 
-def _fmt_dose(dose):
+def _fmt_dose(dose: str | int | float | None) -> str:
+    """Formate une dose en chaîne avec unité mg si aucune unité n'est spécifiée.
+
+    Paramètres:
+    - dose: La dose à formater.
+
+    Retour:
+    - str: La dose formatée en chaîne.
+    """
     if dose is None or dose == "":
         return ""
     s = str(dose).strip()
@@ -40,7 +65,15 @@ def _fmt_dose(dose):
         return s
     return f"{s} mg"
 
-def generate_medicine_conditions_pdf(calendar_id):
+def generate_medicine_conditions_pdf(calendar_id: str) -> BytesIO:
+    """Génère un PDF listant les conditions de prise des médicaments d'un calendrier.
+
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+
+    Retour:
+    - BytesIO: Le flux binaire du PDF généré.
+    """
     # Nouvelle forme: liste triée de [{box_id: {name, dose, conditions}}, ...]
     medicines_list = get_medicines_for_calendar(calendar_id)
 

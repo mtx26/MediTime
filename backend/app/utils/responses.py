@@ -3,7 +3,15 @@ from flask import jsonify, g
 from app.utils.logging import log_backend as logger
 import time
 
-def _merge_log_extra(log_extra=None):
+def _merge_log_extra(log_extra: dict | None =None) -> dict:
+    """Ajoute des informations par défaut au log_extra fourni.
+
+    Paramètres:
+    - log_extra (dict | None): Dictionnaire d'informations supplémentaires pour le log.
+
+    Retour:
+    - dict: Dictionnaire fusionné avec les informations par défaut.
+    """
     log_extra = dict(log_extra or {})
     # Optionnel : extra par défaut posé ailleurs, ex. via un autre décorateur
     default_extra = getattr(g, "default_log_extra", {})
@@ -13,11 +21,17 @@ def _merge_log_extra(log_extra=None):
         log_extra["time"] = round(time.perf_counter() - g._t0, 6)
     return log_extra
 
-def _defaults(uid, origin):
-    """
-    Fallback automatique :
-    - uid => g.uid si non fourni
-    - origin => g.origin si non fournie
+def _defaults(uid: str | None = None, origin: str | None = None) -> tuple[str | None, str | None]:
+    """Récupère les valeurs par défaut pour uid et origin depuis le contexte global Flask (g).
+
+    Paramètres:
+    - uid (str | None): UID fourni explicitement.
+    - origin (str | None): Origine fournie explicitement.
+
+    Retour:
+    - tuple[str | None, str | None]: Tuple contenant l'UID et l'origine
+    - g.uid (str | None): UID depuis g si non fourni.
+    - g.origin (str | None): Origine depuis g si non fournie.
     """
     return (
         uid if uid is not None else getattr(g, "uid", None),
@@ -26,7 +40,20 @@ def _defaults(uid, origin):
 
 # exemple de log_extra : {'calendar_id': '...', 'token': '...'}
 
-def success_response(message, code, uid=None, origin=None, data=None, log_extra=None):
+def success_response(message: str, code: int, uid: str | None =None, origin: str | None =None, data: dict | None =None, log_extra: dict | None =None) -> tuple:
+    """Retourne une réponse JSON de succès avec journalisation.
+
+    Paramètres:
+    - message (str): Message de succès.
+    - code (int): Code de succès.
+    - uid (str | None): UID de l'utilisateur.
+    - origin (str | None): Origine de la requête.
+    - data (dict | None): Données supplémentaires à inclure dans la réponse.
+    - log_extra (dict | None): Informations supplémentaires pour le log.
+
+    Retour:
+    - tuple: Tuple contenant la réponse JSON et le code HTTP.
+    """
     uid, origin = _defaults(uid, origin)
     payload = {"message": message, "code": code}
 
@@ -50,7 +77,21 @@ def success_response(message, code, uid=None, origin=None, data=None, log_extra=
 
     return jsonify(payload), 200
 
-def error_response(message, code, status_code=500, uid=None, origin=None, error=None, log_extra=None):
+def error_response(message: str, code: int, status_code=500, uid: str | None =None, origin: str | None =None, error: Exception | None =None, log_extra: dict | None =None) -> tuple:
+    """Retourne une réponse JSON d'erreur avec journalisation.
+
+    Paramètres:
+    - message (str): Message d'erreur.
+    - code (int): Code d'erreur.
+    - status_code (int): Code HTTP de la réponse.
+    - uid (str | None): UID de l'utilisateur.
+    - origin (str | None): Origine de la requête.
+    - error (Exception | None): Exception associée à l'erreur.
+    - log_extra (dict | None): Informations supplémentaires pour le log.
+
+    Retour:
+    - tuple: Tuple contenant la réponse JSON et le code HTTP.
+    """
     uid, origin = _defaults(uid, origin)
     payload = {"error": message, "code": code}
 
@@ -67,7 +108,20 @@ def error_response(message, code, status_code=500, uid=None, origin=None, error=
 
     return jsonify(payload), status_code
 
-def warning_response(message, code, status_code=400, uid=None, origin=None, log_extra=None):
+def warning_response(message: str, code: int, status_code=400, uid: str | None =None, origin: str | None =None, log_extra: dict | None =None) -> tuple:
+    """Retourne une réponse JSON d'avertissement avec journalisation.
+
+    Paramètres:
+    - message (str): Message d'avertissement.
+    - code (int): Code d'avertissement.
+    - status_code (int): Code HTTP de la réponse.
+    - uid (str | None): UID de l'utilisateur.
+    - origin (str | None): Origine de la requête.
+    - log_extra (dict | None): Informations supplémentaires pour le log.
+
+    Retour:
+    - tuple: Tuple contenant la réponse JSON et le code HTTP.
+    """
     uid, origin = _defaults(uid, origin)
     payload = {"error": message, "code": code}
 

@@ -1,7 +1,15 @@
 from app.db.connection import get_connection
 import json
 
-def get_boxes(calendar_id):
+def get_boxes(calendar_id: str) -> list:
+    """Récupère les boîtes de médicaments associées à un calendrier.
+    
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+
+    Retour:
+    - list: La liste des boîtes de médicaments.
+    """
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
@@ -36,7 +44,14 @@ def get_boxes(calendar_id):
 
     return boxes or []
 
-def update_box(box_id, calendar_id, box):
+def update_box(box_id: str, calendar_id: str, box: dict):
+    """Met à jour une boîte de médicaments existante.
+
+    Paramètres:
+    - box_id (str): L'ID de la boîte à mettre à jour.
+    - calendar_id (str): L'ID du calendrier associé.
+    - box (dict): Les données de la boîte à mettre à jour.
+    """
     name = box.get("name")
     dose = box.get("dose")
     box_capacity = box.get("box_capacity")
@@ -83,7 +98,16 @@ SELECT 1;
             conn.commit()
 
 
-def create_box(calendar_id, box):
+def create_box(calendar_id: str, box: dict) -> str:
+    """Crée une nouvelle boîte de médicaments pour un calendrier donné.
+
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+    - box (dict): Les données de la boîte à créer.
+
+    Retour:
+    - str: L'ID de la nouvelle boîte créée.
+    """
     name = box.get("name") or "nouvelle boite"
     dose = box.get("dose", 0)
     box_capacity = box.get("box_capacity", 0)
@@ -123,14 +147,28 @@ SELECT id FROM ins_box;
             conn.commit()
 
     return box_id
-def delete_box(box_id, calendar_id):
+def delete_box(box_id: str, calendar_id: str):
+    """Supprime une boîte de médicaments et ses conditions associées.
+
+    Paramètres:
+    - box_id (str): L'ID de la boîte à supprimer.
+    - calendar_id (str): L'ID du calendrier associé.
+    """
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("DELETE FROM medicine_boxes WHERE id = %s AND calendar_id = %s", (box_id, calendar_id))
             cursor.execute("DELETE FROM medicine_box_conditions WHERE box_id = %s", (box_id,))
             conn.commit()
 
-def get_medicines_for_calendar(calendar_id):
+def get_medicines_for_calendar(calendar_id: str) -> list:
+    """Récupère les boîtes de médicaments associées à un calendrier.
+
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+
+    Retour:
+    - list: La liste des boîtes de médicaments.
+    """
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
@@ -178,7 +216,16 @@ def get_medicines_for_calendar(calendar_id):
 
 
         
-def restock_box(box_id, calendar_id):
+def restock_box(box_id: str, calendar_id: str) -> bool:
+    """Réapprovisionne une boîte de médicaments en ajoutant sa capacité au stock actuel.
+
+    Paramètres:
+    - box_id (str): L'ID de la boîte à réapprovisionner.
+    - calendar_id (str): L'ID du calendrier associé.
+
+    Retour:
+    - bool: True si la mise à jour a réussi, False sinon.
+    """
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:

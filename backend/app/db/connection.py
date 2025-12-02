@@ -1,19 +1,21 @@
 # db.py
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import os
+from app.config import Config
 
-# 🔒 Optionnel : charge les variables depuis .env
-from dotenv import load_dotenv
-load_dotenv()
+def get_connection() -> psycopg2.extensions.connection:
+    """Établit une connexion à la base de données Supabase PostgreSQL.
 
-def get_connection():
+    Retour:
+    - psycopg2.extensions.connection: Objet de connexion à la base de données.
+    """
+
     return psycopg2.connect(
-        host=os.getenv("PG_HOST"),
-        dbname=os.getenv("PG_DATABASE"),
-        user=os.getenv("PG_USER"),
-        password=os.getenv("PG_PASSWORD"),
-        port=os.getenv("PG_PORT", 5432),
+        host=Config.SUPABASE_DB_HOST,
+        dbname=Config.SUPABASE_DB_NAME,
+        user=Config.SUPABASE_DB_USER,
+        password=Config.SUPABASE_DB_PASSWORD,
+        port=Config.SUPABASE_DB_PORT,
         sslmode="require",
         cursor_factory=RealDictCursor
     )

@@ -12,7 +12,13 @@ frontend_url = Config.FRONTEND_URL
 
 SCOPES = ["https://www.googleapis.com/auth/firebase.messaging"]
 
-def get_fcm_access_token():
+def get_fcm_access_token() -> tuple[str | None, str | None]:
+    """Obtient un token d'accès FCM en utilisant les informations d'identification Google.
+
+    Retour:
+    - tuple: Un tuple contenant le token d'accès (str) et l'ID du projet (str). 
+             Si une erreur se produit, retourne (None, None).
+    """
     credentials_obj, project_id = get_google_credentials(SCOPES)
     if credentials_obj is None:
         return None, None
@@ -31,7 +37,15 @@ def get_fcm_access_token():
         )
         return None, None
 
-def send_fcm_notification(tokens, title, body, json_body):
+def send_fcm_notification(tokens: list, title: str, body: str, json_body: dict):
+    """Envoie une notification FCM aux tokens spécifiés.
+
+    Paramètres:
+    - tokens (list): Liste des tokens d'appareils cibles.
+    - title (str): Titre de la notification.
+    - body (str): Corps de la notification.
+    - json_body (dict): Corps JSON additionnel pour la notification.
+    """
     access_token, project_id = get_fcm_access_token()
     url = f"https://fcm.googleapis.com/v1/projects/{project_id}/messages:send"
 
@@ -40,7 +54,6 @@ def send_fcm_notification(tokens, title, body, json_body):
         "Content-Type": "application/json; UTF-8",
     }
 
-    errors = []
     for token in tokens:
         payload = {
             "message": {
@@ -83,10 +96,13 @@ def send_fcm_notification(tokens, title, body, json_body):
             data = response.text
 
         if response.status_code != 200:
-            errors.append({
-                "token": token,
-                "status_code": response.status_code,
-                "response": data
-            })
-
-    return errors
+            log_backend.error(
+                f"Erreur lors de l'envoi de la notification FCM : {response.status_code}",
+                {
+                    "origin": "FCM",
+                    "code": "FCM_SEND_ERROR",
+                    "status_code": response.status_code,
+                    "token": token,
+                    "response": data
+                }
+            )

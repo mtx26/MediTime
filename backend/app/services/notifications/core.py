@@ -31,16 +31,13 @@ DEFAULT_USER_NAME = "un utilisateur"  # Nom par défaut si utilisateur inconnu
 VIEW_CALENDAR_LABEL = "Voir le calendrier"  # Libellé CTA générique
 
 
-# ========= Types =========
-NotificationDict = Dict[str, Any]  # Alias pour la structure d'une notification
-
-
-
 # ========= Helpers de données =========
-def fetch_user_name(user_id: str | None) -> str:
+def fetch_user_name(user_id: str) -> str:
     """
     Récupère le nom d'affichage d'un utilisateur à partir de son ID.
-    Retourne un nom par défaut si l'utilisateur n'existe pas ou si l'ID est None.
+
+    Paramètres:
+    - user_id (str): ID de l'utilisateur.
     """
     if not user_id:
         return DEFAULT_USER_NAME
@@ -48,10 +45,15 @@ def fetch_user_name(user_id: str | None) -> str:
     return user.get("display_name") if user else DEFAULT_USER_NAME
 
 
-def fetch_calendar_name(calendar_id: str | None) -> str | None:
+def fetch_calendar_name(calendar_id: str) -> str | None:
     """
     Récupère le nom d'un calendrier à partir de son ID.
-    Retourne None si l'ID est absent, ou "unknown" si le calendrier n'existe pas.
+
+    Paramètres:
+    - calendar_id (str): ID du calendrier.
+
+    Retour:
+    - str | None: Nom du calendrier ou "unknown" si non trouvé.
     """
     if not calendar_id:
         return None
@@ -59,10 +61,16 @@ def fetch_calendar_name(calendar_id: str | None) -> str | None:
     return calendar.get("name") if calendar else "unknown"
 
 
-def enrich_notification(notification: NotificationDict) -> NotificationDict:
+def enrich_notification(notification: Dict) -> Dict:
     """
     Ajoute les noms du calendrier et de l’expéditeur au dictionnaire de notification.
     Permet d'avoir des contenus plus riches pour l'affichage et l'envoi.
+
+    Paramètres:
+    - notification (Dict): Dictionnaire de notification à enrichir.
+
+    Retour:
+    - Dict: Dictionnaire enrichi avec les noms.
     """
     try:
         notification["calendar_name"] = fetch_calendar_name(notification.get("calendar_id"))
@@ -84,22 +92,37 @@ def enrich_notification(notification: NotificationDict) -> NotificationDict:
 def _h(text: Any) -> str:
     """
     Sécurise une chaîne pour l'insertion dans du HTML (anti XSS).
-    Utilisé pour tous les contenus dynamiques dans les emails/notifications.
+
+    Paramètres:
+    - text (Any): Texte à sécuriser.
+
+    Retour:
+    - str: Texte sécurisé pour HTML.
     """
     return escape("" if text is None else str(text))
 
 def _p(html_inner: str) -> str:
     """
     Enveloppe un contenu HTML dans une balise <p> stylisée.
+
+    Paramètres:
+    - html_inner (str): Contenu HTML à envelopper.
+
+    Retour:
+    - str: Contenu enveloppé dans une balise <p> avec style.
     """
     return f"<p style='margin:4px 0'>{html_inner}</p>"
 
 
 # ========= Construction des contenus =========
-def _format_medication_list(medications: List[NotificationDict]) -> str:
+def _format_medication_list(medications: List[Dict]) -> str:
     """
     Génère une liste HTML de médicaments avec emoji et badge de stock (pour emails/notifications).
-    Affiche "épuisé" si le stock est à 0, sinon le nombre restant.
+
+    Paramètres:
+    - medications (List[Dict]): Liste de dictionnaires représentant les médicaments.
+    Retour:
+    - str: Liste HTML formatée des médicaments.
     """
     if not medications:
         return ""
@@ -119,10 +142,17 @@ def _format_medication_list(medications: List[NotificationDict]) -> str:
     return "<ul style='margin:8px 0; padding-left:20px;'>" + "".join(lis) + "</ul>"
 
 
-def build_notification_text(notification_type: str, context: NotificationDict) -> Tuple[str, str, str]:
+def build_notification_text(notification_type: str, context: Dict) -> Tuple[str, str, str]:
     """
     Génère le titre, le corps HTML et le libellé du bouton d'action pour une notification donnée.
     Utilisé pour tous les canaux (web, email, push, SMS).
+
+    Paramètres:
+    - notification_type (str): Type de notification.
+    - context (Dict): Contexte contenant les données nécessaires pour construire le message.
+
+    Retour:
+    - Tuple[str, str, str]: Titre, corps HTML et libellé du bouton d'action.
     """
     sender = _h(context.get("sender_name") or DEFAULT_USER_NAME)
     cal = _h(context.get("calendar_name") or "ce calendrier")
@@ -200,10 +230,16 @@ def build_notification_text(notification_type: str, context: NotificationDict) -
             return (title, body, "Voir les notifications")
 
 
-def generate_email_content(notification_type: str, context: NotificationDict) -> Tuple[str, str, str]:
+def generate_email_content(notification_type: str, context: Dict) -> Tuple[str, str, str]:
     """
     Génère le sujet, le corps texte et le HTML complet pour un email de notification.
-    Utilise les templates standards MediTime.
+    
+    Paramètres:
+    - notification_type (str): Type de notification.
+    - context (Dict): Contexte contenant les données nécessaires pour construire le message.
+
+    Retour:
+    - Tuple[str, str, str]: Sujet, corps texte et HTML complet de l'email.
     """
     title, body_html, cta_label = build_notification_text(notification_type, context)
     link = f"{Config.FRONTEND_URL}{context.get('link') or f'/notifications'}"
@@ -225,11 +261,15 @@ def generate_email_content(notification_type: str, context: NotificationDict) ->
 
 
 # ========= Persistance Web =========
-def save_notifications(user_id: str, notification_type: str, items: List[NotificationDict]) -> None:
+def save_notifications(user_id: str, notification_type: str, items: List[Dict]):
     """
     Enregistre chaque notification dans la base de données (historique web).
     Utilisé pour l'affichage dans l'interface utilisateur (onglet notifications).
-    verif pour chaque mod si il y'a la nécessité de nettoyer les anciennes notif pour chaque type (low_stock, calendar_invitation_accepted, calendar_shared_deleted_by_owner, calendar_invitation)
+
+    Paramètres:
+    - user_id (str): Identifiant de l'utilisateur.
+    - notification_type (str): Type de notification.
+    - items (List[Dict]): Liste des données des notifications à enregistrer.
     """
     try:
         with get_connection() as conn, conn.cursor() as cur:
@@ -308,13 +348,19 @@ def save_notifications(user_id: str, notification_type: str, items: List[Notific
 def _get_fcm_tokens(user_id: str) -> List[str]:
     """
     Récupère la liste des tokens FCM pour un utilisateur (pour notifications push).
+
+    Paramètres:
+    - user_id (str): Identifiant de l'utilisateur.
+
+    Retour:
+    - List[str]: Liste des tokens FCM.
     """
     with get_connection() as conn, conn.cursor() as cur:
         cur.execute("SELECT token FROM fcm_tokens WHERE uid = %s", (user_id,))
         return [r["token"] for r in cur.fetchall()]
 
 
-def send_push_notification(user_id: str, context: NotificationDict, notification_type: str) -> None:
+def send_push_notification(user_id: str, context: Dict, notification_type: str):
     """
     Envoie une notification push via FCM à l'utilisateur (si tokens disponibles).
     Le corps est converti en texte brut pour compatibilité mobile.
@@ -329,7 +375,7 @@ def send_push_notification(user_id: str, context: NotificationDict, notification
         log_backend.warning("Aucun token FCM trouvé", {"origin": ORIGIN, "code": "NO_FCM_TOKEN", "uid": user_id})
 
 
-def send_email_notification(user: NotificationDict, context: NotificationDict, notification_type: str) -> None:
+def send_email_notification(user: Dict, context: Dict, notification_type: str):
     """
     Envoie un email à l'utilisateur (si email renseigné).
     Utilise le template standard MediTime.
@@ -342,10 +388,15 @@ def send_email_notification(user: NotificationDict, context: NotificationDict, n
     send_email(to=email, subject=subject, html_content=html_content, plain=_html_to_plain(plain_body))
 
 
-def send_sms_notification(user: NotificationDict, context: NotificationDict, notification_type: str) -> None:
+def send_sms_notification(user: Dict, context: Dict, notification_type: str):
     """
     Envoie un SMS à l'utilisateur (si numéro renseigné).
     Utilise une version texte courte de la notification.
+
+    Paramètres:
+    - user (Dict): Dictionnaire utilisateur contenant au moins le numéro de téléphone.
+    - context (Dict): Contexte de la notification.
+    - notification_type (str): Type de notification.
     """
     phone = user.get("phone")
     if not phone:
@@ -361,6 +412,12 @@ def _html_to_plain(html: str) -> str:
     """
     Conversion ultra simple du HTML vers du texte brut (pour push/SMS).
     Retire les balises <b>, <p>, <span> et remplace les entités de base.
+
+    Paramètres:
+    - html (str): Contenu HTML à convertir.
+
+    Retour:
+    - str: Contenu texte brut.
     """
     return (
         html.replace("<b>", "")
@@ -377,12 +434,16 @@ def _html_to_plain(html: str) -> str:
 
 
 # ========= Orchestration =========
-def send_grouped_notifications(user_id: str, items: List[NotificationDict], notification_type: str, channels: List[str]) -> None:
+def send_grouped_notifications(user_id: str, items: List[Dict], notification_type: str, channels: List[str]):
     """
-    Orchestration principale :
-    - Envoie push/email/SMS une seule fois (groupé) selon les préférences utilisateur et les canaux demandés
-    - Enregistre côté web si demandé
-    - Agrège les notifications similaires (ex : stock faible sur plusieurs médicaments)
+    Envoie un groupe de notifications à un utilisateur via les canaux spécifiés.
+    Regroupe les notifications similaires pour éviter les envois multiples.
+
+    Paramètres:
+    - user_id (str): Identifiant de l'utilisateur.
+    - items (List[Dict]): Liste des notifications à envoyer.
+    - notification_type (str): Type de notification.
+    - channels (List[str]): Canaux par lesquels envoyer les notifications.
     """
     try:
         user = fetch_user(user_id) or {}
@@ -417,12 +478,15 @@ def send_grouped_notifications(user_id: str, items: List[NotificationDict], noti
         )
 
 
-def notify_and_record(user_id: str, body_or_list: NotificationDict | List[NotificationDict], notification_type: str, channels: List[str] = list(DEFAULT_CHANNELS)) -> None:
+def notify_and_record(user_id: str, body_or_list: Dict | List[Dict], notification_type: str, channels: List[str] = list(DEFAULT_CHANNELS)):
     """
-    Point d'entrée principal :
-    - Gère 1 ou plusieurs notifications pour un utilisateur
-    - Enrichit les notifications (ajout noms, etc.)
-    - Orchestration de l'envoi et de l'enregistrement web
+    Envoie une ou plusieurs notifications à un utilisateur via les canaux spécifiés et les enregistre dans l'historique web.
+
+    Paramètres:
+    - user_id (str): Identifiant de l'utilisateur.
+    - body_or_list (Dict | List[Dict]): Notification ou liste de notifications à envoyer.
+    - notification_type (str): Type de notification.
+    - channels (List[str]): Canaux par lesquels envoyer les notifications.
     """
     try:
         items = body_or_list if isinstance(body_or_list, list) else [body_or_list]
@@ -437,10 +501,15 @@ def notify_and_record(user_id: str, body_or_list: NotificationDict | List[Notifi
 
 
 # ========= E-mail direct (hors préférences utilisateur) =========
-def email_address_direct(to_email: str, notification_type: str, context: NotificationDict) -> None:
+def email_address_direct(to_email: str, notification_type: str, context: Dict):
     """
     Envoie un e-mail à une adresse arbitraire (ex : support, test, etc.) en réutilisant les templates standard.
     Ne tient pas compte des préférences utilisateur, pas d’enregistrement en base, pas de push/SMS.
+
+    Paramètres:
+    - to_email (str): Adresse e-mail du destinataire.
+    - notification_type (str): Type de notification.
+    - context (Dict): Contexte de la notification.
     """
     try:
         enriched_context = enrich_notification(context.copy())

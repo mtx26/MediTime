@@ -4,8 +4,9 @@ from app.utils.logging import log_backend
 from app.services.medication import check_low_stock_and_notify_for_calendar, process_box_decrement
 from datetime import datetime, timezone
 
-# diminuer le stock de tous les médicaments
 def decrease_stock():
+    """Diminue les stocks des boîtes de médicaments selon la méthode 'daily_midnight'.
+    """
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:

@@ -2,7 +2,17 @@ from datetime import timedelta, date
 from app.utils.logging import log_backend as logger
 from app.db.connection import get_connection
 
-def generate_calendar_schedule(calendar_id, start_date):
+def generate_calendar_schedule(calendar_id: str, start_date: date) -> tuple[list, list, str | None]:
+    """
+    Génère le planning et le tableau de prise de médicaments pour un calendrier donné à partir d'une date de début.
+    
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+    - start_date (date): La date de début pour générer le planning.
+
+    Retour:
+    - tuple: Un tuple contenant la liste du planning, la liste du tableau de prise, et le nom du calendrier (ou None si non trouvé).
+    """
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -49,7 +59,17 @@ def generate_calendar_schedule(calendar_id, start_date):
         return [], [], None
 
 
-def is_medication_due(med, current_date):
+def is_medication_due(med: dict, current_date: date) -> bool:
+    """
+    Vérifie si un médicament doit être pris à une date donnée.
+
+    Paramètres:
+    - med (dict): Dictionnaire contenant les informations du médicament.
+    - current_date (date): La date à vérifier.
+
+    Retour:
+    - bool: True si le médicament doit être pris à la date donnée, False sinon.
+    """
     try:
         start_date = med.get("start_date", "")
         if isinstance(start_date, date):
@@ -72,7 +92,17 @@ def is_medication_due(med, current_date):
         return False
 
 
-def generate_schedule(start_date, medications):
+def generate_schedule(start_date: date, medications: list[dict]) -> list[dict]:
+    """
+    Génère le planning des prises de médicaments pour une semaine à partir d'une date de début.
+
+    Paramètres:
+    - start_date (date): La date de début pour générer le planning.
+    - medications (list[dict]): Liste des médicaments avec leurs informations.
+
+    Retour:
+    - list[dict]: Liste des événements de prise de médicaments formatés pour un calendrier.
+    """
     monday = start_date - timedelta(days=start_date.weekday())
 
     total_day = 7 # Nombre de jours à afficher (1 semaine)
@@ -136,7 +166,17 @@ def generate_schedule(start_date, medications):
 
 
 """
-def generate_table(start_date, medications):
+def generate_table(start_date: date, medications: list[dict]) -> dict:
+    """
+    Génère le tableau des prises de médicaments pour une semaine à partir d'une date de début.
+
+    Paramètres:
+    - start_date (date): La date de début pour générer le tableau.
+    - medications (list[dict]): Liste des médicaments avec leurs informations.
+
+    Retour:
+    - dict: Dictionnaire contenant les tableaux de prise de médicaments par moment de la journée.
+    """
     monday = start_date - timedelta(days=start_date.weekday())
     total_day = 7
     table_by_moment = {
@@ -161,7 +201,19 @@ def generate_table(start_date, medications):
     return table_by_moment
 
 
-def build_medication_table(med, monday, total_day):
+def build_medication_table(med: dict, monday: date, total_day: int) -> dict:
+    """
+    Construit le tableau de prise pour un médicament donné sur une semaine.
+
+    Paramètres:
+    - med (dict): Dictionnaire contenant les informations du médicament.
+    - monday (date): La date du lundi de la semaine.
+    - total_day (int): Nombre total de jours dans la semaine.
+
+    Retour:
+    - dict: Tableau de prise pour le médicament.
+    """
+
     table = {}
 
     for i in range(total_day):
@@ -178,7 +230,16 @@ def build_medication_table(med, monday, total_day):
     return table
 
 
-def merge_or_append_by_moment(moment_list, name, cells, dose):
+def merge_or_append_by_moment(moment_list: list[dict], name: str, cells: dict, dose: str | None):
+    """
+    Fusionne ou ajoute une entrée dans la liste du moment de la journée.
+
+    Paramètres:
+    - moment_list (list[dict]): Liste des entrées pour un moment de la journée.
+    - name (str): Nom du médicament.
+    - cells (dict): Dictionnaire des prises par jour.
+    - dose (str | None): Dose du médicament.
+    """
     for entry in moment_list:
         if entry["title"] != name:
             continue
@@ -198,16 +259,31 @@ def merge_or_append_by_moment(moment_list, name, cells, dose):
         "dose": dose
     })
 
-def fetch_calendar(calendar_id):
+def fetch_calendar(calendar_id: str) -> dict:
+    """
+    Récupère un calendrier à partir de son ID.
+
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+
+    Retour:
+    - dict: Dictionnaire contenant les informations du calendrier.
+    """
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("SELECT * FROM calendars WHERE id = %s", (calendar_id,))
             calendar = cursor.fetchone() or {}
             return calendar
 
-def fetch_medicine_name(medication_id):
+def fetch_medicine_name(medication_id: str) -> str:
     """
     Récupère le nom d'un médicament à partir de son ID.
+
+    Paramètres:
+    - medication_id (str): L'ID du médicament.
+
+    Retour:
+    - str: Le nom du médicament.
     """
     with get_connection() as conn:
         with conn.cursor() as cursor:
@@ -216,9 +292,13 @@ def fetch_medicine_name(medication_id):
             return result.get("name", "unknown")
         
 
-def update_stock_decrement_method(calendar_id, method):
+def update_stock_decrement_method(calendar_id: str, method: str):
     """
     Met à jour la méthode de diminution de stock pour un calendrier.
+
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+    - method (str): La méthode de diminution de stock.
     """
     with get_connection() as conn:
         with conn.cursor() as cursor:
@@ -229,15 +309,16 @@ def update_stock_decrement_method(calendar_id, method):
             """, (method, calendar_id,))
             conn.commit()
         
-def add_pillbox_uses(calendar_id, uid, base_date):
+def add_pillbox_uses(calendar_id: str, uid: str, base_date: date) -> bool:
     """Enregistre l'utilisation du pillulier pour la semaine de base_date.
 
-    Table utilisée: pillbox_uses (calendar_id, prepared_at, prepared_by, ...)
-    Il n'y a PAS de colonne week_start_date: on contrôle la semaine via prepared_at.
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+    - uid (str): L'ID de l'utilisateur.
+    - base_date (date): La date de base pour la semaine.
 
     Retour:
-        True si une nouvelle préparation est insérée (aucune entrée cette semaine)
-        False si déjà une préparation dans l'intervalle [lundi, lundi+7j)
+    - bool: True si l'enregistrement a été effectué, False sinon.
     """
     
     monday = base_date - timedelta(days=base_date.weekday())
@@ -267,11 +348,16 @@ def add_pillbox_uses(calendar_id, uid, base_date):
             conn.commit()
             return row.get("result", 0) == 1
     
-def get_if_pillbox_is_used(calendar_id, base_date):
+def get_if_pillbox_is_used(calendar_id: str, base_date: date) -> bool:
     """
     Récupère les enregistrements d'utilisation du pillulier pour un calendrier donné pour une date de base.
-    
-    retunrne True si utilisé cette semaine, False sinon
+
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+    - base_date (date): La date de base pour la semaine.
+
+    Retour:
+    - bool: True si le pillulier a été utilisé cette semaine, False sinon.
     """
 
     monday = base_date - timedelta(days=base_date.weekday())
@@ -293,11 +379,15 @@ def get_if_pillbox_is_used(calendar_id, base_date):
             row = cursor.fetchone() or {"result": 0}
             return row.get("result", 0) == 1
         
-def get_pillbox_uses(calendar_id):
+def get_pillbox_uses(calendar_id: str) -> list:
     """
     Récupère les enregistrements d'utilisation du pillulier pour un calendrier donné.
-    
-    retourne une liste d'objets avec les infos de chaque enregistrement
+
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+
+    Retour:
+    - list: Liste des enregistrements d'utilisation du pillulier.
     """
 
     with get_connection() as conn:
@@ -326,9 +416,16 @@ def get_pillbox_uses(calendar_id):
             rows = cursor.fetchall() or []
             return rows
 
-def delete_pillbox_use(calendar_id, use_id):
+def delete_pillbox_use(calendar_id: str, use_id: str) -> bool:
     """
     Supprime un enregistrement d'utilisation du pillulier pour un calendrier donné.
+
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+    - use_id (str): L'ID de l'enregistrement d'utilisation du pillulier.
+
+    Retour:
+    - bool: True si la suppression a été effectuée, False sinon.
     """
     from app.services.medication.pillbox import restore_pillbox
 
