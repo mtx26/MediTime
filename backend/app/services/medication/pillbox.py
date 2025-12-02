@@ -2,7 +2,7 @@ from app.db.connection import get_connection
 from .stock import process_box_decrement, process_box_increment, check_low_stock_and_notify_for_calendar
 from datetime import timedelta
 
-def use_pillbox(calendar_id: str, start_date: str) -> bool:
+def use_pillbox(calendar_id: str, start_date: str) -> bool | None:
     """Utilise le stock de tous les médicaments du calendrier spécifié
     pour une semaine donnée.
 
@@ -11,7 +11,7 @@ def use_pillbox(calendar_id: str, start_date: str) -> bool:
     - start_date: date de la semaine (DD-MM-YYYY).
 
     Retour:
-    - bool: True si l'opération a réussi, False sinon.
+    - bool | None: True si l'opération a réussi, False sinon, None si la méthode n'est pas "weekly_pillbox".
     """
     try:
         with get_connection() as conn:

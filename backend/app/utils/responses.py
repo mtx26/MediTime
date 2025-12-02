@@ -40,12 +40,12 @@ def _defaults(uid: str | None = None, origin: str | None = None) -> tuple[str | 
 
 # exemple de log_extra : {'calendar_id': '...', 'token': '...'}
 
-def success_response(message: str, code: int, uid: str | None =None, origin: str | None =None, data: dict | None =None, log_extra: dict | None =None) -> tuple:
+def success_response(message: str, code: str, uid: str | None =None, origin: str | None =None, data: dict | None =None, log_extra: dict | None =None) -> tuple:
     """Retourne une réponse JSON de succès avec journalisation.
 
     Paramètres:
     - message (str): Message de succès.
-    - code (int): Code de succès.
+    - code (str): Code de succès.
     - uid (str | None): UID de l'utilisateur.
     - origin (str | None): Origine de la requête.
     - data (dict | None): Données supplémentaires à inclure dans la réponse.
@@ -77,12 +77,12 @@ def success_response(message: str, code: int, uid: str | None =None, origin: str
 
     return jsonify(payload), 200
 
-def error_response(message: str, code: int, status_code=500, uid: str | None =None, origin: str | None =None, error: Exception | None =None, log_extra: dict | None =None) -> tuple:
+def error_response(message: str, code: int | str, status_code=500, uid: str | None =None, origin: str | None =None, error: Exception | None =None, log_extra: dict | None =None) -> tuple:
     """Retourne une réponse JSON d'erreur avec journalisation.
 
     Paramètres:
     - message (str): Message d'erreur.
-    - code (int): Code d'erreur.
+    - code (str): Code d'erreur.
     - status_code (int): Code HTTP de la réponse.
     - uid (str | None): UID de l'utilisateur.
     - origin (str | None): Origine de la requête.
@@ -108,12 +108,12 @@ def error_response(message: str, code: int, status_code=500, uid: str | None =No
 
     return jsonify(payload), status_code
 
-def warning_response(message: str, code: int, status_code=400, uid: str | None =None, origin: str | None =None, log_extra: dict | None =None) -> tuple:
+def warning_response(message: str, code: str, status_code : int = 400, uid: str | None =None, origin: str | None =None, log_extra: dict | None =None) -> tuple:
     """Retourne une réponse JSON d'avertissement avec journalisation.
 
     Paramètres:
     - message (str): Message d'avertissement.
-    - code (int): Code d'avertissement.
+    - code (str): Code d'avertissement.
     - status_code (int): Code HTTP de la réponse.
     - uid (str | None): UID de l'utilisateur.
     - origin (str | None): Origine de la requête.
