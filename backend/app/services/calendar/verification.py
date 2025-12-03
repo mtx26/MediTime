@@ -553,7 +553,8 @@ def verify_login_invitation_receiver(token: str = None, uid: str = None) -> dict
     - uid (str): L'UID de l'utilisateur.
 
     Retour:
-    - dict | bool: Un dictionnaire contenant l'ID du calendrier, l'UID du propriétaire, et l'état d'acceptation si l'utilisateur est le destinataire, sinon False.
+    - dict | bool: Un dictionnaire contenant l'ID du calendrier, l'UID du propriétaire, 
+      et l'état d'acceptation si l'utilisateur est le destinataire, sinon False.
     - g.calendar_id (str): L'ID du calendrier extrait du token si valide.
     - g.owner_uid (str): L'UID du propriétaire extrait du token si valide.
     - g.invitation_accepted (bool): L'état d'acceptation de l'invitation extrait du token si valide.

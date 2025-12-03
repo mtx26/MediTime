@@ -160,6 +160,47 @@ def delete_box(box_id: str, calendar_id: str):
             cursor.execute("DELETE FROM medicine_box_conditions WHERE box_id = %s", (box_id,))
             conn.commit()
 
+GET_MEDICINES_QUERY = """
+    SELECT
+      COALESCE(
+        jsonb_agg(
+          jsonb_build_object(
+            m.box_id::text,
+            jsonb_build_object(
+              'name', m.name,
+              'dose', m.dose,
+              'conditions', m.conditions
+            )
+          )
+          ORDER BY m.name
+        ),
+        '[]'::jsonb
+      ) AS medicines
+    FROM (
+      SELECT
+        mb.id   AS box_id,
+        mb.name AS name,
+        mb.dose AS dose,
+        COALESCE(
+          jsonb_agg(
+            jsonb_build_object(
+              'tablet_count', c.tablet_count,
+              'time_of_day',  c.time_of_day,
+              'interval_days', c.interval_days,
+              'start_date',    c.start_date
+            )
+            ORDER BY c.start_date NULLS LAST
+          ) FILTER (WHERE c.id IS NOT NULL),
+          '[]'::jsonb
+        ) AS conditions
+      FROM medicine_boxes mb
+      LEFT JOIN medicine_box_conditions c
+        ON c.box_id = mb.id
+      WHERE mb.calendar_id = %s
+      GROUP BY mb.id, mb.name, mb.dose
+    ) AS m;
+"""
+
 def get_medicines_for_calendar(calendar_id: str) -> list:
     """Récupère les boîtes de médicaments associées à un calendrier.
 
@@ -171,46 +212,7 @@ def get_medicines_for_calendar(calendar_id: str) -> list:
     """
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            cursor.execute("""
-                SELECT
-                  COALESCE(
-                    jsonb_agg(
-                      jsonb_build_object(
-                        m.box_id::text,
-                        jsonb_build_object(
-                          'name', m.name,
-                          'dose', m.dose,
-                          'conditions', m.conditions
-                        )
-                      )
-                      ORDER BY m.name
-                    ),
-                    '[]'::jsonb
-                  ) AS medicines
-                FROM (
-                  SELECT
-                    mb.id   AS box_id,
-                    mb.name AS name,
-                    mb.dose AS dose,
-                    COALESCE(
-                      jsonb_agg(
-                        jsonb_build_object(
-                          'tablet_count', c.tablet_count,
-                          'time_of_day',  c.time_of_day,
-                          'interval_days', c.interval_days,
-                          'start_date',    c.start_date
-                        )
-                        ORDER BY c.start_date NULLS LAST
-                      ) FILTER (WHERE c.id IS NOT NULL),
-                      '[]'::jsonb
-                    ) AS conditions
-                  FROM medicine_boxes mb
-                  LEFT JOIN medicine_box_conditions c
-                    ON c.box_id = mb.id
-                  WHERE mb.calendar_id = %s
-                  GROUP BY mb.id, mb.name, mb.dose
-                ) AS m;
-            """, (calendar_id,))
+            cursor.execute(GET_MEDICINES_QUERY, (calendar_id,))
             row = cursor.fetchone()
             return row.get("medicines") or []
 

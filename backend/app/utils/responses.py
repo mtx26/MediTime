@@ -3,7 +3,7 @@ from flask import jsonify, g
 from app.utils.logging import log_backend as logger
 import time
 
-def _merge_log_extra(log_extra: dict | None =None) -> dict:
+def _merge_log_extra(log_extra: dict | None = None) -> dict:
     """Ajoute des informations par défaut au log_extra fourni.
 
     Paramètres:
@@ -41,12 +41,12 @@ def _defaults(uid: str | None = None, origin: str | None = None) -> tuple[str | 
 # exemple de log_extra : {'calendar_id': '...', 'token': '...'}
 
 def success_response(
-        message: str, 
-        code: str, 
-        uid: str | None = None, 
-        origin: str | None = None, 
-        data: dict | None = None, 
-        log_extra: dict | None = None
+    message: str,
+    code: str,
+    uid: str | None = None,
+    origin: str | None = None,
+    data: dict | None = None,
+    log_extra: dict | None = None
 ) -> tuple:
     """Retourne une réponse JSON de succès avec journalisation.
 
@@ -85,12 +85,12 @@ def success_response(
     return jsonify(payload), 200
 
 def error_response(
-    message: str, 
-    code: int | str, 
-    status_code : int = 500, 
-    uid: str | None = None, 
-    origin: str | None = None, 
-    error: Exception | None = None, 
+    message: str,
+    code: int | str,
+    status_code: int = 500,
+    uid: str | None = None,
+    origin: str | None = None,
+    error: Exception | None = None,
     log_extra: dict | None = None
 ) -> tuple:
     """Retourne une réponse JSON d'erreur avec journalisation.
@@ -124,11 +124,11 @@ def error_response(
     return jsonify(payload), status_code
 
 def warning_response(
-    message: str, 
-    code: str, 
-    status_code : int = 400, 
-    uid: str | None = None, 
-    origin: str | None = None, 
+    message: str,
+    code: str,
+    status_code: int = 400,
+    uid: str | None = None,
+    origin: str | None = None,
     log_extra: dict | None = None
 ) -> tuple:
     """Retourne une réponse JSON d'avertissement avec journalisation.

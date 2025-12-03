@@ -264,7 +264,7 @@ def generate_email_content(notification_type: str, context: Dict) -> Tuple[str, 
 
 
 # ========= Persistance Web =========
-def _cleanup_old_notifications(cur, user_id : str, notification_type: str, item: dict):
+def _cleanup_old_notifications(cur, user_id: str, notification_type: str, item: dict):
     """
     Nettoie les anciennes notifications similaires.
     
@@ -274,46 +274,22 @@ def _cleanup_old_notifications(cur, user_id : str, notification_type: str, item:
     - notification_type (str): Type de notification.
     - item (Dict): Données de la notification actuelle.
     """
-    sender_uid = item.get("sender_uid")
-    calendar_id = item.get("calendar_id")
-    medication_id = item.get("medication_id")
-    shared_calendar_id = item.get("shared_calendar_id")
+    criteria = {
+        "low_stock": ["sender_uid", "calendar_id", "medication_id"],
+        "calendar_invitation_accepted": ["sender_uid", "calendar_id"],
+        "calendar_shared_deleted_by_owner": ["sender_uid", "calendar_id"],
+        "calendar_invitation": ["sender_uid", "shared_calendar_id", "calendar_id"]
+    }
 
-    if notification_type == "low_stock" and sender_uid and calendar_id and medication_id:
-        cur.execute(
-            """
-            DELETE FROM notifications
-            WHERE user_id = %s
-              AND type = %s
-              AND sender_uid = %s
-              AND calendar_id = %s
-              AND medication_id = %s
-            """,
-            (user_id, notification_type, sender_uid, calendar_id, medication_id),
-        )
-    elif (notification_type in ("calendar_invitation_accepted", "calendar_shared_deleted_by_owner")) and sender_uid and calendar_id:
-        cur.execute(
-            """
-            DELETE FROM notifications
-            WHERE user_id = %s
-              AND type = %s
-              AND sender_uid = %s
-              AND calendar_id = %s
-            """,
-            (user_id, notification_type, sender_uid, calendar_id),
-        )
-    elif notification_type == "calendar_invitation" and sender_uid and shared_calendar_id and calendar_id:
-        cur.execute(
-            """
-            DELETE FROM notifications
-            WHERE user_id = %s
-              AND type = %s
-              AND sender_uid = %s
-              AND shared_calendar_id = %s
-              AND calendar_id = %s
-            """,
-            (user_id, notification_type, sender_uid, shared_calendar_id, calendar_id),
-        )
+    required_fields = criteria.get(notification_type)
+    if not required_fields or not all(item.get(f) for f in required_fields):
+        return
+
+    conditions = ["user_id = %s", "type = %s"] + [f"{field} = %s" for field in required_fields]
+    values = [user_id, notification_type] + [item.get(field) for field in required_fields]
+
+    query = f"DELETE FROM notifications WHERE {' AND '.join(conditions)}"
+    cur.execute(query, values)
 
 def save_notifications(user_id: str, notification_type: str, items: List[Dict]):
     """
@@ -475,27 +451,24 @@ def _prepare_grouped_context(items: List[Dict], notification_type: str) -> Dict:
 def send_grouped_notifications(user_id: str, items: List[Dict], notification_type: str, channels: List[str]):
     """
     Envoie un groupe de notifications à un utilisateur via les canaux spécifiés.
-    Regroupe les notifications similaires pour éviter les envois multiples.
-
-    Paramètres:
-    - user_id (str): Identifiant de l'utilisateur.
-    - items (List[Dict]): Liste des notifications à envoyer.
-    - notification_type (str): Type de notification.
-    - channels (List[str]): Canaux par lesquels envoyer les notifications.
     """
     try:
         user = fetch_user(user_id) or {}
-        
         context = _prepare_grouped_context(items, notification_type)
 
         if "web" in channels:
             save_notifications(user_id, notification_type, items)
-        if user.get("push_enabled") and "push" in channels:
-            send_push_notification(user_id, context, notification_type)
-        if user.get("email_enabled") and "email" in channels:
-            send_email_notification(user, context, notification_type)
-        if user.get("sms_enabled") and "sms" in channels:
-            send_sms_notification(user, context, notification_type)
+        
+        # Mapping des canaux vers les fonctions d'envoi et les clés de préférence utilisateur
+        channel_actions = [
+            ("push", "push_enabled", send_push_notification),
+            ("email", "email_enabled", send_email_notification),
+            ("sms", "sms_enabled", send_sms_notification)
+        ]
+
+        for channel, pref_key, send_func in channel_actions:
+            if channel in channels and user.get(pref_key):
+                send_func(user_id if channel == "push" else user, context, notification_type)
 
     except Exception as e:
         log_backend.error(
