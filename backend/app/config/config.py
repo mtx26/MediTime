@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()  # Charge les variables du fichier .env
 
 class Config:
+    """Classe de configuration pour l'application Flask.
+    """
     # Flask
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
     DEBUG = os.getenv("DEBUG", "True") == "True"

@@ -4,6 +4,11 @@ from functools import wraps
 from flask import g
 
 def measure_time():
+    """Décorateur pour mesurer le temps d'exécution d'une fonction et stocker dans g.elapsed_time.
+
+    Retour:
+    - g.elapsed_time (float): Temps écoulé en secondes, arrondi à 6 décimales.
+    """
     def decorator(f):
         @wraps(f)
         def wrapped(*args, **kwargs):

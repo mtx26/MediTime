@@ -9,7 +9,16 @@ from app.utils.responses import warning_response
 ACCESS_DENIED_MSG = "accès refusé"
 
 
-def _extract_calendar_id(kwargs) -> str | None:
+def _extract_calendar_id(kwargs: dict) -> str | None:
+    """Extrait l'ID du calendrier des différents emplacements possibles dans la requête.
+
+    Paramètres:
+    - kwargs (dict): Arguments passés à la fonction décorée.
+
+    Retour:
+    - str | None: L'ID du calendrier s'il est trouvé, sinon None.
+    """
+
     cal_id = kwargs.get("calendar_id")
     if cal_id:
         return cal_id
@@ -22,7 +31,15 @@ def _extract_calendar_id(kwargs) -> str | None:
     return None
 
 
-def _extract_token(kwargs) -> str | None:
+def _extract_token(kwargs: dict) -> str | None:
+    """Extrait le token des différents emplacements possibles dans la requête.
+
+    Paramètres:
+    - kwargs (dict): Arguments passés à la fonction décorée.
+
+    Retour:
+    - str | None: Le token s'il est trouvé, sinon None.
+    """
     return (
         kwargs.get("token")
         or getattr(request, "view_args", {}).get("token")
@@ -30,6 +47,15 @@ def _extract_token(kwargs) -> str | None:
     )
 
 def _verify_calendar_share(calendar_id: str, receiver_uid: str) -> bool:
+    """Vérifie si un utilisateur a accès à un calendrier partagé.
+
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+    - receiver_uid (str): L'UID de l'utilisateur receveur.
+
+    Retour:
+    - bool: True si l'utilisateur a accès au calendrier partagé, False sinon.
+    """
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -71,6 +97,15 @@ def _verify_calendar_share(calendar_id: str, receiver_uid: str) -> bool:
     
 
 def _verify_calendar(calendar_id: str, uid: str) -> bool:
+    """Vérifie si un utilisateur a accès à un calendrier.
+    
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+    - uid (str): L'UID de l'utilisateur.
+
+    Retour:
+    - bool: True si l'utilisateur a accès au calendrier, False sinon.
+    """
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -90,7 +125,15 @@ def _verify_calendar(calendar_id: str, uid: str) -> bool:
         })
         return False
 
-def _verify_token(token: str):
+def _verify_token(token: str) -> str | bool:
+    """Vérifie la validité d'un token de partage de calendrier.
+    
+    Paramètres:
+    - token (str): Le token à vérifier.
+
+    Retour:
+    - str | bool: L'ID du calendrier si le token est valide, sinon False.
+    """
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -130,6 +173,15 @@ def _verify_token(token: str):
         return False
 
 def _verify_token_owner(token: str, uid: str) -> bool:
+    """Vérifie si un utilisateur est le propriétaire d'un token de partage de calendrier.
+    
+    Paramètres:
+    - token (str): Le token à vérifier.
+    - uid (str): L'UID de l'utilisateur.
+
+    Retour:
+    - bool: True si l'utilisateur est le propriétaire du token, False sinon.
+    """
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -153,7 +205,16 @@ def _verify_token_owner(token: str, uid: str) -> bool:
         return False
 
 
-def verify_calendar_share(calendar_id=None, receiver_uid=None):
+def verify_calendar_share(calendar_id: str = None, receiver_uid: str = None) -> bool:
+    """Vérifie si un utilisateur a accès à un calendrier partagé.
+    
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+    - receiver_uid (str): L'UID de l'utilisateur receveur.
+
+    Retour:
+    - bool: True si l'utilisateur a accès au calendrier partagé, False sinon.
+    """
     if callable(calendar_id):
         f = calendar_id
 
@@ -175,7 +236,16 @@ def verify_calendar_share(calendar_id=None, receiver_uid=None):
     return _verify_calendar_share(calendar_id, receiver_uid)
 
 
-def verify_calendar(calendar_id=None, uid=None):
+def verify_calendar(calendar_id: str = None, uid: str = None) -> bool:
+    """Vérifie si un utilisateur a accès à un calendrier.
+    
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+    - uid (str): L'UID de l'utilisateur.
+
+    Retour:
+    - bool: True si l'utilisateur a accès au calendrier, False sinon.
+    """
     if callable(calendar_id):
         f = calendar_id
 
@@ -197,7 +267,17 @@ def verify_calendar(calendar_id=None, uid=None):
     return _verify_calendar(calendar_id, uid)
 
 
-def verify_token(token=None):
+def verify_token(token: str = None) -> str | bool:
+    """Vérifie la validité d'un token de partage de calendrier.
+
+    Paramètres:
+    - token (str): Le token à vérifier.
+
+    Retour:
+    - str | bool: L'ID du calendrier si le token est valide, sinon False
+    - g.calendar_id (str): L'ID du calendrier extrait du token si valide.
+    """
+    
     if callable(token):
         f = token
 
@@ -219,7 +299,16 @@ def verify_token(token=None):
     return _verify_token(token)
 
 
-def verify_token_owner(token=None, uid=None):
+def verify_token_owner(token: str = None, uid: str = None) -> bool:
+    """Vérifie si un utilisateur est le propriétaire d'un token de partage de calendrier.
+
+    Paramètres:
+    - token (str): Le token à vérifier.
+    - uid (str): L'UID de l'utilisateur.
+    
+    Retour:
+    - bool: True si l'utilisateur est le propriétaire du token, False sinon.
+    """
     if callable(token):
         f = token
 
@@ -241,7 +330,16 @@ def verify_token_owner(token=None, uid=None):
     return _verify_token_owner(token, uid)
 
 
-def _verify_login_invite_owner(token: str, uid: str):
+def _verify_login_invite_owner(token: str, uid: str) -> dict | bool:
+    """Vérifie si un utilisateur est le propriétaire d'une invitation de connexion à un calendrier partagé.
+    
+    Paramètres:
+    - token (str): Le token à vérifier.
+    - uid (str): L'UID de l'utilisateur.
+
+    Retour:
+    - dict | bool: Un dictionnaire contenant l'ID du calendrier et l'UID du destinataire si l'utilisateur est le propriétaire, sinon False.
+    """
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -274,7 +372,19 @@ def _verify_login_invite_owner(token: str, uid: str):
         return False
 
 
-def verify_login_invitation_owner(token=None, uid=None):
+def verify_login_invitation_owner(token: str = None, uid: str = None) -> dict | bool:
+    """
+    Vérifie si un utilisateur est le propriétaire d'une invitation de connexion à un calendrier partagé.
+
+    Paramètres:
+    - token (str): Le token à vérifier.
+    - uid (str): L'UID de l'utilisateur.
+
+    Retour:
+    - dict | bool: Un dictionnaire contenant l'ID du calendrier et l'UID du destinataire si l'utilisateur est le propriétaire, sinon False.
+    - g.calendar_id (str): L'ID du calendrier extrait du token si valide.
+    - g.receiver_uid (str): L'UID du destinataire extrait du token si valide.
+    """
     if callable(token):
         f = token
 
@@ -307,7 +417,16 @@ def verify_login_invitation_owner(token=None, uid=None):
 
 # --- REGISTRATION INVITATION (invitations) ---
 
-def _verify_registration_invite_owner(token: str, uid: str):
+def _verify_registration_invite_owner(token: str, uid: str) -> dict | bool:
+    """Vérifie si un utilisateur est le propriétaire d'une invitation d'enregistrement à un calendrier partagé.
+    
+    Paramètres:
+    - token (str): Le token à vérifier.
+    - uid (str): L'UID de l'utilisateur.
+
+    Retour:
+    - dict | bool: Un dictionnaire contenant l'ID du calendrier et l'UID du destinataire si l'utilisateur est le propriétaire, sinon False.
+    """
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -340,7 +459,18 @@ def _verify_registration_invite_owner(token: str, uid: str):
         return False
 
 
-def verify_registration_invitation_owner(token=None, uid=None):
+def verify_registration_invitation_owner(token: str = None, uid: str = None) -> dict | bool:
+    """Vérifie si un utilisateur est le propriétaire d'une invitation d'enregistrement à un calendrier partagé.
+
+    Paramètres:
+    - token (str): Le token à vérifier.
+    - uid (str): L'UID de l'utilisateur.
+
+    Retour:
+    - dict | bool: Un dictionnaire contenant l'ID du calendrier et l'UID du destinataire si l'utilisateur est le propriétaire, sinon False.
+    - g.calendar_id (str): L'ID du calendrier extrait du token si valide.
+    - g.invited_email (str): L'email invité extrait du token si valide.
+    """
     if callable(token):
         f = token
 
@@ -371,7 +501,17 @@ def verify_registration_invitation_owner(token=None, uid=None):
     return _verify_registration_invite_owner(token, uid)
 
 
-def _verify_login_invite_receiver(token: str, uid: str):
+def _verify_login_invite_receiver(token: str, uid: str) -> dict | bool:
+    """Vérifie si un utilisateur est le destinataire d'une invitation de connexion à un calendrier partagé.
+
+    Paramètres:
+    - token (str): Le token à vérifier.
+    - uid (str): L'UID de l'utilisateur.
+
+    Retour:
+    - dict | bool: Un dictionnaire contenant l'ID du calendrier, l'UID du propriétaire, 
+                   et l'état d'acceptation si l'utilisateur est le destinataire, sinon False.
+    """
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
@@ -405,7 +545,20 @@ def _verify_login_invite_receiver(token: str, uid: str):
         return False
 
 
-def verify_login_invitation_receiver(token=None, uid=None):
+def verify_login_invitation_receiver(token: str = None, uid: str = None) -> dict | bool:
+    """Vérifie si un utilisateur est le destinataire d'une invitation de connexion à un calendrier partagé.
+
+    Paramètres:
+    - token (str): Le token à vérifier.
+    - uid (str): L'UID de l'utilisateur.
+
+    Retour:
+    - dict | bool: Un dictionnaire contenant l'ID du calendrier, l'UID du propriétaire, 
+      et l'état d'acceptation si l'utilisateur est le destinataire, sinon False.
+    - g.calendar_id (str): L'ID du calendrier extrait du token si valide.
+    - g.owner_uid (str): L'UID du propriétaire extrait du token si valide.
+    - g.invitation_accepted (bool): L'état d'acceptation de l'invitation extrait du token si valide.
+    """
     if callable(token):
         f = token
 

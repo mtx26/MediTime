@@ -3,7 +3,10 @@ from . import api
 from app.utils.logging import frontend_logger
 
 @api.route("/log", methods=["POST"])
-def log_handler():
+def log_handler() -> dict:
+    """Gère les logs envoyés depuis le frontend.
+    Extrait le message, le type de log et le contexte, puis utilise le logger approprié.
+    """
     data = request.json
     msg = data.get("message", "")
     level = data.get("type", "info").lower()

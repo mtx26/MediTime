@@ -14,7 +14,15 @@ frontend_url = Config.FRONTEND_URL or ""
 
 DEFAULT_PHOTO = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg"
 
-def get_calendar_name(calendar_id):
+def get_calendar_name(calendar_id : str) -> str | None:
+    """Récupère le nom d'un calendrier à partir de son ID.
+    
+    Paramètres:
+    - calendar_id (str): ID du calendrier.
+
+    Retour:
+    - str | None: Nom du calendrier ou None si non trouvé.
+    """
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("SELECT * FROM calendars WHERE id = %s", (calendar_id,))
@@ -25,7 +33,15 @@ def get_calendar_name(calendar_id):
                 return None
     return None
 
-def get_user_info(uid):
+def get_user_info(uid: str) -> tuple[str | None, str | None, str | None]:
+    """Récupère les informations d'un utilisateur à partir de son UID.
+
+    Paramètres:
+    - uid (str): UID de l'utilisateur.
+
+    Retour:
+    - tuple[str | None, str | None, str | None]: Tuple contenant le nom d'affichage, l'email et l'URL de la photo de l'utilisateur.
+    """
     user = fetch_user(uid)
     return user.get("display_name"), user.get("email"), user.get("photo_url")
 

@@ -13,6 +13,12 @@ def load_image_from_bytes(file_bytes: bytes) -> bytes:
     """
     Charge une image à partir de bytes, quel que soit le format (JPG, PNG, HEIC...),
     et retourne une version standardisée au format PNG.
+
+    Paramètres:
+    - file_bytes (bytes): Contenu binaire de l'image.
+    
+    Retour:
+    - bytes: Contenu binaire de l'image au format PNG.
     """
     try:
         image = PILImage.open(io.BytesIO(file_bytes)).convert("RGB")
@@ -24,6 +30,14 @@ def load_image_from_bytes(file_bytes: bytes) -> bytes:
 
 
 def analyze_medical_document(base64_image: str) -> dict:
+    """Analyse un document médical scanné via Gemini et extrait les informations des médicaments.
+
+    Paramètres:
+    - base64_image (str): Image encodée en base64 du document médical scanné.
+
+    Retour:
+    - dict: Dictionnaire contenant les informations extraites des médicaments.
+    """
     try:
         MODEL_ID = "gemini-2.0-flash-lite"
         model = GenerativeModel(MODEL_ID)
@@ -96,7 +110,15 @@ Rules:
         })
         return None
 
-def strip_json_markdown(raw):
+def strip_json_markdown(raw: str) -> str:
+    """Supprime les balises Markdown d'un texte JSON brut retourné par Gemini.
+
+    Paramètres:
+    - raw (str): Texte JSON brut potentiellement encadré par des balises Markdown.
+
+    Retour:
+    - str: Texte JSON nettoyé sans balises Markdown.
+    """
     if isinstance(raw, str):
         text = raw.strip()
         if text.startswith("```json"):
@@ -108,6 +130,8 @@ def strip_json_markdown(raw):
 
 
 def test_analyze_medical_document():
+    """Fonction de test pour l'analyse d'un document médical scanné via Gemini."""
+
     IMAGE_PATH = "C:\\Users\\mtx_2\\Downloads\\calendrier_2ef7fcc2.jpg"  # ou .jpg, .png, etc.
 
     with open(IMAGE_PATH, "rb") as f:

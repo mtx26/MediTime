@@ -6,17 +6,17 @@ from app.utils.logging import log_backend
 from app.config import Config
 from collections import defaultdict
 
-def process_box_decrement(cursor, id_box, qty, start_date, days=7):
+def process_box_decrement(cursor, id_box: str, qty: int, start_date: str, days: int = 7):
     """
     Calcule et applique la diminution du stock pour une boîte donnée
     sur un ou plusieurs jours (par défaut 7).
-    
-    Args:
-        cursor: curseur psycopg2 pour la base.
-        id_box: ID de la boîte de médicament.
-        qty: quantité actuelle de la boîte.
-        start_date: date de départ (datetime.date).
-        days: nombre de jours à traiter (1 ou 7 en général).
+
+    Paramètres:
+    - cursor: curseur psycopg2 pour la base.
+    - id_box: ID de la boîte de médicament.
+    - qty: quantité actuelle de la boîte.
+    - start_date: date de départ (datetime.date).
+    - days: nombre de jours à traiter (1 ou 7 en général).
     """
     if not start_date or days < 1:
         return
@@ -46,18 +46,18 @@ def process_box_decrement(cursor, id_box, qty, start_date, days=7):
             (new_qty, id_box)
         )
 
-def process_box_increment(cursor, id_box, qty, start_date, days=7):
+def process_box_increment(cursor, id_box: str, qty: int, start_date: str, days: int = 7):
     """
     Calcule et applique l'augmentation du stock pour une boîte donnée
     sur un ou plusieurs jours (par défaut 7).
     Inverse de process_box_decrement.
     
-    Args:
-        cursor: curseur psycopg2 pour la base.
-        id_box: ID de la boîte de médicament.
-        qty: quantité actuelle de la boîte.
-        start_date: date de départ (datetime.date).
-        days: nombre de jours à traiter (1 ou 7 en général).
+    Paramètres:
+    - cursor: curseur psycopg2 pour la base.
+    - id_box: ID de la boîte de médicament.
+    - qty: quantité actuelle de la boîte.
+    - start_date: date de départ (datetime.date).
+    - days: nombre de jours à traiter (1 ou 7 en général).
     """
     if not start_date or days < 1:
         return
@@ -91,8 +91,8 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
     """
     Vérifie les stocks faibles pour un calendrier spécifique et envoie des notifications.
     
-    Args:
-        calendar_id: ID du calendrier à vérifier.
+    Paramètres:
+    - calendar_id: ID du calendrier à vérifier.
     """
     log_backend.info(
         "Vérification des stocks faibles", {
@@ -207,11 +207,11 @@ def check_if_stock_is_low(calendar_id: int) -> bool:
     """
     Vérifie si le stock d'un calendrier est faible.
     
-    Args:
-        calendar_id: ID du calendrier à vérifier.
-    
-    Returns:
-        bool: True si le stock est faible, False sinon.
+    Paramètres:
+    - calendar_id: ID du calendrier à vérifier.
+
+    Retour:
+    - bool: True si le stock est faible, False sinon.
     """
     with get_connection() as conn:
         with conn.cursor() as cursor:

@@ -5,8 +5,15 @@ from app.config.config import Config
 from app.utils.logging import log_backend as logger
 
 
-def decode_token(token):
-    """Décode un token JWT Supabase et retourne l'utilisateur (payload) ou None."""
+def decode_token(token: str) -> dict | None:
+    """Décode un token JWT Supabase et retourne l'utilisateur (payload) ou None.
+
+    Paramètres:
+    - token (str): Le token JWT à décoder.
+
+    Retour:
+    - dict | None: Payload décodé ou None si invalide.
+    """
     if not token:
         return None
 
@@ -31,6 +38,14 @@ def decode_token(token):
 
 
 def require_auth(f):
+    """Décorateur pour exiger l'authentification via un token JWT Supabase.
+
+    Paramètres:
+    - f: Fonction à décorer.
+
+    Retour:
+    - Fonction décorée.
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         auth_header = request.headers.get("Authorization", "")

@@ -7,6 +7,8 @@ from app.utils.logging import log_backend
 scheduler = BackgroundScheduler()
 
 def run_scheduler():
+    """Configure et démarre le scheduler APScheduler avec les tâches cron définies.
+    """
     try:
         # Configuration du cron pour test à 13:52
         scheduler.add_job(
@@ -34,9 +36,13 @@ def run_scheduler():
         })
 
 def start_cron():
+    """Démarre le cron en lançant le scheduler.
+    """
     run_scheduler()
 
 def stop_cron():
+    """Arrête le cron en arrêtant le scheduler.
+    """
     if scheduler.running:
         scheduler.shutdown()
         log_backend.info("APScheduler arrêté", {
