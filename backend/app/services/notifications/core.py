@@ -292,10 +292,12 @@ def _cleanup_old_notifications(cur, user_id: str, notification_type: str, item: 
 
     values = [user_id, notification_type] + [item.get(field) for field in required_fields]
 
-    query = sql.SQL("DELETE FROM notifications WHERE {}").format(
-        sql.SQL(" AND ").join(conditions)
+    cur.execute(
+        sql.SQL("DELETE FROM notifications WHERE {}").format(
+            sql.SQL(" AND ").join(conditions)
+        ),
+        values
     )
-    cur.execute(query, values)
 
 def save_notifications(user_id: str, notification_type: str, items: List[Dict]):
     """

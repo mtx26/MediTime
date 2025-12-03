@@ -63,12 +63,14 @@ def update_existing_user(
                 updates["photo_url"] = upload_logo(photo_url)
 
             if updates:
-                query = sql.SQL("UPDATE users SET {} WHERE id = %s RETURNING *").format(
-                    sql.SQL(", ").join(
-                        sql.Composed([sql.Identifier(k), sql.SQL(" = %s")]) for k in updates.keys()
-                    )
+                cursor.execute(
+                    sql.SQL("UPDATE users SET {} WHERE id = %s RETURNING *").format(
+                        sql.SQL(", ").join(
+                            sql.SQL("{} = %s").format(sql.Identifier(k)) for k in updates.keys()
+                        )
+                    ),
+                    list(updates.values()) + [uid]
                 )
-                cursor.execute(query, list(updates.values()) + [uid])
                 updated_user = cursor.fetchone()
                 conn.commit()
                 return updated_user
