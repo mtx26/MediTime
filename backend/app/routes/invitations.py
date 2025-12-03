@@ -210,7 +210,6 @@ def _handle_existing_user_invite(cursor, calendar_id: str, receiver_uid: str, ow
 
     # Créer l'invitation (shared_calendars)
     token, shared_calendar_id = _create_shared_calendar_invite(cursor, receiver_uid, calendar_id)
-    cursor.commit()
 
     link = f"/accept-invite?token={token}&type=login"
 
@@ -262,6 +261,7 @@ def handle_send_invitation(calendar_id: str):
                 # Utilisateur existant : flow login (shared_calendars + notif)
                 receiver_uid = receiver_user.get("id")
                 return _handle_existing_user_invite(cursor, calendar_id, receiver_uid, owner_uid)
+                
 
     except Exception as e:
         return error_response(
@@ -639,7 +639,6 @@ def _process_accept_registration(cursor, token: str, uid: str) -> tuple[str | No
     )
     row = cursor.fetchone()
     id = row.get("id")
-    cursor.commit()
     return calendar_id, owner_uid, id
 
 @api.route("/invitations/registration/accept/<token>", methods=["POST"])
@@ -657,8 +656,8 @@ def accept_registration_invitation(token: str):
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                calendar_id, owner_uid, shared_calendar_id = _process_accept_registration(cursor, conn, token, uid)
-                
+                calendar_id, owner_uid, shared_calendar_id = _process_accept_registration(cursor, token, uid)
+                conn.commit()
                 if not calendar_id:
                     return error_response(
                         message="invitation introuvable",

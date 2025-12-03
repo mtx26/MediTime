@@ -66,7 +66,13 @@ def _fmt_dose(dose: str | int | float | None) -> str:
     return f"{s} mg"
 
 def _format_condition_text(cond: dict, dose_str: str) -> str:
-    """Formate le texte d'une condition."""
+    """
+    Formate le texte d'une condition.
+    
+    Paramètres:
+    - cond (dict): La condition à formater.
+    - dose_str (str): La dose formatée du médicament.
+    """
     tablet_count = cond.get("tablet_count")
     interval_days = cond.get("interval_days")
     moment_key = cond.get("time_of_day")
@@ -87,7 +93,14 @@ def _format_condition_text(cond: dict, dose_str: str) -> str:
     return desc
 
 def _process_medicine_item(med_data: dict, styles, elements: list):
-    """Traite un élément de médicament et l'ajoute aux éléments du PDF."""
+    """
+    Traite un élément de médicament et l'ajoute aux éléments du PDF.
+
+    Paramètres:
+    - med_data (dict): Les données du médicament.
+    - styles: Les styles de paragraphe.
+    - elements (list): La liste des éléments du PDF.
+    """
     name = med_data.get("name", "Sans nom")
     dose_str = _fmt_dose(med_data.get("dose"))
     conditions = med_data.get("conditions", []) or []
