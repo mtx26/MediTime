@@ -143,6 +143,95 @@ def _delete_invite_notification(cursor, receiver_uid: str, calendar_id: str, own
     )
 
 
+def _handle_registration_invite(cursor, calendar_id : str, receiver_email: str, owner_uid: str):
+    """
+    Gère l'invitation pour un utilisateur non enregistré.
+    
+    Paramètres:
+    - cursor: Curseur de la base de données.
+    - calendar_id: ID du calendrier à partager.
+    - receiver_email: Email de l'utilisateur à inviter.
+    - owner_uid: ID de l'utilisateur qui envoie l'invitation.
+    """
+    token = _insert_registration_invitation(cursor, calendar_id, receiver_email)
+    link = f"/accept-invite?token={token}&type=registration"
+
+    email_address_direct(
+        to_email=receiver_email,
+        notification_type="calendar_invitation_registration",
+        context={
+            "link": link,
+            "sender_uid": owner_uid,
+            "calendar_id": calendar_id,
+        },
+    )
+
+    return success_response(
+        message="invitation envoyée",
+        code="INVITATION_SEND_SUCCESS",
+        log_extra={"calendar_id": calendar_id},
+    )
+
+def _handle_existing_user_invite(cursor, calendar_id: str, receiver_uid: str, owner_uid: str):
+    """
+    Gère l'invitation pour un utilisateur existant.
+
+    Paramètres:
+    - cursor: Curseur de la base de données.
+    - calendar_id: ID du calendrier à partager.
+    - receiver_uid: ID de l'utilisateur à inviter.
+    - owner_uid: ID de l'utilisateur qui envoie l'invitation.
+    """
+    # Invitation à soi-même
+    if owner_uid == receiver_uid:
+        return warning_response(
+            message="invitation à soi-même",
+            code="SELF_INVITATION_ERROR",
+            status_code=400,
+            log_extra={"calendar_id": calendar_id},
+        )
+
+    # Déjà invité ?
+    cursor.execute(
+        """
+        SELECT 1
+        FROM shared_calendars
+        WHERE receiver_uid = %s AND calendar_id = %s
+        """,
+        (receiver_uid, calendar_id),
+    )
+    if cursor.fetchone():
+        return warning_response(
+            message="utilisateur déjà invité",
+            code="ALREADY_INVITED",
+            status_code=400,
+            log_extra={"calendar_id": calendar_id},
+        )
+
+    # Créer l'invitation (shared_calendars)
+    token, shared_calendar_id = _create_shared_calendar_invite(cursor, receiver_uid, calendar_id)
+    cursor.commit()
+
+    link = f"/accept-invite?token={token}&type=login"
+
+    # Notifier le receveur
+    notify_and_record(
+        user_id=receiver_uid,
+        body_or_list={
+            "calendar_id": calendar_id,
+            "link": link,
+            "sender_uid": owner_uid,
+            "shared_calendar_id": shared_calendar_id,
+        },
+        notification_type="calendar_invitation",
+    )
+
+    return success_response(
+        message="invitation envoyée",
+        code="INVITATION_SEND_SUCCESS",
+        log_extra={"calendar_id": calendar_id},
+    )
+
 @api.route("/invitations/<calendar_id>", methods=["POST"])
 @measure_time()
 @require_auth
@@ -168,79 +257,11 @@ def handle_send_invitation(calendar_id: str):
 
                 # Pas d'utilisateur : invitation par email (registration flow)
                 if not receiver_user:
-                    token = _insert_registration_invitation(cursor, calendar_id, receiver_email)
-                    link = f"/accept-invite?token={token}&type=registration"
-
-                    email_address_direct(
-                        to_email=receiver_email,
-                        notification_type="calendar_invitation_registration",
-                        context={
-                            "link": link,
-                            "sender_uid": owner_uid,
-                            "calendar_id": calendar_id,
-                        },
-                    )
-
-                    return success_response(
-                        message="invitation envoyée",
-                        code="INVITATION_SEND_SUCCESS",
-                        log_extra={"calendar_id": calendar_id},
-                    )
+                    return _handle_registration_invite(cursor, calendar_id, receiver_email, owner_uid)
 
                 # Utilisateur existant : flow login (shared_calendars + notif)
                 receiver_uid = receiver_user.get("id")
-
-        # Invitation à soi-même
-        if owner_uid == receiver_uid:
-            return warning_response(
-                message="invitation à soi-même",
-                code="SELF_INVITATION_ERROR",
-                status_code=400,
-                log_extra={"calendar_id": calendar_id},
-            )
-
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                # Déjà invité ?
-                cursor.execute(
-                    """
-                    SELECT 1
-                    FROM shared_calendars
-                    WHERE receiver_uid = %s AND calendar_id = %s
-                    """,
-                    (receiver_uid, calendar_id),
-                )
-                if cursor.fetchone():
-                    return warning_response(
-                        message="utilisateur déjà invité",
-                        code="ALREADY_INVITED",
-                        status_code=400,
-                        log_extra={"calendar_id": calendar_id},
-                    )
-
-                # Créer l'invitation (shared_calendars)
-                token, shared_calendar_id = _create_shared_calendar_invite(cursor, receiver_uid, calendar_id)
-                conn.commit()
-
-        link = f"/accept-invite?token={token}&type=login"
-
-        # Notifier le receveur
-        notify_and_record(
-            user_id=receiver_uid,
-            body_or_list={
-                "calendar_id": calendar_id,
-                "link": link,
-                "sender_uid": owner_uid,
-                "shared_calendar_id": shared_calendar_id,
-            },
-            notification_type="calendar_invitation",
-        )
-
-        return success_response(
-            message="invitation envoyée",
-            code="INVITATION_SEND_SUCCESS",
-            log_extra={"calendar_id": calendar_id},
-        )
+                return _handle_existing_user_invite(cursor, calendar_id, receiver_uid, owner_uid)
 
     except Exception as e:
         return error_response(
@@ -590,6 +611,37 @@ def delete_registration_invitation(token: str):
         )
 
 
+def _process_accept_registration(cursor, token: str, uid: str) -> tuple[str | None, str | None, int | None]:
+    """
+    Traite l'acceptation de l'invitation d'enregistrement.
+
+    Paramètres:
+    - cursor: Curseur de la base de données.
+    - token: Token de l'invitation.
+    - uid: ID de l'utilisateur qui accepte l'invitation.
+    """
+    calendar_id, owner_uid = _delete_invitation_returning_calendar_owner(cursor, token)
+    if not calendar_id or not owner_uid:
+        return None, None, None
+
+    cursor.execute(
+        """
+        INSERT INTO shared_calendars (
+            receiver_uid,
+            calendar_id,
+            accepted,
+            accepted_at
+        )
+        VALUES (%s, %s, TRUE, NOW())
+        RETURNING id
+        """,
+        (uid, calendar_id),
+    )
+    row = cursor.fetchone()
+    id = row.get("id")
+    cursor.commit()
+    return calendar_id, owner_uid, id
+
 @api.route("/invitations/registration/accept/<token>", methods=["POST"])
 @measure_time()
 @require_auth
@@ -605,8 +657,9 @@ def accept_registration_invitation(token: str):
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                calendar_id, owner_uid = _delete_invitation_returning_calendar_owner(cursor, token)
-                if not calendar_id or not owner_uid:
+                calendar_id, owner_uid, shared_calendar_id = _process_accept_registration(cursor, conn, token, uid)
+                
+                if not calendar_id:
                     return error_response(
                         message="invitation introuvable",
                         code="INVITATION_NOT_FOUND",
@@ -614,30 +667,13 @@ def accept_registration_invitation(token: str):
                         log_extra={"token": token},
                     )
 
-                cursor.execute(
-                    """
-                    INSERT INTO shared_calendars (
-                        receiver_uid,
-                        calendar_id,
-                        accepted,
-                        accepted_at
-                    )
-                    VALUES (%s, %s, TRUE, NOW())
-                    RETURNING id
-                    """,
-                    (uid, calendar_id),
-                )
-                row = cursor.fetchone()
-                id = row.get("id")
-                conn.commit()
-
         notify_and_record(
             user_id=owner_uid,
             body_or_list={
                 "calendar_id": calendar_id,
                 "link": f"/shared-calendars?calendar={calendar_id}",
                 "sender_uid": uid,
-                "shared_calendar_id" : id,
+                "shared_calendar_id" : shared_calendar_id,
             },
             notification_type="calendar_invitation_accepted",
         )

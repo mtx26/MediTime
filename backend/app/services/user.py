@@ -16,7 +16,15 @@ def fetch_user(uid: str) -> dict:
             user = cursor.fetchone() or {}
             return user
 
-def update_existing_user(uid: str, user_db: dict, display_name: str | None, email: str | None, photo_url: str | None, email_enabled: bool | None, push_enabled: bool | None) -> dict:
+def update_existing_user(
+    uid: str, 
+    user_db: dict, 
+    display_name: str | None, 
+    email: str | None, 
+    photo_url: str | None, 
+    email_enabled: bool | None, 
+    push_enabled: bool | None
+) -> dict:
     """Met à jour les informations de l'utilisateur existant dans la base de données.
 
     Paramètres:
@@ -40,19 +48,21 @@ def update_existing_user(uid: str, user_db: dict, display_name: str | None, emai
             if email is not None and email != user_db["email"]:
                 updates["email"] = email
             if photo_url is not None and photo_url != user_db["photo_url"]:
-                photo_url_uploaded = upload_logo(photo_url)
-                updates["photo_url"] = photo_url_uploaded
+                updates["photo_url"] = upload_logo(photo_url)
             if email_enabled is not None and email_enabled != user_db["email_enabled"]:
                 updates["email_enabled"] = email_enabled
             if push_enabled is not None and push_enabled != user_db["push_enabled"]:
                 updates["push_enabled"] = push_enabled
+            
             if updates:
                 set_clause = ", ".join(f"{k} = %s" for k in updates)
-                values = list(updates.values()) + [uid]
-                cursor.execute(f"UPDATE users SET {set_clause} WHERE id = %s", values)
+                query = f"UPDATE users SET {set_clause} WHERE id = %s RETURNING *"
+                cursor.execute(query, list(updates.values()) + [uid])
+                updated_user = cursor.fetchone()
                 conn.commit()
-
-            return fetch_user(uid)
+                return updated_user
+            
+            return user_db
 
 def insert_new_user(uid: str, display_name: str, email: str, photo_url: str | None, email_enabled: bool = True, push_enabled: bool = True) -> dict:
     """Insère un nouvel utilisateur dans la base de données.

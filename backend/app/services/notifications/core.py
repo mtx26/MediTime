@@ -142,6 +142,71 @@ def _format_medication_list(medications: List[Dict]) -> str:
     return "<ul style='margin:8px 0; padding-left:20px;'>" + "".join(lis) + "</ul>"
 
 
+NOTIFICATION_TEMPLATES = {
+    "calendar_invitation": {
+        "title": "📆 Invitation à un calendrier",
+        "body": "<b>{sender}</b> vous invite à rejoindre le calendrier « <b>{cal}</b> ».",
+        "cta": "Accepter l'invitation"
+    },
+    "calendar_invitation_registration": {
+        "title": "📆 Invitation à un calendrier",
+        "body": "<b>{sender}</b> vous invite à vous inscrire pour accéder au calendrier « <b>{cal}</b> ».",
+        "cta": "S'inscrire et accepter l'invitation"
+    },
+    "calendar_invitation_registration_deleted": {
+        "title": "📆 Invitation au calendrier annulée",
+        "body": "<b>{sender}</b> a annulé votre invitation à vous inscrire pour accéder au calendrier « <b>{cal}</b> ».",
+        "cta": "s'inscrire"
+    },
+    "calendar_invitation_accepted": {
+        "title": "✅ Invitation acceptée",
+        "body": "<b>{sender}</b> a accepté votre invitation pour « <b>{cal}</b> ».",
+        "cta": VIEW_CALENDAR_LABEL
+    },
+    "calendar_invitation_rejected": {
+        "title": "❌ Invitation refusée",
+        "body": "<b>{sender}</b> a refusé votre invitation pour « <b>{cal}</b> ».",
+        "cta": VIEW_CALENDAR_LABEL
+    },
+    "calendar_shared_deleted_by_owner": {
+        "title": "🔒 Partage annulé",
+        "body": "<b>{sender}</b> a arrêté de partager « <b>{cal}</b> » avec vous.",
+        "cta": "Ouvrir le site"
+    },
+    "calendar_shared_deleted_by_receiver": {
+        "title": "📤 Partage retiré",
+        "body": "<b>{sender}</b> a retiré le calendrier « <b>{cal}</b> » de son compte.",
+        "cta": VIEW_CALENDAR_LABEL
+    }
+}
+
+def _build_low_stock_text(context: Dict, cal: str) -> Tuple[str, str, str]:
+    title = f"⚠️ Stock faible – calendrier « {cal} »"
+    if context.get("medications"):
+        body = _p(f"Certains médicaments du calendrier <b>« {cal} »</b> sont en stock critique :") \
+               + _format_medication_list(context["medications"])
+        return (title, body, VIEW_CALENDAR_LABEL)
+
+    med_name = _h(fetch_medicine_name(context.get("medication_id")))
+    qty = context.get("medication_qty") or 0
+    if qty == 0:
+        stock_txt = "<span style='color:red;font-weight:bold;'>épuisé</span>"
+    else:
+        stock_txt = f"<span style='color:orange;font-weight:bold;'>{qty} restant{'s' if qty != 1 else ''}</span>"
+    body = _p(f"Le médicament <b>« {med_name} »</b> est {stock_txt}.")
+    return (title, body, VIEW_CALENDAR_LABEL)
+
+def _build_generic_text(context: Dict) -> Tuple[str, str, str]:
+    count = context.get("notification_count")
+    if count and count > 1:
+        title = "🔔 Nouvelles notifications"
+        body = _p(f"Vous avez <b>{count}</b> nouvelles notifications dans MediTime.")
+        return (title, body, "Voir les notifications")
+
+    title = "🔔 Nouvelle notification"
+    body = _p("Vous avez reçu une nouvelle notification dans MediTime.")
+    return (title, body, "Voir les notifications")
+
 def build_notification_text(notification_type: str, context: Dict) -> Tuple[str, str, str]:
     """
     Génère le titre, le corps HTML et le libellé du bouton d'action pour une notification donnée.
@@ -157,77 +222,15 @@ def build_notification_text(notification_type: str, context: Dict) -> Tuple[str,
     sender = _h(context.get("sender_name") or DEFAULT_USER_NAME)
     cal = _h(context.get("calendar_name") or "ce calendrier")
 
-    match notification_type:
-        case "calendar_invitation":
-            # Invitation à rejoindre un calendrier partagé
-            title = "📆 Invitation à un calendrier"
-            body = _p(f"<b>{sender}</b> vous invite à rejoindre le calendrier « <b>{cal}</b> ».")
-            return (title, body, "Accepter l'invitation")
+    if notification_type in NOTIFICATION_TEMPLATES:
+        tmpl = NOTIFICATION_TEMPLATES[notification_type]
+        body = _p(tmpl["body"].format(sender=sender, cal=cal))
+        return (tmpl["title"], body, tmpl["cta"])
 
-        case "calendar_invitation_registration":
-            # Invitation à s'inscrire pour accéder à un calendrier
-            title = "📆 Invitation à un calendrier"
-            body = _p(f"<b>{sender}</b> vous invite à vous inscrire pour accéder au calendrier « <b>{cal}</b> ».")
-            return (title, body, "S'inscrire et accepter l'invitation")
-        
-        case "calendar_invitation_registration_deleted":
-            # Annulation d'une invitation à s'inscrire
-            title = "📆 Invitation au calendrier annulée"
-            body = _p(f"<b>{sender}</b> a annulé votre invitation à vous inscrire pour accéder au calendrier « <b>{cal}</b> ».")
-            return (title, body, "s'inscrire")
+    if notification_type == "low_stock":
+        return _build_low_stock_text(context, cal)
 
-        case "calendar_invitation_accepted":
-            # Confirmation d'acceptation d'une invitation
-            title = "✅ Invitation acceptée"
-            body = _p(f"<b>{sender}</b> a accepté votre invitation pour « <b>{cal}</b> ».")
-            return (title, body, VIEW_CALENDAR_LABEL)
-
-        case "calendar_invitation_rejected":
-            # Refus d'une invitation
-            title = "❌ Invitation refusée"
-            body = _p(f"<b>{sender}</b> a refusé votre invitation pour « <b>{cal}</b> ».")
-            return (title, body, VIEW_CALENDAR_LABEL)
-
-        case "calendar_shared_deleted_by_owner":
-            # Le propriétaire a arrêté le partage
-            title = "🔒 Partage annulé"
-            body = _p(f"<b>{sender}</b> a arrêté de partager « <b>{cal}</b> » avec vous.")
-            return (title, body, "Ouvrir le site")
-
-        case "calendar_shared_deleted_by_receiver":
-            # Le destinataire a retiré le calendrier de son compte
-            title = "📤 Partage retiré"
-            body = _p(f"<b>{sender}</b> a retiré le calendrier « <b>{cal}</b> » de son compte.")
-            return (title, body, VIEW_CALENDAR_LABEL)
-
-        case "low_stock":
-            # Stock faible ou épuisé pour un ou plusieurs médicaments
-            title = f"⚠️ Stock faible – calendrier « {cal} »"
-            if context.get("medications"):
-                body = _p(f"Certains médicaments du calendrier <b>« {cal} »</b> sont en stock critique :") \
-                       + _format_medication_list(context["medications"])
-                return (title, body, VIEW_CALENDAR_LABEL)
-
-            med_name = _h(fetch_medicine_name(context.get("medication_id")))
-            qty = context.get("medication_qty") or 0
-            if qty == 0:
-                stock_txt = "<span style='color:red;font-weight:bold;'>épuisé</span>"
-            else:
-                stock_txt = f"<span style='color:orange;font-weight:bold;'>{qty} restant{'s' if qty != 1 else ''}</span>"
-            body = _p(f"Le médicament <b>« {med_name} »</b> est {stock_txt}.")
-            return (title, body, VIEW_CALENDAR_LABEL)
-
-        case _:
-            # Cas générique : notification simple ou groupée
-            count = context.get("notification_count")
-            if count and count > 1:
-                title = "🔔 Nouvelles notifications"
-                body = _p(f"Vous avez <b>{count}</b> nouvelles notifications dans MediTime.")
-                return (title, body, "Voir les notifications")
-
-            title = "🔔 Nouvelle notification"
-            body = _p("Vous avez reçu une nouvelle notification dans MediTime.")
-            return (title, body, "Voir les notifications")
+    return _build_generic_text(context)
 
 
 def generate_email_content(notification_type: str, context: Dict) -> Tuple[str, str, str]:
@@ -261,6 +264,57 @@ def generate_email_content(notification_type: str, context: Dict) -> Tuple[str, 
 
 
 # ========= Persistance Web =========
+def _cleanup_old_notifications(cur, user_id : str, notification_type: str, item: dict):
+    """
+    Nettoie les anciennes notifications similaires.
+    
+    Paramètres:
+    - cur: Curseur de la base de données.
+    - user_id (str): Identifiant de l'utilisateur.
+    - notification_type (str): Type de notification.
+    - item (Dict): Données de la notification actuelle.
+    """
+    sender_uid = item.get("sender_uid")
+    calendar_id = item.get("calendar_id")
+    medication_id = item.get("medication_id")
+    shared_calendar_id = item.get("shared_calendar_id")
+
+    if notification_type == "low_stock" and sender_uid and calendar_id and medication_id:
+        cur.execute(
+            """
+            DELETE FROM notifications
+            WHERE user_id = %s
+              AND type = %s
+              AND sender_uid = %s
+              AND calendar_id = %s
+              AND medication_id = %s
+            """,
+            (user_id, notification_type, sender_uid, calendar_id, medication_id),
+        )
+    elif (notification_type in ("calendar_invitation_accepted", "calendar_shared_deleted_by_owner")) and sender_uid and calendar_id:
+        cur.execute(
+            """
+            DELETE FROM notifications
+            WHERE user_id = %s
+              AND type = %s
+              AND sender_uid = %s
+              AND calendar_id = %s
+            """,
+            (user_id, notification_type, sender_uid, calendar_id),
+        )
+    elif notification_type == "calendar_invitation" and sender_uid and shared_calendar_id and calendar_id:
+        cur.execute(
+            """
+            DELETE FROM notifications
+            WHERE user_id = %s
+              AND type = %s
+              AND sender_uid = %s
+              AND shared_calendar_id = %s
+              AND calendar_id = %s
+            """,
+            (user_id, notification_type, sender_uid, shared_calendar_id, calendar_id),
+        )
+
 def save_notifications(user_id: str, notification_type: str, items: List[Dict]):
     """
     Enregistre chaque notification dans la base de données (historique web).
@@ -276,47 +330,9 @@ def save_notifications(user_id: str, notification_type: str, items: List[Dict]):
             for item in items:
                 title, body_html, _ = build_notification_text(notification_type, item)
                 content = {**item, "title": title, "body": body_html}
-                shared_calendar_id = item.get("shared_calendar_id") or None
-                calendar_id = item.get("calendar_id") or None
-                sender_uid = item.get("sender_uid") or None
-                medication_id = item.get("medication_id") or None
                 
-                # Nettoyage simple: supprimer la plus ancienne notif correspondante selon le type
-                if notification_type == "low_stock" and sender_uid and calendar_id and medication_id:
-                    cur.execute(
-                        """
-                        DELETE FROM notifications
-                        WHERE user_id = %s
-                          AND type = %s
-                          AND sender_uid = %s
-                          AND calendar_id = %s
-                          AND medication_id = %s
-                        """,
-                        (user_id, notification_type, sender_uid, calendar_id, medication_id),
-                    )
-                elif (notification_type == "calendar_invitation_accepted" or notification_type == "calendar_shared_deleted_by_owner") and sender_uid and calendar_id:
-                    cur.execute(
-                        """
-                        DELETE FROM notifications
-                        WHERE user_id = %s
-                          AND type = %s
-                          AND sender_uid = %s
-                          AND calendar_id = %s
-                        """,
-                        (user_id, notification_type, sender_uid, calendar_id),
-                    )
-                elif notification_type == "calendar_invitation" and sender_uid and shared_calendar_id and calendar_id:
-                    cur.execute(
-                        """
-                        DELETE FROM notifications
-                        WHERE user_id = %s
-                          AND type = %s
-                          AND sender_uid = %s
-                          AND shared_calendar_id = %s
-                          AND calendar_id = %s
-                        """,
-                        (user_id, notification_type, sender_uid, shared_calendar_id, calendar_id),
-                    )
+                _cleanup_old_notifications(cur, user_id, notification_type, item)
+                
                 cur.execute(
                     """
                     INSERT INTO notifications (
@@ -328,11 +344,11 @@ def save_notifications(user_id: str, notification_type: str, items: List[Dict]):
                         user_id,
                         notification_type,
                         False,
-                        sender_uid,
-                        calendar_id,
+                        item.get("sender_uid"),
+                        item.get("calendar_id"),
                         json.dumps(content),
-                        medication_id,
-                        shared_calendar_id
+                        item.get("medication_id"),
+                        item.get("shared_calendar_id")
                     ),
                 )
             conn.commit()
@@ -434,6 +450,28 @@ def _html_to_plain(html: str) -> str:
 
 
 # ========= Orchestration =========
+def _prepare_grouped_context(items: List[Dict], notification_type: str) -> Dict:
+    """
+    Prépare le contexte pour les notifications groupées.
+    
+    Paramètres:
+    - items (List[Dict]): Liste des notifications à grouper.
+    - notification_type (str): Type de notification.
+
+    Retour:
+    - Dict: Contexte enrichi pour la notification groupée.
+    """
+    context = items[0].copy()
+    if notification_type == "low_stock":
+        # Pour le stock faible, on regroupe tous les médicaments concernés
+        context["medications"] = [
+            {"name": fetch_medicine_name(n.get("medication_id")), "qty": n.get("medication_qty") or 0} for n in items
+        ]
+    elif len(items) > 1:
+        # Pour d'autres cas, on indique le nombre de notifications groupées
+        context["notification_count"] = len(items)
+    return context
+
 def send_grouped_notifications(user_id: str, items: List[Dict], notification_type: str, channels: List[str]):
     """
     Envoie un groupe de notifications à un utilisateur via les canaux spécifiés.
@@ -447,28 +485,16 @@ def send_grouped_notifications(user_id: str, items: List[Dict], notification_typ
     """
     try:
         user = fetch_user(user_id) or {}
-        email_enabled = user.get("email_enabled")
-        push_enabled = user.get("push_enabled")
-        sms_enabled = user.get("sms_enabled")
-
-        # Construction du contexte groupé
-        context = items[0].copy()
-        if notification_type == "low_stock":
-            # Pour le stock faible, on regroupe tous les médicaments concernés
-            context["medications"] = [
-                {"name": fetch_medicine_name(n.get("medication_id")), "qty": n.get("medication_qty") or 0} for n in items
-            ]
-        elif len(items) > 1:
-            # Pour d'autres cas, on indique le nombre de notifications groupées
-            context["notification_count"] = len(items)
+        
+        context = _prepare_grouped_context(items, notification_type)
 
         if "web" in channels:
             save_notifications(user_id, notification_type, items)
-        if push_enabled and "push" in channels:
+        if user.get("push_enabled") and "push" in channels:
             send_push_notification(user_id, context, notification_type)
-        if email_enabled and "email" in channels:
+        if user.get("email_enabled") and "email" in channels:
             send_email_notification(user, context, notification_type)
-        if sms_enabled and "sms" in channels:
+        if user.get("sms_enabled") and "sms" in channels:
             send_sms_notification(user, context, notification_type)
 
     except Exception as e:
@@ -478,7 +504,7 @@ def send_grouped_notifications(user_id: str, items: List[Dict], notification_typ
         )
 
 
-def notify_and_record(user_id: str, body_or_list: Dict | List[Dict], notification_type: str, channels: List[str] = list(DEFAULT_CHANNELS)):
+def notify_and_record(user_id: str, body_or_list: Dict | List[Dict], notification_type: str, channels: List[str] | None = None):
     """
     Envoie une ou plusieurs notifications à un utilisateur via les canaux spécifiés et les enregistre dans l'historique web.
 
@@ -486,8 +512,10 @@ def notify_and_record(user_id: str, body_or_list: Dict | List[Dict], notificatio
     - user_id (str): Identifiant de l'utilisateur.
     - body_or_list (Dict | List[Dict]): Notification ou liste de notifications à envoyer.
     - notification_type (str): Type de notification.
-    - channels (List[str]): Canaux par lesquels envoyer les notifications.
+    - channels (List[str] | None): Canaux par lesquels envoyer les notifications. Par défaut DEFAULT_CHANNELS.
     """
+    if channels is None:
+        channels = list(DEFAULT_CHANNELS)
     try:
         items = body_or_list if isinstance(body_or_list, list) else [body_or_list]
         enriched_items = [enrich_notification(n) for n in items]

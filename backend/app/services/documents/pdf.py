@@ -65,6 +65,27 @@ def _fmt_dose(dose: str | int | float | None) -> str:
         return s
     return f"{s} mg"
 
+def _format_condition_text(cond: dict, dose_str: str) -> str:
+    """Formate le texte d'une condition."""
+    tablet_count = cond.get("tablet_count")
+    interval_days = cond.get("interval_days")
+    moment_key = cond.get("time_of_day")
+    moment_txt = moment_map.get(moment_key, moment_key or "moment")
+    start_txt = _fmt_date(cond.get("start_date"))
+
+    parts = [f"- {tablet_count if tablet_count is not None else '?'} comprimé(s)"]
+    if dose_str:
+        parts.append(f"de {dose_str}")
+    if interval_days:
+        parts.append(f"tous les {interval_days} jour(s)")
+    if moment_txt:
+        parts.append(f", le {moment_txt}")
+
+    desc = " ".join(parts)
+    if start_txt:
+        desc += f", à partir du {start_txt}"
+    return desc
+
 def _process_medicine_item(med_data: dict, styles, elements: list):
     """Traite un élément de médicament et l'ajoute aux éléments du PDF."""
     name = med_data.get("name", "Sans nom")
@@ -80,24 +101,7 @@ def _process_medicine_item(med_data: dict, styles, elements: list):
         return
 
     for cond in conditions:
-        tablet_count = cond.get("tablet_count")
-        interval_days = cond.get("interval_days")
-        moment_key = cond.get("time_of_day")
-        moment_txt = moment_map.get(moment_key, moment_key or "moment")
-        start_txt = _fmt_date(cond.get("start_date"))
-
-        parts = [f"- {tablet_count if tablet_count is not None else '?'} comprimé(s)"]
-        if dose_str:
-            parts.append(f"de {dose_str}")
-        if interval_days:
-            parts.append(f"tous les {interval_days} jour(s)")
-        if moment_txt:
-            parts.append(f", le {moment_txt}")
-
-        desc = " ".join(parts)
-        if start_txt:
-            desc += f", à partir du {start_txt}"
-
+        desc = _format_condition_text(cond, dose_str)
         elements.append(Paragraph(desc, styles['Normal']))
 
     elements.append(Spacer(1, 10))

@@ -131,7 +131,7 @@ def strip_json_markdown(raw: str) -> str:
 
 def test_analyze_medical_document():
     """Fonction de test pour l'analyse d'un document médical scanné via Gemini."""
-    
+
     IMAGE_PATH = "C:\\Users\\mtx_2\\Downloads\\calendrier_2ef7fcc2.jpg"  # ou .jpg, .png, etc.
 
     with open(IMAGE_PATH, "rb") as f:

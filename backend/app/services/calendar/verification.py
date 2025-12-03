@@ -205,7 +205,7 @@ def _verify_token_owner(token: str, uid: str) -> bool:
         return False
 
 
-def verify_calendar_share(calendar_id: str =None, receiver_uid: str =None) -> bool:
+def verify_calendar_share(calendar_id: str = None, receiver_uid: str = None) -> bool:
     """Vérifie si un utilisateur a accès à un calendrier partagé.
     
     Paramètres:
@@ -236,7 +236,7 @@ def verify_calendar_share(calendar_id: str =None, receiver_uid: str =None) -> bo
     return _verify_calendar_share(calendar_id, receiver_uid)
 
 
-def verify_calendar(calendar_id: str =None, uid: str =None) -> bool:
+def verify_calendar(calendar_id: str = None, uid: str = None) -> bool:
     """Vérifie si un utilisateur a accès à un calendrier.
     
     Paramètres:
@@ -267,7 +267,7 @@ def verify_calendar(calendar_id: str =None, uid: str =None) -> bool:
     return _verify_calendar(calendar_id, uid)
 
 
-def verify_token(token: str =None) -> str | bool:
+def verify_token(token: str = None) -> str | bool:
     """Vérifie la validité d'un token de partage de calendrier.
 
     Paramètres:
@@ -299,7 +299,7 @@ def verify_token(token: str =None) -> str | bool:
     return _verify_token(token)
 
 
-def verify_token_owner(token: str =None, uid: str =None) -> bool:
+def verify_token_owner(token: str = None, uid: str = None) -> bool:
     """Vérifie si un utilisateur est le propriétaire d'un token de partage de calendrier.
 
     Paramètres:
@@ -372,7 +372,7 @@ def _verify_login_invite_owner(token: str, uid: str) -> dict | bool:
         return False
 
 
-def verify_login_invitation_owner(token: str =None, uid: str =None) -> dict | bool:
+def verify_login_invitation_owner(token: str = None, uid: str = None) -> dict | bool:
     """
     Vérifie si un utilisateur est le propriétaire d'une invitation de connexion à un calendrier partagé.
 
@@ -459,7 +459,7 @@ def _verify_registration_invite_owner(token: str, uid: str) -> dict | bool:
         return False
 
 
-def verify_registration_invitation_owner(token: str =None, uid: str =None) -> dict | bool:
+def verify_registration_invitation_owner(token: str = None, uid: str = None) -> dict | bool:
     """Vérifie si un utilisateur est le propriétaire d'une invitation d'enregistrement à un calendrier partagé.
 
     Paramètres:
@@ -509,7 +509,8 @@ def _verify_login_invite_receiver(token: str, uid: str) -> dict | bool:
     - uid (str): L'UID de l'utilisateur.
 
     Retour:
-    - dict | bool: Un dictionnaire contenant l'ID du calendrier, l'UID du propriétaire, et l'état d'acceptation si l'utilisateur est le destinataire, sinon False.
+    - dict | bool: Un dictionnaire contenant l'ID du calendrier, l'UID du propriétaire, 
+                   et l'état d'acceptation si l'utilisateur est le destinataire, sinon False.
     """
     try:
         with get_connection() as conn:
@@ -544,7 +545,7 @@ def _verify_login_invite_receiver(token: str, uid: str) -> dict | bool:
         return False
 
 
-def verify_login_invitation_receiver(token: str =None, uid: str =None) -> dict | bool:
+def verify_login_invitation_receiver(token: str = None, uid: str = None) -> dict | bool:
     """Vérifie si un utilisateur est le destinataire d'une invitation de connexion à un calendrier partagé.
 
     Paramètres:

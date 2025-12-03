@@ -54,7 +54,7 @@ def init_vertex_ai():
 
         location = Config.GOOGLE_CLOUD_LOCATION
         if not location:
-             raise RuntimeError("GOOGLE_CLOUD_LOCATION manquant dans .env")
+            raise RuntimeError("GOOGLE_CLOUD_LOCATION manquant dans .env")
 
         aiplatform.init(
             project=project_id,

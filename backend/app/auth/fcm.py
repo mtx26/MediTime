@@ -37,6 +37,35 @@ def get_fcm_access_token() -> tuple[str | None, str | None]:
         )
         return None, None
 
+def _create_fcm_payload(token: str, title: str, body: str, json_body: dict) -> dict:
+    """
+    Crée le payload pour la notification FCM.
+
+    Paramètres:
+    - token (str): Le token de l'appareil cible.
+    - title (str): Le titre de la notification.
+    - body (str): Le corps de la notification.
+    - json_body (dict): Le corps JSON additionnel pour la notification.
+
+    Retour:
+    - dict: Le payload de la notification FCM.
+    """
+    return {
+        "message": {
+            "token": token,
+            "notification": {
+                "title": title,
+                "body": body,
+                "image": urljoin(frontend_url or "", "/icons/icon-192.png")
+            },
+            "webpush": {
+                "fcm_options": {
+                    "link": json_body.get("link") if json_body.get("link") else urljoin(frontend_url or "", "/notifications")
+                }
+            }
+        }
+    }
+
 def send_fcm_notification(tokens: list, title: str, body: str, json_body: dict):
     """Envoie une notification FCM aux tokens spécifiés.
 
@@ -55,21 +84,7 @@ def send_fcm_notification(tokens: list, title: str, body: str, json_body: dict):
     }
 
     for token in tokens:
-        payload = {
-            "message": {
-                "token": token,
-                "notification": {
-                    "title": title,
-                    "body": body,
-                    "image": urljoin(frontend_url or "", "/icons/icon-192.png")
-                },
-                "webpush": {
-                    "fcm_options": {
-                        "link": json_body.get("link") if json_body.get("link") else urljoin(frontend_url or "", "/notifications")
-                    }
-                }
-            }
-        }
+        payload = _create_fcm_payload(token, title, body, json_body)
 
         response = requests.post(url, headers=headers, json=payload)
         log_backend.info(
