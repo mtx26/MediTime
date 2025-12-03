@@ -261,7 +261,6 @@ def handle_send_invitation(calendar_id: str):
                 # Utilisateur existant : flow login (shared_calendars + notif)
                 receiver_uid = receiver_user.get("id")
                 return _handle_existing_user_invite(cursor, calendar_id, receiver_uid, owner_uid)
-                
 
     except Exception as e:
         return error_response(

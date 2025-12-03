@@ -160,6 +160,7 @@ def delete_box(box_id: str, calendar_id: str):
             cursor.execute("DELETE FROM medicine_box_conditions WHERE box_id = %s", (box_id,))
             conn.commit()
 
+
 GET_MEDICINES_QUERY = """
     SELECT
       COALESCE(

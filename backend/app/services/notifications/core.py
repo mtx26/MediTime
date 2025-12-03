@@ -13,6 +13,7 @@
 import json
 import traceback
 from typing import List, Tuple, Dict, Any
+from psycopg2 import sql
 
 from app.auth.fcm import send_fcm_notification  # Envoi de notifications push via Firebase
 from app.db.connection import get_connection    # Connexion à la base de données
@@ -285,10 +286,15 @@ def _cleanup_old_notifications(cur, user_id: str, notification_type: str, item: 
     if not required_fields or not all(item.get(f) for f in required_fields):
         return
 
-    conditions = ["user_id = %s", "type = %s"] + [f"{field} = %s" for field in required_fields]
+    conditions = [sql.SQL("user_id = %s"), sql.SQL("type = %s")]
+    for field in required_fields:
+        conditions.append(sql.SQL("{} = %s").format(sql.Identifier(field)))
+
     values = [user_id, notification_type] + [item.get(field) for field in required_fields]
 
-    query = f"DELETE FROM notifications WHERE {' AND '.join(conditions)}"
+    query = sql.SQL("DELETE FROM notifications WHERE {}").format(
+        sql.SQL(" AND ").join(conditions)
+    )
     cur.execute(query, values)
 
 def save_notifications(user_id: str, notification_type: str, items: List[Dict]):

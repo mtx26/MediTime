@@ -1,5 +1,6 @@
 from app.db.connection import get_connection
 from app.utils.upload import upload_logo
+from psycopg2 import sql
 
 def fetch_user(uid: str) -> dict:
     """Fetch user from the database by user ID.
@@ -16,7 +17,7 @@ def fetch_user(uid: str) -> dict:
             user = cursor.fetchone() or {}
             return user
 
-from psycopg2 import sql
+
 
 def update_existing_user(
     uid: str,
