@@ -201,7 +201,7 @@ def _generate_ics_content(events) -> str:
         
         summary = f"💊 Racheter {event['name']}"
         if event.get('dose'):
-            summary += f" ({event['dose']})"
+            summary += f" ({event['dose']} mg)"
             
         description = f"Stock estimé: {event['stock']:.1f} (Seuil: {event['threshold']})\\nCapacité boîte: {event['capacity']}"
         
