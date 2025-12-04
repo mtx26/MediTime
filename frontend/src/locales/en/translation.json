@@ -738,6 +738,9 @@
     "create_error": "Error creating the link.",
     "delete_success": "ICS link successfully removed.",
     "delete_error": "Error deleting link.",
-    "delete_confirmation": "Do you really want to remove this link?"
+    "delete_confirmation": "Do you really want to remove this link?",
+    "calendar_ics": "ICS Calendar",
+    "info_title": "About ICS links",
+    "info_description": "These links allow you to synchronize your medication schedule with your personal calendar (Google Calendar, Outlook, Apple Calendar, etc.). Copy the link and add it as a 'Calendar Subscription' in your preferred application."
   }
 }

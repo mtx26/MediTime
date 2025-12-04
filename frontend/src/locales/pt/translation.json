@@ -738,6 +738,9 @@
     "create_error": "Erro ao criar o link.",
     "delete_success": "Link ICS removido com sucesso.",
     "delete_error": "Erro ao excluir o link.",
-    "delete_confirmation": "Você realmente deseja remover este link?"
+    "delete_confirmation": "Você realmente deseja remover este link?",
+    "calendar_ics": "Calendário ICS",
+    "info_title": "Sobre links ICS",
+    "info_description": "Esses links permitem sincronizar sua programação de medicamentos com seu calendário pessoal (Google Agenda, Outlook, Calendário da Apple etc.). Copie o link e adicione-o como uma \"Assinatura de Calendário\" no aplicativo de sua preferência."
   }
 }

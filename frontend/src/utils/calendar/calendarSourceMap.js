@@ -1,4 +1,3 @@
-import { update } from "lodash";
 
 export const getCalendarSourceMap = (
   personalCalendars,
@@ -22,6 +21,9 @@ export const getCalendarSourceMap = (
     fetchNotificationsEnabled: personalCalendars.fetchPersonalNotificationsEnabled,
     updateNotificationsEnabled: personalCalendars.updatePersonalNotificationsEnabled,
     fetchStockDecrementMethod: personalCalendars.fetchPersonalStockDecrementMethod,
+    getTokensIcs: personalCalendars.getTokensIcs,
+    createTokenIcs: personalCalendars.createTokenIcs,
+    deleteTokenIcs: personalCalendars.deleteTokenIcs,
     },
   sharedUser: {
     fetchSchedule: sharedUserCalendars.fetchSharedUserCalendarSchedule,
@@ -40,6 +42,9 @@ export const getCalendarSourceMap = (
     fetchNotificationsEnabled: sharedUserCalendars.fetchSharedUserNotificationsEnabled,
     updateNotificationsEnabled: sharedUserCalendars.updateSharedUserNotificationsEnabled,
     fetchStockDecrementMethod: sharedUserCalendars.fetchSharedUserStockDecrementMethod,
+    getTokensIcs: sharedUserCalendars.getSharedTokensIcs,
+    createTokenIcs: sharedUserCalendars.createSharedTokenIcs,
+    deleteTokenIcs: sharedUserCalendars.deleteSharedTokenIcs,
   },
   token: {
     fetchSchedule: tokenCalendars.fetchTokenCalendarSchedule,
@@ -58,6 +63,9 @@ export const getCalendarSourceMap = (
     restockBox: null,
     fetchNotificationsEnabled: null,
     updateNotificationsEnabled: null,
-    fetchStockDecrementMethod: null
+    fetchStockDecrementMethod: null,
+    getTokensIcs: null,
+    createTokenIcs: null,
+    deleteTokenIcs: null,
   },
 });

@@ -146,6 +146,15 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
     // Paramètres
     actions.push(
+      {
+        label: (
+          <>
+            <i className="bi bi-calendar3 me-2" /> {t('ics.calendar_ics')}
+          </>
+        ),
+        linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
+        title: t('ics.calendar_ics'),
+      },
       { separator: true },
       {
         label: (

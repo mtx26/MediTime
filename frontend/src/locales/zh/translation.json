@@ -738,6 +738,9 @@
     "create_error": "创建链接时出错。",
     "delete_success": "ICS链接已成功移除。",
     "delete_error": "删除链接时出错。",
-    "delete_confirmation": "你真的要删除这个链接吗？"
+    "delete_confirmation": "你真的要删除这个链接吗？",
+    "calendar_ics": "ICS日历",
+    "info_title": "关于ICS链接",
+    "info_description": "这些链接可让您将用药时间表与个人日历（Google 日历、Outlook、Apple 日历等）同步。复制链接并将其作为“日历订阅”添加到您常用的应用程序中。"
   }
 }

@@ -738,6 +738,9 @@
     "create_error": "Fehler beim Erstellen des Links.",
     "delete_success": "ICS-Verbindung erfolgreich entfernt.",
     "delete_error": "Fehler beim Löschen des Links.",
-    "delete_confirmation": "Möchten Sie diesen Link wirklich entfernen?"
+    "delete_confirmation": "Möchten Sie diesen Link wirklich entfernen?",
+    "calendar_ics": "ICS-Kalender",
+    "info_title": "Über ICS-Links",
+    "info_description": "Mithilfe dieser Links können Sie Ihren Medikamentenplan mit Ihrem persönlichen Kalender (Google Kalender, Outlook, Apple Kalender usw.) synchronisieren. Kopieren Sie den Link und fügen Sie ihn in Ihrer bevorzugten Anwendung als „Kalenderabonnement“ hinzu."
   }
 }

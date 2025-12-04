@@ -13,12 +13,14 @@ function StockAlertsPage({
   const params = useParams();
   const location = useLocation();
   const { t } = useTranslation();
+  const { lng } = params;
 
   const [boxes, setBoxes] = useState([]);
   const [loadingBoxes, setLoadingBoxes] = useState(true);
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
+  let basePath = 'calendar';
 
   const pathWithoutLang =
     location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
@@ -26,9 +28,11 @@ function StockAlertsPage({
   if (pathWithoutLang.startsWith('/shared-user-calendar')) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
+    basePath = 'shared-user-calendar';
   } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
     calendarType = 'token';
     calendarId = params.sharedToken;
+    basePath = 'shared-token-calendar';
   }
 
   const calendarSource = getCalendarSourceMap(
@@ -116,7 +120,16 @@ function StockAlertsPage({
               ),
               onClick: () => sendStockAlertsSMS(),
               title: t('send_sms'),
-            } 
+            },
+            {
+              label: (
+                <>
+                  <i className="bi bi-calendar3 me-2" /> {t('ics.calendar_ics')}
+                </>
+              ),
+              linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
+              title: t('ics.calendar_ics'),
+            },
           ]}
         />
 
