@@ -54,10 +54,13 @@ def create_calendar_ics(token: str) -> bytes:
         with conn.cursor() as cursor:
             # 1. Valider le token, mettre à jour l'accès et récupérer le calendar_id en une seule requête
             cursor.execute("""
-                UPDATE ics_tokens 
-                SET last_accessed_at = NOW(), last_user_agent = 'ICS-Generator' 
-                WHERE token = %s AND revoked_at IS NULL
-                RETURNING calendar_id
+                UPDATE ics_tokens
+                SET last_accessed_at = NOW(), last_user_agent = 'ICS-Generator'
+                FROM calendars
+                WHERE ics_tokens.token = %s 
+                  AND ics_tokens.revoked_at IS NULL 
+                  AND ics_tokens.calendar_id = calendars.id
+                RETURNING ics_tokens.calendar_id, calendars.name
             """, (token,))
             
             result = cursor.fetchone()
@@ -67,6 +70,7 @@ def create_calendar_ics(token: str) -> bytes:
                 raise ValueError("Token invalide ou révoqué")
             
             calendar_id = result['calendar_id']
+            calendar_name = result['name']
             
             # 2. Récupérer les médicaments ET leurs conditions agrégées en JSON
             cursor.execute("""
@@ -175,9 +179,9 @@ def create_calendar_ics(token: str) -> bytes:
                             # Impossible de prédire la prochaine rupture sans connaître la quantité rachetée
                             break
 
-    return _generate_ics_content(events).encode('utf-8')
+    return _generate_ics_content(events, calendar_name).encode('utf-8')
 
-def _generate_ics_content(events) -> str:
+def _generate_ics_content(events, calendar_name="MediTime Stocks") -> str:
     """Génère le contenu textuel au format iCalendar (ICS)."""
     lines = [
         "BEGIN:VCALENDAR",
@@ -185,7 +189,7 @@ def _generate_ics_content(events) -> str:
         "PRODID:-//MediTime//Medicines//FR",
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH",
-        "X-WR-CALNAME:MediTime Stocks",
+        f"X-WR-CALNAME:{calendar_name} - Stocks",
         "X-WR-TIMEZONE:UTC"
     ]
     
