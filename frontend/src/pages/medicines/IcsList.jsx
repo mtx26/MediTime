@@ -4,6 +4,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import ActionSheet from '../../components/common/ActionSheet';
 import AlertSystem from '../../components/common/AlertSystem';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
+import PropTypes from 'prop-types';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -228,3 +229,9 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 }
 
 export default IcsList;
+
+IcsList.propTypes = {
+  personalCalendars: PropTypes.object.isRequired,
+  sharedUserCalendars: PropTypes.object.isRequired,
+  tokenCalendars: PropTypes.object.isRequired,
+};
