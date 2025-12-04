@@ -727,5 +727,17 @@
     "title": "Perché scegliere MediTime?"
   },
   "yes": "SÌ",
-  "you_have_no_pillbox_use_history": "Non hai alcuna cronologia di utilizzo per l'organizzatore di pillole."
+  "you_have_no_pillbox_use_history": "Non hai alcuna cronologia di utilizzo per l'organizzatore di pillole.",
+  "ics": {
+    "title": "Elenchi di link ICS",
+    "add_token": "Crea un collegamento ICS",
+    "no_tokens": "Nessun collegamento ICS creato.",
+    "token_label": "Lien ICS",
+    "fetch_error": "Errore durante il caricamento dei link.",
+    "create_success": "Collegamento ICS creato con successo.",
+    "create_error": "Errore durante la creazione del collegamento.",
+    "delete_success": "Collegamento ICS rimosso correttamente.",
+    "delete_error": "Errore durante l'eliminazione del collegamento.",
+    "delete_confirmation": "Vuoi davvero rimuovere questo collegamento?"
+  }
 }

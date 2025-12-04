@@ -727,5 +727,17 @@
     "title": "Why choose MediTime?"
   },
   "yes": "Yes",
-  "you_have_no_pillbox_use_history": "You have no usage history for the pill organizer."
+  "you_have_no_pillbox_use_history": "You have no usage history for the pill organizer.",
+  "ics": {
+    "title": "ICS Link Lists",
+    "add_token": "Create an ICS link",
+    "no_tokens": "No ICS link created.",
+    "token_label": "Lien ICS",
+    "fetch_error": "Error loading links.",
+    "create_success": "ICS link successfully created.",
+    "create_error": "Error creating the link.",
+    "delete_success": "ICS link successfully removed.",
+    "delete_error": "Error deleting link.",
+    "delete_confirmation": "Do you really want to remove this link?"
+  }
 }

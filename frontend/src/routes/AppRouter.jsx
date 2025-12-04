@@ -27,6 +27,7 @@ const PillboxUses = lazy(() => import('../pages/calendar/PillboxUses'));
 
 const MedicinesList = lazy(() => import('../pages/medicines/MedicinesList'));
 const BoxesView = lazy(() => import('../pages/medicines/BoxesView'));
+const IcsList = lazy(() => import('../pages/medicines/IcsList'));
 const NotFound = lazy(() => import('../pages/general/NotFound'));
 
 const PrivacyPage = lazy(() => import('../pages/general/PrivacyPage'));
@@ -274,6 +275,19 @@ function AppRoutes({ sharedProps }) {
             />
           }
         />
+        <Route
+          path="ics-tokens"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<IcsList {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
       </Route>
       <Route
         path="calendars"
@@ -374,6 +388,19 @@ function AppRoutes({ sharedProps }) {
               element={
                 <RouteWithLoader
                   element={<PillboxUses {...sharedProps} />}
+                  isLoading={sharedProps.loadingStates.isInitialLoading}
+                />
+              }
+            />
+          }
+        />
+        <Route
+          path="ics-tokens"
+          element={
+            <PrivateRoute
+              element={
+                <RouteWithLoader
+                  element={<IcsList {...sharedProps} />}
                   isLoading={sharedProps.loadingStates.isInitialLoading}
                 />
               }

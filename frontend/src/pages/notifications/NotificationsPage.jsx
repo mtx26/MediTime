@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import NotificationLine from '../../components/common/NotificationLine';
 import ActionSheet from '../../components/common/ActionSheet';
 
-function NotificationsPage({ notifications, sharedUserCalendars }) {
+function NotificationsPage({ notifications }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { lng } = useParams();

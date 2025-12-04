@@ -727,5 +727,17 @@
     "title": "Почему стоит выбрать MediTime?"
   },
   "yes": "Да",
-  "you_have_no_pillbox_use_history": "У вас нет истории использования органайзера для таблеток."
+  "you_have_no_pillbox_use_history": "У вас нет истории использования органайзера для таблеток.",
+  "ics": {
+    "title": "Списки ссылок ICS",
+    "add_token": "Создать ссылку ICS",
+    "no_tokens": "Ссылка ICS не создана.",
+    "token_label": "Залог ICS",
+    "fetch_error": "Ошибка загрузки ссылок.",
+    "create_success": "Ссылка ICS успешно создана.",
+    "create_error": "Ошибка создания ссылки.",
+    "delete_success": "Ссылка ICS успешно удалена.",
+    "delete_error": "Ошибка при удалении ссылки.",
+    "delete_confirmation": "Вы действительно хотите удалить эту ссылку?"
+  }
 }

@@ -17,7 +17,6 @@ const getBorderClass = (box) => {
 };
 
 
-const createSeparator = () => ({ separator: true });
 
 const createIconButton = (className, icon, text, onClick, ariaLabel, title) => (
   <button

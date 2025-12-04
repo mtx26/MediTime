@@ -307,6 +307,43 @@ function App() {
     });
   }, []);
 
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+  const getTokensIcs = useCallback(async (calendarId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/ics`,
+      method: 'GET',
+      origin: 'GET_ICS_TOKENS',
+      uid,
+      analyticsEvent: 'get_ics_tokens',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
+
+  const createTokenIcs = useCallback(async (calendarId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/ics`,
+      method: 'POST',
+      origin: 'CREATE_ICS_TOKEN',
+      uid,
+      analyticsEvent: 'create_ics_token',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
+
+  const deleteTokenIcs = useCallback(async (calendarId, tokenId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/ics/${tokenId}`,
+      method: 'DELETE',
+      origin: 'DELETE_ICS_TOKEN',
+      uid,
+      analyticsEvent: 'delete_ics_token',
+      analyticsData: { calendarId, tokenId, uid },
+    });
+  }, []);
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Fonction pour recupérer un calendrier partagé par un token
@@ -823,6 +860,9 @@ function App() {
       updatePersonalNotificationsEnabled,
       analyzeImage,
       saveAnalysisResult,
+      getTokensIcs,
+      createTokenIcs,
+      deleteTokenIcs,
     },
 
     sharedUserCalendars: {

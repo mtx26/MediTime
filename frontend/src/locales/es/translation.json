@@ -727,5 +727,17 @@
     "title": "¿Por qué elegir MediTime?"
   },
   "yes": "Sí",
-  "you_have_no_pillbox_use_history": "No tienes historial de uso del pastillero."
+  "you_have_no_pillbox_use_history": "No tienes historial de uso del pastillero.",
+  "ics": {
+    "title": "Listas de enlaces de ICS",
+    "add_token": "Crear un enlace ICS",
+    "no_tokens": "No se creó ningún enlace ICS.",
+    "token_label": "Lien ICS",
+    "fetch_error": "Error al cargar enlaces.",
+    "create_success": "Enlace ICS creado exitosamente.",
+    "create_error": "Error al crear el enlace.",
+    "delete_success": "Enlace ICS eliminado exitosamente",
+    "delete_error": "Error al eliminar el enlace.",
+    "delete_confirmation": "¿Realmente deseas eliminar este enlace?"
+  }
 }

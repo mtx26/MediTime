@@ -727,5 +727,17 @@
     "title": "Por que escolher o MediTime?"
   },
   "yes": "Sim",
-  "you_have_no_pillbox_use_history": "Você não possui histórico de uso para o organizador de comprimidos."
+  "you_have_no_pillbox_use_history": "Você não possui histórico de uso para o organizador de comprimidos.",
+  "ics": {
+    "title": "Listas de links ICS",
+    "add_token": "Criar um link ICS",
+    "no_tokens": "Nenhum link ICS criado.",
+    "token_label": "Lien ICS",
+    "fetch_error": "Erro ao carregar os links.",
+    "create_success": "Link ICS criado com sucesso.",
+    "create_error": "Erro ao criar o link.",
+    "delete_success": "Link ICS removido com sucesso.",
+    "delete_error": "Erro ao excluir o link.",
+    "delete_confirmation": "Você realmente deseja remover este link?"
+  }
 }

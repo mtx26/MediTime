@@ -248,6 +248,18 @@
     "description": "Gérez et partagez facilement vos prises de médicaments.",
     "title": "MediTime - Planificateur de traitements"
   },
+  "ics": {
+    "title": "Listes de liens ICS",
+    "add_token": "Créer un lien ICS",
+    "no_tokens": "Aucun lien ICS créé.",
+    "token_label": "Lien ICS",
+    "fetch_error": "Erreur lors du chargement des liens.",
+    "create_success": "Lien ICS créé avec succès.",
+    "create_error": "Erreur lors de la création du lien.",
+    "delete_success": "Lien ICS supprimé avec succès.",
+    "delete_error": "Erreur lors de la suppression du lien.",
+    "delete_confirmation": "Voulez-vous vraiment supprimer ce lien ?"
+  },
   "image_upload": {
     "analysis_error": "Erreur lors de l'analyse de l'image.",
     "click_to_change": "Cliquez pour changer de fichier",

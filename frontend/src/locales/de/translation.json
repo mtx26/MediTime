@@ -727,5 +727,17 @@
     "title": "Warum MediTime wählen?"
   },
   "yes": "Ja",
-  "you_have_no_pillbox_use_history": "Für den Pillenorganizer liegen keine Nutzungsdaten vor."
+  "you_have_no_pillbox_use_history": "Für den Pillenorganizer liegen keine Nutzungsdaten vor.",
+  "ics": {
+    "title": "ICS-Linklisten",
+    "add_token": "Erstellen Sie einen ICS-Link",
+    "no_tokens": "Es wurde keine ICS-Verbindung hergestellt.",
+    "token_label": "Lien ICS",
+    "fetch_error": "Fehler beim Laden der Links.",
+    "create_success": "ICS-Verbindung erfolgreich hergestellt.",
+    "create_error": "Fehler beim Erstellen des Links.",
+    "delete_success": "ICS-Verbindung erfolgreich entfernt.",
+    "delete_error": "Fehler beim Löschen des Links.",
+    "delete_confirmation": "Möchten Sie diesen Link wirklich entfernen?"
+  }
 }
