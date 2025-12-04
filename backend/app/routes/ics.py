@@ -180,7 +180,7 @@ def get_calendar_ics(token):
         )
     except Exception as e:
         return error_response(
-            message="Erreur interne lors de la génération du calendrier",
+            message=f"Erreur interne lors de la génération du calendrier: {str(e)}",
             code="ICS_GENERATION_ERROR",
             status_code=500,
             error=str(e)
