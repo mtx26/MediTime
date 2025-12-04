@@ -738,6 +738,9 @@
     "create_error": "リンクの作成中にエラーが発生しました。",
     "delete_success": "ICS リンクが正常に削除されました。",
     "delete_error": "リンクの削除中にエラーが発生しました。",
-    "delete_confirmation": "このリンクを本当に削除しますか?"
+    "delete_confirmation": "このリンクを本当に削除しますか?",
+    "calendar_ics": "ICSカレンダー",
+    "info_title": "ICSリンクについて",
+    "info_description": "これらのリンクを使用すると、服薬スケジュールを個人用カレンダー（Googleカレンダー、Outlook、Appleカレンダーなど）と同期できます。リンクをコピーし、お好みのアプリケーションで「カレンダーサブスクリプション」として追加してください。"
   }
 }

@@ -344,6 +344,39 @@ function App() {
     });
   }, []);
 
+  const getSharedTokensIcs = useCallback(async (calendarId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/ics`,
+      method: 'GET',
+      origin: 'LIST_SHARED_ICS_TOKENS',
+      uid,
+      analyticsEvent: 'get_shared_ics_tokens',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
+
+  const createSharedTokenIcs = useCallback(async (calendarId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/ics`,
+      method: 'POST',
+      origin: 'CREATE_SHARED_ICS_TOKEN',
+      uid,
+      analyticsEvent: 'create_shared_ics_token',
+      analyticsData: { calendarId, uid },
+    });
+  }, []);
+
+  const deleteSharedTokenIcs = useCallback(async (calendarId, tokenId) => {
+    return await performApiCall({
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/ics/${tokenId}`,
+      method: 'DELETE',
+      origin: 'DELETE_SHARED_ICS_TOKEN',
+      uid,
+      analyticsEvent: 'delete_shared_ics_token',
+      analyticsData: { calendarId, tokenId, uid },
+    });
+  }, []);
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Fonction pour recupérer un calendrier partagé par un token
@@ -891,6 +924,9 @@ function App() {
       fetchSharedUserNotificationsEnabled,
       updateSharedUserNotificationsEnabled,
       fetchSharedUserStockDecrementMethod,
+      getSharedTokensIcs,
+      createSharedTokenIcs,
+      deleteSharedTokenIcs,
     },
 
     tokenCalendars: {

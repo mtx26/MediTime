@@ -249,6 +249,7 @@
     "title": "MediTime - Planificateur de traitements"
   },
   "ics": {
+    "calendar_ics": "Calendrier ICS",
     "title": "Listes de liens ICS",
     "add_token": "Créer un lien ICS",
     "no_tokens": "Aucun lien ICS créé.",
@@ -258,7 +259,9 @@
     "create_error": "Erreur lors de la création du lien.",
     "delete_success": "Lien ICS supprimé avec succès.",
     "delete_error": "Erreur lors de la suppression du lien.",
-    "delete_confirmation": "Voulez-vous vraiment supprimer ce lien ?"
+    "delete_confirmation": "Voulez-vous vraiment supprimer ce lien ?",
+    "info_title": "À propos des liens ICS",
+    "info_description": "Ces liens vous permettent de synchroniser votre prise de médicaments avec votre calendrier personnel (Google Calendar, Outlook, Apple Calendar, etc.). Copiez le lien et ajoutez-le comme 'Abonnement à un calendrier' dans votre application préférée."
   },
   "image_upload": {
     "analysis_error": "Erreur lors de l'analyse de l'image.",

@@ -324,6 +324,15 @@ function CalendarPage({
                       {
                         label: (
                           <>
+                            <i className="bi bi-calendar3 me-2" /> {t('ics.calendar_ics')}
+                          </>
+                        ),
+                        linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
+                        title: t('ics.calendar_ics'),
+                      },
+                      {
+                        label: (
+                          <>
                             <i className="bi bi-clock-history me-2" /> {t('pillbox_uses')}
                           </>
                         ),
@@ -392,6 +401,15 @@ function CalendarPage({
                         ),
                         onClick: () => calendarSource.downloadCalendarPdf(calendarId),
                         title: t('boxes.export_pdf'),
+                      },
+                      {
+                        label: (
+                          <>
+                            <i className="bi bi-calendar3 me-2" /> {t('ics.calendar_ics')}
+                          </>
+                        ),
+                        linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
+                        title: t('ics.calendar_ics'),
                       },
                       {
                         label: (

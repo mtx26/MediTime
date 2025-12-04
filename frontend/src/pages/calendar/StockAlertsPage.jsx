@@ -116,7 +116,16 @@ function StockAlertsPage({
               ),
               onClick: () => sendStockAlertsSMS(),
               title: t('send_sms'),
-            } 
+            },
+            {
+              label: (
+                <>
+                  <i className="bi bi-calendar3 me-2" /> {t('ics.calendar_ics')}
+                </>
+              ),
+              linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
+              title: t('ics.calendar_ics'),
+            },
           ]}
         />
 

@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useParams, useLocation } from 'react-router-dom';
 import ActionSheet from '../../components/common/ActionSheet';
 import AlertSystem from '../../components/common/AlertSystem';
+import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 
-function IcsList({ personalCalendars }) {
-  const { calendarId } = useParams();
+function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const { t } = useTranslation();
+  const location = useLocation();
+  const params = useParams();
 
   const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +19,25 @@ function IcsList({ personalCalendars }) {
   const [alertType, setAlertType] = useState('');
   const [tokenToDelete, setTokenToDelete] = useState(null);
 
+  let calendarType = 'personal';
+  let calendarId = params.calendarId;
+
+  const pathWithoutLang =
+    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+
+  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
+    calendarType = 'sharedUser';
+    calendarId = params.calendarId;
+  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
+    calendarType = 'token';
+    calendarId = params.sharedToken;
+  }
+
+  const calendarSource = getCalendarSourceMap(
+    personalCalendars,
+    sharedUserCalendars,
+    tokenCalendars
+  )[calendarType];
   const showAlert = (message, type) => {
     setAlertMessage(message);
     setAlertType(type);
@@ -24,21 +45,21 @@ function IcsList({ personalCalendars }) {
 
   const fetchTokens = useCallback(async () => {
     setLoading(true);
-    const result = await personalCalendars.getTokensIcs(calendarId);
+    const result = await calendarSource.getTokensIcs(calendarId);
     if (result.success) {
       setTokens(result.data.tokens || []);
     } else {
       showAlert(t('ics.fetch_error'), 'danger');
     }
     setLoading(false);
-  }, [calendarId, personalCalendars.getTokensIcs, t]);
+  }, [calendarId, calendarSource.getTokensIcs, t]);
 
   useEffect(() => {
     fetchTokens();
   }, [fetchTokens]);
 
   const handleCreateToken = async () => {
-    const result = await personalCalendars.createTokenIcs(calendarId);
+    const result = await calendarSource.createTokenIcs(calendarId);
     if (result.success) {
       showAlert(t('ics.create_success'), 'success');
       fetchTokens();
@@ -48,7 +69,7 @@ function IcsList({ personalCalendars }) {
   };
 
   const handleDeleteToken = async (tokenId) => {
-    const result = await personalCalendars.deleteTokenIcs(calendarId, tokenId);
+    const result = await calendarSource.deleteTokenIcs(calendarId, tokenId);
     if (result.success) {
       showAlert(t('ics.delete_success'), 'success');
       fetchTokens();
@@ -76,8 +97,7 @@ function IcsList({ personalCalendars }) {
   };
 
   const getWebcalUrl = (token) => {
-    let url = `${VITE_API_URL}/api/calendar/${token}.ics`;
-    return url.replace(/^https?:\/\//, 'webcal://');
+    return `webcal:${VITE_API_URL}/api/calendar/${token}.ics`;
   };
 
   if (loading) {
@@ -103,10 +123,22 @@ function IcsList({ personalCalendars }) {
       />
       
       <div className="mb-4">
-        <h4>
+        <h4 className="mb-3 fw-bold">
           <i className="bi bi-link-45deg me-2"></i>
           {t('ics.title')}
         </h4>
+      </div>
+
+      <div className="alert alert-info shadow-sm mb-4">
+        <div className="d-flex">
+          <div className="me-3">
+            <i className="bi bi-info-circle-fill fs-4"></i>
+          </div>
+          <div>
+            <h5 className="alert-heading">{t('ics.info_title')}</h5>
+            <p className="mb-0">{t('ics.info_description')}</p>
+          </div>
+        </div>
       </div>
 
       {tokens.map((token) => (
@@ -189,6 +221,7 @@ function IcsList({ personalCalendars }) {
           <i className="bi bi-plus-lg me-2"></i>
           {t('ics.add_token')}
         </button>
+
       </div>
     </div>
   );

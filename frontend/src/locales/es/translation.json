@@ -738,6 +738,9 @@
     "create_error": "Error al crear el enlace.",
     "delete_success": "Enlace ICS eliminado exitosamente",
     "delete_error": "Error al eliminar el enlace.",
-    "delete_confirmation": "¿Realmente deseas eliminar este enlace?"
+    "delete_confirmation": "¿Realmente deseas eliminar este enlace?",
+    "calendar_ics": "Calendario del ICS",
+    "info_title": "Acerca de los enlaces de ICS",
+    "info_description": "Estos enlaces le permiten sincronizar su horario de medicación con su calendario personal (Google Calendar, Outlook, Apple Calendar, etc.). Copie el enlace y agréguelo como \"Suscripción al Calendario\" en su aplicación preferida."
   }
 }

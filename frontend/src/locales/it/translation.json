@@ -738,6 +738,9 @@
     "create_error": "Errore durante la creazione del collegamento.",
     "delete_success": "Collegamento ICS rimosso correttamente.",
     "delete_error": "Errore durante l'eliminazione del collegamento.",
-    "delete_confirmation": "Vuoi davvero rimuovere questo collegamento?"
+    "delete_confirmation": "Vuoi davvero rimuovere questo collegamento?",
+    "calendar_ics": "Calendario ICS",
+    "info_title": "Informazioni sui collegamenti ICS",
+    "info_description": "Questi link ti consentono di sincronizzare il tuo programma di assunzione dei farmaci con il tuo calendario personale (Google Calendar, Outlook, Apple Calendar, ecc.). Copia il link e aggiungilo come \"Abbonamento al calendario\" nella tua applicazione preferita."
   }
 }
