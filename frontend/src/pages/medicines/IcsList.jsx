@@ -39,6 +39,7 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     sharedUserCalendars,
     tokenCalendars
   )[calendarType];
+  
   const showAlert = (message, type) => {
     setAlertMessage(message);
     setAlertType(type);

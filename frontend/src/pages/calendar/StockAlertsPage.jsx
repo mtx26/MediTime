@@ -13,6 +13,7 @@ function StockAlertsPage({
   const params = useParams();
   const location = useLocation();
   const { t } = useTranslation();
+  const { lng } = params;
 
   const [boxes, setBoxes] = useState([]);
   const [loadingBoxes, setLoadingBoxes] = useState(true);
