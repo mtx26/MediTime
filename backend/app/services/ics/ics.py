@@ -194,7 +194,7 @@ def _generate_ics_content(events, calendar_name="MediTime Stocks") -> str:
     ]
     
     # Date de génération du fichier
-    now_str = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    now_str = datetime.timezone.utcnow().strftime("%Y%m%dT%H%M%SZ")
     
     for event in events:
         # Format date YYYYMMDD pour les événements "toute la journée"
