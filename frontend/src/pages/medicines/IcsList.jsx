@@ -110,7 +110,7 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         style={{ height: '60vh' }}
       >
         <div className="spinner-border text-primary">
-          <span className="visually-hidden">{t('common.loading')}</span>
+          <span className="visually-hidden">{t('loading')}</span>
         </div>
       </div>
     );
