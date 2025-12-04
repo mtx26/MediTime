@@ -732,7 +732,6 @@
     "title": "ICS-Linklisten",
     "add_token": "Erstellen Sie einen ICS-Link",
     "no_tokens": "Es wurde keine ICS-Verbindung hergestellt.",
-    "token_label": "Lien ICS",
     "fetch_error": "Fehler beim Laden der Links.",
     "create_success": "ICS-Verbindung erfolgreich hergestellt.",
     "create_error": "Fehler beim Erstellen des Links.",
@@ -741,6 +740,7 @@
     "delete_confirmation": "Möchten Sie diesen Link wirklich entfernen?",
     "calendar_ics": "ICS-Kalender",
     "info_title": "Über ICS-Links",
-    "info_description": "Mithilfe dieser Links können Sie Ihren Medikamentenplan mit Ihrem persönlichen Kalender (Google Kalender, Outlook, Apple Kalender usw.) synchronisieren. Kopieren Sie den Link und fügen Sie ihn in Ihrer bevorzugten Anwendung als „Kalenderabonnement“ hinzu."
+    "info_description": "Mithilfe dieser Links können Sie Ihren Medikamentenplan mit Ihrem persönlichen Kalender (Google Kalender, Outlook, Apple Kalender usw.) synchronisieren. Kopieren Sie den Link und fügen Sie ihn in Ihrer bevorzugten Anwendung als „Kalenderabonnement“ hinzu.",
+    "token_label": "Pfandrecht"
   }
 }
