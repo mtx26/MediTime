@@ -732,7 +732,6 @@
     "title": "ICS Link Lists",
     "add_token": "Create an ICS link",
     "no_tokens": "No ICS link created.",
-    "token_label": "Lien ICS",
     "fetch_error": "Error loading links.",
     "create_success": "ICS link successfully created.",
     "create_error": "Error creating the link.",
@@ -741,6 +740,7 @@
     "delete_confirmation": "Do you really want to remove this link?",
     "calendar_ics": "ICS Calendar",
     "info_title": "About ICS links",
-    "info_description": "These links allow you to synchronize your medication schedule with your personal calendar (Google Calendar, Outlook, Apple Calendar, etc.). Copy the link and add it as a 'Calendar Subscription' in your preferred application."
+    "info_description": "These links allow you to synchronize your medication schedule with your personal calendar (Google Calendar, Outlook, Apple Calendar, etc.). Copy the link and add it as a 'Calendar Subscription' in your preferred application.",
+    "token_label": "Link"
   }
 }
