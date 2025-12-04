@@ -76,6 +76,7 @@ def create_calendar_ics(token: str) -> bytes:
                     mb.stock_quantity, 
                     mb.stock_alert_threshold, 
                     mb.box_capacity,
+                    mb.dose,
                     COALESCE(
                         json_agg(
                             json_build_object(
@@ -103,6 +104,7 @@ def create_calendar_ics(token: str) -> bytes:
                 capacity = med['box_capacity']
                 name = med['name']
                 conditions = med['conditions']
+                med_dose = med['dose']
                 
                 # Si le stock est déjà sous le seuil (ou égal), c'est urgent : événement aujourd'hui
                 if simulated_stock <= threshold:
@@ -110,7 +112,9 @@ def create_calendar_ics(token: str) -> bytes:
                         'date': today,
                         'name': name,
                         'stock': simulated_stock,
-                        'threshold': threshold
+                        'threshold': threshold,
+                        'dose': med_dose,
+                        'capacity': capacity
                     })
                     # On simule un rachat immédiat pour voir les prochaines occurrences
                     if capacity > 0:
@@ -159,7 +163,9 @@ def create_calendar_ics(token: str) -> bytes:
                             'date': current_day,
                             'name': name,
                             'stock': simulated_stock,
-                            'threshold': threshold
+                            'threshold': threshold,
+                            'dose': med_dose,
+                            'capacity': capacity
                         })
                         
                         # On simule le rachat d'une boîte
@@ -193,14 +199,20 @@ def _generate_ics_content(events) -> str:
         dt_end = (event['date'] + timedelta(days=1)).strftime("%Y%m%d")
         uid = str(uuid.uuid4())
         
+        summary = f"💊 Racheter {event['name']}"
+        if event.get('dose'):
+            summary += f" ({event['dose']})"
+            
+        description = f"Stock estimé: {event['stock']:.1f} (Seuil: {event['threshold']})\\nCapacité boîte: {event['capacity']}"
+        
         lines.extend([
             "BEGIN:VEVENT",
             f"UID:{uid}",
             f"DTSTAMP:{now_str}",
             f"DTSTART;VALUE=DATE:{dt_start}",
             f"DTEND;VALUE=DATE:{dt_end}",
-            f"SUMMARY:💊 Racheter {event['name']}",
-            f"DESCRIPTION:Stock estimé: {event['stock']:.1f} (Seuil: {event['threshold']})",
+            f"SUMMARY:{summary}",
+            f"DESCRIPTION:{description}",
             "STATUS:CONFIRMED",
             "TRANSP:TRANSPARENT", # Indique que cet événement ne bloque pas le temps (disponible)
             "END:VEVENT"

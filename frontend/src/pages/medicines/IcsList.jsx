@@ -39,7 +39,7 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     sharedUserCalendars,
     tokenCalendars
   )[calendarType];
-  
+
   const showAlert = (message, type) => {
     setAlertMessage(message);
     setAlertType(type);
@@ -99,7 +99,8 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   };
 
   const getWebcalUrl = (token) => {
-    return `webcal:${VITE_API_URL}/api/calendar/${token}.ics`;
+    const url = `${VITE_API_URL}/api/calendar/${token}.ics`;
+    return url.replace(/^https?:\/\//, 'webcal://');
   };
 
   if (loading) {
