@@ -162,7 +162,8 @@ def get_calendar_ics(token):
     Ce lien est destiné à être ajouté dans Google Calendar, Outlook, etc.
     """
     try:
-        ics_content = create_calendar_ics(token)
+        user_agent = request.headers.get('User-Agent', 'Unknown')
+        ics_content = create_calendar_ics(token, user_agent)
         return Response(
             ics_content,
             mimetype='text/calendar',

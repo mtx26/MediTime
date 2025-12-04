@@ -3,7 +3,16 @@ import uuid
 from app.db.connection import get_connection
 
 def create_ics_token(calendar_id: str, owner_uid: str) -> dict:
-    """Crée un nouveau token d'accès ICS pour un calendrier."""
+    """
+    Crée un nouveau token d'accès ICS pour un calendrier.
+    
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier pour lequel créer le token.
+    - owner_uid (str): L'UID du propriétaire du calendrier.
+
+    Retour:
+    - dict: Un dictionnaire contenant les informations du token créé.
+    """
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
@@ -14,7 +23,15 @@ def create_ics_token(calendar_id: str, owner_uid: str) -> dict:
             return cursor.fetchone()
 
 def get_ics_tokens(calendar_id: str, owner_uid: str) -> list:
-    """Récupère tous les tokens ICS actifs pour un calendrier."""
+    """Récupère tous les tokens ICS actifs pour un calendrier.
+    
+    Paramètres:
+    - calendar_id (str): L'ID du calendrier.
+    - owner_uid (str): L'UID du propriétaire du calendrier.
+
+    Retour:
+    - list: Une liste de dictionnaires contenant les informations des tokens actifs.
+    """
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
@@ -26,7 +43,15 @@ def get_ics_tokens(calendar_id: str, owner_uid: str) -> list:
             return cursor.fetchall()
 
 def delete_ics_token(token_id: str, owner_uid: str) -> bool:
-    """Révoque un token ICS (soft delete)."""
+    """Révoque un token ICS (soft delete).
+    
+    Paramètres:
+    - token_id (str): L'ID du token à révoquer.
+    - owner_uid (str): L'UID du propriétaire du token.
+
+    Retour:
+    - bool: True si le token a été révoqué, False sinon.
+    """
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
@@ -37,7 +62,7 @@ def delete_ics_token(token_id: str, owner_uid: str) -> bool:
             """, (token_id, owner_uid))
             return cursor.fetchone() is not None
 
-def create_calendar_ics(token: str) -> bytes:
+def create_calendar_ics(token: str, user_agent: str) -> bytes:
     """Crée un calendrier ICS pour un token donné.
     
     Calcule la date prévisionnelle de rupture de stock pour chaque médicament
@@ -45,6 +70,7 @@ def create_calendar_ics(token: str) -> bytes:
 
     Paramètres:
     - token (str): Le token d'accès au calendrier (table ics_tokens).
+    - user_agent (str): Le User-Agent du client qui demande le calendrier.
 
     Retour:
     - bytes: Le contenu du fichier .ics encodé en UTF-8.
@@ -55,13 +81,13 @@ def create_calendar_ics(token: str) -> bytes:
             # 1. Valider le token, mettre à jour l'accès et récupérer le calendar_id en une seule requête
             cursor.execute("""
                 UPDATE ics_tokens
-                SET last_accessed_at = NOW(), last_user_agent = 'ICS-Generator'
+                SET last_accessed_at = NOW(), last_user_agent = %s
                 FROM calendars
                 WHERE ics_tokens.token = %s 
                   AND ics_tokens.revoked_at IS NULL 
                   AND ics_tokens.calendar_id = calendars.id
                 RETURNING ics_tokens.calendar_id, calendars.name
-            """, (token,))
+            """, (user_agent, token))
             
             result = cursor.fetchone()
             
@@ -181,8 +207,15 @@ def create_calendar_ics(token: str) -> bytes:
 
     return _generate_ics_content(events, calendar_name).encode('utf-8')
 
-def _generate_ics_content(events, calendar_name="MediTime Stocks") -> str:
-    """Génère le contenu textuel au format iCalendar (ICS)."""
+def _generate_ics_content(events: list, calendar_name: str = "MediTime Stocks") -> str:
+    """Génère le contenu textuel au format iCalendar (ICS).
+    
+    Paramètres:
+    - events (list): Liste des événements à inclure dans le calendrier.
+    - calendar_name (str): Le nom du calendrier.
+    
+    Retour:
+    - str: Le contenu du fichier .ics."""
     lines = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
