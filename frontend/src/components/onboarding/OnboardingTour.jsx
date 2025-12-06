@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const Tooltip = ({
   continuous,
@@ -54,10 +55,24 @@ const Tooltip = ({
   );
 };
 
+Tooltip.propTypes = {
+  continuous: PropTypes.bool,
+  index: PropTypes.number.isRequired,
+  step: PropTypes.shape({
+    title: PropTypes.string,
+    content: PropTypes.node.isRequired,
+  }).isRequired,
+  backProps: PropTypes.object.isRequired,
+  closeProps: PropTypes.object.isRequired,
+  primaryProps: PropTypes.object.isRequired,
+  tooltipProps: PropTypes.object.isRequired,
+  skipProps: PropTypes.object.isRequired,
+  size: PropTypes.number.isRequired,
+};
+
 const OnboardingTour = ({ isAppLoading }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
   const { lng } = useParams();
   
   const [run, setRun] = useState(false);
