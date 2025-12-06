@@ -212,6 +212,9 @@ def _handle_existing_user_invite(cursor, calendar_id: str, receiver_uid: str, ow
     # Créer l'invitation (shared_calendars)
     token, shared_calendar_id = _create_shared_calendar_invite(cursor, receiver_uid, calendar_id)
 
+    # Commit pour rendre le shared_calendar visible pour notify_and_record (qui utilise une nouvelle connexion)
+    cursor.connection.commit()
+
     link = f"/accept-invite?token={token}&type=login"
 
     # Notifier le receveur
