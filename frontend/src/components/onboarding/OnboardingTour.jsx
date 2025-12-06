@@ -66,8 +66,7 @@ const OnboardingTour = ({ isAppLoading }) => {
 
   // Check if tour has been completed
   useEffect(() => {
-    // const tourCompleted = localStorage.getItem('meditime_tour_completed');
-    const tourCompleted = false; // For testing purposes, always show the tour
+    const tourCompleted = localStorage.getItem('meditime_tour_completed_v1');
     if (!tourCompleted && !isAppLoading) {
       setRun(true);
     }
@@ -299,7 +298,7 @@ const OnboardingTour = ({ isAppLoading }) => {
 
     if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
       setRun(false);
-      localStorage.setItem('meditime_tour_completed', 'true');
+      localStorage.setItem('meditime_tour_completed_v1', 'true');
     } else if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
       const nextIndex = index + (action === ACTIONS.PREV ? -1 : 1);
       
