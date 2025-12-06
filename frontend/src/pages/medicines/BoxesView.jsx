@@ -36,7 +36,7 @@ const createBadge = (bgColor, icon, text) => (
   </span>
 );
 
-const createActionCard = (borderColor, iconClass, textColor, text, onClick, ariaLabel, hasTooltip, showTooltip, setShowTooltip, t, dataTour) => (
+const createActionCard = ({ borderColor, iconClass, textColor, text, onClick, ariaLabel, hasTooltip, showTooltip, setShowTooltip, t, dataTour }) => (
   <button
     type="button"
     onClick={onClick}
@@ -565,32 +565,32 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
           ))}
           <div className="col-12 col-md-6 mb-3">
             <div className="d-flex flex-column gap-2 h-100">
-              {createActionCard(
-                'success',
-                'bi bi-plus-circle',
-                'text-success',
-                t('boxes.add_manual'),
-                () => addBox(),
-                t('boxes.add_manual'),
-                false,
+              {createActionCard({
+                borderColor: 'success',
+                iconClass: 'bi bi-plus-circle',
+                textColor: 'text-success',
+                text: t('boxes.add_manual'),
+                onClick: () => addBox(),
+                ariaLabel: t('boxes.add_manual'),
+                hasTooltip: false,
                 showTooltip,
                 setShowTooltip,
                 t,
-                "add-manual-btn"
-              )}
-              {createActionCard(
-                'primary',
-                'bi bi-qr-code-scan',
-                'text-primary',
-                t('boxes.add_with_qr'),
-                openAddMode,
-                t('boxes.add_with_qr'),
-                true,
+                dataTour: "add-manual-btn"
+              })}
+              {createActionCard({
+                borderColor: 'primary',
+                iconClass: 'bi bi-qr-code-scan',
+                textColor: 'text-primary',
+                text: t('boxes.add_with_qr'),
+                onClick: openAddMode,
+                ariaLabel: t('boxes.add_with_qr'),
+                hasTooltip: true,
                 showTooltip,
                 setShowTooltip,
                 t,
-                "add-qr-btn"
-              )}
+                dataTour: "add-qr-btn"
+              })}
             </div>
           </div>
         </div>

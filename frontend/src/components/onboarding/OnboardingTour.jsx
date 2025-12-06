@@ -308,6 +308,16 @@ const OnboardingTour = ({ isAppLoading }) => {
     }
   ];
 
+  const ensureActionSheetOpen = (selector) => {
+    const btn = document.querySelector(selector);
+    if (btn) {
+      const isMenuOpen = btn.parentNode.querySelector('.dropdown-menu') !== null;
+      if (!isMenuOpen) {
+        btn.click();
+      }
+    }
+  };
+
   const handleJoyrideCallback = useCallback((data) => {
     const { action, index, status, type } = data;
 
@@ -322,95 +332,31 @@ const OnboardingTour = ({ isAppLoading }) => {
           return;
       }
 
-      // Define transitions requiring navigation
-      let shouldNavigate = false;
-      let nextPath = '';
+      const transitions = {
+        0: `/${lng}/calendars`,
+        1: `/${lng}/add-calendar`,
+        4: `/${lng}/calendar/demo`,
+        6: `/${lng}/calendar/demo/boxes`,
+        10: `/${lng}/calendar/demo`,
+        14: `/${lng}/calendar/demo/settings`,
+        16: `/${lng}/calendar/demo/settings?tab=notifications`,
+        17: `/${lng}/calendar/demo`,
+        18: `/${lng}/shared-calendars?calendar=demo`,
+        22: `/${lng}/calendar/demo`,
+        24: `/${lng}/calendar/demo/stock-alerts`,
+        27: `/${lng}/calendar/demo`
+      };
 
-      // 0 -> 1: Go to Calendars list
-      if (index === 0) {
-          shouldNavigate = true;
-          nextPath = `/${lng}/calendars`;
-      }
-      // 1 -> 2: Go to Add Calendar
-      else if (index === 1) {
-          shouldNavigate = true;
-          nextPath = `/${lng}/add-calendar`;
-      }
-      // 4 -> 5: Go to Calendar View (Demo)
-      else if (index === 4) {
-          shouldNavigate = true;
-          nextPath = `/${lng}/calendar/demo`;
-      }
-      // 6 -> 7: Go to Medicines Page (Boxes View)
-      else if (index === 6) {
-          shouldNavigate = true;
-          nextPath = `/${lng}/calendar/demo/boxes`;
-      }
-      // 10 -> 11: Go back to Calendar View
-      else if (index === 10) {
-          shouldNavigate = true;
-          nextPath = `/${lng}/calendar/demo`;
-      }
-      // 14 -> 15: Go to Settings Page
-      else if (index === 14) {
-          shouldNavigate = true;
-          nextPath = `/${lng}/calendar/demo/settings`;
-      }
-      // 15 -> 16: Switch to Notifications Tab
-      else if (index === 16) {
-          shouldNavigate = true;
-          nextPath = `/${lng}/calendar/demo/settings?tab=notifications`;
-      }
-      // 17 -> 18: Go back to Calendar View
-      else if (index === 17) {
-          shouldNavigate = true;
-          nextPath = `/${lng}/calendar/demo`;
-      }
-      // 18 -> 19: Go to Share Page
-      else if (index === 18) {
-          shouldNavigate = true;
-          nextPath = `/${lng}/shared-calendars?calendar=demo`;
-      }
-      // 22 -> 23: Go back to Calendar View
-      else if (index === 22) {
-          shouldNavigate = true;
-          nextPath = `/${lng}/calendar/demo`;
-      }
-      // 24 -> 25: Go to Stock Alerts Page
-      else if (index === 24) {
-          shouldNavigate = true;
-          nextPath = `/${lng}/calendar/demo/stock-alerts`;
-      }
-      // 27 -> 28: Go back to Calendar View
-      else if (index === 27) {
-          shouldNavigate = true;
-          nextPath = `/${lng}/calendar/demo`;
-      }
-
-      if (shouldNavigate) {
+      if (transitions[index]) {
           setRun(false); // Pause tour
-          navigate(nextPath);
+          navigate(transitions[index]);
           setWaitingForStep(nextIndex);
       } else if ([14, 18, 23, 24, 28].includes(nextIndex)) {
-          // Ensure ActionSheet is open for steps inside it (Calendar View)
-          const btn = document.querySelector('[data-tour="calendar-actions-btn"]');
-          if (btn) {
-            const isMenuOpen = btn.parentNode.querySelector('.dropdown-menu') !== null;
-            if (!isMenuOpen) {
-              btn.click();
-            }
-          }
+          ensureActionSheetOpen('[data-tour="calendar-actions-btn"]');
           setRun(false);
           setWaitingForStep(nextIndex);
       } else if ([26, 27].includes(nextIndex)) {
-          // Ensure ActionSheet is open for steps inside it (Stock Alerts View)
-          const btn = document.querySelector('[data-tour="stock-alerts-actions-btn"]');
-          if (btn) {
-            const isMenuOpen = btn.parentNode.querySelector('.dropdown-menu') !== null;
-            if (!isMenuOpen) {
-              btn.click();
-            }
-          }
+          ensureActionSheetOpen('[data-tour="stock-alerts-actions-btn"]');
           setRun(false);
           setWaitingForStep(nextIndex);
       } else {
@@ -505,3 +451,7 @@ const OnboardingTour = ({ isAppLoading }) => {
 };
 
 export default OnboardingTour;
+
+OnboardingTour.propTypes = {
+  isAppLoading: PropTypes.bool.isRequired,
+};

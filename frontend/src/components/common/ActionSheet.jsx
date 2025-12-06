@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
-function ActionSheet({ actions, buttonSize, minimal = false, dataTour }) {
+function ActionSheet({ actions, buttonSize, dataTour }) {
   const [show, setShow] = useState(false);
   const buttonRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -33,31 +33,14 @@ function ActionSheet({ actions, buttonSize, minimal = false, dataTour }) {
 <>
   <span className="position-relative d-inline-block">
     <button
-      className={
-        minimal
-          ? 'border-0 bg-transparent d-flex align-items-center justify-content-center'
-          : `btn btn-outline-dark ${buttonSize === 'sm' ? 'btn-sm' : ''}`
-      }
-      style={
-        minimal
-          ? {
-              width: '2rem',
-              height: '2rem',
-              lineHeight: 1,
-              cursor: 'pointer',
-            }
-          : {}
-      }
+      className={`btn btn-outline-dark ${buttonSize === 'sm' ? 'btn-sm' : ''}`}
       ref={buttonRef}
       onClick={toggleDropdown}
       label={t('Actions')}
       title={t('Actions')}
       data-tour={dataTour}
     >
-      <i
-        className="bi bi-three-dots-vertical"
-        style={minimal ? { fontSize: '1.2rem' } : {}}
-      ></i>
+      <i className="bi bi-three-dots-vertical"></i>
     </button>
 
 
@@ -127,6 +110,7 @@ function ActionSheet({ actions, buttonSize, minimal = false, dataTour }) {
 
 ActionSheet.propTypes = {
   buttonSize: PropTypes.string,
+  dataTour: PropTypes.string,
   actions: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.node,
