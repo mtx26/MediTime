@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@fullcalendar/bootstrap5": "^6.1.17",
+    "@fullcalendar/core": "^6.1.19",
     "@fullcalendar/daygrid": "^6.1.17",
     "@fullcalendar/interaction": "^6.1.17",
     "@fullcalendar/react": "^6.1.17",
@@ -28,6 +29,7 @@
     "react-easy-crop": "^5.4.2",
     "react-flags-select": "^2.5.0",
     "react-i18next": "^15.6.1",
+    "react-joyride": "^2.9.3",
     "react-router-dom": "^7.6.0",
     "uuid": "^11.1.0",
     "zxing-wasm": "^2.2.1"

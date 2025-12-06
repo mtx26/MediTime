@@ -70,6 +70,7 @@ function AddCalendarPage({ personalCalendars }) {
                   required
                   value={newCalendarName}
                   onChange={(e) => setNewCalendarName(e.target.value)}
+                  data-tour="calendar-name-input"
                 />
               </div>
 
@@ -82,6 +83,7 @@ function AddCalendarPage({ personalCalendars }) {
                   id="importType"
                   onChange={(e) => setImportType(e.target.value)}
                   value={importType}
+                  data-tour="import-type-select"
                 >
                   <option value="manual">{t('calendar.import_type_manual')}</option>
                   <option value="qr">{t('calendar.scan_qr_option')}</option>
@@ -98,6 +100,7 @@ function AddCalendarPage({ personalCalendars }) {
                     <button
                       type="submit"
                       className="btn btn-success w-100"
+                      data-tour="submit-calendar-btn"
                     >
                       <i className="bi bi-plus-lg me-2"></i>
                       {t('add')}

@@ -264,6 +264,7 @@ function CalendarPage({
                   to={`/${lng}/${basePath}/${calendarId}/boxes`}
                   aria-label={t('medicines.label')}
                   title={t('medicines.label')}
+                  data-tour="nav-medicines-btn"
                 >
                   <i className="bi bi-capsule"></i>
                   <span> {t('medicines.label')}</span>
@@ -272,6 +273,7 @@ function CalendarPage({
                 {/* Bouton pour afficher le menu déroulant */}
                 {calendarType === 'personal' && (
                   <ActionSheet
+                    dataTour="calendar-actions-btn"
                     actions={[
                       // view toggle actions
                       {
@@ -301,6 +303,7 @@ function CalendarPage({
                         ),
                         linkTo: `/${lng}/shared-calendars?calendar=${calendarId}`,
                         title: t('share'),
+                        dataTour: 'share-calendar-btn',
                       },
                       { separator: true },
                       {
@@ -311,6 +314,7 @@ function CalendarPage({
                         ),
                         onClick: () => calendarSource.downloadCalendarPdf(calendarId),
                         title: t('boxes.export_pdf'),
+                        dataTour: 'export-pdf-btn',
                       },
                       {
                         label: (
@@ -320,6 +324,7 @@ function CalendarPage({
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/stock-alerts`,
                         title: t('stock'),
+                        dataTour: 'stock-alerts-btn',
                       },
                       {
                         label: (
@@ -338,6 +343,7 @@ function CalendarPage({
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/pillbox-uses`,
                         title: t('pillbox_uses'),
+                        dataTour: 'pillbox-history-btn',
                       },
                       { separator: true },
                       {
@@ -347,7 +353,9 @@ function CalendarPage({
                           </>
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
-                        title: t('settings.label'),},
+                        title: t('settings.label'),
+                        dataTour: 'calendar-settings-btn',
+                      },
                       { separator: true },
                       {
                         label: (
@@ -464,7 +472,7 @@ function CalendarPage({
             </div>
             {/* Bouton pour naviguer vers la semaine suivante ou precedente */}
             {stockDecrementMethod === "weekly_pillbox" && (
-              <div className='d-flex d-lg-none justify-content-center align-items-center'>
+              <div className='d-flex d-lg-none justify-content-center align-items-center' data-tour="calendar-week-selector">
                 <CalendarWeekSelector
                   calendarTable={calendarTable}
                   onWeekSelect={onWeekSelect}
@@ -473,7 +481,7 @@ function CalendarPage({
                 />
               </div>
             )}
-            <div className='d-none d-lg-flex justify-content-center align-items-center'>
+            <div className='d-none d-lg-flex justify-content-center align-items-center' data-tour="calendar-week-selector">
               <CalendarWeekSelector
                 calendarTable={calendarTable}
                 onWeekSelect={onWeekSelect}
@@ -499,6 +507,7 @@ function CalendarPage({
                       to={`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`}
                       aria-label={t('pillbox.fill')}
                       title={t('pillbox.fill')}
+                      data-tour="calendar-grid-mobile-btn"
                     >
                       <i className="bi bi-capsule"></i> {t('pillbox.fill')}
                     </Link>
@@ -507,7 +516,7 @@ function CalendarPage({
               )}
 
               {/* Pilulier - Vue desktop */}
-              <div className="d-none d-lg-block col-12 col-lg-8 mb-4">
+              <div className="d-none d-lg-block col-12 col-lg-8 mb-4" data-tour="calendar-grid-desktop">
                 <h4 className="mb-3 fw-bold">
                   <i className="bi bi-capsule"></i> {t('pillbox.title')}
                 </h4>
