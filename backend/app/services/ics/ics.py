@@ -236,7 +236,7 @@ def _generate_ics_content(events: list, calendar_name: str = "MediTime Stocks") 
         dt_end = (event['date'] + timedelta(days=1)).strftime("%Y%m%d")
         uid = str(uuid.uuid4())
         
-        summary = f"💊 Racheter {event['name']}"
+        summary = f"💊 {event['name']}"
         if event.get('dose'):
             summary += f" ({event['dose']} mg)"
             
