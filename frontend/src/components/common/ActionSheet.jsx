@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
-function ActionSheet({ actions, buttonSize, minimal = false }) {
+function ActionSheet({ actions, buttonSize, minimal = false, dataTour }) {
   const [show, setShow] = useState(false);
   const buttonRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -19,7 +19,8 @@ function ActionSheet({ actions, buttonSize, minimal = false }) {
         buttonRef.current &&
         !buttonRef.current.contains(e.target) &&
         dropdownRef.current &&
-        !dropdownRef.current.contains(e.target)
+        !dropdownRef.current.contains(e.target) &&
+        !e.target.closest('.react-joyride__tooltip')
       ) {
         setShow(false);
       }
@@ -51,6 +52,7 @@ function ActionSheet({ actions, buttonSize, minimal = false }) {
       onClick={toggleDropdown}
       label={t('Actions')}
       title={t('Actions')}
+      data-tour={dataTour}
     >
       <i
         className="bi bi-three-dots-vertical"
@@ -90,6 +92,7 @@ function ActionSheet({ actions, buttonSize, minimal = false }) {
                   className={`dropdown-item ${action.danger ? 'text-danger' : ''}`}
                   title={action.title}
                   aria-label={action.title}
+                  data-tour={action.dataTour}
                 >
                   {action.label}
                 </Link>
@@ -107,6 +110,7 @@ function ActionSheet({ actions, buttonSize, minimal = false }) {
                 }}
                 title={action.title}
                 aria-label={action.title}
+                data-tour={action.dataTour}
               >
                 {action.label}
               </button>

@@ -69,7 +69,7 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars 
   return (
     <div>
       <h5 className="mb-4">{t('calendar_settings.notifications.label')}</h5>
-      <div className="form-check form-switch">
+      <div className="form-check form-switch" data-tour="settings-notifications-toggle">
         <input
           className="form-check-input"
           type="checkbox"

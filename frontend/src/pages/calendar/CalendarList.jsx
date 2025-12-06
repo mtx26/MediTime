@@ -316,6 +316,7 @@ function SelectCalendar({
           <Link
             className={`text-center btn btn-outline-primary ${personalCalendars.calendarsData.length > 0 ? 'rounded-0 rounded-bottom' : ''}`}
             to={`/${lng}/add-calendar`}
+            data-tour="add-calendar-btn"
           >
             <i className="bi bi-calendar-plus me-2"></i> {t('calendar.add_calendar')}
           </Link>

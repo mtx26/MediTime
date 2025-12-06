@@ -238,6 +238,25 @@ function SharedList({
 
   // 🔄 Fonction pour mettre à jour les info de partage
   const setGroupedSharedFunction = useCallback(async () => {
+    // --- MOCK DEMO START ---
+    if (calendarFromURL === 'demo') {
+      setGroupedShared({
+        'demo': {
+          calendar_name: t("tour.calendar_name"),
+          users: [
+            { email: 'doctor@example.com', receiver_name: 'Dr. Smith', status: 'accepted', permission: 'read', receiver_photo_url: "https://www.w3schools.com/howto/img_avatar.png" },
+            { email: 'family@example.com', receiver_name: 'Family Member', status: 'pending', permission: 'write', receiver_photo_url: "https://www.w3schools.com/howto/img_avatar.png" }
+          ],
+          tokens: [
+            { id: 'demo-token-1', token: 'demo-link-123', permission: 'read', expires_at: null, is_revoked: false }
+          ]
+        }
+      });
+      setLoadingGroupedShared(false);
+      return;
+    }
+    // --- MOCK DEMO END ---
+
     setLoadingGroupedShared(true);
     const rep = await sharedUserCalendars.fetchGroupedSharedCalendars();
 
@@ -250,12 +269,12 @@ function SharedList({
     }
 
     setLoadingGroupedShared(false);
-  }, [sharedUserCalendars, t]);
+  }, [sharedUserCalendars, t, calendarFromURL]);
 
 
   // 🔄 Chargement des données groupées
   useEffect(() => {
-    if (userInfo && personalCalendars.calendarsData) {
+    if ((userInfo && personalCalendars.calendarsData) || calendarFromURL === 'demo') {
       setGroupedSharedFunction();
     }
   }, [
@@ -263,6 +282,7 @@ function SharedList({
     personalCalendars.calendarsData,
     tokenCalendars.tokensList,
     setGroupedSharedFunction,
+    calendarFromURL
   ]);
 
   // 🔄 Initialisation des permissions et des dates d'expiration
@@ -277,6 +297,13 @@ function SharedList({
   }, [userInfo, personalCalendars.calendarsData]);
 
   useEffect(() => {
+    // --- MOCK DEMO START ---
+    if (calendarFromURL === 'demo') {
+      setSelectedCalendarId('demo');
+      return;
+    }
+    // --- MOCK DEMO END ---
+
     const existsInList = personalCalendars.calendarsData?.some(c => c.id === calendarFromURL);
 
     if (calendarFromURL && existsInList) {
@@ -304,7 +331,8 @@ function SharedList({
 
   if (
     personalCalendars.calendarsData &&
-    personalCalendars.calendarsData?.length === 0
+    personalCalendars.calendarsData?.length === 0 &&
+    calendarFromURL !== 'demo'
   ) {
     return (
       <div className="container mt-4 text-center">
@@ -321,6 +349,18 @@ function SharedList({
           className="d-flex flex-nowrap gap-2 p-1 overflow-auto"
           style={{ scrollBehavior: 'smooth' }}
         >
+          {/* --- MOCK DEMO START --- */}
+          {calendarFromURL === 'demo' && (
+            <Link
+              key="demo"
+              to="?calendar=demo"
+              className="btn rounded-pill px-3 py-1 fw-semibold shadow-sm text-nowrap btn-primary"
+              title={t("tour.calendar_name")}
+            >
+              {t("tour.calendar_name")}
+            </Link>
+          )}
+          {/* --- MOCK DEMO END --- */}
           {(personalCalendars?.calendarsData || []).map((calendar) => (
             <Link
               key={calendar.id}
@@ -586,7 +626,7 @@ function TokenList({
 
               {/* TODO: racourcir le lien */}
               {/* Lien */}
-              <div className="input-group col-md-6 mb-2">
+              <div className="input-group col-md-6 mb-2" data-tour="share-public-links">
                 <input
                   id={"tokenLink" + token.id}
                   type="text"
@@ -773,7 +813,7 @@ function UserList({
         </h5>
         {/* Liste des utilisateurs partagés */}
         {(data.users || []).map((user) => (
-          <li className="list-group-item" key={user.token}>
+          <li className="list-group-item" key={user.token} data-tour="share-users-list">
             {alertId === user.token && (
               <AlertSystem
                 type={alertType}
@@ -941,6 +981,7 @@ function UserList({
           <div className="row align-items-center mt-2">
             <div className="col-md-12">
               <form
+                data-tour="share-invite-user-form"
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleSendInvitation(calendarId);

@@ -13,6 +13,7 @@ import { performApiCall } from './services/api/apiUtils';
 import { useTranslation } from 'react-i18next';
 import I18nHead from './components/common/I18nHead';
 import StructuredData from './components/common/StructuredData';
+import OnboardingTour from './components/onboarding/OnboardingTour';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -1048,6 +1049,7 @@ function App() {
 
   return (
     <div className="d-flex flex-column min-vh-100">
+      <OnboardingTour isAppLoading={isInitialLoading} />
       <I18nHead 
         title={t('home_meta.title')} 
         description={t('home_meta.description')} 

@@ -36,7 +36,7 @@ const createBadge = (bgColor, icon, text) => (
   </span>
 );
 
-const createActionCard = (borderColor, iconClass, textColor, text, onClick, ariaLabel, hasTooltip, showTooltip, setShowTooltip, t) => (
+const createActionCard = (borderColor, iconClass, textColor, text, onClick, ariaLabel, hasTooltip, showTooltip, setShowTooltip, t, dataTour) => (
   <button
     type="button"
     onClick={onClick}
@@ -44,6 +44,7 @@ const createActionCard = (borderColor, iconClass, textColor, text, onClick, aria
     style={{ cursor: 'pointer' }}
     aria-label={ariaLabel}
     title={ariaLabel}
+    data-tour={dataTour}
   >
     <div className={`card h-100 shadow border border-${borderColor}`}>
       <div className={`card-body d-flex flex-column justify-content-center align-items-center p-3 ${hasTooltip ? 'position-relative' : ''}`}>
@@ -239,7 +240,50 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     tokenCalendars
   )[calendarType];
 
-  useRealtimeBoxesSwitcher(calendarType, calendarId, setBoxes, setLoadingBoxes);
+  const isDemo = calendarId === 'demo';
+
+  useRealtimeBoxesSwitcher(
+    isDemo ? null : calendarType,
+    calendarId,
+    setBoxes,
+    isDemo ? () => {} : setLoadingBoxes
+  );
+
+
+  useEffect(() => {
+    if (isDemo) {
+      setBoxes([
+        {
+          id: 'demo-1',
+          name: 'Doliprane 1000mg',
+          dose: '1000 mg',
+          box_capacity: 8,
+          stock_quantity: 5,
+          stock_alert_threshold: 2,
+          conditions: []
+        },
+        {
+          id: 'demo-2',
+          name: 'Amoxicilline',
+          dose: '500 mg',
+          box_capacity: 12,
+          stock_quantity: 1,
+          stock_alert_threshold: 3,
+          conditions: []
+        },
+        {
+          id: 'demo-3',
+          name: 'Vitamin C',
+          dose: '500 mg',
+          box_capacity: 30,
+          stock_quantity: 25,
+          stock_alert_threshold: 5,
+          conditions: []
+        }
+      ]);
+      setLoadingBoxes(true);
+    }
+  }, [isDemo]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -441,7 +485,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   return (
     <div className="container align-items-center d-flex flex-column gap-3">
       <div className="p-1 w-100" style={{ maxWidth: '800px' }}>
-        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap" data-tour="stock-view-title">
           <h4 className="mb-0 fw-bold">
             <i className="bi bi-box-seam me-2"></i> {t('boxes.title')}
           </h4>
@@ -531,7 +575,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                 false,
                 showTooltip,
                 setShowTooltip,
-                t
+                t,
+                "add-manual-btn"
               )}
               {createActionCard(
                 'primary',
@@ -543,7 +588,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                 true,
                 showTooltip,
                 setShowTooltip,
-                t
+                t,
+                "add-qr-btn"
               )}
             </div>
           </div>
@@ -609,6 +655,7 @@ function BoxCard({
       ),
       onClick: () => setSelectedModifyBox(box.id),
       title: t('boxes.edit'),
+      dataTour: 'box-edit-btn',
     },
     {
       label: (
@@ -880,7 +927,8 @@ function BoxCard({
             type="button"
             title={t('boxes.intake_conditions')}
             aria-label={t('boxes.intake_conditions')}
-              onClick={toggleDrop}
+            onClick={toggleDrop}
+            data-tour="box-condition-toggle"
           >
             <span>{t('boxes.intake_conditions')}</span>
             <i

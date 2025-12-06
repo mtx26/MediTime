@@ -61,41 +61,42 @@ const Stock = ({ personalCalendars }) => {
   return (
     <div>
       <h5 className="mb-4">{t('calendar_settings.stock.label')}</h5>
+      <div data-tour="settings-stock-methods">
+        <div className="form-check mb-3" style={{ cursor: 'pointer' }}>
+          <input
+            className="form-check-input"
+            type="radio"
+            name="stockDecrementMethod"
+            id="weeklyPillbox"
+            value="weekly_pillbox"
+            checked={selectedMethod === 'weekly_pillbox'}
+            onChange={() => modifyStockDecrementMethod('weekly_pillbox')}
+            style={{ cursor: 'pointer' }}
+          />
+          <label className="form-check-label" htmlFor="weeklyPillbox" style={{ cursor: 'pointer' }}>
+            <strong>{t('calendar_settings.stock.weekly.label')}</strong>
+            <br />
+            <small className="text-muted">{t('calendar_settings.stock.weekly.description')}</small>
+          </label>
+        </div>
 
-      <div className="form-check mb-3" style={{ cursor: 'pointer' }}>
-        <input
-          className="form-check-input"
-          type="radio"
-          name="stockDecrementMethod"
-          id="weeklyPillbox"
-          value="weekly_pillbox"
-          checked={selectedMethod === 'weekly_pillbox'}
-          onChange={() => modifyStockDecrementMethod('weekly_pillbox')}
-          style={{ cursor: 'pointer' }}
-        />
-        <label className="form-check-label" htmlFor="weeklyPillbox" style={{ cursor: 'pointer' }}>
-          <strong>{t('calendar_settings.stock.weekly.label')}</strong>
-          <br />
-          <small className="text-muted">{t('calendar_settings.stock.weekly.description')}</small>
-        </label>
-      </div>
-
-      <div className="form-check" style={{ cursor: 'pointer' }}>
-        <input
-          className="form-check-input"
-          type="radio"
-          name="stockDecrementMethod"
-          id="dailyMidnight"
-          value="daily_midnight"
-          checked={selectedMethod === 'daily_midnight'}
-          onChange={() => modifyStockDecrementMethod('daily_midnight')}
-          style={{ cursor: 'pointer' }}
-        />
-        <label className="form-check-label" htmlFor="dailyMidnight" style={{ cursor: 'pointer' }}>
-          <strong>{t('calendar_settings.stock.daily.label')}</strong>
-          <br />
-          <small className="text-muted">{t('calendar_settings.stock.daily.description')}</small>
-        </label>
+        <div className="form-check" style={{ cursor: 'pointer' }}>
+          <input
+            className="form-check-input"
+            type="radio"
+            name="stockDecrementMethod"
+            id="dailyMidnight"
+            value="daily_midnight"
+            checked={selectedMethod === 'daily_midnight'}
+            onChange={() => modifyStockDecrementMethod('daily_midnight')}
+            style={{ cursor: 'pointer' }}
+          />
+          <label className="form-check-label" htmlFor="dailyMidnight" style={{ cursor: 'pointer' }}>
+            <strong>{t('calendar_settings.stock.daily.label')}</strong>
+            <br />
+            <small className="text-muted">{t('calendar_settings.stock.daily.description')}</small>
+          </label>
+        </div>
       </div>
     </div>
   );

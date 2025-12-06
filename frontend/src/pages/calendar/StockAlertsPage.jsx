@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -41,8 +41,40 @@ function StockAlertsPage({
     tokenCalendars
   )[calendarType];
 
+  // --- MOCK DEMO START ---
+  useEffect(() => {
+    if (calendarId === 'demo') {
+      setBoxes([
+        {
+          id: 'demo-box-1',
+          name: 'Doliprane',
+          dose: '1000 mg',
+          stock_quantity: 2,
+          stock_alert_threshold: 5,
+          box_capacity: 10,
+        },
+        {
+          id: 'demo-box-2',
+          name: 'Vitamin C',
+          dose: '500 mg',
+          stock_quantity: 0,
+          stock_alert_threshold: 3,
+          box_capacity: 20,
+        }
+      ]);
+      setLoadingBoxes(true);
+    }
+  }, [calendarId]);
+  // --- MOCK DEMO END ---
+
+  const isDemo = calendarId === 'demo';
   // Hook en temps réel
-  useRealtimeBoxesSwitcher(calendarType, calendarId, setBoxes, setLoadingBoxes);
+  useRealtimeBoxesSwitcher(
+    isDemo ? null : calendarType,
+    calendarId,
+    setBoxes,
+    isDemo ? () => {} : setLoadingBoxes
+  );
 
   // On filtre les boîtes qui sont en stock faible
   const alerts = boxes.filter(
@@ -111,6 +143,7 @@ function StockAlertsPage({
           {t('stock_alerts')}
         </h2>
         <ActionSheet
+          dataTour="stock-alerts-actions-btn"
           actions={[
             {
               label: (
@@ -120,6 +153,7 @@ function StockAlertsPage({
               ),
               onClick: () => sendStockAlertsSMS(),
               title: t('send_sms'),
+              dataTour: 'send-sms-btn',
             },
             {
               label: (
@@ -129,6 +163,7 @@ function StockAlertsPage({
               ),
               linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
               title: t('ics.calendar_ics'),
+              dataTour: 'ics-calendar-btn',
             },
           ]}
         />
