@@ -79,15 +79,19 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
     with get_connection() as conn:
         with conn.cursor() as cursor:
             # 1. Valider le token, mettre à jour l'accès et récupérer le calendar_id en une seule requête
+            # On injecte le token en session pour passer le RLS
             cursor.execute("""
+                WITH set_session AS (
+                    SELECT set_config('app.current_ics_token', %s, true)
+                )
                 UPDATE ics_tokens
                 SET last_accessed_at = NOW(), last_user_agent = %s
-                FROM calendars
+                FROM calendars, set_session
                 WHERE ics_tokens.token = %s 
                   AND ics_tokens.revoked_at IS NULL 
                   AND ics_tokens.calendar_id = calendars.id
                 RETURNING ics_tokens.calendar_id, calendars.name
-            """, (user_agent, token))
+            """, (token, user_agent, token))
             
             result = cursor.fetchone()
             
@@ -99,6 +103,7 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
             calendar_name = result['name']
             
             # 2. Récupérer les médicaments ET leurs conditions agrégées en JSON
+            # Le RLS va filtrer via app.current_ics_token injecté précédemment (la session persiste dans la transaction)
             cursor.execute("""
                 SELECT 
                     mb.id, 

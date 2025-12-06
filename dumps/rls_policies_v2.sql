@@ -354,6 +354,63 @@ USING (
 );
 
 
+-- ------------------------------------------------------------------------------
+-- POLITIQUES POUR ACCÈS ICS (ics_tokens, medicine_boxes, conditions)
+-- ------------------------------------------------------------------------------
+
+-- Permettre l'accès public à la table ics_tokens SI on connait le token (pour la validation/update)
+CREATE POLICY "Public access via ics token" ON ics_tokens
+FOR ALL
+TO public
+USING (
+    token = current_setting('app.current_ics_token', true)
+    AND revoked_at IS NULL
+);
+
+-- Permettre l'accès en lecture au calendrier via token ICS (pour récupérer le nom)
+CREATE POLICY "Public access via ics token" ON calendars
+FOR SELECT
+TO public
+USING (
+    EXISTS (
+        SELECT 1 
+        FROM ics_tokens it
+        WHERE it.token = current_setting('app.current_ics_token', true)
+        AND it.calendar_id = calendars.id
+        AND it.revoked_at IS NULL
+    )
+);
+
+-- Permettre l'accès aux boîtes via token ICS
+CREATE POLICY "Public access via ics token" ON medicine_boxes
+FOR SELECT
+TO public
+USING (
+    EXISTS (
+        SELECT 1 
+        FROM ics_tokens it
+        WHERE it.token = current_setting('app.current_ics_token', true)
+        AND it.calendar_id = medicine_boxes.calendar_id
+        AND it.revoked_at IS NULL
+    )
+);
+
+-- Permettre l'accès aux conditions via token ICS
+CREATE POLICY "Public access via ics token" ON medicine_box_conditions
+FOR SELECT
+TO public
+USING (
+    EXISTS (
+        SELECT 1 
+        FROM medicine_boxes box
+        JOIN ics_tokens it ON it.calendar_id = box.calendar_id
+        WHERE box.id = medicine_box_conditions.box_id
+        AND it.token = current_setting('app.current_ics_token', true)
+        AND it.revoked_at IS NULL
+    )
+);
+
+
 
 -- ------------------------------------------------------------------------------
 -- TABLE: pillbox_uses
@@ -464,7 +521,15 @@ USING (auth.uid() = uid);
 -- ------------------------------------------------------------------------------
 CREATE POLICY "Users can manage own ics tokens" 
 ON public.ics_tokens FOR ALL 
-USING (auth.uid() = owner_uid);
+USING (auth.uid() = owner_uid)
+WITH CHECK (
+  auth.uid() = owner_uid
+  AND EXISTS (
+    SELECT 1 FROM calendars c 
+    WHERE c.id = calendar_id 
+    AND c.owner_uid = auth.uid()
+  )
+);
 
 
 -- ------------------------------------------------------------------------------
@@ -593,7 +658,14 @@ USING (
 -- Insertion : Seul le propriétaire du calendrier peut créer un token.
 CREATE POLICY "Users can insert shared tokens" 
 ON public.shared_tokens FOR INSERT 
-WITH CHECK (owner_uid = auth.uid());
+WITH CHECK (
+  owner_uid = auth.uid()
+  AND EXISTS (
+    SELECT 1 FROM calendars c 
+    WHERE c.id = calendar_id 
+    AND c.owner_uid = auth.uid()
+  )
+);
 
 -- Mise à jour : Seul le propriétaire peut modifier (révoquer, changer expiration/permissions).
 CREATE POLICY "Users can update own shared tokens" 
