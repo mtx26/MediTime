@@ -17,6 +17,8 @@ ALTER TABLE public.ics_tokens ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.medicaments_afmps ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.shared_calendars ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.shared_calendar_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.shared_tokens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pillbox_uses ENABLE ROW LEVEL SECURITY;
 
 -- 1.1 FONCTIONS UTILITAIRES (SECURITY DEFINER)
 -- Permet de briser la récursion infinie (Calendars -> Invitations/Shared -> Calendars)
@@ -31,6 +33,20 @@ AS $$
     SELECT 1 FROM calendars
     WHERE id = cal_id
     AND owner_uid = auth.uid()
+  );
+$$;
+
+-- Permet de briser la récursion infinie (SharedCalendars -> SharedCalendars)
+CREATE OR REPLACE FUNCTION public.is_calendar_receiver(cal_id uuid)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM shared_calendars
+    WHERE calendar_id = cal_id
+    AND receiver_uid = auth.uid()
   );
 $$;
 
@@ -303,9 +319,54 @@ USING (
   )
 );
 
-CREATE POLICY "Users can manage conditions of accessible boxes" 
-ON public.medicine_box_conditions FOR ALL 
+-- UPDATE/DELETE : La boîte doit exister et être accessible
+CREATE POLICY "Users can update/delete conditions of accessible boxes" 
+ON public.medicine_box_conditions FOR UPDATE 
 USING (
+  EXISTS (
+    SELECT 1 FROM public.medicine_boxes mb
+    JOIN public.calendars c ON c.id = mb.calendar_id
+    LEFT JOIN public.invitations i ON i.calendar_id = c.id
+    LEFT JOIN public.shared_calendars sc ON sc.calendar_id = c.id
+    WHERE mb.id = medicine_box_conditions.box_id 
+    AND (
+      c.owner_uid = auth.uid()
+      OR 
+      (i.invited_email = (select auth.jwt() ->> 'email') AND i.role IN ('write', 'admin'))
+      OR
+      (sc.receiver_uid = auth.uid() AND sc.access = 'edit')
+    )
+  )
+);
+
+CREATE POLICY "Users can delete conditions of accessible boxes" 
+ON public.medicine_box_conditions FOR DELETE 
+USING (
+  EXISTS (
+    SELECT 1 FROM public.medicine_boxes mb
+    JOIN public.calendars c ON c.id = mb.calendar_id
+    LEFT JOIN public.invitations i ON i.calendar_id = c.id
+    LEFT JOIN public.shared_calendars sc ON sc.calendar_id = c.id
+    WHERE mb.id = medicine_box_conditions.box_id 
+    AND (
+      c.owner_uid = auth.uid()
+      OR 
+      (i.invited_email = (select auth.jwt() ->> 'email') AND i.role IN ('write', 'admin'))
+      OR
+      (sc.receiver_uid = auth.uid() AND sc.access = 'edit')
+    )
+  )
+);
+
+-- INSERT : Cas spécial pour supporter l'insertion via CTE (boîte créée dans la même transaction)
+-- On autorise l'insertion SI :
+-- 1. La boîte existe et on a les droits (cas normal)
+-- 2. OU la boîte n'existe PAS DU TOUT dans la base (cas création simultanée)
+--    Pour vérifier l'inexistence globale de manière sûre (sans être filtré par le RLS de medicine_boxes),
+--    on utilise une fonction SECURITY DEFINER.
+CREATE POLICY "Users can insert conditions" 
+ON public.medicine_box_conditions FOR INSERT 
+WITH CHECK (
   EXISTS (
     SELECT 1 FROM public.medicine_boxes mb
     JOIN public.calendars c ON c.id = mb.calendar_id
@@ -337,6 +398,8 @@ USING (
         FROM shared_tokens st
         WHERE st.id::text = current_setting('app.current_token', true)
         AND st.calendar_id = medicine_boxes.calendar_id
+        AND st.revoked = false
+        AND (st.expires_at IS NULL OR st.expires_at > NOW())
     )
 );
 
@@ -350,6 +413,8 @@ USING (
         JOIN shared_tokens st ON st.calendar_id = box.calendar_id
         WHERE box.id = medicine_box_conditions.box_id
         AND st.id::text = current_setting('app.current_token', true)
+        AND st.revoked = false
+        AND (st.expires_at IS NULL OR st.expires_at > NOW())
     )
 );
 
@@ -357,6 +422,13 @@ USING (
 -- ------------------------------------------------------------------------------
 -- POLITIQUES POUR ACCÈS ICS (ics_tokens, medicine_boxes, conditions)
 -- ------------------------------------------------------------------------------
+
+-- Permettre aux propriétaires de gérer leurs tokens ICS
+CREATE POLICY "Owners can manage their ics tokens" ON ics_tokens
+FOR ALL
+TO authenticated
+USING (owner_uid = auth.uid())
+WITH CHECK (owner_uid = auth.uid());
 
 -- Permettre l'accès public à la table ics_tokens SI on connait le token (pour la validation/update)
 CREATE POLICY "Public access via ics token" ON ics_tokens
@@ -416,7 +488,6 @@ USING (
 -- TABLE: pillbox_uses
 -- Usage: app/services/medication/pillbox.py, app/services/calendar/core.py
 -- ------------------------------------------------------------------------------
-ALTER TABLE public.pillbox_uses ENABLE ROW LEVEL SECURITY;
 
 -- Lecture : Accès si on a accès au calendrier (Propriétaire, Invité, Partagé)
 CREATE POLICY "Users can view pillbox uses of accessible calendars" 
@@ -569,14 +640,17 @@ USING (
 -- TABLE: shared_calendars
 -- Usage: Gestion des partages (actifs)
 -- ------------------------------------------------------------------------------
--- Voir les partages où je suis le receveur OU le propriétaire du calendrier.
+-- Voir les partages où je suis le receveur OU le propriétaire du calendrier OU un autre partage du même calendrier.
 -- Utilisation de is_calendar_owner() pour éviter la récursion avec la policy de 'calendars'.
+-- Utilisation de is_calendar_receiver() pour éviter la récursion avec la policy de 'shared_calendars'.
 CREATE POLICY "Users can view shared calendars" 
 ON public.shared_calendars FOR SELECT 
 USING (
   receiver_uid = auth.uid()
   OR
   is_calendar_owner(calendar_id)
+  OR
+  is_calendar_receiver(calendar_id)
 );
 
 -- Insertion : Le receveur (acceptation invitation) ou le propriétaire (création invitation).
