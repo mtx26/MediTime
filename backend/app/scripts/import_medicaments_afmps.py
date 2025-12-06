@@ -192,7 +192,8 @@ def clear_existing_data(table_name: str) -> None:
     else:
         identifier = sql.Identifier(table_name)
 
-    with get_connection() as conn:
+    # SCRIPT ADMIN: skip_rls=True
+    with get_connection(skip_rls=True) as conn:
         with conn.cursor() as cur:
             delete_query = sql.Composed([sql.SQL("DELETE FROM "), identifier])
             cur.execute(delete_query)
@@ -205,7 +206,8 @@ def insert_data_chunks(df_sql: pd.DataFrame, insert_sql_template: sql.Composable
     total = len(df_sql)
     inserted = 0
 
-    with get_connection() as conn:
+    # SCRIPT ADMIN: skip_rls=True
+    with get_connection(skip_rls=True) as conn:
         with conn.cursor() as cur:
             print("Deleted existing rows in the table.")
 

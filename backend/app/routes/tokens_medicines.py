@@ -14,11 +14,13 @@ from app.utils import with_query_origin
 @with_query_origin(default_origin="REALTIME_TOKEN_MEDICINES")
 def handle_token_medicines(token):
     try:
-        calendar_id = g.calendar_id
-
         with get_connection() as conn:
             with conn.cursor() as cursor:
+                # On injecte le token dans la session DB via une CTE pour que la politique RLS puisse le vérifier
                 cursor.execute("""
+                    WITH set_session AS (
+                        SELECT set_config('app.current_token', %s, true)
+                    )
                     SELECT
                         cond.*, 
                         box.name,
@@ -26,10 +28,9 @@ def handle_token_medicines(token):
                         box.box_capacity,
                         box.stock_quantity,
                         box.stock_alert_threshold
-                    FROM medicine_box_conditions cond
+                    FROM set_session, medicine_box_conditions cond
                     JOIN medicine_boxes box ON cond.box_id = box.id
-                    WHERE box.calendar_id = %s
-                """, (calendar_id,))
+                """, (token,))
                 medicines = cursor.fetchall()
 
         return success_response(

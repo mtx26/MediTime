@@ -400,14 +400,15 @@ def get_pillbox_uses(calendar_id: str) -> list:
                     pu.prepared_at,
                     pu.created_at,
                     pu.updated_at,
-                    jsonb_build_object(
-                        'id', u.id,
-                        'email', u.email,
-                        'display_name', u.display_name,
-                        'photo_url', u.photo_url
+                    (
+                        SELECT jsonb_build_object(
+                            'id', pu.prepared_by,
+                            'display_name', p.display_name,
+                            'photo_url', p.photo_url
+                        )
+                        FROM get_public_user_info(pu.prepared_by) p
                     ) as prepared_by
                 FROM pillbox_uses pu
-                JOIN users u ON pu.prepared_by = u.id
                 WHERE pu.calendar_id = %s
                 ORDER BY pu.prepared_at DESC;
                 """,

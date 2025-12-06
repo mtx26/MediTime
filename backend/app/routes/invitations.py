@@ -26,7 +26,8 @@ def _get_user_by_email(cursor, email: str) -> dict | None:
     Retour:
     - dict ou None: Dictionnaire contenant les informations de l'utilisateur si trouvé, sinon None.
     """
-    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+    # Utilisation de la fonction RPC sécurisée pour contourner RLS
+    cursor.execute("SELECT * FROM get_user_by_email(%s)", (email,))
     return cursor.fetchone()
 
 
@@ -250,6 +251,8 @@ def handle_send_invitation(calendar_id: str):
         payload = request.get_json(force=True)
         receiver_email = payload.get("email")
 
+        # Utilisation de get_connection() standard (RLS actif)
+        # La recherche d'utilisateur se fait via RPC sécurisé dans _get_user_by_email
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 receiver_user = _get_user_by_email(cursor, receiver_email)
@@ -343,6 +346,8 @@ def delete_login_invitation(token: str):
     calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
     receiver_uid = g.receiver_uid if hasattr(g, "receiver_uid") else None
     try:
+        # Utilisation de get_connection() standard (RLS actif)
+        # La policy "Users can delete own or sent notifications" permet la suppression
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 deleted = _delete_shared_calendar_by_token(cursor, token)
