@@ -81,8 +81,8 @@ const OnboardingTour = ({ isAppLoading }) => {
 
   // Check if tour has been completed
   useEffect(() => {
-    //const tourCompleted = localStorage.getItem('meditime_tour_completed_v1');
-    const tourCompleted = false
+    const tourCompleted = localStorage.getItem('meditime_tour_completed_v1');
+    //const tourCompleted = false
     if (!tourCompleted && !isAppLoading) {
       setRun(true);
     }
