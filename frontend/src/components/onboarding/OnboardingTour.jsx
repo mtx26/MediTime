@@ -162,6 +162,14 @@ const OnboardingTour = ({ isAppLoading }) => {
       placement: 'left',
       disableBeacon: true,
     },
+    // 11. Calendar Grid (Mobile Button)
+    {
+      target: '[data-tour="calendar-grid-mobile-btn"]',
+      content: t('tour.calendar_grid_content'),
+      title: t('tour.calendar_grid_title'),
+      placement: 'left',
+      disableBeacon: true,
+    },
     // 11. Week Selector
     {
       target: '[data-tour="calendar-week-selector"]',

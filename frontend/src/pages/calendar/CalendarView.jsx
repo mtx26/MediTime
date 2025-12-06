@@ -507,7 +507,7 @@ function CalendarPage({
                       to={`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`}
                       aria-label={t('pillbox.fill')}
                       title={t('pillbox.fill')}
-                      data-tour="calendar-grid-desktop"
+                      data-tour="calendar-grid-mobile-btn"
                     >
                       <i className="bi bi-capsule"></i> {t('pillbox.fill')}
                     </Link>
