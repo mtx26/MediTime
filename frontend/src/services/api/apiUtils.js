@@ -70,7 +70,7 @@ export async function performApiCall({
 
     // 2. Stock Decrement Method
     if (url.includes('/stock-decrement-method')) {
-        if (method === 'GET') return { success: true, method: 'manual' };
+        if (method === 'GET') return { success: true, method: 'weekly_pillbox' };
         if (method === 'POST') return { success: true, message: 'Demo method updated' };
     }
 

@@ -472,7 +472,7 @@ function CalendarPage({
             </div>
             {/* Bouton pour naviguer vers la semaine suivante ou precedente */}
             {stockDecrementMethod === "weekly_pillbox" && (
-              <div className='d-flex d-lg-none justify-content-center align-items-center'>
+              <div className='d-flex d-lg-none justify-content-center align-items-center' data-tour="calendar-week-selector">
                 <CalendarWeekSelector
                   calendarTable={calendarTable}
                   onWeekSelect={onWeekSelect}
@@ -497,7 +497,7 @@ function CalendarPage({
             <>
               {/* Pilulier - Vue mobile */}
               {stockDecrementMethod === "weekly_pillbox" && (
-                <div className="d-block d-lg-none col-12 col-lg-8 mb-4" data-tour="calendar-grid">
+                <div className="d-block d-lg-none col-12 col-lg-8 mb-4">
                   <div className="mb-2">
                     <h4 className="mb-3 fw-bold">
                       <i className="bi bi-capsule"></i> {t('pillbox.title')}
@@ -507,6 +507,7 @@ function CalendarPage({
                       to={`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`}
                       aria-label={t('pillbox.fill')}
                       title={t('pillbox.fill')}
+                      data-tour="calendar-grid-desktop"
                     >
                       <i className="bi bi-capsule"></i> {t('pillbox.fill')}
                     </Link>

@@ -17,7 +17,7 @@ const Tooltip = ({
   const { t } = useTranslation();
 
   return (
-    <div {...tooltipProps} className="card shadow" style={{ maxWidth: 400, zIndex: 10000 }}>
+    <div {...tooltipProps} className="card shadow" style={{ maxWidth: 400, width: '90vw', zIndex: 10000 }}>
       <div className="card-body">
         {step.title && <h5 className="card-title mb-3">{step.title}</h5>}
         <div className="card-text mb-4">{step.content}</div>
