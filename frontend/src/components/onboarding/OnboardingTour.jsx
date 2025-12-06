@@ -81,8 +81,8 @@ const OnboardingTour = ({ isAppLoading }) => {
 
   // Check if tour has been completed
   useEffect(() => {
-    const tourCompleted = localStorage.getItem('meditime_tour_completed_v1');
-    //const tourCompleted = false
+    //const tourCompleted = localStorage.getItem('meditime_tour_completed_v1');
+    const tourCompleted = false
     if (!tourCompleted && !isAppLoading) {
       setRun(true);
     }
@@ -332,7 +332,8 @@ const OnboardingTour = ({ isAppLoading }) => {
       19: `/${lng}/shared-calendars?calendar=demo`,
       23: `/${lng}/calendar/demo`,
       25: `/${lng}/calendar/demo/stock-alerts`,
-      28: `/${lng}/calendar/demo`
+      28: `/${lng}/calendar/demo`,
+      29: `/${lng}/calendars`,
     };
 
     if (transitions[currentIndex]) {
