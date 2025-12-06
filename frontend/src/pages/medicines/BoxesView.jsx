@@ -246,7 +246,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     isDemo ? null : calendarType,
     calendarId,
     setBoxes,
-    isDemo ? () => {} : setLoadingBoxes
+    isDemo ? () => { /* no-op */ } : setLoadingBoxes
   );
 
 

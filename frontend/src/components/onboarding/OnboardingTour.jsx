@@ -325,52 +325,66 @@ const OnboardingTour = ({ isAppLoading }) => {
     if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
       setRun(false);
       localStorage.setItem('meditime_tour_completed_v1', 'true');
-    } else if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
-      const nextIndex = index + (action === ACTIONS.PREV ? -1 : 1);
-      
-      if (action === ACTIONS.PREV) {
-          setStepIndex(nextIndex);
-          return;
-      }
-
-      const transitions = {
-        0: `/${lng}/calendars`,
-        1: `/${lng}/add-calendar`,
-        4: `/${lng}/calendar/demo`,
-        6: `/${lng}/calendar/demo/boxes`,
-        10: `/${lng}/calendar/demo`,
-        15: `/${lng}/calendar/demo/settings`,
-        17: `/${lng}/calendar/demo/settings?tab=notifications`,
-        18: `/${lng}/calendar/demo`,
-        19: `/${lng}/shared-calendars?calendar=demo`,
-        23: `/${lng}/calendar/demo`,
-        25: `/${lng}/calendar/demo/stock-alerts`,
-        28: `/${lng}/calendar/demo`
-      };
-
-      if (transitions[index]) {
-          setRun(false); // Pause tour
-          navigate(transitions[index]);
-          setWaitingForStep(nextIndex);
-      } else if ([15, 19, 24, 25, 29].includes(nextIndex)) {
-          ensureActionSheetOpen('[data-tour="calendar-actions-btn"]');
-          setRun(false);
-          setWaitingForStep(nextIndex);
-      } else if ([27, 28].includes(nextIndex)) {
-          ensureActionSheetOpen('[data-tour="stock-alerts-actions-btn"]');
-          setRun(false);
-          setWaitingForStep(nextIndex);
-      } else {
-          setStepIndex(nextIndex);
-      }
+      return;
     }
+
+    if (type !== EVENTS.STEP_AFTER && type !== EVENTS.TARGET_NOT_FOUND) {
+      return;
+    }
+
+    const nextIndex = index + (action === ACTIONS.PREV ? -1 : 1);
+    
+    if (action === ACTIONS.PREV) {
+        setStepIndex(nextIndex);
+        return;
+    }
+
+    const transitions = {
+      0: `/${lng}/calendars`,
+      1: `/${lng}/add-calendar`,
+      4: `/${lng}/calendar/demo`,
+      6: `/${lng}/calendar/demo/boxes`,
+      10: `/${lng}/calendar/demo`,
+      15: `/${lng}/calendar/demo/settings`,
+      17: `/${lng}/calendar/demo/settings?tab=notifications`,
+      18: `/${lng}/calendar/demo`,
+      19: `/${lng}/shared-calendars?calendar=demo`,
+      23: `/${lng}/calendar/demo`,
+      25: `/${lng}/calendar/demo/stock-alerts`,
+      28: `/${lng}/calendar/demo`
+    };
+
+    if (transitions[index]) {
+        setRun(false); // Pause tour
+        navigate(transitions[index]);
+        setWaitingForStep(nextIndex);
+        return;
+    }
+
+    if ([15, 19, 24, 25, 29].includes(nextIndex)) {
+        ensureActionSheetOpen('[data-tour="calendar-actions-btn"]');
+        setRun(false);
+        setWaitingForStep(nextIndex);
+        return;
+    }
+
+    if ([27, 28].includes(nextIndex)) {
+        ensureActionSheetOpen('[data-tour="stock-alerts-actions-btn"]');
+        setRun(false);
+        setWaitingForStep(nextIndex);
+        return;
+    }
+
+    setStepIndex(nextIndex);
   }, [navigate, lng]);
 
   // Poll for element existence when waiting for a step
   useEffect(() => {
-      if (waitingForStep === null) return;
+      if (waitingForStep === null || typeof waitingForStep !== 'number') return;
 
       const targetStep = steps[waitingForStep];
+      if (!targetStep) return;
+
       const targetSelector = targetStep.target;
 
       // If target is body, we just assume it's ready immediately after a small delay
@@ -386,23 +400,11 @@ const OnboardingTour = ({ isAppLoading }) => {
       const intervalId = setInterval(() => {
           // Check if we need to open the menu for steps 15, 19, 24, 25, 29 (Calendar View)
           if ([15, 19, 24, 25, 29].includes(waitingForStep)) {
-             const btn = document.querySelector('[data-tour="calendar-actions-btn"]');
-             if (btn) {
-                const isMenuOpen = btn.parentNode.querySelector('.dropdown-menu') !== null;
-                if (!isMenuOpen) {
-                  btn.click();
-                }
-             }
+             ensureActionSheetOpen('[data-tour="calendar-actions-btn"]');
           }
           // Check if we need to open the menu for step 27, 28 (Stock Alerts View)
           if ([27, 28].includes(waitingForStep)) {
-             const btn = document.querySelector('[data-tour="stock-alerts-actions-btn"]');
-             if (btn) {
-                const isMenuOpen = btn.parentNode.querySelector('.dropdown-menu') !== null;
-                if (!isMenuOpen) {
-                  btn.click();
-                }
-             }
+             ensureActionSheetOpen('[data-tour="stock-alerts-actions-btn"]');
           }
 
           const element = document.querySelector(targetSelector);

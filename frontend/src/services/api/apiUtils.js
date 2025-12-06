@@ -124,9 +124,7 @@ export async function performApiCall({
   analyticsData = {},
 }) {
   // --- MOCK DEMO START ---
-  if (url?.includes('/calendars/demo')) {
-    return handleDemoMock(url, method);
-  }
+  if (url?.includes('/calendars/demo')) return handleDemoMock(url, method);
   // --- MOCK DEMO END ---
 
   try {

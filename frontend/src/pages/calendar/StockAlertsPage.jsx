@@ -73,7 +73,7 @@ function StockAlertsPage({
     isDemo ? null : calendarType,
     calendarId,
     setBoxes,
-    isDemo ? () => {} : setLoadingBoxes
+    isDemo ? () => { /* no-op */ } : setLoadingBoxes
   );
 
   // On filtre les boîtes qui sont en stock faible
