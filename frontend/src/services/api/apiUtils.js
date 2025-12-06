@@ -69,18 +69,10 @@ function handlePillbox(url, method) {
 }
 
 function handleBoxes(url, method) {
-  if (url.includes('/restock') && method === 'POST') {
-    return { success: true, message: 'Demo box restocked' };
-  }
-  if (method === 'POST') {
-    return { success: true, box_id: 'demo-new-box', message: 'Demo box created', code: 200 };
-  }
-  if (method === 'PUT') {
-    return { success: true, message: 'Demo box updated' };
-  }
-  if (method === 'DELETE') {
-    return { success: true, message: 'Demo box deleted' };
-  }
+  if (url.includes('/restock') && method === 'POST') return { success: true, message: 'Demo box restocked' };
+  if (method === 'POST') return { success: true, box_id: 'demo-new-box', message: 'Demo box created', code: 200 };
+  if (method === 'PUT') return { success: true, message: 'Demo box updated' };
+  if (method === 'DELETE') return { success: true, message: 'Demo box deleted' };
   return null;
 }
 

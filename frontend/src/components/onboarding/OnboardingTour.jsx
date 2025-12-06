@@ -81,8 +81,8 @@ const OnboardingTour = ({ isAppLoading }) => {
 
   // Check if tour has been completed
   useEffect(() => {
-    const tourCompleted = localStorage.getItem('meditime_tour_completed_v1');
-    //const tourCompleted = false
+    //const tourCompleted = localStorage.getItem('meditime_tour_completed_v1');
+    const tourCompleted = false
     if (!tourCompleted && !isAppLoading) {
       setRun(true);
     }
@@ -309,7 +309,7 @@ const OnboardingTour = ({ isAppLoading }) => {
     }
   ];
 
-  const ensureActionSheetOpen = (selector) => {
+  const ensureActionSheetOpen = useCallback((selector) => {
     const btn = document.querySelector(selector);
     if (btn) {
       const isMenuOpen = btn.parentNode.querySelector('.dropdown-menu') !== null;
@@ -317,7 +317,47 @@ const OnboardingTour = ({ isAppLoading }) => {
         btn.click();
       }
     }
-  };
+  }, []);
+
+  const handleNextStep = useCallback((currentIndex, nextIndex) => {
+    const transitions = {
+      0: `/${lng}/calendars`,
+      1: `/${lng}/add-calendar`,
+      4: `/${lng}/calendar/demo`,
+      6: `/${lng}/calendar/demo/boxes`,
+      10: `/${lng}/calendar/demo`,
+      15: `/${lng}/calendar/demo/settings`,
+      17: `/${lng}/calendar/demo/settings?tab=notifications`,
+      18: `/${lng}/calendar/demo`,
+      19: `/${lng}/shared-calendars?calendar=demo`,
+      23: `/${lng}/calendar/demo`,
+      25: `/${lng}/calendar/demo/stock-alerts`,
+      28: `/${lng}/calendar/demo`
+    };
+
+    if (transitions[currentIndex]) {
+        setRun(false); // Pause tour
+        navigate(transitions[currentIndex]);
+        setWaitingForStep(nextIndex);
+        return;
+    }
+
+    if ([15, 19, 24, 25, 29].includes(nextIndex)) {
+        ensureActionSheetOpen('[data-tour="calendar-actions-btn"]');
+        setRun(false);
+        setWaitingForStep(nextIndex);
+        return;
+    }
+
+    if ([27, 28].includes(nextIndex)) {
+        ensureActionSheetOpen('[data-tour="stock-alerts-actions-btn"]');
+        setRun(false);
+        setWaitingForStep(nextIndex);
+        return;
+    }
+
+    setStepIndex(nextIndex);
+  }, [lng, navigate, ensureActionSheetOpen]);
 
   const handleJoyrideCallback = useCallback((data) => {
     const { action, index, status, type } = data;
@@ -339,53 +379,19 @@ const OnboardingTour = ({ isAppLoading }) => {
         return;
     }
 
-    const transitions = {
-      0: `/${lng}/calendars`,
-      1: `/${lng}/add-calendar`,
-      4: `/${lng}/calendar/demo`,
-      6: `/${lng}/calendar/demo/boxes`,
-      10: `/${lng}/calendar/demo`,
-      15: `/${lng}/calendar/demo/settings`,
-      17: `/${lng}/calendar/demo/settings?tab=notifications`,
-      18: `/${lng}/calendar/demo`,
-      19: `/${lng}/shared-calendars?calendar=demo`,
-      23: `/${lng}/calendar/demo`,
-      25: `/${lng}/calendar/demo/stock-alerts`,
-      28: `/${lng}/calendar/demo`
-    };
-
-    if (transitions[index]) {
-        setRun(false); // Pause tour
-        navigate(transitions[index]);
-        setWaitingForStep(nextIndex);
-        return;
-    }
-
-    if ([15, 19, 24, 25, 29].includes(nextIndex)) {
-        ensureActionSheetOpen('[data-tour="calendar-actions-btn"]');
-        setRun(false);
-        setWaitingForStep(nextIndex);
-        return;
-    }
-
-    if ([27, 28].includes(nextIndex)) {
-        ensureActionSheetOpen('[data-tour="stock-alerts-actions-btn"]');
-        setRun(false);
-        setWaitingForStep(nextIndex);
-        return;
-    }
-
-    setStepIndex(nextIndex);
-  }, [navigate, lng]);
+    handleNextStep(index, nextIndex);
+  }, [handleNextStep]);
 
   // Poll for element existence when waiting for a step
   useEffect(() => {
       if (waitingForStep === null || typeof waitingForStep !== 'number') return;
+      if (waitingForStep < 0 || waitingForStep >= steps.length) return;
 
       const targetStep = steps[waitingForStep];
       if (!targetStep) return;
 
       const targetSelector = targetStep.target;
+      if (typeof targetSelector !== 'string') return;
 
       // If target is body, we just assume it's ready immediately after a small delay
       if (targetSelector === 'body') {
