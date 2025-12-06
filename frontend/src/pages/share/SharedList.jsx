@@ -244,8 +244,8 @@ function SharedList({
         'demo': {
           calendar_name: t("tour.calendar_name"),
           users: [
-            { email: 'doctor@example.com', receiver_name: 'Dr. Smith', status: 'accepted', permission: 'read', receiver_photo_url: "https://www.w3schools.com/howto/img_avatar.png" },
-            { email: 'family@example.com', receiver_name: 'Family Member', status: 'pending', permission: 'write', receiver_photo_url: "https://www.w3schools.com/howto/img_avatar.png" }
+            { email: 'doctor@example.com', receiver_name: 'Dr. Smith', accepted: true, permission: 'read', receiver_photo_url: "https://www.w3schools.com/howto/img_avatar.png" },
+            { email: 'family@example.com', receiver_name: 'Family Member', accepted: false, permission: 'write', receiver_photo_url: "https://www.w3schools.com/howto/img_avatar.png" }
           ],
           tokens: [
             { id: 'demo-token-1', token: 'demo-link-123', permission: 'read', expires_at: null, is_revoked: false }
