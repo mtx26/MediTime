@@ -595,11 +595,7 @@ ON public.ics_tokens FOR ALL
 USING (auth.uid() = owner_uid)
 WITH CHECK (
   auth.uid() = owner_uid
-  AND EXISTS (
-    SELECT 1 FROM calendars c 
-    WHERE c.id = calendar_id 
-    AND c.owner_uid = auth.uid()
-  )
+  AND is_calendar_owner(calendar_id)
 );
 
 
