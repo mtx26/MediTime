@@ -173,6 +173,7 @@ export const MicrosoftHandleLogin = async (redirect) => {
       provider: 'azure',
       options: {
         redirectTo: buildCallbackUrl(redirect),
+        scopes: 'email profile openid',
         queryParams: {
           prompt: 'select_account',
           access_type: 'offline',
