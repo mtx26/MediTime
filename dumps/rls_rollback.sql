@@ -87,11 +87,13 @@ DROP POLICY IF EXISTS "Public read access" ON public.medicaments_afmps;
 
 -- 2. SUPPRESSION DES FONCTIONS
 -- ==============================================================================
-DROP FUNCTION IF EXISTS public.is_calendar_owner(uuid);
-DROP FUNCTION IF EXISTS public.is_calendar_receiver(uuid);
-DROP FUNCTION IF EXISTS public.get_user_by_email(text);
-DROP FUNCTION IF EXISTS public.get_fcm_tokens_for_user(uuid);
-DROP FUNCTION IF EXISTS public.get_public_user_info(uuid);
+DROP FUNCTION IF EXISTS public.is_calendar_owner(uuid) CASCADE;
+DROP FUNCTION IF EXISTS public.is_calendar_receiver(uuid) CASCADE;
+DROP FUNCTION IF EXISTS public.get_auth_email() CASCADE;
+DROP FUNCTION IF EXISTS public.is_invited_to_calendar(uuid) CASCADE;
+DROP FUNCTION IF EXISTS public.get_user_by_email(text) CASCADE;
+DROP FUNCTION IF EXISTS public.get_fcm_tokens_for_user(uuid) CASCADE;
+DROP FUNCTION IF EXISTS public.get_public_user_info(uuid) CASCADE;
 
 -- 3. DÉSACTIVATION DU RLS SUR TOUTES LES TABLES
 -- ==============================================================================

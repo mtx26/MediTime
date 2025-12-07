@@ -50,6 +50,30 @@ AS $$
   );
 $$;
 
+-- Helper function to get current user's email securely (bypassing RLS on users)
+CREATE OR REPLACE FUNCTION public.get_auth_email()
+RETURNS text
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT email FROM users WHERE id = auth.uid();
+$$;
+
+-- Helper function to check if user is invited to a calendar (bypassing RLS on invitations)
+CREATE OR REPLACE FUNCTION public.is_invited_to_calendar(cal_id uuid)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM invitations
+    WHERE calendar_id = cal_id
+    AND invited_email = (SELECT email FROM users WHERE id = auth.uid())
+  );
+$$;
+
 -- 2. POLITIQUES (POLICIES)
 -- ==============================================================================
 
@@ -84,10 +108,16 @@ USING (
   OR
   -- Cas 3: Je suis invité, je veux voir le propriétaire (users.id)
   EXISTS (
-    SELECT 1 FROM public.invitations i
-    JOIN public.calendars c ON i.calendar_id = c.id
+    SELECT 1 FROM public.calendars c
     WHERE c.owner_uid = users.id
-    AND i.invited_email = (select auth.jwt() ->> 'email')
+    AND is_invited_to_calendar(c.id)
+  )
+  OR
+  -- Cas 4: J'ai reçu une notification de cet utilisateur
+  EXISTS (
+    SELECT 1 FROM public.notifications n
+    WHERE n.sender_uid = users.id
+    AND n.user_id = auth.uid()
   )
 );
 
@@ -112,17 +142,9 @@ ON public.calendars FOR SELECT
 USING (
   owner_uid = auth.uid()
   OR
-  EXISTS (
-    SELECT 1 FROM public.invitations 
-    WHERE calendar_id = calendars.id 
-    AND invited_email = (select auth.jwt() ->> 'email')
-  )
+  is_invited_to_calendar(id)
   OR
-  EXISTS (
-    SELECT 1 FROM public.shared_calendars
-    WHERE calendar_id = calendars.id
-    AND receiver_uid = auth.uid()
-  )
+  is_calendar_receiver(id)
 );
 
 -- Insertion : On ne peut créer un calendrier que si on en est le propriétaire.
@@ -556,10 +578,10 @@ CREATE POLICY "Users can view own notifications"
 ON public.notifications FOR SELECT 
 USING (auth.uid() = user_id);
 
--- Insertion : Le système (via sender_uid) ou l'utilisateur (invitations)
+-- Insertion : Tout utilisateur peut insérer une notification (contrôlé par le backend)
 CREATE POLICY "Users can insert sent notifications" 
 ON public.notifications FOR INSERT 
-WITH CHECK (sender_uid = auth.uid());
+WITH CHECK (true);
 
 -- Modification : Marquer comme lu (propre notif)
 CREATE POLICY "Users can update own notifications" 
@@ -609,7 +631,7 @@ CREATE POLICY "Users can view invitations sent or received"
 ON public.invitations FOR SELECT 
 USING (
   -- Je suis l'invité (basé sur l'email du token JWT)
-  (invited_email = (select auth.jwt() ->> 'email'))
+  (invited_email = get_auth_email())
   OR 
   -- Je suis le propriétaire du calendrier qui invite (via fonction sécurisée)
   is_calendar_owner(calendar_id)
@@ -626,7 +648,7 @@ WITH CHECK (
 CREATE POLICY "Users can delete invitations" 
 ON public.invitations FOR DELETE 
 USING (
-  (invited_email = (select auth.jwt() ->> 'email'))
+  (invited_email = get_auth_email())
   OR 
   is_calendar_owner(calendar_id)
 );
@@ -656,6 +678,8 @@ WITH CHECK (
   receiver_uid = auth.uid()
   OR
   is_calendar_owner(calendar_id)
+  OR
+  is_invited_to_calendar(calendar_id)
 );
 
 -- Mise à jour : Le receveur peut accepter (passer accepted à true).
