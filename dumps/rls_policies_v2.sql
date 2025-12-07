@@ -578,10 +578,10 @@ CREATE POLICY "Users can view own notifications"
 ON public.notifications FOR SELECT 
 USING (auth.uid() = user_id);
 
--- Insertion : Le système (via sender_uid) ou l'utilisateur (invitations)
+-- Insertion : Tout utilisateur peut insérer une notification (contrôlé par le backend)
 CREATE POLICY "Users can insert sent notifications" 
 ON public.notifications FOR INSERT 
-WITH CHECK (sender_uid = auth.uid());
+WITH CHECK (true);
 
 -- Modification : Marquer comme lu (propre notif)
 CREATE POLICY "Users can update own notifications" 
