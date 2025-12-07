@@ -60,14 +60,17 @@ def _verify_calendar_share(calendar_id: str, receiver_uid: str) -> bool:
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
+                    WITH set_user AS (
+                        SELECT set_config('request.jwt.claim.sub', %s, true)
+                    )
                     SELECT
-                        EXISTS (SELECT 1 FROM calendars WHERE id = %s) AS calendar_exists,
+                        EXISTS (SELECT 1 FROM calendars, set_user WHERE id = %s) AS calendar_exists,
                         EXISTS (
                             SELECT 1
-                            FROM shared_calendars
+                            FROM shared_calendars, set_user
                             WHERE calendar_id = %s AND receiver_uid = %s
                         ) AS share_exists
-                """, (calendar_id, calendar_id, receiver_uid))
+                """, (receiver_uid, calendar_id, calendar_id, receiver_uid))
 
                 row = cursor.fetchone()
 
@@ -109,12 +112,15 @@ def _verify_calendar(calendar_id: str, uid: str) -> bool:
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM calendars WHERE id = %s AND owner_uid = %s", (calendar_id, uid,))
-                calendar = cursor.fetchone()
-                if not calendar:
-                    return False
-                
-                return True
+                # On laisse le RLS filtrer. Si une ligne est retournée, c'est que l'utilisateur a accès
+                # (soit propriétaire, soit invité, soit partagé).
+                cursor.execute("""
+                    WITH set_user AS (
+                        SELECT set_config('request.jwt.claim.sub', %s, true)
+                    )
+                    SELECT 1 FROM calendars, set_user WHERE id = %s
+                """, (uid, calendar_id))
+                return cursor.fetchone() is not None
 
     except Exception as e:
         logger.error("erreur lors de la vérification de l'accès au calendrier", {
@@ -137,19 +143,22 @@ def _verify_token(token: str) -> str | bool:
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM shared_tokens WHERE id = %s", (token,))
+                # Injection du token en session pour passer le RLS de shared_tokens
+                cursor.execute("""
+                    WITH set_session AS (
+                        SELECT set_config('app.current_token', %s, true)
+                    )
+                    SELECT * FROM shared_tokens, set_session WHERE id = %s
+                """, (token, token))
+                
                 token_data = cursor.fetchone()
                 if not token_data:
                     return False
 
                 calendar_id = token_data.get("calendar_id")
-                owner_uid = token_data.get("owner_uid")
                 expires_at = token_data.get("expires_at")
                 revoked = token_data.get("revoked")
                 permissions = token_data.get("permissions")
-
-                if not _verify_calendar(calendar_id, owner_uid):
-                    return False
 
                 now = datetime.now(timezone.utc).date()
 
@@ -185,15 +194,10 @@ def _verify_token_owner(token: str, uid: str) -> bool:
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM shared_tokens WHERE id = %s", (token,))
-                token_data = cursor.fetchone()
-                if not token_data:
-                    return False
-
-                if token_data.get("owner_uid") != uid:
-                    return False
-
-                return True
+                # Le RLS sur shared_tokens filtre déjà par owner_uid = auth.uid()
+                # Donc si on trouve la ligne, c'est que l'utilisateur est le propriétaire.
+                cursor.execute("SELECT 1 FROM shared_tokens WHERE id = %s", (token,))
+                return cursor.fetchone() is not None
 
     except Exception as e:
         logger.error("erreur lors de la vérification de la propriété du token", {
@@ -344,16 +348,13 @@ def _verify_login_invite_owner(token: str, uid: str) -> dict | bool:
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
-                    SELECT sc.calendar_id, sc.receiver_uid, c.owner_uid
+                    SELECT sc.calendar_id, sc.receiver_uid
                     FROM shared_calendars sc
                     JOIN calendars c ON c.id = sc.calendar_id
-                    WHERE sc.token = %s
-                """, (token,))
+                    WHERE sc.token = %s AND c.owner_uid = %s
+                """, (token, uid))
                 row = cursor.fetchone()
                 if not row:
-                    return False
-
-                if row.get("owner_uid") != uid:
                     return False
 
                 # On hydrate via retour: calendar_id + receiver_uid
@@ -431,16 +432,13 @@ def _verify_registration_invite_owner(token: str, uid: str) -> dict | bool:
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
-                    SELECT i.calendar_id, i.invited_email, c.owner_uid
+                    SELECT i.calendar_id, i.invited_email
                     FROM invitations i
                     JOIN calendars c ON c.id = i.calendar_id
-                    WHERE i.token = %s
-                """, (token,))
+                    WHERE i.token = %s AND c.owner_uid = %s
+                """, (token, uid))
                 row = cursor.fetchone()
                 if not row:
-                    return False
-
-                if row.get("owner_uid") != uid:
                     return False
 
                 # On hydrate via retour: calendar_id + invited_email
@@ -516,17 +514,13 @@ def _verify_login_invite_receiver(token: str, uid: str) -> dict | bool:
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
-                    SELECT sc.calendar_id, sc.receiver_uid, sc.accepted, c.owner_uid
+                    SELECT sc.calendar_id, sc.accepted, c.owner_uid
                     FROM shared_calendars sc
                     JOIN calendars c ON c.id = sc.calendar_id
-                    WHERE sc.token = %s
-                """, (token,))
+                    WHERE sc.token = %s AND sc.receiver_uid = %s
+                """, (token, uid))
                 row = cursor.fetchone()
                 if not row:
-                    return False
-
-                # ici on exige que le token cible bien ce receiver
-                if row.get("receiver_uid") != uid:
                     return False
 
                 return {

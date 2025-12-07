@@ -263,7 +263,13 @@ def handle_get_token_metadata(token):
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT owner_uid FROM shared_tokens WHERE id = %s", (token,))
+                # On injecte le token dans la session DB via une CTE pour que la politique RLS puisse le vérifier
+                cursor.execute("""
+                    WITH set_session AS (
+                        SELECT set_config('app.current_token', %s, true)
+                    )
+                    SELECT owner_uid FROM set_session, shared_tokens WHERE id = %s
+                """, (token, token))
                 token_data = cursor.fetchone()
                 if not token_data:
                     return warning_response(

@@ -74,7 +74,7 @@ WITH upd AS (
 ),
 del AS (
   DELETE FROM medicine_box_conditions
-  WHERE box_id = %s
+  WHERE box_id IN (SELECT id FROM upd)
 ),
 ins AS (
   INSERT INTO medicine_box_conditions (box_id, tablet_count, interval_days, start_date, time_of_day)
@@ -85,13 +85,13 @@ ins AS (
     NULLIF(c->>'start_date','')::date                              AS start_date,
     COALESCE(NULLIF(c->>'time_of_day',''), 'morning')              AS time_of_day
   FROM jsonb_array_elements(%s::jsonb) AS c
+  WHERE EXISTS (SELECT 1 FROM upd)
   RETURNING 1
 )
 SELECT 1;
 """, (
     name, dose, box_capacity, stock_alert_threshold, stock_quantity,
     box_id, calendar_id,      # upd WHERE
-    box_id,                   # del
     box_id,                   # ins (box_id)
     json.dumps(conditions)    # ins (payload)
 ))
@@ -157,7 +157,7 @@ def delete_box(box_id: str, calendar_id: str):
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("DELETE FROM medicine_boxes WHERE id = %s AND calendar_id = %s", (box_id, calendar_id))
-            cursor.execute("DELETE FROM medicine_box_conditions WHERE box_id = %s", (box_id,))
+            # La suppression des conditions est gérée par ON DELETE CASCADE
             conn.commit()
 
 

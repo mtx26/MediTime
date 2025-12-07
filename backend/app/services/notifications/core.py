@@ -19,7 +19,7 @@ from app.auth.fcm import send_fcm_notification  # Envoi de notifications push vi
 from app.db.connection import get_connection    # Connexion à la base de données
 from app.services.calendar import fetch_calendar, fetch_medicine_name  # Récupération calendrier/médicament
 from app.services.notifications.messaging import send_email, send_sms  # Envoi email/SMS
-from app.services.user import fetch_user       # Récupération utilisateur
+from app.services.user import fetch_user, fetch_public_user_info       # Récupération utilisateur
 from app.utils.logging import log_backend      # Logger backend
 from app.config import Config                  # Configuration globale
 from html import escape                        # Sécurisation HTML
@@ -42,7 +42,9 @@ def fetch_user_name(user_id: str) -> str:
     """
     if not user_id:
         return DEFAULT_USER_NAME
-    user = fetch_user(user_id)
+    # Utilisation de fetch_public_user_info pour contourner le RLS si nécessaire
+    # car l'utilisateur qui reçoit la notif n'est pas forcément celui qui l'a envoyée
+    user = fetch_public_user_info(user_id)
     return user.get("display_name") if user else DEFAULT_USER_NAME
 
 
@@ -310,6 +312,8 @@ def save_notifications(user_id: str, notification_type: str, items: List[Dict]):
     - items (List[Dict]): Liste des données des notifications à enregistrer.
     """
     try:
+        # Utilisation de get_connection() standard (RLS actif)
+        # La policy "Users can insert sent notifications" permet l'insertion si sender_uid = auth.uid()
         with get_connection() as conn, conn.cursor() as cur:
             for item in items:
                 title, body_html, _ = build_notification_text(notification_type, item)
@@ -355,8 +359,10 @@ def _get_fcm_tokens(user_id: str) -> List[str]:
     Retour:
     - List[str]: Liste des tokens FCM.
     """
+    # Utilisation de get_connection() standard (RLS actif)
+    # Utilisation de la fonction RPC sécurisée pour contourner RLS sur fcm_tokens
     with get_connection() as conn, conn.cursor() as cur:
-        cur.execute("SELECT token FROM fcm_tokens WHERE uid = %s", (user_id,))
+        cur.execute("SELECT token FROM get_fcm_tokens_for_user(%s)", (user_id,))
         return [r["token"] for r in cur.fetchall()]
 
 

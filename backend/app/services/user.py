@@ -17,6 +17,22 @@ def fetch_user(uid: str) -> dict:
             user = cursor.fetchone() or {}
             return user
 
+def fetch_public_user_info(uid: str) -> dict:
+    """Récupère les informations publiques d'un utilisateur (nom, photo) via RPC sécurisé.
+    Utilisé pour les notifications et l'affichage public.
+
+    Paramètres:
+    - uid (str): ID de l'utilisateur.
+
+    Retour:
+    - dict: Dictionnaire avec display_name et photo_url.
+    """
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM get_public_user_info(%s)", (uid,))
+            user = cursor.fetchone() or {}
+            return user
+
 
 
 def update_existing_user(

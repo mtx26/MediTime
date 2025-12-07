@@ -20,7 +20,8 @@ def proxy_pdf(box_id):
                 status_code=400,
             )
 
-        with get_connection() as conn:
+        # Connexion sans RLS car cette route est publique/sans auth
+        with get_connection(skip_rls=True) as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
                     SELECT ma.url_notice_fr

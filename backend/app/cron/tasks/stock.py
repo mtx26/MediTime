@@ -8,6 +8,7 @@ def decrease_stock():
     """Diminue les stocks des boîtes de médicaments selon la méthode 'daily_midnight'.
     """
     try:
+        # CRON TASK: S'exécute sans contexte utilisateur (g.uid est None), donc get_connection() retourne une connexion admin
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 # Récupère d'un coup tous les calendars concernés + leurs boîtes
