@@ -80,7 +80,8 @@ function StockAlertsPage({
   const alerts = boxes.filter(
     (box) =>
       box.stock_alert_threshold > 0 &&
-      box.stock_quantity <= box.stock_alert_threshold
+      box.stock_quantity <= box.stock_alert_threshold &&
+      box.box_capacity > 0
   );
 
   const restockBox = (calendarId, boxId) => {
