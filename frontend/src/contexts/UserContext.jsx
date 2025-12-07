@@ -11,6 +11,7 @@ export const UserProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(
     () => JSON.parse(localStorage.getItem('userInfo')) || null
   );
+  const [recoveryEvent, setRecoveryEvent] = useState(false);
   const tokenRef = useRef(null);
 
   useEffect(() => {
@@ -115,6 +116,9 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setRecoveryEvent(true);
+        }
         if (event === 'TOKEN_REFRESHED' && session) {
           if (tokenRef.current && tokenRef.current !== session.access_token) {
             log.info('[UserContext] Token mis à jour, appel reloadUser');
@@ -124,6 +128,7 @@ export const UserProvider = ({ children }) => {
           setUserInfo(null);
           localStorage.removeItem('userInfo');
           tokenRef.current = null;
+          setRecoveryEvent(false);
         }
       }
     );
@@ -132,7 +137,7 @@ export const UserProvider = ({ children }) => {
   }, [reloadUser]);
 
   return (
-    <UserContext.Provider value={{ userInfo }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ userInfo, recoveryEvent }}>{children}</UserContext.Provider>
   );
 };
 
