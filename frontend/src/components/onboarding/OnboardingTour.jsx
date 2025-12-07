@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { UserContext } from '../../contexts/UserContext';
 
 const Tooltip = ({
   continuous,
@@ -74,6 +75,7 @@ const OnboardingTour = ({ isAppLoading }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { lng } = useParams();
+  const { userInfo } = useContext(UserContext);
   
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
@@ -83,10 +85,10 @@ const OnboardingTour = ({ isAppLoading }) => {
   useEffect(() => {
     const tourCompleted = localStorage.getItem('meditime_tour_completed_v1');
     //const tourCompleted = false
-    if (!tourCompleted && !isAppLoading) {
+    if (!tourCompleted && !isAppLoading && userInfo) {
       setRun(true);
     }
-  }, [isAppLoading]);
+  }, [isAppLoading, userInfo]);
 
   const steps = [
     // 0. Welcome (Dashboard)
