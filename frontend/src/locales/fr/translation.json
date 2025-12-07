@@ -61,6 +61,7 @@
       "facebook": "Facebook",
       "github": "Github",
       "google": "Google",
+      "microsoft": "Microsoft",
       "twitter": "Twitter"
     },
     "register": "Inscription",
@@ -72,6 +73,7 @@
     "with_facebook": "Connexion avec Facebook",
     "with_github": "Connexion avec Github",
     "with_google": "Connexion avec Google",
+    "with_microsoft": "Connexion avec Microsoft",
     "with_twitter": "Connexion avec Twitter"
   },
   "auth_callback": {
