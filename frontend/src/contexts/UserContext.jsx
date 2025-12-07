@@ -51,7 +51,7 @@ export const UserProvider = ({ children }) => {
       if (res.status === 404) {
         const body_backend = {
           uid: user.id,
-          display_name: user.user_metadata?.name ?? null,
+          display_name: user.user_metadata?.full_name ?? user.user_metadata?.name ?? null,
           email: user.email,
           photo_url: user.user_metadata?.avatar_url ?? null,
           email_enabled: true,

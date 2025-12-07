@@ -359,7 +359,7 @@ function Navbar({ sharedProps }) {
                       <img
                         src={
                           userInfo.photoUrl ||
-                          'https://www.w3schools.com/howto/img_avatar.png'
+                          'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg'
                         }
                         alt="Profil"
                         className="rounded-circle me-2"
@@ -475,7 +475,7 @@ function Navbar({ sharedProps }) {
               <img
                 src={
                   userInfo?.photoUrl ||
-                  'https://www.w3schools.com/howto/img_avatar.png'
+                  'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg'
                 }
                 alt="Profil"
                 className="rounded-circle"
