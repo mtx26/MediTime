@@ -207,7 +207,7 @@ function Auth() {
                 </div>
                 <span>{t('auth.provider.facebook')}</span>
               </div>
-              {/*
+              
               <div className="d-flex flex-column align-items-center">
                 <div className="px-2">
                   <button
@@ -221,7 +221,7 @@ function Auth() {
                 </div>
                 <span>{t('auth.provider.microsoft')}</span>
               </div>
-              */}
+              
             </div>
             <p className="text-center mt-3 mb-0 text-muted">{t('auth.or_with_email')}</p>
           </div>
