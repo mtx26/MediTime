@@ -232,10 +232,14 @@
   "expired": "Expiré",
   "expires_at": "Expire le",
   "fcm": {
-    "sw_error": "[FCM] Erreur SW",
-    "sw_registered": "[FCM] SW enregistré",
-    "token_registered": "[FCM] Token enregistré côté backend",
-    "token_send_error": "[FCM] Erreur d’envoi du token"
+    "device_registration": "Recevez des notifications sur ce dispositif",
+    "device_registration_desc": "Activez les notifications push pour rester informé en temps réel de vos rappels et alertes médicaments.",
+    "enable_btn": "Activer les notifications",
+    "enabled_msg": "Notifications activées !",
+    "token_registered": "Token enregistré côté backend",
+    "token_send_error": "Erreur d’envoi du token",
+    "sw_registered": "Service Worker enregistré",
+    "sw_error": "Erreur d’enregistrement du Service Worker"
   },
   "features": {
     "desc1": "Programmez vos prises, recevez des rappels et gardez l’esprit tranquille.",

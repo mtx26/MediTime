@@ -61,7 +61,8 @@
       "facebook": "Фейсбук",
       "github": "Гитхаб",
       "google": "Google",
-      "twitter": "Твиттер"
+      "twitter": "Твиттер",
+      "microsoft": "Microsoft"
     },
     "register": "Регистрация",
     "register_with": "Зарегистрируйтесь с помощью:",
@@ -72,7 +73,8 @@
     "with_facebook": "Войти через Facebook",
     "with_github": "Подключение к Github",
     "with_google": "Войти через Google",
-    "with_twitter": "Подключиться к Twitter"
+    "with_twitter": "Подключиться к Twitter",
+    "with_microsoft": "Войти через Microsoft"
   },
   "auth_callback": {
     "loading": "Подключение...",
@@ -230,10 +232,14 @@
   "expired": "Истекший",
   "expires_at": "Истекает",
   "fcm": {
-    "sw_error": "[FCM] Ошибка ПО",
-    "sw_registered": "[FCM] SW записано",
     "token_registered": "[FCM] Токен зарегистрирован на стороне бэкэнда",
-    "token_send_error": "[FCM] Ошибка отправки токена"
+    "token_send_error": "[FCM] Ошибка отправки токена",
+    "device_registration": "Получать уведомления на этом устройстве",
+    "device_registration_desc": "Включите push-уведомления, чтобы в режиме реального времени получать напоминания и оповещения о приеме лекарств.",
+    "enable_btn": "Включить уведомления",
+    "enabled_msg": "Уведомления включены!",
+    "sw_registered": "Зарегистрированный работник сферы услуг",
+    "sw_error": "Ошибка регистрации работника службы поддержки"
   },
   "features": {
     "desc1": "Планируйте свои прививки, получайте напоминания и будьте спокойны.",

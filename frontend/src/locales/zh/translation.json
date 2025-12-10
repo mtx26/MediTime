@@ -61,7 +61,8 @@
       "facebook": "Facebook",
       "github": "Github",
       "google": "谷歌",
-      "twitter": "叽叽喳喳"
+      "twitter": "叽叽喳喳",
+      "microsoft": "微软"
     },
     "register": "登记",
     "register_with": "注册方式：",
@@ -72,7 +73,8 @@
     "with_facebook": "使用 Facebook 登录",
     "with_github": "与 Github 连接",
     "with_google": "使用 Google 登录",
-    "with_twitter": "与 Twitter 建立联系"
+    "with_twitter": "与 Twitter 建立联系",
+    "with_microsoft": "使用 Microsoft 登录"
   },
   "auth_callback": {
     "loading": "正在连接...",
@@ -230,10 +232,14 @@
   "expired": "已到期",
   "expires_at": "到期日期",
   "fcm": {
-    "sw_error": "[FCM] 软件错误",
-    "sw_registered": "[FCM] 短波已录制",
     "token_registered": "[FCM] 在后端注册的令牌",
-    "token_send_error": "[FCM] 发送令牌时出错"
+    "token_send_error": "[FCM] 发送令牌时出错",
+    "device_registration": "在此设备上接收通知",
+    "device_registration_desc": "启用推送通知，即可实时了解您的用药提醒和警报。",
+    "enable_btn": "启用通知",
+    "enabled_msg": "通知已启用！",
+    "sw_registered": "注册服务人员",
+    "sw_error": "服务工作线程注册错误"
   },
   "features": {
     "desc1": "安排您的拍摄，接收提醒并安心。",

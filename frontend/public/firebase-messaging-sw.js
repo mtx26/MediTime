@@ -1,13 +1,17 @@
 importScripts('https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.10.0/firebase-messaging-compat.js');
 
-firebase.initializeApp({
-  apiKey: "AIzaSyDJzyhnHPkWVYzw38CuLBvj0d9syMTf6uw",
-  authDomain: "medic-mamy.firebaseapp.com",
-  projectId: "medic-mamy",
-  messagingSenderId: "90914528083",
-  appId: "1:90914528083:web:84e9a65d36da88b359dfa6",
-});
+const firebaseConfig = {
+  apiKey: "AIzaSyBmad_HQKx0oyrhg2rEXn0Nlwgn6_rCqtc",
+  authDomain: "meditime-462409.firebaseapp.com",
+  projectId: "meditime-462409",
+  storageBucket: "meditime-462409.firebasestorage.app",
+  messagingSenderId: "259799675814",
+  appId: "1:259799675814:web:9360d7a451afd8bef4d567",
+  measurementId: "G-XCSFJJZFHC"
+};
+
+firebase.initializeApp(firebaseConfig);
 
 const messaging = firebase.messaging();
 // If you would like to customize notifications that are received in the

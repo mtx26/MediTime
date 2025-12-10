@@ -61,7 +61,8 @@
       "facebook": "Facebook",
       "github": "Github",
       "google": "Google",
-      "twitter": "Twitter"
+      "twitter": "Twitter",
+      "microsoft": "Microsoft"
     },
     "register": "Registration",
     "register_with": "Register with:",
@@ -72,7 +73,8 @@
     "with_facebook": "Login with Facebook",
     "with_github": "Connecting with Github",
     "with_google": "Sign in with Google",
-    "with_twitter": "Connect with Twitter"
+    "with_twitter": "Connect with Twitter",
+    "with_microsoft": "Sign in with Microsoft"
   },
   "auth_callback": {
     "loading": "Connecting...",
@@ -230,10 +232,14 @@
   "expired": "Expired",
   "expires_at": "Expires on",
   "fcm": {
-    "sw_error": "[FCM] SW error",
-    "sw_registered": "[FCM] SW recorded",
     "token_registered": "[FCM] Token registered on the backend side",
-    "token_send_error": "[FCM] Error sending token"
+    "token_send_error": "[FCM] Error sending token",
+    "device_registration": "Receive notifications on this device",
+    "device_registration_desc": "Enable push notifications to stay informed in real time about your medication reminders and alerts.",
+    "enable_btn": "Enable notifications",
+    "enabled_msg": "Notifications enabled!",
+    "sw_registered": "Registered Service Worker",
+    "sw_error": "Service Worker registration error"
   },
   "features": {
     "desc1": "Schedule your shots, receive reminders and have peace of mind.",

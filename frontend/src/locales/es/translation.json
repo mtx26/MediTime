@@ -61,7 +61,8 @@
       "facebook": "Facebook",
       "github": "Github",
       "google": "Google",
-      "twitter": "Gorjeo"
+      "twitter": "Gorjeo",
+      "microsoft": "Microsoft"
     },
     "register": "Registro",
     "register_with": "Regístrate con:",
@@ -72,7 +73,8 @@
     "with_facebook": "Iniciar sesión con Facebook",
     "with_github": "Conectando con Github",
     "with_google": "Iniciar sesión con Google",
-    "with_twitter": "Conectarse con Twitter"
+    "with_twitter": "Conectarse con Twitter",
+    "with_microsoft": "Iniciar sesión con Microsoft"
   },
   "auth_callback": {
     "loading": "Conectando...",
@@ -230,10 +232,14 @@
   "expired": "Venció",
   "expires_at": "Caduca el",
   "fcm": {
-    "sw_error": "[FCM] Error de software",
-    "sw_registered": "[FCM] SW grabado",
     "token_registered": "[FCM] Token registrado en el backend",
-    "token_send_error": "[FCM] Error al enviar el token"
+    "token_send_error": "[FCM] Error al enviar el token",
+    "device_registration": "Recibir notificaciones en este dispositivo",
+    "device_registration_desc": "Habilite las notificaciones push para mantenerse informado en tiempo real sobre sus recordatorios y alertas de medicamentos.",
+    "enable_btn": "Habilitar notificaciones",
+    "enabled_msg": "¡Notificaciones habilitadas!",
+    "sw_registered": "Trabajador de servicio registrado",
+    "sw_error": "Error de registro del Service Worker"
   },
   "features": {
     "desc1": "Programa tus vacunas, recibe recordatorios y ten tranquilidad.",
