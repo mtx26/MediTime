@@ -7,7 +7,7 @@ import './i18n';
 import { SpeedInsights } from "@vercel/speed-insights/react"
 
 // Initialize Google Analytics
-const gaId = import.meta.env.VITE_GA_ID;
+const gaId = import.meta.env.VITE_FIREBASE_MEASUREMENT_ID;
 if (gaId) {
   const script = document.createElement('script');
   script.async = true;
