@@ -228,7 +228,7 @@ def build_low_stock_text(context: Dict, cal: str) -> Tuple[str, str, str]:
         fcm_body = f"Le médicament « {med_name} » {stock_txt_fcm}."
 
         return (title, body, fcm_body, VIEW_CALENDAR_LABEL)
-    # Sécurité supplémentaire : si la liste est vide ou inattendue
+    
     log_backend.warning(
         "Aucun médicament pour notification de stock faible (cas inattendu)",
         {"origin": ORIGIN, "code": "NO_MEDICATION_IN_CONTEXT_UNEXPECTED", "context": context},
