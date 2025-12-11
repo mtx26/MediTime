@@ -207,6 +207,11 @@ def build_low_stock_text(context: Dict, cal: str) -> Tuple[str, str, str]:
         return (title, body, fcm_body, VIEW_CALENDAR_LABEL)
 
     # ---- Cas : un seul médicament ----
+    if not meds:
+        log_backend.warning(
+            "Aucun médicament pour notification de stock faible",
+            {"origin": ORIGIN, "code": "NO_MEDICATION_IN_CONTEXT", "context": context},
+        )
     med = meds[0]  # garanti par le cas précédent
     med_name = _h(med.get("name"))
     qty = med.get("qty") or 0
