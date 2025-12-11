@@ -10,8 +10,8 @@ export default function Notification({ fcm }) {
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
   const uid = userInfo?.uid ?? null;
-  const [notificationsEnabled, setNotificationsEnabled] = useState(window.Notification.permission === 'granted');
-  const notificationNotSupported = !('Notification' in window) || Notification.permission === 'denied';
+  const [notificationsEnabled, setNotificationsEnabled] = useState(window?.Notification?.permission === 'granted');
+  const notificationNotSupported = !('Notification' in window) || window.Notification.permission === 'denied';
   const [isRegistering, setIsRegistering] = useState(false);
 
   return (
