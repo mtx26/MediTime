@@ -195,12 +195,6 @@ def build_low_stock_text(context: Dict, cal: str) -> Tuple[str, str, str]:
     - Tuple[str, str, str, str]: Titre, corps HTML, corps FCM et libellé du bouton d'action.
     """
     meds = context.get("medications") or []
-    if meds == []:
-        log_backend.warning(
-            "Aucun médicament pour notification de stock faible",
-            {"origin": ORIGIN, "code": "NO_MEDICATION_IN_CONTEXT", "context": context},
-        )
-        return ("", "", "", "")
     
     title = f"⚠️ Stock faible – calendrier « {cal} »"
 
@@ -214,25 +208,32 @@ def build_low_stock_text(context: Dict, cal: str) -> Tuple[str, str, str]:
         return (title, body, fcm_body, VIEW_CALENDAR_LABEL)
 
     # ---- Cas : un seul médicament ----
-    med = meds[0]  # garanti par le cas précédent
-    med_name = _h(med.get("name"))
-    qty = med.get("qty") or 0
+    if len(meds) == 1:
+        med = meds[0]
+        med_name = _h(med.get("name"))
+        qty = med.get("qty") or 0
 
-    if qty == 0:
-        stock_txt = "<span style='color:red;font-weight:bold;'>est à court de stock</span>"
-        stock_txt_fcm = "est à court de stock"
-    else:
-        stock_txt = (
-            f"<span style='color:orange;font-weight:bold;'>a seulement {qty} dose"
-            f"{'s' if qty != 1 else ''} restante"
-            f"{'s' if qty != 1 else ''}</span>"
-        )
-        stock_txt_fcm = f"a seulement {qty} dose{'s' if qty != 1 else ''} restante{'s' if qty != 1 else ''}"
+        if qty == 0:
+            stock_txt = "<span style='color:red;font-weight:bold;'>est à court de stock</span>"
+            stock_txt_fcm = "est à court de stock"
+        else:
+            stock_txt = (
+                f"<span style='color:orange;font-weight:bold;'>a seulement {qty} dose"
+                f"{'s' if qty != 1 else ''} restante"
+                f"{'s' if qty != 1 else ''}</span>"
+            )
+            stock_txt_fcm = f"a seulement {qty} dose{'s' if qty != 1 else ''} restante{'s' if qty != 1 else ''}"
 
-    body = _p(f"Le médicament <b>« {med_name} »</b> {stock_txt}.")
-    fcm_body = f"Le médicament « {med_name} » {stock_txt_fcm}."
+        body = _p(f"Le médicament <b>« {med_name} »</b> {stock_txt}.")
+        fcm_body = f"Le médicament « {med_name} » {stock_txt_fcm}."
 
-    return (title, body, fcm_body, VIEW_CALENDAR_LABEL)
+        return (title, body, fcm_body, VIEW_CALENDAR_LABEL)
+    # Sécurité supplémentaire : si la liste est vide ou inattendue
+    log_backend.warning(
+        "Aucun médicament pour notification de stock faible (cas inattendu)",
+        {"origin": ORIGIN, "code": "NO_MEDICATION_IN_CONTEXT_UNEXPECTED", "context": context},
+    )
+    return (title, "", "", VIEW_CALENDAR_LABEL)
 
 
 
