@@ -11,6 +11,7 @@ export default function Notification({ fcm }) {
   const { userInfo } = useContext(UserContext);
   const uid = userInfo?.uid ?? null;
   const [notificationsEnabled, setNotificationsEnabled] = useState(window.Notification.permission === 'granted');
+  const notificationNotSupported = !('Notification' in window) || Notification.permission === 'denied';
   const [isRegistering, setIsRegistering] = useState(false);
 
   return (
@@ -61,31 +62,33 @@ export default function Notification({ fcm }) {
               <div className="text-secondary small">{t('fcm.device_registration_desc')}</div>
             </div>
           </div>
-          <button 
-            className={`btn btn-sm d-flex align-items-center ${notificationsEnabled ? 'btn-success' : 'btn-primary fw-bold'}`}
-            onClick={async () => {
-              setIsRegistering(true);
-              await fcm.sendTokenToBackend()
-              setIsRegistering(false);
-              setNotificationsEnabled(window.Notification.permission === 'granted');
-            }}
-            disabled={isRegistering}
-            style={{fontSize: '0.95rem', borderRadius: '1.2rem', minWidth: '120px'}}
-          >
-            {notificationsEnabled ? (
-              <>
-                <i className="bi bi-arrow-clockwise me-2"></i>
-                {t('fcm.reload')}
-              </>
-            ) : isRegistering ? (
-              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-            ) : (
-              <>
-                <i className="bi bi-bell me-2"></i>
-                {t('fcm.enable_btn')}
-              </>
-            )}
-          </button>
+          {notificationNotSupported ? null : (
+            <button 
+              className={`btn btn-sm d-flex align-items-center ${notificationsEnabled ? 'btn-success' : 'btn-primary fw-bold'}`}
+              onClick={async () => {
+                setIsRegistering(true);
+                await fcm.sendTokenToBackend()
+                setIsRegistering(false);
+                setNotificationsEnabled(window.Notification.permission === 'granted');
+              }}
+              disabled={isRegistering}
+              style={{fontSize: '0.95rem', borderRadius: '1.2rem', minWidth: '120px'}}
+            >
+              {notificationsEnabled ? (
+                <>
+                  <i className="bi bi-arrow-clockwise me-2"></i>
+                  {t('fcm.reload')}
+                </>
+              ) : isRegistering ? (
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              ) : (
+                <>
+                  <i className="bi bi-bell me-2"></i>
+                  {t('fcm.enable_btn')}
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>
