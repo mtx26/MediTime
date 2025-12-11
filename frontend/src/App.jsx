@@ -872,6 +872,7 @@ function App() {
   const sendTokenToBackend = useCallback(async () => {
 
     const token = await requestPermissionAndGetToken(uid)
+    if (!token) console.warn('FCM token not available');
 
     return await performApiCall({
       url: `${API_URL}/api/notifications/register-token`,

@@ -30,14 +30,14 @@ export const requestPermissionAndGetToken = async (uid) => {
       vapidKey: import.meta.env.VITE_FCM_VAPID_KEY,
     });
 
-    log.info('[FCM] Token reçu :', {
+    console.log('Token fcm reçu :', {
       uid: uid,
       token: token,
       origin: 'FCM_TOKEN_RECEIVED',
     });
     return token;
   } catch (err) {
-    log.error('[FCM] Erreur permission ou token', {
+    console.error('Erreur permission ou token fcm', {
       uid: uid,
       origin: 'FCM_TOKEN_ERROR',
       error: err,
