@@ -1018,11 +1018,11 @@ function App() {
   }, [userInfo?.uid]);
 
   useEffect(() => {
-    const fcmNotificationsEnabled = window.Notification.permission === 'granted';
+    const fcmNotificationsEnabled = window?.Notification?.permission === 'granted' || false;
     if (fcmNotificationsEnabled) {
       sendTokenToBackend();
     }
-  }, [window.Notification.permission, sendTokenToBackend]);
+  }, [window?.Notification?.permission, sendTokenToBackend]);
 
   useEffect(() => {
     if (lng && i18n.language !== lng) {
