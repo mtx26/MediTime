@@ -239,7 +239,8 @@
     "enable_btn": "Benachrichtigungen aktivieren",
     "enabled_msg": "Benachrichtigungen aktiviert!",
     "sw_registered": "Registrierter Dienstleistungsarbeiter",
-    "sw_error": "Fehler bei der Registrierung von Service Workern"
+    "sw_error": "Fehler bei der Registrierung von Service Workern",
+    "reload": "Aufladen"
   },
   "features": {
     "desc1": "Planen Sie Ihre Aufnahmen, erhalten Sie Erinnerungen und seien Sie beruhigt.",

@@ -239,7 +239,8 @@
     "enable_btn": "Ativar notificações",
     "enabled_msg": "Notificações ativadas!",
     "sw_registered": "Trabalhador de serviço registrado",
-    "sw_error": "Erro no cadastro de funcionário de serviço"
+    "sw_error": "Erro no cadastro de funcionário de serviço",
+    "reload": "Recarregar"
   },
   "features": {
     "desc1": "Agende suas vacinas, receba lembretes e fique tranquilo.",

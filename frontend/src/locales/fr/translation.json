@@ -239,7 +239,8 @@
     "token_registered": "Token enregistré côté backend",
     "token_send_error": "Erreur d’envoi du token",
     "sw_registered": "Service Worker enregistré",
-    "sw_error": "Erreur d’enregistrement du Service Worker"
+    "sw_error": "Erreur d’enregistrement du Service Worker",
+    "reload": "Recharger"
   },
   "features": {
     "desc1": "Programmez vos prises, recevez des rappels et gardez l’esprit tranquille.",

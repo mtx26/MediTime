@@ -239,7 +239,8 @@
     "enable_btn": "Habilitar notificaciones",
     "enabled_msg": "¡Notificaciones habilitadas!",
     "sw_registered": "Trabajador de servicio registrado",
-    "sw_error": "Error de registro del Service Worker"
+    "sw_error": "Error de registro del Service Worker",
+    "reload": "Recargar"
   },
   "features": {
     "desc1": "Programa tus vacunas, recibe recordatorios y ten tranquilidad.",
