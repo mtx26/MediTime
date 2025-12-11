@@ -9,7 +9,7 @@ import { UserContext } from '../../contexts/UserContext';
 import AlertSystem from '../../components/common/AlertSystem';
 import { useTranslation } from 'react-i18next';
 
-const SettingsPage = ({ sharedProps }) => {
+export default function SettingsPage( sharedProps ) {
   const { t } = useTranslation();
   const location = useLocation();
   const { lng } = useParams();
@@ -116,5 +116,3 @@ const SettingsPage = ({ sharedProps }) => {
     </div>
   );
 };
-
-export default SettingsPage;

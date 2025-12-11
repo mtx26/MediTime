@@ -239,7 +239,8 @@
     "enable_btn": "启用通知",
     "enabled_msg": "通知已启用！",
     "sw_registered": "注册服务人员",
-    "sw_error": "服务工作线程注册错误"
+    "sw_error": "服务工作线程注册错误",
+    "reload": "充电"
   },
   "features": {
     "desc1": "安排您的拍摄，接收提醒并安心。",

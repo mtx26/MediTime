@@ -239,7 +239,8 @@
     "enable_btn": "Enable notifications",
     "enabled_msg": "Notifications enabled!",
     "sw_registered": "Registered Service Worker",
-    "sw_error": "Service Worker registration error"
+    "sw_error": "Service Worker registration error",
+    "reload": "Recharge"
   },
   "features": {
     "desc1": "Schedule your shots, receive reminders and have peace of mind.",

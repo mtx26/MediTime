@@ -2,58 +2,16 @@ import React, { use, useContext, useState } from 'react';
 import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import { updateUserInfo } from '../../services/auth/authService';
-import { requestPermissionAndGetToken } from '../../services/firebase/firebase';
 import { getToken } from '../../services/supabase/tokenUtils';
-import { log } from '../../utils/logger';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const Notification = () => {
+export default function Notification({ fcm }) {
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
   const uid = userInfo?.uid ?? null;
   const [notificationsEnabled, setNotificationsEnabled] = useState(window.Notification.permission === 'granted');
   const [isRegistering, setIsRegistering] = useState(false);
-
-  // 🔐 Demande de permission et envoi du token
-  const sendTokenToBackend = async () => {
-    setIsRegistering(true);
-    const tokenFcm = await requestPermissionAndGetToken(userInfo?.uid);
-    const token = await getToken();
-    if (!token || !userInfo?.uid) return;
-
-    // 🎯 Envoi du token FCM au backend Flask
-    fetch(`${API_URL}/api/notifications/register-token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        token: tokenFcm,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        log.info(t('fcm.token_registered'), {
-          uid: userInfo.uid,
-          token: tokenFcm,
-          origin: 'FCM_TOKEN',
-          code: 'FCM_TOKEN_REGISTER_SUCCESS',
-        });
-      })
-      .catch((error) => {
-        log.error(t('fcm.token_send_error'), {
-          uid: userInfo.uid,
-          token: tokenFcm,
-          origin: 'FCM_TOKEN',
-          code: 'FCM_TOKEN_REGISTER_ERROR',
-          error: error,
-        });
-      });
-    setNotificationsEnabled(window.Notification.permission === 'granted');
-    setIsRegistering(false);
-  };
 
   return (
     <div>
@@ -95,8 +53,8 @@ const Notification = () => {
         </label>
       </div>
       <div className="card bg-light border-0 mb-3 p-0">
-        <div className="card-body d-flex align-items-center justify-content-between py-2 px-3">
-          <div className="d-flex align-items-center">
+        <div className="card-body d-flex flex-column flex-md-row align-items-center justify-content-between py-2 px-3 gap-3">
+          <div className="d-flex align-items-center mb-2 mb-md-0">
             <i className="bi bi-bell-fill text-primary me-2" style={{fontSize: '1.3rem'}}></i>
             <div>
               <div className="fw-semibold text-dark" style={{fontSize: '1rem'}}>{t('fcm.device_registration')}</div>
@@ -105,14 +63,19 @@ const Notification = () => {
           </div>
           <button 
             className={`btn btn-sm d-flex align-items-center ${notificationsEnabled ? 'btn-success' : 'btn-primary fw-bold'}`}
-            onClick={sendTokenToBackend}
-            disabled={notificationsEnabled || isRegistering}
+            onClick={async () => {
+              setIsRegistering(true);
+              await fcm.sendTokenToBackend()
+              setIsRegistering(false);
+              setNotificationsEnabled(window.Notification.permission === 'granted');
+            }}
+            disabled={isRegistering}
             style={{fontSize: '0.95rem', borderRadius: '1.2rem', minWidth: '120px'}}
           >
             {notificationsEnabled ? (
               <>
-                <i className="bi bi-check-circle me-2"></i>
-                {t('fcm.enabled_msg')}
+                <i className="bi bi-arrow-clockwise me-2"></i>
+                {t('fcm.reload')}
               </>
             ) : isRegistering ? (
               <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -128,5 +91,3 @@ const Notification = () => {
     </div>
   );
 };
-
-export default Notification;

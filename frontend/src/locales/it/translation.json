@@ -239,7 +239,8 @@
     "enable_btn": "Abilita le notifiche",
     "enabled_msg": "Notifiche abilitate!",
     "sw_registered": "Lavoratore dei servizi registrato",
-    "sw_error": "Errore di registrazione del Service Worker"
+    "sw_error": "Errore di registrazione del Service Worker",
+    "reload": "Ricaricare"
   },
   "features": {
     "desc1": "Pianifica i tuoi scatti, ricevi promemoria e vivi in tutta tranquillità.",
