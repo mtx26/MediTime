@@ -2,12 +2,12 @@ from . import api
 from app.utils.auth import require_auth
 from app.utils.responses import success_response, error_response, warning_response
 from app.services.user import fetch_user
-from app.services.calendar import fetch_medicine_name
 from app.db.connection import get_connection
 from flask import request, g
 from app.config import Config
 from app.utils.measure import measure_time
 from app.utils import with_query_origin
+from app.services.notifications import notify_and_record
 
 frontend_url = Config.FRONTEND_URL or ""
 
@@ -166,7 +166,7 @@ def handle_read_notification(notification_id):
 @api.route("/notifications/register-token", methods=["POST"])
 @measure_time()
 @require_auth
-@with_query_origin(default_origin="FCM_TOKEN")
+@with_query_origin(default_origin="FCM_TOKEN_SEND")
 def register_token():
     data = request.json
     token = data.get("token")

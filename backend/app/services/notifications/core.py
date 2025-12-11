@@ -15,7 +15,7 @@ import traceback
 from typing import List, Tuple, Dict, Any
 from psycopg2 import sql
 
-from app.auth.fcm import send_fcm_notification  # Envoi de notifications push via Firebase
+from app.services.notifications.messaging import send_fcm_notification  # Envoi de notifications push via Firebase
 from app.db.connection import get_connection    # Connexion à la base de données
 from app.services.calendar import fetch_calendar, fetch_medicine_name  # Récupération calendrier/médicament
 from app.services.notifications.messaging import send_email, send_sms  # Envoi email/SMS
@@ -27,7 +27,7 @@ from html import escape                        # Sécurisation HTML
 
 # ========= Constantes =========
 ORIGIN = "NOTIFICATIONS"  # Origine pour le logging
-DEFAULT_CHANNELS: Tuple[str, ...] = ("email", "web")  # Canaux par défaut (web = historique, email)
+DEFAULT_CHANNELS: Tuple[str, ...] = ("email", "web", "push")  # Canaux par défaut (web = historique, email, )
 DEFAULT_USER_NAME = "un utilisateur"  # Nom par défaut si utilisateur inconnu
 VIEW_CALENDAR_LABEL = "Voir le calendrier"  # Libellé CTA générique
 
@@ -117,8 +117,46 @@ def _p(html_inner: str) -> str:
     return f"<p style='margin:4px 0'>{html_inner}</p>"
 
 
+NOTIFICATION_TEMPLATES = {
+    "calendar_invitation": {
+        "title": "📆 Invitation à un calendrier",
+        "body": "{sender} vous invite à rejoindre le calendrier « {cal} ».",
+        "cta": "Accepter l'invitation"
+    },
+    "calendar_invitation_registration": {
+        "title": "📆 Invitation à un calendrier",
+        "body": "{sender} vous invite à vous inscrire pour accéder au calendrier « {cal} ».",
+        "cta": "S'inscrire et accepter l'invitation"
+    },
+    "calendar_invitation_registration_deleted": {
+        "title": "📆 Invitation au calendrier annulée",
+        "body": "{sender} a annulé votre invitation à vous inscrire pour accéder au calendrier « {cal} ».",
+        "cta": "S'inscrire"
+    },
+    "calendar_invitation_accepted": {
+        "title": "✅ Invitation acceptée",
+        "body": "{sender} a accepté votre invitation pour « {cal} ».",
+        "cta": VIEW_CALENDAR_LABEL
+    },
+    "calendar_invitation_rejected": {
+        "title": "❌ Invitation refusée",
+        "body": "{sender} a refusé votre invitation pour « {cal} ».",
+        "cta": VIEW_CALENDAR_LABEL
+    },
+    "calendar_shared_deleted_by_owner": {
+        "title": "🔒 Partage annulé",
+        "body": "{sender} a arrêté de partager « {cal} » avec vous.",
+        "cta": "Ouvrir le site"
+    },
+    "calendar_shared_deleted_by_receiver": {
+        "title": "📤 Partage retiré",
+        "body": "{sender} a retiré le calendrier « {cal} » de son compte.",
+        "cta": VIEW_CALENDAR_LABEL
+    }
+}
+
 # ========= Construction des contenus =========
-def _format_medication_list(medications: List[Dict]) -> str:
+def format_medication_list(medications: List[Dict]) -> str:
     """
     Génère une liste HTML de médicaments avec emoji et badge de stock (pour emails/notifications).
 
@@ -145,70 +183,74 @@ def _format_medication_list(medications: List[Dict]) -> str:
     return "<ul style='margin:8px 0; padding-left:20px;'>" + "".join(lis) + "</ul>"
 
 
-NOTIFICATION_TEMPLATES = {
-    "calendar_invitation": {
-        "title": "📆 Invitation à un calendrier",
-        "body": "<b>{sender}</b> vous invite à rejoindre le calendrier « <b>{cal}</b> ».",
-        "cta": "Accepter l'invitation"
-    },
-    "calendar_invitation_registration": {
-        "title": "📆 Invitation à un calendrier",
-        "body": "<b>{sender}</b> vous invite à vous inscrire pour accéder au calendrier « <b>{cal}</b> ».",
-        "cta": "S'inscrire et accepter l'invitation"
-    },
-    "calendar_invitation_registration_deleted": {
-        "title": "📆 Invitation au calendrier annulée",
-        "body": "<b>{sender}</b> a annulé votre invitation à vous inscrire pour accéder au calendrier « <b>{cal}</b> ».",
-        "cta": "s'inscrire"
-    },
-    "calendar_invitation_accepted": {
-        "title": "✅ Invitation acceptée",
-        "body": "<b>{sender}</b> a accepté votre invitation pour « <b>{cal}</b> ».",
-        "cta": VIEW_CALENDAR_LABEL
-    },
-    "calendar_invitation_rejected": {
-        "title": "❌ Invitation refusée",
-        "body": "<b>{sender}</b> a refusé votre invitation pour « <b>{cal}</b> ».",
-        "cta": VIEW_CALENDAR_LABEL
-    },
-    "calendar_shared_deleted_by_owner": {
-        "title": "🔒 Partage annulé",
-        "body": "<b>{sender}</b> a arrêté de partager « <b>{cal}</b> » avec vous.",
-        "cta": "Ouvrir le site"
-    },
-    "calendar_shared_deleted_by_receiver": {
-        "title": "📤 Partage retiré",
-        "body": "<b>{sender}</b> a retiré le calendrier « <b>{cal}</b> » de son compte.",
-        "cta": VIEW_CALENDAR_LABEL
-    }
-}
+def build_low_stock_text(context: Dict, cal: str) -> Tuple[str, str, str]:
+    """
+    Génère le titre, le corps HTML et le libellé du bouton d'action pour une notification de stock faible.
 
-def _build_low_stock_text(context: Dict, cal: str) -> Tuple[str, str, str]:
+    Paramètres:
+    - context (Dict): Contexte contenant les données nécessaires pour construire le message.
+    - cal (str): Nom du calendrier.
+
+    Retour:
+    - Tuple[str, str, str, str]: Titre, corps HTML, corps FCM et libellé du bouton d'action.
+    """
+    meds = context.get("medications") or []
     title = f"⚠️ Stock faible – calendrier « {cal} »"
-    if context.get("medications"):
-        body = _p(f"Certains médicaments du calendrier <b>« {cal} »</b> sont en stock critique :") \
-               + _format_medication_list(context["medications"])
-        return (title, body, VIEW_CALENDAR_LABEL)
 
-    med_name = _h(fetch_medicine_name(context.get("medication_id")))
-    qty = context.get("medication_qty") or 0
+    # ---- Cas : plusieurs médicaments en stock critique ----
+    if len(meds) > 1:
+        body = (
+            _p(f"Certains médicaments du calendrier <b>« {cal} »</b> sont en stock critique :")
+            + format_medication_list(meds)
+        )
+        fcm_body = f"Certains médicaments du calendrier « {cal} » sont en stock critique."
+        return (title, body, fcm_body, VIEW_CALENDAR_LABEL)
+
+    # ---- Cas : un seul médicament ----
+    med = meds[0]  # garanti par le cas précédent
+    med_name = _h(med.get("name"))
+    qty = med.get("qty") or 0
+
     if qty == 0:
-        stock_txt = "<span style='color:red;font-weight:bold;'>épuisé</span>"
+        stock_txt = "<span style='color:red;font-weight:bold;'>est à court de stock</span>"
+        stock_txt_fcm = "est à court de stock"
     else:
-        stock_txt = f"<span style='color:orange;font-weight:bold;'>{qty} restant{'s' if qty != 1 else ''}</span>"
-    body = _p(f"Le médicament <b>« {med_name} »</b> est {stock_txt}.")
-    return (title, body, VIEW_CALENDAR_LABEL)
+        stock_txt = (
+            f"<span style='color:orange;font-weight:bold;'>a seulement {qty} dose"
+            f"{'s' if qty != 1 else ''} restante"
+            f"{'s' if qty != 1 else ''}</span>"
+        )
+        stock_txt_fcm = f"a seulement {qty} dose{'s' if qty != 1 else ''} restante{'s' if qty != 1 else ''}"
 
-def _build_generic_text(context: Dict) -> Tuple[str, str, str]:
+    body = _p(f"Le médicament <b>« {med_name} »</b> {stock_txt}.")
+    fcm_body = f"Le médicament « {med_name} » {stock_txt_fcm}."
+
+    return (title, body, fcm_body, VIEW_CALENDAR_LABEL)
+
+
+
+def build_generic_text(context: Dict) -> Tuple[str, str, str]:
+    """
+    Génère le titre, le corps HTML et le libellé du bouton d'action pour une notification générique.
+
+    Paramètres:
+    - context (Dict): Contexte contenant les données nécessaires pour construire le message.
+
+    Retour:
+    - Tuple[str, str, str, str]: Titre, corps HTML, corps FCM et libellé du bouton d'action.
+    """
+
     count = context.get("notification_count")
     if count and count > 1:
         title = "🔔 Nouvelles notifications"
         body = _p(f"Vous avez <b>{count}</b> nouvelles notifications dans MediTime.")
-        return (title, body, "Voir les notifications")
+        fcm_body = f"Vous avez {count} nouvelles notifications dans MediTime."
+        return (title, body, fcm_body, "Voir les notifications")
 
     title = "🔔 Nouvelle notification"
     body = _p("Vous avez reçu une nouvelle notification dans MediTime.")
-    return (title, body, "Voir les notifications")
+    fcm_body = "Vous avez reçu une nouvelle notification dans MediTime."
+    return (title, body, fcm_body, "Voir les notifications")
 
 def build_notification_text(notification_type: str, context: Dict) -> Tuple[str, str, str]:
     """
@@ -227,13 +269,14 @@ def build_notification_text(notification_type: str, context: Dict) -> Tuple[str,
 
     if notification_type in NOTIFICATION_TEMPLATES:
         tmpl = NOTIFICATION_TEMPLATES[notification_type]
-        body = _p(tmpl["body"].format(sender=sender, cal=cal))
-        return (tmpl["title"], body, tmpl["cta"])
+        body = _p(tmpl["body"].format(sender=f"<b>{sender}</b>", cal=f"<b>{cal}</b>"))
+        fcm_body = tmpl["body"].format(sender=sender, cal=cal)
+        return (tmpl["title"], body, fcm_body, tmpl["cta"])
 
     if notification_type == "low_stock":
-        return _build_low_stock_text(context, cal)
+        return build_low_stock_text(context, cal)
 
-    return _build_generic_text(context)
+    return build_generic_text(context)
 
 
 def generate_email_content(notification_type: str, context: Dict) -> Tuple[str, str, str]:
@@ -245,9 +288,9 @@ def generate_email_content(notification_type: str, context: Dict) -> Tuple[str, 
     - context (Dict): Contexte contenant les données nécessaires pour construire le message.
 
     Retour:
-    - Tuple[str, str, str]: Sujet, corps texte et HTML complet de l'email.
+    - Tuple[str, str, str]: Sujet de l'email, corps texte et corps HTML.
     """
-    title, body_html, cta_label = build_notification_text(notification_type, context)
+    title, body_html, fcm_body, cta_label = build_notification_text(notification_type, context)
     link = f"{Config.FRONTEND_URL}{context.get('link') or f'/notifications'}"
     html = f"""
         <p style="font-size:16px;color:#555;white-space:pre-line;">{body_html}</p>
@@ -262,12 +305,12 @@ def generate_email_content(notification_type: str, context: Dict) -> Tuple[str, 
         </p>
     """
     # Sujet unifié
-    return f"MediTime – {title}", body_html, html
+    return f"MediTime – {title}", fcm_body,  html
 
 
 
 # ========= Persistance Web =========
-def _cleanup_old_notifications(cur, user_id: str, notification_type: str, item: dict):
+def cleanup_old_notifications(cur, user_id: str, notification_type: str, item: dict):
     """
     Nettoie les anciennes notifications similaires.
     
@@ -345,19 +388,16 @@ def save_notifications(user_id: str, notification_type: str, items: List[Dict]):
     try:
         # Utilisation de get_connection() standard (RLS actif)
         # La policy "Users can insert sent notifications" permet l'insertion si sender_uid = auth.uid()
-        with get_connection() as conn, conn.cursor() as cur:
-            for item in items:
-                title, body_html, _ = build_notification_text(notification_type, item)
-                content = {**item, "title": title, "body": body_html}
-                
-                _cleanup_old_notifications(cur, user_id, notification_type, item)
+        with get_connection(skip_rls=True) as conn, conn.cursor() as cur:
+            for item in items:                
+                cleanup_old_notifications(cur, user_id, notification_type, item)
                 
                 cur.execute(
                     """
                     INSERT INTO notifications (
-                        user_id, type, read, timestamp, sender_uid, calendar_id, content, medication_id, shared_calendar_id
+                        user_id, type, read, timestamp, sender_uid, calendar_id, medication_id, shared_calendar_id
                     )
-                    VALUES (%s, %s, %s, NOW(), %s, %s, %s::jsonb, %s, %s)
+                    VALUES (%s, %s, %s, NOW(), %s, %s, %s, %s)
                     """,
                     (
                         user_id,
@@ -365,22 +405,26 @@ def save_notifications(user_id: str, notification_type: str, items: List[Dict]):
                         False,
                         item.get("sender_uid"),
                         item.get("calendar_id"),
-                        json.dumps(content),
                         item.get("medication_id"),
                         item.get("shared_calendar_id")
                     ),
                 )
             conn.commit()
+
+        log_backend.info(
+            "Notifications enregistrées",
+            {"origin": "WEB", "code": "SAVE_SUCCESS", "uid": user_id, "count": len(items)},
+        )
     except Exception as e:
         log_backend.error(
             "Erreur save_notifications",
-            {"origin": ORIGIN, "code": "SAVE_ERROR", "uid": user_id, "error": str(e), "trace": traceback.format_exc()},
+            {"origin": "WEB", "code": "SAVE_ERROR", "uid": user_id, "error": str(e), "trace": traceback.format_exc()},
         )
 
 
 
 # ========= Envois par canal =========
-def _get_fcm_tokens(user_id: str) -> List[str]:
+def get_fcm_tokens(user_id: str) -> List[str]:
     """
     Récupère la liste des tokens FCM pour un utilisateur (pour notifications push).
 
@@ -390,39 +434,45 @@ def _get_fcm_tokens(user_id: str) -> List[str]:
     Retour:
     - List[str]: Liste des tokens FCM.
     """
-    # Utilisation de get_connection() standard (RLS actif)
-    # Utilisation de la fonction RPC sécurisée pour contourner RLS sur fcm_tokens
     with get_connection() as conn, conn.cursor() as cur:
         cur.execute("SELECT token FROM get_fcm_tokens_for_user(%s)", (user_id,))
         return [r["token"] for r in cur.fetchall()]
 
 
-def send_push_notification(user_id: str, context: Dict, notification_type: str):
+def send_push_notification(user: Dict, context: Dict, notification_type: str):
     """
     Envoie une notification push via FCM à l'utilisateur (si tokens disponibles).
     Le corps est converti en texte brut pour compatibilité mobile.
+
+    Paramètres:
+    - user (Dict): Dictionnaire utilisateur contenant au moins l'ID.
+    - context (Dict): Contexte de la notification.
+    - notification_type (str): Type de notification.
     """
-    title, body_html, _ = build_notification_text(notification_type, context)
-    tokens = _get_fcm_tokens(user_id)
+    title, _, fcm_body, _ = build_notification_text(notification_type, context)
+    tokens = get_fcm_tokens(user.get("id"))
     if tokens:
-        # Pour push, on passe le body en texte court (sans HTML)
-        plain_body = _html_to_plain(body_html)
-        send_fcm_notification(tokens, title, plain_body, context)
+        send_fcm_notification(tokens, title, fcm_body, context)
     else:
-        log_backend.warning("Aucun token FCM trouvé", {"origin": ORIGIN, "code": "NO_FCM_TOKEN", "uid": user_id})
+        log_backend.warning("Aucun token FCM trouvé", {"origin": "FCM", "code": "NO_FCM_TOKEN", "uid": user.get("id")})
 
 
 def send_email_notification(user: Dict, context: Dict, notification_type: str):
     """
     Envoie un email à l'utilisateur (si email renseigné).
     Utilise le template standard MediTime.
+
+    Paramètres:
+    - user (Dict): Dictionnaire utilisateur contenant au moins l'email.
+    - context (Dict): Contexte de la notification.
+    - notification_type (str): Type de notification.
     """
     email = user.get("email")
     if not email:
         log_backend.warning("Aucun email pour l'utilisateur", {"origin": ORIGIN, "code": "NO_EMAIL", "uid": user.get("id")})
         return
-    subject, plain_body, html_content = generate_email_content(notification_type, context)
-    send_email(to=email, subject=subject, html_content=html_content, plain=_html_to_plain(plain_body))
+    subject, fcm_body, html_content = generate_email_content(notification_type, context)
+    send_email(to=email, subject=subject, html_content=html_content, plain=fcm_body)
 
 
 def send_sms_notification(user: Dict, context: Dict, notification_type: str):
@@ -437,41 +487,15 @@ def send_sms_notification(user: Dict, context: Dict, notification_type: str):
     """
     phone = user.get("phone")
     if not phone:
-        log_backend.warning("Aucun numéro de téléphone", {"origin": ORIGIN, "code": "NO_PHONE_NUMBER", "uid": user.get("id")})
+        log_backend.warning("Aucun numéro de téléphone", {"origin": "SMS", "code": "NO_PHONE_NUMBER", "uid": user.get("id")})
         return
     # SMS = version texte courte
-    title, body_html, _ = build_notification_text(notification_type, context)
-    plain = f"{title} — {_html_to_plain(body_html)}"
-    send_sms(phone, plain)
-
-
-def _html_to_plain(html: str) -> str:
-    """
-    Conversion ultra simple du HTML vers du texte brut (pour push/SMS).
-    Retire les balises <b>, <p>, <span> et remplace les entités de base.
-
-    Paramètres:
-    - html (str): Contenu HTML à convertir.
-
-    Retour:
-    - str: Contenu texte brut.
-    """
-    return (
-        html.replace("<b>", "")
-        .replace("</b>", "")
-        .replace("<p>", "")
-        .replace("</p>", " ")
-        .replace("<span style='color:red;font-weight:bold;'>", "")
-        .replace("<span style='color:orange;font-weight:bold;'>", "")
-        .replace("</span>", "")
-        .replace("&nbsp;", " ")
-        .strip()
-    )
-
-
+    title, _, fcm_body, _ = build_notification_text(notification_type, context)
+    message = f"{title} — {fcm_body}"
+    send_sms(phone, message)
 
 # ========= Orchestration =========
-def _prepare_grouped_context(items: List[Dict], notification_type: str) -> Dict:
+def prepare_grouped_context(items: List[Dict], notification_type: str) -> Dict:
     """
     Prépare le contexte pour les notifications groupées.
     
@@ -496,10 +520,16 @@ def _prepare_grouped_context(items: List[Dict], notification_type: str) -> Dict:
 def send_grouped_notifications(user_id: str, items: List[Dict], notification_type: str, channels: List[str]):
     """
     Envoie un groupe de notifications à un utilisateur via les canaux spécifiés.
+
+    Paramètres:
+    - user_id (str): Identifiant de l'utilisateur.
+    - items (List[Dict]): Liste des notifications à envoyer.
+    - notification_type (str): Type de notification.
+    - channels (List[str]): Canaux par lesquels envoyer les notifications.
     """
     try:
         user = fetch_user(user_id) or {}
-        context = _prepare_grouped_context(items, notification_type)
+        context = prepare_grouped_context(items, notification_type)
 
         if "web" in channels:
             save_notifications(user_id, notification_type, items)
@@ -513,7 +543,7 @@ def send_grouped_notifications(user_id: str, items: List[Dict], notification_typ
 
         for channel, pref_key, send_func in channel_actions:
             if channel in channels and user.get(pref_key):
-                send_func(user_id if channel == "push" else user, context, notification_type)
+                send_func(user, context, notification_type)
 
     except Exception as e:
         log_backend.error(
@@ -559,8 +589,8 @@ def email_address_direct(to_email: str, notification_type: str, context: Dict):
     """
     try:
         enriched_context = enrich_notification(context.copy())
-        subject, plain_body, html_content = generate_email_content(notification_type, enriched_context)
-        send_email(to=to_email, subject=subject, html_content=html_content, plain=_html_to_plain(plain_body))
+        subject, fcm_body, html_content = generate_email_content(notification_type, enriched_context)
+        send_email(to=to_email, subject=subject, html_content=html_content, plain=fcm_body)
     except Exception as e:
         log_backend.error(
             "Erreur email_address_direct",
