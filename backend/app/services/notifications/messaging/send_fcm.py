@@ -20,7 +20,7 @@ def delete_fcm_token(token: str):
             cursor.execute("DELETE FROM fcm_tokens WHERE token = %s", (token,))
             conn.commit()
 
-def _create_fcm_payload(token: str, title: str, body: str, json_body: dict) -> dict:
+def _create_fcm_payload(token: str, title: str, body: str, context: dict) -> dict:
     """
     Crée le payload pour la notification FCM.
 
@@ -28,34 +28,35 @@ def _create_fcm_payload(token: str, title: str, body: str, json_body: dict) -> d
     - token (str): Le token de l'appareil cible.
     - title (str): Le titre de la notification.
     - body (str): Le corps de la notification.
-    - json_body (dict): Le corps JSON additionnel pour la notification.
+    - context (dict): Le corps JSON additionnel pour la notification.
 
     Retour:
     - dict: Le payload de la notification FCM.
     """
+    icon_url = urljoin(frontend_url, "/icons/icon-192.png")
+
     return {
         "message": {
             "token": token,
-            "notification": {
-                "title": title,
-                "body": body,
-                "image": urljoin(frontend_url or "", "/icons/icon-192.png")
-            },
             "webpush": {
+                "notification": {
+                    "title": title,
+                    "body": body,
+                    "icon": icon_url,
+                },
                 "fcm_options": {
-                    "link": f"{Config.FRONTEND_URL}{json_body.get('link') or f'/notifications'}"
+                    "link": f"{Config.FRONTEND_URL}{context.get('link') or '/notifications'}"
                 }
             }
         }
     }
-
-def send_fcm_notification(tokens: list, title: str, plain_body: str, context: dict):
+def send_fcm_notification(tokens: list, title: str, body: str, context: dict):
     """Envoie une notification FCM aux tokens spécifiés.
 
     Paramètres:
     - tokens (list): Liste des tokens d'appareils cibles.
     - title (str): Titre de la notification.
-    - plain_body (str): Corps de la notification en texte brut.
+    - body (str): Corps de la notification en texte brut.
     - context (dict): Corps JSON additionnel pour la notification.
     """
     access_token, project_id = get_fcm_access_token()
@@ -67,7 +68,7 @@ def send_fcm_notification(tokens: list, title: str, plain_body: str, context: di
     }
 
     for token in tokens:
-        payload = _create_fcm_payload(token, title, plain_body, context)
+        payload = _create_fcm_payload(token, title, body, context)
 
         response = requests.post(url, headers=headers, json=payload)
         try:

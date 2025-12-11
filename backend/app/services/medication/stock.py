@@ -148,7 +148,7 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
         grouped: dict[str, list[dict]] = defaultdict(list)
         for result in results:
             med_id = result.get("id")
-            link = f"/medication/{med_id}"
+            link = f"/calendar/{calendar_id}/stock-alerts"
             uid_owner = result.get("owner_uid")
 
             notif = {
@@ -170,7 +170,11 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
 
         for uid, notifs in grouped.items():
             try:
-                notify_and_record(user_id=uid, body_or_list=notifs, notification_type="low_stock")
+                notify_and_record(
+                    user_id=uid, 
+                    body_or_list=notifs, 
+                    notification_type="low_stock"
+                )
                 log_backend.info(
                     "Notifications de stock faible envoyées pour le calendrier",
                     {

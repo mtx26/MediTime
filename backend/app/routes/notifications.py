@@ -7,7 +7,6 @@ from flask import request, g
 from app.config import Config
 from app.utils.measure import measure_time
 from app.utils import with_query_origin
-from app.services.notifications import notify_and_record
 
 frontend_url = Config.FRONTEND_URL or ""
 
@@ -72,7 +71,8 @@ def handle_notifications():
         COALESCE(u.photo_url, %s)              AS sender_photo_url,
         mb.name                                AS medication_name,
         mb.stock_quantity                      AS medication_qty,
-        sc.accepted                            AS accepted
+        sc.accepted                            AS accepted,
+        sc.token                               AS token
 
     FROM notifications n
     LEFT JOIN calendars c                    ON c.id  = n.calendar_id

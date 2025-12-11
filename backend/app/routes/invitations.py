@@ -367,7 +367,7 @@ def delete_login_invitation(token: str):
                 conn.commit()
 
         # Notifier le receveur que le partage a été retiré
-        link = f"/calendar/{calendar_id}"
+        link = "/calendars"
         notify_and_record(
             user_id=receiver_uid,
             body_or_list={
@@ -672,12 +672,13 @@ def accept_registration_invitation(token: str):
                         status_code=404,
                         log_extra={"token": token},
                     )
+        link = f"/shared-calendars?calendar={calendar_id}"
 
         notify_and_record(
             user_id=owner_uid,
             body_or_list={
                 "calendar_id": calendar_id,
-                "link": f"/shared-calendars?calendar={calendar_id}",
+                "link": link,
                 "sender_uid": uid,
                 "shared_calendar_id" : shared_calendar_id,
             },
