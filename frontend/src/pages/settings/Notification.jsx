@@ -53,16 +53,16 @@ export default function Notification({ fcm }) {
           {t('notification.push_toggle')}
         </label>
       </div>
-      <div className="card bg-light border-0 mb-3 p-0">
-        <div className="card-body d-flex flex-column flex-md-row align-items-center justify-content-between py-2 px-3 gap-3">
-          <div className="d-flex align-items-center mb-2 mb-md-0">
-            <i className="bi bi-bell-fill text-primary me-2" style={{fontSize: '1.3rem'}}></i>
-            <div>
-              <div className="fw-semibold text-dark" style={{fontSize: '1rem'}}>{t('fcm.device_registration')}</div>
-              <div className="text-secondary small">{t('fcm.device_registration_desc')}</div>
+      {notificationNotSupported ? null : (
+        <div className="card bg-light border-0 mb-3 p-0">
+          <div className="card-body d-flex flex-column flex-md-row align-items-center justify-content-between py-2 px-3 gap-3">
+            <div className="d-flex align-items-center mb-2 mb-md-0">
+              <i className="bi bi-bell-fill text-primary me-2" style={{fontSize: '1.3rem'}}></i>
+              <div>
+                <div className="fw-semibold text-dark" style={{fontSize: '1rem'}}>{t('fcm.device_registration')}</div>
+                <div className="text-secondary small">{t('fcm.device_registration_desc')}</div>
+              </div>
             </div>
-          </div>
-          {notificationNotSupported ? null : (
             <button 
               className={`btn btn-sm d-flex align-items-center ${notificationsEnabled ? 'btn-success' : 'btn-primary fw-bold'}`}
               onClick={async () => {
@@ -88,9 +88,9 @@ export default function Notification({ fcm }) {
                 </>
               )}
             </button>
-          )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

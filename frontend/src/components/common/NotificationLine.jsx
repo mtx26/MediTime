@@ -57,7 +57,7 @@ export default function NotificationLine({
               aria-label={t('accept')}
               title={t('accept')}
               className="btn btn-sm btn-outline-success me-2"
-              to={notif.link}
+              to={`/accept-invite?token=${notif.token}&type=login`}
               onClick={(e) => {
                 e.stopPropagation();
               }}
@@ -66,6 +66,7 @@ export default function NotificationLine({
             </Link>
           </div>
         );
+        link = `/accept-invite?token=${notif.token}&type=login`;
       } else {
         message = (
           <Trans
@@ -89,6 +90,7 @@ export default function NotificationLine({
             </Link>
           </div>
         );
+        link = `/${lng}/shared-user-calendar/${notif.calendar_id}`;
       }
       break;
 
@@ -158,7 +160,7 @@ export default function NotificationLine({
           components={[<strong />]}
         />
       );
-      link = notif.link;
+      link =  `/${lng}/calendar/${notif.calendar_id}/stock-alerts`;
       break;
 
     default:
@@ -173,27 +175,45 @@ export default function NotificationLine({
           : 'bg-light text-muted'
       }`}
     >
-      <div
-        onClick={() => {
-          isUnread && onRead(notif.notification_id);
-          link && navigate(link);
-        }}
-        style={{ cursor: isUnread || link ? 'pointer' : 'default' }}
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+      {link ? (
+        <Link
+          to={link}
+          onClick={(e) => {
+            e.stopPropagation();
             isUnread && onRead(notif.notification_id);
-            link && navigate(link);
-          }
-        }}
-      >
-        <p className="mb-0">
-          {icon}
-          {message}
-        </p>
-        {actions}
-        <small className="text-muted d-block mt-2">{timestamp}</small>
-      </div>
+          }}
+          style={{ cursor: isUnread || link ? 'pointer' : 'default' }}
+          className="text-decoration-none d-block text-reset"
+          tabIndex={0}
+        >
+          <p className="mb-0">
+            {icon}
+            {message}
+          </p>
+          {actions}
+          <small className="text-muted d-block mt-2">{timestamp}</small>
+        </Link>  
+      ) : (
+        <div
+          onClick={() => {
+            isUnread && onRead(notif.notification_id);
+          }}
+          style={{ cursor: isUnread || link ? 'pointer' : 'default' }}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              isUnread && onRead(notif.notification_id);
+            }
+          }}
+        >
+          <p className="mb-0">
+            {icon}
+            {message}
+          </p>
+          {actions}
+          <small className="text-muted d-block mt-2">{timestamp}</small>
+        </div>
+      )}
     </li>
   );
 }
