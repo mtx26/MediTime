@@ -9,7 +9,7 @@ import { updateUserInfo } from '../../services/auth/authService';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const Account = ({ sharedProps }) => {
+export default function Account() {
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
   const uid = userInfo?.uid ?? null;
@@ -235,5 +235,3 @@ const Account = ({ sharedProps }) => {
     </>
   );
 };
-
-export default Account;

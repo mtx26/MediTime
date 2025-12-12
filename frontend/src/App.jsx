@@ -4,16 +4,15 @@ import { useParams, useLocation } from 'react-router-dom';
 import Navbar from './components/common/Header';
 import Footer from './components/common/Footer';
 import AppRoutes from './routes/AppRouter';
-import { log } from './utils/logger';
 import { UserContext } from './contexts/UserContext';
 import { toISO } from './utils/calendar/dateUtils';
 import RealtimeManager from './components/realtime/RealtimeManager';
-import { getToken } from './services/supabase/tokenUtils';
 import { performApiCall } from './services/api/apiUtils';
 import { useTranslation } from 'react-i18next';
 import I18nHead from './components/common/I18nHead';
 import StructuredData from './components/common/StructuredData';
 import OnboardingTour from './components/onboarding/OnboardingTour';
+import { requestPermissionAndGetToken } from './services/firebase/firebase';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -868,7 +867,23 @@ function App() {
     const url = `${API_URL}/api/calendars/${calendarId}/pdf`;
     window.open(url, '_blank');
   }, []);
-  
+
+  // 🔐 Demande de permission et envoi du token
+  const sendTokenToBackend = useCallback(async () => {
+
+    const token = await requestPermissionAndGetToken(uid)
+    if (!token) console.warn('FCM token not available');
+
+    return await performApiCall({
+      url: `${API_URL}/api/notifications/register-token`,
+      method: 'POST',
+      body: { token },
+      origin: 'FCM_TOKEN_SEND',
+      uid,
+      analyticsEvent: 'FCM_TOKEN_SEND',
+      analyticsData: { uid, token },
+    });
+  } , []);
   
 
   const sharedProps = {
@@ -946,7 +961,9 @@ function App() {
       notificationsData,
       setNotificationsData,
     },
-
+    fcm: {
+      sendTokenToBackend,
+    },
     loadingStates: {
       isInitialLoading,
     },
@@ -984,57 +1001,28 @@ function App() {
       navigator.serviceWorker
         .register('/firebase-messaging-sw.js')
         .then((registration) => {
-          log.info(t('fcm.sw_registered'), registration, {
-            origin: 'FCM_SW_REGISTER_SUCCESS',
+          console.log(t('fcm.sw_registered'), {
+            origin: 'FCM_SW_REGISTER',
+            code: 'FCM_SW_REGISTER_SUCCESS',
+            registration,
           });
         })
         .catch((err) => {
-          log.error(t('fcm.sw_error'), err, {
-            origin: 'FCM_SW_REGISTER_ERROR',
+          console.error(t('fcm.sw_error'), {
+            origin: 'FCM_SW_REGISTER',
+            code: 'FCM_SW_REGISTER_ERROR',
+            error: err,
           });
         });
     }
-
-    // 🔐 Demande de permission et envoi du token
-    const sendTokenToBackend = async () => {
-      const { requestPermissionAndGetToken } = await import('./services/firebase/firebase');
-      const tokenFcm = await requestPermissionAndGetToken(userInfo?.uid);
-      const token = await getToken();
-      if (!token || !userInfo?.uid) return;
-
-      // 🎯 Envoi du token FCM au backend Flask
-      fetch(`${API_URL}/api/notifications/register-token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          token: tokenFcm,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          log.info(t('fcm.token_registered'), {
-            uid: userInfo.uid,
-            token: tokenFcm,
-            origin: 'FCM_TOKEN',
-            code: 'FCM_TOKEN_REGISTER_SUCCESS',
-          });
-        })
-        .catch((error) => {
-          log.error(t('fcm.token_send_error'), {
-            uid: userInfo.uid,
-            token: tokenFcm,
-            origin: 'FCM_TOKEN',
-            code: 'FCM_TOKEN_REGISTER_ERROR',
-            error: error,
-          });
-        });
-    };
-
-    sendTokenToBackend();
   }, [userInfo?.uid]);
+
+  useEffect(() => {
+    const fcmNotificationsEnabled = window?.Notification?.permission === 'granted' || false;
+    if (fcmNotificationsEnabled) {
+      sendTokenToBackend();
+    }
+  }, [window?.Notification?.permission, sendTokenToBackend]);
 
   useEffect(() => {
     if (lng && i18n.language !== lng) {

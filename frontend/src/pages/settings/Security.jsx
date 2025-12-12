@@ -5,7 +5,7 @@ import AlertSystem from '../../components/common/AlertSystem';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useTranslation } from 'react-i18next';
 
-const Security = ({ sharedProps }) => {
+export default function Security() {
   const { t } = useTranslation();
   // 👤 Contexte utilisateur
   const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
@@ -185,5 +185,3 @@ const Security = ({ sharedProps }) => {
     </div>
   );
 };
-
-export default Security;

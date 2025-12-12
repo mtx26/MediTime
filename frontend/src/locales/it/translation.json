@@ -61,7 +61,8 @@
       "facebook": "Facebook",
       "github": "Github",
       "google": "Google",
-      "twitter": "Cinguettio"
+      "twitter": "Cinguettio",
+      "microsoft": "Microsoft"
     },
     "register": "Registrazione",
     "register_with": "Registrati con:",
@@ -72,7 +73,8 @@
     "with_facebook": "Accedi con Facebook",
     "with_github": "Connessione con Github",
     "with_google": "Accedi con Google",
-    "with_twitter": "Connettiti con Twitter"
+    "with_twitter": "Connettiti con Twitter",
+    "with_microsoft": "Accedi con Microsoft"
   },
   "auth_callback": {
     "loading": "Connessione in corso...",
@@ -230,10 +232,15 @@
   "expired": "Scaduto",
   "expires_at": "Scade il",
   "fcm": {
-    "sw_error": "[FCM] Errore SW",
-    "sw_registered": "[FCM] SW registrato",
     "token_registered": "[FCM] Token registrato sul lato backend",
-    "token_send_error": "[FCM] Errore durante l'invio del token"
+    "token_send_error": "[FCM] Errore durante l'invio del token",
+    "device_registration": "Ricevi notifiche su questo dispositivo",
+    "device_registration_desc": "Abilita le notifiche push per rimanere informato in tempo reale sui promemoria e sugli avvisi relativi ai tuoi farmaci.",
+    "enable_btn": "Abilita le notifiche",
+    "enabled_msg": "Notifiche abilitate!",
+    "sw_registered": "Lavoratore dei servizi registrato",
+    "sw_error": "Errore di registrazione del Service Worker",
+    "reload": "Ricaricare"
   },
   "features": {
     "desc1": "Pianifica i tuoi scatti, ricevi promemoria e vivi in tutta tranquillità.",

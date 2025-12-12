@@ -61,7 +61,8 @@
       "facebook": "Facebook",
       "github": "Github",
       "google": "Google",
-      "twitter": "Twitter"
+      "twitter": "Twitter",
+      "microsoft": "Microsoft"
     },
     "register": "Anmeldung",
     "register_with": "Registrieren mit:",
@@ -72,7 +73,8 @@
     "with_facebook": "Mit Facebook anmelden",
     "with_github": "Verbindung mit Github",
     "with_google": "Mit Google anmelden",
-    "with_twitter": "Verbinden Sie sich mit Twitter"
+    "with_twitter": "Verbinden Sie sich mit Twitter",
+    "with_microsoft": "Mit Microsoft anmelden"
   },
   "auth_callback": {
     "loading": "Verbinden...",
@@ -230,10 +232,15 @@
   "expired": "Abgelaufen",
   "expires_at": "Läuft ab am",
   "fcm": {
-    "sw_error": "[FCM] SW-Fehler",
-    "sw_registered": "[FCM] SW aufgezeichnet",
     "token_registered": "[FCM] Token auf der Backend-Seite registriert",
-    "token_send_error": "[FCM] Fehler beim Senden des Tokens"
+    "token_send_error": "[FCM] Fehler beim Senden des Tokens",
+    "device_registration": "Benachrichtigungen auf diesem Gerät empfangen",
+    "device_registration_desc": "Aktivieren Sie Push-Benachrichtigungen, um in Echtzeit über Ihre Medikamentenerinnerungen und -warnungen informiert zu bleiben.",
+    "enable_btn": "Benachrichtigungen aktivieren",
+    "enabled_msg": "Benachrichtigungen aktiviert!",
+    "sw_registered": "Registrierter Dienstleistungsarbeiter",
+    "sw_error": "Fehler bei der Registrierung von Service Workern",
+    "reload": "Aufladen"
   },
   "features": {
     "desc1": "Planen Sie Ihre Aufnahmen, erhalten Sie Erinnerungen und seien Sie beruhigt.",

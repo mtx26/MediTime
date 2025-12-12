@@ -61,7 +61,8 @@
       "facebook": "Facebook",
       "github": "GitHub",
       "google": "Google",
-      "twitter": "Twitter"
+      "twitter": "Twitter",
+      "microsoft": "Microsoft"
     },
     "register": "Registro",
     "register_with": "Registre-se com:",
@@ -72,7 +73,8 @@
     "with_facebook": "Entrar com o Facebook",
     "with_github": "Conectando com o Github",
     "with_google": "Entrar com o Google",
-    "with_twitter": "Conecte-se com o Twitter"
+    "with_twitter": "Conecte-se com o Twitter",
+    "with_microsoft": "Iniciar sessão com a Microsoft"
   },
   "auth_callback": {
     "loading": "Conectando...",
@@ -230,10 +232,15 @@
   "expired": "Expirado",
   "expires_at": "Expira em",
   "fcm": {
-    "sw_error": "[FCM] Erro de SW",
-    "sw_registered": "[FCM] SW gravado",
     "token_registered": "[FCM] Token registrado no backend",
-    "token_send_error": "[FCM] Erro ao enviar token"
+    "token_send_error": "[FCM] Erro ao enviar token",
+    "device_registration": "Receba notificações neste dispositivo",
+    "device_registration_desc": "Ative as notificações push para ficar informado em tempo real sobre seus lembretes e alertas de medicação.",
+    "enable_btn": "Ativar notificações",
+    "enabled_msg": "Notificações ativadas!",
+    "sw_registered": "Trabalhador de serviço registrado",
+    "sw_error": "Erro no cadastro de funcionário de serviço",
+    "reload": "Recarregar"
   },
   "features": {
     "desc1": "Agende suas vacinas, receba lembretes e fique tranquilo.",

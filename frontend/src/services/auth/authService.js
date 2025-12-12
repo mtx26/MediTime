@@ -199,6 +199,9 @@ export const registerWithEmail = async (email, password, name, redirect) => {
       password,
       options: {
         emailRedirectTo: buildCallbackUrl(redirect),
+        data: {
+          full_name: name,
+        },
       },
     });
     if (error) {

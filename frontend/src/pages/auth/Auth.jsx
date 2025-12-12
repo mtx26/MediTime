@@ -82,6 +82,9 @@ function Auth() {
       origin: 'Auth.jsx',
       user: userInfo?.uid,
     });
+    setDuration(4000);
+    setAlertMessage(t('auth.verification_sent'));
+    setAlertType('success');
   };
 
   const handleSubmit = async (e) => {
