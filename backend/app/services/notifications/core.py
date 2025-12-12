@@ -312,76 +312,7 @@ def generate_email_content(notification_type: str, context: Dict) -> Tuple[str, 
             <a href="{link}" style="color:#007bff;">{link}</a>
         </p>
     """
-    # Sujet unifié
     return f"MediTime – {title}", fcm_body,  html
-
-
-
-# ========= Persistance Web =========
-def cleanup_old_notifications(cur, user_id: str, notification_type: str, item: dict):
-    """
-    Nettoie les anciennes notifications similaires.
-    
-    Paramètres:
-    - cur: Curseur de la base de données.
-    - user_id (str): Identifiant de l'utilisateur.
-    - notification_type (str): Type de notification.
-    - item (Dict): Données de la notification actuelle.
-    """
-    # Règles de nettoyage : quels types supprimer et sur quels champs matcher
-    cleanup_rules = {
-        "low_stock": {
-            "types": ["low_stock"],
-            "fields": ["sender_uid", "calendar_id", "medication_id"]
-        },
-        "calendar_invitation_accepted": {
-            "types": ["calendar_invitation_accepted"],
-            "fields": ["sender_uid", "calendar_id"]
-        },
-        "calendar_shared_deleted_by_owner": {
-            "types": ["calendar_shared_deleted_by_owner"],
-            "fields": ["sender_uid", "calendar_id"]
-        },
-        "calendar_invitation": {
-            # Si on reçoit une invitation, on supprime l'ancienne invitation 
-            # ET l'éventuelle notification de suppression de partage précédente
-            "types": ["calendar_invitation", "calendar_shared_deleted_by_owner"],
-            "fields": ["sender_uid", "calendar_id"]
-        }
-    }
-
-    rule = cleanup_rules.get(notification_type)
-    # Si pas de règle spécifique, on ne fait rien
-    if not rule:
-        return
-
-    target_types = rule["types"]
-    match_fields = rule["fields"]
-
-    # Vérification que l'item a bien les champs nécessaires
-    if not all(item.get(f) for f in match_fields):
-        return
-
-    # Construction de la requête DELETE
-    conditions = [sql.SQL("user_id = %s")]
-    params = [user_id]
-
-    # Clause WHERE type IN (...)
-    conditions.append(sql.SQL("type IN ({})").format(
-        sql.SQL(', ').join([sql.Placeholder()] * len(target_types))
-    ))
-    params.extend(target_types)
-
-    # Clauses pour les champs de correspondance
-    for field in match_fields:
-        conditions.append(sql.SQL("{} = %s").format(sql.Identifier(field)))
-        params.append(item.get(field))
-
-    query = sql.SQL("DELETE FROM notifications WHERE {}").format(
-        sql.SQL(" AND ").join(conditions)
-    )
-
-    cur.execute(query, params)
 
 def save_notifications(user_id: str, notification_type: str, items: List[Dict]):
     """
@@ -394,12 +325,8 @@ def save_notifications(user_id: str, notification_type: str, items: List[Dict]):
     - items (List[Dict]): Liste des données des notifications à enregistrer.
     """
     try:
-        # Utilisation de get_connection() standard (RLS actif)
-        # La policy "Users can insert sent notifications" permet l'insertion si sender_uid = auth.uid()
         with get_connection(skip_rls=True) as conn, conn.cursor() as cur:
-            for item in items:                
-                cleanup_old_notifications(cur, user_id, notification_type, item)
-                
+            for item in items:  
                 cur.execute(
                     """
                     INSERT INTO notifications (

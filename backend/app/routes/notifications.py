@@ -44,6 +44,73 @@ def get_user_info(uid: str) -> tuple[str | None, str | None, str | None]:
     user = fetch_user(uid)
     return user.get("display_name"), user.get("email"), user.get("photo_url")
 
+
+def clean_notification(cursor):
+    """Nettoie les notifications en supprimant les doublons selon des critères spécifiques.
+    
+    Paramètres:
+    - cursor: Curseur de la base de données pour exécuter les requêtes.
+    """
+
+    cursor.execute("""
+        DELETE FROM notifications
+        WHERE medication_id IS NOT NULL
+        AND type = 'low_stock'
+        AND EXISTS (
+            SELECT 1 FROM medicine_boxes mb
+            WHERE mb.id = notifications.medication_id
+            AND mb.stock_quantity > mb.stock_alert_threshold
+        )
+    """)
+
+    CLEANUP_NOTIFICATIONS_SQL = """
+        WITH ranked AS (
+            SELECT
+                id,
+                ROW_NUMBER() OVER (
+                    PARTITION BY
+                        user_id,
+
+                        CASE
+                            WHEN type = 'low_stock'
+                                THEN 'low_stock'
+                            WHEN type = 'calendar_invitation_accepted'
+                                THEN 'calendar_invitation_accepted'
+                            WHEN type = 'calendar_shared_deleted_by_receiver'
+                                THEN 'calendar_shared_deleted_by_receiver'
+                            WHEN type IN ('calendar_invitation', 'calendar_shared_deleted_by_owner')
+                                THEN 'calendar_invitation'
+                        END,
+
+                        sender_uid,
+                        calendar_id,
+
+                        CASE
+                            WHEN type = 'low_stock' THEN medication_id
+                            ELSE NULL
+                        END
+                    ORDER BY created_at DESC, id DESC
+                ) AS rn
+            FROM notifications
+            WHERE type IN (
+                'low_stock',
+                'calendar_invitation_accepted',
+                'calendar_shared_deleted_by_receiver',
+                'calendar_invitation',
+                'calendar_shared_deleted_by_owner'
+            )
+        )
+        DELETE FROM notifications
+        WHERE id IN (
+            SELECT id
+            FROM ranked
+            WHERE rn > 1
+        );
+        """
+    
+    cursor.execute(CLEANUP_NOTIFICATIONS_SQL)
+
+
 # Route pour récupérer toutes les notifications (enrichies côté SQL)
 @api.route("/notifications", methods=["GET"])
 @measure_time()
@@ -87,17 +154,7 @@ def handle_notifications():
 
     try:
         with get_connection() as conn, conn.cursor() as cursor:
-            # netoyage des low_stock pour lesquelles le stock est redevenu suffisant
-            cursor.execute("""
-                DELETE FROM notifications
-                WHERE medication_id IS NOT NULL
-                AND type = 'low_stock'
-                AND EXISTS (
-                    SELECT 1 FROM medicine_boxes mb
-                    WHERE mb.id = notifications.medication_id
-                    AND mb.stock_quantity > mb.stock_alert_threshold
-                )
-            """)
+            clean_notification(cursor)
             conn.commit()
 
             # Récupération des notifications
