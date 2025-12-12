@@ -72,7 +72,7 @@ export default function HoveredUserProfile({
 
       <Popover.Portal container={containerRef?.current}>
         <Popover.Content
-          sideOffset={8}
+          sideOffset={0}
           align="center"
           className="shadow-lg rounded-3 bg-white border p-3"
           style={{
@@ -96,7 +96,7 @@ export default function HoveredUserProfile({
               <small className="text-muted">{user.email}</small>
             </div>
           </div>
-          <Popover.Arrow className="text-white" />
+          <Popover.Arrow width={20} height={10}/>
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>
