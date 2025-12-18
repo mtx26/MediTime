@@ -78,27 +78,25 @@ def _create_shared_calendar_invite(cursor, receiver_uid: str, calendar_id: str) 
     return (row.get("token"), row.get("id")) if row else (None, None)
 
 
-def _delete_shared_calendar_by_token(cursor, token: str) -> bool:
+def _delete_shared_calendar_by_token(cursor, token: str):
     """Supprime une invitation de partage de calendrier par son token.
 
     Paramètres:
     - cursor: Curseur de la base de données.
     - token: Token de l'invitation à supprimer.
-
-    Retour:
-    - bool: True si la suppression a réussi, False sinon.
     """
+    print(token)
 
     cursor.execute(
         """
         UPDATE shared_calendars
-        SET deleted_at = COALESCE(deleted_at, NOW())
-        WHERE token = %s AND deleted_at IS NULL
-        RETURNING 1
+        SET deleted_at = NOW()
+        WHERE token = %s
+            AND deleted_at IS NULL
+            AND accepted_at IS NULL
         """,
         (token,),
     )
-    return cursor.fetchone() is not None
 
 
 def _delete_invitation_returning_calendar_owner(cursor, token: str) -> tuple[str | None, str | None]:
@@ -365,14 +363,7 @@ def delete_login_invitation(token: str):
         # La policy "Users can delete own or sent notifications" permet la suppression
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                deleted = _delete_shared_calendar_by_token(cursor, token)
-                if not deleted:
-                    return warning_response(
-                        message="calendrier non trouvé",
-                        code="SHARED_USERS_DELETE_ERROR",
-                        status_code=404,
-                        log_extra={"token": token},
-                    )
+                _delete_shared_calendar_by_token(cursor, token)
 
                 # Supprimer la notif d'invitation côté receveur
                 _delete_invite_notification(cursor, receiver_uid, calendar_id, owner_uid)
@@ -490,8 +481,15 @@ def handle_reject_login_invitation(token: str):
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    "DELETE FROM shared_calendars WHERE token = %s",
-                    (token,),
+                    """
+                    UPDATE shared_calendars
+                    SET deleted_at = COALESCE(deleted_at, NOW())
+                    WHERE token = %s
+                      AND receiver_uid = %s
+                      AND accepted_at IS NULL
+                      AND deleted_at IS NULL
+                    """,
+                    (token, uid),
                 )
                 conn.commit()
 

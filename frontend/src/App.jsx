@@ -432,19 +432,6 @@ function App() {
   }, []);
   
 
-  // Fonction pour revoker un token
-  const updateRevokeToken = useCallback(async (token) => {
-    return await performApiCall({
-      url: `${API_URL}/api/tokens/revoke/${token}`,
-      method: 'POST',
-      origin: 'TOKEN_REVOKE',
-      uid,
-      analyticsEvent: 'update_revoke_token',
-      analyticsData: { token, uid },
-    });
-  }, []);
-  
-
   // Fonction pour mettre à jour l'expiration d'un token
   const updateTokenExpiration = useCallback(async (token, expiresAt) => {
     return await performApiCall({
@@ -455,20 +442,6 @@ function App() {
       uid,
       analyticsEvent: 'update_token_expiration',
       analyticsData: { token, uid, expiresAt },
-    });
-  }, []);
-  
-
-  // Fonction pour mettre à jour les permissions d'un token
-  const updateTokenPermissions = useCallback(async (token, permissions) => {
-    return await performApiCall({
-      url: `${API_URL}/api/tokens/permissions/${token}`,
-      method: 'POST',
-      body: { permissions },
-      origin: 'TOKEN_PERMISSIONS_UPDATE',
-      uid,
-      analyticsEvent: 'update_token_permissions',
-      analyticsData: { token, uid, permissions },
     });
   }, []);
   
@@ -948,9 +921,7 @@ function App() {
     tokenCalendars: {
       fetchTokenCalendarSchedule,
       createToken,
-      updateTokenPermissions,
       updateTokenExpiration,
-      updateRevokeToken,
       deleteToken,
       tokensList,
       setTokensList,

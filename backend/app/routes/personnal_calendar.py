@@ -33,6 +33,7 @@ def handle_calendars():
                     LEFT JOIN calendar_settings cs ON cs.calendar_id = c.id
                     LEFT JOIN medicine_boxes mb 
                         ON mb.calendar_id = c.id
+                        AND mb.deleted_at IS NULL
                     WHERE c.owner_uid = %s and c.deleted_at IS NULL
                     GROUP BY c.id, cs.stock_decrement_method
                 """, (uid,))

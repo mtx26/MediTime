@@ -139,7 +139,7 @@ def handle_notifications():
         COALESCE(u.photo_url, %s)              AS sender_photo_url,
         mb.name                                AS medication_name,
         mb.stock_quantity                      AS medication_qty,
-        sc.accepted                            AS accepted,
+        sc.accepted_at IS NOT NULL             AS accepted,
         sc.token                               AS token
 
     FROM notifications n

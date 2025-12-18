@@ -230,6 +230,7 @@ def check_if_stock_is_low(calendar_id: int) -> bool:
                     AND stock_quantity <= stock_alert_threshold 
                     AND stock_alert_threshold > 0
                     AND box_capacity > 0
+                    AND deleted_at IS NULL
                 """,
                 (calendar_id,)
             )

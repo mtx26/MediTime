@@ -46,7 +46,7 @@ def handle_shared_calendars():
                                         JOIN calendars c            ON sc.calendar_id = c.id
                     JOIN users u                ON c.owner_uid = u.id
                     JOIN shared_calendar_settings scs ON scs.shared_calendar_id = sc.id
-                    LEFT JOIN medicine_boxes mb ON mb.calendar_id = c.id
+                    LEFT JOIN medicine_boxes mb ON mb.calendar_id = c.id AND mb.deleted_at IS NULL
                     WHERE sc.receiver_uid = %s
                                             AND sc.accepted_at IS NOT NULL
                                             AND sc.deleted_at IS NULL
@@ -134,16 +134,17 @@ def handle_delete_user_shared_calendar(calendar_id):
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
-                                        UPDATE shared_calendars sc
-                                        SET deleted_at = COALESCE(deleted_at, NOW())
-                                        FROM calendars c
-                                        WHERE sc.calendar_id = c.id
-                                            AND sc.receiver_uid = %s
-                                            AND sc.calendar_id = %s
-                                            AND sc.deleted_at IS NULL
-                                        RETURNING c.owner_uid
+                    UPDATE shared_calendars sc
+                    SET deleted_at = COALESCE(deleted_at, NOW())
+                    FROM calendars c
+                    WHERE sc.calendar_id = c.id
+                        AND sc.receiver_uid = %s
+                        AND sc.calendar_id = %s
+                        AND sc.deleted_at IS NULL
+                    RETURNING c.owner_uid
                 """, (receiver_uid, calendar_id))
                 result = cursor.fetchone()
+                conn.commit()
 
                 if not result:
                     return warning_response(
@@ -291,7 +292,10 @@ def handle_shared_user_notifications(calendar_id):
                     SELECT scs.notifications_enabled 
                     FROM shared_calendar_settings scs 
                     JOIN shared_calendars sc ON scs.shared_calendar_id = sc.id 
-                    WHERE sc.calendar_id = %s AND sc.receiver_uid = %s
+                    WHERE sc.calendar_id = %s 
+                      AND sc.receiver_uid = %s
+                      AND sc.accepted_at IS NOT NULL
+                      AND sc.deleted_at IS NULL
                 """, (calendar_id, g.uid))
                 calendar = cursor.fetchone()
                 if not calendar:
@@ -334,7 +338,11 @@ def handle_shared_user_notifications_update(calendar_id):
                     FROM shared_calendars sc 
                     WHERE shared_calendar_settings.shared_calendar_id = sc.id 
                       AND sc.calendar_id = %s
-                """, (calendar_id,))
+                      AND sc.receiver_uid = %s
+                      AND sc.accepted_at IS NOT NULL
+                      AND sc.deleted_at IS NULL
+                """, (calendar_id, g.uid))
+                conn.commit()
 
         return success_response(
             message="Notifications mises à jour",

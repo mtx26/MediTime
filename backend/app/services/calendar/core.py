@@ -33,6 +33,9 @@ def generate_calendar_schedule(calendar_id: str, start_date: date) -> tuple[list
                     JOIN medicine_boxes box ON box.calendar_id = c.id
                     JOIN medicine_box_conditions cond ON cond.box_id = box.id
                     WHERE c.id = %s
+                        AND box.deleted_at IS NULL
+                        AND cond.deleted_at IS NULL
+                        AND c.deleted_at IS NULL
                 """, (calendar_id,))
 
                 rows = cursor.fetchall()
@@ -332,12 +335,12 @@ def add_pillbox_uses(calendar_id: str, uid: str, base_date: date) -> bool:
                     INSERT INTO pillbox_uses (calendar_id, prepared_at, prepared_by)
                     SELECT %s, %s, %s
                     WHERE NOT EXISTS (
-                                                SELECT 1
-                                                FROM pillbox_uses
-                                                WHERE calendar_id = %s
-                                                    AND prepared_at >= %s
-                                                    AND prepared_at < %s
-                                                    AND restored_at IS NULL
+                    SELECT 1
+                    FROM pillbox_uses
+                    WHERE calendar_id = %s
+                        AND prepared_at >= %s
+                        AND prepared_at < %s
+                        AND restored_at IS NULL
                     )
                     RETURNING 1 AS inserted
                 )
@@ -370,10 +373,10 @@ def get_if_pillbox_is_used(calendar_id: str, base_date: date) -> bool:
                 """
                 SELECT 1 AS result
                 FROM pillbox_uses
-                                WHERE calendar_id = %s
-                                    AND prepared_at >= %s
-                                    AND prepared_at < %s
-                                    AND restored_at IS NULL
+                WHERE calendar_id = %s
+                    AND prepared_at >= %s
+                    AND prepared_at < %s
+                    AND restored_at IS NULL
                 LIMIT 1;
                 """,
                 (calendar_id, monday, next_monday)
@@ -411,8 +414,8 @@ def get_pillbox_uses(calendar_id: str) -> list:
                         FROM get_public_user_info(pu.prepared_by) p
                     ) as prepared_by
                 FROM pillbox_uses pu
-                                WHERE pu.calendar_id = %s
-                                    AND pu.restored_at IS NULL
+                WHERE pu.calendar_id = %s
+                    AND pu.restored_at IS NULL
                 ORDER BY pu.prepared_at DESC;
                 """,
                 (calendar_id,)
@@ -449,7 +452,7 @@ def delete_pillbox_use(calendar_id: str, use_id: str) -> bool:
 
             if restore_pillbox(calendar_id, prepared_at):
                 cursor.execute(
-                    "UPDATE pillbox_uses SET restored_at = COALESCE(restored_at, NOW()) WHERE id = %s",
+                    "UPDATE pillbox_uses SET restored_at = NOW() WHERE id = %s",
                     (use_id,)
                 )
             else:

@@ -92,52 +92,6 @@ def handle_create_token(calendar_id):
         )
 
 
-# Route pour supprimer définitivement un token
-@api.route("/tokens/revoke/<token>", methods=["POST"])
-@measure_time()
-@require_auth
-@verify_token_owner
-@with_query_origin(default_origin="TOKEN_REVOKE")
-def handle_update_revoke_token(token):
-    try:
-
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                # Suppression définitive - pas de réactivation possible
-                cursor.execute("""
-                    UPDATE shared_tokens
-                    SET deleted_at = NOW()
-                    WHERE id = %s AND deleted_at IS NULL
-                    RETURNING id
-                """, (token,))
-                row = cursor.fetchone()
-
-            if not row:
-                return warning_response(
-                    message="token introuvable ou déjà supprimé",
-                    code="TOKEN_NOT_FOUND",
-                    status_code=404,
-                    log_extra={"token": token}
-                )
-
-            conn.commit()
-
-        return success_response(
-            message="token supprimé définitivement",
-            code="TOKEN_DELETED_SUCCESS",
-            log_extra={"token": token}
-        )
-
-    except Exception as e:
-        return error_response(
-            message="erreur lors de la suppression du token",
-            code="TOKEN_DELETE_ERROR",
-            status_code=500,
-            error=str(e),
-            log_extra={"token": token}
-        )
-
-
 # Route pour mettre à jour l'expiration d'un token
 @api.route("/tokens/expiration/<token>", methods=["POST"])
 @measure_time()
