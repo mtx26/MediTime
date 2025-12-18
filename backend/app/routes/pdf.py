@@ -29,7 +29,8 @@ def proxy_pdf(box_id):
                     LEFT JOIN medicaments_afmps ma
                       ON ma.name ILIKE CONCAT('%%', mb.name, '%%')
                      AND ma.dose ILIKE CONCAT('%%', mb.dose, '%%')
-                    WHERE mb.id = %s
+                                        WHERE mb.id = %s
+                                            AND mb.deleted_at IS NULL
                 """, (box_id,))
                 url_result = cursor.fetchone()
 

@@ -43,12 +43,14 @@ def handle_shared_calendars():
                         COUNT(mb.id) AS "boxes_count",
                         COALESCE(BOOL_OR(mb.stock_quantity <= mb.stock_alert_threshold AND mb.stock_alert_threshold > 0 AND mb.box_capacity > 0), FALSE) AS "ifLowStock"
                     FROM shared_calendars sc
-                    JOIN calendars c            ON sc.calendar_id = c.id
+                                        JOIN calendars c            ON sc.calendar_id = c.id
                     JOIN users u                ON c.owner_uid = u.id
                     JOIN shared_calendar_settings scs ON scs.shared_calendar_id = sc.id
                     LEFT JOIN medicine_boxes mb ON mb.calendar_id = c.id
                     WHERE sc.receiver_uid = %s
-                      AND sc.accepted = TRUE
+                                            AND sc.accepted_at IS NOT NULL
+                                            AND sc.deleted_at IS NULL
+                                            AND c.deleted_at IS NULL
                     GROUP BY
                         sc.calendar_id, sc.access, c.id, c.name, c.owner_uid,
                         u.display_name, u.email, u.photo_url, scs.notifications_enabled
@@ -132,12 +134,14 @@ def handle_delete_user_shared_calendar(calendar_id):
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
-                    DELETE FROM shared_calendars sc
-                    USING calendars c
-                    WHERE sc.calendar_id = c.id
-                      AND sc.receiver_uid = %s
-                      AND sc.calendar_id = %s
-                    RETURNING c.owner_uid
+                                        UPDATE shared_calendars sc
+                                        SET deleted_at = COALESCE(deleted_at, NOW())
+                                        FROM calendars c
+                                        WHERE sc.calendar_id = c.id
+                                            AND sc.receiver_uid = %s
+                                            AND sc.calendar_id = %s
+                                            AND sc.deleted_at IS NULL
+                                        RETURNING c.owner_uid
                 """, (receiver_uid, calendar_id))
                 result = cursor.fetchone()
 
@@ -196,8 +200,9 @@ def handle_grouped_shared():
           SELECT jsonb_agg(
                    jsonb_build_object(
                      'receiver_uid', sc.receiver_uid,
-                     'access', sc.access,
-                     'accepted', sc.accepted,
+                                         'access', sc.access,
+                                         'accepted', sc.accepted_at IS NOT NULL,
+                                         'accepted_at', sc.accepted_at,
                      'token', sc.token,
                      'receiver_photo_url', COALESCE(u.photo_url, 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg'),
                      'receiver_name', u.display_name,
@@ -207,7 +212,8 @@ def handle_grouped_shared():
                  )
           FROM shared_calendars sc
           JOIN users u ON u.id = sc.receiver_uid
-          WHERE sc.calendar_id = c.id
+                    WHERE sc.calendar_id = c.id
+                        AND sc.deleted_at IS NULL
         ),
         '[]'::jsonb
       ) AS users,
@@ -217,7 +223,8 @@ def handle_grouped_shared():
         (
             SELECT jsonb_agg(to_jsonb(st) ORDER BY st.created_at)
             FROM shared_tokens st
-            WHERE st.calendar_id = c.id
+                        WHERE st.calendar_id = c.id
+                            AND st.deleted_at IS NULL
         ),
         '[]'::jsonb
         ) AS tokens,
@@ -227,13 +234,15 @@ def handle_grouped_shared():
         (
           SELECT jsonb_agg( (to_jsonb(i) - 'id') ORDER BY i.created_at )
           FROM invitations i
-          WHERE i.calendar_id = c.id
+                    WHERE i.calendar_id = c.id
+                        AND i.deleted_at IS NULL
         ),
         '[]'::jsonb
       ) AS invitations
 
-    FROM calendars c
-    WHERE c.owner_uid = %s
+        FROM calendars c
+        WHERE c.owner_uid = %s
+            AND c.deleted_at IS NULL
     ORDER BY c.name;
     """
 

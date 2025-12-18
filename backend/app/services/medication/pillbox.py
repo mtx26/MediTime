@@ -32,8 +32,10 @@ def use_pillbox(calendar_id: str, start_date: str) -> bool | None:
                     LEFT JOIN calendar_settings cs ON cs.calendar_id = c.id
                     LEFT JOIN medicine_boxes mb
                       ON mb.calendar_id = c.id
-                     AND mb.box_capacity > 0
-                    WHERE c.id = %s
+                      AND mb.box_capacity > 0
+                      AND mb.deleted_at IS NULL
+                                        WHERE c.id = %s
+                                            AND c.deleted_at IS NULL
                     GROUP BY c.id, cs.stock_decrement_method
                 """, (calendar_id,))
                 row = cursor.fetchone()
@@ -96,7 +98,9 @@ def restore_pillbox(calendar_id: str, start_date: str) -> bool:
                     LEFT JOIN medicine_boxes mb
                       ON mb.calendar_id = c.id
                      AND mb.box_capacity > 0
+                     AND mb.deleted_at IS NULL
                     WHERE c.id = %s
+                      AND c.deleted_at IS NULL
                     GROUP BY c.id
                 """, (calendar_id,))
 

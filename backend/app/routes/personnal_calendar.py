@@ -33,7 +33,7 @@ def handle_calendars():
                     LEFT JOIN calendar_settings cs ON cs.calendar_id = c.id
                     LEFT JOIN medicine_boxes mb 
                         ON mb.calendar_id = c.id
-                    WHERE c.owner_uid = %s
+                    WHERE c.owner_uid = %s and c.deleted_at IS NULL
                     GROUP BY c.id, cs.stock_decrement_method
                 """, (uid,))
                 calendars = cursor.fetchall()
@@ -121,8 +121,9 @@ def handle_delete_calendar(calendar_id):
             with conn.cursor() as cursor:
                 # Supprime et vérifie en une seule requête
                 cursor.execute("""
-                    DELETE FROM calendars
-                    WHERE id = %s
+                    UPDATE calendars
+                    SET deleted_at = NOW()
+                    WHERE id = %s AND deleted_at IS NULL
                     RETURNING 1
                 """, (calendar_id,))
                 deleted = cursor.fetchone()

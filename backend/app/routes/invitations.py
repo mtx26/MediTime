@@ -68,11 +68,11 @@ def _create_shared_calendar_invite(cursor, receiver_uid: str, calendar_id: str) 
     """
     cursor.execute(
         """
-        INSERT INTO shared_calendars (receiver_uid, calendar_id, accepted, access)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO shared_calendars (receiver_uid, calendar_id, access)
+        VALUES (%s, %s, %s)
         RETURNING token, id
         """,
-        (receiver_uid, calendar_id, False, "edit"),
+        (receiver_uid, calendar_id, "edit"),
     )
     row = cursor.fetchone()
     return (row.get("token"), row.get("id")) if row else (None, None)
@@ -90,7 +90,12 @@ def _delete_shared_calendar_by_token(cursor, token: str) -> bool:
     """
 
     cursor.execute(
-        "DELETE FROM shared_calendars WHERE token = %s RETURNING 1",
+        """
+        UPDATE shared_calendars
+        SET deleted_at = COALESCE(deleted_at, NOW())
+        WHERE token = %s AND deleted_at IS NULL
+        RETURNING 1
+        """,
         (token,),
     )
     return cursor.fetchone() is not None
@@ -108,15 +113,17 @@ def _delete_invitation_returning_calendar_owner(cursor, token: str) -> tuple[str
     """
 
     cursor.execute(
-        """
-        DELETE FROM invitations i
-        USING calendars c
-        WHERE i.calendar_id = c.id
-          AND i.token = %s
-        RETURNING i.calendar_id, c.owner_uid
-        """,
-        (token,),
-    )
+                """
+                UPDATE invitations i
+                SET deleted_at = COALESCE(deleted_at, NOW())
+                FROM calendars c
+                WHERE i.calendar_id = c.id
+                    AND i.token = %s
+                    AND i.deleted_at IS NULL
+                RETURNING i.calendar_id, c.owner_uid
+                """,
+                (token,),
+        )
     row = cursor.fetchone()
     if not row:
         return (None, None)
@@ -192,15 +199,18 @@ def _handle_existing_user_invite(cursor, calendar_id: str, receiver_uid: str, ow
             log_extra={"calendar_id": calendar_id},
         )
 
-    # Déjà invité ?
-    cursor.execute(
-        """
-        SELECT 1
-        FROM shared_calendars
-        WHERE receiver_uid = %s AND calendar_id = %s
-        """,
-        (receiver_uid, calendar_id),
-    )
+        # Déjà invité ?
+        cursor.execute(
+                """
+                SELECT 1
+                FROM shared_calendars
+                WHERE receiver_uid = %s AND calendar_id = %s
+                    AND accepted_at IS NULL
+                    AND deleted_at IS NULL
+                LIMIT 1
+                """,
+                (receiver_uid, calendar_id),
+        )
     if cursor.fetchone():
         return warning_response(
             message="utilisateur déjà invité",
@@ -302,9 +312,11 @@ def handle_login_invitation(token: str):
                     FROM shared_calendars sc
                     JOIN calendars c ON sc.calendar_id = c.id
                     JOIN users u     ON c.owner_uid = u.id
-                    WHERE sc.token = %s
-                      AND sc.receiver_uid = %s
-                      AND sc.accepted = FALSE
+                                        WHERE sc.token = %s
+                                            AND sc.receiver_uid = %s
+                                            AND sc.accepted_at IS NULL
+                                            AND sc.deleted_at IS NULL
+                                            AND c.deleted_at IS NULL
                     """,
                     (token, uid),
                 )
@@ -414,13 +426,13 @@ def handle_accept_login_invitation(token: str):
             with conn.cursor() as cursor:
                 cursor.execute(
                     """
-                    UPDATE shared_calendars
-                    SET accepted = TRUE,
-                        accepted_at = NOW()
-                    WHERE token = %s
-                      AND receiver_uid = %s
-                      AND accepted = FALSE
-                    RETURNING id
+                                        UPDATE shared_calendars
+                                        SET accepted_at = NOW()
+                                        WHERE token = %s
+                                            AND receiver_uid = %s
+                                            AND accepted_at IS NULL
+                                            AND deleted_at IS NULL
+                                        RETURNING id
                     """,
                     (token, uid),
                 )
@@ -588,7 +600,11 @@ def delete_registration_invitation(token: str):
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    "DELETE FROM invitations WHERE token = %s AND calendar_id = %s",
+                    """
+                    UPDATE invitations
+                    SET deleted_at = COALESCE(deleted_at, NOW())
+                    WHERE token = %s AND calendar_id = %s AND deleted_at IS NULL
+                    """,
                     (token, calendar_id),
                 )
                 conn.commit()
@@ -636,10 +652,9 @@ def _process_accept_registration(cursor, token: str, uid: str) -> tuple[str | No
         INSERT INTO shared_calendars (
             receiver_uid,
             calendar_id,
-            accepted,
             accepted_at
         )
-        VALUES (%s, %s, TRUE, NOW())
+        VALUES (%s, %s, NOW())
         RETURNING id
         """,
         (uid, calendar_id),

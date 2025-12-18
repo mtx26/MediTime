@@ -14,12 +14,13 @@ def decrease_stock():
                 # Récupère d'un coup tous les calendars concernés + leurs boîtes
                 cursor.execute("""
                     SELECT
-                    c.id AS calendar_id,
+                                        c.id AS calendar_id,
                     COALESCE(
                         (
                         SELECT jsonb_agg(to_jsonb(mb) ORDER BY mb.created_at)
                         FROM medicine_boxes mb
-                        WHERE mb.calendar_id = c.id
+                                                WHERE mb.calendar_id = c.id
+                                                    AND mb.deleted_at IS NULL
                         ),
                         '[]'::jsonb
                     ) AS boxes
@@ -29,7 +30,8 @@ def decrease_stock():
                     FROM calendar_settings cs
                     WHERE cs.calendar_id = c.id
                         AND cs.stock_decrement_method = 'daily_midnight'
-                    );
+                                        )
+                                            AND c.deleted_at IS NULL;
                 """)
                 rows = cursor.fetchall()
 
