@@ -73,20 +73,6 @@ function SharedList({
     setAlertId(tokenId);
   };
 
-  // 📄 Mise à jour des permissions
-  const handleUpdateTokenPermissions = async (tokenId, value) => {
-    const rep = await tokenCalendars.updateTokenPermissions(tokenId, value);
-    if (rep.success) {
-      setAlertType("success");
-      setAlertMessage("✅ " + rep.message);
-    } else {
-      setAlertType("danger");
-      setAlertMessage("❌ " + rep.error);
-    }
-    setAlertId(tokenId);
-    setSelectedModifyToken(null);
-  };
-
   const promptDeleteCalendar = ({
     calendarId,
     navigate,
@@ -114,20 +100,6 @@ function SharedList({
         setAlertMessage("❌ " + rep.error);
       }
     });
-  };
-
-  // 🔄 Activation/désactivation du lien
-  const handleToggleToken = async (tokenId) => {
-    const rep = await tokenCalendars.updateRevokeToken(tokenId);
-    if (rep.success) {
-      setAlertType("success");
-      setAlertMessage("✅ " + rep.message);
-    } else {
-      setAlertType("danger");
-      setAlertMessage("❌ " + rep.error);
-    }
-    setAlertId(tokenId);
-    setSelectedModifyToken(null);
   };
 
   const deleteTokenConfirmAction = (tokenId) => {
@@ -397,8 +369,6 @@ function SharedList({
               setAlertId={setAlertId}
               handleCopyLink={handleCopyLink}
               handleUpdateTokenExpiration={handleUpdateTokenExpiration}
-              handleUpdateTokenPermissions={handleUpdateTokenPermissions}
-              handleToggleToken={handleToggleToken}
               deleteTokenConfirmAction={deleteTokenConfirmAction}
               handleCreateToken={handleCreateToken}
               today={today}
@@ -480,8 +450,8 @@ const calendarActions = ({
 function CalendarCard({
   calendarId, data, alertId, alertType, alertMessage, onConfirmAction,
   setAlertType, setAlertMessage, setOnConfirmAction, setAlertId,
-  handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions,
-  handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today,
+  handleCopyLink, handleUpdateTokenExpiration,
+  deleteTokenConfirmAction, handleCreateToken, today,
   VITE_URL, selectedModifyToken, setSelectedModifyToken, tokenCalendars,
   handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction,
   emailsToInvite, setEmailsToInvite, navigate, personalCalendars, promptDeleteCalendar,
@@ -489,7 +459,7 @@ function CalendarCard({
   const { t } = useTranslation();
   const { lng } = useParams();
   const alertHandlers = { alertId, alertType, alertMessage, onConfirmAction, setAlertMessage, setOnConfirmAction, setAlertId };
-  const tokenProps = { ...alertHandlers, setAlertType, handleCopyLink, handleUpdateTokenExpiration, handleUpdateTokenPermissions, handleToggleToken, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyToken, setSelectedModifyToken, tokenCalendars };
+  const tokenProps = { ...alertHandlers, setAlertType, handleCopyLink, handleUpdateTokenExpiration, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyToken, setSelectedModifyToken, tokenCalendars };
   const userProps = { ...alertHandlers, handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
   return (
     <div>
@@ -540,8 +510,6 @@ function TokenList({
   setAlertId,
   handleCopyLink,
   handleUpdateTokenExpiration,
-  handleUpdateTokenPermissions,
-  handleToggleToken,
   deleteTokenConfirmAction,
   handleCreateToken,
   today,
@@ -566,33 +534,6 @@ function TokenList({
               </div>
               <ActionSheet
                 actions={[
-                  {
-                    label: (
-                      <>
-                        <i className="bi bi-pencil-square me-2"></i> {t('modify')}
-                      </>
-                    ),
-                    onClick: () => setSelectedModifyToken(token.id),
-                    title: t('modify')
-                  },
-                  {
-                    label: (
-                      <>
-                        <i className="bi bi-arrow-clockwise me-2"></i> {t('regenerate')}
-                      </>
-                    ),
-                    onClick: () => {
-                      setAlertType("confirm-danger");
-                      setAlertMessage(t("regenerate_link_confirm"));
-                      setAlertId(token.id);
-                      setOnConfirmAction(() => async () => {
-                        await tokenCalendars.deleteToken(token.id);
-                        await handleCreateToken(calendarId);
-                      });
-                    },
-                    title: t('regenerate')
-                  },
-                  { separator: true },
                   {
                     label: (
                       <>
@@ -624,130 +565,74 @@ function TokenList({
                 />
               )}
 
-              {/* TODO: racourcir le lien */}
               {/* Lien */}
               <div className="input-group col-md-6 mb-2" data-tour="share-public-links">
                 <input
                   id={"tokenLink" + token.id}
                   type="text"
-                  className={`form-control border-2 border-${token.revoked ? "danger" : "success"}`}
+                  className={`form-control border-2 ${
+                    token.expires_at && new Date(token.expires_at) < new Date()
+                      ? "border-danger"
+                      : "border-success"
+                  }`}
                   aria-label={t("shared_link_label")}
                   title={t("shared_link_label")}
                   value={`${VITE_URL}/${lng}/shared-token-calendar/${token.id}`}
                   readOnly
                 />
                 <button
-                  className={`btn btn-outline-${token.revoked ? "danger" : "success"}`}
+                  className={`btn ${
+                    token.expires_at && new Date(token.expires_at) < new Date()
+                      ? "btn-outline-danger"
+                      : "btn-outline-success"
+                  }`}
                   onClick={() => handleCopyLink(token)}
                   aria-label={t("copy_link")}
                   title={t("copy_link")}
-                  disabled={token.revoked}
                 >
                   <i className="bi bi-clipboard"></i>
                 </button>
               </div>
 
-              {selectedModifyToken === token.id && (
-                <li className="list-group-item py-3 px-3">
-                  <div className="row align-items-center gy-3 gx-4">
-                    {/* Colonne 1 : Switch */}
-                    <div className="col-auto d-flex align-items-center gap-2">
-                      <label
-                        htmlFor={`switchToken-${token.id}`}
-                        className="form-label mb-0 fw-semibold"
-                      >
-                        {t("activation")}:
-                      </label>
-                      <div className="form-check form-switch m-0">
-                        <input
-                          className={`form-check-input ${token.revoked ? "" : "bg-success"}`}
-                          type="checkbox"
-                          role="switch"
-                          id={`switchToken-${token.id}`}
-                          checked={!token.revoked}
-                          onChange={() => handleToggleToken(token.id)}
-                          aria-label={t("activation_toggle_aria")}
-                          title={
-                            token.revoked ? t("reactivate_link") : t("revoke_link")
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {/* Colonne 2 : Expiration */}
-                    <div className="col-auto d-flex align-items-center flex-wrap gap-2">
-                      <label
-                        htmlFor={`tokenExpiration${token.id}`}
-                        className="form-label mb-0 fw-semibold"
-                      >
-                        {t("expiration")}:
-                      </label>
-                      <select
-                        id={`tokenExpiration${token.id}`}
-                        className="form-select w-auto"
-                        value={token.expires_at === null ? "" : "date"}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          handleUpdateTokenExpiration(
-                            token.id,
-                            value === "" ? null : today,
-                          );
-                        }}
-                      >
-                        <option value="">{t("never")}</option>
-                        <option value="date">{t("date")}</option>
-                      </select>
-                      {token.expires_at && (
-                        <input
-                          type="date"
-                          className="form-control w-auto"
-                          style={{ minWidth: "130px" }}
-                          value={toISO(token.expires_at)}
-                          onChange={(e) =>
-                            handleUpdateTokenExpiration(
-                              token.id,
-                              toISO(e.target.value),
-                            )
-                          }
-                          min={toISO(today)}
-                        />
-                      )}
-                    </div>
-
-                    {/* Colonne 3 : Permissions */}
-                    <div className="col-auto d-flex align-items-center gap-2">
-                      <label
-                        htmlFor={`tokenPermissions${token.id}`}
-                        className="form-label mb-0 fw-semibold"
-                      >
-                        {t("access")}:
-                      </label>
-                      <select
-                        id={`tokenPermissions${token.id}`}
-                        className="form-select w-auto"
-                        value={token.permissions}
-                        onChange={(e) =>
-                          handleUpdateTokenPermissions(token.id, e.target.value)
-                        }
-                      >
-                        <option value="read">{t("read_only")}</option>
-                        <option value="edit">{t("read_write")}</option>
-                      </select>
-                    </div>
-                    {/* Colonne 4 : Annuler a la ligne suivante */}
-                    <div className="d-flex col-12">
-                      <button
-                        className="btn btn-outline-secondary"
-                        onClick={() => setSelectedModifyToken(null)}
-                        aria-label={t("cancel")}
-                        title={t("cancel")}
-                      >
-                        <i className="bi bi-x-lg"></i> {t("cancel")}
-                      </button>
-                    </div>
-                  </div>
-                </li>
-              )}
+              {/* Expiration */}
+              <div className="d-flex align-items-center gap-2 mb-2">
+                <label
+                  htmlFor={`tokenExpiration${token.id}`}
+                  className="form-label mb-0 fw-semibold"
+                >
+                  {t("expiration")}:
+                </label>
+                <select
+                  id={`tokenExpiration${token.id}`}
+                  className="form-select w-auto"
+                  value={token.expires_at === null ? "" : "date"}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    handleUpdateTokenExpiration(
+                      token.id,
+                      value === "" ? null : today,
+                    );
+                  }}
+                >
+                  <option value="">{t("never")}</option>
+                  <option value="date">{t("date")}</option>
+                </select>
+                {token.expires_at && (
+                  <input
+                    type="date"
+                    className="form-control w-auto"
+                    style={{ minWidth: "130px" }}
+                    value={toISO(token.expires_at)}
+                    onChange={(e) =>
+                      handleUpdateTokenExpiration(
+                        token.id,
+                        toISO(e.target.value),
+                      )
+                    }
+                    min={toISO(today)}
+                  />
+                )}
+              </div>
             </div>
           </ul>
         </div>
@@ -1029,8 +914,6 @@ function UserList({
 SharedList.propTypes = {
   tokenCalendars: PropTypes.shape({
     updateTokenExpiration: PropTypes.func.isRequired,
-    updateTokenPermissions: PropTypes.func.isRequired,
-    updateRevokeToken: PropTypes.func.isRequired,
     deleteToken: PropTypes.func.isRequired,
     createToken: PropTypes.func.isRequired,
     tokensList: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -1068,8 +951,6 @@ CalendarCard.propTypes = {
   setAlertId: PropTypes.func.isRequired,
   handleCopyLink: PropTypes.func.isRequired,
   handleUpdateTokenExpiration: PropTypes.func.isRequired,
-  handleUpdateTokenPermissions: PropTypes.func.isRequired,
-  handleToggleToken: PropTypes.func.isRequired,
   deleteTokenConfirmAction: PropTypes.func.isRequired,
   handleCreateToken: PropTypes.func.isRequired,
   today: PropTypes.string.isRequired,
@@ -1097,8 +978,6 @@ TokenList.propTypes = {
   setAlertId: PropTypes.func.isRequired,
   handleCopyLink: PropTypes.func.isRequired,
   handleUpdateTokenExpiration: PropTypes.func.isRequired,
-  handleUpdateTokenPermissions: PropTypes.func.isRequired,
-  handleToggleToken: PropTypes.func.isRequired,
   deleteTokenConfirmAction: PropTypes.func.isRequired,
   handleCreateToken: PropTypes.func.isRequired,
   today: PropTypes.string.isRequired,

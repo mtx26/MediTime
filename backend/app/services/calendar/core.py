@@ -33,6 +33,9 @@ def generate_calendar_schedule(calendar_id: str, start_date: date) -> tuple[list
                     JOIN medicine_boxes box ON box.calendar_id = c.id
                     JOIN medicine_box_conditions cond ON cond.box_id = box.id
                     WHERE c.id = %s
+                        AND box.deleted_at IS NULL
+                        AND cond.deleted_at IS NULL
+                        AND c.deleted_at IS NULL
                 """, (calendar_id,))
 
                 rows = cursor.fetchall()
@@ -271,7 +274,7 @@ def fetch_calendar(calendar_id: str) -> dict:
     """
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM calendars WHERE id = %s", (calendar_id,))
+            cursor.execute("SELECT * FROM calendars WHERE id = %s AND deleted_at IS NULL", (calendar_id,))
             calendar = cursor.fetchone() or {}
             return calendar
 
@@ -287,7 +290,7 @@ def fetch_medicine_name(medication_id: str) -> str:
     """
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT name FROM medicine_boxes WHERE id = %s", (medication_id,))
+            cursor.execute("SELECT name FROM medicine_boxes WHERE id = %s AND deleted_at IS NULL", (medication_id,))
             result = cursor.fetchone() or {}
             return result.get("name", "unknown")
         
@@ -332,11 +335,12 @@ def add_pillbox_uses(calendar_id: str, uid: str, base_date: date) -> bool:
                     INSERT INTO pillbox_uses (calendar_id, prepared_at, prepared_by)
                     SELECT %s, %s, %s
                     WHERE NOT EXISTS (
-                        SELECT 1
-                        FROM pillbox_uses
-                        WHERE calendar_id = %s
-                          AND prepared_at >= %s
-                          AND prepared_at < %s
+                    SELECT 1
+                    FROM pillbox_uses
+                    WHERE calendar_id = %s
+                        AND prepared_at >= %s
+                        AND prepared_at < %s
+                        AND restored_at IS NULL
                     )
                     RETURNING 1 AS inserted
                 )
@@ -370,8 +374,9 @@ def get_if_pillbox_is_used(calendar_id: str, base_date: date) -> bool:
                 SELECT 1 AS result
                 FROM pillbox_uses
                 WHERE calendar_id = %s
-                  AND prepared_at >= %s
-                  AND prepared_at < %s
+                    AND prepared_at >= %s
+                    AND prepared_at < %s
+                    AND restored_at IS NULL
                 LIMIT 1;
                 """,
                 (calendar_id, monday, next_monday)
@@ -410,6 +415,7 @@ def get_pillbox_uses(calendar_id: str) -> list:
                     ) as prepared_by
                 FROM pillbox_uses pu
                 WHERE pu.calendar_id = %s
+                    AND pu.restored_at IS NULL
                 ORDER BY pu.prepared_at DESC;
                 """,
                 (calendar_id,)
@@ -432,9 +438,9 @@ def delete_pillbox_use(calendar_id: str, use_id: str) -> bool:
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            # recuperer la dare de l'enregistrement pour vérification et suppression cette enregistrement
+            # recuperer la date de l'enregistrement pour vérification et suppression cette enregistrement
             cursor.execute(
-                "SELECT prepared_at FROM pillbox_uses WHERE id = %s AND calendar_id = %s",
+                "SELECT prepared_at FROM pillbox_uses WHERE id = %s AND calendar_id = %s AND restored_at IS NULL",
                 (use_id, calendar_id)
             )
             row = cursor.fetchone()
@@ -445,9 +451,8 @@ def delete_pillbox_use(calendar_id: str, use_id: str) -> bool:
             prepared_at = prepared_at.date()
 
             if restore_pillbox(calendar_id, prepared_at):
-                # Supprimer l'enregistrement
                 cursor.execute(
-                    "DELETE FROM pillbox_uses WHERE id = %s",
+                    "UPDATE pillbox_uses SET restored_at = NOW() WHERE id = %s",
                     (use_id,)
                 )
             else:

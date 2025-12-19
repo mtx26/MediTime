@@ -26,7 +26,7 @@ def get_boxes(calendar_id: str) -> list:
                   COALESCE((
                     SELECT jsonb_agg(to_jsonb(mbc) ORDER BY mbc.created_at)
                     FROM medicine_box_conditions mbc
-                    WHERE mbc.box_id = mb.id
+                    WHERE mbc.box_id = mb.id AND mbc.deleted_at IS NULL
                   ), '[]'::jsonb) AS conditions,
                   /* url_notice_fr liée au nom de la boîte (équivalent à ILIKE sans wildcard) */
                   (
@@ -38,6 +38,8 @@ def get_boxes(calendar_id: str) -> list:
                 FROM medicine_boxes mb
                 JOIN calendars c ON c.id = mb.calendar_id
                 WHERE mb.calendar_id = %s
+                  AND mb.deleted_at IS NULL
+                  AND c.deleted_at IS NULL
                 ORDER BY mb.created_at;
             """, (calendar_id,))
             boxes = cursor.fetchall()
@@ -69,12 +71,14 @@ WITH upd AS (
       box_capacity = %s,
       stock_alert_threshold = %s,
       stock_quantity = %s
-  WHERE id = %s AND calendar_id = %s
+  WHERE id = %s AND calendar_id = %s AND deleted_at IS NULL
   RETURNING id
 ),
 del AS (
-  DELETE FROM medicine_box_conditions
+  UPDATE medicine_box_conditions
+  SET deleted_at = NOW()
   WHERE box_id IN (SELECT id FROM upd)
+    AND deleted_at IS NULL
 ),
 ins AS (
   INSERT INTO medicine_box_conditions (box_id, tablet_count, interval_days, start_date, time_of_day)
@@ -89,12 +93,12 @@ ins AS (
   RETURNING 1
 )
 SELECT 1;
-""", (
-    name, dose, box_capacity, stock_alert_threshold, stock_quantity,
-    box_id, calendar_id,      # upd WHERE
-    box_id,                   # ins (box_id)
-    json.dumps(conditions)    # ins (payload)
-))
+            """, (
+                name, dose, box_capacity, stock_alert_threshold, stock_quantity,
+                box_id, calendar_id,      # upd WHERE
+                box_id,                   # ins (box_id)
+                json.dumps(conditions)    # ins (payload)
+            ))
             conn.commit()
 
 
@@ -155,10 +159,27 @@ def delete_box(box_id: str, calendar_id: str):
     - calendar_id (str): L'ID du calendrier associé.
     """
     with get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("DELETE FROM medicine_boxes WHERE id = %s AND calendar_id = %s", (box_id, calendar_id))
-            # La suppression des conditions est gérée par ON DELETE CASCADE
-            conn.commit()
+      with conn.cursor() as cursor:
+        cursor.execute(
+          """
+          UPDATE medicine_boxes
+          SET deleted_at = COALESCE(deleted_at, NOW())
+          WHERE id = %s AND calendar_id = %s AND deleted_at IS NULL
+          RETURNING id
+          """,
+          (box_id, calendar_id)
+        )
+        updated = cursor.fetchone()
+        if updated:
+          cursor.execute(
+            """
+            UPDATE medicine_box_conditions
+            SET deleted_at = COALESCE(deleted_at, NOW())
+            WHERE box_id = %s AND deleted_at IS NULL
+            """,
+            (box_id,)
+          )
+        conn.commit()
 
 
 GET_MEDICINES_QUERY = """
@@ -198,6 +219,8 @@ GET_MEDICINES_QUERY = """
       LEFT JOIN medicine_box_conditions c
         ON c.box_id = mb.id
       WHERE mb.calendar_id = %s
+        AND mb.deleted_at IS NULL
+        AND c.deleted_at IS NULL
       GROUP BY mb.id, mb.name, mb.dose
     ) AS m;
 """
@@ -235,7 +258,7 @@ def restock_box(box_id: str, calendar_id: str) -> bool:
                 cursor.execute("""
                     UPDATE medicine_boxes 
                     SET stock_quantity = stock_quantity + box_capacity 
-                    WHERE id = %s AND calendar_id = %s
+                    WHERE id = %s AND calendar_id = %s AND deleted_at IS NULL
                 """, (box_id, calendar_id))
                 conn.commit()
         return True

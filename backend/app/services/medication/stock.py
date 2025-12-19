@@ -24,7 +24,7 @@ def process_box_decrement(cursor, id_box: str, qty: int, start_date: str, days: 
     cursor.execute("""
         SELECT tablet_count, start_date, interval_days
         FROM medicine_box_conditions
-        WHERE box_id = %s
+        WHERE box_id = %s AND deleted_at IS NULL
     """, (id_box,))
     conditions = cursor.fetchall()
 
@@ -42,7 +42,7 @@ def process_box_decrement(cursor, id_box: str, qty: int, start_date: str, days: 
     if total_tablets > 0:
         new_qty = qty - total_tablets
         cursor.execute(
-            "UPDATE medicine_boxes SET stock_quantity = %s WHERE id = %s",
+            "UPDATE medicine_boxes SET stock_quantity = %s WHERE id = %s AND deleted_at IS NULL",
             (new_qty, id_box)
         )
 
@@ -65,7 +65,7 @@ def process_box_increment(cursor, id_box: str, qty: int, start_date: str, days: 
     cursor.execute("""
         SELECT tablet_count, start_date, interval_days
         FROM medicine_box_conditions
-        WHERE box_id = %s
+        WHERE box_id = %s AND deleted_at IS NULL
     """, (id_box,))
     conditions = cursor.fetchall()
 
@@ -83,7 +83,7 @@ def process_box_increment(cursor, id_box: str, qty: int, start_date: str, days: 
     if total_tablets > 0:
         new_qty = qty + total_tablets
         cursor.execute(
-            "UPDATE medicine_boxes SET stock_quantity = %s WHERE id = %s",
+            "UPDATE medicine_boxes SET stock_quantity = %s WHERE id = %s AND deleted_at IS NULL",
             (new_qty, id_box)
         )
 
@@ -124,6 +124,8 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
                         AND m.stock_quantity <= m.stock_alert_threshold 
                         AND m.stock_alert_threshold > 0
                         AND m.box_capacity > 0
+                        AND m.deleted_at IS NULL
+                        AND c.deleted_at IS NULL
                     """,
                     (calendar_id,)
                 )
@@ -137,6 +139,8 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
                     JOIN shared_calendar_settings scs ON scs.shared_calendar_id = sc.id
                     WHERE sc.calendar_id = %s 
                         AND scs.notifications_enabled = TRUE
+                        AND sc.deleted_at IS NULL
+                        AND sc.accepted_at IS NOT NULL
                     """,
                     (calendar_id,)
                 )
@@ -226,6 +230,7 @@ def check_if_stock_is_low(calendar_id: int) -> bool:
                     AND stock_quantity <= stock_alert_threshold 
                     AND stock_alert_threshold > 0
                     AND box_capacity > 0
+                    AND deleted_at IS NULL
                 """,
                 (calendar_id,)
             )

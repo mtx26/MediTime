@@ -24,7 +24,7 @@ def get_calendar_name(calendar_id : str) -> str | None:
     """
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM calendars WHERE id = %s", (calendar_id,))
+            cursor.execute("SELECT * FROM calendars WHERE id = %s AND deleted_at IS NULL", (calendar_id,))
             calendar = cursor.fetchone()
             if calendar:
                 return calendar.get("name")
@@ -59,7 +59,8 @@ def clean_notification(cursor):
         AND EXISTS (
             SELECT 1 FROM medicine_boxes mb
             WHERE mb.id = notifications.medication_id
-            AND mb.stock_quantity > mb.stock_alert_threshold
+              AND mb.deleted_at IS NULL
+              AND mb.stock_quantity > mb.stock_alert_threshold
         )
     """)
 
@@ -138,7 +139,7 @@ def handle_notifications():
         COALESCE(u.photo_url, %s)              AS sender_photo_url,
         mb.name                                AS medication_name,
         mb.stock_quantity                      AS medication_qty,
-        sc.accepted                            AS accepted,
+        sc.accepted_at IS NOT NULL             AS accepted,
         sc.token                               AS token
 
     FROM notifications n

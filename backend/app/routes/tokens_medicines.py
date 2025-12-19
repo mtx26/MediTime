@@ -30,6 +30,8 @@ def handle_token_medicines(token):
                         box.stock_alert_threshold
                     FROM set_session, medicine_box_conditions cond
                     JOIN medicine_boxes box ON cond.box_id = box.id
+                    WHERE cond.deleted_at IS NULL
+                        AND box.deleted_at IS NULL
                 """, (token,))
                 medicines = cursor.fetchall()
 

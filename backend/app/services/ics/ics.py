@@ -37,7 +37,9 @@ def get_ics_tokens(calendar_id: str, owner_uid: str) -> list:
             cursor.execute("""
                 SELECT id, token, created_at, last_accessed_at, last_user_agent
                 FROM ics_tokens
-                WHERE calendar_id = %s AND owner_uid = %s AND revoked_at IS NULL
+                WHERE calendar_id = %s
+                    AND owner_uid = %s
+                    AND deleted_at IS NULL
                 ORDER BY created_at DESC
             """, (calendar_id, owner_uid))
             return cursor.fetchall()
@@ -56,8 +58,10 @@ def delete_ics_token(token_id: str, owner_uid: str) -> bool:
         with conn.cursor() as cursor:
             cursor.execute("""
                 UPDATE ics_tokens
-                SET revoked_at = NOW()
-                WHERE id = %s AND owner_uid = %s AND revoked_at IS NULL
+                SET deleted_at = COALESCE(deleted_at, NOW())
+                WHERE id = %s
+                    AND owner_uid = %s
+                    AND deleted_at IS NULL
                 RETURNING id
             """, (token_id, owner_uid))
             return cursor.fetchone() is not None
@@ -88,8 +92,8 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                 SET last_accessed_at = NOW(), last_user_agent = %s
                 FROM calendars, set_session
                 WHERE ics_tokens.token = %s 
-                  AND ics_tokens.revoked_at IS NULL 
-                  AND ics_tokens.calendar_id = calendars.id
+                    AND ics_tokens.deleted_at IS NULL
+                    AND ics_tokens.calendar_id = calendars.id
                 RETURNING ics_tokens.calendar_id, calendars.name
             """, (token, user_agent, token))
             
@@ -123,8 +127,9 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                         '[]'
                     ) as conditions
                 FROM medicine_boxes mb
-                LEFT JOIN medicine_box_conditions mbc ON mb.id = mbc.box_id
+                LEFT JOIN medicine_box_conditions mbc ON mb.id = mbc.box_id AND mbc.deleted_at IS NULL
                 WHERE mb.calendar_id = %s
+                    AND mb.deleted_at IS NULL
                 GROUP BY mb.id
             """, (calendar_id,))
             

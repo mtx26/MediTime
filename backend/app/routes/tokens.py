@@ -20,7 +20,7 @@ def handle_tokens():
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM shared_tokens WHERE owner_uid = %s", (uid,))
+                cursor.execute("SELECT * FROM shared_tokens WHERE owner_uid = %s AND deleted_at IS NULL", (uid,))
                 tokens_list = cursor.fetchall()
 
         return success_response(
@@ -54,16 +54,10 @@ def handle_create_token(calendar_id):
         if not expires_at:
             expires_at = None
 
-        permissions = payload.get("permissions")
-
-        if not permissions:
-            permissions = ["read"]
-
-
-        # Verifier si le calendrier est déjà partagé
+        # Vérifier si le calendrier est déjà partagé
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM shared_tokens WHERE calendar_id = %s AND owner_uid = %s", (calendar_id, owner_uid))
+                cursor.execute("SELECT * FROM shared_tokens WHERE calendar_id = %s AND owner_uid = %s AND deleted_at IS NULL", (calendar_id, owner_uid))
                 token = cursor.fetchone()
                 if token:
                     return warning_response(
@@ -76,9 +70,10 @@ def handle_create_token(calendar_id):
         
                 cursor.execute(
                     """
-                    INSERT INTO shared_tokens (calendar_id, expires_at, permissions, revoked, owner_uid) VALUES (%s, %s, %s, %s, %s)
+                    INSERT INTO shared_tokens (calendar_id, expires_at, owner_uid)
+                    VALUES (%s, %s, %s)
                     """,
-                    (calendar_id, expires_at, permissions, False, owner_uid)
+                    (calendar_id, expires_at, owner_uid)
                 )
 
                 return success_response(
@@ -94,53 +89,6 @@ def handle_create_token(calendar_id):
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
-        )
-
-
-# Route pour révoquer un token
-@api.route("/tokens/revoke/<token>", methods=["POST"])
-@measure_time()
-@require_auth
-@verify_token_owner
-@with_query_origin(default_origin="TOKEN_REVOKE")
-def handle_update_revoke_token(token):
-    try:
-
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                # Toggle + récupérer la nouvelle valeur en une seule requête
-                cursor.execute("""
-                    UPDATE shared_tokens
-                    SET revoked = NOT revoked
-                    WHERE id = %s
-                    RETURNING revoked
-                """, (token,))
-                row = cursor.fetchone()
-
-            if not row:
-                return warning_response(
-                    message="token introuvable",
-                    code="TOKEN_REVOKE_ERROR",
-                    status_code=404,
-                    log_extra={"token": token}
-                )
-
-            conn.commit()
-
-        revoked = row.get("revoked", False)
-        return success_response(
-            message="token révoqué" if revoked else "token réactivé",
-            code="TOKEN_REVOKE_SUCCESS" if revoked else "TOKEN_REACTIVATED_SUCCESS",
-            log_extra={"token": token, "revoked": revoked}
-        )
-
-    except Exception as e:
-        return error_response(
-            message="erreur lors de la révocation du token",
-            code="TOKEN_REVOKE_ERROR",
-            status_code=500,
-            error=str(e),
-            log_extra={"token": token}
         )
 
 
@@ -164,7 +112,10 @@ def handle_update_token_expiration(token):
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("UPDATE shared_tokens SET expires_at = %s WHERE id = %s", (expires_at, token))
+                cursor.execute(
+                    "UPDATE shared_tokens SET expires_at = %s WHERE id = %s AND deleted_at IS NULL",
+                    (expires_at, token)
+                )
 
                 return success_response(
                     message="expiration du token mise à jour", 
@@ -176,39 +127,6 @@ def handle_update_token_expiration(token):
         return error_response(
             message="erreur lors de la mise à jour de l'expiration du token",
             code="TOKEN_EXPIRATION_UPDATE_ERROR", 
-            status_code=500,
-            error=str(e),
-            log_extra={"token": token}
-        )
-
-
-# Route pour mettre à jour les permissions d'un token
-@api.route("/tokens/permissions/<token>", methods=["POST"])
-@measure_time()
-@require_auth
-@verify_token_owner
-@with_query_origin(default_origin="TOKEN_PERMISSIONS_UPDATE")
-def handle_update_token_permissions(token):
-    try:
-
-        payload = request.get_json(force=True)
-
-        permissions = payload.get("permissions")
-
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("UPDATE shared_tokens SET permissions = %s WHERE id = %s", (permissions, token))
-
-                return success_response(
-                    message="permissions du token mises à jour", 
-                    code="TOKEN_PERMISSIONS_UPDATED", 
-                    log_extra={"token": token}
-                )
-
-    except Exception as e:
-        return error_response(
-            message="erreur lors de la mise à jour des permissions du token",
-            code="TOKEN_PERMISSIONS_UPDATE_ERROR", 
             status_code=500,
             error=str(e),
             log_extra={"token": token}
@@ -268,7 +186,7 @@ def handle_get_token_metadata(token):
                     WITH set_session AS (
                         SELECT set_config('app.current_token', %s, true)
                     )
-                    SELECT owner_uid FROM set_session, shared_tokens WHERE id = %s
+                    SELECT owner_uid FROM set_session, shared_tokens WHERE id = %s AND deleted_at IS NULL
                 """, (token, token))
                 token_data = cursor.fetchone()
                 if not token_data:
@@ -314,7 +232,10 @@ def handle_delete_token(token):
 
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("DELETE FROM shared_tokens WHERE id = %s", (token,))
+                cursor.execute(
+                    "UPDATE shared_tokens SET deleted_at = COALESCE(deleted_at, NOW()) WHERE id = %s",
+                    (token,)
+                )
 
                 return success_response(
                     message="token supprimé", 
