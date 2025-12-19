@@ -197,13 +197,12 @@ def _handle_existing_user_invite(cursor, calendar_id: str, receiver_uid: str, ow
             log_extra={"calendar_id": calendar_id},
         )
 
-        # Déjà invité ?
-        cursor.execute(
+    # Déjà invité ?
+    cursor.execute(
                 """
                 SELECT 1
                 FROM shared_calendars
                 WHERE receiver_uid = %s AND calendar_id = %s
-                    AND accepted_at IS NULL
                     AND deleted_at IS NULL
                 LIMIT 1
                 """,
