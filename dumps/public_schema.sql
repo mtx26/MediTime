@@ -239,7 +239,8 @@ CREATE TABLE IF NOT EXISTS "public"."calendars" (
     "owner_uid" "uuid" NOT NULL,
     "name" "text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "deleted_at" timestamp without time zone
 );
 
 
@@ -264,9 +265,9 @@ CREATE TABLE IF NOT EXISTS "public"."ics_tokens" (
     "token" "text" DEFAULT "encode"("extensions"."gen_random_bytes"(32), 'hex'::"text") NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    "revoked_at" timestamp with time zone,
     "last_accessed_at" timestamp with time zone,
-    "last_user_agent" "text"
+    "last_user_agent" "text",
+    "deleted_at" timestamp without time zone
 );
 
 
@@ -281,6 +282,8 @@ CREATE TABLE IF NOT EXISTS "public"."invitations" (
     "token" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"(),
+    "accepted_at" timestamp without time zone,
+    "deleted_at" timestamp without time zone,
     CONSTRAINT "invitations_role_check" CHECK (("role" = ANY (ARRAY['read'::"text", 'write'::"text", 'admin'::"text"])))
 );
 
@@ -324,6 +327,7 @@ CREATE TABLE IF NOT EXISTS "public"."medicine_box_conditions" (
     "tablet_count" double precision NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
+    "deleted_at" timestamp without time zone,
     CONSTRAINT "medicine_box_conditions_time_of_day_check" CHECK (("time_of_day" = ANY (ARRAY['morning'::"text", 'noon'::"text", 'evening'::"text"])))
 );
 
@@ -340,7 +344,8 @@ CREATE TABLE IF NOT EXISTS "public"."medicine_boxes" (
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
     "box_capacity" integer DEFAULT 0 NOT NULL,
-    "dose" integer
+    "dose" integer,
+    "deleted_at" timestamp without time zone
 );
 
 
@@ -372,7 +377,8 @@ CREATE TABLE IF NOT EXISTS "public"."pillbox_uses" (
     "prepared_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "prepared_by" "uuid",
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "restored_at" timestamp with time zone
 );
 
 
@@ -395,11 +401,11 @@ CREATE TABLE IF NOT EXISTS "public"."shared_calendars" (
     "calendar_id" "uuid" NOT NULL,
     "receiver_uid" "uuid" NOT NULL,
     "access" "text" DEFAULT 'edit'::"text" NOT NULL,
-    "accepted" boolean DEFAULT false NOT NULL,
     "accepted_at" timestamp with time zone,
     "token" "uuid" DEFAULT "gen_random_uuid"(),
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "deleted_at" timestamp with time zone
 );
 
 
@@ -410,11 +416,10 @@ CREATE TABLE IF NOT EXISTS "public"."shared_tokens" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "calendar_id" "uuid" NOT NULL,
     "expires_at" timestamp without time zone,
-    "permissions" "text" DEFAULT 'read'::"text" NOT NULL,
-    "revoked" boolean DEFAULT false NOT NULL,
     "owner_uid" "uuid" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "deleted_at" timestamp without time zone
 );
 
 
@@ -691,39 +696,45 @@ CREATE POLICY "Owners can manage their ics tokens" ON "public"."ics_tokens" TO "
 
 
 
-CREATE POLICY "Public access via ics token" ON "public"."calendars" FOR SELECT USING ((EXISTS ( SELECT 1
+CREATE POLICY "Owners can update shared calendars" ON "public"."shared_calendars" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."calendars" "c"
+  WHERE (("c"."id" = "shared_calendars"."calendar_id") AND ("c"."owner_uid" = "auth"."uid"())))));
+
+
+
+CREATE POLICY "Public access via ics token" ON "public"."calendars" FOR SELECT USING ((("deleted_at" IS NULL) AND (EXISTS ( SELECT 1
    FROM "public"."ics_tokens" "it"
-  WHERE (("it"."token" = "current_setting"('app.current_ics_token'::"text", true)) AND ("it"."calendar_id" = "calendars"."id") AND ("it"."revoked_at" IS NULL)))));
+  WHERE (("it"."calendar_id" = "calendars"."id") AND ("it"."token" = "current_setting"('app.current_ics_token'::"text", true)) AND ("it"."deleted_at" IS NULL))))));
 
 
 
-CREATE POLICY "Public access via ics token" ON "public"."ics_tokens" USING ((("token" = "current_setting"('app.current_ics_token'::"text", true)) AND ("revoked_at" IS NULL)));
+CREATE POLICY "Public access via ics token" ON "public"."ics_tokens" FOR SELECT USING ((("deleted_at" IS NULL) AND ("token" = "current_setting"('app.current_ics_token'::"text", true))));
 
 
 
-CREATE POLICY "Public access via ics token" ON "public"."medicine_box_conditions" FOR SELECT USING ((EXISTS ( SELECT 1
+CREATE POLICY "Public access via ics token" ON "public"."medicine_box_conditions" FOR SELECT USING ((("deleted_at" IS NULL) AND (EXISTS ( SELECT 1
    FROM ("public"."medicine_boxes" "box"
      JOIN "public"."ics_tokens" "it" ON (("it"."calendar_id" = "box"."calendar_id")))
-  WHERE (("box"."id" = "medicine_box_conditions"."box_id") AND ("it"."token" = "current_setting"('app.current_ics_token'::"text", true)) AND ("it"."revoked_at" IS NULL)))));
+  WHERE (("box"."id" = "medicine_box_conditions"."box_id") AND ("it"."token" = "current_setting"('app.current_ics_token'::"text", true)) AND ("it"."deleted_at" IS NULL) AND ("box"."deleted_at" IS NULL))))));
 
 
 
-CREATE POLICY "Public access via ics token" ON "public"."medicine_boxes" FOR SELECT USING ((EXISTS ( SELECT 1
+CREATE POLICY "Public access via ics token" ON "public"."medicine_boxes" FOR SELECT USING ((("deleted_at" IS NULL) AND (EXISTS ( SELECT 1
    FROM "public"."ics_tokens" "it"
-  WHERE (("it"."token" = "current_setting"('app.current_ics_token'::"text", true)) AND ("it"."calendar_id" = "medicine_boxes"."calendar_id") AND ("it"."revoked_at" IS NULL)))));
+  WHERE (("it"."calendar_id" = "medicine_boxes"."calendar_id") AND ("it"."token" = "current_setting"('app.current_ics_token'::"text", true)) AND ("it"."deleted_at" IS NULL))))));
 
 
 
-CREATE POLICY "Public access via shared token" ON "public"."medicine_box_conditions" FOR SELECT USING ((EXISTS ( SELECT 1
+CREATE POLICY "Public access via shared token" ON "public"."medicine_box_conditions" FOR SELECT USING ((("deleted_at" IS NULL) AND (EXISTS ( SELECT 1
    FROM ("public"."medicine_boxes" "box"
      JOIN "public"."shared_tokens" "st" ON (("st"."calendar_id" = "box"."calendar_id")))
-  WHERE (("box"."id" = "medicine_box_conditions"."box_id") AND (("st"."id")::"text" = "current_setting"('app.current_token'::"text", true)) AND ("st"."revoked" = false) AND (("st"."expires_at" IS NULL) OR ("st"."expires_at" > "now"()))))));
+  WHERE (("box"."id" = "medicine_box_conditions"."box_id") AND ("st"."id" = ("current_setting"('app.current_token'::"text", true))::"uuid") AND ("st"."deleted_at" IS NULL) AND ("box"."deleted_at" IS NULL))))));
 
 
 
-CREATE POLICY "Public access via shared token" ON "public"."medicine_boxes" FOR SELECT USING ((EXISTS ( SELECT 1
+CREATE POLICY "Public access via shared token" ON "public"."medicine_boxes" FOR SELECT USING ((("deleted_at" IS NULL) AND (EXISTS ( SELECT 1
    FROM "public"."shared_tokens" "st"
-  WHERE ((("st"."id")::"text" = "current_setting"('app.current_token'::"text", true)) AND ("st"."calendar_id" = "medicine_boxes"."calendar_id") AND ("st"."revoked" = false) AND (("st"."expires_at" IS NULL) OR ("st"."expires_at" > "now"()))))));
+  WHERE (("st"."id" = ("current_setting"('app.current_token'::"text", true))::"uuid") AND ("st"."calendar_id" = "medicine_boxes"."calendar_id") AND ("st"."deleted_at" IS NULL))))));
 
 
 
@@ -870,6 +881,14 @@ CREATE POLICY "Users can update own profile" ON "public"."users" FOR UPDATE USIN
 
 
 CREATE POLICY "Users can update own shared tokens" ON "public"."shared_tokens" FOR UPDATE USING (("owner_uid" = "auth"."uid"()));
+
+
+
+CREATE POLICY "Users can update pillbox uses of accessible calendars" ON "public"."pillbox_uses" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM (("public"."calendars" "c"
+     LEFT JOIN "public"."invitations" "i" ON (("i"."calendar_id" = "c"."id")))
+     LEFT JOIN "public"."shared_calendars" "sc" ON (("sc"."calendar_id" = "c"."id")))
+  WHERE (("c"."id" = "pillbox_uses"."calendar_id") AND (("c"."owner_uid" = "auth"."uid"()) OR (("i"."invited_email" = ( SELECT ("auth"."jwt"() ->> 'email'::"text"))) AND ("i"."role" = ANY (ARRAY['write'::"text", 'admin'::"text"]))) OR (("sc"."receiver_uid" = "auth"."uid"()) AND ("sc"."access" = 'edit'::"text")))))));
 
 
 
