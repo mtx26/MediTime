@@ -24,6 +24,7 @@ def generate_calendar_schedule(calendar_id: str, start_date: date) -> tuple[list
                         cond.time_of_day,
                         cond.interval_days,
                         cond.start_date,
+                        cond.max_date,
                         cond.tablet_count,
                         cond.created_at,
                         cond.updated_at,
@@ -80,6 +81,10 @@ def is_medication_due(med: dict, current_date: date) -> bool:
         else:
             sd = current_date
 
+        # Fin de validité optionnelle: max_date est soit une date, soit absent/None
+        max_date = med.get("max_date")
+        if max_date and current_date > max_date:
+            return False
 
         delta_days = (current_date - sd).days
 

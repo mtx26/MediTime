@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, date
 import uuid
 from app.db.connection import get_connection
+from app.services.calendar.core import is_medication_due
 
 def create_ics_token(calendar_id: str, owner_uid: str) -> dict:
     """
@@ -106,7 +107,7 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
             calendar_id = result['calendar_id']
             calendar_name = result['name']
             
-            # 2. Récupérer les médicaments ET leurs conditions agrégées en JSON
+            # 2. Récupérer les médicaments avec leur condition (une ligne par condition)
             # Le RLS va filtrer via app.current_ics_token injecté précédemment (la session persiste dans la transaction)
             cursor.execute("""
                 SELECT 
@@ -116,104 +117,56 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                     mb.stock_alert_threshold, 
                     mb.box_capacity,
                     mb.dose,
-                    COALESCE(
-                        json_agg(
-                            json_build_object(
-                                'start_date', mbc.start_date,
-                                'interval_days', mbc.interval_days,
-                                'tablet_count', mbc.tablet_count
-                            )
-                        ) FILTER (WHERE mbc.id IS NOT NULL), 
-                        '[]'
-                    ) as conditions
+                    mbc.interval_days,
+                    mbc.start_date,
+                    mbc.max_date,
+                    mbc.tablet_count
                 FROM medicine_boxes mb
-                LEFT JOIN medicine_box_conditions mbc ON mb.id = mbc.box_id AND mbc.deleted_at IS NULL
+                JOIN medicine_box_conditions mbc ON mb.id = mbc.box_id
                 WHERE mb.calendar_id = %s
                     AND mb.deleted_at IS NULL
-                GROUP BY mb.id
+                    AND mbc.deleted_at IS NULL
             """, (calendar_id,))
             
             medicines = cursor.fetchall()
             
             events = []
             today = date.today()
-            
-            for med in medicines:
-                simulated_stock = med['stock_quantity']
-                threshold = med['stock_alert_threshold']
-                capacity = med['box_capacity']
-                name = med['name']
-                conditions = med['conditions']
-                med_dose = med['dose']
-                
-                # Si le stock est déjà sous le seuil (ou égal), c'est urgent : événement aujourd'hui
-                if simulated_stock <= threshold:
-                    events.append({
-                        'date': today,
-                        'name': name,
-                        'stock': simulated_stock,
-                        'threshold': threshold,
-                        'dose': med_dose,
-                        'capacity': capacity
-                    })
-                    # On simule un rachat immédiat pour voir les prochaines occurrences
-                    if capacity > 0:
-                        simulated_stock += capacity
-                    else:
-                        # Si on ne connait pas la capacité de la boîte, on ne peut pas prédire la suite
-                        continue
-                
-                if not conditions:
-                    # Si pas de conditions de prise, on ne peut pas prédire la baisse de stock
-                    continue
-                
-                # On simule sur 365 jours maximum
-                for day_offset in range(1, 366):
-                    current_day = today + timedelta(days=day_offset)
-                    daily_consumption = 0
-                    
-                    for cond in conditions:
-                        # La date vient du JSON, c'est donc une string YYYY-MM-DD ou None
-                        start_date_str = cond.get('start_date')
-                        if start_date_str:
-                            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+
+            def record_event(med_state: dict, at_date: date):
+                events.append({
+                    'date': at_date,
+                    'name': med_state['name'],
+                    'stock': med_state['stock'],
+                    'threshold': med_state['threshold'],
+                    'dose': med_state['dose'],
+                    'capacity': med_state['capacity']
+                })
+
+            # Simulation jour par jour pour coller au core
+            for day_offset in range(0, 366):
+                current_day = today + timedelta(days=day_offset)
+
+                for med in medicines:
+                    # Avant consommation: alerte si sous seuil
+                    if med['stock'] <= med['threshold']:
+                        record_event(med, current_day)
+                        if med['capacity'] > 0:
+                            med['stock'] += med['capacity']
                         else:
-                            start_date = None
-                            
-                        interval = cond['interval_days']
-                        dose = cond['tablet_count']
-                        
-                        # Si pas de date de début définie, on assume que c'est actif dès aujourd'hui
-                        eff_start_date = start_date if start_date else today
-                        
-                        # Si la condition commence dans le futur, on l'ignore pour l'instant
-                        if eff_start_date > current_day:
                             continue
-                            
-                        # Vérifier si c'est un jour de prise
-                        days_diff = (current_day - eff_start_date).days
-                        if interval > 0 and days_diff % interval == 0:
-                            daily_consumption += dose
-                    
-                    simulated_stock -= daily_consumption
-                    
-                    # Si le stock passe sous le seuil (ou l'atteint)
-                    if simulated_stock <= threshold:
-                        events.append({
-                            'date': current_day,
-                            'name': name,
-                            'stock': simulated_stock,
-                            'threshold': threshold,
-                            'dose': med_dose,
-                            'capacity': capacity
-                        })
-                        
-                        # On simule le rachat d'une boîte
-                        if capacity > 0:
-                            simulated_stock += capacity
+
+                    # Consommation du jour
+                    if is_medication_due(med, current_day):
+                        med['stock'] -= med['tablet_count']
+
+                    # Après consommation: alerte si sous seuil
+                    if med['stock'] <= med['threshold']:
+                        record_event(med, current_day)
+                        if med['capacity'] > 0:
+                            med['stock'] += med['capacity']
                         else:
-                            # Impossible de prédire la prochaine rupture sans connaître la quantité rachetée
-                            break
+                            continue
 
     return _generate_ics_content(events, calendar_name).encode('utf-8')
 
