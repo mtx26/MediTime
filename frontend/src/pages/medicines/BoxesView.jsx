@@ -16,7 +16,7 @@ import QRCodeScanner from '../../components/scanner/QRCodeScanner';
 const IconButton = ({ className, icon, text, onClick, title }) => (
   <button 
     type="button" 
-    className={className} 
+    className={`${className} shadow`} 
     onClick={onClick} 
     aria-label={text} 
     title={title || text}
@@ -776,6 +776,7 @@ function BoxCard({
       type: 'number',
       min: '0',
       step: '0.25',
+      format: 'float',
       required: true,
     },
     {
@@ -795,9 +796,10 @@ function BoxCard({
       type: 'number',
       min: '0',
       step: '1',
+      format: 'int',
       onChange: (cond, value, updateFn) => {
         // Si interval_days devient <= 1, mettre start_date à null
-        if (parseInt(value) <= 1) {
+        if (value <= 1) {
           updateFn('start_date', null);
         }
       },
@@ -833,6 +835,7 @@ function BoxCard({
       type: (cond) => cond.max_date_mode === 'until_date' ? 'date' : 'number',
       min: '1',
       step: '1',
+      format: (cond) => cond.max_date_mode === 'until_date' ? '' : 'int',
       onChange: (cond, value, updateFn) => {
         if (!value || value === '') {
           updateFn('max_date', null);
@@ -841,8 +844,6 @@ function BoxCard({
         }
         
         if (cond.max_date_mode === 'for_days') {
-          const days = parseInt(value);
-
           // Calculer la date de fin en fonction de la ou on se situe dans la journé
           const now = new Date();
           const target = new Date(now);
@@ -851,10 +852,10 @@ function BoxCard({
           target.setHours(targetHour, 0, 0, 0);
           const includeToday = now < target;
           const endDate = new Date(now);
-          endDate.setDate(endDate.getDate() + (includeToday ? days - 1 : days));
+          endDate.setDate(endDate.getDate() + (includeToday ? value - 1 : value));
           endDate.setHours(23, 59, 59, 999);
           updateFn('max_date', endDate.toISOString());
-          updateFn('max_date_days', days);
+          updateFn('max_date_days', value);
         } else {
           const selectedDate = new Date(value);
           selectedDate.setHours(23, 59, 59, 999);
@@ -1193,10 +1194,10 @@ function BoxCard({
                     .map((cond) => (
                       <div
                         key={cond.id}
-                        className="mb-2 p-3 border rounded bg-light"
+                        className="mb-2 p-3 border rounded bg-light shadow"
                       >
                         {conditionFields.map(
-                          ({ label, field, type, min, step, options, ifComplete, onChange, required}, idx) => {
+                          ({ label, field, type, min, step, format, options, ifComplete, onChange, required}, idx) => {
                             // Si ifComplete est défini et retourne false, ne pas afficher le champ
                             if (ifComplete && !ifComplete(cond)) {
                               return null;
@@ -1206,6 +1207,7 @@ function BoxCard({
                             const resolvedLabel = typeof label === 'function' ? label(cond) : label;
                             const resolvedField = typeof field === 'function' ? field(cond) : field;
                             const resolvedType = typeof type === 'function' ? type(cond) : type;
+                            const resolvedFormat = typeof format === 'function' ? format(cond) : format;
                             const resolvedRequired = typeof required === 'function' ? required(cond) : required;
                             
                             return (
@@ -1245,9 +1247,16 @@ function BoxCard({
                                   min={min}
                                   step={step}
                                   onChange={(e) => {
-                                    updateCondition(cond.id, resolvedField, e.target.value);
+                                    let value = e.target.value;
+                                    // Parser selon le format
+                                    if (resolvedFormat === 'int') {
+                                      value = parseInt(value);
+                                    } else if (resolvedFormat === 'float') {
+                                      value = parseFloat(value);
+                                    }
+                                    updateCondition(cond.id, resolvedField, value);
                                     if (onChange) {
-                                      onChange(cond, e.target.value, (f, v) => updateCondition(cond.id, f, v));
+                                      onChange(cond, value, (f, v) => updateCondition(cond.id, f, v));
                                     }
                                   }}
                                   aria-label={resolvedLabel}
@@ -1266,9 +1275,10 @@ function BoxCard({
                           onClick={() => deleteCondition(cond.id)}
                         />
                       </div>
-                    ))}
+                    ))
+                  }
                   <IconButton
-                    className="btn btn-outline-dark w-100"
+                    className="btn btn-sm bg-light border w-100 mt-2"
                     icon="plus-lg"
                     text={t('boxes.condition.add')}
                     onClick={addCondition}
@@ -1280,7 +1290,7 @@ function BoxCard({
                   .map((cond) => (
                     <div
                       key={cond.id}
-                      className="mb-2 p-3 border rounded bg-light"
+                      className="mb-3 p-3 border rounded bg-light shadow"
                     >
                       <strong>
                         {cond.tablet_count}{' '}
@@ -1331,14 +1341,14 @@ function BoxCard({
             <div className="d-flex gap-2">
               <button
                 type="submit"
-                className="btn btn-success btn-sm"
+                className="btn btn-success btn-sm w-50"
                 aria-label={t('boxes.save')}
                 title={t('boxes.save')}
               >
                 <i className="bi bi-save"></i> {t('boxes.save')}
               </button>
               <IconButton
-                className="btn btn-secondary btn-sm"
+                className="btn btn-secondary btn-sm w-50"
                 icon="x"
                 text={t('boxes.cancel')}
                 onClick={onCancel}
