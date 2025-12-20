@@ -226,14 +226,13 @@ def build_medication_table(med: dict, monday: date, total_day: int) -> dict:
 
     for i in range(total_day):
         current_date = monday + timedelta(days=i)
-        if not is_medication_due(med, current_date):
-            continue
+        if is_medication_due(med, current_date):
 
-        day = current_date.strftime("%a")
-        moment = med["time_of_day"]
-        if moment not in table:
-            table[moment] = {}
-        table[moment][day] = med["tablet_count"]
+            day = current_date.strftime("%a")
+            moment = med["time_of_day"]
+            if moment not in table:
+                table[moment] = {}
+            table[moment][day] = med["tablet_count"]
 
     return table
 
