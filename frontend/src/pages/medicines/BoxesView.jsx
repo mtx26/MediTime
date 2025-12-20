@@ -46,13 +46,11 @@ const ActionCard = ({ borderColor, icon, color, text, onClick, hasTooltip, toolt
       <div className={`card h-100 shadow border border-${borderColor}`}>
         <div className="card-body d-flex flex-column justify-content-center align-items-center p-3 position-relative">
           {hasTooltip && (
-            <button
-              type="button"
-              className="btn btn-link position-absolute top-0 end-0 m-1 p-1 text-info"
+            <div
+              className="position-absolute top-0 end-0 m-1 p-1 text-info"
+              style={{ cursor: 'help' }}
               onMouseEnter={() => setShowTooltip(true)}
               onMouseLeave={() => setShowTooltip(false)}
-              aria-label={t('boxes.qr_code_help_text')}
-              title={t('boxes.qr_code_help_text')}
             >
               <i className="bi bi-info-circle"></i>
               {showTooltip && (
@@ -69,7 +67,7 @@ const ActionCard = ({ borderColor, icon, color, text, onClick, hasTooltip, toolt
                   {tooltip}
                 </div>
               )}
-            </button>
+            </div>
           )}
           <i className={`bi bi-${icon} text-${color} fs-1`}></i>
           <p className={`text-${color} fw-bold mt-2 mb-0 text-center`}>
