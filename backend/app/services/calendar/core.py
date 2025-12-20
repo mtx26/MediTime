@@ -24,6 +24,7 @@ def generate_calendar_schedule(calendar_id: str, start_date: date) -> tuple[list
                         cond.time_of_day,
                         cond.interval_days,
                         cond.start_date,
+                        cond.max_date,
                         cond.tablet_count,
                         cond.created_at,
                         cond.updated_at,
@@ -80,6 +81,13 @@ def is_medication_due(med: dict, current_date: date) -> bool:
         else:
             sd = current_date
 
+        # Fin de validité optionnelle: max_date est soit une date, soit absent/None
+        max_date = med.get("max_date")
+        if max_date:
+            # Convertir max_date en date si c'est un datetime (depuis la BD)
+            max_date_only = max_date.date() if hasattr(max_date, 'date') else max_date
+            if current_date > max_date_only:
+                return False
 
         delta_days = (current_date - sd).days
 
@@ -221,14 +229,13 @@ def build_medication_table(med: dict, monday: date, total_day: int) -> dict:
 
     for i in range(total_day):
         current_date = monday + timedelta(days=i)
-        if not is_medication_due(med, current_date):
-            continue
+        if is_medication_due(med, current_date):
 
-        day = current_date.strftime("%a")
-        moment = med["time_of_day"]
-        if moment not in table:
-            table[moment] = {}
-        table[moment][day] = med["tablet_count"]
+            day = current_date.strftime("%a")
+            moment = med["time_of_day"]
+            if moment not in table:
+                table[moment] = {}
+            table[moment][day] = med["tablet_count"]
 
     return table
 

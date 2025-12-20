@@ -61,8 +61,8 @@
       "facebook": "Фейсбук",
       "github": "Гитхаб",
       "google": "Google",
-      "twitter": "Твиттер",
-      "microsoft": "Microsoft"
+      "microsoft": "Microsoft",
+      "twitter": "Твиттер"
     },
     "register": "Регистрация",
     "register_with": "Зарегистрируйтесь с помощью:",
@@ -73,8 +73,8 @@
     "with_facebook": "Войти через Facebook",
     "with_github": "Подключение к Github",
     "with_google": "Войти через Google",
-    "with_twitter": "Подключиться к Twitter",
-    "with_microsoft": "Войти через Microsoft"
+    "with_microsoft": "Войти через Microsoft",
+    "with_twitter": "Подключиться к Twitter"
   },
   "auth_callback": {
     "loading": "Подключение...",
@@ -93,10 +93,18 @@
       "add": "Добавить условие",
       "delete": "УДАЛИТЬ",
       "interval_days": "Дневной интервал",
+      "max_date": "Дата окончания",
       "none": "Никаких условий принятия",
       "start_date": "Дата начала",
       "tablet_count": "Количество таблеток",
-      "time_of_day": "Время приема"
+      "time_of_day": "Время приема",
+      "duration_days": "Количество дней",
+      "end_date": "Дата окончания",
+      "for_days": "В течение... дней",
+      "max_date_mode": "Продолжительность приема",
+      "until_date": "До...",
+      "no_limit": "Без ограничений",
+      "expired": "Условие истекло"
     },
     "day": "день",
     "days": "дней",
@@ -107,6 +115,7 @@
     "every": "все",
     "export_pdf": "Экспорт",
     "from": "Из",
+    "until": "До",
     "intake_conditions": "Условия приема",
     "name": "Имя",
     "new_box": "Новая коробка",
@@ -232,15 +241,15 @@
   "expired": "Истекший",
   "expires_at": "Истекает",
   "fcm": {
-    "token_registered": "[FCM] Токен зарегистрирован на стороне бэкэнда",
-    "token_send_error": "[FCM] Ошибка отправки токена",
     "device_registration": "Получать уведомления на этом устройстве",
     "device_registration_desc": "Включите push-уведомления, чтобы в режиме реального времени получать напоминания и оповещения о приеме лекарств.",
     "enable_btn": "Включить уведомления",
     "enabled_msg": "Уведомления включены!",
-    "sw_registered": "Зарегистрированный работник сферы услуг",
+    "reload": "Пополнение счета",
     "sw_error": "Ошибка регистрации работника службы поддержки",
-    "reload": "Пополнение счета"
+    "sw_registered": "Зарегистрированный работник сферы услуг",
+    "token_registered": "[FCM] Токен зарегистрирован на стороне бэкэнда",
+    "token_send_error": "[FCM] Ошибка отправки токена"
   },
   "features": {
     "desc1": "Планируйте свои прививки, получайте напоминания и будьте спокойны.",

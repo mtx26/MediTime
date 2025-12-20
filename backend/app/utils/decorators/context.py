@@ -1,7 +1,6 @@
 # app/utils/context.py
 from functools import wraps
 from flask import g, request
-import time
 
 def with_query_origin(default_origin: str | None = None):
     """Décorateur pour extraire le paramètre de requête 'origin' et le stocker dans le contexte global Flask (g).

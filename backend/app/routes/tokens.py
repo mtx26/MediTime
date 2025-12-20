@@ -1,13 +1,10 @@
-from app.utils.responses import success_response, error_response, warning_response
-from app.utils.auth import require_auth
-from datetime import datetime, timezone
-from . import api
 from flask import request, g
+from . import api
+from datetime import datetime, timezone
 from app.db.connection import get_connection
 from app.services.calendar import generate_calendar_schedule
-from app.services.calendar import verify_calendar, verify_token_owner, verify_token
-from app.utils.measure import measure_time
-from app.utils import with_query_origin
+from app.utils.responses import success_response, error_response, warning_response
+from app.utils.decorators import require_auth, measure_time, with_query_origin, verify_calendar, verify_token_owner, verify_token
 
 # Route pour récupérer tous les tokens et les informations associées
 @api.route("/tokens", methods=["GET"])

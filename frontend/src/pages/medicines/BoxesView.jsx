@@ -9,1133 +9,77 @@ import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 import QRCodeScanner from '../../components/scanner/QRCodeScanner';
 
-const getBorderClass = (box) => {
-  if (box.box_capacity === 0) return '';
-  if (box.stock_quantity <= 0) return 'border-danger';
-  if (box.stock_quantity <= box.stock_alert_threshold) return 'border-warning';
-  return '';
-};
+// ============================================================================
+// UTILITY COMPONENTS
+// ============================================================================
 
-
-
-const createIconButton = (className, icon, text, onClick, ariaLabel, title) => (
-  <button
-    type="button"
-    className={className}
-    onClick={onClick}
-    aria-label={ariaLabel || text}
+const IconButton = ({ className, icon, text, onClick, title }) => (
+  <button 
+    type="button" 
+    className={`${className} shadow`} 
+    onClick={onClick} 
+    aria-label={text} 
     title={title || text}
   >
     <i className={`bi bi-${icon}`}></i> {text}
   </button>
 );
 
-const createBadge = (bgColor, icon, text) => (
-  <span className={`badge bg-${bgColor}`}>
+const Badge = ({ color, icon, text }) => (
+  <span className={`badge bg-${color}`}>
     <i className={`bi bi-${icon}`} /> {text}
   </span>
 );
 
-const createActionCard = ({ borderColor, iconClass, textColor, text, onClick, ariaLabel, hasTooltip, showTooltip, setShowTooltip, t, dataTour }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="btn p-0 border-0 bg-transparent text-start flex-fill"
-    style={{ cursor: 'pointer' }}
-    aria-label={ariaLabel}
-    title={ariaLabel}
-    data-tour={dataTour}
-  >
-    <div className={`card h-100 shadow border border-${borderColor}`}>
-      <div className={`card-body d-flex flex-column justify-content-center align-items-center p-3 ${hasTooltip ? 'position-relative' : ''}`}>
-        {hasTooltip && (
-          <button
-            type="button"
-            className="btn btn-link position-absolute top-0 end-0 m-1 p-1 text-info"
-            style={{ fontSize: '1.2rem' }}
-            onMouseEnter={() => setShowTooltip(true)}
-            onMouseLeave={() => setShowTooltip(false)}
-          >
-            <i className="bi bi-info-circle"></i>
-            {showTooltip && (
-              <div
-                className="position-absolute bg-dark text-white p-2 rounded shadow"
-                style={{
-                  top: '100%',
-                  right: '0',
-                  width: '200px',
-                  fontSize: '0.8rem',
-                  zIndex: 1050
-                }}
-              >
-                {t('boxes.qr_code_help_text')}
-              </div>
-            )}
-          </button>
-        )}
-        <i className={`${iconClass} ${textColor} fs-1`}></i>
-        <p className={`${textColor} fw-bold mt-2 mb-0 text-center`}>{text}</p>
-      </div>
-    </div>
-  </button>
-);
-
-function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
-  const location = useLocation();
-  const params = useParams();
-  const navigate = useNavigate();
-  const lng = params.lng;
-  const { t } = useTranslation();
-
-  const [boxes, setBoxes] = useState([]);
-  const [loadingBoxes, setLoadingBoxes] = useState(undefined);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('');
-  
-  const showAlert = (message, type) => {
-    setAlertMessage(message);
-    setAlertType(type);
-  };
-
-  const handleApiResponse = (res, successMessage = null) => {
-    if (res.success) {
-      showAlert('✅ ' + (successMessage || res.message), 'success');
-    } else {
-      showAlert('❌ ' + res.error, 'danger');
-    }
-    return res.success;
-  };
-
-  const getCommonActions = (calendarType) => {
-    const actions = [];
-
-    // Export PDF (action métier)
-    actions.push({
-      label: (
-        <>
-          <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
-        </>
-      ),
-      onClick: () => calendarSource.downloadCalendarPdf(calendarId),
-      title: t('boxes.export_pdf'),
-    });
-
-    // Actions spécifiques aux calendriers personnels
-    if (calendarType === 'personal') {
-      actions.unshift({
-        label: (
-          <>
-            <i className="bi bi-box-arrow-up me-2" /> {t('share')}
-          </>
-        ),
-        linkTo: `/${lng}/shared-calendars?calendar=${calendarId}`,
-        title: t('share'),
-      });
-      actions.push(
-        { separator: true },
-        {
-          label: (
-            <>
-              <i className="bi bi-exclamation-triangle me-2" /> {t('stock')}
-            </>
-          ),
-          linkTo: `/${lng}/${basePath}/${calendarId}/stock-alerts`,
-          title: t('stock'),
-        }
-      );
-    }
-
-    // Paramètres
-    actions.push(
-      {
-        label: (
-          <>
-            <i className="bi bi-calendar3 me-2" /> {t('ics.calendar_ics')}
-          </>
-        ),
-        linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
-        title: t('ics.calendar_ics'),
-      },
-      { separator: true },
-      {
-        label: (
-          <>
-            <i className="bi bi-gear me-2" /> {t('settings.label')}
-          </>
-        ),
-        linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
-        title: t('settings.label')
-      },
-      { separator: true }
-    );
-
-    // Suppression calendrier (action métier)
-    if (calendarType === 'personal') {
-      actions.push({
-        label: (
-          <>
-            <i className="bi bi-trash me-2" /> {t('delete')}
-          </>
-        ),
-        onClick: async () => {
-          const rep = await personalCalendars.deleteCalendar(calendarId);
-          if (rep.success) {
-            navigate(`/${lng}/calendars`);
-          } else {
-            showAlert(rep.error, 'danger');
-          }
-        },
-        title: t('delete'),
-        danger: true
-      });
-    } else if (calendarType === 'sharedUser') {
-      actions.push({
-        label: (
-          <>
-            <i className="bi bi-trash3 me-2" /> {t('delete')}
-          </>
-        ),
-        onClick: () => sharedUserCalendars.deleteSharedCalendar(calendarId),
-        title: t('delete'),
-        danger: true
-      });
-    }
-
-    return actions;
-  };
-  const [selectedModifyBox, setSelectedModifyBox] = useState(null);
-  const [selectedDropBox, setSelectedDropBox] = useState({});
-  const [modifyBoxName, setModifyBoxName] = useState({});
-  const [modifyBoxCapacity, setModifyBoxCapacity] = useState({});
+const ActionCard = ({ borderColor, icon, color, text, onClick, hasTooltip, tooltip, dataTour, t }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const [showQRModal, setShowQRModal] = useState(false);
-  const [singleScan, setSingleScan] = useState(false); // true pour update, false pour add
-  const [currentEditingBoxId, setCurrentEditingBoxId] = useState(null); // ID de la boîte en cours d'édition
-  const [modifyBoxStockAlertThreshold, setModifyBoxStockAlertThreshold] =
-    useState({});
-  const [modifyBoxStockQuantity, setModifyBoxStockQuantity] = useState({});
-  const [boxConditions, setBoxConditions] = useState({});
-  const [dose, setDose] = useState({});
-
-  let calendarType = 'personal';
-  let calendarId = params.calendarId;
-  let basePath = 'calendar';
-
-  const pathWithoutLang =
-    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-
-  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
-    calendarType = 'sharedUser';
-    calendarId = params.calendarId;
-    basePath = 'shared-user-calendar';
-  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
-    calendarType = 'token';
-    calendarId = params.sharedToken;
-    basePath = 'shared-token-calendar';
-  }
-
-  const calendarSource = getCalendarSourceMap(
-    personalCalendars,
-    sharedUserCalendars,
-    tokenCalendars
-  )[calendarType];
-
-  const isDemo = calendarId === 'demo';
-
-  useRealtimeBoxesSwitcher(
-    isDemo ? null : calendarType,
-    calendarId,
-    setBoxes,
-    isDemo ? () => { /* no-op */ } : setLoadingBoxes
-  );
-
-
-  useEffect(() => {
-    if (isDemo) {
-      setBoxes([
-        {
-          id: 'demo-1',
-          name: 'Doliprane 1000mg',
-          dose: '1000 mg',
-          box_capacity: 8,
-          stock_quantity: 5,
-          stock_alert_threshold: 2,
-          conditions: []
-        },
-        {
-          id: 'demo-2',
-          name: 'Amoxicilline',
-          dose: '500 mg',
-          box_capacity: 12,
-          stock_quantity: 1,
-          stock_alert_threshold: 3,
-          conditions: []
-        },
-        {
-          id: 'demo-3',
-          name: 'Vitamin C',
-          dose: '500 mg',
-          box_capacity: 30,
-          stock_quantity: 25,
-          stock_alert_threshold: 5,
-          conditions: []
-        }
-      ]);
-      setLoadingBoxes(true);
-    }
-  }, [isDemo]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const boxConditionsForSelected = boxConditions[selectedModifyBox] || {};
-    
-    const conditions = Object.values(boxConditionsForSelected).filter(
-      (condition) => condition !== undefined
-    );
-    
-    const box = {
-      name: modifyBoxName[selectedModifyBox],
-      dose: dose[selectedModifyBox],
-      box_capacity: modifyBoxCapacity[selectedModifyBox],
-      stock_alert_threshold: modifyBoxStockAlertThreshold[selectedModifyBox],
-      stock_quantity: modifyBoxStockQuantity[selectedModifyBox],
-      conditions: conditions,
-    };
-    
-    const res = await calendarSource.updateBox(
-      calendarId,
-      selectedModifyBox,
-      box
-    );
-    handleApiResponse(res);
-    setSelectedModifyBox(null);
-  };
-
-  const restockBox = async (boxId) => {
-    const res = await calendarSource.restockBox(calendarId, boxId);
-    handleApiResponse(res);
-  };
-
-  const addBox = async () => {
-    const res = await calendarSource.createBox(calendarId, t('boxes.new_box'));
-    if (res.success) {
-      setSelectedModifyBox(res.boxId);
-      setSelectedDropBox((prev) => ({ ...prev, [res.boxId]: true }));
-    }
-  };
-
-  const processMedicineCreation = async (medicineBox) => {
-    try {
-      const res = await calendarSource.createBox(
-        calendarId,
-        medicineBox.name,
-        medicineBox.box_capacity,
-        medicineBox.stock_alert_threshold,
-        medicineBox.stock_quantity,
-        medicineBox.dose
-      );
-      return res.success;
-    } catch (error) {
-      console.error('Erreur création boîte:', error);
-      return false;
-    }
-  };
-
-  const addScannedMedicines = async (medicineBoxes) => {
-    if (!medicineBoxes || medicineBoxes.length === 0) {
-      showAlert('⚠️ Ajouter des médicaments', 'warning');
-      return { success: false };
-    }
-
-    let successCount = 0;
-    let errorCount = 0;
-
-    for (const medicineBox of medicineBoxes) {
-      const success = await processMedicineCreation(medicineBox);
-      if (success) {
-        successCount++;
-      } else {
-        errorCount++;
-      }
-    }
-
-    setShowQRModal(false);
-
-    if (errorCount === 0) {
-      showAlert('✅ Ajouté', 'success');
-      return { success: true, successCount, errorCount };
-    } else if (successCount === 0) {
-      showAlert('❌ Ajouter des médicaments', 'danger');
-      return { success: false, successCount, errorCount };
-    } else {
-      showAlert(`⚠️ ${successCount} ajouté(s), ${errorCount} erreur(s)`, 'warning');
-      return { success: true, successCount, errorCount };
-    }
-  };
-
-  const updateScannedMedicine = async (medicineBoxes) => {
-    if (!medicineBoxes || medicineBoxes.length === 0 || !currentEditingBoxId) {
-      showAlert('⚠️ Ajouter un médicament', 'warning');
-      return { success: false };
-    }
-
-    const medicineBox = medicineBoxes[0];
-    try {
-      // Récupérer les conditions actuelles du médicament
-      const currentBox = boxes.find(box => box.id === currentEditingBoxId);
-      const currentConditions = currentBox ? currentBox.conditions : [];
-      
-      const box = {
-        name: medicineBox.name,
-        dose: medicineBox.dose,
-        box_capacity: medicineBox.box_capacity,
-        stock_alert_threshold: medicineBox.stock_alert_threshold,
-        stock_quantity: medicineBox.stock_quantity,
-        conditions: currentConditions, // Conserver les conditions existantes
-      };
-      
-      const res = await calendarSource.updateBox(calendarId, currentEditingBoxId, box);
-      
-      setShowQRModal(false);
-      setCurrentEditingBoxId(null);
-      setSingleScan(false);
-      
-      if (res.success) {
-        showAlert('✅ Ajouté', 'success');
-        return { success: true, successCount: 1, errorCount: 0 };
-      } else {
-        showAlert('❌ Ajouter un médicament', 'danger');
-        return { success: false, successCount: 0, errorCount: 1 };
-      }
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
-      showAlert('❌ Ajouter un médicament', 'danger');
-      return { success: false, successCount: 0, errorCount: 1 };
-    }
-  };
-
-  const openAddMode = () => {
-    setSingleScan(false);
-    setCurrentEditingBoxId(null);
-    setShowQRModal(true);
-  };
-
-  const openUpdateMode = (boxId) => {
-    setSingleScan(true);
-    setCurrentEditingBoxId(boxId);
-    setShowQRModal(true);
-  };
-
-  const deleteBox = async (boxId) => {
-    const res = await calendarSource.deleteBox(calendarId, boxId);
-    handleApiResponse(res);
-  };
-
-  const initializeBoxStates = (boxes) => {
-    const createStateFromBoxes = (field, defaultValue = {}) => 
-      boxes.reduce((acc, box) => ({ ...acc, [box.id]: box[field] }), defaultValue);
-
-    setModifyBoxName(createStateFromBoxes('name'));
-    setDose(createStateFromBoxes('dose'));
-    setModifyBoxCapacity(createStateFromBoxes('box_capacity'));
-    setModifyBoxStockAlertThreshold(createStateFromBoxes('stock_alert_threshold'));
-    setModifyBoxStockQuantity(createStateFromBoxes('stock_quantity'));
-    setBoxConditions(
-      boxes.reduce(
-        (acc, box) => ({
-          ...acc,
-          [box.id]: box.conditions.reduce(
-            (condAcc, condition) => ({ ...condAcc, [condition.id]: condition }),
-            {}
-          ),
-        }),
-        {}
-      )
-    );
-  };
-
-  useEffect(() => {
-    if (boxes.length > 0) {
-      initializeBoxStates(boxes);
-    }
-  }, [boxes]);
-
-  if (loadingBoxes === undefined) {
-    return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: '60vh' }}
-      >
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">{t('loading_medicines')}</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (loadingBoxes === false) {
-    return (
-      <div className="alert alert-danger text-center mt-5" role="alert">
-        {t('invalid_or_expired_link')}
-      </div>
-    );
-  }
-
-  return (
-    <div className="container align-items-center d-flex flex-column gap-3">
-      <div className="p-1 w-100" style={{ maxWidth: '800px' }}>
-        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap" data-tour="stock-view-title">
-          <h4 className="mb-0 fw-bold">
-            <i className="bi bi-box-seam me-2"></i> {t('boxes.title')}
-          </h4>
-          <div className="ms-auto">
-            {calendarType === 'personal' && (
-              <ActionSheet actions={getCommonActions('personal')} />
-            )}
-            {calendarType === 'sharedUser' && (
-              <ActionSheet actions={getCommonActions('sharedUser')} />
-            )}
-          </div>
-        </div>
-
-
-
-        <AlertSystem
-          type={alertType}
-          message={alertMessage}
-          onClose={() => {
-            setAlertMessage('');
-            setAlertType('');
-          }}
-        />
-        <div className="row row-cols-1 row-cols-md-2 g-4">
-          {boxes.map((box) => (
-            <div className="col-12 col-md-6 mb-3" key={box.id}>
-              {selectedModifyBox && selectedModifyBox === box.id ? (
-                <form onSubmit={handleSubmit}>
-                  <BoxCard
-                    box={box}
-                    selectedModifyBox={selectedModifyBox}
-                    setSelectedModifyBox={setSelectedModifyBox}
-                    setModifyBoxName={setModifyBoxName}
-                    modifyBoxName={modifyBoxName}
-                    setModifyBoxCapacity={setModifyBoxCapacity}
-                    modifyBoxCapacity={modifyBoxCapacity}
-                    setModifyBoxStockAlertThreshold={setModifyBoxStockAlertThreshold}
-                    modifyBoxStockAlertThreshold={modifyBoxStockAlertThreshold}
-                    setModifyBoxStockQuantity={setModifyBoxStockQuantity}
-                    modifyBoxStockQuantity={modifyBoxStockQuantity}
-                    restockBox={restockBox}
-                    deleteBox={deleteBox}
-                    selectedDropBox={selectedDropBox}
-                    setSelectedDropBox={setSelectedDropBox}
-                    boxConditions={boxConditions}
-                    setBoxConditions={setBoxConditions}
-                    setDose={setDose}
-                    dose={dose}
-                    openUpdateMode={openUpdateMode}
-                  />
-                </form>
-              ) : (
-                <BoxCard
-                  box={box}
-                  selectedModifyBox={selectedModifyBox}
-                  setSelectedModifyBox={setSelectedModifyBox}
-                  setModifyBoxName={setModifyBoxName}
-                  modifyBoxName={modifyBoxName}
-                  setModifyBoxCapacity={setModifyBoxCapacity}
-                  modifyBoxCapacity={modifyBoxCapacity}
-                  setModifyBoxStockAlertThreshold={setModifyBoxStockAlertThreshold}
-                  modifyBoxStockAlertThreshold={modifyBoxStockAlertThreshold}
-                  setModifyBoxStockQuantity={setModifyBoxStockQuantity}
-                  modifyBoxStockQuantity={modifyBoxStockQuantity}
-                  restockBox={restockBox}
-                  deleteBox={deleteBox}
-                  selectedDropBox={selectedDropBox}
-                  setSelectedDropBox={setSelectedDropBox}
-                  boxConditions={boxConditions}
-                  setBoxConditions={setBoxConditions}
-                  setDose={setDose}
-                  dose={dose}
-                  openUpdateMode={openUpdateMode}
-                />
-              )}
-            </div>
-          ))}
-          <div className="col-12 col-md-6 mb-3">
-            <div className="d-flex flex-column gap-2 h-100">
-              {createActionCard({
-                borderColor: 'success',
-                iconClass: 'bi bi-plus-circle',
-                textColor: 'text-success',
-                text: t('boxes.add_manual'),
-                onClick: () => addBox(),
-                ariaLabel: t('boxes.add_manual'),
-                hasTooltip: false,
-                showTooltip,
-                setShowTooltip,
-                t,
-                dataTour: "add-manual-btn"
-              })}
-              {createActionCard({
-                borderColor: 'primary',
-                iconClass: 'bi bi-qr-code-scan',
-                textColor: 'text-primary',
-                text: t('boxes.add_with_qr'),
-                onClick: openAddMode,
-                ariaLabel: t('boxes.add_with_qr'),
-                hasTooltip: true,
-                showTooltip,
-                setShowTooltip,
-                t,
-                dataTour: "add-qr-btn"
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Composant QRCodeScanner avec modal intégrée */}
-      <QRCodeScanner
-        modal={true}
-        show={showQRModal}
-        singleScan={singleScan}
-        onAddAll={singleScan ? updateScannedMedicine : addScannedMedicines}
-        onClose={() => {
-          setShowQRModal(false);
-          setCurrentEditingBoxId(null);
-          setSingleScan(false);
-        }}
-      />
-    </div>
-  );
-}
-
-function BoxCard({
-  box,
-  selectedModifyBox,
-  setSelectedModifyBox,
-  setModifyBoxName,
-  modifyBoxName,
-  setModifyBoxCapacity,
-  modifyBoxCapacity,
-  setModifyBoxStockAlertThreshold,
-  modifyBoxStockAlertThreshold,
-  setModifyBoxStockQuantity,
-  modifyBoxStockQuantity,
-  restockBox,
-  deleteBox,
-  selectedDropBox,
-  setSelectedDropBox,
-  boxConditions,
-  setBoxConditions,
-  setDose,
-  dose,
-  openUpdateMode
-}) {
-  const { t } = useTranslation();
-
-  const getBoxActions = () => [
-    {
-      label: (
-        <>
-          <i className="bi bi-qr-code-scan me-2" /> {t('boxes.scan_qr_code')}
-        </>
-      ),
-      onClick: () => openUpdateMode(box.id),
-      title: t('boxes.scan_qr_code'),
-    },
-    { separator: true },
-    {
-      label: (
-        <>
-          <i className="bi bi-pencil me-2" /> {t('boxes.edit')}
-        </>
-      ),
-      onClick: () => setSelectedModifyBox(box.id),
-      title: t('boxes.edit'),
-      dataTour: 'box-edit-btn',
-    },
-    {
-      label: (
-        <>
-          <i className="bi bi-file-earmark-pdf me-2" /> {t('boxes.view_notice')}
-        </>
-      ),
-      onClick: () => openNotice(box.id),
-      title: t('boxes.view_notice'),
-    },
-    { separator: true },
-    {
-      label: (
-        <>
-          <i className="bi bi-trash me-2" /> {t('boxes.delete')}
-        </>
-      ),
-      onClick: () => deleteBox(box.id),
-      title: t('boxes.delete'),
-      danger: true,
-    },
-  ];
-
-  const resetModificationStates = () => {
-    setSelectedModifyBox(null);
-    setModifyBoxName({ ...modifyBoxName, [box.id]: box.name });
-    setModifyBoxCapacity({ ...modifyBoxCapacity, [box.id]: box.box_capacity });
-    setModifyBoxStockAlertThreshold({ ...modifyBoxStockAlertThreshold, [box.id]: box.stock_alert_threshold });
-    setModifyBoxStockQuantity({ ...modifyBoxStockQuantity, [box.id]: box.stock_quantity });
-    setBoxConditions({
-      ...boxConditions,
-      [box.id]: box.conditions.reduce(
-        (acc, condition) => ({ ...acc, [condition.id]: condition }),
-        {}
-      ),
-    });
-    setDose({ ...dose, [box.id]: box.dose });
-  };
-
-  const addNewCondition = () => {
-    const id = uuidv4();
-    
-    setBoxConditions((prev) => {
-      const newState = {
-        ...prev,
-        [box.id]: {
-          ...(prev[box.id] || {}),
-          [id]: {
-            id,
-            tablet_count: 1,
-            interval_days: 1,
-            start_date: null,
-            time_of_day: 'morning',
-          },
-        },
-      };
-      
-      return newState;
-    });
-  };
-
-  const deleteCondition = (conditionId) => {
-    setBoxConditions((prev) => ({
-      ...prev,
-      [box.id]: {
-        ...prev[box.id],
-        [conditionId]: undefined,
-      },
-    }));
-  };
-
-  const handleConditionChange = (conditionId, field, value) => {
-    setBoxConditions((prev) => ({
-      ...prev,
-      [box.id]: {
-        ...prev[box.id],
-        [conditionId]: {
-          ...prev[box.id][conditionId],
-          [field]: value,
-        },
-      },
-    }));
-  };
-
-  const editable = selectedModifyBox === box.id;
-  const timeOfDayMap = {
-    morning: t('morning'),
-    noon: t('noon'),
-    evening: t('evening'),
-  };
-
-  const getConditionFields = (condition) => [
-    {
-      label: t('boxes.condition.tablet_count'),
-      field: 'tablet_count',
-      type: 'number',
-      min: '0',
-      step: '0.25',
-    }, 
-    {
-      label: t('boxes.condition.time_of_day'),
-      field: 'time_of_day',
-      type: 'select',
-      options: [
-        { value: 'morning', label: t('morning') },
-        { value: 'noon', label: t('noon') },
-        { value: 'evening', label: t('evening') },
-      ],
-    }, 
-    {
-      label: t('boxes.condition.interval_days'),
-      field: 'interval_days',
-      type: 'number',
-      min: '0',
-      step: '1',
-    }, 
-    {
-      label: t('boxes.condition.start_date'),
-      field: 'start_date',
-      type: 'date',
-      disabled: condition.interval_days === 1,
-    }
-  ];
-
-  const getDisplayValue = (field, value, options = null) => {
-    if (!value && value !== 0) return '-';
-    
-    if (options) {
-      const option = options.find(opt => opt.value === value);
-      return option?.label || value;
-    }
-    
-    if (field === 'time_of_day') {
-      return timeOfDayMap[value] || value;
-    }
-    
-    return value;
-  };
-
-  const openNotice = (box_id) => {
-    const url = `${import.meta.env.VITE_API_URL}/api/proxy/pdf/${box_id}`;
-    window.open(url, '_blank');
-  };
-
-  const toggleDrop = () =>
-    setSelectedDropBox((prev) => ({ ...prev, [box.id]: !prev[box.id] }));
-
-  const borderClass = getBorderClass(box);
-
-  return (
-    <div className={`card h-100 shadow border ${borderClass}`}>
-      <div className="card-body position-relative">
-      <div className="position-absolute top-0 end-0 m-2">
-        {(!selectedModifyBox || selectedModifyBox !== box.id) && (
-          <ActionSheet
-            buttonSize="sm"
-            actions={getBoxActions()}
-          />
-        )}
-      </div>
-
-      <h5 className="card-title fs-semibold mb-1">
-        {selectedModifyBox && selectedModifyBox === box.id ? (
-          <InputDropdown
-            name={modifyBoxName[box.id]}
-            dose={dose[box.id]}
-            onChangeName={(newName) =>
-              setModifyBoxName({ ...modifyBoxName, [box.id]: newName })
-            }
-            onChangeDose={(newDose) =>
-              setDose({ ...dose, [box.id]: newDose })
-            }
-            onChangeBoxCapacity={(newBoxCapacity) =>
-              setModifyBoxCapacity({
-                ...modifyBoxCapacity,
-                [box.id]: newBoxCapacity,
-              })
-            }
-            onChangeStockQuantity={(newStockQuantity) =>
-              setModifyBoxStockQuantity({
-                ...modifyBoxStockQuantity,
-                [box.id]: newStockQuantity,
-              })
-            }
-            fetchSuggestions={fetchSuggestions}
-          />
-        ) : (
-          modifyBoxName[box.id] +
-          (dose[box.id] > 0 ? ' (' + dose[box.id] + ' mg)' : '')
-        )}
-      </h5>
-
-      <div className="d-flex mb-2 gap-2">
-        {[{
-          label: t('boxes.capacity'),
-          field: 'box_capacity',
-          value: modifyBoxCapacity[box.id],
-          onChange: (e) =>
-            setModifyBoxCapacity({
-              ...modifyBoxCapacity,
-              [box.id]: e.target.value,
-            }),
-        }, {
-          label: t('boxes.alert_threshold'),
-          field: 'stock_alert_threshold',
-          value: modifyBoxStockAlertThreshold[box.id],
-          onChange: (e) =>
-            setModifyBoxStockAlertThreshold({
-              ...modifyBoxStockAlertThreshold,
-              [box.id]: e.target.value,
-            }),
-        }].map(({ label, field, value, onChange }) => (
-          <BoxField
-            key={field}
-            type="number"
-            label={label}
-            value={value}
-            editable={editable}
-            onChange={onChange}
-          />
-        ))}
-      </div>
-      <div className="d-flex mb-2 gap-2 align-items-center">
-        <BoxField
-          type="number"
-          label={t('boxes.remaining_qty')}
-          value={modifyBoxStockQuantity[box.id]}
-          editable={editable}
-          onChange={(e) =>
-            setModifyBoxStockQuantity({
-              ...modifyBoxStockQuantity,
-              [box.id]: e.target.value,
-            })
-          }
-        />
-        {(!selectedModifyBox || selectedModifyBox !== box.id) && (
-          <>
-            <div className="w-50">
-              {createIconButton(
-                "btn btn-outline-success",
-                "plus-circle",
-                t('boxes.restock'),
-                () => restockBox(box.id),
-                t('boxes.restock'),
-                t('boxes.restock')
-              )}
-            </div>
-          </>
-        )}
-      </div>
-
-      {(!selectedModifyBox || selectedModifyBox !== box.id) && (
-        <div className="d-flex mb-2 align-items-center w-100 gap-2">
-          <StockBadge box={box} />
-          <ConditionUnlessBadge 
-            conditions={box.conditions} 
-            boxId={box.id} 
-            setSelectedDropBox={setSelectedDropBox}
-            setSelectedModifyBox={setSelectedModifyBox}
-          />
-        </div> 
-      )}
-
-      <div className="mt-4 mb-2">
-        <hr className="border-dark mb-0" />
-        <h5 className="w-100">
-          <button
-            className="btn w-100 text-start d-flex justify-content-between align-items-center border-0 bg-transparent px-0 pb-0 mb-0"
-            type="button"
-            title={t('boxes.intake_conditions')}
-            aria-label={t('boxes.intake_conditions')}
-            onClick={toggleDrop}
-            data-tour="box-condition-toggle"
-          >
-            <span>{t('boxes.intake_conditions')}</span>
-            <i
-              className={`bi bi-chevron-${selectedDropBox[box.id] === true ? 'up' : 'down'}`}
-            ></i>
-          </button>
-        </h5>
-
-        {/* Condition de prise */}
-        {selectedDropBox[box.id] === true && (
-          <div className="mt-2">
-            {editable ? (
-              <>
-                {Object.values(boxConditions[box.id] || {})
-                  .filter((condition) => condition !== undefined)
-                  .map((condition) => (
-                    <div key={condition.id}>
-                      <div className="mb-2 p-3 border rounded bg-light">
-                        {getConditionFields(condition).map(({ label, field, type, min, step, options, disabled }) => (
-                          <div key={field}>
-                            <label htmlFor={field}>{label}</label>
-                            {type === 'select' ? (
-                              <select
-                                className="form-control form-control-sm"
-                                defaultValue={condition[field]}
-                                title={label}
-                                aria-label={label}
-                                onChange={(e) => handleConditionChange(condition.id, field, e.target.value)}
-                              >
-                                {options.map(opt => (
-                                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                ))}
-                              </select>
-                            ) : (
-                              <input
-                                type={type}
-                                className="form-control form-control-sm"
-                                defaultValue={
-                                  field === 'start_date' && condition.start_date
-                                    ? new Date(condition.start_date).toISOString().split('T')[0]
-                                    : condition[field]
-                                }
-                                title={label}
-                                aria-label={label}
-                                min={min}
-                                step={step}
-                                disabled={disabled}
-                                onChange={(e) => handleConditionChange(condition.id, field, e.target.value)}
-                              />
-                            )}
-                          </div>
-                        ))}
-                        {createIconButton(
-                          "btn btn-danger btn-sm mt-2",
-                          "trash",
-                          t('boxes.condition.delete'),
-                          () => deleteCondition(condition.id),
-                          t('boxes.condition.delete'),
-                          t('boxes.condition.delete')
-                        )}
-                      </div>
-                    </div>
-                  ))}
-
-                {createIconButton(
-                  "btn btn-outline-dark w-100",
-                  "plus-lg",
-                  t('boxes.condition.add'),
-                  addNewCondition
-                )}
-              </>
-            ) : Object.values(box.conditions).filter(
-                (condition) => condition !== undefined
-              ).length > 0 ? (
-              Object.values(box.conditions)
-                .filter((condition) => condition !== undefined)
-                .map((condition) => (
-                  <div
-                    className="mb-2 p-3 border rounded bg-light"
-                    key={condition.id}
-                  >
-                    <strong>
-                      {condition.tablet_count}{' '}
-                      {condition.tablet_count > 1 ? t('boxes.tablets') : t('boxes.tablet')}
-                    </strong>{' '}
-                    {t('boxes.every')} {' '}
-                    <strong>
-                      {condition.interval_days}{' '}
-                      {condition.interval_days > 1 ? t('boxes.days') : t('boxes.day')}
-                    </strong>{' '}
-                    {t('boxes.each')} {' '}
-                    <strong>{getDisplayValue('time_of_day', condition.time_of_day)}</strong>
-                    <br />
-                    {condition.interval_days > 1 && (
-                      <small className="text-muted">
-                        {t('boxes.from')} {' '}
-                        {new Date(condition.start_date).toLocaleDateString()}
-                      </small>
-                    )}
-                  </div>
-                ))
-            ) : (
-              <div className="border rounded bg-light d-flex justify-content-start align-items-center p-2 mb-2">
-                <p className="text-muted mb-0">{t('boxes.condition.none')}</p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {selectedModifyBox && selectedModifyBox === box.id && (
-        <>
-          <hr />
-          <div className="d-flex gap-2">
-            <button
-              type="submit"
-              className="btn btn-success btn-sm"
-              aria-label={t('boxes.save')}
-              title={t('boxes.save')}
-            >
-              <i className="bi bi-save"></i> {t('boxes.save')}
-            </button>
-            {createIconButton(
-              "btn btn-secondary btn-sm",
-              "x",
-              t('boxes.cancel'),
-              resetModificationStates,
-              t('boxes.cancel'),
-              t('boxes.cancel')
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  </div>
-);
-}
-
-function BoxField({
-  type,
-  label,
-  value,
-  editable,
-  onChange,
-  onFocus = null,
-  onBlur = null,
-  onClick = null,
-}) {
-  return (
-    <div className="w-50">
-      <small className="text-muted">{label}</small>
-      <br />
-      {editable ? (
-        <input
-          type={type}
-          aria-label={label}
-          className="form-control form-control-sm w-75"
-          value={value}
-          onChange={onChange}
-          required
-          onFocus={onFocus}
-          onBlur={onBlur}
-          onClick={onClick}
-        />
-      ) : (
-        <strong>{value}</strong>
-      )}
-    </div>
-  );
-}
-
-function StockBadge({ box }) {
-  const { t } = useTranslation();
   
-  if (box.box_capacity === 0) return null;
-
-  if (box.stock_quantity <= 0) {
-    return createBadge('danger', 'exclamation-triangle', t('boxes.stock.badge.out'));
-  }
-
-  if (box.stock_quantity <= box.stock_alert_threshold) {
-    return createBadge('warning', 'exclamation-triangle', t('boxes.stock.badge.low'));
-  }
-
-  return createBadge('success', 'check-circle', t('boxes.stock.badge.high'));
-}
-
-function ConditionUnlessBadge({ conditions, boxId, setSelectedDropBox, setSelectedModifyBox }) {
-  const { t } = useTranslation();
-
-  const hasNoConditions =
-    Object.values(conditions || {}).filter((c) => c !== undefined).length === 0;
-
-  return hasNoConditions ? (
+  return (
     <button 
-      className='btn p-0' 
-      onClick={() => {
-        setSelectedDropBox((prev) => ({ ...prev, [boxId]: true }));
-        setSelectedModifyBox(boxId)
-      }}
+      type="button" 
+      onClick={onClick} 
+      className="btn p-0 border-0 bg-transparent text-start flex-fill" 
+      data-tour={dataTour}
+      aria-label={text}
+      title={text}
     >
-      {createBadge('warning', 'info-circle', t('boxes.condition.none'))}
+      <div className={`card h-100 shadow border border-${borderColor}`}>
+        <div className="card-body d-flex flex-column justify-content-center align-items-center p-3 position-relative">
+          {hasTooltip && (
+            <div
+              className="position-absolute top-0 end-0 m-1 p-1 text-info"
+              style={{ cursor: 'help' }}
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+            >
+              <i className="bi bi-info-circle"></i>
+              {showTooltip && (
+                <div 
+                  className="position-absolute bg-dark text-white p-2 rounded shadow" 
+                  style={{ 
+                    top: '100%', 
+                    right: '0', 
+                    width: '200px', 
+                    fontSize: '0.8rem', 
+                    zIndex: 1050 
+                  }}
+                >
+                  {tooltip}
+                </div>
+              )}
+            </div>
+          )}
+          <i className={`bi bi-${icon} text-${color} fs-1`}></i>
+          <p className={`text-${color} fw-bold mt-2 mb-0 text-center`}>
+            {text}
+          </p>
+        </div>
+      </div>
     </button>
-  ) : null;
-}
+  );
+};
 
-function InputDropdown({
+const InputDropdown = ({
   name,
   dose,
   onChangeName,
@@ -1143,11 +87,18 @@ function InputDropdown({
   onChangeBoxCapacity,
   onChangeStockQuantity,
   fetchSuggestions,
-}) {
+}) => {
   const { t } = useTranslation();
   const [suggestions, setSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const inputRef = useRef();
+
+  useEffect(() => {
+    // Focus automatique sur le champ name
+    inputRef.current?.focus();
+    // Scroll pour placer le champ en vue (le scroll-padding du HTML gère l'espace pour header/footer)
+    inputRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
 
   const handleSelect = (item) => {
     const onlyNumbers = parseInt(item.dose.replace(/\D/g, ''));
@@ -1177,35 +128,42 @@ function InputDropdown({
   }, [name, dose]);
 
   return (
-    <div className="position-relative w-100 d-flex gap-2">
+    <div className="position-relative d-flex mb-2 gap-2">
       <div className="w-50">
         <small className="text-muted">{t('boxes.name')}</small>
         <br />
         <input
           ref={inputRef}
           type="text"
-          className="form-control form-control-sm"
+          className="form-control form-control-sm w-75 scroll-target"
           defaultValue={name}
           onChange={(e) => {
             onChangeName(e.target.value);
-            setShowDropdown(true)
+            setShowDropdown(true);
           }}
           onClick={() => setTimeout(() => setShowDropdown(true), 300)}
           onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
           placeholder={t('boxes.start_typing')}
+          aria-label={t('boxes.name')}
+          title={t('boxes.name')}
         />
       </div>
-      <BoxField
-        type="number"
-        label={t('boxes.dose')}
-        value={dose}
-        editable={true}
-        onChange={(e) => {
-          onChangeDose(parseInt(e.target.value));
-        }}
-        onClick={() => setTimeout(() => setShowDropdown(true), 300)}
-        onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
-      />
+      <div className="w-50">
+        <small className="text-muted">{t('boxes.dose')}</small>
+        <br />
+        <input
+          type="number"
+          className="form-control form-control-sm w-75"
+          value={dose}
+          onChange={(e) => {
+            onChangeDose(parseInt(e.target.value));
+          }}
+          onClick={() => setTimeout(() => setShowDropdown(true), 300)}
+          onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+          aria-label={t('boxes.dose')}
+          title={t('boxes.dose')}
+        />
+      </div>
       {showDropdown && suggestions.length > 0 && (
         <ul
           className="dropdown-menu show position-absolute top-100 start-0 w-100"
@@ -1225,6 +183,1180 @@ function InputDropdown({
           ))}
         </ul>
       )}
+    </div>
+  );
+};
+
+// ============================================================================
+// MAIN COMPONENT: BoxesView
+// ============================================================================
+
+function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
+  const location = useLocation();
+  const params = useParams();
+  const navigate = useNavigate();
+  const lng = params.lng;
+  const { t } = useTranslation();
+
+  // =========================================================================
+  // STATE
+  // =========================================================================
+  
+  const [boxes, setBoxes] = useState([]);
+  const [loadingBoxes, setLoadingBoxes] = useState(undefined);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('');
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [singleScan, setSingleScan] = useState(false);
+  const [currentEditingBoxId, setCurrentEditingBoxId] = useState(null);
+  const [expandedBoxes, setExpandedBoxes] = useState({});
+  const [editingBoxId, setEditingBoxId] = useState(null);
+  const [editingBox, setEditingBox] = useState(null);
+
+  // =========================================================================
+  // CALENDAR DETECTION
+  // =========================================================================
+  
+  const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+  let calendarType = 'personal';
+  let calendarId = params.calendarId;
+  let basePath = 'calendar';
+
+  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
+    calendarType = 'sharedUser';
+    basePath = 'shared-user-calendar';
+  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
+    calendarType = 'token';
+    calendarId = params.sharedToken;
+    basePath = 'shared-token-calendar';
+  }
+
+  const calendarSource = getCalendarSourceMap(
+    personalCalendars, 
+    sharedUserCalendars, 
+    tokenCalendars
+  )[calendarType];
+  
+  const isDemo = calendarId === 'demo';
+
+  // =========================================================================
+  // HOOKS
+  // =========================================================================
+  
+  useRealtimeBoxesSwitcher(
+    isDemo ? null : calendarType, 
+    calendarId, 
+    setBoxes, 
+    isDemo ? () => {} : setLoadingBoxes
+  );
+
+  useEffect(() => {
+    if (isDemo) {
+      setBoxes([
+        {
+          id: 'demo-1',
+          name: 'Doliprane 1000mg',
+          dose: '1000 mg',
+          box_capacity: 8,
+          stock_quantity: 5,
+          stock_alert_threshold: 2,
+          conditions: [],
+        },
+        {
+          id: 'demo-2',
+          name: 'Amoxicilline',
+          dose: '500 mg',
+          box_capacity: 12,
+          stock_quantity: 1,
+          stock_alert_threshold: 3,
+          conditions: [],
+        },
+        {
+          id: 'demo-3',
+          name: 'Vitamin C',
+          dose: '500 mg',
+          box_capacity: 30,
+          stock_quantity: 25,
+          stock_alert_threshold: 5,
+          conditions: [],
+        },
+      ]);
+      setLoadingBoxes(true);
+    }
+  }, [isDemo]);
+
+  // =========================================================================
+  // HELPER FUNCTIONS
+  // =========================================================================
+  
+  const showAlert = (msg, type) => {
+    setAlertMessage(msg);
+    setAlertType(type);
+  };
+
+  const handleApiResponse = (res, msg = null) => {
+    if (res.success) {
+      showAlert('✅ ' + (msg || res.message), 'success');
+    } else {
+      showAlert('❌ ' + res.error, 'danger');
+    }
+    return res.success;
+  };
+
+  const initEditing = (box) => {
+    setEditingBoxId(box.id);
+    setEditingBox({
+      name: box.name,
+      dose: box.dose,
+      box_capacity: box.box_capacity,
+      stock_alert_threshold: box.stock_alert_threshold,
+      stock_quantity: box.stock_quantity,
+      conditions: box.conditions.reduce(
+        (acc, c) => ({
+          ...acc,
+          [c.id]: {
+            ...c,
+            max_date_mode: c.max_date 
+              ? (c.max_date_days ? 'for_days' : 'until_date')
+              : '',
+          }
+        }), 
+        {}
+      ),
+    });
+  };
+
+  const resetEditing = () => {
+    setEditingBoxId(null);
+    setEditingBox(null);
+  };
+  
+  const cancelEditing = () => {
+    // Si c'est une box temporaire, la supprimer
+    if (editingBoxId && editingBoxId.startsWith('temp-')) {
+      setBoxes(prev => prev.filter(b => b.id !== editingBoxId));
+    }
+    resetEditing();
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const conditions = Object.values(editingBox.conditions || {}).filter(
+      c => c !== undefined
+    );
+    
+    // Si c'est une nouvelle box temporaire (ID commence par "temp-")
+    if (editingBoxId.startsWith('temp-')) {
+      const res = await calendarSource.createBox(
+        calendarId,
+        editingBox.name,
+        editingBox.box_capacity,
+        editingBox.stock_alert_threshold,
+        editingBox.stock_quantity,
+        editingBox.dose
+      );
+      
+      if (res.success) {
+        // Supprimer la box temporaire et mettre à jour avec la vraie
+        setBoxes(prev => prev.filter(b => b.id !== editingBoxId));
+        handleApiResponse(res);
+      } else {
+        handleApiResponse(res);
+      }
+    } else {
+      // Mise à jour d'une box existante
+      const res = await calendarSource.updateBox(
+        calendarId, 
+        editingBoxId, 
+        { ...editingBox, conditions }
+      );
+      handleApiResponse(res);
+    }
+    
+    resetEditing();
+  };
+
+  const processMedicineCreation = async (med) => {
+    const res = await calendarSource.createBox(
+      calendarId,
+      med.name,
+      med.box_capacity,
+      med.stock_alert_threshold,
+      med.stock_quantity,
+      med.dose
+    );
+    return res.success;
+  };
+
+  const addScannedMedicines = async (medicines) => {
+    if (!medicines?.length) {
+      showAlert('⚠️ Ajouter des médicaments', 'warning');
+      return { success: false };
+    }
+    
+    let success = 0;
+    let error = 0;
+    
+    for (const med of medicines) {
+      if (await processMedicineCreation(med)) {
+        success++;
+      } else {
+        error++;
+      }
+    }
+    
+    setShowQRModal(false);
+    
+    if (error === 0) {
+      showAlert('✅ Ajouté', 'success');
+    } else if (success === 0) {
+      showAlert('❌ Ajouter des médicaments', 'danger');
+    } else {
+      showAlert(`⚠️ ${success} ajouté(s), ${error} erreur(s)`, 'warning');
+    }
+    
+    return { success: error === 0, successCount: success, errorCount: error };
+  };
+
+  const updateScannedMedicine = async (medicines) => {
+    if (!medicines?.length || !currentEditingBoxId) {
+      showAlert('⚠️ Ajouter un médicament', 'warning');
+      return { success: false };
+    }
+    
+    const med = medicines[0];
+    const currentBox = boxes.find(b => b.id === currentEditingBoxId);
+    
+    const res = await calendarSource.updateBox(
+      calendarId,
+      currentEditingBoxId,
+      {
+        name: med.name,
+        dose: med.dose,
+        box_capacity: med.box_capacity,
+        stock_alert_threshold: med.stock_alert_threshold,
+        stock_quantity: med.stock_quantity,
+        conditions: currentBox?.conditions || [],
+      }
+    );
+    
+    setShowQRModal(false);
+    setCurrentEditingBoxId(null);
+    setSingleScan(false);
+    
+    if (res.success) {
+      showAlert('✅ Ajouté', 'success');
+    } else {
+      showAlert('❌ Ajouter un médicament', 'danger');
+    }
+    
+    return {
+      success: res.success,
+      successCount: res.success ? 1 : 0,
+      errorCount: res.success ? 0 : 1,
+    };
+  };
+
+  const getCommonActions = () => {
+    const actions = [
+      {
+        label: (
+          <>
+            <i className="bi bi-download me-2" />
+            {t('boxes.export_pdf')}
+          </>
+        ),
+        onClick: () => calendarSource.downloadCalendarPdf(calendarId),
+        title: t('boxes.export_pdf'),
+      },
+    ];
+    
+    if (calendarType === 'personal') {
+      actions.unshift({
+        label: (
+          <>
+            <i className="bi bi-box-arrow-up me-2" />
+            {t('share')}
+          </>
+        ),
+        linkTo: `/${lng}/shared-calendars?calendar=${calendarId}`,
+        title: t('share'),
+      });
+      actions.push(
+        { separator: true },
+        {
+          label: (
+            <>
+              <i className="bi bi-exclamation-triangle me-2" />
+              {t('stock')}
+            </>
+          ),
+          linkTo: `/${lng}/${basePath}/${calendarId}/stock-alerts`,
+          title: t('stock'),
+        }
+      );
+    }
+    
+    actions.push(
+      {
+        label: (
+          <>
+            <i className="bi bi-calendar3 me-2" />
+            {t('ics.calendar_ics')}
+          </>
+        ),
+        linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
+        title: t('ics.calendar_ics'),
+      },
+      { separator: true },
+      {
+        label: (
+          <>
+            <i className="bi bi-gear me-2" />
+            {t('settings.label')}
+          </>
+        ),
+        linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
+        title: t('settings.label'),
+      },
+      { separator: true }
+    );
+    
+    if (calendarType === 'personal') {
+      actions.push({
+        label: (
+          <>
+            <i className="bi bi-trash me-2" />
+            {t('delete')}
+          </>
+        ),
+        onClick: async () => {
+          const r = await personalCalendars.deleteCalendar(calendarId);
+          if (r.success) {
+            navigate(`/${lng}/calendars`);
+          } else {
+            showAlert(r.error, 'danger');
+          }
+        },
+        title: t('delete'),
+        danger: true,
+      });
+    } else if (calendarType === 'sharedUser') {
+      actions.push({
+        label: (
+          <>
+            <i className="bi bi-trash3 me-2" />
+            {t('delete')}
+          </>
+        ),
+        onClick: () => sharedUserCalendars.deleteSharedCalendar(calendarId),
+        title: t('delete'),
+        danger: true,
+      });
+    }
+    
+    return actions;
+  };
+
+  // =========================================================================
+  // LOADING STATES
+  // =========================================================================
+  
+  if (loadingBoxes === undefined) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: '60vh' }}
+      >
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">
+            {t('loading_medicines')}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadingBoxes === false) {
+    return (
+      <div className="alert alert-danger text-center mt-5" role="alert">
+        {t('invalid_or_expired_link')}
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // RENDER
+  // =========================================================================
+  
+  return (
+    <div className="container align-items-center d-flex flex-column gap-3">
+      <div className="p-1 w-100" style={{ maxWidth: '800px' }}>
+        
+        {/* Header */}
+        <div
+          className="d-flex justify-content-between align-items-center mb-3 flex-wrap"
+          data-tour="stock-view-title"
+        >
+          <h4 className="mb-0 fw-bold">
+            <i className="bi bi-box-seam me-2"></i>
+            {t('boxes.title')}
+          </h4>
+          <ActionSheet actions={getCommonActions()} />
+        </div>
+
+        {/* Alert System */}
+        <AlertSystem
+          type={alertType}
+          message={alertMessage}
+          onClose={() => {
+            setAlertMessage('');
+            setAlertType('');
+          }}
+        />
+
+        {/* Boxes Grid */}
+        <div className="row row-cols-1 row-cols-md-2 g-4">
+          {boxes.map((box) => (
+            <div className="col-12 col-md-6 mb-3" key={box.id}>
+              {editingBoxId === box.id ? (
+                <form onSubmit={handleSubmit}>
+                  <BoxCard
+                    box={box}
+                    editingBoxId={editingBoxId}
+                    editingBox={editingBox}
+                    setEditingBox={setEditingBox}
+                    onCancel={cancelEditing}
+                    expandedBoxes={expandedBoxes}
+                    setExpandedBoxes={setExpandedBoxes}
+                    calendarId={calendarId}
+                    calendarSource={calendarSource}
+                    showAlert={showAlert}
+                    handleApiResponse={handleApiResponse}
+                    onEdit={initEditing}
+                    onUpdateScan={() => {
+                      setSingleScan(true);
+                      setCurrentEditingBoxId(box.id);
+                      setShowQRModal(true);
+                    }}
+                    t={t}
+                  />
+                </form>
+              ) : (
+                <BoxCard
+                  box={box}
+                  editingBoxId={editingBoxId}
+                  editingBox={editingBox}
+                  setEditingBox={setEditingBox}
+                  onSubmit={handleSubmit}
+                  onCancel={cancelEditing}
+                  expandedBoxes={expandedBoxes}
+                  setExpandedBoxes={setExpandedBoxes}
+                  calendarId={calendarId}
+                  calendarSource={calendarSource}
+                  showAlert={showAlert}
+                  handleApiResponse={handleApiResponse}
+                  onEdit={initEditing}
+                  onUpdateScan={() => {
+                    setSingleScan(true);
+                    setCurrentEditingBoxId(box.id);
+                    setShowQRModal(true);
+                  }}
+                  t={t}
+                />
+              )}
+            </div>
+          ))}
+
+          {/* Action Cards */}
+          <div className="col-12 col-md-6">
+            <div className="d-flex flex-column gap-2 h-100">
+              <ActionCard
+                borderColor="success"
+                icon="plus-circle"
+                color="success"
+                text={t('boxes.add_manual')}
+                onClick={() => {
+                  // Créer une nouvelle box temporaire localement
+                  const tempId = `temp-${Date.now()}`;
+                  const newBox = {
+                    id: tempId,
+                    name: t('boxes.new_box'),
+                    dose: 0,
+                    box_capacity: 0,
+                    stock_quantity: 0,
+                    stock_alert_threshold: 0,
+                    conditions: [],
+                  };
+                  
+                  // Ajouter la box au state local
+                  setBoxes((prev) => [...prev, newBox]);
+                  
+                  // Mettre en mode édition
+                  initEditing(newBox);
+                  setExpandedBoxes((p) => ({
+                    ...p,
+                    [tempId]: true,
+                  }));
+                }}
+                ariaLabel={t('boxes.add_manual')}
+                hasTooltip={false}
+                dataTour="add-manual-btn"
+                t={t}
+              />
+              <ActionCard
+                borderColor="primary"
+                icon="qr-code-scan"
+                color="primary"
+                text={t('boxes.add_with_qr')}
+                onClick={() => {
+                  setSingleScan(false);
+                  setCurrentEditingBoxId(null);
+                  setShowQRModal(true);
+                }}
+                ariaLabel={t('boxes.add_with_qr')}
+                hasTooltip={true}
+                tooltip={t('boxes.qr_code_help_text')}
+                dataTour="add-qr-btn"
+                t={t}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* QR Code Scanner Modal */}
+      <QRCodeScanner
+        modal={true}
+        show={showQRModal}
+        singleScan={singleScan}
+        onAddAll={singleScan ? updateScannedMedicine : addScannedMedicines}
+        onClose={() => {
+          setShowQRModal(false);
+          setCurrentEditingBoxId(null);
+          setSingleScan(false);
+        }}
+      />
+    </div>
+  );
+}
+
+// ============================================================================
+// BOX CARD COMPONENT
+// ============================================================================
+
+function BoxCard({
+  box,
+  editingBoxId,
+  editingBox,
+  setEditingBox,
+  onCancel,
+  expandedBoxes,
+  setExpandedBoxes,
+  calendarId,
+  calendarSource,
+  showAlert,
+  handleApiResponse,
+  onEdit,
+  onUpdateScan,
+  t,
+}) {
+  const isEditing = editingBoxId === box.id && editingBox && editingBox.name !== undefined;
+  
+  const timeOfDayMap = {
+    morning: t('morning'),
+    noon: t('noon'),
+    evening: t('evening'),
+  };
+  
+  const conditionFields = [
+    {
+      label: t('boxes.condition.tablet_count'),
+      field: 'tablet_count',
+      type: 'number',
+      min: '0',
+      step: '0.25',
+      format: 'float',
+      required: true,
+    },
+    {
+      label: t('boxes.condition.time_of_day'),
+      field: 'time_of_day',
+      type: 'select',
+      options: [
+        { value: 'morning', label: t('morning') },
+        { value: 'noon', label: t('noon') },
+        { value: 'evening', label: t('evening') },
+      ],
+      required: true,
+    },
+    {
+      label: t('boxes.condition.interval_days'),
+      field: 'interval_days',
+      type: 'number',
+      min: '0',
+      step: '1',
+      format: 'int',
+      onChange: (cond, value, updateFn) => {
+        // Si interval_days devient <= 1, mettre start_date à null
+        if (value <= 1) {
+          updateFn('start_date', null);
+        }
+      },
+      required: true,
+    },
+    {
+      label: t('boxes.condition.start_date'),
+      field: 'start_date',
+      type: 'date',
+      ifComplete: (cond) => cond.interval_days > 1,
+      required: (cond) => cond.interval_days > 1,
+    },
+    {
+      label: t('boxes.condition.max_date_mode'),
+      field: 'max_date_mode',
+      type: 'select',
+      options: [
+        { value: '', label: t('boxes.condition.no_limit') },
+        { value: 'until_date', label: t('boxes.condition.until_date') },
+        { value: 'for_days', label: t('boxes.condition.for_days') },
+      ],
+      onChange: (cond, value, updateFn) => {
+        updateFn('max_date', null);
+        updateFn('max_date_days', null);
+      },
+      required: false,
+    },
+    {
+      label: (cond) => cond.max_date_mode === 'until_date' 
+        ? t('boxes.condition.end_date') 
+        : t('boxes.condition.duration_days'),
+      field: (cond) => cond.max_date_mode === 'until_date' ? 'max_date' : 'max_date_days',
+      type: (cond) => cond.max_date_mode === 'until_date' ? 'date' : 'number',
+      min: '1',
+      step: '1',
+      format: (cond) => cond.max_date_mode === 'until_date' ? '' : 'int',
+      onChange: (cond, value, updateFn) => {
+        if (!value || value === '') {
+          updateFn('max_date', null);
+          if (cond.max_date_mode === 'for_days') updateFn('max_date_days', null);
+          return;
+        }
+        
+        if (cond.max_date_mode === 'for_days') {
+          // Calculer la date de fin en fonction de la ou on se situe dans la journé
+          const now = new Date();
+          const target = new Date(now);
+          const hourByTime = { morning: 8, noon: 12, evening: 18 };
+          const targetHour = hourByTime[cond.time_of_day] ?? 8;
+          target.setHours(targetHour, 0, 0, 0);
+          const includeToday = now < target;
+          const endDate = new Date(now);
+          endDate.setDate(endDate.getDate() + (includeToday ? value - 1 : value));
+          endDate.setHours(23, 59, 59, 999);
+          updateFn('max_date', endDate.toISOString());
+          updateFn('max_date_days', value);
+        } else {
+          const selectedDate = new Date(value);
+          selectedDate.setHours(23, 59, 59, 999);
+          updateFn('max_date', selectedDate.toISOString());
+        }
+      },
+      ifComplete: (cond) => cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
+      required: (cond) => cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
+    },
+  ];
+
+  // =========================================================================
+  // HELPER FUNCTIONS
+  // =========================================================================
+  
+  const openNotice = () => {
+    window.open(`${import.meta.env.VITE_API_URL}/api/proxy/pdf/${box.id}`, '_blank');
+  };
+
+  const toggleExpand = () => {
+    setExpandedBoxes((p) => ({ ...p, [box.id]: !p[box.id] }));
+  };
+
+  const addCondition = () => {
+    const id = uuidv4();
+    setEditingBox((p) => ({
+      ...p,
+      conditions: {
+        ...p.conditions,
+        [id]: {
+          id,
+          tablet_count: 1,
+          interval_days: 1,
+          start_date: null,
+          time_of_day: 'morning',
+          max_date: null,
+          max_date_mode: '',
+          max_date_days: null,
+        },
+      },
+    }));
+  };
+
+  const deleteCondition = (id) => {
+    setEditingBox((p) => ({
+      ...p,
+      conditions: { ...p.conditions, [id]: undefined },
+    }));
+  };
+
+  const updateCondition = (id, field, val) => {
+    setEditingBox((p) => ({
+      ...p,
+      conditions: {
+        ...p.conditions,
+        [id]: { ...p.conditions[id], [field]: val },
+      },
+    }));
+  };
+
+  const restockBox = async () => {
+    const r = await calendarSource.restockBox(calendarId, box.id);
+    handleApiResponse(r);
+  };
+
+  const deleteBox = async () => {
+    const r = await calendarSource.deleteBox(calendarId, box.id);
+    handleApiResponse(r);
+  };
+
+  const getBoxActions = () => [
+    {
+      label: (
+        <>
+          <i className="bi bi-qr-code-scan me-2" />
+          {t('boxes.scan_qr_code')}
+        </>
+      ),
+      onClick: onUpdateScan,
+      title: t('boxes.scan_qr_code'),
+    },
+    { separator: true },
+    {
+      label: (
+        <>
+          <i className="bi bi-pencil me-2" />
+          {t('boxes.edit')}
+        </>
+      ),
+      onClick: () => onEdit(box),
+      title: t('boxes.edit'),
+      dataTour: 'box-edit-btn',
+    },
+    {
+      label: (
+        <>
+          <i className="bi bi-file-earmark-pdf me-2" />
+          {t('boxes.view_notice')}
+        </>
+      ),
+      onClick: openNotice,
+      title: t('boxes.view_notice'),
+    },
+    { separator: true },
+    {
+      label: (
+        <>
+          <i className="bi bi-trash me-2" />
+          {t('boxes.delete')}
+        </>
+      ),
+      onClick: deleteBox,
+      title: t('boxes.delete'),
+      danger: true,
+    },
+  ];
+
+  const borderClass =
+    box.box_capacity === 0
+      ? ''
+      : box.stock_quantity <= 0
+      ? 'border-danger'
+      : box.stock_quantity <= box.stock_alert_threshold
+      ? 'border-warning'
+      : '';
+
+  // =========================================================================
+  // RENDER BOX CARD
+  // =========================================================================
+  
+  return (
+    <div className={`card h-100 shadow border ${borderClass}`}>
+      <div className="card-body position-relative">
+        
+        {/* Action Menu */}
+        {!isEditing && (
+          <div className="position-absolute top-0 end-0 m-2">
+            <ActionSheet buttonSize="sm" actions={getBoxActions()} />
+          </div>
+        )}
+
+        {/* Title */}
+        {isEditing ? (
+          <InputDropdown
+            name={editingBox.name}
+            dose={editingBox.dose}
+            onChangeName={(value) =>
+              setEditingBox((p) => ({ ...p, name: value }))
+            }
+            onChangeDose={(value) =>
+              setEditingBox((p) => ({ ...p, dose: value }))
+            }
+            onChangeBoxCapacity={(value) =>
+              setEditingBox((p) => ({ ...p, box_capacity: value }))
+            }
+            onChangeStockQuantity={(value) =>
+              setEditingBox((p) => ({ ...p, stock_quantity: value }))
+            }
+            fetchSuggestions={fetchSuggestions}
+          />
+        ) : (
+          <h5 className="card-title fs-semibold mb-1">
+            {`${box.name}${box.dose > 0 ? ' (' + box.dose + ' mg)' : ''}`}
+          </h5>
+        )}
+
+
+        {/* Capacity and Alert Threshold */}
+        <div className="d-flex mb-2 gap-2">
+          <div className="w-50">
+            <small className="text-muted">{t('boxes.capacity')}</small>
+            <br />
+            {isEditing ? (
+              <input
+                type="number"
+                className="form-control form-control-sm w-75"
+                value={editingBox.box_capacity}
+                onChange={(e) =>
+                  setEditingBox((p) => ({
+                    ...p,
+                    box_capacity: parseInt(e.target.value),
+                  }))
+                }
+                aria-label={t('boxes.capacity')}
+                title={t('boxes.capacity')}
+              />
+            ) : (
+              <strong>{box.box_capacity}</strong>
+            )}
+          </div>
+          <div className="w-50">
+            <small className="text-muted">{t('boxes.alert_threshold')}</small>
+            <br />
+            {isEditing ? (
+              <input
+                type="number"
+                className="form-control form-control-sm w-75"
+                value={editingBox.stock_alert_threshold}
+                onChange={(e) =>
+                  setEditingBox((p) => ({
+                    ...p,
+                    stock_alert_threshold: parseInt(e.target.value),
+                  }))
+                }
+                aria-label={t('boxes.alert_threshold')}
+                title={t('boxes.alert_threshold')}
+              />
+            ) : (
+              <strong>{box.stock_alert_threshold}</strong>
+            )}
+          </div>
+        </div>
+
+        {/* Stock Quantity and Restock Button */}
+        <div className="d-flex mb-2 gap-2 align-items-center">
+          <div className="w-50">
+            <small className="text-muted">{t('boxes.remaining_qty')}</small>
+            <br />
+            {isEditing ? (
+              <input
+                type="number"
+                className="form-control form-control-sm w-75"
+                value={editingBox.stock_quantity}
+                onChange={(e) =>
+                  setEditingBox((p) => ({
+                    ...p,
+                    stock_quantity: parseInt(e.target.value),
+                  }))
+                }
+                aria-label={t('boxes.remaining_qty')}
+                title={t('boxes.remaining_qty')}
+              />
+            ) : (
+              <strong>{box.stock_quantity}</strong>
+            )}
+          </div>
+          {!isEditing && (
+            <div className="w-50">
+              <IconButton
+                className="btn btn-outline-success w-100"
+                icon="plus-circle"
+                text={t('boxes.restock')}
+                onClick={restockBox}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Stock Badges */}
+        {!isEditing && (
+          <div className="d-flex mb-2 align-items-center w-100 gap-2">
+            {box.box_capacity !== 0 && (
+              <Badge
+                color={
+                  box.stock_quantity <= 0
+                    ? 'danger'
+                    : box.stock_quantity <= box.stock_alert_threshold
+                    ? 'warning'
+                    : 'success'
+                }
+                icon={
+                  box.stock_quantity <= 0
+                    ? 'exclamation-triangle'
+                    : box.stock_quantity <= box.stock_alert_threshold
+                    ? 'exclamation-triangle'
+                    : 'check-circle'
+                }
+                text={
+                  box.stock_quantity <= 0
+                    ? t('boxes.stock.badge.out')
+                    : box.stock_quantity <= box.stock_alert_threshold
+                    ? t('boxes.stock.badge.low')
+                    : t('boxes.stock.badge.high')
+                }
+              />
+            )}
+            {box.conditions.filter((c) => c !== undefined).length === 0 && (
+              <button
+                className="btn p-0"
+                onClick={() => {
+                  setExpandedBoxes((p) => ({ ...p, [box.id]: true }));
+                  onEdit(box);
+                }}
+                aria-label={t('boxes.condition.add')}
+                title={t('boxes.condition.add')}
+              >
+                <Badge
+                  color="warning"
+                  icon="info-circle"
+                  text={t('boxes.condition.none')}
+                />
+              </button>
+            )}
+            {/*medic expired (date max depasser)*/}
+            {box.conditions.some((c) => {
+              if (!c || !c.max_date) return false;
+              const now = new Date();
+              const maxDate = new Date(c.max_date);
+              return now > maxDate;
+            }) && (
+              <Badge
+                color="secondary"
+                icon="exclamation-circle"
+                text={t('boxes.condition.expired')}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Conditions Section */}
+        <div className="mt-4 mb-2">
+          <hr className="border-dark mb-0" />
+          <h5 className="w-100">
+            <button
+              className="btn w-100 text-start d-flex justify-content-between align-items-center border-0 bg-transparent px-0 pb-0 mb-0"
+              type="button"
+              title={t('boxes.intake_conditions')}
+              onClick={toggleExpand}
+              data-tour="box-condition-toggle"
+            >
+              <span>{t('boxes.intake_conditions')}</span>
+              <i
+                className={`bi bi-chevron-${
+                  expandedBoxes[box.id] ? 'up' : 'down'
+                }`}
+              ></i>
+            </button>
+          </h5>
+
+          {expandedBoxes[box.id] && (
+            <div className="mt-2">
+              {isEditing ? (
+                <>
+                  {Object.values(editingBox.conditions || {})
+                    .filter((c) => c !== undefined)
+                    .map((cond) => (
+                      <div
+                        key={cond.id}
+                        className="mb-2 p-3 border rounded bg-light shadow"
+                      >
+                        {conditionFields.map(
+                          ({ label, field, type, min, step, format, options, ifComplete, onChange, required}, idx) => {
+                            // Si ifComplete est défini et retourne false, ne pas afficher le champ
+                            if (ifComplete && !ifComplete(cond)) {
+                              return null;
+                            }
+                            
+                            // Résoudre les valeurs dynamiques
+                            const resolvedLabel = typeof label === 'function' ? label(cond) : label;
+                            const resolvedField = typeof field === 'function' ? field(cond) : field;
+                            const resolvedType = typeof type === 'function' ? type(cond) : type;
+                            const resolvedFormat = typeof format === 'function' ? format(cond) : format;
+                            const resolvedRequired = typeof required === 'function' ? required(cond) : required;
+                            
+                            return (
+                            <div key={`${cond.id}-${resolvedField}-${idx}`}>
+                              <label>{resolvedLabel}</label>
+                              {resolvedType === 'select' ? (
+                                <select
+                                  className="form-control form-control-sm"
+                                  value={cond[resolvedField] ?? ''}
+                                  onChange={(e) => {
+                                    updateCondition(cond.id, resolvedField, e.target.value);
+                                    if (onChange) {
+                                      onChange(cond, e.target.value, (f, v) => updateCondition(cond.id, f, v));
+                                    }
+                                  }}
+                                  aria-label={resolvedLabel}
+                                  title={resolvedLabel}
+                                  required={resolvedRequired}
+                                >
+                                  {options.map((o) => (
+                                    <option key={o.value} value={o.value}>
+                                      {o.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <input
+                                  type={resolvedType}
+                                  className="form-control form-control-sm"
+                                  value={
+                                    (resolvedField === 'start_date' || (resolvedField === 'max_date' && resolvedType === 'date')) && cond[resolvedField]
+                                      ? new Date(cond[resolvedField])
+                                          .toISOString()
+                                          .split('T')[0]
+                                      : cond[resolvedField] ?? ''
+                                  }
+                                  min={min}
+                                  step={step}
+                                  onChange={(e) => {
+                                    let value = e.target.value;
+                                    // Parser selon le format
+                                    if (resolvedFormat === 'int') {
+                                      value = parseInt(value);
+                                    } else if (resolvedFormat === 'float') {
+                                      value = parseFloat(value);
+                                    }
+                                    updateCondition(cond.id, resolvedField, value);
+                                    if (onChange) {
+                                      onChange(cond, value, (f, v) => updateCondition(cond.id, f, v));
+                                    }
+                                  }}
+                                  aria-label={resolvedLabel}
+                                  title={resolvedLabel}
+                                  required={resolvedRequired}
+                                />
+                              )}
+                            </div>
+                          );
+                          }
+                        )}
+                        <IconButton
+                          className="btn btn-danger btn-sm mt-2"
+                          icon="trash"
+                          text={t('boxes.condition.delete')}
+                          onClick={() => deleteCondition(cond.id)}
+                        />
+                      </div>
+                    ))
+                  }
+                  <IconButton
+                    className="btn btn-sm bg-light border w-100 mt-2"
+                    icon="plus-lg"
+                    text={t('boxes.condition.add')}
+                    onClick={addCondition}
+                  />
+                </>
+              ) : box.conditions.filter((c) => c !== undefined).length > 0 ? (
+                box.conditions
+                  .filter((c) => c !== undefined)
+                  .map((cond) => (
+                    <div
+                      key={cond.id}
+                      className="mb-3 p-3 border rounded bg-light shadow"
+                    >
+                      <strong>
+                        {cond.tablet_count}{' '}
+                        {cond.tablet_count > 1
+                          ? t('boxes.tablets')
+                          : t('boxes.tablet')}
+                      </strong>{' '}
+                      {t('boxes.every')}{' '}
+                      <strong>
+                        {cond.interval_days}{' '}
+                        {cond.interval_days > 1
+                          ? t('boxes.days')
+                          : t('boxes.day')}
+                      </strong>{' '}
+                      {t('boxes.each')}{' '}
+                      <strong>{timeOfDayMap[cond.time_of_day]}</strong>
+                      {cond.interval_days > 1 && <br />}
+                      {cond.interval_days > 1 && (
+                        <small className="text-muted">
+                          {t('boxes.from')}{' '}
+                          {new Date(cond.start_date).toLocaleDateString()}
+                        </small>
+                      )}
+                      {cond.max_date && <br />}
+                      {cond.max_date && (
+                        <small className="text-muted">
+                          {t('boxes.until')}{' '}
+                          {new Date(cond.max_date).toLocaleDateString()}
+                        </small>
+                      )}
+                    </div>
+                  ))
+              ) : (
+                <div className="border rounded bg-light d-flex justify-content-start align-items-center p-2 mb-2">
+                  <p className="text-muted mb-0">
+                    {t('boxes.condition.none')}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Save/Cancel Buttons */}
+        {isEditing && (
+          <>
+            <hr />
+            <div className="d-flex gap-2">
+              <button
+                type="submit"
+                className="btn btn-success btn-sm w-50"
+                aria-label={t('boxes.save')}
+                title={t('boxes.save')}
+              >
+                <i className="bi bi-save"></i> {t('boxes.save')}
+              </button>
+              <IconButton
+                className="btn btn-secondary btn-sm w-50"
+                icon="x"
+                text={t('boxes.cancel')}
+                onClick={onCancel}
+              />
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

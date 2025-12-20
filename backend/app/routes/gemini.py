@@ -1,10 +1,8 @@
 from . import api
 from flask import request, g
-from app.utils import require_auth
 from app.utils.responses import success_response, error_response, warning_response
 from app.vertex.gemini import analyze_medical_document
-from app.utils import measure_time
-from app.utils import with_query_origin
+from app.utils.decorators import measure_time, with_query_origin, require_auth
 from app.services.documents import save_analysis_result
 
 @api.route("/documents/analyze", methods=["POST"])

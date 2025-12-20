@@ -149,7 +149,7 @@ function App() {
   
 
   // Fonction pour créer une boîte de médicaments
-  const createPersonalBox = useCallback(async (calendarId, name, boxCapacity = 0, stockAlertThreshold = 10, stockQuantity = 0, dose = 0 ) => {
+  const createPersonalBox = useCallback(async (calendarId, name, boxCapacity, stockAlertThreshold, stockQuantity, dose ) => {
     const result = await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/boxes`,
       method: 'POST',
@@ -659,10 +659,10 @@ function App() {
     async (
       calendarId,
       name,
-      boxCapacity = 0,
-      stockAlertThreshold = 10,
-      stockQuantity = 0,
-      dose = 0
+      boxCapacity,
+      stockAlertThreshold,
+      stockQuantity,
+      dose
     ) => {
       const result = await performApiCall({
         url: `${API_URL}/api/shared/users/calendars/${calendarId}/boxes`,
@@ -1016,7 +1016,7 @@ function App() {
       />
       <StructuredData />
       <Navbar sharedProps={sharedProps} />
-      <main className="flex-grow-1 d-flex flex-column pb-5 pb-lg-0">
+      <main className="flex-grow-1 d-flex flex-column safe-bottom">
         {userInfo && (
           <RealtimeManager
             setCalendarsData={setCalendarsData}
@@ -1029,7 +1029,7 @@ function App() {
           />
         )}
 
-        <div className="container mt-4 pb-5 pb-lg-0">
+        <div className="container mt-4 mb-3">
           <AppRoutes sharedProps={sharedProps} />
         </div>
       </main>

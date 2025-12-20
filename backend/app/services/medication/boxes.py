@@ -54,45 +54,46 @@ def update_box(box_id: str, calendar_id: str, box: dict):
     - calendar_id (str): L'ID du calendrier associé.
     - box (dict): Les données de la boîte à mettre à jour.
     """
-    name = box.get("name")
-    dose = box.get("dose")
-    box_capacity = box.get("box_capacity")
-    stock_alert_threshold = box.get("stock_alert_threshold")
-    stock_quantity = box.get("stock_quantity")
-    conditions = box.get("conditions", []) or []
+    name = box.get("name") or "nouvelle boite"
+    dose = box.get("dose") or 0
+    box_capacity = box.get("box_capacity") or 0
+    stock_alert_threshold = box.get("stock_alert_threshold") or 10
+    stock_quantity = box.get("stock_quantity") or 0
+    conditions = box.get("conditions") or []
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
-WITH upd AS (
-  UPDATE medicine_boxes 
-  SET name = %s,
-      dose = %s,
-      box_capacity = %s,
-      stock_alert_threshold = %s,
-      stock_quantity = %s
-  WHERE id = %s AND calendar_id = %s AND deleted_at IS NULL
-  RETURNING id
-),
-del AS (
-  UPDATE medicine_box_conditions
-  SET deleted_at = NOW()
-  WHERE box_id IN (SELECT id FROM upd)
-    AND deleted_at IS NULL
-),
-ins AS (
-  INSERT INTO medicine_box_conditions (box_id, tablet_count, interval_days, start_date, time_of_day)
-  SELECT
-    %s                                                             AS box_id,
-    (c->>'tablet_count')::float8                                   AS tablet_count,
-    (c->>'interval_days')::int                                     AS interval_days,
-    NULLIF(c->>'start_date','')::date                              AS start_date,
-    COALESCE(NULLIF(c->>'time_of_day',''), 'morning')              AS time_of_day
-  FROM jsonb_array_elements(%s::jsonb) AS c
-  WHERE EXISTS (SELECT 1 FROM upd)
-  RETURNING 1
-)
-SELECT 1;
+              WITH upd AS (
+                UPDATE medicine_boxes 
+                SET name = %s,
+                    dose = %s,
+                    box_capacity = %s,
+                    stock_alert_threshold = %s,
+                    stock_quantity = %s
+                WHERE id = %s AND calendar_id = %s AND deleted_at IS NULL
+                RETURNING id
+              ),
+              del AS (
+                UPDATE medicine_box_conditions
+                SET deleted_at = NOW()
+                WHERE box_id IN (SELECT id FROM upd)
+                  AND deleted_at IS NULL
+              ),
+              ins AS (
+                INSERT INTO medicine_box_conditions (box_id, tablet_count, interval_days, start_date, time_of_day, max_date)
+                SELECT
+                  %s                                                             AS box_id,
+                  (c->>'tablet_count')::float8                                   AS tablet_count,
+                  (c->>'interval_days')::int                                     AS interval_days,
+                  NULLIF(c->>'start_date','')::date                              AS start_date,
+                  COALESCE(NULLIF(c->>'time_of_day',''), 'morning')              AS time_of_day,
+                  NULLIF(c->>'max_date','')::date                                AS max_date
+                FROM jsonb_array_elements(%s::jsonb) AS c
+                WHERE EXISTS (SELECT 1 FROM upd)
+                RETURNING 1
+              )
+              SELECT 1;
             """, (
                 name, dose, box_capacity, stock_alert_threshold, stock_quantity,
                 box_id, calendar_id,      # upd WHERE
@@ -113,44 +114,47 @@ def create_box(calendar_id: str, box: dict) -> str:
     - str: L'ID de la nouvelle boîte créée.
     """
     name = box.get("name") or "nouvelle boite"
-    dose = box.get("dose", 0)
-    box_capacity = box.get("box_capacity", 0)
-    stock_alert_threshold = box.get("stock_alert_threshold", 10)
-    stock_quantity = box.get("stock_quantity", 0)
-    conditions = box.get("conditions", []) or []
+    dose = box.get("dose") or 0
+    box_capacity = box.get("box_capacity") or 0
+    stock_alert_threshold = box.get("stock_alert_threshold") or 10
+    stock_quantity = box.get("stock_quantity") or 0
+    conditions = box.get("conditions") or []
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
-WITH ins_box AS (
-  INSERT INTO medicine_boxes (calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity)
-  VALUES (%s, %s, %s, %s, %s, %s)
-  RETURNING id
-),
-ins_cond AS (
-  INSERT INTO medicine_box_conditions (id, box_id, tablet_count, interval_days, start_date, time_of_day)
-  SELECT
-    COALESCE((c->>'id')::uuid, gen_random_uuid())        AS id,
-    (SELECT id FROM ins_box)                             AS box_id,
-    (c->>'tablet_count')::float8                         AS tablet_count,
-    (c->>'interval_days')::int                           AS interval_days,
-    NULLIF(c->>'start_date','')::date                    AS start_date,
-    COALESCE(NULLIF(c->>'time_of_day',''), 'morning')    AS time_of_day
-  FROM jsonb_array_elements(%s::jsonb) AS c
-  -- si le tableau est vide, cette clause n'insère rien (comportement OK)
-  RETURNING 1
-)
-SELECT id FROM ins_box;
-""", (
-    calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity,
-    json.dumps(conditions)
-))
+              WITH ins_box AS (
+                INSERT INTO medicine_boxes (calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                RETURNING id
+              ),
+              ins_cond AS (
+                INSERT INTO medicine_box_conditions (id, box_id, tablet_count, interval_days, start_date, time_of_day, max_date)
+                SELECT
+                  COALESCE((c->>'id')::uuid, gen_random_uuid())        AS id,
+                  (SELECT id FROM ins_box)                             AS box_id,
+                  (c->>'tablet_count')::float8                         AS tablet_count,
+                  (c->>'interval_days')::int                           AS interval_days,
+                  NULLIF(c->>'start_date','')::date                    AS start_date,
+                  COALESCE(NULLIF(c->>'time_of_day',''), 'morning')    AS time_of_day,
+                  NULLIF(c->>'max_date','')::date                      AS max_date
+                FROM jsonb_array_elements(%s::jsonb) AS c
+                -- si le tableau est vide, cette clause n'insère rien (comportement OK)
+                RETURNING 1
+              )
+              SELECT id FROM ins_box;
+              """, (
+                  calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity,
+                  json.dumps(conditions)
+              ))
             row = cursor.fetchone()
             # Selon votre cursor (tuple ou dict), récupère l'id proprement :
             box_id = row[0] if row and not isinstance(row, dict) else (row.get("id") if row else None)
             conn.commit()
 
     return box_id
+  
+  
 def delete_box(box_id: str, calendar_id: str):
     """Supprime une boîte de médicaments et ses conditions associées.
 

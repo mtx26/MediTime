@@ -61,8 +61,8 @@
       "facebook": "Facebook",
       "github": "Github",
       "google": "Google",
-      "twitter": "Gorjeo",
-      "microsoft": "Microsoft"
+      "microsoft": "Microsoft",
+      "twitter": "Gorjeo"
     },
     "register": "Registro",
     "register_with": "Regístrate con:",
@@ -73,8 +73,8 @@
     "with_facebook": "Iniciar sesión con Facebook",
     "with_github": "Conectando con Github",
     "with_google": "Iniciar sesión con Google",
-    "with_twitter": "Conectarse con Twitter",
-    "with_microsoft": "Iniciar sesión con Microsoft"
+    "with_microsoft": "Iniciar sesión con Microsoft",
+    "with_twitter": "Conectarse con Twitter"
   },
   "auth_callback": {
     "loading": "Conectando...",
@@ -93,10 +93,18 @@
       "add": "Añadir una condición",
       "delete": "BORRAR",
       "interval_days": "Intervalo de días",
+      "max_date": "Fecha de finalización",
       "none": "No hay condiciones de toma",
       "start_date": "Fecha de inicio",
       "tablet_count": "Número de comprimidos",
-      "time_of_day": "Hora de toma"
+      "time_of_day": "Hora de toma",
+      "duration_days": "Número de días",
+      "end_date": "Fecha de finalización",
+      "for_days": "Por... días",
+      "max_date_mode": "Duración de la ingesta",
+      "until_date": "Hasta...",
+      "no_limit": "Sin límite",
+      "expired": "Condición expirada"
     },
     "day": "día",
     "days": "días",
@@ -107,6 +115,7 @@
     "every": "mucho",
     "export_pdf": "Exportar",
     "from": "Desde",
+    "until": "Hasta el",
     "intake_conditions": "Condiciones de toma",
     "name": "Nombre",
     "new_box": "Nueva caja",
@@ -232,15 +241,15 @@
   "expired": "Venció",
   "expires_at": "Caduca el",
   "fcm": {
-    "token_registered": "[FCM] Token registrado en el backend",
-    "token_send_error": "[FCM] Error al enviar el token",
     "device_registration": "Recibir notificaciones en este dispositivo",
     "device_registration_desc": "Habilite las notificaciones push para mantenerse informado en tiempo real sobre sus recordatorios y alertas de medicamentos.",
     "enable_btn": "Habilitar notificaciones",
     "enabled_msg": "¡Notificaciones habilitadas!",
-    "sw_registered": "Trabajador de servicio registrado",
+    "reload": "Recargar",
     "sw_error": "Error de registro del Service Worker",
-    "reload": "Recargar"
+    "sw_registered": "Trabajador de servicio registrado",
+    "token_registered": "[FCM] Token registrado en el backend",
+    "token_send_error": "[FCM] Error al enviar el token"
   },
   "features": {
     "desc1": "Programa tus vacunas, recibe recordatorios y ten tranquilidad.",

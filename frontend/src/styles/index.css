@@ -2,6 +2,11 @@
 html {
   overflow-y: scroll;
   height: 100%;
+  scroll-padding-top: 60px;
+}
+
+.scroll-target {
+  scroll-margin-top: 60px;
 }
 
 body {
@@ -20,6 +25,17 @@ body.modal-open {
 
 #root {
   height: 100%;
+}
+
+.safe-bottom {
+  padding-bottom: 0; /* hauteur approx. de la barre mobile */
+}
+
+/* === RÉSERVE D'ESPACE EN BAS DU CONTENU PRINCIPAL (mobile et desktop) === */
+@media (max-width: 991px) {
+  .safe-bottom {
+    padding-bottom: 80px; /* hauteur approx. de la barre mobile */
+  }
 }
 
 

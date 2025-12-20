@@ -2,10 +2,7 @@ from flask import Response, request, g
 from . import api
 from app.services.ics import create_calendar_ics, create_ics_token, get_ics_tokens, delete_ics_token
 from app.utils.responses import error_response, success_response
-from app.utils.measure import measure_time
-from app.utils import with_query_origin
-from app.utils.auth import require_auth
-from app.services.calendar import verify_calendar, verify_calendar_share
+from app.utils.decorators import measure_time, with_query_origin, require_auth, verify_calendar, verify_calendar_share
 
 @api.route('/calendars/<calendar_id>/ics', methods=['POST'])
 @measure_time()

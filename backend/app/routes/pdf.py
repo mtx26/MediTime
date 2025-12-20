@@ -1,11 +1,10 @@
-from flask import request, Response, g
+from flask import Response, g
+from . import api
 import requests
 from app.db.connection import get_connection
-from . import api
 from app.utils.responses import error_response
+from app.utils.decorators import measure_time, with_query_origin, elapsed_now
 from app.utils.logging import log_backend
-from app.utils.measure import measure_time, elapsed_now
-from app.utils import with_query_origin
 
 
 @api.route("/proxy/pdf/<box_id>", methods=["GET"])

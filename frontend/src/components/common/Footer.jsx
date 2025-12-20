@@ -23,7 +23,7 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-light border-top mt-5 pt-4 pb-3 d-none d-lg-block">
+    <footer className="bg-light border-top pt-4 pb-3 d-none d-lg-block">
       <div className="container">
         <div className="row gy-4 align-items-center">
           {/* Colonne liens */}

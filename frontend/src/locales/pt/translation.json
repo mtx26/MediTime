@@ -61,8 +61,8 @@
       "facebook": "Facebook",
       "github": "GitHub",
       "google": "Google",
-      "twitter": "Twitter",
-      "microsoft": "Microsoft"
+      "microsoft": "Microsoft",
+      "twitter": "Twitter"
     },
     "register": "Registro",
     "register_with": "Registre-se com:",
@@ -73,8 +73,8 @@
     "with_facebook": "Entrar com o Facebook",
     "with_github": "Conectando com o Github",
     "with_google": "Entrar com o Google",
-    "with_twitter": "Conecte-se com o Twitter",
-    "with_microsoft": "Iniciar sessão com a Microsoft"
+    "with_microsoft": "Iniciar sessão com a Microsoft",
+    "with_twitter": "Conecte-se com o Twitter"
   },
   "auth_callback": {
     "loading": "Conectando...",
@@ -93,10 +93,18 @@
       "add": "Adicionar uma condição",
       "delete": "EXCLUIR",
       "interval_days": "Intervalo de dias",
+      "max_date": "Data de término",
       "none": "Sem condições de tomada",
       "start_date": "Data de início",
       "tablet_count": "Número de comprimidos",
-      "time_of_day": "Hora da tomada"
+      "time_of_day": "Hora da tomada",
+      "duration_days": "Número de dias",
+      "end_date": "Data de término",
+      "for_days": "Por... dias",
+      "max_date_mode": "Duração da ingestão",
+      "until_date": "Até...",
+      "no_limit": "Sem limite",
+      "expired": "Condição expirada"
     },
     "day": "dia",
     "days": "dias",
@@ -107,6 +115,7 @@
     "every": "todos os",
     "export_pdf": "Exportar",
     "from": "Do",
+    "until": "Até",
     "intake_conditions": "Condições de tomada",
     "name": "Nome",
     "new_box": "Nova caixa",
@@ -232,15 +241,15 @@
   "expired": "Expirado",
   "expires_at": "Expira em",
   "fcm": {
-    "token_registered": "[FCM] Token registrado no backend",
-    "token_send_error": "[FCM] Erro ao enviar token",
     "device_registration": "Receba notificações neste dispositivo",
     "device_registration_desc": "Ative as notificações push para ficar informado em tempo real sobre seus lembretes e alertas de medicação.",
     "enable_btn": "Ativar notificações",
     "enabled_msg": "Notificações ativadas!",
-    "sw_registered": "Trabalhador de serviço registrado",
+    "reload": "Recarregar",
     "sw_error": "Erro no cadastro de funcionário de serviço",
-    "reload": "Recarregar"
+    "sw_registered": "Trabalhador de serviço registrado",
+    "token_registered": "[FCM] Token registrado no backend",
+    "token_send_error": "[FCM] Erro ao enviar token"
   },
   "features": {
     "desc1": "Agende suas vacinas, receba lembretes e fique tranquilo.",
