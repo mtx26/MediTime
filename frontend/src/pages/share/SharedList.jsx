@@ -690,7 +690,7 @@ function UserList({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="card p-3 mb-3 shadow">
+    <div className="card p-3 shadow">
       <ul className="list-group">
         <h5>
           <i className="bi bi-person me-2"></i>

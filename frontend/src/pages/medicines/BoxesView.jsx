@@ -93,6 +93,13 @@ const InputDropdown = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const inputRef = useRef();
 
+  useEffect(() => {
+    // Focus automatique sur le champ name
+    inputRef.current?.focus();
+    // Scroll pour placer le champ en vue (le scroll-padding du HTML gère l'espace pour header/footer)
+    inputRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
   const handleSelect = (item) => {
     const onlyNumbers = parseInt(item.dose.replace(/\D/g, ''));
     onChangeName(item.name);
@@ -128,7 +135,7 @@ const InputDropdown = ({
         <input
           ref={inputRef}
           type="text"
-          className="form-control form-control-sm w-75"
+          className="form-control form-control-sm w-75 scroll-target"
           defaultValue={name}
           onChange={(e) => {
             onChangeName(e.target.value);
@@ -662,7 +669,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
           ))}
 
           {/* Action Cards */}
-          <div className="col-12 col-md-6 mb-3">
+          <div className="col-12 col-md-6">
             <div className="d-flex flex-column gap-2 h-100">
               <ActionCard
                 borderColor="success"

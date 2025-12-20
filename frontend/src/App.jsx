@@ -1016,7 +1016,7 @@ function App() {
       />
       <StructuredData />
       <Navbar sharedProps={sharedProps} />
-      <main className="flex-grow-1 d-flex flex-column pb-5 pb-lg-0">
+      <main className="flex-grow-1 d-flex flex-column safe-bottom">
         {userInfo && (
           <RealtimeManager
             setCalendarsData={setCalendarsData}
@@ -1029,7 +1029,7 @@ function App() {
           />
         )}
 
-        <div className="container mt-4 pb-5 pb-lg-0">
+        <div className="container mt-4 mb-3">
           <AppRoutes sharedProps={sharedProps} />
         </div>
       </main>
