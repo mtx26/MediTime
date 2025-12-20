@@ -1,19 +1,10 @@
 from flask import request, g
-from app.utils.responses import success_response, error_response, warning_response
-from app.utils.auth import require_auth
-from app.db.connection import get_connection
-from app.services.calendar import (
-    verify_calendar,
-    verify_login_invitation_owner,
-    verify_registration_invitation_owner,
-    verify_login_invitation_receiver,
-)
-from app.services.notifications import notify_and_record
 from . import api
-from app.services.notifications import email_address_direct
-from app.utils.measure import measure_time
-import json
-from app.utils import with_query_origin
+from app.db.connection import get_connection
+from app.utils.decorators import verify_calendar, verify_login_invitation_owner, verify_registration_invitation_owner, verify_login_invitation_receiver
+from app.services.notifications import notify_and_record, email_address_direct
+from app.utils.responses import success_response, error_response, warning_response
+from app.utils.decorators import require_auth, measure_time, with_query_origin
 
 
 def _get_user_by_email(cursor, email: str) -> dict | None:

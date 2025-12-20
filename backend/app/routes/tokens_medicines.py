@@ -1,10 +1,8 @@
-from . import api
 from flask import g
+from . import api
 from app.db.connection import get_connection
-from app.services.calendar import verify_token
 from app.utils.responses import success_response, error_response
-from app.utils.measure import measure_time
-from app.utils import with_query_origin
+from app.utils.decorators import measure_time, with_query_origin, verify_token
 
 
 # Route pour obtenir les médicaments d’un token public

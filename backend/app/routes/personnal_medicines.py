@@ -1,13 +1,10 @@
 from flask import request, g
-from app.utils.auth import require_auth
 from . import api
-from app.services.calendar import verify_calendar, add_pillbox_uses, get_if_pillbox_is_used, get_pillbox_uses, delete_pillbox_use
-from app.services.medication import update_box, create_box, delete_box, get_boxes, restock_box
-from app.utils.responses import success_response, error_response, warning_response
-from app.services.medication import use_pillbox
 from datetime import datetime, timezone
-from app.utils.measure import measure_time
-from app.utils import with_query_origin
+from app.services.calendar import add_pillbox_uses, get_if_pillbox_is_used, get_pillbox_uses, delete_pillbox_use
+from app.services.medication import update_box, create_box, delete_box, get_boxes, restock_box, use_pillbox
+from app.utils.responses import success_response, error_response, warning_response
+from app.utils.decorators import require_auth, verify_calendar, measure_time, with_query_origin
 
 ERROR_UNAUTHORIZED_ACCESS = "accès refusé"
 

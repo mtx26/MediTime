@@ -1,12 +1,10 @@
-from . import api
 from flask import request, g
-from app.utils.auth import require_auth
-from app.utils.responses import success_response, error_response
-from app.services.user import fetch_user, update_existing_user, insert_new_user
-from app.utils.upload import upload_logo
+from . import api
 from app.db.connection import get_connection
-from app.utils.measure import measure_time
-from app.utils import with_query_origin
+from app.services.user import fetch_user, update_existing_user, insert_new_user
+from app.utils.responses import success_response, error_response
+from app.utils.upload import upload_logo
+from app.utils.decorators import require_auth, measure_time, with_query_origin
 
 
 @api.route("/user/sync", methods=["GET"])
