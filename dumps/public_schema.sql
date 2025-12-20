@@ -240,7 +240,7 @@ CREATE TABLE IF NOT EXISTS "public"."calendars" (
     "name" "text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    "deleted_at" timestamp without time zone
+    "deleted_at" timestamp with time zone
 );
 
 
@@ -267,7 +267,7 @@ CREATE TABLE IF NOT EXISTS "public"."ics_tokens" (
     "updated_at" timestamp with time zone DEFAULT "now"(),
     "last_accessed_at" timestamp with time zone,
     "last_user_agent" "text",
-    "deleted_at" timestamp without time zone
+    "deleted_at" timestamp with time zone
 );
 
 
@@ -282,8 +282,8 @@ CREATE TABLE IF NOT EXISTS "public"."invitations" (
     "token" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    "accepted_at" timestamp without time zone,
-    "deleted_at" timestamp without time zone,
+    "accepted_at" timestamp with time zone,
+    "deleted_at" timestamp with time zone,
     CONSTRAINT "invitations_role_check" CHECK (("role" = ANY (ARRAY['read'::"text", 'write'::"text", 'admin'::"text"])))
 );
 
@@ -327,7 +327,8 @@ CREATE TABLE IF NOT EXISTS "public"."medicine_box_conditions" (
     "tablet_count" double precision NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    "deleted_at" timestamp without time zone,
+    "deleted_at" timestamp with time zone,
+    "max_date" timestamp with time zone,
     CONSTRAINT "medicine_box_conditions_time_of_day_check" CHECK (("time_of_day" = ANY (ARRAY['morning'::"text", 'noon'::"text", 'evening'::"text"])))
 );
 
@@ -345,7 +346,7 @@ CREATE TABLE IF NOT EXISTS "public"."medicine_boxes" (
     "updated_at" timestamp with time zone DEFAULT "now"(),
     "box_capacity" integer DEFAULT 0 NOT NULL,
     "dose" integer,
-    "deleted_at" timestamp without time zone
+    "deleted_at" timestamp with time zone
 );
 
 
@@ -415,11 +416,11 @@ ALTER TABLE "public"."shared_calendars" OWNER TO "postgres";
 CREATE TABLE IF NOT EXISTS "public"."shared_tokens" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "calendar_id" "uuid" NOT NULL,
-    "expires_at" timestamp without time zone,
+    "expires_at" timestamp with time zone,
     "owner_uid" "uuid" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    "deleted_at" timestamp without time zone
+    "deleted_at" timestamp with time zone
 );
 
 
