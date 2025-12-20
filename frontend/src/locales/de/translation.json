@@ -103,7 +103,8 @@
       "for_days": "Seit... Tagen",
       "max_date_mode": "Dauer der Einnahme",
       "until_date": "Bis...",
-      "no_limit": "Keine Grenzen"
+      "no_limit": "Keine Grenzen",
+      "expired": "Bedingung abgelaufen"
     },
     "day": "Tag",
     "days": "Tage",

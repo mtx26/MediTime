@@ -1148,6 +1148,19 @@ function BoxCard({
                 />
               </button>
             )}
+            {/*medic expired (date max depasser)*/}
+            {box.conditions.some((c) => {
+              if (!c || !c.max_date) return false;
+              const now = new Date();
+              const maxDate = new Date(c.max_date);
+              return now > maxDate;
+            }) && (
+              <Badge
+                color="secondary"
+                icon="exclamation-circle"
+                text={t('boxes.condition.expired')}
+              />
+            )}
           </div>
         )}
 

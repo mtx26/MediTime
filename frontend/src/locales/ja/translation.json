@@ -103,7 +103,8 @@
       "for_days": "数日間",
       "max_date_mode": "摂取期間",
       "until_date": "それまで...",
-      "no_limit": "制限なし"
+      "no_limit": "制限なし",
+      "expired": "条件が期限切れです"
     },
     "day": "日",
     "days": "日数",

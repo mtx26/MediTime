@@ -103,7 +103,8 @@
       "for_days": "持续……天",
       "max_date_mode": "摄入持续时间",
       "until_date": "直到...",
-      "no_limit": "无限制"
+      "no_limit": "无限制",
+      "expired": "条件已过期"
     },
     "day": "天",
     "days": "天",

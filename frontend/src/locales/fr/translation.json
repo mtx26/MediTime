@@ -99,6 +99,7 @@
       "max_date": "Date de fin",
       "max_date_mode": "Durée de prise",
       "none": "Aucune condition de prise",
+      "expired": "Condition expirée",
       "start_date": "Date de début",
       "tablet_count": "Nombre de comprimés",
       "time_of_day": "Heure de prise",

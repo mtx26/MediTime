@@ -103,7 +103,8 @@
       "for_days": "Por... dias",
       "max_date_mode": "Duração da ingestão",
       "until_date": "Até...",
-      "no_limit": "Sem limite"
+      "no_limit": "Sem limite",
+      "expired": "Condição expirada"
     },
     "day": "dia",
     "days": "dias",

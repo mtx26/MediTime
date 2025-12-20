@@ -103,7 +103,8 @@
       "for_days": "Per... giorni",
       "max_date_mode": "Durata dell'assunzione",
       "until_date": "Fino a...",
-      "no_limit": "Nessun limite"
+      "no_limit": "Nessun limite",
+      "expired": "Condizione scaduta"
     },
     "day": "giorno",
     "days": "giorni",

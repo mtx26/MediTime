@@ -103,7 +103,8 @@
       "for_days": "For... days",
       "max_date_mode": "Duration of intake",
       "until_date": "Until...",
-      "no_limit": "No limit"
+      "no_limit": "No limit",
+      "expired": "Condition expired"
     },
     "day": "day",
     "days": "days",
