@@ -92,11 +92,18 @@
     "condition": {
       "add": "Ajouter une condition",
       "delete": "Supprimer",
+      "duration_days": "Nombre de jours",
+      "end_date": "Date de fin",
+      "for_days": "Pendant... jours",
       "interval_days": "Intervalle de jours",
+      "max_date": "Date de fin",
+      "max_date_mode": "Durée de prise",
       "none": "Aucune condition de prise",
       "start_date": "Date de début",
       "tablet_count": "Nombre de comprimés",
-      "time_of_day": "Heure de prise"
+      "time_of_day": "Heure de prise",
+      "until_date": "Jusqu'à...",
+      "no_limit": "Sans limite"
     },
     "day": "jour",
     "days": "jours",
@@ -107,6 +114,7 @@
     "every": "tous les",
     "export_pdf": "Exporter",
     "from": "À partir du",
+    "until": "Jusqu'au",
     "intake_conditions": "Conditions de prise",
     "name": "Nom",
     "new_box": "Nouvelle boîte",
@@ -236,11 +244,11 @@
     "device_registration_desc": "Activez les notifications push pour rester informé en temps réel de vos rappels et alertes médicaments.",
     "enable_btn": "Activer les notifications",
     "enabled_msg": "Notifications activées !",
-    "token_registered": "Token enregistré côté backend",
-    "token_send_error": "Erreur d’envoi du token",
-    "sw_registered": "Service Worker enregistré",
+    "reload": "Recharger",
     "sw_error": "Erreur d’enregistrement du Service Worker",
-    "reload": "Recharger"
+    "sw_registered": "Service Worker enregistré",
+    "token_registered": "Token enregistré côté backend",
+    "token_send_error": "Erreur d’envoi du token"
   },
   "features": {
     "desc1": "Programmez vos prises, recevez des rappels et gardez l’esprit tranquille.",

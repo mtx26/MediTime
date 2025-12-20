@@ -61,8 +61,8 @@
       "facebook": "Facebook",
       "github": "Github",
       "google": "Google",
-      "twitter": "Cinguettio",
-      "microsoft": "Microsoft"
+      "microsoft": "Microsoft",
+      "twitter": "Cinguettio"
     },
     "register": "Registrazione",
     "register_with": "Registrati con:",
@@ -73,8 +73,8 @@
     "with_facebook": "Accedi con Facebook",
     "with_github": "Connessione con Github",
     "with_google": "Accedi con Google",
-    "with_twitter": "Connettiti con Twitter",
-    "with_microsoft": "Accedi con Microsoft"
+    "with_microsoft": "Accedi con Microsoft",
+    "with_twitter": "Connettiti con Twitter"
   },
   "auth_callback": {
     "loading": "Connessione in corso...",
@@ -93,10 +93,17 @@
       "add": "Aggiungi una condizione",
       "delete": "ELIMINARE",
       "interval_days": "Intervallo di giorno",
+      "max_date": "Data di fine",
       "none": "Nessuna condizione di assunzione",
       "start_date": "Data di inizio",
       "tablet_count": "Numero di compresse",
-      "time_of_day": "Tempo di assunzione"
+      "time_of_day": "Tempo di assunzione",
+      "duration_days": "Numero di giorni",
+      "end_date": "Data di fine",
+      "for_days": "Per... giorni",
+      "max_date_mode": "Durata dell'assunzione",
+      "until_date": "Fino a...",
+      "no_limit": "Nessun limite"
     },
     "day": "giorno",
     "days": "giorni",
@@ -107,6 +114,7 @@
     "every": "tutti i",
     "export_pdf": "Esportare",
     "from": "Dal",
+    "until": "Fino al",
     "intake_conditions": "Condizioni di assunzione",
     "name": "Nome",
     "new_box": "Nuova scatola",
@@ -232,15 +240,15 @@
   "expired": "Scaduto",
   "expires_at": "Scade il",
   "fcm": {
-    "token_registered": "[FCM] Token registrato sul lato backend",
-    "token_send_error": "[FCM] Errore durante l'invio del token",
     "device_registration": "Ricevi notifiche su questo dispositivo",
     "device_registration_desc": "Abilita le notifiche push per rimanere informato in tempo reale sui promemoria e sugli avvisi relativi ai tuoi farmaci.",
     "enable_btn": "Abilita le notifiche",
     "enabled_msg": "Notifiche abilitate!",
-    "sw_registered": "Lavoratore dei servizi registrato",
+    "reload": "Ricaricare",
     "sw_error": "Errore di registrazione del Service Worker",
-    "reload": "Ricaricare"
+    "sw_registered": "Lavoratore dei servizi registrato",
+    "token_registered": "[FCM] Token registrato sul lato backend",
+    "token_send_error": "[FCM] Errore durante l'invio del token"
   },
   "features": {
     "desc1": "Pianifica i tuoi scatti, ricevi promemoria e vivi in tutta tranquillità.",

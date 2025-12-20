@@ -83,8 +83,11 @@ def is_medication_due(med: dict, current_date: date) -> bool:
 
         # Fin de validité optionnelle: max_date est soit une date, soit absent/None
         max_date = med.get("max_date")
-        if max_date and current_date > max_date:
-            return False
+        if max_date:
+            # Convertir max_date en date si c'est un datetime (depuis la BD)
+            max_date_only = max_date.date() if hasattr(max_date, 'date') else max_date
+            if current_date > max_date_only:
+                return False
 
         delta_days = (current_date - sd).days
 

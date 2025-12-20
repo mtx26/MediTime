@@ -61,8 +61,8 @@
       "facebook": "Facebook",
       "github": "Github",
       "google": "Google",
-      "twitter": "Twitter",
-      "microsoft": "Microsoft"
+      "microsoft": "Microsoft",
+      "twitter": "Twitter"
     },
     "register": "Anmeldung",
     "register_with": "Registrieren mit:",
@@ -73,8 +73,8 @@
     "with_facebook": "Mit Facebook anmelden",
     "with_github": "Verbindung mit Github",
     "with_google": "Mit Google anmelden",
-    "with_twitter": "Verbinden Sie sich mit Twitter",
-    "with_microsoft": "Mit Microsoft anmelden"
+    "with_microsoft": "Mit Microsoft anmelden",
+    "with_twitter": "Verbinden Sie sich mit Twitter"
   },
   "auth_callback": {
     "loading": "Verbinden...",
@@ -93,10 +93,17 @@
       "add": "Hinzufügen einer Bedingung",
       "delete": "LÖSCHEN",
       "interval_days": "Tagesintervall",
+      "max_date": "Enddatum",
       "none": "Keine Bedingungen für die Einnahme",
       "start_date": "Startdatum",
       "tablet_count": "Anzahl der Tabletten",
-      "time_of_day": "Zeitpunkt der Einnahme"
+      "time_of_day": "Zeitpunkt der Einnahme",
+      "duration_days": "Anzahl der Tage",
+      "end_date": "Enddatum",
+      "for_days": "Seit... Tagen",
+      "max_date_mode": "Dauer der Einnahme",
+      "until_date": "Bis...",
+      "no_limit": "Keine Grenzen"
     },
     "day": "Tag",
     "days": "Tage",
@@ -107,6 +114,7 @@
     "every": "alle",
     "export_pdf": "Export",
     "from": "Von der",
+    "until": "Bis zum",
     "intake_conditions": "Einnahmebedingungen",
     "name": "Name",
     "new_box": "Neue Box",
@@ -232,15 +240,15 @@
   "expired": "Abgelaufen",
   "expires_at": "Läuft ab am",
   "fcm": {
-    "token_registered": "[FCM] Token auf der Backend-Seite registriert",
-    "token_send_error": "[FCM] Fehler beim Senden des Tokens",
     "device_registration": "Benachrichtigungen auf diesem Gerät empfangen",
     "device_registration_desc": "Aktivieren Sie Push-Benachrichtigungen, um in Echtzeit über Ihre Medikamentenerinnerungen und -warnungen informiert zu bleiben.",
     "enable_btn": "Benachrichtigungen aktivieren",
     "enabled_msg": "Benachrichtigungen aktiviert!",
-    "sw_registered": "Registrierter Dienstleistungsarbeiter",
+    "reload": "Aufladen",
     "sw_error": "Fehler bei der Registrierung von Service Workern",
-    "reload": "Aufladen"
+    "sw_registered": "Registrierter Dienstleistungsarbeiter",
+    "token_registered": "[FCM] Token auf der Backend-Seite registriert",
+    "token_send_error": "[FCM] Fehler beim Senden des Tokens"
   },
   "features": {
     "desc1": "Planen Sie Ihre Aufnahmen, erhalten Sie Erinnerungen und seien Sie beruhigt.",

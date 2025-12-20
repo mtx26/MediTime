@@ -149,7 +149,7 @@ function App() {
   
 
   // Fonction pour créer une boîte de médicaments
-  const createPersonalBox = useCallback(async (calendarId, name, boxCapacity = 0, stockAlertThreshold = 10, stockQuantity = 0, dose = 0 ) => {
+  const createPersonalBox = useCallback(async (calendarId, name, boxCapacity, stockAlertThreshold, stockQuantity, dose ) => {
     const result = await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/boxes`,
       method: 'POST',
@@ -659,10 +659,10 @@ function App() {
     async (
       calendarId,
       name,
-      boxCapacity = 0,
-      stockAlertThreshold = 10,
-      stockQuantity = 0,
-      dose = 0
+      boxCapacity,
+      stockAlertThreshold,
+      stockQuantity,
+      dose
     ) => {
       const result = await performApiCall({
         url: `${API_URL}/api/shared/users/calendars/${calendarId}/boxes`,

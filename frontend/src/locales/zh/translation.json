@@ -61,8 +61,8 @@
       "facebook": "Facebook",
       "github": "Github",
       "google": "谷歌",
-      "twitter": "叽叽喳喳",
-      "microsoft": "微软"
+      "microsoft": "微软",
+      "twitter": "叽叽喳喳"
     },
     "register": "登记",
     "register_with": "注册方式：",
@@ -73,8 +73,8 @@
     "with_facebook": "使用 Facebook 登录",
     "with_github": "与 Github 连接",
     "with_google": "使用 Google 登录",
-    "with_twitter": "与 Twitter 建立联系",
-    "with_microsoft": "使用 Microsoft 登录"
+    "with_microsoft": "使用 Microsoft 登录",
+    "with_twitter": "与 Twitter 建立联系"
   },
   "auth_callback": {
     "loading": "正在连接...",
@@ -93,10 +93,17 @@
       "add": "添加条件",
       "delete": "删除",
       "interval_days": "天间隔",
+      "max_date": "结束日期",
       "none": "无条件服用",
       "start_date": "开始日期",
       "tablet_count": "药片数量",
-      "time_of_day": "服用时间"
+      "time_of_day": "服用时间",
+      "duration_days": "天数",
+      "end_date": "结束日期",
+      "for_days": "持续……天",
+      "max_date_mode": "摄入持续时间",
+      "until_date": "直到...",
+      "no_limit": "无限制"
     },
     "day": "天",
     "days": "天",
@@ -107,6 +114,7 @@
     "every": "所有",
     "export_pdf": "出口",
     "from": "从",
+    "until": "直到",
     "intake_conditions": "服用条件",
     "name": "姓名",
     "new_box": "新盒子",
@@ -232,15 +240,15 @@
   "expired": "已到期",
   "expires_at": "到期日期",
   "fcm": {
-    "token_registered": "[FCM] 在后端注册的令牌",
-    "token_send_error": "[FCM] 发送令牌时出错",
     "device_registration": "在此设备上接收通知",
     "device_registration_desc": "启用推送通知，即可实时了解您的用药提醒和警报。",
     "enable_btn": "启用通知",
     "enabled_msg": "通知已启用！",
-    "sw_registered": "注册服务人员",
+    "reload": "充电",
     "sw_error": "服务工作线程注册错误",
-    "reload": "充电"
+    "sw_registered": "注册服务人员",
+    "token_registered": "[FCM] 在后端注册的令牌",
+    "token_send_error": "[FCM] 发送令牌时出错"
   },
   "features": {
     "desc1": "安排您的拍摄，接收提醒并安心。",

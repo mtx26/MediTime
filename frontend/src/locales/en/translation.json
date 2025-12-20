@@ -61,8 +61,8 @@
       "facebook": "Facebook",
       "github": "Github",
       "google": "Google",
-      "twitter": "Twitter",
-      "microsoft": "Microsoft"
+      "microsoft": "Microsoft",
+      "twitter": "Twitter"
     },
     "register": "Registration",
     "register_with": "Register with:",
@@ -73,8 +73,8 @@
     "with_facebook": "Login with Facebook",
     "with_github": "Connecting with Github",
     "with_google": "Sign in with Google",
-    "with_twitter": "Connect with Twitter",
-    "with_microsoft": "Sign in with Microsoft"
+    "with_microsoft": "Sign in with Microsoft",
+    "with_twitter": "Connect with Twitter"
   },
   "auth_callback": {
     "loading": "Connecting...",
@@ -93,10 +93,17 @@
       "add": "Add a condition",
       "delete": "DELETE",
       "interval_days": "Day interval",
+      "max_date": "End date",
       "none": "No conditions of taking",
       "start_date": "Start date",
       "tablet_count": "Number of tablets",
-      "time_of_day": "Time of taking"
+      "time_of_day": "Time of taking",
+      "duration_days": "Number of days",
+      "end_date": "End date",
+      "for_days": "For... days",
+      "max_date_mode": "Duration of intake",
+      "until_date": "Until...",
+      "no_limit": "No limit"
     },
     "day": "day",
     "days": "days",
@@ -107,6 +114,7 @@
     "every": "all the",
     "export_pdf": "Export",
     "from": "From the",
+    "until": "Until",
     "intake_conditions": "Conditions of taking",
     "name": "Name",
     "new_box": "New box",
@@ -232,15 +240,15 @@
   "expired": "Expired",
   "expires_at": "Expires on",
   "fcm": {
-    "token_registered": "[FCM] Token registered on the backend side",
-    "token_send_error": "[FCM] Error sending token",
     "device_registration": "Receive notifications on this device",
     "device_registration_desc": "Enable push notifications to stay informed in real time about your medication reminders and alerts.",
     "enable_btn": "Enable notifications",
     "enabled_msg": "Notifications enabled!",
-    "sw_registered": "Registered Service Worker",
+    "reload": "Recharge",
     "sw_error": "Service Worker registration error",
-    "reload": "Recharge"
+    "sw_registered": "Registered Service Worker",
+    "token_registered": "[FCM] Token registered on the backend side",
+    "token_send_error": "[FCM] Error sending token"
   },
   "features": {
     "desc1": "Schedule your shots, receive reminders and have peace of mind.",
