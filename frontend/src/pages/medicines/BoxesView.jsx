@@ -771,6 +771,7 @@ function BoxCard({
       type: 'number',
       min: '0',
       step: '0.25',
+      required: true,
     },
     {
       label: t('boxes.condition.time_of_day'),
@@ -781,6 +782,7 @@ function BoxCard({
         { value: 'noon', label: t('noon') },
         { value: 'evening', label: t('evening') },
       ],
+      required: true,
     },
     {
       label: t('boxes.condition.interval_days'),
@@ -794,12 +796,14 @@ function BoxCard({
           updateFn('start_date', null);
         }
       },
+      required: true,
     },
     {
       label: t('boxes.condition.start_date'),
       field: 'start_date',
       type: 'date',
       ifComplete: (cond) => cond.interval_days > 1,
+      required: (cond) => cond.interval_days > 1,
     },
     {
       label: t('boxes.condition.max_date_mode'),
@@ -814,6 +818,7 @@ function BoxCard({
         updateFn('max_date', null);
         updateFn('max_date_days', null);
       },
+      required: false,
     },
     {
       label: (cond) => cond.max_date_mode === 'until_date' 
@@ -832,11 +837,8 @@ function BoxCard({
         
         if (cond.max_date_mode === 'for_days') {
           const days = parseInt(value);
-          if (isNaN(days) || days <= 0) {
-            updateFn('max_date', null);
-            updateFn('max_date_days', null);
-            return;
-          }
+
+          // Calculer la date de fin en fonction de la ou on se situe dans la journé
           const now = new Date();
           const target = new Date(now);
           const hourByTime = { morning: 8, noon: 12, evening: 18 };
@@ -855,6 +857,7 @@ function BoxCard({
         }
       },
       ifComplete: (cond) => cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
+      required: (cond) => cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
     },
   ];
 
@@ -1175,7 +1178,7 @@ function BoxCard({
                         className="mb-2 p-3 border rounded bg-light"
                       >
                         {conditionFields.map(
-                          ({ label, field, type, min, step, options, ifComplete, onChange }, idx) => {
+                          ({ label, field, type, min, step, options, ifComplete, onChange, required}, idx) => {
                             // Si ifComplete est défini et retourne false, ne pas afficher le champ
                             if (ifComplete && !ifComplete(cond)) {
                               return null;
@@ -1185,6 +1188,7 @@ function BoxCard({
                             const resolvedLabel = typeof label === 'function' ? label(cond) : label;
                             const resolvedField = typeof field === 'function' ? field(cond) : field;
                             const resolvedType = typeof type === 'function' ? type(cond) : type;
+                            const resolvedRequired = typeof required === 'function' ? required(cond) : required;
                             
                             return (
                             <div key={`${cond.id}-${resolvedField}-${idx}`}>
@@ -1201,6 +1205,7 @@ function BoxCard({
                                   }}
                                   aria-label={resolvedLabel}
                                   title={resolvedLabel}
+                                  required={resolvedRequired}
                                 >
                                   {options.map((o) => (
                                     <option key={o.value} value={o.value}>
@@ -1229,6 +1234,7 @@ function BoxCard({
                                   }}
                                   aria-label={resolvedLabel}
                                   title={resolvedLabel}
+                                  required={resolvedRequired}
                                 />
                               )}
                             </div>
