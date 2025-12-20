@@ -203,7 +203,7 @@ def _generate_ics_content(events: list, calendar_name: str = "MediTime Stocks") 
         if event.get('dose'):
             summary += f" ({event['dose']} mg)"
             
-        description = f"Stock estimé: {event['stock']:.1f} (Seuil: {event['threshold']})\\nCapacité boîte: {event['capacity']}"
+        description = f"Stock estimé: {event['stock']:.2f} (Seuil: {event['threshold']})\\nCapacité boîte: {event['capacity']}"
         
         lines.extend([
             "BEGIN:VEVENT",
