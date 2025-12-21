@@ -15,6 +15,8 @@ const DateModal = forwardRef(
       close: () => setVisible(false),
     }));
 
+    if (!visible) return null;
+
     return (
       <Dialog.Root open={visible} onOpenChange={setVisible}>
         <Dialog.Portal>

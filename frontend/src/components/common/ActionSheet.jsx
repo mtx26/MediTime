@@ -53,7 +53,7 @@ function ActionSheet({ actions, buttonSize, dataTour }) {
             return (
               <DropdownMenu.Item key={index} asChild>
                 <button
-                  className={`dropdown-item btn btn-outline-dark ${action.danger ? 'text-danger' : ''}`}
+                  className={`dropdown-item ${action.danger ? 'text-danger' : ''}`}
                   onClick={action.onClick}
                   title={action.title}
                   aria-label={action.title}
