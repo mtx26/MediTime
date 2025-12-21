@@ -4,6 +4,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';
 import ActionSheet from '../../components/common/ActionSheet';
+import IconButton from '../../components/common/UtilityComponents';
 
 function StockAlertsPage({
   personalCalendars,
@@ -180,16 +181,34 @@ function StockAlertsPage({
         <div className="row g-3">
           {alerts.map((med) => (
             <div key={med.id} className="col-12 col-lg-6">
-              <div className={`card shadow h-100 ${med.stock_quantity <= 0 ? 'border-danger' : 'border-warning'}`}>
+              <div className={`card shadow h-100 ${med.stock_quantity <= 0 ? 'border-danger' : ''}`}>
                 <div className="card-body d-flex flex-column justify-content-between">
                   <div>
-                    <h5 className="card-title mb-2">{med.name}</h5>
-                    <p className="card-text text-muted mb-2">
-                      {t('actual_stock')} : {med.stock_quantity} / {t('boxes.alert_threshold')} : {med.stock_alert_threshold}
-                    </p>
+                    <h5 className="card-title mb-2">{med.name} ({med.dose} mg)</h5>
+                    <div className="mb-2">
+                      <div className="row g-2 text-sm">
+                        <div className="col-6">
+                          <small className="d-block text-muted">{t('boxes.capacity')}</small>
+                          <strong>{med.box_capacity}</strong>
+                        </div>
+                        <div className="col-6">
+                          <small className="d-block text-muted">{t('boxes.alert_threshold')}</small>
+                          <strong>{med.stock_alert_threshold}</strong>
+                        </div>
+                        <div className="col-6">
+                          <small className="d-block text-muted">{t('actual_stock')}</small>
+                          <strong className="text-danger">{med.stock_quantity}</strong>
+                        </div>
+  
+                        <div className="col-6">
+                          <small className="d-block text-muted">{t('stock_percentage')}</small>
+                          <strong>{Math.round((med.stock_quantity / med.box_capacity) * 100)}%</strong>
+                        </div>
+                      </div>
+                    </div>
                     <span
                       className={`badge ${
-                        med.stock_quantity <= 0 ? 'bg-danger' : 'bg-warning text-dark'
+                        med.stock_quantity <= 0 ? 'bg-danger' : 'bg-secondary'
                       }`}
                     >
                       {med.stock_quantity <= 0
@@ -198,15 +217,14 @@ function StockAlertsPage({
                     </span>
                   </div>
                   <div className="mt-3">
-                    <button
+                    <IconButton
                       className="btn btn-outline-success w-100"
+                      icon="plus-circle"
+                      text={t('boxes.restock')}
                       onClick={() => restockBox(calendarId, med.id)}
-                      aria-label={t('boxes.restock')}
-                      title={t('boxes.restock')}
-                    >
-                      <i className="bi bi-plus-circle me-1"></i>
-                      {t('boxes.restock')}
-                    </button>
+                      disabled={med.box_capacity === 0}
+                      helpDisabled={t('boxes.restock_disabled_tooltip')}
+                    />
                   </div>
                 </div>
               </div>

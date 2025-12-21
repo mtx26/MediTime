@@ -104,7 +104,10 @@
       "max_date_mode": "摄入持续时间",
       "until_date": "直到...",
       "no_limit": "无限制",
-      "expired": "条件已过期"
+      "expired": "条件已过期",
+      "inactive": "非活性药物",
+      "inactive_tooltip": "您服用此药的所有说明均已过期。该药物已完全失效。",
+      "expired_tooltip": "您享受此优惠的其中一项条件已过期，该优惠现已失效。"
     },
     "day": "天",
     "days": "天",
@@ -135,13 +138,22 @@
       "badge": {
         "high": "高库存",
         "low": "库存不足",
-        "out": "缺货"
+        "out": "缺货",
+        "alerts_disabled": "警报已禁用",
+        "tooltip": {
+          "high": "库存充足。您目前药片数量足够，无需采取任何行动。",
+          "low": "库存告急！您即将达到警戒线。请尽快补货，以免断货。",
+          "out": "已售罄。您没有剩余的药片了。请尽快补货。",
+          "alerts_disabled": "由于库存容量或警报阈值设置为 0，此药品的库存警报功能已禁用。您将不会收到缺货通知。请更改设置以重新启用此功能。"
+        }
       }
     },
     "tablet": "压缩",
     "tablets": "平板电脑",
     "title": "药箱",
-    "view_notice": "查看说明"
+    "view_notice": "查看说明",
+    "restock_disabled_tooltip": "由于箱子容量为 0，补货按钮已禁用。请更改容量以重新启用补货功能。",
+    "condition_none_tooltip": "服用这些药物没有具体条件。点击此处添加条件，即可定期收到提醒。"
   },
   "calendar": {
     "add": "添加日历",
@@ -825,5 +837,6 @@
     "title": "为什么选择 MediTime？"
   },
   "yes": "是的",
-  "you_have_no_pillbox_use_history": "您的药盒没有使用记录。"
+  "you_have_no_pillbox_use_history": "您的药盒没有使用记录。",
+  "stock_percentage": "百分比"
 }

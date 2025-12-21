@@ -8,32 +8,29 @@ import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 import QRCodeScanner from '../../components/scanner/QRCodeScanner';
+import Tooltips from '../../components/common/Tooltips';
+import IconButton from '../../components/common/UtilityComponents';
 
 // ============================================================================
 // UTILITY COMPONENTS
 // ============================================================================
 
-const IconButton = ({ className, icon, text, onClick, title }) => (
-  <button 
-    type="button" 
-    className={`${className} shadow`} 
-    onClick={onClick} 
-    aria-label={text} 
-    title={title || text}
-  >
-    <i className={`bi bi-${icon}`}></i> {text}
-  </button>
-);
-
-const Badge = ({ color, icon, text }) => (
-  <span className={`badge bg-${color}`}>
-    <i className={`bi bi-${icon}`} /> {text}
-  </span>
-);
+const Badge = ({ color, icon, text, tooltip }) => {
+  const content = (
+    <span className={`badge bg-${color}`}>
+      <i className={`bi bi-${icon}`} /> {text}
+    </span>
+  );
+  return tooltip ? (
+    <Tooltips content={tooltip} side="bottom">
+      {content}
+    </Tooltips>
+  ) : (
+    content
+  );
+};
 
 const ActionCard = ({ borderColor, icon, color, text, onClick, hasTooltip, tooltip, dataTour, t }) => {
-  const [showTooltip, setShowTooltip] = useState(false);
-  
   return (
     <button 
       type="button" 
@@ -46,28 +43,9 @@ const ActionCard = ({ borderColor, icon, color, text, onClick, hasTooltip, toolt
       <div className={`card h-100 shadow border border-${borderColor}`}>
         <div className="card-body d-flex flex-column justify-content-center align-items-center p-3 position-relative">
           {hasTooltip && (
-            <div
-              className="position-absolute top-0 end-0 m-1 p-1 text-info"
-              style={{ cursor: 'help' }}
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
-            >
-              <i className="bi bi-info-circle"></i>
-              {showTooltip && (
-                <div 
-                  className="position-absolute bg-dark text-white p-2 rounded shadow" 
-                  style={{ 
-                    top: '100%', 
-                    right: '0', 
-                    width: '200px', 
-                    fontSize: '0.8rem', 
-                    zIndex: 1050 
-                  }}
-                >
-                  {tooltip}
-                </div>
-              )}
-            </div>
+            <Tooltips content={tooltip} side="bottom" className="position-absolute top-0 end-0 m-1 p-1">
+              <i className="bi bi-info-circle text-info" style={{ cursor: 'pointer' }}></i>
+            </Tooltips>
           )}
           <i className={`bi bi-${icon} text-${color} fs-1`}></i>
           <p className={`text-${color} fw-bold mt-2 mb-0 text-center`}>
@@ -1099,6 +1077,8 @@ function BoxCard({
                 icon="plus-circle"
                 text={t('boxes.restock')}
                 onClick={restockBox}
+                disabled={box.box_capacity === 0}
+                helpDisabled={t('boxes.restock_disabled_tooltip')}
               />
             </div>
           )}
@@ -1130,6 +1110,13 @@ function BoxCard({
                     ? t('boxes.stock.badge.low')
                     : t('boxes.stock.badge.high')
                 }
+                tooltip={
+                  box.stock_quantity <= 0
+                    ? t('boxes.stock.badge.tooltip.out')
+                    : box.stock_quantity <= box.stock_alert_threshold
+                    ? t('boxes.stock.badge.tooltip.low')
+                    : t('boxes.stock.badge.tooltip.high')
+                }
               />
             )}
             {box.conditions.filter((c) => c !== undefined).length === 0 && (
@@ -1146,20 +1133,43 @@ function BoxCard({
                   color="warning"
                   icon="info-circle"
                   text={t('boxes.condition.none')}
+                  tooltip={t('boxes.condition_none_tooltip')}
                 />
               </button>
             )}
-            {/*medic expired (date max depasser)*/}
-            {box.conditions.some((c) => {
+            {/* medic inactive (toutes les conditions sont desactiver) */}
+            {box.conditions.every((c) => {
               if (!c || !c.max_date) return false;
               const now = new Date();
               const maxDate = new Date(c.max_date);
               return now > maxDate;
-            }) && (
+            }) ? (
               <Badge
-                color="secondary"
-                icon="exclamation-circle"
-                text={t('boxes.condition.expired')}
+                color="warning"
+                icon="pause-circle"
+                text={t('boxes.condition.inactive')}
+                tooltip={t('boxes.condition.inactive_tooltip')}
+              />
+            ) : box.conditions.some((c) => {
+                if (!c || !c.max_date) return false;
+                const now = new Date();
+                const maxDate = new Date(c.max_date);
+                return now > maxDate;
+              }) && (
+                <Badge
+                  color="secondary"
+                  icon="exclamation-circle"
+                  text={t('boxes.condition.expired')}
+                  tooltip={t('boxes.condition.expired_tooltip')}
+                />
+              )}
+            {/*Afficher si alart pour un medoc desactiver (box_capacity <= 0 ou stock_alert_threshold <= 0)*/}
+            {(box.box_capacity <= 0 || box.stock_alert_threshold <= 0) && (
+              <Badge
+                color="info"
+                icon="slash-circle"
+                text={t('boxes.stock.badge.alerts_disabled')}
+                tooltip={t('boxes.stock.badge.tooltip.alerts_disabled')}
               />
             )}
           </div>

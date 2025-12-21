@@ -104,7 +104,10 @@
       "max_date_mode": "Duração da ingestão",
       "until_date": "Até...",
       "no_limit": "Sem limite",
-      "expired": "Condição expirada"
+      "expired": "Condição expirada",
+      "inactive": "Medicamento inativo",
+      "inactive_tooltip": "Todas as suas instruções para tomar este medicamento expiraram. O medicamento está completamente inativo.",
+      "expired_tooltip": "Uma das suas condições para usufruir desta oferta expirou. Agora está inativa."
     },
     "day": "dia",
     "days": "dias",
@@ -135,13 +138,22 @@
       "badge": {
         "high": "Alto estoque",
         "low": "Estoque baixo",
-        "out": "Fora de estoque"
+        "out": "Fora de estoque",
+        "alerts_disabled": "Alertas desativados",
+        "tooltip": {
+          "high": "Estoque em boas condições. Você tem comprimidos suficientes, nenhuma ação é necessária neste momento.",
+          "low": "Níveis críticos de estoque! Você está se aproximando do limite de alerta. Lembre-se de reabastecer em breve para evitar que o produto acabe.",
+          "out": "Produto esgotado. Não temos mais comprimidos. Reponha o estoque o mais rápido possível.",
+          "alerts_disabled": "Os alertas de estoque estão desativados para este medicamento porque a capacidade ou o limite de alerta está definido como 0. Você não receberá notificações de falta de estoque. Altere suas configurações para reativá-los."
+        }
       }
     },
     "tablet": "comprimido",
     "tablets": "comprimidos",
     "title": "Caixas de remédios",
-    "view_notice": "Veja as instruções"
+    "view_notice": "Veja as instruções",
+    "restock_disabled_tooltip": "O botão de reabastecimento está desativado porque a capacidade da caixa é 0. Altere a capacidade para reativar o reabastecimento.",
+    "condition_none_tooltip": "Não foram definidas condições para a realização destes exercícios. Clique aqui para adicionar um e receber lembretes regulares."
   },
   "calendar": {
     "add": "Adicionar um calendário",
@@ -825,5 +837,6 @@
     "title": "Por que escolher o MediTime?"
   },
   "yes": "Sim",
-  "you_have_no_pillbox_use_history": "Você não possui histórico de uso para o organizador de comprimidos."
+  "you_have_no_pillbox_use_history": "Você não possui histórico de uso para o organizador de comprimidos.",
+  "stock_percentage": "Percentagem"
 }

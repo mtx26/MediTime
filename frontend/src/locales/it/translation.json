@@ -104,7 +104,10 @@
       "max_date_mode": "Durata dell'assunzione",
       "until_date": "Fino a...",
       "no_limit": "Nessun limite",
-      "expired": "Condizione scaduta"
+      "expired": "Condizione scaduta",
+      "inactive": "Farmaco inattivo",
+      "inactive_tooltip": "Tutte le istruzioni per l'assunzione di questo farmaco sono scadute. Il farmaco è completamente inattivo.",
+      "expired_tooltip": "Una delle condizioni per usufruire di questa offerta è scaduta. Ora è inattiva."
     },
     "day": "giorno",
     "days": "giorni",
@@ -135,13 +138,22 @@
       "badge": {
         "high": "Elevato stock",
         "low": "Scorte basse",
-        "out": "Esaurito"
+        "out": "Esaurito",
+        "alerts_disabled": "Avvisi disabilitati",
+        "tooltip": {
+          "high": "Scorte in buone condizioni. Hai abbastanza compresse, al momento non è richiesta alcuna azione.",
+          "low": "Livelli di scorte critici! Ti stai avvicinando alla soglia di allerta. Ricordati di rifornirti presto per evitare di rimanere senza.",
+          "out": "Esaurito immediatamente. Non hai più compresse. Rifornisciti il prima possibile.",
+          "alerts_disabled": "Gli avvisi di esaurimento scorte sono disabilitati per questo farmaco perché la capacità o la soglia di avviso è impostata su 0. Non riceverai notifiche di esaurimento scorte. Modifica le impostazioni per riattivarle."
+        }
       }
     },
     "tablet": "compresso",
     "tablets": "compresse",
     "title": "Scatole di medicinali",
-    "view_notice": "Vedi le istruzioni"
+    "view_notice": "Vedi le istruzioni",
+    "restock_disabled_tooltip": "Il pulsante di rifornimento è disabilitato perché la capacità della scatola è 0. Modificare la capacità per riattivare il rifornimento.",
+    "condition_none_tooltip": "Non sono state definite condizioni per prenderli. Clicca qui per aggiungerne uno e ricevere promemoria regolari."
   },
   "calendar": {
     "add": "Aggiungi un calendario",
@@ -825,5 +837,6 @@
     "title": "Perché scegliere MediTime?"
   },
   "yes": "SÌ",
-  "you_have_no_pillbox_use_history": "Non hai alcuna cronologia di utilizzo per l'organizzatore di pillole."
+  "you_have_no_pillbox_use_history": "Non hai alcuna cronologia di utilizzo per l'organizzatore di pillole.",
+  "stock_percentage": "Percentuale"
 }

@@ -104,7 +104,10 @@
       "max_date_mode": "Duration of intake",
       "until_date": "Until...",
       "no_limit": "No limit",
-      "expired": "Condition expired"
+      "expired": "Condition expired",
+      "inactive": "Inactive drug",
+      "inactive_tooltip": "All your instructions for taking this medication have expired. The medication is completely inactive.",
+      "expired_tooltip": "One of your conditions for taking advantage of this offer has expired. It is now inactive."
     },
     "day": "day",
     "days": "days",
@@ -135,13 +138,22 @@
       "badge": {
         "high": "High stock",
         "low": "Low stock",
-        "out": "Out of stock"
+        "out": "Out of stock",
+        "alerts_disabled": "Alerts disabled",
+        "tooltip": {
+          "high": "Stock in good condition. You have enough tablets, no action is required at this time.",
+          "low": "Critical stock levels! You're approaching the alert threshold. Remember to restock soon to avoid running out.",
+          "out": "Out of stock immediately. You have no more tablets. Restock as soon as possible.",
+          "alerts_disabled": "Stock alerts are disabled for this medication because the capacity or alert threshold is set to 0. You will not receive stockout notifications. Change your settings to re-enable them."
+        }
       }
     },
     "tablet": "compressed",
     "tablets": "tablets",
     "title": "Medicine boxes",
-    "view_notice": "See the instructions"
+    "view_notice": "See the instructions",
+    "restock_disabled_tooltip": "The restocking button is disabled because the box capacity is 0. Change the capacity to re-enable restocking.",
+    "condition_none_tooltip": "No conditions have been defined for taking these. Click here to add one in order to receive regular reminders."
   },
   "calendar": {
     "add": "Add a calendar",
@@ -825,5 +837,6 @@
     "title": "Why choose MediTime?"
   },
   "yes": "Yes",
-  "you_have_no_pillbox_use_history": "You have no usage history for the pill organizer."
+  "you_have_no_pillbox_use_history": "You have no usage history for the pill organizer.",
+  "stock_percentage": "Percentage"
 }

@@ -104,7 +104,10 @@
       "max_date_mode": "Duración de la ingesta",
       "until_date": "Hasta...",
       "no_limit": "Sin límite",
-      "expired": "Condición expirada"
+      "expired": "Condición expirada",
+      "inactive": "fármaco inactivo",
+      "inactive_tooltip": "Todas sus instrucciones para tomar este medicamento han caducado. El medicamento está completamente inactivo.",
+      "expired_tooltip": "Una de tus condiciones para aprovechar esta oferta ha expirado. Ya no está activa."
     },
     "day": "día",
     "days": "días",
@@ -135,13 +138,22 @@
       "badge": {
         "high": "Alto stock",
         "low": "Stock bajo",
-        "out": "Agotado"
+        "out": "Agotado",
+        "alerts_disabled": "Alertas deshabilitadas",
+        "tooltip": {
+          "high": "Stock en buen estado. Tiene suficientes tabletas; no es necesario realizar ninguna acción por el momento.",
+          "low": "¡Niveles críticos de existencias! Se acerca al límite de alerta. Recuerde reabastecerse pronto para evitar quedarse sin existencias.",
+          "out": "Agotado inmediatamente. No tienes más tabletas. Reabastecer lo antes posible.",
+          "alerts_disabled": "Las alertas de stock están desactivadas para este medicamento porque la capacidad o el umbral de alerta están configurados en 0. No recibirá notificaciones de desabastecimiento. Cambie su configuración para volver a activarlas."
+        }
       }
     },
     "tablet": "comprimido",
     "tablets": "tabletas",
     "title": "Cajas de medicamentos",
-    "view_notice": "Vea las instrucciones"
+    "view_notice": "Vea las instrucciones",
+    "restock_disabled_tooltip": "El botón de reposición está deshabilitado porque la capacidad de la caja es 0. Cambie la capacidad para volver a habilitar la reposición.",
+    "condition_none_tooltip": "No se han definido condiciones para realizarlas. Haga clic aquí para añadir una y recibir recordatorios periódicos."
   },
   "calendar": {
     "add": "Agregar un calendario",
@@ -825,5 +837,6 @@
     "title": "¿Por qué elegir MediTime?"
   },
   "yes": "Sí",
-  "you_have_no_pillbox_use_history": "No tienes historial de uso del pastillero."
+  "you_have_no_pillbox_use_history": "No tienes historial de uso del pastillero.",
+  "stock_percentage": "Porcentaje"
 }

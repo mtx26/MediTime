@@ -12,6 +12,7 @@
     "@google-cloud/translate": "^9.3.0",
     "@popperjs/core": "^2.11.8",
     "@radix-ui/react-popover": "^1.1.12",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@supabase/supabase-js": "^2.50.2",
     "@vercel/speed-insights": "^1.2.0",
     "bootstrap": "^5.3.3",

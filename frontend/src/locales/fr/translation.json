@@ -99,7 +99,10 @@
       "max_date": "Date de fin",
       "max_date_mode": "Durée de prise",
       "none": "Aucune condition de prise",
+      "inactive": "Médicament inactif",
+      "inactive_tooltip": "Toutes vos conditions de prise pour ce médicament ont dépassé leur date limite. Le médicament est complètement inactif.",
       "expired": "Condition expirée",
+      "expired_tooltip": "Parmi vos conditions de prise, une des conditions a dépassé sa date limite. Elle est maintenant inactive.",
       "start_date": "Date de début",
       "tablet_count": "Nombre de comprimés",
       "time_of_day": "Heure de prise",
@@ -122,6 +125,7 @@
     "qr_code_help_text": "Le code DataMatrix se trouve sur l'emballage du médicament, près du code-barres. C'est un petit carré noir et blanc.",
     "remaining_qty": "Quantité restante",
     "restock": "Réstockage",
+    "restock_disabled_tooltip": "Le bouton de restockage est désactivé car la capacité de la boîte est à 0. Modifiez la capacité pour réactiver le restockage.",
     "save": "Enregistrer",
     "scan_qr_code": "Scanner QR code",
     "start_typing": "Commencez à taper...",
@@ -135,12 +139,20 @@
       "badge": {
         "high": "Stock élevé",
         "low": "Stock bas",
-        "out": "Stock épuisé"
+        "out": "Stock épuisé",
+        "alerts_disabled": "Alertes désactivées",
+        "tooltip": {
+          "high": "Stock en bon état. Vous avez suffisamment de comprimés, aucune action n'est nécessaire pour le moment.",
+          "low": "Stock critique ! Vous approchez du seuil d'alerte. Pensez à réapprovisionner bientôt pour éviter une rupture.",
+          "out": "Rupture de stock immédiate. Vous n'avez plus aucun comprimé. Réapprovisionnez dès que possible.",
+          "alerts_disabled": "Les alertes de stock sont désactivées pour ce médicament car la capacité ou le seuil d'alerte est à 0. Vous ne recevrez pas de notifications de rupture. Modifiez les paramètres pour réactiver."
+        }
       }
     },
     "tablet": "comprimé",
     "tablets": "comprimés",
     "title": "Boîtes de médicaments",
+    "condition_none_tooltip": "Aucune condition de prise définie. Cliquez ici pour en ajouter une afin de recevoir des rappels réguliers.",
     "view_notice": "Voir la notice"
   },
   "calendar": {
@@ -825,5 +837,6 @@
     "title": "Pourquoi choisir MediTime ?"
   },
   "yes": "Oui",
-  "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier."
+  "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier.",
+  "stock_percentage": "Pourcentage"
 }
