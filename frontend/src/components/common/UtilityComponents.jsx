@@ -21,4 +21,4 @@ export default function IconButton({ className, icon, text, onClick, title, disa
   ) : (
     content
   );
-};
+}

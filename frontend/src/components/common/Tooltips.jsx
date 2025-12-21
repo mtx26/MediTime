@@ -48,4 +48,4 @@ export default function Tooltips({ children, content, side = 'bottom', className
       </Tooltip.Root>
     </Tooltip.Provider>
   );
-};
+}

@@ -741,6 +741,7 @@ function BoxCard({
   calendarSource,
   onEdit,
   onUpdateScan,
+  showAlert,
   t,
 }) {
   const isEditing = editingBoxId === box.id && editingBox && editingBox.name !== undefined;
