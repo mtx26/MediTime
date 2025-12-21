@@ -16,7 +16,7 @@
     "@radix-ui/react-toast": "^1.2.15",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@radix-ui/themes": "^3.2.1",
-    "@supabase/supabase-js": "^2.50.2",
+    "@supabase/supabase-js": "^2.89.0",
     "@vercel/speed-insights": "^1.2.0",
     "bootstrap": "^5.3.3",
     "date-fns": "^4.1.0",
