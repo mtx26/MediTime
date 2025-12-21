@@ -194,7 +194,14 @@
     "today": "Today",
     "week": "Week",
     "weekly_help": "Click on a day in the calendar to see the associated medications in a window.",
-    "weekly_view": "Calendar by week"
+    "weekly_view": "Calendar by week",
+    "delete_title": "Delete the calendar?",
+    "delete_description": "This action is irreversible. All medications and schedules associated with this calendar will be permanently discontinued.",
+    "rename_title": "Rename the calendar?",
+    "rename_description": "The new name will be visible to all users with whom you share this calendar.",
+    "delete_shared_title": "Delete the shared calendar?",
+    "delete_shared_description": "You will no longer have access to this shared calendar. The calendar will remain accessible to the owner and other users.",
+    "error_deleting_calendar": "Error deleting calendar."
   },
   "calendar_completed": "Calendar successfully completed!",
   "calendar_completed_this_week": "Pillbox full for this week!",
@@ -289,7 +296,9 @@
     "info_title": "About ICS links",
     "no_tokens": "No ICS link created.",
     "title": "ICS Link Lists",
-    "token_label": "Link"
+    "token_label": "Link",
+    "delete_title": "Remove the ICS link?",
+    "delete_description": "The link will be deactivated and will no longer be able to sync your calendar. You will need to create a new link to reactivate synchronization."
   },
   "image_upload": {
     "analysis_error": "Error parsing image.",
@@ -838,5 +847,16 @@
   },
   "yes": "Yes",
   "you_have_no_pillbox_use_history": "You have no usage history for the pill organizer.",
-  "stock_percentage": "Percentage"
+  "stock_percentage": "Percentage",
+  "calendar_completion_error": "Error completing calendar.",
+  "calendar_deleted": "Calendar successfully deleted.",
+  "pillbox_completion_description": "The stock of all medications for this week will be reduced according to your schedule. This action is irreversible.",
+  "delete_access_title": "Remove this user's access?",
+  "delete_access_description": "This user will no longer be able to view or modify this calendar. This action is irreversible.",
+  "delete_calendar_title": "Delete this shared calendar?",
+  "delete_calendar_description": "You will lose access to this calendar. The calendar will remain accessible to the owner and other users with whom it is shared.",
+  "delete_invitation_title": "Delete this invitation?",
+  "delete_invitation_description": "The invitation will be cancelled and the recipient will no longer be able to accept it.",
+  "delete_link_title": "Remove this sharing link?",
+  "delete_link_description": "The link will be permanently removed. No one will be able to access the calendar via this link anymore, including users who have already used it."
 }

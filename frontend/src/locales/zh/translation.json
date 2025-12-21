@@ -194,7 +194,14 @@
     "today": "今天",
     "week": "星期",
     "weekly_help": "单击日历中的某一天即可在窗口中查看相关药物。",
-    "weekly_view": "按周日历"
+    "weekly_view": "按周日历",
+    "delete_title": "删除日历？",
+    "delete_description": "此举不可逆转。与此日程相关的所有药物和用药计划都将永久停止。",
+    "rename_title": "重命名日历？",
+    "rename_description": "新名称将对所有与您共享此日历的用户可见。",
+    "delete_shared_title": "删除共享日历？",
+    "delete_shared_description": "您将无法再访问此共享日历。日历所有者和其他用户仍可访问该日历。",
+    "error_deleting_calendar": "删除日历时出错。"
   },
   "calendar_completed": "行事历成功完成！",
   "calendar_completed_this_week": "这周药盒已满！",
@@ -289,7 +296,9 @@
     "info_title": "关于ICS链接",
     "no_tokens": "未创建ICS链接。",
     "title": "ICS链接列表",
-    "token_label": "留置权 ICS"
+    "token_label": "留置权 ICS",
+    "delete_title": "移除ICS链接？",
+    "delete_description": "该链接将被停用，无法再同步您的日历。您需要创建一个新链接才能重新激活同步功能。"
   },
   "image_upload": {
     "analysis_error": "解析图像时出错。",
@@ -838,5 +847,16 @@
   },
   "yes": "是的",
   "you_have_no_pillbox_use_history": "您的药盒没有使用记录。",
-  "stock_percentage": "百分比"
+  "stock_percentage": "百分比",
+  "calendar_completion_error": "日历填写过程中出错。",
+  "calendar_deleted": "日历已成功删除。",
+  "pillbox_completion_description": "本周所有药品的库存将根据您的用药计划减少。此操作不可逆。",
+  "delete_access_title": "移除该用户的访问权限？",
+  "delete_access_description": "该用户将无法再查看或修改此日历。此操作不可逆。",
+  "delete_calendar_title": "删除此共享日历？",
+  "delete_calendar_description": "您将失去对此日历的访问权限。日历所有者和其他与其共享日历的用户仍可访问该日历。",
+  "delete_invitation_title": "删除此邀请？",
+  "delete_invitation_description": "邀请将被取消，收件人将无法再接受邀请。",
+  "delete_link_title": "删除此分享链接？",
+  "delete_link_description": "该链接将被永久移除。任何人，包括已使用过该链接的用户，都将无法再通过该链接访问日历。"
 }

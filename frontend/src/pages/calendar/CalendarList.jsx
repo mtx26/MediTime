@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import AlertSystem from '../../components/common/AlertSystem';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
+import { useAlert } from '../../contexts/AlertContext';
 
 
 function SelectCalendar({
@@ -12,17 +12,11 @@ function SelectCalendar({
 }) {
   const { lng } = useParams();
   const { t } = useTranslation();
+  const { showAlert, showConfirm } = useAlert();
 
   // 📅 Gestion des calendriers
   const [renameValues, setRenameValues] = useState({}); // État pour les valeurs de renommage de calendrier
   const [renameMode, setRenameMode] = useState(null); // État pour le mode de renommage
-  
-
-  // ⚠️ Alertes et confirmations
-  const [alertType, setAlertType] = useState(''); // État pour le type d'alerte
-  const [alertMessage, setAlertMessage] = useState(''); // État pour le message d'alerte
-  const [onConfirmAction, setOnConfirmAction] = useState(null); // État pour l'action à confirmer
-  const [selectedAlert, setSelectedAlert] = useState(null); // État pour l'alerte sélectionnée
 
   const renameConfirmAction = async (calendarId) => {
     const rep = await personalCalendars.renameCalendar(
@@ -31,63 +25,55 @@ function SelectCalendar({
     );
     if (rep.success) {
       setRenameValues((prev) => ({ ...prev, [calendarId]: '' }));
-      setAlertType('success');
-      setAlertMessage('✅ ' + rep.message);
-      setSelectedAlert('calendar' + calendarId);
+      showAlert('success', rep.message);
     } else {
-      setAlertType('danger');
-      setAlertMessage('❌ ' + rep.error);
-      setSelectedAlert('calendar' + calendarId);
+      showAlert('danger', rep.error);
     }
   };
 
   // 🔄 Renommage d'un calendrier
   const handleRenameClick = (calendarId) => {
-    setAlertType('confirm-safe');
-    setSelectedAlert('calendar' + calendarId);
-    setAlertMessage('✅ ' + t('calendar.confirm_rename'));
-    setOnConfirmAction(() => () => renameConfirmAction(calendarId));
+    showConfirm(
+      'confirm-safe',
+      t('calendar.rename_title'),
+      t('calendar.rename_description'),
+      () => renameConfirmAction(calendarId)
+    );
   };
 
   const deleteConfirmAction = async (calendarId) => {
     const rep = await personalCalendars.deleteCalendar(calendarId);
     if (rep.success) {
-      setAlertType('success');
-      setAlertMessage('✅ ' + rep.message);
-      setSelectedAlert('calendar.label');
+      showAlert('success', rep.message);
     } else {
-      setAlertType('danger');
-      setAlertMessage('❌ ' + rep.error);
-      setSelectedAlert('calendar' + calendarId);
+      showAlert('danger', rep.error);
     }
   };
 
   const handleDeleteCalendarClick = (calendarId) => {
-    setAlertType('confirm-danger');
-    setSelectedAlert('calendar' + calendarId);
-    setAlertMessage('❌ ' + t('calendar.confirm_delete'));
-    setOnConfirmAction(() => () => deleteConfirmAction(calendarId));
+    showConfirm(
+      'confirm-danger',
+      t('calendar.delete_title'),
+      t('calendar.delete_description'),
+      () => deleteConfirmAction(calendarId)
+    );
   };
 
   const deleteSharedCalendarConfirmAction = async (calendarId) => {
     const rep = await sharedUserCalendars.deleteSharedCalendar(calendarId);
     if (rep.success) {
-      setAlertType('success');
-      setAlertMessage('✅ ' + rep.message);
-      setSelectedAlert('sharedCalendar');
+      showAlert('success', rep.message);
     } else {
-      setAlertType('danger');
-      setAlertMessage('❌ ' + rep.error);
-      setSelectedAlert('sharedCalendar' + calendarId);
+      showAlert('danger', rep.error);
     }
   };
 
   const handleDeleteSharedCalendarClick = (calendarId) => {
-    setAlertType('confirm-danger');
-    setSelectedAlert('sharedCalendar' + calendarId);
-    setAlertMessage('❌ ' + t('calendar.confirm_delete_shared'));
-    setOnConfirmAction(
-      () => () => deleteSharedCalendarConfirmAction(calendarId)
+    showConfirm(
+      'confirm-danger',
+      t('calendar.delete_shared_title'),
+      t('calendar.delete_shared_description'),
+      () => deleteSharedCalendarConfirmAction(calendarId)
     );
   };
 
@@ -110,55 +96,12 @@ function SelectCalendar({
         <h4 className="mb-3 fw-bold">
           <i className="bi bi-calendar-week"></i> {t('my_calendars')}
         </h4>
-        {selectedAlert === 'header' && (
-          <AlertSystem
-            type={alertType}
-            message={alertMessage}
-            onClose={() => {
-              setAlertMessage('');
-              setOnConfirmAction(null);
-              setSelectedAlert(null);
-            }}
-            onConfirm={() => {
-              if (onConfirmAction) onConfirmAction();
-            }}
-          />
-        )}
-
-        {selectedAlert === 'calendar' && (
-          <AlertSystem
-            type={alertType}
-            message={alertMessage}
-            onClose={() => {
-              setAlertMessage('');
-              setOnConfirmAction(null);
-              setSelectedAlert(null);
-            }}
-            onConfirm={() => {
-              if (onConfirmAction) onConfirmAction();
-            }}
-          />
-        )}
 
         {/* Liste des calendriers */}
         <div className="list-group shadow">
           {(Array.isArray(personalCalendars.calendarsData) && personalCalendars.calendarsData.length > 0) && (
             personalCalendars.calendarsData.map((calendarData, index) => (
               <div key={index} className="list-group-item">
-                {selectedAlert === 'calendar' + calendarData.id && (
-                  <AlertSystem
-                    type={alertType}
-                    message={alertMessage}
-                    onClose={() => {
-                      setAlertMessage('');
-                      setOnConfirmAction(null);
-                      setSelectedAlert(null);
-                    }}
-                    onConfirm={() => {
-                      if (onConfirmAction) onConfirmAction();
-                    }}
-                  />
-                )}
                 <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
                   {/* Partie gauche : Nom + nombre */}
                   <div className="me-auto">
@@ -328,22 +271,6 @@ function SelectCalendar({
           <i className="bi bi-people"></i> {t('shared_calendars')}
         </h4>
 
-        {/* 🔔 Alertes et confirmations */}
-        {selectedAlert === 'sharedCalendar' && (
-          <AlertSystem
-            type={alertType}
-            message={alertMessage}
-            onClose={() => {
-              setAlertMessage('');
-              setOnConfirmAction(null);
-              setSelectedAlert(null);
-            }}
-            onConfirm={() => {
-              if (onConfirmAction) onConfirmAction();
-            }}
-          />
-        )}
-
         {/* Liste des calendriers partagés */}
         {Array.isArray(sharedUserCalendars.sharedCalendarsData) &&
         sharedUserCalendars.sharedCalendarsData.length > 0 ? (
@@ -351,21 +278,6 @@ function SelectCalendar({
             {sharedUserCalendars.sharedCalendarsData.map(
               (calendarData, index) => (
                 <div key={index} className="list-group-item">
-                  {/* 🔔 Alertes et confirmations */}
-                  {selectedAlert === 'sharedCalendar' + calendarData.id && (
-                    <AlertSystem
-                      type={alertType}
-                      message={alertMessage}
-                      onClose={() => {
-                        setAlertMessage('');
-                        setOnConfirmAction(null);
-                        setSelectedAlert(null);
-                      }}
-                      onConfirm={() => {
-                        if (onConfirmAction) onConfirmAction();
-                      }}
-                    />
-                  )}
 
                   <div className="d-flex justify-content-between align-items-center gap-2 mb-2">
                     <div className="flex-grow-1">

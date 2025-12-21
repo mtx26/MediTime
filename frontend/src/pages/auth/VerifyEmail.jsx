@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
-import AlertSystem from '../../components/common/AlertSystem';
+import { useAlert } from '../../contexts/AlertContext';
 import { log } from '../../utils/logger';
 import { useTranslation } from 'react-i18next';
 
@@ -10,10 +10,7 @@ function VerifyEmail() {
   // 🔐 Contexte utilisateur
   const { userInfo } = useContext(UserContext);
   const { t } = useTranslation();
-
-  // ⚠️ Alertes
-  const [alertMessage, setAlertMessage] = useState(null); // Message d'alerte
-  const [alertType, setAlertType] = useState('info'); // Type d'alerte (par défaut : info)
+  const { showAlert } = useAlert();
 
   // 📍 Navigation
   const navigate = useNavigate(); // Hook de navigation
@@ -42,8 +39,7 @@ function VerifyEmail() {
             redirectTo: `${window.location.origin}/${lng}/auth/callback`,
           },
         });
-        setAlertMessage(t('auth.verification_sent'));
-        setAlertType('success');
+        showAlert('success', t('auth.verification_sent'));
         log.info('Email de vérification envoyé', {
           code: 'EMAIL_VERIFICATION_SENT',
           origin: 'VerifyEmail',
@@ -55,12 +51,10 @@ function VerifyEmail() {
           origin: 'EMAIL_VERIFICATION_ERROR',
           error,
         });
-        setAlertMessage('❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`));
-        setAlertType('danger');
+        showAlert('danger', t(`supabase-error.${error.code || 'unexpected_error'}`));
       }
     } else {
-      setAlertMessage(t('verify_email.no_user'));
-      setAlertType('danger');
+      showAlert('danger', t('verify_email.no_user'));
     }
   };
 
@@ -90,12 +84,6 @@ function VerifyEmail() {
             <h5>{t('verify_email.title')}</h5>
             <p>{t('verify_email.instructions')}</p>
           </div>
-
-          <AlertSystem
-            type={alertType}
-            message={alertMessage}
-            onClose={() => setAlertMessage(null)}
-          />
 
           <form onSubmit={handleSendVerification}>
             <button

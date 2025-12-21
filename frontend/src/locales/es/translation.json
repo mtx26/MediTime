@@ -194,7 +194,14 @@
     "today": "Hoy",
     "week": "Semana",
     "weekly_help": "Haga clic en un día del calendario para ver los medicamentos asociados en una ventana.",
-    "weekly_view": "Calendario por semana"
+    "weekly_view": "Calendario por semana",
+    "delete_title": "¿Borrar el calendario?",
+    "delete_description": "Esta acción es irreversible. Todos los medicamentos y horarios asociados a este calendario se suspenderán permanentemente.",
+    "rename_title": "¿Cambiar el nombre del calendario?",
+    "rename_description": "El nuevo nombre será visible para todos los usuarios con quienes comparte este calendario.",
+    "delete_shared_title": "¿Eliminar el calendario compartido?",
+    "delete_shared_description": "Ya no tendrás acceso a este calendario compartido. El calendario seguirá siendo accesible para el propietario y otros usuarios.",
+    "error_deleting_calendar": "Error al eliminar el calendario."
   },
   "calendar_completed": "¡Calendario completado exitosamente!",
   "calendar_completed_this_week": "¡Pastillas llenas para esta semana!",
@@ -289,7 +296,9 @@
     "info_title": "Acerca de los enlaces de ICS",
     "no_tokens": "No se creó ningún enlace ICS.",
     "title": "Listas de enlaces de ICS",
-    "token_label": "Derecho de retención"
+    "token_label": "Derecho de retención",
+    "delete_title": "¿Quitar el enlace ICS?",
+    "delete_description": "El enlace se desactivará y ya no podrá sincronizar tu calendario. Deberás crear un nuevo enlace para reactivar la sincronización."
   },
   "image_upload": {
     "analysis_error": "Error al analizar la imagen.",
@@ -838,5 +847,16 @@
   },
   "yes": "Sí",
   "you_have_no_pillbox_use_history": "No tienes historial de uso del pastillero.",
-  "stock_percentage": "Porcentaje"
+  "stock_percentage": "Porcentaje",
+  "calendar_completion_error": "Error al completar el calendario.",
+  "calendar_deleted": "Calendario eliminado exitosamente.",
+  "pillbox_completion_description": "El stock de medicamentos para esta semana se reducirá según su horario. Esta medida es irreversible.",
+  "delete_access_title": "¿Eliminar el acceso de este usuario?",
+  "delete_access_description": "Este usuario ya no podrá ver ni modificar este calendario. Esta acción es irreversible.",
+  "delete_calendar_title": "¿Eliminar este calendario compartido?",
+  "delete_calendar_description": "Perderás el acceso a este calendario. El calendario seguirá siendo accesible para el propietario y los demás usuarios con quienes lo compartas.",
+  "delete_invitation_title": "¿Borrar esta invitación?",
+  "delete_invitation_description": "La invitación será cancelada y el destinatario ya no podrá aceptarla.",
+  "delete_link_title": "¿Eliminar este enlace para compartir?",
+  "delete_link_description": "El enlace se eliminará permanentemente. Nadie podrá acceder al calendario a través de este enlace, incluidos los usuarios que ya lo hayan usado."
 }

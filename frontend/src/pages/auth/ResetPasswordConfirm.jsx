@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../services/supabase/supabaseClient';
-import AlertSystem from '../../components/common/AlertSystem';
+import { useAlert } from '../../contexts/AlertContext';
 import { log } from '../../utils/logger';
 import { useTranslation } from 'react-i18next';
 
 export default function ResetPasswordConfirm() {
   const [password, setPassword] = useState('');
-  const [alertType, setAlertType] = useState('info');
-  const [alertMessage, setAlertMessage] = useState(null);
+  const { showAlert } = useAlert();
   const [loading, setLoading] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
   const navigate = useNavigate();
@@ -23,8 +22,7 @@ export default function ResetPasswordConfirm() {
       } = await supabase.auth.getSession();
 
       if (error || !session?.user) {
-        setAlertType('danger');
-        setAlertMessage(t('reset_password_confirm.invalid_session'));
+        showAlert('danger', t('reset_password_confirm.invalid_session'));
         return;
       }
 
@@ -44,8 +42,7 @@ export default function ResetPasswordConfirm() {
     setLoading(true);
 
     if (!sessionReady) {
-      setAlertType('danger');
-      setAlertMessage(t('reset_password_confirm.cannot_change'));
+      showAlert('danger', t('reset_password_confirm.cannot_change'));
       setLoading(false);
       return;
     }
@@ -55,11 +52,9 @@ export default function ResetPasswordConfirm() {
       log.error("Erreur lors du changement de mot de passe", error, {
         origin: "RESET_PASSWORD_CONFIRM",
       });
-      setAlertType('danger');
-      setAlertMessage(error.message);
+      showAlert('danger', error.message);
     } else {
-      setAlertType('success');
-      setAlertMessage(t('reset_password_confirm.success'));
+      showAlert('success', t('reset_password_confirm.success'));
       setTimeout(() => navigate(`/${lng}/login`), 2500);
     }
 
@@ -74,11 +69,6 @@ export default function ResetPasswordConfirm() {
           <p className="text-muted text-center">
             {t('reset_password_confirm.instructions')}
           </p>
-          <AlertSystem
-            type={alertType}
-            message={alertMessage}
-            onClose={() => setAlertMessage(null)}
-          />
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label htmlFor="password" className="form-label">

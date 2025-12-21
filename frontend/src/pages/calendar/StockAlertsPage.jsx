@@ -201,8 +201,14 @@ function StockAlertsPage({
                         </div>
   
                         <div className="col-6">
-                          <small className="d-block text-muted">{t('stock_percentage')}</small>
-                          <strong>{Math.round((med.stock_quantity / med.box_capacity) * 100)}%</strong>
+                          <IconButton
+                            className="btn btn-outline-success w-100"
+                            icon="plus-circle"
+                            text={t('boxes.restock')}
+                            onClick={() => restockBox(calendarId, med.id)}
+                            disabled={med.box_capacity === 0}
+                            helpDisabled={t('boxes.restock_disabled_tooltip')}
+                          />
                         </div>
                       </div>
                     </div>
@@ -215,16 +221,6 @@ function StockAlertsPage({
                         ? t('critical_stock')
                         : t('low_stock')}
                     </span>
-                  </div>
-                  <div className="mt-3">
-                    <IconButton
-                      className="btn btn-outline-success w-100"
-                      icon="plus-circle"
-                      text={t('boxes.restock')}
-                      onClick={() => restockBox(calendarId, med.id)}
-                      disabled={med.box_capacity === 0}
-                      helpDisabled={t('boxes.restock_disabled_tooltip')}
-                    />
                   </div>
                 </div>
               </div>

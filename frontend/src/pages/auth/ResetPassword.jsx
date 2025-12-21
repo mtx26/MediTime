@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { resetPassword } from '../../services/auth/authService';
-import AlertSystem from '../../components/common/AlertSystem';
+import { useAlert } from '../../contexts/AlertContext';
 import { useTranslation } from 'react-i18next';
 
 function ResetPassword() {
   const { t } = useTranslation();
+  const { showAlert } = useAlert();
   const [email, setEmail] = useState(''); // État pour l'adresse e-mail
   const [formValid, setFormValid] = useState(true);
-  const [alertType, setAlertType] = useState('info');
-  const [alertMessage, setAlertMessage] = useState(null);
 
   // 🔄 Réinitialisation du mot de passe
   const handleReset = async (e) => {
@@ -20,8 +19,7 @@ function ResetPassword() {
       try {
         await resetPassword(email);
       } catch (error) {}
-      setAlertType('success');
-      setAlertMessage(t('reset_password.success'));
+      showAlert('success', t('reset_password.success'));
     }
   };
 
@@ -36,11 +34,6 @@ function ResetPassword() {
             <h5>{t('reset_password.title')}</h5>
             <p>{t('reset_password.instructions')}</p>
           </div>
-          <AlertSystem
-            type={alertType}
-            message={alertMessage}
-            onClose={() => setAlertMessage(null)}
-          />
           <form onSubmit={handleReset}>
             <div className="mb-3">
               <label htmlFor="emailInput" className="form-label">

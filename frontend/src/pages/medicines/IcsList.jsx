@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useLocation } from 'react-router-dom';
 import ActionSheet from '../../components/common/ActionSheet';
-import AlertSystem from '../../components/common/AlertSystem';
+import { useAlert } from '../../contexts/AlertContext';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import PropTypes from 'prop-types';
 
@@ -16,8 +16,7 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('');
+  const { showAlert, showConfirm } = useAlert();
   const [tokenToDelete, setTokenToDelete] = useState(null);
 
   let calendarType = 'personal';
@@ -40,21 +39,16 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     tokenCalendars
   )[calendarType];
 
-  const showAlert = (message, type) => {
-    setAlertMessage(message);
-    setAlertType(type);
-  };
-
   const fetchTokens = useCallback(async () => {
     setLoading(true);
     const result = await calendarSource.getTokensIcs(calendarId);
     if (result.success) {
       setTokens(result.data.tokens || []);
     } else {
-      showAlert(t('ics.fetch_error'), 'danger');
+      showAlert('danger', t('ics.fetch_error'));
     }
     setLoading(false);
-  }, [calendarId, calendarSource.getTokensIcs, t]);
+  }, [calendarId, calendarSource.getTokensIcs, t, showAlert]);
 
   useEffect(() => {
     fetchTokens();
@@ -63,38 +57,35 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const handleCreateToken = async () => {
     const result = await calendarSource.createTokenIcs(calendarId);
     if (result.success) {
-      showAlert(t('ics.create_success'), 'success');
+      showAlert('success', t('ics.create_success'));
       fetchTokens();
     } else {
-      showAlert(t('ics.create_error'), 'danger');
+      showAlert('danger', t('ics.create_error'));
     }
   };
 
   const handleDeleteToken = async (tokenId) => {
     const result = await calendarSource.deleteTokenIcs(calendarId, tokenId);
     if (result.success) {
-      showAlert(t('ics.delete_success'), 'success');
+      showAlert('success', t('ics.delete_success'));
       fetchTokens();
     } else {
-      showAlert(t('ics.delete_error'), 'danger');
+      showAlert('danger', t('ics.delete_error'));
     }
   };
 
   const openDeleteActionSheet = (token) => {
-    setTokenToDelete(token.id);
-    showAlert('ics.delete_confirmation', 'confirm-danger');
-  };
-
-  const handleConfirmDelete = async () => {
-    if (tokenToDelete) {
-      await handleDeleteToken(tokenToDelete);
-      setTokenToDelete(null);
-    }
+    showConfirm(
+      'confirm-danger',
+      t('ics.delete_title'),
+      t('ics.delete_description'),
+      () => {handleDeleteToken(token.id);}
+    );
   };
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
-      showAlert(t('link_copied'), 'success');
+      showAlert('success', t('link_copied'));
     });
   };
 
@@ -118,13 +109,6 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   return (
     <div className="container mt-4" style={{ maxWidth: '800px' }}>
-      <AlertSystem
-        message={!tokenToDelete ? alertMessage : ''}
-        type={alertType}
-        onClose={() => setAlertMessage('')}
-        onConfirm={handleConfirmDelete}
-      />
-      
       <div className="mb-4">
         <h4 className="mb-3 fw-bold">
           <i className="bi bi-link-45deg me-2"></i>
@@ -147,17 +131,6 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       {tokens.map((token) => (
         <div className="card p-3 mb-3 shadow" key={token.id}>
           <ul className="list-group">
-            {tokenToDelete === token.id && (
-              <AlertSystem
-                message={alertMessage}
-                type={alertType}
-                onClose={() => {
-                  setTokenToDelete(null);
-                  setAlertMessage('');
-                }}
-                onConfirm={handleConfirmDelete}
-              />
-            )}
             <h5 className="mb-3 d-flex justify-content-between align-items-center">
               <div>
                 <i className="bi bi-link-45deg me-2"></i>

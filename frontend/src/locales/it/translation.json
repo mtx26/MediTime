@@ -194,7 +194,14 @@
     "today": "Oggi",
     "week": "Settimana",
     "weekly_help": "Cliccando su un giorno nel calendario si possono visualizzare in una finestra i farmaci associati.",
-    "weekly_view": "Calendario per settimana"
+    "weekly_view": "Calendario per settimana",
+    "delete_title": "Eliminare il calendario?",
+    "delete_description": "Questa azione è irreversibile. Tutti i farmaci e gli schemi associati a questo calendario saranno definitivamente sospesi.",
+    "rename_title": "Rinominare il calendario?",
+    "rename_description": "Il nuovo nome sarà visibile a tutti gli utenti con cui condividi questo calendario.",
+    "delete_shared_title": "Eliminare il calendario condiviso?",
+    "delete_shared_description": "Non avrai più accesso a questo calendario condiviso. Il calendario rimarrà accessibile al proprietario e agli altri utenti.",
+    "error_deleting_calendar": "Errore durante l'eliminazione del calendario."
   },
   "calendar_completed": "Calendario completato con successo!",
   "calendar_completed_this_week": "Questa settimana il bunker è pieno!",
@@ -289,7 +296,9 @@
     "info_title": "Informazioni sui collegamenti ICS",
     "no_tokens": "Nessun collegamento ICS creato.",
     "title": "Elenchi di link ICS",
-    "token_label": "Collegamento"
+    "token_label": "Collegamento",
+    "delete_title": "Rimuovere il collegamento ICS?",
+    "delete_description": "Il collegamento verrà disattivato e non sarà più possibile sincronizzare il tuo calendario. Dovrai creare un nuovo collegamento per riattivare la sincronizzazione."
   },
   "image_upload": {
     "analysis_error": "Errore durante l'analisi dell'immagine.",
@@ -838,5 +847,16 @@
   },
   "yes": "SÌ",
   "you_have_no_pillbox_use_history": "Non hai alcuna cronologia di utilizzo per l'organizzatore di pillole.",
-  "stock_percentage": "Percentuale"
+  "stock_percentage": "Percentuale",
+  "calendar_completion_error": "Errore durante il completamento del calendario.",
+  "calendar_deleted": "Calendario eliminato con successo.",
+  "pillbox_completion_description": "La scorta di tutti i farmaci per questa settimana verrà ridotta in base al tuo programma. Questa azione è irreversibile.",
+  "delete_access_title": "Rimuovere l'accesso di questo utente?",
+  "delete_access_description": "Questo utente non potrà più visualizzare o modificare questo calendario. Questa azione è irreversibile.",
+  "delete_calendar_title": "Eliminare questo calendario condiviso?",
+  "delete_calendar_description": "Perderai l'accesso a questo calendario. Il calendario rimarrà accessibile al proprietario e agli altri utenti con cui è condiviso.",
+  "delete_invitation_title": "Eliminare questo invito?",
+  "delete_invitation_description": "L'invito verrà annullato e il destinatario non potrà più accettarlo.",
+  "delete_link_title": "Vuoi rimuovere questo link di condivisione?",
+  "delete_link_description": "Il link verrà rimosso definitivamente. Nessuno potrà più accedere al calendario tramite questo link, nemmeno gli utenti che lo hanno già utilizzato."
 }

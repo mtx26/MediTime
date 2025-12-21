@@ -194,7 +194,14 @@
     "today": "Hoje",
     "week": "Semana",
     "weekly_help": "Clique em um dia no calendário para ver os medicamentos associados em uma janela.",
-    "weekly_view": "Calendário por semana"
+    "weekly_view": "Calendário por semana",
+    "delete_title": "Apagar o calendário?",
+    "delete_description": "Esta ação é irreversível. Todos os medicamentos e horários associados a este calendário serão permanentemente descontinuados.",
+    "rename_title": "Alterar o nome do calendário?",
+    "rename_description": "O novo nome ficará visível para todos os usuários com quem você compartilhar este calendário.",
+    "delete_shared_title": "Excluir o calendário compartilhado?",
+    "delete_shared_description": "Você não terá mais acesso a este calendário compartilhado. O calendário permanecerá acessível ao proprietário e aos demais usuários.",
+    "error_deleting_calendar": "Erro ao excluir o calendário."
   },
   "calendar_completed": "Calendário concluído com sucesso!",
   "calendar_completed_this_week": "Caixa de comprimidos cheia para esta semana!",
@@ -289,7 +296,9 @@
     "info_title": "Sobre links ICS",
     "no_tokens": "Nenhum link ICS criado.",
     "title": "Listas de links ICS",
-    "token_label": "Penhora"
+    "token_label": "Penhora",
+    "delete_title": "Remover o link do ICS?",
+    "delete_description": "O link será desativado e não poderá mais sincronizar seu calendário. Você precisará criar um novo link para reativar a sincronização."
   },
   "image_upload": {
     "analysis_error": "Erro ao analisar a imagem.",
@@ -838,5 +847,16 @@
   },
   "yes": "Sim",
   "you_have_no_pillbox_use_history": "Você não possui histórico de uso para o organizador de comprimidos.",
-  "stock_percentage": "Percentagem"
+  "stock_percentage": "Percentagem",
+  "calendar_completion_error": "Erro ao concluir o calendário.",
+  "calendar_deleted": "Calendário excluído com sucesso.",
+  "pillbox_completion_description": "O estoque de todos os medicamentos desta semana será reduzido de acordo com sua programação. Essa ação é irreversível.",
+  "delete_access_title": "Remover o acesso deste usuário?",
+  "delete_access_description": "Este usuário não poderá mais visualizar ou modificar este calendário. Esta ação é irreversível.",
+  "delete_calendar_title": "Excluir este calendário compartilhado?",
+  "delete_calendar_description": "Você perderá o acesso a este calendário. O calendário permanecerá acessível ao proprietário e a outros usuários com quem ele foi compartilhado.",
+  "delete_invitation_title": "Excluir este convite?",
+  "delete_invitation_description": "O convite será cancelado e o destinatário não poderá mais aceitá-lo.",
+  "delete_link_title": "Remover este link de compartilhamento?",
+  "delete_link_description": "O link será removido permanentemente. Ninguém mais poderá acessar o calendário por meio deste link, incluindo usuários que já o utilizaram."
 }

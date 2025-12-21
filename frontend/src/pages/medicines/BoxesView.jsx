@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';
-import AlertSystem from '../../components/common/AlertSystem';
+import { useAlert } from '../../contexts/AlertContext';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { v4 as uuidv4 } from 'uuid';
 import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
@@ -182,8 +182,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   
   const [boxes, setBoxes] = useState([]);
   const [loadingBoxes, setLoadingBoxes] = useState(undefined);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('');
+  const { showAlert, showConfirm } = useAlert();
   const [showQRModal, setShowQRModal] = useState(false);
   const [singleScan, setSingleScan] = useState(false);
   const [currentEditingBoxId, setCurrentEditingBoxId] = useState(null);
@@ -266,19 +265,41 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   // =========================================================================
   // HELPER FUNCTIONS
   // =========================================================================
-  
-  const showAlert = (msg, type) => {
-    setAlertMessage(msg);
-    setAlertType(type);
+
+  // Fonction pour supprimer le calendrier avec confirmation
+  const handleDeleteCalendar = () => {
+    showConfirm(
+      'confirm-danger',
+      t('calendar.delete_title'),
+      t('calendar.delete_description'),
+      async () => {
+        const r = await personalCalendars.deleteCalendar(calendarId);
+        if (r.success) {
+          showAlert('success', t('calendar_deleted'));
+          navigate(`/${lng}/calendars`);
+        } else {
+          showAlert('danger', r.error);
+        }
+      }
+    );
   };
 
-  const handleApiResponse = (res, msg = null) => {
-    if (res.success) {
-      showAlert('✅ ' + (msg || res.message), 'success');
-    } else {
-      showAlert('❌ ' + res.error, 'danger');
-    }
-    return res.success;
+  // Fonction pour supprimer un calendrier partagé avec confirmation
+  const handleDeleteSharedCalendar = () => {
+    showConfirm(
+      'confirm-danger',
+      t('delete_calendar_title'),
+      t('delete_calendar_description'),
+      async () => {
+        const r = await sharedUserCalendars.deleteSharedCalendar(calendarId);
+        if (r.success) {
+          showAlert('success', t('calendar_deleted'));
+          navigate(`/${lng}/calendars`);
+        } else {
+          showAlert('danger', r.error || t('calendar.error_deleting_calendar'));
+        }
+      }
+    );
   };
 
   const initEditing = (box) => {
@@ -337,9 +358,9 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       if (res.success) {
         // Supprimer la box temporaire et mettre à jour avec la vraie
         setBoxes(prev => prev.filter(b => b.id !== editingBoxId));
-        handleApiResponse(res);
+        showAlert('success', res.message);
       } else {
-        handleApiResponse(res);
+        showAlert('danger', res.error);
       }
     } else {
       // Mise à jour d'une box existante
@@ -348,7 +369,11 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         editingBoxId, 
         { ...editingBox, conditions }
       );
-      handleApiResponse(res);
+      if (res.success) {
+        showAlert('success', res.message);
+      } else {
+        showAlert('danger', res.error);
+      }
     }
     
     resetEditing();
@@ -368,7 +393,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   const addScannedMedicines = async (medicines) => {
     if (!medicines?.length) {
-      showAlert('⚠️ Ajouter des médicaments', 'warning');
+      showAlert('Ajouter des médicaments', 'warning');
       return { success: false };
     }
     
@@ -386,11 +411,11 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     setShowQRModal(false);
     
     if (error === 0) {
-      showAlert('✅ Ajouté', 'success');
+      showAlert('success', 'Médicaments ajoutés avec succès');
     } else if (success === 0) {
-      showAlert('❌ Ajouter des médicaments', 'danger');
+      showAlert('danger', 'Impossible d\'ajouter les médicaments');
     } else {
-      showAlert(`⚠️ ${success} ajouté(s), ${error} erreur(s)`, 'warning');
+      showAlert('warning', `${success} médicament(s) ajouté(s), ${error} erreur(s)`);
     }
     
     return { success: error === 0, successCount: success, errorCount: error };
@@ -423,9 +448,9 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     setSingleScan(false);
     
     if (res.success) {
-      showAlert('✅ Ajouté', 'success');
+      showAlert('success', 'Médicament mis à jour avec succès');
     } else {
-      showAlert('❌ Ajouter un médicament', 'danger');
+      showAlert('danger', 'Impossible de mettre à jour le médicament');
     }
     
     return {
@@ -508,14 +533,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
             {t('delete')}
           </>
         ),
-        onClick: async () => {
-          const r = await personalCalendars.deleteCalendar(calendarId);
-          if (r.success) {
-            navigate(`/${lng}/calendars`);
-          } else {
-            showAlert(r.error, 'danger');
-          }
-        },
+        onClick: handleDeleteCalendar,
         title: t('delete'),
         danger: true,
       });
@@ -527,7 +545,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
             {t('delete')}
           </>
         ),
-        onClick: () => sharedUserCalendars.deleteSharedCalendar(calendarId),
+        onClick: handleDeleteSharedCalendar,
         title: t('delete'),
         danger: true,
       });
@@ -583,16 +601,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
           <ActionSheet actions={getCommonActions()} />
         </div>
 
-        {/* Alert System */}
-        <AlertSystem
-          type={alertType}
-          message={alertMessage}
-          onClose={() => {
-            setAlertMessage('');
-            setAlertType('');
-          }}
-        />
-
         {/* Boxes Grid */}
         <div className="row row-cols-1 row-cols-md-2 g-4">
           {boxes.map((box) => (
@@ -610,7 +618,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                     calendarId={calendarId}
                     calendarSource={calendarSource}
                     showAlert={showAlert}
-                    handleApiResponse={handleApiResponse}
                     onEdit={initEditing}
                     onUpdateScan={() => {
                       setSingleScan(true);
@@ -633,7 +640,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                   calendarId={calendarId}
                   calendarSource={calendarSource}
                   showAlert={showAlert}
-                  handleApiResponse={handleApiResponse}
                   onEdit={initEditing}
                   onUpdateScan={() => {
                     setSingleScan(true);
@@ -733,8 +739,6 @@ function BoxCard({
   setExpandedBoxes,
   calendarId,
   calendarSource,
-  showAlert,
-  handleApiResponse,
   onEdit,
   onUpdateScan,
   t,
@@ -896,12 +900,20 @@ function BoxCard({
 
   const restockBox = async () => {
     const r = await calendarSource.restockBox(calendarId, box.id);
-    handleApiResponse(r);
+    if (r.success) {
+      showAlert('success', r.message);
+    } else {
+      showAlert('danger', r.error);
+    }
   };
 
   const deleteBox = async () => {
     const r = await calendarSource.deleteBox(calendarId, box.id);
-    handleApiResponse(r);
+    if (r.success) {
+      showAlert('success', r.message);
+    } else {
+      showAlert('danger', r.error);
+    }
   };
 
   const getBoxActions = () => [
@@ -1372,3 +1384,4 @@ function BoxCard({
 }
 
 export default BoxesView;
+
