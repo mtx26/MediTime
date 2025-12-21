@@ -858,5 +858,9 @@
   "delete_invitation_title": "¿Borrar esta invitación?",
   "delete_invitation_description": "La invitación será cancelada y el destinatario ya no podrá aceptarla.",
   "delete_link_title": "¿Eliminar este enlace para compartir?",
-  "delete_link_description": "El enlace se eliminará permanentemente. Nadie podrá acceder al calendario a través de este enlace, incluidos los usuarios que ya lo hayan usado."
+  "delete_link_description": "El enlace se eliminará permanentemente. Nadie podrá acceder al calendario a través de este enlace, incluidos los usuarios que ya lo hayan usado.",
+  "restore_error": "Error durante la restauración",
+  "restore_pillbox_description": "Esta acción cancelará la última preparación del pastillero y restaurará las cantidades en stock.",
+  "restore_pillbox_title": "¿Restaurar el pastillero?",
+  "pillbox_restored": "Pastillero restaurado con éxito"
 }

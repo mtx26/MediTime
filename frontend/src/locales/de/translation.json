@@ -858,5 +858,9 @@
   "delete_invitation_title": "Diese Einladung löschen?",
   "delete_invitation_description": "Die Einladung wird storniert und der Empfänger kann sie nicht mehr annehmen.",
   "delete_link_title": "Diesen Freigabelink entfernen?",
-  "delete_link_description": "Der Link wird dauerhaft entfernt. Niemand kann mehr über diesen Link auf den Kalender zugreifen, auch nicht diejenigen, die ihn bereits verwendet haben."
+  "delete_link_description": "Der Link wird dauerhaft entfernt. Niemand kann mehr über diesen Link auf den Kalender zugreifen, auch nicht diejenigen, die ihn bereits verwendet haben.",
+  "restore_error": "Fehler bei der Wiederherstellung",
+  "restore_pillbox_description": "Diese Aktion macht die letzte Befüllung der Pillendose rückgängig und stellt die vorhandenen Mengen wieder her.",
+  "restore_pillbox_title": "Den Pillenkasten wiederherstellen?",
+  "pillbox_restored": "Pillbox erfolgreich wiederhergestellt"
 }

@@ -858,5 +858,9 @@
   "delete_invitation_title": "Delete this invitation?",
   "delete_invitation_description": "The invitation will be cancelled and the recipient will no longer be able to accept it.",
   "delete_link_title": "Remove this sharing link?",
-  "delete_link_description": "The link will be permanently removed. No one will be able to access the calendar via this link anymore, including users who have already used it."
+  "delete_link_description": "The link will be permanently removed. No one will be able to access the calendar via this link anymore, including users who have already used it.",
+  "restore_error": "Error during restoration",
+  "restore_pillbox_description": "This action will cancel the last preparation of the pillbox and restore the quantities in stock.",
+  "restore_pillbox_title": "Restore the pillbox?",
+  "pillbox_restored": "Pillbox successfully restored"
 }

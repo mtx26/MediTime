@@ -858,5 +858,9 @@
   "delete_invitation_title": "この招待を削除しますか?",
   "delete_invitation_description": "招待はキャンセルされ、受信者は招待を承諾できなくなります。",
   "delete_link_title": "この共有リンクを削除しますか?",
-  "delete_link_description": "リンクは完全に削除されます。既にこのリンクを使用しているユーザーを含め、誰もこのリンク経由でカレンダーにアクセスできなくなります。"
+  "delete_link_description": "リンクは完全に削除されます。既にこのリンクを使用しているユーザーを含め、誰もこのリンク経由でカレンダーにアクセスできなくなります。",
+  "restore_error": "復元中にエラーが発生しました",
+  "restore_pillbox_description": "このアクションにより、ピルボックスの最後の準備がキャンセルされ、在庫数量が復元されます。",
+  "restore_pillbox_title": "トーチカを復元しますか?",
+  "pillbox_restored": "トーチカの修復に成功"
 }

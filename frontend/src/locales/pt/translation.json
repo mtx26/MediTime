@@ -858,5 +858,9 @@
   "delete_invitation_title": "Excluir este convite?",
   "delete_invitation_description": "O convite será cancelado e o destinatário não poderá mais aceitá-lo.",
   "delete_link_title": "Remover este link de compartilhamento?",
-  "delete_link_description": "O link será removido permanentemente. Ninguém mais poderá acessar o calendário por meio deste link, incluindo usuários que já o utilizaram."
+  "delete_link_description": "O link será removido permanentemente. Ninguém mais poderá acessar o calendário por meio deste link, incluindo usuários que já o utilizaram.",
+  "restore_error": "Erro durante a restauração",
+  "restore_pillbox_description": "Esta ação cancelará a última preparação do porta-comprimidos e restaurará as quantidades em estoque.",
+  "restore_pillbox_title": "Restaurar o compartimento para comprimidos?",
+  "pillbox_restored": "O compartimento para comprimidos foi restaurado com sucesso."
 }

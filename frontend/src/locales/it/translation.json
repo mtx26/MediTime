@@ -858,5 +858,9 @@
   "delete_invitation_title": "Eliminare questo invito?",
   "delete_invitation_description": "L'invito verrà annullato e il destinatario non potrà più accettarlo.",
   "delete_link_title": "Vuoi rimuovere questo link di condivisione?",
-  "delete_link_description": "Il link verrà rimosso definitivamente. Nessuno potrà più accedere al calendario tramite questo link, nemmeno gli utenti che lo hanno già utilizzato."
+  "delete_link_description": "Il link verrà rimosso definitivamente. Nessuno potrà più accedere al calendario tramite questo link, nemmeno gli utenti che lo hanno già utilizzato.",
+  "restore_error": "Errore durante il ripristino",
+  "restore_pillbox_description": "Questa azione annullerà l'ultima preparazione del portapillole e ripristinerà le quantità in magazzino.",
+  "restore_pillbox_title": "Ripristinare il fortino?",
+  "pillbox_restored": "Pillbox ripristinato con successo"
 }
