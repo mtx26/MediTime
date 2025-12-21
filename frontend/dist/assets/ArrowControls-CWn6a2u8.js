@@ -1,1 +1,0 @@
-import{c as i}from"./vendor-Bp3PLBun.js";import{P as t}from"./index-Czjbf-Zu.js";function s({onLeft:e,onRight:r}){return i.useEffect(()=>{const o=n=>{n.key==="ArrowLeft"?e():n.key==="ArrowRight"&&r()};return window.addEventListener("keydown",o),()=>window.removeEventListener("keydown",o)},[e,r]),null}s.propTypes={onLeft:t.func.isRequired,onRight:t.func.isRequired};export{s as A};

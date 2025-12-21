@@ -1,1 +1,0 @@
-import{u as o,j as t}from"./index-Czjbf-Zu.js";import"./vendor-Bp3PLBun.js";function r(){const{t:n}=o();return t.jsxs("div",{children:[t.jsx("h1",{children:n("not_found.title")}),t.jsx("p",{children:n("not_found.message")})]})}export{r as default};
