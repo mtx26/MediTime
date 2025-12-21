@@ -104,7 +104,10 @@
       "max_date_mode": "摂取期間",
       "until_date": "それまで...",
       "no_limit": "制限なし",
-      "expired": "条件が期限切れです"
+      "expired": "条件が期限切れです",
+      "inactive": "不活性薬剤",
+      "inactive_tooltip": "この薬の服用に関するすべての指示は期限切れです。この薬は完全に無効です。",
+      "expired_tooltip": "このオファーを利用するための条件の1つが期限切れになりました。オファーは現在無効です。"
     },
     "day": "日",
     "days": "日数",
@@ -135,13 +138,22 @@
       "badge": {
         "high": "在庫が多い",
         "low": "在庫が少ない",
-        "out": "在庫切れ"
+        "out": "在庫切れ",
+        "alerts_disabled": "アラートが無効になっています",
+        "tooltip": {
+          "high": "在庫は良好です。タブレットは十分にありますので、現時点では何もする必要はありません。",
+          "low": "在庫レベルが限界に近づいています！アラートしきい値に近づいています。在庫切れを防ぐため、お早めに補充してください。",
+          "out": "在庫切れです。タブレットはもうありません。できるだけ早く再入荷してください。",
+          "alerts_disabled": "この医薬品の在庫アラートは、在庫数またはアラートしきい値が0に設定されているため無効になっています。在庫切れ通知は受信されません。設定を変更して再度有効にしてください。"
+        }
       }
     },
     "tablet": "圧縮された",
     "tablets": "錠剤",
     "title": "薬箱",
-    "view_notice": "説明書をご覧ください"
+    "view_notice": "説明書をご覧ください",
+    "restock_disabled_tooltip": "ボックスの容量が 0 のため、補充ボタンは無効になっています。補充を再度有効にするには、容量を変更してください。",
+    "condition_none_tooltip": "受講条件は設定されていません。定期的にリマインダーを受け取るには、こちらをクリックして条件を追加してください。"
   },
   "calendar": {
     "add": "カレンダーを追加する",
@@ -182,7 +194,14 @@
     "today": "今日",
     "week": "週",
     "weekly_help": "カレンダーの日付をクリックすると、関連する薬がウィンドウに表示されます。",
-    "weekly_view": "週ごとのカレンダー"
+    "weekly_view": "週ごとのカレンダー",
+    "delete_title": "カレンダーを削除しますか?",
+    "delete_description": "この操作は元に戻せません。このカレンダーに関連付けられているすべての薬とスケジュールは永久に中止されます。",
+    "rename_title": "カレンダーの名前を変更しますか?",
+    "rename_description": "新しい名前は、このカレンダーを共有するすべてのユーザーに表示されます。",
+    "delete_shared_title": "共有カレンダーを削除しますか?",
+    "delete_shared_description": "この共有カレンダーにアクセスできなくなります。カレンダーの所有者と他のユーザーは引き続きアクセスできます。",
+    "error_deleting_calendar": "カレンダーの削除中にエラーが発生しました。"
   },
   "calendar_completed": "カレンダーが無事完成しました！",
   "calendar_completed_this_week": "今週はピルボックスがいっぱいです！",
@@ -277,7 +296,9 @@
     "info_title": "ICSリンクについて",
     "no_tokens": "ICS リンクは作成されませんでした。",
     "title": "ICSリンクリスト",
-    "token_label": "先取特権ICS"
+    "token_label": "先取特権ICS",
+    "delete_title": "ICS リンクを削除しますか?",
+    "delete_description": "リンクは無効化され、カレンダーを同期できなくなります。同期を再開するには、新しいリンクを作成する必要があります。"
   },
   "image_upload": {
     "analysis_error": "画像の解析中にエラーが発生しました。",
@@ -825,5 +846,21 @@
     "title": "MediTimeを選ぶ理由"
   },
   "yes": "はい",
-  "you_have_no_pillbox_use_history": "ピルオーガナイザーの使用履歴がありません。"
+  "you_have_no_pillbox_use_history": "ピルオーガナイザーの使用履歴がありません。",
+  "stock_percentage": "パーセンテージ",
+  "calendar_completion_error": "カレンダーを完了中にエラーが発生しました。",
+  "calendar_deleted": "カレンダーは正常に削除されました。",
+  "pillbox_completion_description": "今週のすべての医薬品の在庫は、お客様のスケジュールに従って減らされます。この操作は元に戻せません。",
+  "delete_access_title": "このユーザーのアクセスを削除しますか?",
+  "delete_access_description": "このユーザーは今後このカレンダーを閲覧または変更できなくなります。この操作は元に戻せません。",
+  "delete_calendar_title": "この共有カレンダーを削除しますか?",
+  "delete_calendar_description": "このカレンダーにアクセスできなくなります。カレンダーの所有者と、カレンダーを共有している他のユーザーは引き続きアクセスできます。",
+  "delete_invitation_title": "この招待を削除しますか?",
+  "delete_invitation_description": "招待はキャンセルされ、受信者は招待を承諾できなくなります。",
+  "delete_link_title": "この共有リンクを削除しますか?",
+  "delete_link_description": "リンクは完全に削除されます。既にこのリンクを使用しているユーザーを含め、誰もこのリンク経由でカレンダーにアクセスできなくなります。",
+  "restore_error": "復元中にエラーが発生しました",
+  "restore_pillbox_description": "このアクションにより、ピルボックスの最後の準備がキャンセルされ、在庫数量が復元されます。",
+  "restore_pillbox_title": "トーチカを復元しますか?",
+  "pillbox_restored": "トーチカの修復に成功"
 }

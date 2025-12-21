@@ -1,39 +1,44 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';
-import AlertSystem from '../../components/common/AlertSystem';
+import { useAlert } from '../../contexts/AlertContext';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { v4 as uuidv4 } from 'uuid';
 import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 import QRCodeScanner from '../../components/scanner/QRCodeScanner';
+import Tooltips from '../../components/common/Tooltips';
+import IconButton from '../../components/common/UtilityComponents';
+import PropTypes from 'prop-types';
 
 // ============================================================================
 // UTILITY COMPONENTS
 // ============================================================================
 
-const IconButton = ({ className, icon, text, onClick, title }) => (
-  <button 
-    type="button" 
-    className={`${className} shadow`} 
-    onClick={onClick} 
-    aria-label={text} 
-    title={title || text}
-  >
-    <i className={`bi bi-${icon}`}></i> {text}
-  </button>
-);
+const Badge = ({ color, icon, text, tooltip }) => {
+  const content = (
+    <span className={`badge bg-${color}`}>
+      <i className={`bi bi-${icon}`} /> {text}
+    </span>
+  );
+  return tooltip ? (
+    <Tooltips content={tooltip} side="bottom">
+      {content}
+    </Tooltips>
+  ) : (
+    content
+  );
+};
 
-const Badge = ({ color, icon, text }) => (
-  <span className={`badge bg-${color}`}>
-    <i className={`bi bi-${icon}`} /> {text}
-  </span>
-);
+Badge.propTypes = {
+  color: PropTypes.string.isRequired,
+  icon: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  tooltip: PropTypes.string,
+};
 
 const ActionCard = ({ borderColor, icon, color, text, onClick, hasTooltip, tooltip, dataTour, t }) => {
-  const [showTooltip, setShowTooltip] = useState(false);
-  
   return (
     <button 
       type="button" 
@@ -46,28 +51,9 @@ const ActionCard = ({ borderColor, icon, color, text, onClick, hasTooltip, toolt
       <div className={`card h-100 shadow border border-${borderColor}`}>
         <div className="card-body d-flex flex-column justify-content-center align-items-center p-3 position-relative">
           {hasTooltip && (
-            <div
-              className="position-absolute top-0 end-0 m-1 p-1 text-info"
-              style={{ cursor: 'help' }}
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
-            >
-              <i className="bi bi-info-circle"></i>
-              {showTooltip && (
-                <div 
-                  className="position-absolute bg-dark text-white p-2 rounded shadow" 
-                  style={{ 
-                    top: '100%', 
-                    right: '0', 
-                    width: '200px', 
-                    fontSize: '0.8rem', 
-                    zIndex: 1050 
-                  }}
-                >
-                  {tooltip}
-                </div>
-              )}
-            </div>
+            <Tooltips content={tooltip} side="bottom" className="position-absolute top-0 end-0 m-1 p-1">
+              <i className="bi bi-info-circle text-info" style={{ cursor: 'pointer' }}></i>
+            </Tooltips>
           )}
           <i className={`bi bi-${icon} text-${color} fs-1`}></i>
           <p className={`text-${color} fw-bold mt-2 mb-0 text-center`}>
@@ -77,6 +63,18 @@ const ActionCard = ({ borderColor, icon, color, text, onClick, hasTooltip, toolt
       </div>
     </button>
   );
+};
+
+ActionCard.propTypes = {
+  borderColor: PropTypes.string.isRequired,
+  icon: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+  hasTooltip: PropTypes.bool,
+  tooltip: PropTypes.string,
+  dataTour: PropTypes.string,
+  t: PropTypes.func.isRequired,
 };
 
 const InputDropdown = ({
@@ -204,8 +202,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   
   const [boxes, setBoxes] = useState([]);
   const [loadingBoxes, setLoadingBoxes] = useState(undefined);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('');
+  const { showAlert, showConfirm } = useAlert();
   const [showQRModal, setShowQRModal] = useState(false);
   const [singleScan, setSingleScan] = useState(false);
   const [currentEditingBoxId, setCurrentEditingBoxId] = useState(null);
@@ -288,19 +285,41 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   // =========================================================================
   // HELPER FUNCTIONS
   // =========================================================================
-  
-  const showAlert = (msg, type) => {
-    setAlertMessage(msg);
-    setAlertType(type);
+
+  // Fonction pour supprimer le calendrier avec confirmation
+  const handleDeleteCalendar = () => {
+    showConfirm(
+      'confirm-danger',
+      t('calendar.delete_title'),
+      t('calendar.delete_description'),
+      async () => {
+        const r = await personalCalendars.deleteCalendar(calendarId);
+        if (r.success) {
+          showAlert('success', t('calendar_deleted'));
+          navigate(`/${lng}/calendars`);
+        } else {
+          showAlert('danger', r.error);
+        }
+      }
+    );
   };
 
-  const handleApiResponse = (res, msg = null) => {
-    if (res.success) {
-      showAlert('✅ ' + (msg || res.message), 'success');
-    } else {
-      showAlert('❌ ' + res.error, 'danger');
-    }
-    return res.success;
+  // Fonction pour supprimer un calendrier partagé avec confirmation
+  const handleDeleteSharedCalendar = () => {
+    showConfirm(
+      'confirm-danger',
+      t('delete_calendar_title'),
+      t('delete_calendar_description'),
+      async () => {
+        const r = await sharedUserCalendars.deleteSharedCalendar(calendarId);
+        if (r.success) {
+          showAlert('success', t('calendar_deleted'));
+          navigate(`/${lng}/calendars`);
+        } else {
+          showAlert('danger', r.error || t('calendar.error_deleting_calendar'));
+        }
+      }
+    );
   };
 
   const initEditing = (box) => {
@@ -359,9 +378,9 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       if (res.success) {
         // Supprimer la box temporaire et mettre à jour avec la vraie
         setBoxes(prev => prev.filter(b => b.id !== editingBoxId));
-        handleApiResponse(res);
+        showAlert('success', res.message);
       } else {
-        handleApiResponse(res);
+        showAlert('danger', res.error);
       }
     } else {
       // Mise à jour d'une box existante
@@ -370,7 +389,11 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         editingBoxId, 
         { ...editingBox, conditions }
       );
-      handleApiResponse(res);
+      if (res.success) {
+        showAlert('success', res.message);
+      } else {
+        showAlert('danger', res.error);
+      }
     }
     
     resetEditing();
@@ -390,7 +413,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   const addScannedMedicines = async (medicines) => {
     if (!medicines?.length) {
-      showAlert('⚠️ Ajouter des médicaments', 'warning');
+      showAlert('Ajouter des médicaments', 'warning');
       return { success: false };
     }
     
@@ -408,11 +431,11 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     setShowQRModal(false);
     
     if (error === 0) {
-      showAlert('✅ Ajouté', 'success');
+      showAlert('success', 'Médicaments ajoutés avec succès');
     } else if (success === 0) {
-      showAlert('❌ Ajouter des médicaments', 'danger');
+      showAlert('danger', 'Impossible d\'ajouter les médicaments');
     } else {
-      showAlert(`⚠️ ${success} ajouté(s), ${error} erreur(s)`, 'warning');
+      showAlert('warning', `${success} médicament(s) ajouté(s), ${error} erreur(s)`);
     }
     
     return { success: error === 0, successCount: success, errorCount: error };
@@ -445,9 +468,9 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     setSingleScan(false);
     
     if (res.success) {
-      showAlert('✅ Ajouté', 'success');
+      showAlert('success', 'Médicament mis à jour avec succès');
     } else {
-      showAlert('❌ Ajouter un médicament', 'danger');
+      showAlert('danger', 'Impossible de mettre à jour le médicament');
     }
     
     return {
@@ -530,14 +553,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
             {t('delete')}
           </>
         ),
-        onClick: async () => {
-          const r = await personalCalendars.deleteCalendar(calendarId);
-          if (r.success) {
-            navigate(`/${lng}/calendars`);
-          } else {
-            showAlert(r.error, 'danger');
-          }
-        },
+        onClick: handleDeleteCalendar,
         title: t('delete'),
         danger: true,
       });
@@ -549,7 +565,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
             {t('delete')}
           </>
         ),
-        onClick: () => sharedUserCalendars.deleteSharedCalendar(calendarId),
+        onClick: handleDeleteSharedCalendar,
         title: t('delete'),
         danger: true,
       });
@@ -605,16 +621,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
           <ActionSheet actions={getCommonActions()} />
         </div>
 
-        {/* Alert System */}
-        <AlertSystem
-          type={alertType}
-          message={alertMessage}
-          onClose={() => {
-            setAlertMessage('');
-            setAlertType('');
-          }}
-        />
-
         {/* Boxes Grid */}
         <div className="row row-cols-1 row-cols-md-2 g-4">
           {boxes.map((box) => (
@@ -632,7 +638,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                     calendarId={calendarId}
                     calendarSource={calendarSource}
                     showAlert={showAlert}
-                    handleApiResponse={handleApiResponse}
                     onEdit={initEditing}
                     onUpdateScan={() => {
                       setSingleScan(true);
@@ -655,7 +660,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                   calendarId={calendarId}
                   calendarSource={calendarSource}
                   showAlert={showAlert}
-                  handleApiResponse={handleApiResponse}
                   onEdit={initEditing}
                   onUpdateScan={() => {
                     setSingleScan(true);
@@ -755,10 +759,9 @@ function BoxCard({
   setExpandedBoxes,
   calendarId,
   calendarSource,
-  showAlert,
-  handleApiResponse,
   onEdit,
   onUpdateScan,
+  showAlert,
   t,
 }) {
   const isEditing = editingBoxId === box.id && editingBox && editingBox.name !== undefined;
@@ -918,12 +921,20 @@ function BoxCard({
 
   const restockBox = async () => {
     const r = await calendarSource.restockBox(calendarId, box.id);
-    handleApiResponse(r);
+    if (r.success) {
+      showAlert('success', r.message);
+    } else {
+      showAlert('danger', r.error);
+    }
   };
 
   const deleteBox = async () => {
     const r = await calendarSource.deleteBox(calendarId, box.id);
-    handleApiResponse(r);
+    if (r.success) {
+      showAlert('success', r.message);
+    } else {
+      showAlert('danger', r.error);
+    }
   };
 
   const getBoxActions = () => [
@@ -1099,6 +1110,8 @@ function BoxCard({
                 icon="plus-circle"
                 text={t('boxes.restock')}
                 onClick={restockBox}
+                disabled={box.box_capacity === 0}
+                helpDisabled={t('boxes.restock_disabled_tooltip')}
               />
             </div>
           )}
@@ -1130,6 +1143,13 @@ function BoxCard({
                     ? t('boxes.stock.badge.low')
                     : t('boxes.stock.badge.high')
                 }
+                tooltip={
+                  box.stock_quantity <= 0
+                    ? t('boxes.stock.badge.tooltip.out')
+                    : box.stock_quantity <= box.stock_alert_threshold
+                    ? t('boxes.stock.badge.tooltip.low')
+                    : t('boxes.stock.badge.tooltip.high')
+                }
               />
             )}
             {box.conditions.filter((c) => c !== undefined).length === 0 && (
@@ -1146,20 +1166,45 @@ function BoxCard({
                   color="warning"
                   icon="info-circle"
                   text={t('boxes.condition.none')}
+                  tooltip={t('boxes.condition_none_tooltip')}
                 />
               </button>
             )}
-            {/*medic expired (date max depasser)*/}
-            {box.conditions.some((c) => {
-              if (!c || !c.max_date) return false;
+            {/* medic inactive (toutes les conditions sont desactiver) */}
+            {box.conditions?.every((c) => {
+              if (!c?.max_date) return false;
               const now = new Date();
               const maxDate = new Date(c.max_date);
               return now > maxDate;
-            }) && (
+            }) ? (
               <Badge
-                color="secondary"
-                icon="exclamation-circle"
-                text={t('boxes.condition.expired')}
+                color="warning"
+                icon="pause-circle"
+                text={t('boxes.condition.inactive')}
+                tooltip={t('boxes.condition.inactive_tooltip')}
+              />
+            ) : (
+              box.conditions?.some((c) => {
+                if (!c?.max_date) return false;
+                const now = new Date();
+                const maxDate = new Date(c.max_date);
+                return now > maxDate;
+              }) && (
+                <Badge
+                  color="secondary"
+                  icon="exclamation-circle"
+                  text={t('boxes.condition.expired')}
+                  tooltip={t('boxes.condition.expired_tooltip')}
+                />
+              )
+            )}
+            {/*Afficher si alart pour un medoc desactiver (box_capacity <= 0 ou stock_alert_threshold <= 0)*/}
+            {(box.box_capacity <= 0 || box.stock_alert_threshold <= 0) && (
+              <Badge
+                color="info"
+                icon="slash-circle"
+                text={t('boxes.stock.badge.alerts_disabled')}
+                tooltip={t('boxes.stock.badge.tooltip.alerts_disabled')}
               />
             )}
           </div>
@@ -1361,4 +1406,43 @@ function BoxCard({
   );
 }
 
+BoxCard.propTypes = {
+  box: PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    dose: PropTypes.string,
+    box_capacity: PropTypes.number,
+    stock_quantity: PropTypes.number,
+    stock_alert_threshold: PropTypes.number,
+    conditions: PropTypes.arrayOf(PropTypes.shape({
+      tablet_count: PropTypes.number,
+      time_of_day: PropTypes.string,
+      interval_days: PropTypes.number,
+      start_date: PropTypes.string,
+      max_date: PropTypes.string,
+    })),
+  }).isRequired,
+  editingBoxId: PropTypes.string,
+  editingBox: PropTypes.object,
+  setEditingBox: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  expandedBoxes: PropTypes.object.isRequired,
+  setExpandedBoxes: PropTypes.func.isRequired,
+  calendarId: PropTypes.string.isRequired,
+  calendarSource: PropTypes.string.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onUpdateScan: PropTypes.func.isRequired,
+  showAlert: PropTypes.func.isRequired,
+  t: PropTypes.func.isRequired,
+};
+
+BoxesView.propTypes = {
+  personalCalendars: PropTypes.object,
+  sharedUserCalendars: PropTypes.shape({
+    deleteSharedCalendar: PropTypes.func,
+  }),
+  tokenCalendars: PropTypes.object,
+};
+
 export default BoxesView;
+

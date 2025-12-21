@@ -104,7 +104,10 @@
       "max_date_mode": "Durata dell'assunzione",
       "until_date": "Fino a...",
       "no_limit": "Nessun limite",
-      "expired": "Condizione scaduta"
+      "expired": "Condizione scaduta",
+      "inactive": "Farmaco inattivo",
+      "inactive_tooltip": "Tutte le istruzioni per l'assunzione di questo farmaco sono scadute. Il farmaco è completamente inattivo.",
+      "expired_tooltip": "Una delle condizioni per usufruire di questa offerta è scaduta. Ora è inattiva."
     },
     "day": "giorno",
     "days": "giorni",
@@ -135,13 +138,22 @@
       "badge": {
         "high": "Elevato stock",
         "low": "Scorte basse",
-        "out": "Esaurito"
+        "out": "Esaurito",
+        "alerts_disabled": "Avvisi disabilitati",
+        "tooltip": {
+          "high": "Scorte in buone condizioni. Hai abbastanza compresse, al momento non è richiesta alcuna azione.",
+          "low": "Livelli di scorte critici! Ti stai avvicinando alla soglia di allerta. Ricordati di rifornirti presto per evitare di rimanere senza.",
+          "out": "Esaurito immediatamente. Non hai più compresse. Rifornisciti il prima possibile.",
+          "alerts_disabled": "Gli avvisi di esaurimento scorte sono disabilitati per questo farmaco perché la capacità o la soglia di avviso è impostata su 0. Non riceverai notifiche di esaurimento scorte. Modifica le impostazioni per riattivarle."
+        }
       }
     },
     "tablet": "compresso",
     "tablets": "compresse",
     "title": "Scatole di medicinali",
-    "view_notice": "Vedi le istruzioni"
+    "view_notice": "Vedi le istruzioni",
+    "restock_disabled_tooltip": "Il pulsante di rifornimento è disabilitato perché la capacità della scatola è 0. Modificare la capacità per riattivare il rifornimento.",
+    "condition_none_tooltip": "Non sono state definite condizioni per prenderli. Clicca qui per aggiungerne uno e ricevere promemoria regolari."
   },
   "calendar": {
     "add": "Aggiungi un calendario",
@@ -182,7 +194,14 @@
     "today": "Oggi",
     "week": "Settimana",
     "weekly_help": "Cliccando su un giorno nel calendario si possono visualizzare in una finestra i farmaci associati.",
-    "weekly_view": "Calendario per settimana"
+    "weekly_view": "Calendario per settimana",
+    "delete_title": "Eliminare il calendario?",
+    "delete_description": "Questa azione è irreversibile. Tutti i farmaci e gli schemi associati a questo calendario saranno definitivamente sospesi.",
+    "rename_title": "Rinominare il calendario?",
+    "rename_description": "Il nuovo nome sarà visibile a tutti gli utenti con cui condividi questo calendario.",
+    "delete_shared_title": "Eliminare il calendario condiviso?",
+    "delete_shared_description": "Non avrai più accesso a questo calendario condiviso. Il calendario rimarrà accessibile al proprietario e agli altri utenti.",
+    "error_deleting_calendar": "Errore durante l'eliminazione del calendario."
   },
   "calendar_completed": "Calendario completato con successo!",
   "calendar_completed_this_week": "Questa settimana il bunker è pieno!",
@@ -277,7 +296,9 @@
     "info_title": "Informazioni sui collegamenti ICS",
     "no_tokens": "Nessun collegamento ICS creato.",
     "title": "Elenchi di link ICS",
-    "token_label": "Collegamento"
+    "token_label": "Collegamento",
+    "delete_title": "Rimuovere il collegamento ICS?",
+    "delete_description": "Il collegamento verrà disattivato e non sarà più possibile sincronizzare il tuo calendario. Dovrai creare un nuovo collegamento per riattivare la sincronizzazione."
   },
   "image_upload": {
     "analysis_error": "Errore durante l'analisi dell'immagine.",
@@ -825,5 +846,21 @@
     "title": "Perché scegliere MediTime?"
   },
   "yes": "SÌ",
-  "you_have_no_pillbox_use_history": "Non hai alcuna cronologia di utilizzo per l'organizzatore di pillole."
+  "you_have_no_pillbox_use_history": "Non hai alcuna cronologia di utilizzo per l'organizzatore di pillole.",
+  "stock_percentage": "Percentuale",
+  "calendar_completion_error": "Errore durante il completamento del calendario.",
+  "calendar_deleted": "Calendario eliminato con successo.",
+  "pillbox_completion_description": "La scorta di tutti i farmaci per questa settimana verrà ridotta in base al tuo programma. Questa azione è irreversibile.",
+  "delete_access_title": "Rimuovere l'accesso di questo utente?",
+  "delete_access_description": "Questo utente non potrà più visualizzare o modificare questo calendario. Questa azione è irreversibile.",
+  "delete_calendar_title": "Eliminare questo calendario condiviso?",
+  "delete_calendar_description": "Perderai l'accesso a questo calendario. Il calendario rimarrà accessibile al proprietario e agli altri utenti con cui è condiviso.",
+  "delete_invitation_title": "Eliminare questo invito?",
+  "delete_invitation_description": "L'invito verrà annullato e il destinatario non potrà più accettarlo.",
+  "delete_link_title": "Vuoi rimuovere questo link di condivisione?",
+  "delete_link_description": "Il link verrà rimosso definitivamente. Nessuno potrà più accedere al calendario tramite questo link, nemmeno gli utenti che lo hanno già utilizzato.",
+  "restore_error": "Errore durante il ripristino",
+  "restore_pillbox_description": "Questa azione annullerà l'ultima preparazione del portapillole e ripristinerà le quantità in magazzino.",
+  "restore_pillbox_title": "Ripristinare il fortino?",
+  "pillbox_restored": "Pillbox ripristinato con successo"
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import AlertSystem from '../../common/AlertSystem';
+import { useAlert } from '../../../contexts/AlertContext';
 
 const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onStateChange }, ref) => {
   const { t } = useTranslation();
@@ -10,8 +10,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('');
+  const { showAlert } = useAlert();
   const fileInputRef = useRef(null);
 
   // Fonction pour valider une URL de prévisualisation d'image
@@ -52,8 +51,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
     if (droppedFile && droppedFile.type.startsWith('image/')) {
       setFile(droppedFile);
     } else {
-      setAlertMessage(t('image_upload.file_type_error'));
-      setAlertType('warning');
+      showAlert('warning', t('image_upload.file_type_error'));
     }
   };
 
@@ -61,10 +59,8 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
     const selectedFile = e.target.files[0];
     if (selectedFile && selectedFile.type.startsWith('image/')) {
       setFile(selectedFile);
-      setAlertMessage(''); // Clear any previous alert
     } else {
-      setAlertMessage(t('image_upload.file_type_error'));
-      setAlertType('warning');
+      showAlert('warning', t('image_upload.file_type_error'));
     }
   };
 
@@ -78,30 +74,25 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
   }));
 
   const handleImport = async (e) => {
-    e.preventDefault(); // Empêcher la soumission par défaut du formulaire
+    e.preventDefault();
     
     if (!file) {
-      setAlertMessage(t('image_upload.select_file_error'));
-      setAlertType('warning');
+      showAlert('warning', t('image_upload.select_file_error'));
       return;
     }
 
     if (!calendarName.trim()) {
-      setAlertMessage('❌ ' + t('calendar.error_no_calendar_name'));
-      setAlertType('error');
+      showAlert('danger', t('calendar.error_no_calendar_name'));
       return;
     }
 
     setIsProcessing(true);
-    setAlertMessage('');
 
     try {
-      // Analyser l'image avec l'API personnalisée
       const analysisResult = await personalCalendars.analyzeImage(file);
       
       if (analysisResult.success) {
         if (analysisResult.medicines && analysisResult.medicines.length > 0) {
-          // Rediriger vers la page de review avec les médicaments trouvés
           navigate(`/${lng}/add-calendar/review`, {
             state: { 
               importedMedicines: analysisResult.medicines,
@@ -109,17 +100,14 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
             },
           });
         } else {
-          setAlertMessage(t('image_upload.no_medicines_found'));
-          setAlertType('info');
+          showAlert('info', t('image_upload.no_medicines_found'));
         }
       } else {
-        setAlertMessage(analysisResult.error || t('image_upload.analysis_error'));
-        setAlertType('danger');
+        showAlert('danger', analysisResult.error || t('image_upload.analysis_error'));
       }
     } catch (error) {
       console.error('Erreur lors de l\'analyse de l\'image:', error);
-      setAlertMessage(t('image_upload.file_analysis_error'));
-      setAlertType('danger');
+      showAlert('danger', t('image_upload.file_analysis_error'));
     } finally {
       setIsProcessing(false);
     }
@@ -128,7 +116,6 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
   const removeFile = () => {
     setFile(null);
     setPreviewUrl(null);
-    setAlertMessage(''); // Clear alerts when removing file
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -138,14 +125,6 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
     <div className="row">
       <hr/>
       <div className="col-12">
-        {alertMessage && (
-          <AlertSystem 
-            message={alertMessage}
-            type={alertType}
-            onClose={() => setAlertMessage('')}
-          />
-        )}
-
         <div>
           <div>
             <h5 className="mb-3 text-center">
@@ -190,8 +169,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
                           // En cas d'erreur de chargement, supprimer la prévisualisation
                           setPreviewUrl(null);
                           setFile(null);
-                          setAlertMessage(t('image_upload.preview_error'));
-                          setAlertType('warning');
+                          showAlert('warning', t('image_upload.preview_error'));
                         }}
                       />
                       <button

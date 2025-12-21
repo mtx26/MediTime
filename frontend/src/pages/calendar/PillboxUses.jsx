@@ -6,6 +6,7 @@ import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 import { getMondayDate } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { UserContext } from '../../contexts/UserContext';
+import { useAlert } from '../../contexts/AlertContext';
 
 const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();
@@ -14,6 +15,7 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
   const { lng } = params;
 
   const { userInfo } = useContext(UserContext);
+  const { showAlert, showConfirm } = useAlert();
 
   const [pillboxUsesData, setPillboxUsesData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,13 +62,24 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
     setLoading((rep.success ? false : undefined))
   };
 
-  const cancelUse = async (useId) => {
+  const cancelUse = (useId) => {
     if (!calendarId) return;
-    const res = await calendarSource.cancelUse(calendarId, useId)
-    if (res.success) {
-      setLoading(true);
-      fetchData();
-    }
+    
+    showConfirm(
+      'confirm-safe',
+      t('restore_pillbox_title'),
+      t('restore_pillbox_description'),
+      async () => {
+        const res = await calendarSource.cancelUse(calendarId, useId);
+        if (res.success) {
+          showAlert('success', res.message || t('pillbox_restored'));
+          setLoading(true);
+          fetchData();
+        } else {
+          showAlert('danger', res.error || t('restore_error'));
+        }
+      }
+    );
   };
 
   useEffect(() => {

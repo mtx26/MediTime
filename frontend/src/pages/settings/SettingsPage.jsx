@@ -6,7 +6,7 @@ import Preferences from './Preferences';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { handleLogout, resetPassword } from '../../services/auth/authService';
 import { UserContext } from '../../contexts/UserContext';
-import AlertSystem from '../../components/common/AlertSystem';
+import { useAlert } from '../../contexts/AlertContext';
 import { useTranslation } from 'react-i18next';
 
 export default function SettingsPage( sharedProps ) {
@@ -14,9 +14,7 @@ export default function SettingsPage( sharedProps ) {
   const location = useLocation();
   const { lng } = useParams();
   const { userInfo } = useContext(UserContext);
-  const [alertType, setAlertType] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
-  const [showAlert, setShowAlert] = useState(false);
+  const { showAlert } = useAlert();
 
   const getInitialTab = () => {
     const params = new URLSearchParams(location.search);
@@ -87,15 +85,12 @@ export default function SettingsPage( sharedProps ) {
                 >
                   <i className="bi bi-unlock fs-5 me-2"></i> {t('logout')}
                 </button>
-                {showAlert && <AlertSystem type={alertType} message={alertMessage} />}
                 <button
                   aria-label={t('reset_password.title')}
                   title={t('reset_password.title')}
                   onClick={() => {
                     resetPassword(userInfo.email);
-                    setAlertType('success');
-                    setAlertMessage(t('reset_password.success'));
-                    setShowAlert(true);
+                    showAlert('success', t('reset_password.success'));
                   }}
                   className='btn btn-outline-primary text-start nav-link text-start'
                 >

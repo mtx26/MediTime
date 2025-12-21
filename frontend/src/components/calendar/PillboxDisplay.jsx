@@ -5,7 +5,7 @@ import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import isEqual from 'lodash/isEqual';
 import { useTranslation } from 'react-i18next';
 import { getMondayDate, toISO } from '../../utils/calendar/dateUtils';
-import AlertSystem from '../common/AlertSystem';
+import { useAlert } from '../../contexts/AlertContext';
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const pill_count = {
@@ -33,10 +33,8 @@ export default function PillboxDisplay({
   const [selectedMedIndex, setSelectedMedIndex] = useState(0);
   const [orderedMeds, setOrderedMeds] = useState([]);
   const [loading, setLoading] = useState(undefined);
-  const [message, setMessage] = useState('');
-  const [alertType, setAlertType] = useState('');
+  const { showConfirm, showAlert } = useAlert();
   const [isPillboxUsed, setIsPillboxUsed] = useState(false); // Indicateur d'utilisation de la boîte à pilules
-  const [showConfirmation, setShowConfirmation] = useState(false);
   const [pillboxError, setPillboxError] = useState(false);
 
   // Calculer les dates de la semaine à partir du lundi fourni
@@ -123,46 +121,13 @@ export default function PillboxDisplay({
   if (loading === false) {
     return (
       <div className="alert alert-danger text-center mt-5" role="alert">
-        ❌ {t('invalid_or_expired_link')}
+        {t('invalid_or_expired_link')}
       </div>
     );
   }
 
   return (
     <div className="position-relative">
-      {showConfirmation && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1055 }}
-        >
-          <AlertSystem
-            message={message}
-            type={alertType}
-            onClose={() => {
-              setMessage('');
-              setAlertType('');
-              setShowConfirmation(false);
-            }}
-            onConfirm={async() => {
-              const rep = await calendarSource.decreaseStock(calendarId, toISO(selectedDate));
-
-              // Navigation propre au pillbox (effectuée même si rep.success est false, comme avant)
-              if (type === 'pillbox') {
-                navigate(`/${lng}/${basePath}/${calendarId}?success=${encodeURIComponent(t('pillbox_stock_decreased_successfully'))}`);
-              }
-
-              if (rep.success) {
-                const rep2 = await calendarSource.fetchIfPillboxUsed(calendarId, toISO(selectedDate));
-                setIsPillboxUsed(rep2.if_pillbox_used);
-              } else {
-                setPillboxError(true);
-              }
-              setShowConfirmation(false);
-            }}
-          />
-        </div>
-      )}
-
       <div className="container-fluid text-center w-100 mt-3">
         {isPillboxUsed ? (
           <div className="mb-3 p-3">
@@ -285,10 +250,25 @@ export default function PillboxDisplay({
                         <button
                           className="btn btn-success mt-4"
                           onClick={() => {
-                            setMessage(t('confirm_calendar_completion'));
-                            setAlertType('confirm-safe');
-                            setShowConfirmation(true);
-                            
+                            showConfirm(
+                              'confirm-safe',
+                              t('confirm_calendar_completion'),
+                              t('pillbox_completion_description'),
+                              async () => {
+                                const rep = await calendarSource.decreaseStock(calendarId, toISO(selectedDate));
+
+                                if (rep.success) {
+                                  showAlert('success', t('calendar_completed'));
+                                } else {
+                                  setPillboxError(true);
+                                  showAlert('danger', rep.error || t('calendar_completion_error'));
+                                }
+                                // Navigation propre au pillbox (effectuée même si rep.success est false, comme avant)
+                                if (type === 'pillbox') {
+                                  navigate(`/${lng}/${basePath}/${calendarId}`);
+                                }
+                              }
+                            );
                           }}
                           aria-label={t('done')}
                           title={t('done')}

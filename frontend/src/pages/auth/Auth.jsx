@@ -10,7 +10,7 @@ import {
   FacebookHandleLogin,
   MicrosoftHandleLogin
 } from '../../services/auth/authService';
-import AlertSystem from '../../components/common/AlertSystem';
+import { useAlert } from '../../contexts/AlertContext';
 import { log } from '../../utils/logger';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -20,17 +20,13 @@ import { getValidRedirect } from '../../utils/redirect';
 function Auth() {
   const { userInfo } = useContext(UserContext);
   const { t } = useTranslation();
+  const { showAlert } = useAlert();
   // 👤 Authentification utilisateur
   const [email, setEmail] = useState(''); // État pour l'adresse e-mail
   const [password, setPassword] = useState(''); // État pour le mot de passe
   const [name, setName] = useState(''); // État pour le nom d'utilisateur
   const [passwordVisible, setPasswordVisible] = useState(false); // État pour l'affichage du mot de passe
   const [activeTab, setActiveTab] = useState('login'); // État pour l'onglet actif (login/register)
-
-  // ⚠️ Alertes
-  const [alertMessage, setAlertMessage] = useState(null); // État pour le message d'alerte
-  const [alertType, setAlertType] = useState('info'); // État pour le type d'alerte (par défaut : info)
-  const [duration, setDuration] = useState(2000); // État pour la durée de l'alerte
 
   const location = useLocation();
   const { lng } = useParams();
@@ -51,10 +47,7 @@ function Auth() {
   const handleLogin = async () => {
     const error = await loginWithEmail(email, password);
     if (error) {
-      setAlertMessage(
-        '❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`)
-      );
-      setAlertType('danger');
+      showAlert('danger', t(`supabase-error.${error.code || 'unexpected_error'}`));
       return;
     }
     log.info('Connexion réussie', {
@@ -71,10 +64,7 @@ function Auth() {
   const handleRegister = async () => {
     const error = await registerWithEmail(email, password, name, redirect);
     if (error) {
-      setAlertMessage(
-        '❌ ' + t(`supabase-error.${error.code || 'unexpected_error'}`)
-      );
-      setAlertType('danger');
+      showAlert('danger', t(`supabase-error.${error.code || 'unexpected_error'}`));
       return;
     }
     log.info('Inscription réussie', {
@@ -82,9 +72,7 @@ function Auth() {
       origin: 'Auth.jsx',
       user: userInfo?.uid,
     });
-    setDuration(4000);
-    setAlertMessage(t('auth.verification_sent'));
-    setAlertType('success');
+    showAlert('success', t('auth.verification_sent'));
   };
 
   const handleSubmit = async (e) => {
@@ -228,13 +216,6 @@ function Auth() {
             </div>
             <p className="text-center mt-3 mb-0 text-muted">{t('auth.or_with_email')}</p>
           </div>
-
-          <AlertSystem
-            type={alertType}
-            message={alertMessage}
-            onClose={() => setAlertMessage(null)}
-            duration={duration}
-          />
 
             <form onSubmit={handleSubmit}>
             {activeTab === 'register' && (

@@ -104,7 +104,10 @@
       "max_date_mode": "Dauer der Einnahme",
       "until_date": "Bis...",
       "no_limit": "Keine Grenzen",
-      "expired": "Bedingung abgelaufen"
+      "expired": "Bedingung abgelaufen",
+      "inactive": "Inaktiver Wirkstoff",
+      "inactive_tooltip": "Alle Anweisungen zur Einnahme dieses Medikaments sind abgelaufen. Das Medikament ist völlig wirkungslos.",
+      "expired_tooltip": "Eine der Bedingungen für die Inanspruchnahme dieses Angebots ist nicht mehr erfüllt. Es ist nun deaktiviert."
     },
     "day": "Tag",
     "days": "Tage",
@@ -135,13 +138,22 @@
       "badge": {
         "high": "Hoher Lagerbestand",
         "low": "Geringer Lagerbestand",
-        "out": "Produkt nicht vorrätig"
+        "out": "Produkt nicht vorrätig",
+        "alerts_disabled": "Benachrichtigungen deaktiviert",
+        "tooltip": {
+          "high": "Der Lagerbestand ist in gutem Zustand. Sie haben ausreichend Tabletten, es ist derzeit kein Handlungsbedarf erforderlich.",
+          "low": "Kritische Lagerbestände! Sie nähern sich dem Warnschwellenwert. Denken Sie daran, Ihre Vorräte bald aufzufüllen, um Engpässe zu vermeiden.",
+          "out": "Sofort ausverkauft. Sie haben keine Tabletten mehr. Bitte schnellstmöglich wieder auffüllen.",
+          "alerts_disabled": "Für dieses Medikament sind Benachrichtigungen bei Lieferengpässen deaktiviert, da die Kapazität bzw. der Alarmschwellenwert auf 0 gesetzt ist. Sie erhalten daher keine Benachrichtigungen bei Lieferengpässen. Um diese Benachrichtigungen wieder zu aktivieren, ändern Sie bitte Ihre Einstellungen."
+        }
       }
     },
     "tablet": "komprimiert",
     "tablets": "Tabletten",
     "title": "Medikamentenboxen",
-    "view_notice": "Siehe die Anweisungen"
+    "view_notice": "Siehe die Anweisungen",
+    "restock_disabled_tooltip": "Die Schaltfläche zum Auffüllen ist deaktiviert, da die Boxkapazität 0 beträgt. Ändern Sie die Kapazität, um das Auffüllen wieder zu aktivieren.",
+    "condition_none_tooltip": "Für die Einnahme dieser Produkte sind keine Bedingungen festgelegt. Klicken Sie hier, um eine Bedingung hinzuzufügen und regelmäßig Erinnerungen zu erhalten."
   },
   "calendar": {
     "add": "Einen Kalender hinzufügen",
@@ -182,7 +194,14 @@
     "today": "Heute",
     "week": "Woche",
     "weekly_help": "Klicken Sie auf einen Tag im Kalender, um die zugehörigen Medikamente in einem Fenster anzuzeigen.",
-    "weekly_view": "Kalender nach Woche"
+    "weekly_view": "Kalender nach Woche",
+    "delete_title": "Kalender löschen?",
+    "delete_description": "Diese Maßnahme ist unumkehrbar. Alle mit diesem Kalender verbundenen Medikamente und Einnahmepläne werden dauerhaft eingestellt.",
+    "rename_title": "Den Kalender umbenennen?",
+    "rename_description": "Der neue Name wird für alle Nutzer sichtbar sein, mit denen Sie diesen Kalender teilen.",
+    "delete_shared_title": "Den freigegebenen Kalender löschen?",
+    "delete_shared_description": "Sie haben keinen Zugriff mehr auf diesen freigegebenen Kalender. Der Kalender bleibt für den Inhaber und andere Nutzer weiterhin zugänglich.",
+    "error_deleting_calendar": "Fehler beim Löschen des Kalenders."
   },
   "calendar_completed": "Kalender erfolgreich abgeschlossen!",
   "calendar_completed_this_week": "Pillendose für diese Woche voll!",
@@ -277,7 +296,9 @@
     "info_title": "Über ICS-Links",
     "no_tokens": "Es wurde keine ICS-Verbindung hergestellt.",
     "title": "ICS-Linklisten",
-    "token_label": "Pfandrecht"
+    "token_label": "Pfandrecht",
+    "delete_title": "ICS-Link entfernen?",
+    "delete_description": "Der Link wird deaktiviert und kann Ihren Kalender nicht mehr synchronisieren. Sie müssen einen neuen Link erstellen, um die Synchronisierung wieder zu aktivieren."
   },
   "image_upload": {
     "analysis_error": "Fehler beim Parsen des Bildes.",
@@ -825,5 +846,21 @@
     "title": "Warum MediTime wählen?"
   },
   "yes": "Ja",
-  "you_have_no_pillbox_use_history": "Für den Pillenorganizer liegen keine Nutzungsdaten vor."
+  "you_have_no_pillbox_use_history": "Für den Pillenorganizer liegen keine Nutzungsdaten vor.",
+  "stock_percentage": "Prozentsatz",
+  "calendar_completion_error": "Fehler beim Abschließen des Kalenders.",
+  "calendar_deleted": "Kalender erfolgreich gelöscht.",
+  "pillbox_completion_description": "Der Vorrat an allen Medikamenten für diese Woche wird gemäß Ihrem Plan reduziert. Diese Maßnahme ist unumkehrbar.",
+  "delete_access_title": "Zugriffsrechte dieses Benutzers entfernen?",
+  "delete_access_description": "Dieser Benutzer kann diesen Kalender nicht mehr anzeigen oder bearbeiten. Diese Maßnahme ist unwiderruflich.",
+  "delete_calendar_title": "Diesen freigegebenen Kalender löschen?",
+  "delete_calendar_description": "Sie verlieren den Zugriff auf diesen Kalender. Der Kalender bleibt für den Inhaber und andere Nutzer, mit denen er geteilt wurde, weiterhin zugänglich.",
+  "delete_invitation_title": "Diese Einladung löschen?",
+  "delete_invitation_description": "Die Einladung wird storniert und der Empfänger kann sie nicht mehr annehmen.",
+  "delete_link_title": "Diesen Freigabelink entfernen?",
+  "delete_link_description": "Der Link wird dauerhaft entfernt. Niemand kann mehr über diesen Link auf den Kalender zugreifen, auch nicht diejenigen, die ihn bereits verwendet haben.",
+  "restore_error": "Fehler bei der Wiederherstellung",
+  "restore_pillbox_description": "Diese Aktion macht die letzte Befüllung der Pillendose rückgängig und stellt die vorhandenen Mengen wieder her.",
+  "restore_pillbox_title": "Den Pillenkasten wiederherstellen?",
+  "pillbox_restored": "Pillbox erfolgreich wiederhergestellt"
 }

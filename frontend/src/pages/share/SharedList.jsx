@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState, useCallback } from "react";
 import { UserContext } from "../../contexts/UserContext";
 import PropTypes from "prop-types";
-import AlertSystem from "../../components/common/AlertSystem";
+import { useAlert } from "../../contexts/AlertContext";
 import HoveredUserProfile from "../../components/common/HoveredUserProfile";
 import { toISO } from "../../utils/calendar/dateUtils";
 import { useTranslation } from "react-i18next";
@@ -24,10 +24,7 @@ function SharedList({
   const { lng } = useParams();
 
   // ⚠️ Alertes et confirmations
-  const [alertType, setAlertType] = useState(""); // Type d'alerte (ex. success, error)
-  const [alertMessage, setAlertMessage] = useState(""); // Message d'alerte
-  const [onConfirmAction, setOnConfirmAction] = useState(null); // Action à confirmer
-  const [alertId, setAlertId] = useState(null); // Identifiant de l'alerte ciblée
+  const { showAlert, showConfirm } = useAlert();
 
   // 🔄 Chargement et données partagées groupées
   const [loadingGroupedShared, setLoadingGroupedShared] = useState(true); // État de chargement des partages groupés
@@ -50,13 +47,9 @@ function SharedList({
       await navigator.clipboard.writeText(
         `${VITE_URL}/${lng}/shared-token-calendar/${token.id}`,
       );
-      setAlertType("success");
-      setAlertMessage(t("link_copied"));
-      setAlertId(token.id);
+      showAlert('success', t("link_copied"));
     } catch {
-      setAlertType("danger");
-      setAlertMessage(t("copy_link_error"));
-      setAlertId(token.id);
+      showAlert('danger', t("copy_link_error"));
     }
   };
 
@@ -64,133 +57,105 @@ function SharedList({
   const handleUpdateTokenExpiration = async (tokenId, date) => {
     const rep = await tokenCalendars.updateTokenExpiration(tokenId, date);
     if (rep.success) {
-      setAlertType("success");
-      setAlertMessage("✅ " + rep.message);
+      showAlert('success', rep.message);
     } else {
-      setAlertType("danger");
-      setAlertMessage("❌ " + rep.error);
+      showAlert('danger', rep.error);
     }
-    setAlertId(tokenId);
   };
 
   const promptDeleteCalendar = ({
     calendarId,
     navigate,
     personalCalendars,
-    setAlertType,
-    setAlertMessage,
-    setAlertId,
-    setOnConfirmAction,
     t,
     lng,
   }) => {
-    setAlertType("confirm-danger");
-    setAlertMessage(t("delete_calendar_confirm"));
-    setAlertId(calendarId);
-    setOnConfirmAction(() => async () => {
-      const rep = await personalCalendars.deleteCalendar(calendarId);
-      if (rep.success) {
-        setAlertType("success");
-        setAlertMessage("✅ " + rep.message);
-        setTimeout(() => {
+    showConfirm(
+      'confirm-danger',
+      t("calendar.delete_title'"),
+      t("calendar.delete_description"),
+      async () => {
+        const rep = await personalCalendars.deleteCalendar(calendarId);
+        if (rep.success) {
+          showAlert('success', rep.message);
           navigate(`/${lng}/calendars`);
-        }, 1000);
-      } else {
-        setAlertType("danger");
-        setAlertMessage("❌ " + rep.error);
+        } else {
+          showAlert('danger', rep.error);
+        }
       }
-    });
+    );
   };
 
   const deleteTokenConfirmAction = (tokenId) => {
-    setAlertType("confirm-danger");
-    setAlertMessage(t("delete_link_confirm"));
-    setAlertId(tokenId);
-    setOnConfirmAction(() => () => handleDeleteToken(tokenId));
+    showConfirm(
+      'confirm-danger',
+      t("delete_link_title"),
+      t("delete_link_description"),
+      () => handleDeleteToken(tokenId)
+    );
   };
 
-  // 🔄 Suppression du lien
   const handleDeleteToken = async (tokenId) => {
     const rep = await tokenCalendars.deleteToken(tokenId);
     if (rep.success) {
-      setAlertType("success");
-      setAlertMessage("✅ " + rep.message);
+      showAlert('success', rep.message);
     } else {
-      setAlertType("danger");
-      setAlertMessage("❌ " + rep.error);
+      showAlert('danger', rep.error);
     }
-    setAlertId(tokenId);
     setSelectedModifyToken(null);
   };
 
   const deleteLoginInvitationConfirmAction = (token) => {
-    setAlertType("confirm-danger");
-    setAlertMessage(t("delete_access_confirm"));
-    setAlertId(token);
-    setOnConfirmAction(() => () => handleDeleteLoginInvitation(token));
+    showConfirm(
+      'confirm-danger',
+      t("delete_access_title"),
+      t("delete_access_description"),
+      () => handleDeleteLoginInvitation(token)
+    );
   };
 
-  // 🔄 Suppression de l'utilisateur
   const handleDeleteLoginInvitation = async (token) => {
     const rep = await sharedUserCalendars.deleteLoginInvitation(token);
     if (rep.success) {
-      setAlertType("success");
-      setAlertMessage("✅ " + rep.message);
-      setAlertId(token);
-      setTimeout(async () => {
-        await setGroupedSharedFunction();
-      }, 1000);
+      showAlert('success', rep.message);
+      setGroupedSharedFunction();
     } else {
-      setAlertType("danger");
-      setAlertMessage("❌ " + rep.error);
-      setAlertId(token);
+      showAlert('danger', rep.error);
     }
   };
 
   const deleteRegistrationInvitationConfirmAction = (token) => {
-    setAlertType("confirm-danger");
-    setAlertMessage(t("delete_link_confirm"));
-    setAlertId(token);
-    setOnConfirmAction(() => () => handledeleteRegistrationInvitation(token));
+    showConfirm(
+      'confirm-danger',
+      t("delete_invitation_title"),
+      t("delete_invitation_description"),
+      () => handledeleteRegistrationInvitation(token)
+    );
   };
 
   const handledeleteRegistrationInvitation = async (token) => {
     const rep = await sharedUserCalendars.deleteRegistrationInvitation(token);
     if (rep.success) {
-      setAlertType("success");
-      setAlertMessage("✅ " + rep.message);
-      setAlertId(token);
-      setTimeout(async () => {
-        await setGroupedSharedFunction();
-      }, 1000);
+      showAlert('success', rep.message);
+      setGroupedSharedFunction();
     } else {
-      setAlertType("danger");
-      setAlertMessage("❌ " + rep.error);
-      setAlertId(token);
+      showAlert('danger', rep.error);
     }
   };
 
-  // 📄 Envoi d'une invitation
   const handleSendInvitation = async (calendarId) => {
     const email = emailsToInvite[calendarId];
 
     const rep = await sharedUserCalendars.sendInvitation(email, calendarId);
     if (rep.success) {
-      setAlertType("success");
-      setAlertMessage("✅ " + rep.message);
-      setAlertId("addUser-" + calendarId);
-      setTimeout(async () => {
-        await setGroupedSharedFunction();
-      }, 1000);
+      showAlert('success', rep.message);
+      setGroupedSharedFunction();
       setEmailsToInvite((prev) => ({ ...prev, [calendarId]: "" }));
     } else {
-      setAlertType("danger");
-      setAlertMessage("❌ " + rep.error);
-      setAlertId("addUser-" + calendarId);
+      showAlert('danger', rep.error);
     }
   };
 
-  // 🔄 Création d'un lien de partage
   const handleCreateToken = async (calendarId) => {
     const rep = await tokenCalendars.createToken(
       calendarId,
@@ -198,13 +163,9 @@ function SharedList({
       permissions[calendarId],
     );
     if (rep.success) {
-      setAlertType("success");
-      setAlertMessage("✅ " + rep.message);
-      setAlertId("newLink-" + calendarId);
+      showAlert('success', rep.message);
     } else {
-      setAlertType("danger");
-      setAlertMessage("❌ " + rep.error);
-      setAlertId("newLink-" + calendarId);
+      showAlert('danger', rep.error);
     }
   };
 
@@ -236,12 +197,11 @@ function SharedList({
       setGroupedShared(rep.grouped);
     } else {
       setGroupedShared({});
-      setAlertType("danger");
-      setAlertMessage(rep.message);
+      showAlert('danger', rep.message);
     }
 
     setLoadingGroupedShared(false);
-  }, [sharedUserCalendars, t, calendarFromURL]);
+  }, [sharedUserCalendars, t, calendarFromURL, showAlert]);
 
 
   // 🔄 Chargement des données groupées
@@ -359,14 +319,6 @@ function SharedList({
               key={calendarId}
               calendarId={calendarId}
               data={data}
-              alertId={alertId}
-              alertType={alertType}
-              alertMessage={alertMessage}
-              onConfirmAction={onConfirmAction}
-              setAlertType={setAlertType}
-              setAlertMessage={setAlertMessage}
-              setOnConfirmAction={setOnConfirmAction}
-              setAlertId={setAlertId}
               handleCopyLink={handleCopyLink}
               handleUpdateTokenExpiration={handleUpdateTokenExpiration}
               deleteTokenConfirmAction={deleteTokenConfirmAction}
@@ -395,10 +347,6 @@ const calendarActions = ({
   calendarId,
   navigate,
   personalCalendars,
-  setAlertType,
-  setAlertMessage,
-  setAlertId,
-  setOnConfirmAction,
   promptDeleteCalendar,
   t,
   lng,
@@ -434,10 +382,6 @@ const calendarActions = ({
           calendarId,
           navigate,
           personalCalendars,
-          setAlertType,
-          setAlertMessage,
-          setAlertId,
-          setOnConfirmAction,
           t,
           lng,
         }),
@@ -448,8 +392,7 @@ const calendarActions = ({
 };
 
 function CalendarCard({
-  calendarId, data, alertId, alertType, alertMessage, onConfirmAction,
-  setAlertType, setAlertMessage, setOnConfirmAction, setAlertId,
+  calendarId, data,
   handleCopyLink, handleUpdateTokenExpiration,
   deleteTokenConfirmAction, handleCreateToken, today,
   VITE_URL, selectedModifyToken, setSelectedModifyToken, tokenCalendars,
@@ -458,9 +401,8 @@ function CalendarCard({
 }) {
   const { t } = useTranslation();
   const { lng } = useParams();
-  const alertHandlers = { alertId, alertType, alertMessage, onConfirmAction, setAlertMessage, setOnConfirmAction, setAlertId };
-  const tokenProps = { ...alertHandlers, setAlertType, handleCopyLink, handleUpdateTokenExpiration, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyToken, setSelectedModifyToken, tokenCalendars };
-  const userProps = { ...alertHandlers, handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
+  const tokenProps = { handleCopyLink, handleUpdateTokenExpiration, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyToken, setSelectedModifyToken, tokenCalendars };
+  const userProps = { handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
   return (
     <div>
       <div className="card-body">
@@ -474,24 +416,12 @@ function CalendarCard({
                 calendarId,
                 navigate,
                 personalCalendars,
-                setAlertType,
-                setAlertMessage,
-                setAlertId,
-                setOnConfirmAction,
                 promptDeleteCalendar,
                 t,
                 lng,
               })}
             />
           </h4>
-        {alertId === calendarId && (
-          <AlertSystem
-            type={alertType}
-            message={alertMessage}
-            onClose={() => { setAlertMessage(""); setOnConfirmAction(null); setAlertId(null); }}
-            onConfirm={async () => { if (onConfirmAction) await onConfirmAction(); }}
-          />
-        )}
         <TokenList {...tokenProps} />
         <UserList {...userProps} />
       </div>
@@ -500,14 +430,6 @@ function CalendarCard({
 }
 
 function TokenList({
-  setAlertType,
-  alertId,
-  alertType,
-  alertMessage,
-  onConfirmAction,
-  setAlertMessage,
-  setOnConfirmAction,
-  setAlertId,
   handleCopyLink,
   handleUpdateTokenExpiration,
   deleteTokenConfirmAction,
@@ -549,22 +471,6 @@ function TokenList({
               />
             </h5>
             <div key={token.id}>
-              {/* Alert */}
-              {alertId === token.id && (
-                <AlertSystem
-                  type={alertType}
-                  message={alertMessage}
-                  onClose={() => {
-                    setAlertMessage("");
-                    setOnConfirmAction(null);
-                    setAlertId(null);
-                  }}
-                  onConfirm={async () => {
-                    if (onConfirmAction) await onConfirmAction();
-                  }}
-                />
-              )}
-
               {/* Lien */}
               <div className="input-group col-md-6 mb-2" data-tour="share-public-links">
                 <input
@@ -643,21 +549,6 @@ function TokenList({
           <i className="bi bi-link-45deg me-2"></i>
           {t("public_links")} :
         </h5>
-        {/* Alert */}
-        {alertId === "newLink-" + calendarId && (
-          <AlertSystem
-            type={alertType}
-            message={alertMessage}
-            onClose={() => {
-              setAlertMessage("");
-              setOnConfirmAction(null);
-              setAlertId(null);
-            }}
-            onConfirm={async () => {
-              if (onConfirmAction) await onConfirmAction();
-            }}
-          />
-        )}
         <button
           className="btn btn-outline-dark w-100"
           onClick={() => handleCreateToken(calendarId)}
@@ -673,13 +564,6 @@ function TokenList({
 }
 
 function UserList({
-  alertId,
-  alertType,
-  alertMessage,
-  onConfirmAction,
-  setAlertMessage,
-  setOnConfirmAction,
-  setAlertId,
   handleSendInvitation,
   deleteLoginInvitationConfirmAction,
   deleteRegistrationInvitationConfirmAction,
@@ -699,20 +583,6 @@ function UserList({
         {/* Liste des utilisateurs partagés */}
         {(data.users || []).map((user) => (
           <li className="list-group-item" key={user.token} data-tour="share-users-list">
-            {alertId === user.token && (
-              <AlertSystem
-                type={alertType}
-                message={alertMessage}
-                onClose={() => {
-                  setAlertMessage("");
-                  setOnConfirmAction(null);
-                  setAlertId(null);
-                }}
-                onConfirm={() => {
-                  if (onConfirmAction) onConfirmAction();
-                }}
-              />
-            )}
             <div className="row align-items-center col-md-12 d-flex">
               <div className="col-8 d-flex align-items-center gap-2 p-0">
                 <HoveredUserProfile
@@ -785,20 +655,6 @@ function UserList({
               className="list-group-item"
               key={invitation.token}
             >
-              {alertId === invitation.token && (
-                <AlertSystem
-                  type={alertType}
-                  message={alertMessage}
-                  onClose={() => {
-                    setAlertMessage("");
-                    setOnConfirmAction(null);
-                    setAlertId(null);
-                  }}
-                  onConfirm={() => {
-                    if (onConfirmAction) onConfirmAction();
-                  }}
-                />
-              )}
               <div className="row align-items-center col-md-12 d-flex">
                 {/* Colonne gauche : image + infos */}
                 <div className="col-8 d-flex align-items-center gap-2 p-0">
@@ -847,22 +703,6 @@ function UserList({
 
         {/* Ajouter un utilisateur */}
         <div>
-          {/* Alert */}
-          {alertId === "addUser-" + calendarId && (
-            <AlertSystem
-              type={alertType}
-              message={alertMessage}
-              onClose={() => {
-                setAlertMessage("");
-                setOnConfirmAction(null);
-                setAlertId(null);
-              }}
-              onConfirm={() => {
-                if (onConfirmAction) onConfirmAction();
-              }}
-            />
-          )}
-
           <div className="row align-items-center mt-2">
             <div className="col-md-12">
               <form
@@ -941,14 +781,6 @@ CalendarCard.propTypes = {
     users: PropTypes.array,
     calendar_name: PropTypes.string,
   }).isRequired,
-  alertId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  alertType: PropTypes.string,
-  alertMessage: PropTypes.string,
-  onConfirmAction: PropTypes.func,
-  setAlertType: PropTypes.func.isRequired,
-  setAlertMessage: PropTypes.func.isRequired,
-  setOnConfirmAction: PropTypes.func.isRequired,
-  setAlertId: PropTypes.func.isRequired,
   handleCopyLink: PropTypes.func.isRequired,
   handleUpdateTokenExpiration: PropTypes.func.isRequired,
   deleteTokenConfirmAction: PropTypes.func.isRequired,
@@ -960,6 +792,7 @@ CalendarCard.propTypes = {
   tokenCalendars: PropTypes.object.isRequired,
   handleSendInvitation: PropTypes.func.isRequired,
   deleteLoginInvitationConfirmAction: PropTypes.func.isRequired,
+  deleteRegistrationInvitationConfirmAction: PropTypes.func.isRequired,
   emailsToInvite: PropTypes.object.isRequired,
   setEmailsToInvite: PropTypes.func.isRequired,
   navigate: PropTypes.func.isRequired,
@@ -968,14 +801,6 @@ CalendarCard.propTypes = {
 };
 
 TokenList.propTypes = {
-  setAlertType: PropTypes.func.isRequired,
-  alertId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  alertType: PropTypes.string,
-  alertMessage: PropTypes.string,
-  onConfirmAction: PropTypes.func,
-  setAlertMessage: PropTypes.func.isRequired,
-  setOnConfirmAction: PropTypes.func.isRequired,
-  setAlertId: PropTypes.func.isRequired,
   handleCopyLink: PropTypes.func.isRequired,
   handleUpdateTokenExpiration: PropTypes.func.isRequired,
   deleteTokenConfirmAction: PropTypes.func.isRequired,
@@ -1001,15 +826,9 @@ TokenList.propTypes = {
 };
 
 UserList.propTypes = {
-  alertId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  alertType: PropTypes.string,
-  alertMessage: PropTypes.string,
-  onConfirmAction: PropTypes.func,
-  setAlertMessage: PropTypes.func.isRequired,
-  setOnConfirmAction: PropTypes.func.isRequired,
-  setAlertId: PropTypes.func.isRequired,
   handleSendInvitation: PropTypes.func.isRequired,
   deleteLoginInvitationConfirmAction: PropTypes.func.isRequired,
+  deleteRegistrationInvitationConfirmAction: PropTypes.func.isRequired,
   data: PropTypes.shape({
     users: PropTypes.arrayOf(
       PropTypes.shape({

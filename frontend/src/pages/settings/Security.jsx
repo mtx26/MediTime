@@ -1,12 +1,13 @@
 import React, { useState, useContext } from 'react';
 import { updateUserPassword } from '../../services/auth/authService';
 import { UserContext } from '../../contexts/UserContext';
-import AlertSystem from '../../components/common/AlertSystem';
+import { useAlert } from '../../contexts/AlertContext';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useTranslation } from 'react-i18next';
 
 export default function Security() {
   const { t } = useTranslation();
+  const { showAlert } = useAlert();
   // 👤 Contexte utilisateur
   const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
 
@@ -15,10 +16,6 @@ export default function Security() {
   const [newPassword, setNewPassword] = useState(''); // État pour le nouveau mot de passe
   const [oldPasswordVisible, setOldPasswordVisible] = useState(false); // État pour l'affichage de l'ancien mot de passe
   const [newPasswordVisible, setNewPasswordVisible] = useState(false); // État pour l'affichage du nouveau mot de passe
-
-  // ⚠️ Alertes
-  const [alertMessage, setAlertMessage] = useState(null); // État pour le message d'alerte
-  const [alertType, setAlertType] = useState('info'); // État pour le type d'alerte (par défaut : info)
 
   const isGoogleUser = userInfo?.provider === 'google';
 
@@ -37,15 +34,13 @@ export default function Security() {
       await reauthenticate();
       await updateUserPassword(newPassword);
 
-      setAlertType('success');
-      setAlertMessage(t('security.password_updated'));
+      showAlert('success', t('security.password_updated'));
 
       // Réinitialiser les champs
       setNewPassword('');
       setOldPassword('');
     } catch (error) {
-      setAlertType('danger');
-      setAlertMessage(error.message);
+      showAlert('danger', error.message);
     }
   };
 
@@ -57,12 +52,6 @@ export default function Security() {
     <div>
       <h2 className="mb-4">{t('security.title')}</h2>
       <p className="text-muted mb-4">{t('security.instructions')}</p>
-
-      <AlertSystem
-        type={alertType}
-        message={alertMessage}
-        onClose={() => setAlertMessage(null)}
-      />
 
       <div className="mb-4">
         <h5>{t('security.current_email')}</h5>
