@@ -65,6 +65,18 @@ const ActionCard = ({ borderColor, icon, color, text, onClick, hasTooltip, toolt
   );
 };
 
+ActionCard.propTypes = {
+  borderColor: PropTypes.string.isRequired,
+  icon: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+  hasTooltip: PropTypes.bool,
+  tooltip: PropTypes.string,
+  dataTour: PropTypes.string,
+  t: PropTypes.func.isRequired,
+};
+
 const InputDropdown = ({
   name,
   dose,
@@ -1393,6 +1405,36 @@ function BoxCard({
     </div>
   );
 }
+
+BoxCard.propTypes = {
+  box: PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    dose: PropTypes.string,
+    box_capacity: PropTypes.number,
+    stock_quantity: PropTypes.number,
+    stock_alert_threshold: PropTypes.number,
+    conditions: PropTypes.arrayOf(PropTypes.shape({
+      tablet_count: PropTypes.number,
+      time_of_day: PropTypes.string,
+      interval_days: PropTypes.number,
+      start_date: PropTypes.string,
+      max_date: PropTypes.string,
+    })),
+  }).isRequired,
+  editingBoxId: PropTypes.string,
+  editingBox: PropTypes.object,
+  setEditingBox: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  expandedBoxes: PropTypes.object.isRequired,
+  setExpandedBoxes: PropTypes.func.isRequired,
+  calendarId: PropTypes.string.isRequired,
+  calendarSource: PropTypes.string.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onUpdateScan: PropTypes.func.isRequired,
+  showAlert: PropTypes.func.isRequired,
+  t: PropTypes.func.isRequired,
+};
 
 BoxesView.propTypes = {
   personalCalendars: PropTypes.object,
