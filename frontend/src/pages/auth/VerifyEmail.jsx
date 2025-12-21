@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';

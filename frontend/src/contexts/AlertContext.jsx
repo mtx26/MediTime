@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import Toast from '../components/common/Toast';
+import PropTypes from 'prop-types';
 
 const AlertContext = createContext(null);
 
@@ -32,8 +33,13 @@ export function AlertProvider({ children }) {
 
   const isConfirm = alertType.startsWith('confirm');
 
+  const value = useMemo(
+    () => ({ showAlert, showConfirm, closeAlert }),
+    [showAlert, showConfirm, closeAlert]
+  );
+
   return (
-    <AlertContext.Provider value={{ showAlert, showConfirm, closeAlert }}>
+    <AlertContext.Provider value={value}>
       {children}
       {alertMessage && isConfirm && (
         <ConfirmDialog
@@ -59,6 +65,10 @@ export function AlertProvider({ children }) {
     </AlertContext.Provider>
   );
 }
+
+AlertProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export function useAlert() {
   const context = useContext(AlertContext);

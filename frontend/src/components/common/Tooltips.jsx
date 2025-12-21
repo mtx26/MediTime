@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import * as Tooltip from '@radix-ui/react-tooltip';
+import PropTypes from 'prop-types';
 
 export default function Tooltips({ children, content, side = 'bottom', className = '' }) {
   const [open, setOpen] = useState(false);
-  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const isTouchDevice = 'ontouchstart' in globalThis || navigator.maxTouchPoints > 0;
   
   if (!content) return children;
   
@@ -13,10 +14,18 @@ export default function Tooltips({ children, content, side = 'bottom', className
         <Tooltip.Trigger asChild>
           <span 
             className={className || 'd-inline-block'}
+            role="button"
+            tabIndex={0}
             onClick={(e) => {
               if (isTouchDevice) {
                 e.preventDefault();
                 e.stopPropagation();
+                setOpen(!open);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
                 setOpen(!open);
               }
             }}
@@ -49,3 +58,10 @@ export default function Tooltips({ children, content, side = 'bottom', className
     </Tooltip.Provider>
   );
 }
+
+Tooltips.propTypes = {
+  children: PropTypes.node.isRequired,
+  content: PropTypes.node,
+  side: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
+  className: PropTypes.string,
+};

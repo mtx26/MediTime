@@ -16,6 +16,7 @@ import WeekCalendarSelector from '../../components/calendar/WeekCalendarSelector
 import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
 import PillboxDisplay from '../../components/calendar/PillboxDisplay';
 import ActionSheet from '../../components/common/ActionSheet';
+import PropTypes from 'prop-types';
 
 function CalendarPage({
   personalCalendars,
@@ -737,5 +738,15 @@ function CalendarWeekSelector({
     )
   )
 }
+
+CalendarPage.propTypes = {
+  personalCalendars: PropTypes.shape({
+    deletePersonalCalendar: PropTypes.func,
+  }),
+  sharedUserCalendars: PropTypes.shape({
+    deleteSharedCalendar: PropTypes.func,
+  }),
+  tokenCalendars: PropTypes.object,
+};
 
 export default CalendarPage;

@@ -17,7 +17,6 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(true);
   const { showAlert, showConfirm } = useAlert();
-  const [tokenToDelete, setTokenToDelete] = useState(null);
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;

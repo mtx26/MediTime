@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import QRCodeScanner from '../../components/scanner/QRCodeScanner';
 import Tooltips from '../../components/common/Tooltips';
 import IconButton from '../../components/common/UtilityComponents';
+import PropTypes from 'prop-types';
 
 // ============================================================================
 // UTILITY COMPONENTS
@@ -28,6 +29,13 @@ const Badge = ({ color, icon, text, tooltip }) => {
   ) : (
     content
   );
+};
+
+Badge.propTypes = {
+  color: PropTypes.string.isRequired,
+  icon: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  tooltip: PropTypes.string,
 };
 
 const ActionCard = ({ borderColor, icon, color, text, onClick, hasTooltip, tooltip, dataTour, t }) => {
@@ -1151,8 +1159,8 @@ function BoxCard({
               </button>
             )}
             {/* medic inactive (toutes les conditions sont desactiver) */}
-            {box.conditions.every((c) => {
-              if (!c || !c.max_date) return false;
+            {box.conditions?.every((c) => {
+              if (!c?.max_date) return false;
               const now = new Date();
               const maxDate = new Date(c.max_date);
               return now > maxDate;
@@ -1163,8 +1171,9 @@ function BoxCard({
                 text={t('boxes.condition.inactive')}
                 tooltip={t('boxes.condition.inactive_tooltip')}
               />
-            ) : box.conditions.some((c) => {
-                if (!c || !c.max_date) return false;
+            ) : (
+              box.conditions?.some((c) => {
+                if (!c?.max_date) return false;
                 const now = new Date();
                 const maxDate = new Date(c.max_date);
                 return now > maxDate;
@@ -1175,7 +1184,8 @@ function BoxCard({
                   text={t('boxes.condition.expired')}
                   tooltip={t('boxes.condition.expired_tooltip')}
                 />
-              )}
+              )
+            )}
             {/*Afficher si alart pour un medoc desactiver (box_capacity <= 0 ou stock_alert_threshold <= 0)*/}
             {(box.box_capacity <= 0 || box.stock_alert_threshold <= 0) && (
               <Badge
@@ -1383,6 +1393,14 @@ function BoxCard({
     </div>
   );
 }
+
+BoxesView.propTypes = {
+  personalCalendars: PropTypes.object,
+  sharedUserCalendars: PropTypes.shape({
+    deleteSharedCalendar: PropTypes.func,
+  }),
+  tokenCalendars: PropTypes.object,
+};
 
 export default BoxesView;
 
