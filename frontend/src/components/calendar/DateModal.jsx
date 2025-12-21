@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import ReactDOM from 'react-dom';
+import * as Dialog from '@radix-ui/react-dialog';
 import WeeklyEventContent from './WeeklyEventContent';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
@@ -15,21 +15,20 @@ const DateModal = forwardRef(
       close: () => setVisible(false),
     }));
 
-    if (!visible) return null;
-
-    return ReactDOM.createPortal(
-      <>
-        <dialog
-          open
-          className="modal d-block"
-          aria-modal="true"
-          aria-labelledby="dialogTitle"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-        >
-          <div className="modal-dialog modal-dialog-centered">
+    return (
+      <Dialog.Root open={visible} onOpenChange={setVisible}>
+        <Dialog.Portal>
+          <Dialog.Overlay 
+            className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50"
+            style={{ zIndex: 1050 }}
+          />
+          <Dialog.Content
+            className="modal-dialog modal-dialog-centered position-fixed top-50 start-50 translate-middle"
+            style={{ zIndex: 1051, maxWidth: '500px', width: '90%' }}
+          >
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">
+                <Dialog.Title className="modal-title">
                   <i className="bi bi-calendar-date"></i>{' '}
                   {new Date(selectedDate).toLocaleDateString(t('locale'), {
                     weekday: 'long',
@@ -37,13 +36,14 @@ const DateModal = forwardRef(
                     month: 'long',
                     day: 'numeric',
                   })}
-                </h5>
-                <button
-                  className="btn-close"
-                  aria-label={t('close')}
-                  title={t('close')}
-                  onClick={() => setVisible(false)}
-                ></button>
+                </Dialog.Title>
+                <Dialog.Close asChild>
+                  <button
+                    className="btn-close"
+                    aria-label={t('close')}
+                    title={t('close')}
+                  ></button>
+                </Dialog.Close>
               </div>
               <div className="modal-body">
                 <WeeklyEventContent
@@ -58,21 +58,20 @@ const DateModal = forwardRef(
                 />
               </div>
               <div className="modal-footer">
-                <button
-                  className="btn btn-secondary"
-                  aria-label={t('close')}
-                  title={t('close')}
-                  onClick={() => setVisible(false)}
-                >
-                  {t('close')}
-                </button>
+                <Dialog.Close asChild>
+                  <button
+                    className="btn btn-secondary"
+                    aria-label={t('close')}
+                    title={t('close')}
+                  >
+                    {t('close')}
+                  </button>
+                </Dialog.Close>
               </div>
             </div>
-          </div>
-        </dialog>
-        <div className="modal-backdrop fade show"></div>
-      </>,
-      document.getElementById('modal-container')
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     );
   }
 );

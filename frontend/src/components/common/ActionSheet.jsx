@@ -1,110 +1,72 @@
-import { useRef, useState, useEffect } from 'react';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
 function ActionSheet({ actions, buttonSize, dataTour }) {
-  const [show, setShow] = useState(false);
-  const buttonRef = useRef(null);
-  const dropdownRef = useRef(null);
   const { t } = useTranslation();
 
-  const toggleDropdown = () => {
-    setShow((prev) => !prev);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        buttonRef.current &&
-        !buttonRef.current.contains(e.target) &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target) &&
-        !e.target.closest('.react-joyride__tooltip')
-      ) {
-        setShow(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   return (
-<>
-  <span className="position-relative d-inline-block">
-    <button
-      className={`btn btn-outline-dark ${buttonSize === 'sm' ? 'btn-sm' : ''}`}
-      ref={buttonRef}
-      onClick={toggleDropdown}
-      label={t('Actions')}
-      title={t('Actions')}
-      data-tour={dataTour}
-    >
-      <i className="bi bi-three-dots-vertical"></i>
-    </button>
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button
+          className={`btn btn-outline-dark ${buttonSize === 'sm' ? 'btn-sm' : ''}`}
+          aria-label={t('Actions')}
+          title={t('Actions')}
+          data-tour={dataTour}
+        >
+          <i className="bi bi-three-dots-vertical"></i>
+        </button>
+      </DropdownMenu.Trigger>
 
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          className="dropdown-menu show shadow"
+          align="end"
+          sideOffset={5}
+          style={{
+            minWidth: '12rem',
+            zIndex: 1055,
+          }}
+        >
+          {actions.map((action, index) => {
+            if (action.separator) {
+              return <DropdownMenu.Separator key={`separator-${index}`} className="dropdown-divider" />;
+            }
 
+            if (action.linkTo) {
+              return (
+                <DropdownMenu.Item key={index} asChild>
+                  <Link
+                    to={action.linkTo}
+                    className={`dropdown-item ${action.danger ? 'text-danger' : ''}`}
+                    title={action.title}
+                    aria-label={action.title}
+                    data-tour={action.dataTour}
+                  >
+                    {action.label}
+                  </Link>
+                </DropdownMenu.Item>
+              );
+            }
 
-    {show && (
-      <ul
-        className="dropdown-menu show shadow"
-        ref={dropdownRef}
-        style={{
-          position: 'absolute',
-          top: '100%',
-          right: 0,
-          minWidth: '12rem',
-          zIndex: 1055,
-        }}
-      >
-        {actions.map((action, index) => {
-          if (action.separator) {
             return (
-              <li key={`separator-${index}`}>
-                <hr className="dropdown-divider" />
-              </li>
-            );
-          }
-
-          if (action.linkTo) {
-            return (
-              <li key={index}>
-                <Link
-                  to={action.linkTo}
-                  onClick={() => setShow(false)}
-                  className={`dropdown-item ${action.danger ? 'text-danger' : ''}`}
+              <DropdownMenu.Item key={index} asChild>
+                <button
+                  className={`dropdown-item btn btn-outline-dark ${action.danger ? 'text-danger' : ''}`}
+                  onClick={action.onClick}
                   title={action.title}
                   aria-label={action.title}
                   data-tour={action.dataTour}
                 >
                   {action.label}
-                </Link>
-              </li>
+                </button>
+              </DropdownMenu.Item>
             );
-          }
-
-          return (
-            <li key={index}>
-              <button
-                className={`dropdown-item btn btn-outline-dark ${action.danger ? 'text-danger' : ''}`}
-                onClick={() => {
-                  action.onClick?.();
-                  setShow(false);
-                }}
-                title={action.title}
-                aria-label={action.title}
-                data-tour={action.dataTour}
-              >
-                {action.label}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-    )}
-  </span>
-</>
-
+          })}
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 }
 

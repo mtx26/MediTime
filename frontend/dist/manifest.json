@@ -1,0 +1,28 @@
+{
+  "name": "MediTime",
+  "short_name": "MediTime",
+  "description": "Schedule your treatments and share your medical calendars with ease.",
+  "start_url": "/en/",
+  "lang": "en",
+  "display": "standalone",
+  "backgroundColor": "#FFFFFF",
+  "themeColor": "#5FC3B4",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "type": "image/png",
+      "sizes": "180x180",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
+import * as Dialog from '@radix-ui/react-dialog';
 import { useTranslation } from "react-i18next";
 import { readBarcodes } from "zxing-wasm/reader";
 import { fetchMedicaments } from "../../utils/api/scanner";
@@ -587,26 +588,30 @@ const QRCodeScanner = forwardRef(({
   return (
     <>
       {modal ? (
-        // Mode Modal Bootstrap
-        <>
-          <div 
-            className={`modal fade ${show ? 'show' : ''}`} 
-            style={{ display: show ? 'block' : 'none' }} 
-            tabIndex="-1"
-          >
-            <div className="modal-dialog modal-dialog-centered modal-lg" style={{ maxWidth: '500px' }}>
+        // Mode Modal avec Radix UI Dialog
+        <Dialog.Root open={show} onOpenChange={(open) => !open && handleClose()}>
+          <Dialog.Portal>
+            <Dialog.Overlay 
+              className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50"
+              style={{ zIndex: 1050 }}
+            />
+            <Dialog.Content
+              className="modal-dialog modal-dialog-centered modal-lg position-fixed top-50 start-50 translate-middle"
+              style={{ zIndex: 1051, maxWidth: '500px', width: '90%' }}
+            >
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">
+                  <Dialog.Title className="modal-title">
                     <i className="bi bi-qr-code-scan me-2"></i>
                     {t('scanner.title')}
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    onClick={handleClose}
-                    aria-label={t('scanner.close')}
-                  ></button>
+                  </Dialog.Title>
+                  <Dialog.Close asChild>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      aria-label={t('scanner.close')}
+                    ></button>
+                  </Dialog.Close>
                 </div>
                 <div className="modal-body">
                   {renderScannerContent()}
@@ -615,11 +620,9 @@ const QRCodeScanner = forwardRef(({
                   {renderFooterButtons()}
                 </div>
               </div>
-            </div>
-          </div>
-          {/* Overlay pour modal Bootstrap */}
-          {show && <div className="modal-backdrop fade show"></div>}
-        </>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
       ) : (
         // Mode Non-modal (intégré directement)
         <div>

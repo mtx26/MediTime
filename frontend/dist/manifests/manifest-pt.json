@@ -1,0 +1,28 @@
+{
+  "name": "MediTime",
+  "short_name": "MediTime",
+  "description": "Agende seus tratamentos e compartilhe seus calendários médicos com facilidade.",
+  "start_url": "/pt/",
+  "lang": "pt",
+  "display": "standalone",
+  "backgroundColor": "#FFFFFF",
+  "themeColor": "#5FC3B4",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "type": "image/png",
+      "sizes": "180x180",
+      "purpose": "any"
+    }
+  ]
+}

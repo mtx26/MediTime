@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
+import * as Dialog from '@radix-ui/react-dialog';
 import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../services/supabase/supabaseClient';
@@ -6,6 +7,7 @@ import { log } from '../../utils/logger';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '../../utils/files/cropImage';
 import { updateUserInfo } from '../../services/auth/authService';
+import AlertSystem from '../../components/common/AlertSystem';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,6 +29,7 @@ export default function Account() {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [rawImage, setRawImage] = useState(null);
+  const [alert, setAlert] = useState({ type: '', message: '' });
 
   useEffect(() => {
     if (displayName !== userInfo?.displayName) {
@@ -93,7 +96,7 @@ export default function Account() {
       if (file) {
         const maxSize = 1024 * 1024 * 5; // 5MB
         if (file.size > maxSize) {
-          alert(t('account.image_size_error'));
+          setAlert({ type: 'danger', message: 'account.image_size_error' });
           return;
         }
         const imageURL = URL.createObjectURL(file);
@@ -114,6 +117,13 @@ export default function Account() {
 
   return (
     <>
+      {alert.message && (
+        <AlertSystem
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert({ type: '', message: '' })}
+        />
+      )}
       <div>
         <h2 className="mb-4">{t('settings.account')}</h2>
         <p className="text-muted mb-4">{t('account.instructions')}</p>
@@ -180,21 +190,25 @@ export default function Account() {
           )}
         </form>
       </div>
-      {showCropModal && (
-        <div
-          className="modal fade show d-block"
-          tabIndex="-1"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-        >
-          <div className="modal-dialog modal-dialog-centered modal-lg">
+      <Dialog.Root open={showCropModal} onOpenChange={setShowCropModal}>
+        <Dialog.Portal>
+          <Dialog.Overlay 
+            className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50"
+            style={{ zIndex: 1050 }}
+          />
+          <Dialog.Content
+            className="modal-dialog modal-dialog-centered modal-lg position-fixed top-50 start-50 translate-middle"
+            style={{ zIndex: 1051, maxWidth: '800px', width: '90%' }}
+          >
             <div className="modal-content bg-white">
               <div className="modal-header">
-                <h5 className="modal-title">{t('account.crop.title')}</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowCropModal(false)}
-                ></button>
+                <Dialog.Title className="modal-title">{t('account.crop.title')}</Dialog.Title>
+                <Dialog.Close asChild>
+                  <button
+                    type="button"
+                    className="btn-close"
+                  ></button>
+                </Dialog.Close>
               </div>
               <div
                 className="modal-body"
@@ -229,9 +243,9 @@ export default function Account() {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   );
 };
