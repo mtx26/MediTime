@@ -84,7 +84,6 @@ def _delete_shared_calendar_by_token(cursor, token: str):
         SET deleted_at = NOW()
         WHERE token = %s
             AND deleted_at IS NULL
-            AND accepted_at IS NULL
         """,
         (token,),
     )
@@ -349,7 +348,6 @@ def delete_login_invitation(token: str):
     calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
     receiver_uid = g.receiver_uid if hasattr(g, "receiver_uid") else None
     try:
-        # Utilisation de get_connection() standard (RLS actif)
         # La policy "Users can delete own or sent notifications" permet la suppression
         with get_connection() as conn:
             with conn.cursor() as cursor:
