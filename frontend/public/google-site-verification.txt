@@ -1,0 +1,8 @@
+# Google Search Console Verification
+# Remplacez cette ligne par votre code de vérification Google
+# Format: google-site-verification: xxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Bing Webmaster Tools Verification  
+# Format: <meta name="msvalidate.01" content="xxxx" />
+
+# Note: Ces vérifications doivent être ajoutées dans index.html via des meta tags

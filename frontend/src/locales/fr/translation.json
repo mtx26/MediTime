@@ -99,7 +99,10 @@
       "max_date": "Date de fin",
       "max_date_mode": "Durée de prise",
       "none": "Aucune condition de prise",
+      "inactive": "Médicament inactif",
+      "inactive_tooltip": "Toutes vos conditions de prise pour ce médicament ont dépassé leur date limite. Le médicament est complètement inactif.",
       "expired": "Condition expirée",
+      "expired_tooltip": "Parmi vos conditions de prise, une des conditions a dépassé sa date limite. Elle est maintenant inactive.",
       "start_date": "Date de début",
       "tablet_count": "Nombre de comprimés",
       "time_of_day": "Heure de prise",
@@ -122,6 +125,7 @@
     "qr_code_help_text": "Le code DataMatrix se trouve sur l'emballage du médicament, près du code-barres. C'est un petit carré noir et blanc.",
     "remaining_qty": "Quantité restante",
     "restock": "Réstockage",
+    "restock_disabled_tooltip": "Le bouton de restockage est désactivé car la capacité de la boîte est à 0. Modifiez la capacité pour réactiver le restockage.",
     "save": "Enregistrer",
     "scan_qr_code": "Scanner QR code",
     "start_typing": "Commencez à taper...",
@@ -135,12 +139,20 @@
       "badge": {
         "high": "Stock élevé",
         "low": "Stock bas",
-        "out": "Stock épuisé"
+        "out": "Stock épuisé",
+        "alerts_disabled": "Alertes désactivées",
+        "tooltip": {
+          "high": "Stock en bon état. Vous avez suffisamment de comprimés, aucune action n'est nécessaire pour le moment.",
+          "low": "Stock critique ! Vous approchez du seuil d'alerte. Pensez à réapprovisionner bientôt pour éviter une rupture.",
+          "out": "Rupture de stock immédiate. Vous n'avez plus aucun comprimé. Réapprovisionnez dès que possible.",
+          "alerts_disabled": "Les alertes de stock sont désactivées pour ce médicament car la capacité ou le seuil d'alerte est à 0. Vous ne recevrez pas de notifications de rupture. Modifiez les paramètres pour réactiver."
+        }
       }
     },
     "tablet": "comprimé",
     "tablets": "comprimés",
     "title": "Boîtes de médicaments",
+    "condition_none_tooltip": "Aucune condition de prise définie. Cliquez ici pour en ajouter une afin de recevoir des rappels réguliers.",
     "view_notice": "Voir la notice"
   },
   "calendar": {
@@ -153,12 +165,19 @@
     "confirm_delete": "Supprimer le calendrier ?",
     "confirm_delete_shared": "Supprimer le calendrier partagé ?",
     "confirm_rename": "Renommer le calendrier ?",
+    "delete_title": "Supprimer le calendrier ?",
+    "delete_description": "Cette action est irréversible. Tous les médicaments et le planning associés à ce calendrier seront définitivement supprimés.",
+    "rename_title": "Renommer le calendrier ?",
+    "rename_description": "Le nouveau nom sera visible par tous les utilisateurs avec qui vous partagez ce calendrier.",
+    "delete_shared_title": "Supprimer le calendrier partagé ?",
+    "delete_shared_description": "Vous n'aurez plus accès à ce calendrier partagé. Le calendrier restera accessible au propriétaire et aux autres utilisateurs.",
     "create_calendar_qr": "Scan QR : {{calendarName}}",
     "creating_calendar": "Création en cours...",
     "daily_view": "Calendrier journalier",
     "day": "Jour",
     "drag_and_drop": "Glissez une image ici ou cliquez pour la sélectionner",
     "error_calendar_creation": "Erreur lors de la création du calendrier",
+    "error_deleting_calendar": "Erreur lors de la suppression du calendrier.",
     "error_no_calendar_name": "Veuillez saisir un nom de calendrier",
     "error_no_medicines": "Aucun médicament scanné",
     "error_partial_success": "Calendrier créé mais {{count}} médicament(s) n'ont pas pu être ajoutés",
@@ -186,6 +205,8 @@
   },
   "calendar_completed": "Calendrier complété avec succès !",
   "calendar_completed_this_week": "Pilulier complété pour cette semaine !",
+  "calendar_completion_error": "Erreur lors de la complétion du calendrier.",
+  "calendar_deleted": "Calendrier supprimé avec succès.",
   "calendar_settings": {
     "label": "Paramètres du calendrier",
     "notifications": {
@@ -213,6 +234,7 @@
   "choose_date": "Choisir une date",
   "close": "Fermer",
   "confirm_calendar_completion": "Confirmer la complétion du calendrier",
+  "pillbox_completion_description": "Le stock de tous les médicaments de cette semaine sera diminué selon votre planning. Cette action est irréversible.",
   "contact": "Contact",
   "copy_link": "Copier le lien",
   "copy_link_error": "Erreur lors de la copie du lien.",
@@ -231,9 +253,17 @@
   "delete": "Supprimer",
   "delete_access": "Supprimer l'accès",
   "delete_access_confirm": "Supprimer l'accès ?",
+  "delete_access_title": "Supprimer l'accès de cet utilisateur ?",
+  "delete_access_description": "Cet utilisateur ne pourra plus consulter ni modifier ce calendrier. Cette action est irréversible.",
   "delete_calendar_confirm": "Supprimer ce calendrier ?",
+  "delete_calendar_title": "Supprimer ce calendrier partagé ?",
+  "delete_calendar_description": "Vous perdrez l'accès à ce calendrier. Le calendrier restera accessible au propriétaire et aux autres utilisateurs avec qui il est partagé.",
+  "delete_invitation_title": "Supprimer cette invitation ?",
+  "delete_invitation_description": "L'invitation sera annulée et le destinataire ne pourra plus l'accepter.",
   "delete_link": "Supprimer le lien",
   "delete_link_confirm": "Supprimer le lien ?",
+  "delete_link_title": "Supprimer ce lien de partage ?",
+  "delete_link_description": "Le lien sera définitivement supprimé. Plus personne ne pourra accéder au calendrier via ce lien, y compris les utilisateurs qui l'ont déjà utilisé.",
   "done": "Terminé",
   "evening": "Soir",
   "expiration": "Expiration",
@@ -270,6 +300,8 @@
     "create_error": "Erreur lors de la création du lien.",
     "create_success": "Lien ICS créé avec succès.",
     "delete_confirmation": "Voulez-vous vraiment supprimer ce lien ?",
+    "delete_title": "Supprimer le lien ICS ?",
+    "delete_description": "Le lien sera désactivé et ne pourra plus synchroniser votre calendrier. Vous devrez créer un nouveau lien pour réactiver la synchronisation.",
     "delete_error": "Erreur lors de la suppression du lien.",
     "delete_success": "Lien ICS supprimé avec succès.",
     "fetch_error": "Erreur lors du chargement des liens.",
@@ -498,6 +530,10 @@
     "title": "Nouveau mot de passe"
   },
   "restore": "Restaurer",
+  "restore_error": "Erreur lors de la restauration",
+  "restore_pillbox_description": "Cette action annulera la dernière préparation du pilulier et restaurera les quantités en stock.",
+  "restore_pillbox_title": "Restaurer le pilulier ?",
+  "pillbox_restored": "Pilulier restauré avec succès",
   "retry": "Réessayer",
   "revoke_link": "Révoquer le lien",
   "rights_reserved": "Tous droits réservés",
@@ -825,5 +861,14 @@
     "title": "Pourquoi choisir MediTime ?"
   },
   "yes": "Oui",
-  "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier."
+  "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier.",
+  "stock_percentage": "Pourcentage",
+  "shortcuts": {
+    "addMedication": "Ajouter un médicament",
+    "addMedicationShort": "Ajouter",
+    "addMedicationDesc": "Ajouter rapidement un nouveau médicament",
+    "calendar": "Calendrier",
+    "calendarShort": "Calendrier",
+    "calendarDesc": "Voir votre calendrier de médicaments"
+  }
 }

@@ -104,7 +104,10 @@
       "max_date_mode": "摄入持续时间",
       "until_date": "直到...",
       "no_limit": "无限制",
-      "expired": "条件已过期"
+      "expired": "条件已过期",
+      "inactive": "非活性药物",
+      "inactive_tooltip": "您服用此药的所有说明均已过期。该药物已完全失效。",
+      "expired_tooltip": "您享受此优惠的其中一项条件已过期，该优惠现已失效。"
     },
     "day": "天",
     "days": "天",
@@ -135,13 +138,22 @@
       "badge": {
         "high": "高库存",
         "low": "库存不足",
-        "out": "缺货"
+        "out": "缺货",
+        "alerts_disabled": "警报已禁用",
+        "tooltip": {
+          "high": "库存充足。您目前药片数量足够，无需采取任何行动。",
+          "low": "库存告急！您即将达到警戒线。请尽快补货，以免断货。",
+          "out": "已售罄。您没有剩余的药片了。请尽快补货。",
+          "alerts_disabled": "由于库存容量或警报阈值设置为 0，此药品的库存警报功能已禁用。您将不会收到缺货通知。请更改设置以重新启用此功能。"
+        }
       }
     },
     "tablet": "压缩",
     "tablets": "平板电脑",
     "title": "药箱",
-    "view_notice": "查看说明"
+    "view_notice": "查看说明",
+    "restock_disabled_tooltip": "由于箱子容量为 0，补货按钮已禁用。请更改容量以重新启用补货功能。",
+    "condition_none_tooltip": "服用这些药物没有具体条件。点击此处添加条件，即可定期收到提醒。"
   },
   "calendar": {
     "add": "添加日历",
@@ -182,7 +194,14 @@
     "today": "今天",
     "week": "星期",
     "weekly_help": "单击日历中的某一天即可在窗口中查看相关药物。",
-    "weekly_view": "按周日历"
+    "weekly_view": "按周日历",
+    "delete_title": "删除日历？",
+    "delete_description": "此举不可逆转。与此日程相关的所有药物和用药计划都将永久停止。",
+    "rename_title": "重命名日历？",
+    "rename_description": "新名称将对所有与您共享此日历的用户可见。",
+    "delete_shared_title": "删除共享日历？",
+    "delete_shared_description": "您将无法再访问此共享日历。日历所有者和其他用户仍可访问该日历。",
+    "error_deleting_calendar": "删除日历时出错。"
   },
   "calendar_completed": "行事历成功完成！",
   "calendar_completed_this_week": "这周药盒已满！",
@@ -277,7 +296,9 @@
     "info_title": "关于ICS链接",
     "no_tokens": "未创建ICS链接。",
     "title": "ICS链接列表",
-    "token_label": "留置权 ICS"
+    "token_label": "留置权 ICS",
+    "delete_title": "移除ICS链接？",
+    "delete_description": "该链接将被停用，无法再同步您的日历。您需要创建一个新链接才能重新激活同步功能。"
   },
   "image_upload": {
     "analysis_error": "解析图像时出错。",
@@ -825,5 +846,29 @@
     "title": "为什么选择 MediTime？"
   },
   "yes": "是的",
-  "you_have_no_pillbox_use_history": "您的药盒没有使用记录。"
+  "you_have_no_pillbox_use_history": "您的药盒没有使用记录。",
+  "stock_percentage": "百分比",
+  "calendar_completion_error": "日历填写过程中出错。",
+  "calendar_deleted": "日历已成功删除。",
+  "pillbox_completion_description": "本周所有药品的库存将根据您的用药计划减少。此操作不可逆。",
+  "delete_access_title": "移除该用户的访问权限？",
+  "delete_access_description": "该用户将无法再查看或修改此日历。此操作不可逆。",
+  "delete_calendar_title": "删除此共享日历？",
+  "delete_calendar_description": "您将失去对此日历的访问权限。日历所有者和其他与其共享日历的用户仍可访问该日历。",
+  "delete_invitation_title": "删除此邀请？",
+  "delete_invitation_description": "邀请将被取消，收件人将无法再接受邀请。",
+  "delete_link_title": "删除此分享链接？",
+  "delete_link_description": "该链接将被永久移除。任何人，包括已使用过该链接的用户，都将无法再通过该链接访问日历。",
+  "restore_error": "恢复过程中出错",
+  "restore_pillbox_description": "此操作将取消药盒的最后一次准备工作，并恢复库存数量。",
+  "restore_pillbox_title": "恢复碉堡？",
+  "pillbox_restored": "药盒已成功恢复",
+  "shortcuts": {
+    "addMedication": "添加药物",
+    "addMedicationShort": "添加",
+    "addMedicationDesc": "快速添加一种新药",
+    "calendar": "日历",
+    "calendarShort": "日历",
+    "calendarDesc": "请查看您的用药时间表"
+  }
 }

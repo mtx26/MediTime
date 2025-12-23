@@ -64,6 +64,13 @@ export const useI18nMetadata = ({
     upsertMetaTag('meta', 'property', 'og:image', { 
       content: `${I18N_CONFIG.BASE_URL}${I18N_CONFIG.DEFAULT_META.ogImage}` 
     });
+    
+    // Discord Rich Embed
+    upsertMetaTag('meta', 'property', 'og:image:width', { content: '1200' });
+    upsertMetaTag('meta', 'property', 'og:image:height', { content: '630' });
+    upsertMetaTag('meta', 'property', 'og:image:alt', { 
+      content: `${t('app.name')} - ${t('app.subtitle')}` 
+    });
 
     // 5. Twitter Cards
     upsertMetaTag('meta', 'name', 'twitter:card', { 
@@ -77,8 +84,15 @@ export const useI18nMetadata = ({
     upsertMetaTag('meta', 'name', 'twitter:site', { 
       content: I18N_CONFIG.DEFAULT_META.twitterSite 
     });
+    upsertMetaTag('meta', 'name', 'twitter:image:alt', { 
+      content: `${t('app.name')} - ${t('app.subtitle')}` 
+    });
 
-    // 6. Métadonnées personnalisées
+    // 6. Pinterest Rich Pins
+    upsertMetaTag('meta', 'name', 'pinterest-rich-pin', { content: 'true' });
+    upsertMetaTag('meta', 'name', 'pinterest:description', { content: finalDescription });
+
+    // 7. Métadonnées personnalisées
     Object.entries(customMeta).forEach(([key, value]) => {
       if (key.startsWith('og:')) {
         upsertMetaTag('meta', 'property', key, { content: value });
@@ -87,8 +101,11 @@ export const useI18nMetadata = ({
       }
     });
 
-    // 7. Manifest dynamique
+    // 8. Manifest dynamique
     updateManifest();
+    
+    // 9. Schema.org JSON-LD dynamique
+    updateSchemaOrg();
 
   }, [finalTitle, finalDescription, path, lng, t, customMeta]);
 
@@ -100,6 +117,117 @@ export const useI18nMetadata = ({
     
     // Met à jour le lien du manifest
     upsertMetaTag('link', 'rel', 'manifest', { href: manifestUrl });
+  };
+
+  const updateSchemaOrg = () => {
+    // Supprime l'ancien script Schema.org s'il existe
+    const existingScript = document.querySelector('script[type="application/ld+json"]');
+    if (existingScript) {
+      existingScript.remove();
+    }
+
+    // Crée le nouveau script avec les traductions
+    const schema = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": `${I18N_CONFIG.BASE_URL}/#webapp`,
+          "name": t('app.name'),
+          "alternateName": `${t('app.name')} - ${t('app.subtitle')}`,
+          "url": I18N_CONFIG.BASE_URL,
+          "logo": `${I18N_CONFIG.BASE_URL}/icons/icon-512.png`,
+          "applicationCategory": "HealthApplication",
+          "applicationSubCategory": "Medical",
+          "operatingSystem": "All",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "description": t('app.description'),
+          "screenshot": `${I18N_CONFIG.BASE_URL}/icons/icon-512.png`,
+          "inLanguage": ["en", "fr", "es", "de", "it", "ja", "zh", "pt", "ru"],
+          "browserRequirements": "Requires JavaScript. Requires HTML5.",
+          "softwareVersion": "0.1.0",
+          "datePublished": "2025-12-23",
+          "dateModified": "2025-12-23",
+          "installUrl": `${I18N_CONFIG.BASE_URL}/${lng}/register`,
+          "creator": {
+            "@type": "Person",
+            "@id": `${I18N_CONFIG.BASE_URL}/#creator`,
+            "name": "Mtx_26",
+            "url": "https://github.com/mtx26"
+          },
+          "publisher": {
+            "@id": `${I18N_CONFIG.BASE_URL}/#organization`
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": `${I18N_CONFIG.BASE_URL}/#organization`,
+          "name": t('app.name'),
+          "url": I18N_CONFIG.BASE_URL,
+          "logo": {
+            "@type": "ImageObject",
+            "url": `${I18N_CONFIG.BASE_URL}/icons/icon-192.png`,
+            "width": 192,
+            "height": 192
+          },
+          "founder": {
+            "@type": "Person",
+            "name": "Mtx_26"
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "mtx_26@outlook.be",
+            "contactType": "technical support",
+            "availableLanguage": ["en", "fr", "es", "de", "it", "ja", "zh", "pt", "ru"]
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": `${I18N_CONFIG.BASE_URL}/#website`,
+          "url": I18N_CONFIG.BASE_URL,
+          "name": t('app.name'),
+          "description": t('app.description'),
+          "publisher": {
+            "@id": `${I18N_CONFIG.BASE_URL}/#organization`
+          },
+          "inLanguage": ["en", "fr", "es", "de", "it", "ja", "zh", "pt", "ru"]
+        },
+        {
+          "@type": "MobileApplication",
+          "@id": `${I18N_CONFIG.BASE_URL}/#mobileapp`,
+          "name": t('app.name'),
+          "operatingSystem": "Android, iOS, Windows, macOS, Linux",
+          "applicationCategory": "HealthApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": `${I18N_CONFIG.BASE_URL}/#breadcrumb`,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": t('navigation.home') || 'Home',
+              "item": `${I18N_CONFIG.BASE_URL}/${lng}/home`
+            }
+          ]
+        }
+      ]
+    };
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(schema);
+    document.head.appendChild(script);
   };
 
   return {

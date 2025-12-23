@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../contexts/UserContext';
 import { toISO } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
-import AlertSystem from '../../components/common/AlertSystem';
+import { useAlert } from '../../contexts/AlertContext';
 import isEqual from 'lodash/isEqual';
 import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import DateModal from '../../components/calendar/DateModal';
@@ -16,6 +16,7 @@ import WeekCalendarSelector from '../../components/calendar/WeekCalendarSelector
 import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
 import PillboxDisplay from '../../components/calendar/PillboxDisplay';
 import ActionSheet from '../../components/common/ActionSheet';
+import PropTypes from 'prop-types';
 
 function CalendarPage({
   personalCalendars,
@@ -40,9 +41,7 @@ function CalendarPage({
   const [calendarTable, setCalendarTable] = useState([]); // Événements du calendrier
   const [calendarName, setCalendarName] = useState(''); // Nom du calendrier
   const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
-  const [alertType, setAlertType] = useState(''); // Type d'alerte
-  const [alertMessage, setAlertMessage] = useState(''); // Message d'alerte
-  const [alertDuration, setAlertDuration] = useState(2000); // Durée d'affichage de l'alerte
+  const { showAlert, showConfirm } = useAlert();
 
   // Méthode de décrémentation du stock (pour affichage différencié)
   const [stockDecrementMethod, setStockDecrementMethod] = useState(false);
@@ -180,6 +179,42 @@ function CalendarPage({
     }
   }, [stockDecrementMethod, initialNextDate, selectedDate]);
 
+  // Fonction pour supprimer le calendrier avec confirmation
+  const handleDeleteCalendar = () => {
+    showConfirm(
+      'confirm-danger',
+      t('calendar.delete_title'),
+      t('calendar.delete_description'),
+      async () => {
+        const rep = await personalCalendars.deleteCalendar(calendarId);
+        if (rep.success) {
+          showAlert('success', t('calendar_deleted'));
+          navigate(`/${lng}/calendars`);
+        } else {  
+          showAlert('danger', rep.error || t('calendar.error_deleting_calendar'));
+        }
+      }
+    );
+  };
+
+  // Fonction pour supprimer un calendrier partagé avec confirmation
+  const handleDeleteSharedCalendar = () => {
+    showConfirm(
+      'confirm-danger',
+      t('calendar.delete_shared_title'),
+      t('calendar.delete_shared_description'),
+      async () => {
+        const rep = await sharedUserCalendars.deleteSharedCalendar(calendarId);
+        if (rep.success) {
+          showAlert('success', t('calendar_deleted'));
+          navigate(`/${lng}/calendars`);
+        } else {
+          showAlert('danger', rep.error || t('calendar.error_deleting_calendar'));
+        }
+      }
+    );
+  };
+
 
   // 📍 Filtrage des événements pour un jour spécifique et tri par ordre alphabétique
   useEffect(() => {
@@ -199,17 +234,6 @@ function CalendarPage({
     setEventsForDay(filtered);
   }, [selectedDate, calendarEvents]);
 
-    // Afficher un message de succès si présent dans l'URL
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const successMsg = searchParams.get('success');
-    if (successMsg) {
-      setAlertType('success');
-      setAlertMessage(successMsg);
-      setAlertDuration(4000);
-    }
-  }, [location.search, calendarId]);
-
   // 📍 Mémoisation des événements pour le calendrier
   const memoizedEvents = useMemo(() => {
     return calendarEvents.map((event) => ({
@@ -222,7 +246,7 @@ function CalendarPage({
   if ((loading === undefined || loadingStockMethod === undefined) && calendarId) {
     return (
       <div className="alert alert-danger text-center mt-5" role="alert">
-        ❌ {t('invalid_or_expired_link')}
+        {t('invalid_or_expired_link')}
       </div>
     );
   }
@@ -247,15 +271,6 @@ function CalendarPage({
         <div className="row justify-content-center">
           <div className="col-12 col-lg-4 mb-2">
             <div className="mb-3">
-              {/* Alert system */}
-              <AlertSystem
-                type={alertType}
-                message={alertMessage}
-                onClose={() => {
-                  setAlertMessage('');
-                }}
-                duration={alertDuration}
-              />
               {/* Boutons de navigation et partage */}
               <div className="d-flex align-items-center gap-2 mb-3">
                 {/* Bouton Médicaments qui prend tout l'espace dispo */}
@@ -363,15 +378,7 @@ function CalendarPage({
                             <i className="bi bi-trash me-2" /> {t('delete')}
                           </>
                         ),
-                        onClick: async () => {
-                          const rep = await personalCalendars.deleteCalendar(calendarId);
-                          if (rep.success) {
-                            navigate(`/${lng}/calendars`);
-                          } else {
-                            setAlertType('danger');
-                            setAlertMessage(rep.error);
-                          }
-                        },
+                        onClick: handleDeleteCalendar,
                         title: t('delete'),
                         danger: true,
                       },
@@ -444,7 +451,7 @@ function CalendarPage({
                             <i className="bi bi-trash3 me-2"></i> {t('delete')}
                           </>
                         ),
-                        onClick: () => sharedUserCalendars.deleteSharedCalendar(calendarId),
+                        onClick: handleDeleteSharedCalendar,
                         title: t('delete'),
                         danger: true,
                       },
@@ -731,5 +738,15 @@ function CalendarWeekSelector({
     )
   )
 }
+
+CalendarPage.propTypes = {
+  personalCalendars: PropTypes.shape({
+    deletePersonalCalendar: PropTypes.func,
+  }),
+  sharedUserCalendars: PropTypes.shape({
+    deleteSharedCalendar: PropTypes.func,
+  }),
+  tokenCalendars: PropTypes.object,
+};
 
 export default CalendarPage;

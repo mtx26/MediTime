@@ -91,11 +91,11 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                 )
                 UPDATE ics_tokens
                 SET last_accessed_at = NOW(), last_user_agent = %s
-                FROM calendars, set_session
+                FROM calendars, set_session, calendar_settings
                 WHERE ics_tokens.token = %s 
                     AND ics_tokens.deleted_at IS NULL
                     AND ics_tokens.calendar_id = calendars.id
-                RETURNING ics_tokens.calendar_id, calendars.name
+                RETURNING ics_tokens.calendar_id, calendars.name, calendar_settings.stock_decrement_method
             """, (token, user_agent, token))
             
             result = cursor.fetchone()
@@ -106,8 +106,9 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
             
             calendar_id = result['calendar_id']
             calendar_name = result['name']
+            stock_mode = result['stock_decrement_method']
             
-            # 2. Récupérer les médicaments avec leur condition (une ligne par condition)
+            # 2. Récupérer les médicaments avec leurs conditions groupées
             # Le RLS va filtrer via app.current_ics_token injecté précédemment (la session persiste dans la transaction)
             cursor.execute("""
                 SELECT 
@@ -117,56 +118,81 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                     mb.stock_alert_threshold, 
                     mb.box_capacity,
                     mb.dose,
-                    mbc.interval_days,
-                    mbc.start_date,
-                    mbc.max_date,
-                    mbc.tablet_count
+                    json_agg(
+                        json_build_object(
+                            'interval_days', mbc.interval_days,
+                            'start_date', to_char(mbc.start_date, 'YYYY-MM-DD'),
+                            'max_date', to_char(mbc.max_date, 'YYYY-MM-DD'),
+                            'tablet_count', mbc.tablet_count
+                        ) ORDER BY mbc.start_date
+                    ) as conditions
                 FROM medicine_boxes mb
                 JOIN medicine_box_conditions mbc ON mb.id = mbc.box_id
                 WHERE mb.calendar_id = %s
                     AND mb.deleted_at IS NULL
                     AND mbc.deleted_at IS NULL
+                GROUP BY mb.id, mb.name, mb.stock_quantity, mb.stock_alert_threshold, mb.box_capacity, mb.dose
             """, (calendar_id,))
             
             medicines = cursor.fetchall()
-            
             events = []
-            today = date.today()
 
-            def record_event(med_state: dict, at_date: date):
-                events.append({
-                    'date': at_date,
-                    'name': med_state['name'],
-                    'stock': med_state['stock'],
-                    'threshold': med_state['threshold'],
-                    'dose': med_state['dose'],
-                    'capacity': med_state['capacity']
+            def record_event(var, med, stock, at_date):
+                var.append({
+                    "date": at_date,
+                    "name": med["name"],
+                    "stock": stock,
+                    "threshold": med["stock_alert_threshold"],
+                    "dose": med["dose"],
+                    "capacity": med["box_capacity"]
                 })
-
-            # Simulation jour par jour pour coller au core
-            for day_offset in range(0, 366):
-                current_day = today + timedelta(days=day_offset)
-
-                for med in medicines:
-                    # Avant consommation: alerte si sous seuil
-                    if med['stock'] <= med['threshold']:
-                        record_event(med, current_day)
-                        if med['capacity'] > 0:
-                            med['stock'] += med['capacity']
-                        else:
-                            continue
-
-                    # Consommation du jour
-                    if is_medication_due(med, current_day):
-                        med['stock'] -= med['tablet_count']
-
-                    # Après consommation: alerte si sous seuil
-                    if med['stock'] <= med['threshold']:
-                        record_event(med, current_day)
-                        if med['capacity'] > 0:
-                            med['stock'] += med['capacity']
-                        else:
-                            continue
+            
+            for med in medicines:
+                events_temp = []
+                today = date.today()
+                sunday = today + timedelta(days=(6 - today.weekday()))
+                is_active = False
+                
+                stock = med['stock_quantity']
+                if today <= sunday and stock_mode == 'weekly_pillbox':
+                    if stock < 0:
+                        record_event(events, med, stock, today)
+                        stock += med['box_capacity']
+                    elif stock <= med['stock_alert_threshold']:
+                        record_event(events_temp, med, stock, today)
+                        stock += med['box_capacity']
+                    today = sunday + timedelta(days=1)
+                    
+                    
+                for day in range(0, 365):
+                    check_date = today + timedelta(days=day)
+                    
+                    for cond in med['conditions']:
+                        # Conversion des dates string en objets date
+                        cond_parsed = {
+                            'interval_days': cond['interval_days'],
+                            'start_date': datetime.strptime(cond['start_date'], '%Y-%m-%d').date() if cond.get('start_date') else None,
+                            'max_date': datetime.strptime(cond['max_date'], '%Y-%m-%d').date() if cond.get('max_date') else None,
+                            'tablet_count': cond['tablet_count']
+                        }
+                        
+                        if is_medication_due(cond_parsed, check_date):
+                            is_active = True
+                            stock -= cond['tablet_count']
+                    
+                    # Vérifier si on doit enregistrer une alerte
+                    should_alert = stock <= med['stock_alert_threshold']
+                    if stock_mode == 'weekly_pillbox':
+                        # En mode hebdomadaire, n'alerter que les lundis
+                        should_alert = should_alert and check_date.weekday() == 0
+                    
+                    if should_alert:
+                        record_event(events, med, stock, check_date)
+                        stock += med['box_capacity']
+                
+                    
+                if is_active:
+                    events.extend(events_temp)
 
     return _generate_ics_content(events, calendar_name).encode('utf-8')
 
