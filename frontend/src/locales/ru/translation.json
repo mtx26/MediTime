@@ -862,5 +862,13 @@
   "restore_error": "Ошибка во время восстановления",
   "restore_pillbox_description": "Это действие отменит последнюю подготовку бункера для таблеток и восстановит количество таблеток на складе.",
   "restore_pillbox_title": "Восстановить ДОТ?",
-  "pillbox_restored": "ДОТ успешно восстановлен."
+  "pillbox_restored": "ДОТ успешно восстановлен.",
+  "shortcuts": {
+    "addMedication": "Добавить лекарство",
+    "addMedicationShort": "Добавлять",
+    "addMedicationDesc": "Быстро добавить новый препарат",
+    "calendar": "Календарь",
+    "calendarShort": "Календарь",
+    "calendarDesc": "Ознакомьтесь с графиком приема лекарств."
+  }
 }

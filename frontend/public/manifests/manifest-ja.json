@@ -2,27 +2,92 @@
   "name": "MediTime",
   "short_name": "MediTime",
   "description": "治療をスケジュールし、医療カレンダーを簡単に共有できます。",
-  "start_url": "/ja/",
+  "start_url": "/ja/home",
   "lang": "ja",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "backgroundColor": "#FFFFFF",
   "themeColor": "#5FC3B4",
+  "categories": [
+    "health",
+    "medical",
+    "productivity",
+    "lifestyle"
+  ],
   "icons": [
+    {
+      "src": "/icons/icon-16.png",
+      "type": "image/png",
+      "sizes": "16x16",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-32.png",
+      "type": "image/png",
+      "sizes": "32x32",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-48.png",
+      "type": "image/png",
+      "sizes": "48x48",
+      "purpose": "any maskable"
+    },
     {
       "src": "/icons/icon-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/apple-touch-icon.png",
       "type": "image/png",
       "sizes": "180x180",
       "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "dir": "ltr",
+  "shortcuts": [
+    {
+      "name": "薬を追加する",
+      "short_name": "追加",
+      "description": "新しい薬をすぐに追加する",
+      "url": "/ja/add-calendar",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "カレンダー",
+      "short_name": "カレンダー",
+      "description": "服薬スケジュールを確認する",
+      "url": "/ja/calendars",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

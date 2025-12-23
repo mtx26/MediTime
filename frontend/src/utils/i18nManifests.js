@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { I18N_CONFIG } from '../config/i18nMeta.js';
+import { I18N_CONFIG, getPWAConfig } from '../config/i18nMeta.js';
 import { enabledLanguageCodes } from '../config/languages.js';
 
 /**
@@ -44,9 +44,9 @@ export const generateI18nManifests = async () => {
           name: "MediTime",
           short_name: "MediTime",
           description: "Medical treatment scheduling and sharing application",
-          start_url: `/${langCode}/`,
+          start_url: `/${langCode}/home`,
           lang: langCode,
-          ...I18N_CONFIG.PWA_CONFIG
+          ...getPWAConfig(langCode)
         };
         
         fs.writeFileSync(
@@ -59,9 +59,9 @@ export const generateI18nManifests = async () => {
           name: translations.app.name || "MediTime",
           short_name: translations.app.shortName || "MediTime",
           description: translations.app.description || "Medical treatment application",
-          start_url: `/${langCode}/`,
+          start_url: `/${langCode}/home`,
           lang: langCode,
-          ...I18N_CONFIG.PWA_CONFIG
+          ...getPWAConfig(langCode, translations)
         };
         
         fs.writeFileSync(
@@ -85,9 +85,9 @@ export const generateI18nManifests = async () => {
     name: enTranslations?.app?.name || "MediTime",
     short_name: enTranslations?.app?.shortName || "MediTime",
     description: enTranslations?.app?.description || "Medical treatment application",
-    start_url: '/en/',
+    start_url: '/en/home',
     lang: 'en',
-    ...I18N_CONFIG.PWA_CONFIG
+    ...getPWAConfig('en', enTranslations)
   };
   
   fs.writeFileSync(
@@ -124,9 +124,9 @@ export const generateManifestForLanguage = (language) => {
     name: translations?.app?.name || "MediTime",
     short_name: translations?.app?.shortName || "MediTime",
     description: translations?.app?.description || "Medical treatment application",
-    start_url: `/${language}/`,
+    start_url: `/${language}/home`,
     lang: language,
-    ...I18N_CONFIG.PWA_CONFIG
+    ...getPWAConfig(language, translations)
   };
 };
 

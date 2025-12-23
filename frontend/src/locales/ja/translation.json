@@ -862,5 +862,13 @@
   "restore_error": "復元中にエラーが発生しました",
   "restore_pillbox_description": "このアクションにより、ピルボックスの最後の準備がキャンセルされ、在庫数量が復元されます。",
   "restore_pillbox_title": "トーチカを復元しますか?",
-  "pillbox_restored": "トーチカの修復に成功"
+  "pillbox_restored": "トーチカの修復に成功",
+  "shortcuts": {
+    "addMedication": "薬を追加する",
+    "addMedicationShort": "追加",
+    "addMedicationDesc": "新しい薬をすぐに追加する",
+    "calendar": "カレンダー",
+    "calendarShort": "カレンダー",
+    "calendarDesc": "服薬スケジュールを確認する"
+  }
 }

@@ -1,4 +1,61 @@
+# MediTime Robots.txt - Optimis\u00e9 pour SEO
+# Derni\u00e8re mise \u00e0 jour: 2025-12-23
+
+# Tous les robots sont autoris\u00e9s par d\u00e9faut
 User-agent: *
 Allow: /
 
+# Bloquer les pages privées (routes avec auth requise)
+Disallow: /*/calendars
+Disallow: /*/calendar/
+Disallow: /*/shared-calendars
+Disallow: /*/shared-user-calendar/
+Disallow: /*/shared-token-calendar/
+Disallow: /*/settings
+Disallow: /*/notifications
+Disallow: /*/add-calendar
+Disallow: /*/accept-invite
+Disallow: /*/verify-email
+Disallow: /*/auth/callback
+
+# Bloquer pages transitoires/techniques
+Disallow: /*/reset-password-confirm
+
+# Bloquer API et fichiers techniques
+Disallow: /api/
+Disallow: /logs/
+Disallow: /*?*token=
+Disallow: /*?*session=
+Disallow: /*?*redirect=
+
+# Optimisation crawl rate pour les gros bots
+User-agent: Googlebot
+Crawl-delay: 0
+Allow: /*/home
+Allow: /*/login
+Allow: /*/register
+Allow: /*/privacy
+Allow: /*/terms
+Allow: /*/reset-password
+Allow: /icons/
+Allow: /manifests/
+
+User-agent: Bingbot
+Crawl-delay: 1
+Allow: /*/home
+Allow: /*/privacy
+Allow: /*/terms
+
+User-agent: Slurp
+Crawl-delay: 1
+
+# Bloquer les mauvais bots
+User-agent: MJ12bot
+User-agent: AhrefsBot
+User-agent: SemrushBot
+User-agent: DotBot
+Disallow: /
+
+# Sitemap et ressources
 Sitemap: https://meditime-app.com/sitemap.xml
+Host: https://meditime-app.com

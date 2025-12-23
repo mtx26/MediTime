@@ -1,0 +1,32 @@
+/* TEAM */
+  Developer: Mtx_26
+  Contact: mtx_26 [at] outlook.be
+  GitHub: https://github.com/mtx26
+  Location: Belgium
+
+/* SITE */
+  Last update: 2025-12-23
+  Standards: HTML5, CSS3, JavaScript ES6+
+  Components: React 19, Bootstrap 5, Vite
+  Backend: Flask (Python), PostgreSQL
+  Hosting: Supabase, CapRover
+  Languages: EN, FR, ES, DE, IT, JA, ZH, PT, RU
+  Doctype: HTML5
+  IDE: Visual Studio Code
+
+/* THANKS */
+  - React Team
+  - Bootstrap Team
+  - Supabase Team
+  - All open-source contributors
+
+/* APPLICATION */
+  Name: MediTime
+  Description: Medication Management & Reminder Application
+  Version: 0.1.0
+  Features: Medication tracking, reminders, calendar sharing, multi-language support
+  
+/* SECURITY */
+  Report vulnerabilities: mtx_26@outlook.be
+  Encryption: TLS/HTTPS
+  Authentication: Supabase Auth

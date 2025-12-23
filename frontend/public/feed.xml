@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>MediTime - Medication Management Updates</title>
+    <description>Latest updates and news from MediTime, your smart medication tracker</description>
+    <link>https://meditime-app.com</link>
+    <atom:link href="https://meditime-app.com/feed.xml" rel="self" type="application/rss+xml" />
+    <language>en</language>
+    <lastBuildDate>Mon, 23 Dec 2025 00:00:00 +0000</lastBuildDate>
+    <pubDate>Mon, 23 Dec 2025 00:00:00 +0000</pubDate>
+    <ttl>1800</ttl>
+    <image>
+      <url>https://meditime-app.com/icons/icon-512.png</url>
+      <title>MediTime</title>
+      <link>https://meditime-app.com</link>
+      <width>512</width>
+      <height>512</height>
+    </image>
+    
+    <item>
+      <title>MediTime 0.1.0 Released - Your Smart Medication Companion</title>
+      <link>https://meditime-app.com/en/home</link>
+      <guid isPermaLink="true">https://meditime-app.com/en/home</guid>
+      <pubDate>Mon, 23 Dec 2025 00:00:00 +0000</pubDate>
+      <description><![CDATA[
+        <p>We're excited to announce the launch of MediTime, your smart medication management companion!</p>
+        <h3>Key Features:</h3>
+        <ul>
+          <li>📱 Smart medication reminders and notifications</li>
+          <li>📅 Medical calendar sharing with family and caregivers</li>
+          <li>💊 Prescription and pill tracking</li>
+          <li>📦 Pillbox and stock management</li>
+          <li>🌍 Support for 9 languages</li>
+          <li>📴 Offline access and sync</li>
+          <li>📤 Export calendars to ICS format</li>
+          <li>📷 QR code scanning for medications</li>
+        </ul>
+        <p>Never miss a dose again with MediTime!</p>
+      ]]></description>
+      <category>Health</category>
+      <category>Medical</category>
+      <category>Productivity</category>
+    </item>
+  </channel>
+</rss>
