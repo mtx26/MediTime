@@ -22,33 +22,15 @@ export default function StructuredData() {
       "name": t('navigation.register'),
       "url": `${baseUrl}/${currentLang}/register`
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "SiteNavigationElement", 
-      "name": t('navigation.about'),
-      "url": `${baseUrl}/${currentLang}/about`
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "SiteNavigationElement",
-      "name": t('navigation.help'), 
-      "url": `${baseUrl}/${currentLang}/help`
-    }
+    // ...about et help supprimés car routes inexistantes
   ];
 
   const webSite = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": t('app.name'),
-    "url": baseUrl,
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": `${baseUrl}/${currentLang}/search?q={search_term_string}`
-      },
-      "query-input": "required name=search_term_string"
-    }
+    "url": baseUrl
+    // SearchAction retiré car la route /search n'existe pas
   };
 
   const organization = {

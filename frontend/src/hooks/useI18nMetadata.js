@@ -136,7 +136,6 @@ export const useI18nMetadata = ({
           "name": t('app.name'),
           "alternateName": `${t('app.name')} - ${t('app.subtitle')}`,
           "url": I18N_CONFIG.BASE_URL,
-          "logo": `${I18N_CONFIG.BASE_URL}/icons/icon-512.png`,
           "applicationCategory": "HealthApplication",
           "applicationSubCategory": "Medical",
           "operatingSystem": "All",
