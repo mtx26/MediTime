@@ -62,23 +62,40 @@ export const SEO_CONFIG = {
 
 /**
  * Génère les shortcuts PWA selon la langue
+ * @param {string} langCode - Code de langue
+ * @param {Function|Object} t - Fonction de traduction i18next ou objet de traductions brutes
  */
-export const getShortcuts = (langCode, t) => [
-  {
-    name: t('shortcuts.addMedication'),
-    short_name: t('shortcuts.addMedicationShort'),
-    description: t('shortcuts.addMedicationDesc'),
-    url: `/${langCode}/add-calendar`,
-    icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }]
-  },
-  {
-    name: t('shortcuts.calendar'),
-    short_name: t('shortcuts.calendarShort'),
-    description: t('shortcuts.calendarDesc'),
-    url: `/${langCode}/calendars`,
-    icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }]
-  }
-];
+export const getShortcuts = (langCode, t) => {
+  // Si t est une fonction (i18next), l'utiliser directement
+  // Sinon, créer une fonction helper pour accéder aux traductions
+  const translate = typeof t === 'function' 
+    ? t 
+    : (key) => {
+        const keys = key.split('.');
+        let value = t;
+        for (const k of keys) {
+          value = value?.[k];
+        }
+        return value || key;
+      };
+
+  return [
+    {
+      name: translate('shortcuts.addMedication'),
+      short_name: translate('shortcuts.addMedicationShort'),
+      description: translate('shortcuts.addMedicationDesc'),
+      url: `/${langCode}/add-calendar`,
+      icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }]
+    },
+    {
+      name: translate('shortcuts.calendar'),
+      short_name: translate('shortcuts.calendarShort'),
+      description: translate('shortcuts.calendarDesc'),
+      url: `/${langCode}/calendars`,
+      icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }]
+    }
+  ];
+};
 
 /**
  * Génère le Schema.org complet optimisé
