@@ -862,5 +862,13 @@
   },
   "yes": "Oui",
   "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier.",
-  "stock_percentage": "Pourcentage"
+  "stock_percentage": "Pourcentage",
+  "shortcuts": {
+    "addMedication": "Ajouter un médicament",
+    "addMedicationShort": "Ajouter",
+    "addMedicationDesc": "Ajouter rapidement un nouveau médicament",
+    "calendar": "Calendrier",
+    "calendarShort": "Calendrier",
+    "calendarDesc": "Voir votre calendrier de médicaments"
+  }
 }

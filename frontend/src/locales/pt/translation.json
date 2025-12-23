@@ -862,5 +862,13 @@
   "restore_error": "Erro durante a restauração",
   "restore_pillbox_description": "Esta ação cancelará a última preparação do porta-comprimidos e restaurará as quantidades em estoque.",
   "restore_pillbox_title": "Restaurar o compartimento para comprimidos?",
-  "pillbox_restored": "O compartimento para comprimidos foi restaurado com sucesso."
+  "pillbox_restored": "O compartimento para comprimidos foi restaurado com sucesso.",
+  "shortcuts": {
+    "addMedication": "Adicionar um medicamento",
+    "addMedicationShort": "Adicionar",
+    "addMedicationDesc": "Adicione rapidamente um novo medicamento",
+    "calendar": "Calendário",
+    "calendarShort": "Calendário",
+    "calendarDesc": "Consulte sua tabela de medicamentos."
+  }
 }

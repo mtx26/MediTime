@@ -862,5 +862,13 @@
   "restore_error": "Fehler bei der Wiederherstellung",
   "restore_pillbox_description": "Diese Aktion macht die letzte Befüllung der Pillendose rückgängig und stellt die vorhandenen Mengen wieder her.",
   "restore_pillbox_title": "Den Pillenkasten wiederherstellen?",
-  "pillbox_restored": "Pillbox erfolgreich wiederhergestellt"
+  "pillbox_restored": "Pillbox erfolgreich wiederhergestellt",
+  "shortcuts": {
+    "addMedication": "Füge ein Medikament hinzu",
+    "addMedicationShort": "Hinzufügen",
+    "addMedicationDesc": "Fügen Sie schnell ein neues Medikament hinzu.",
+    "calendar": "Kalender",
+    "calendarShort": "Kalender",
+    "calendarDesc": "Siehe Ihren Medikamentenplan"
+  }
 }

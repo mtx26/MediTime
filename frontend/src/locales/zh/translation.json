@@ -862,5 +862,13 @@
   "restore_error": "恢复过程中出错",
   "restore_pillbox_description": "此操作将取消药盒的最后一次准备工作，并恢复库存数量。",
   "restore_pillbox_title": "恢复碉堡？",
-  "pillbox_restored": "药盒已成功恢复"
+  "pillbox_restored": "药盒已成功恢复",
+  "shortcuts": {
+    "addMedication": "添加药物",
+    "addMedicationShort": "添加",
+    "addMedicationDesc": "快速添加一种新药",
+    "calendar": "日历",
+    "calendarShort": "日历",
+    "calendarDesc": "请查看您的用药时间表"
+  }
 }

@@ -2,27 +2,92 @@
   "name": "MediTime",
   "short_name": "MediTime",
   "description": "Pianifica i tuoi trattamenti e condividi i tuoi calendari medici con facilità.",
-  "start_url": "/it/",
+  "start_url": "/it/home",
   "lang": "it",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "backgroundColor": "#FFFFFF",
   "themeColor": "#5FC3B4",
+  "categories": [
+    "health",
+    "medical",
+    "productivity",
+    "lifestyle"
+  ],
   "icons": [
+    {
+      "src": "/icons/icon-16.png",
+      "type": "image/png",
+      "sizes": "16x16",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-32.png",
+      "type": "image/png",
+      "sizes": "32x32",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-48.png",
+      "type": "image/png",
+      "sizes": "48x48",
+      "purpose": "any maskable"
+    },
     {
       "src": "/icons/icon-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/apple-touch-icon.png",
       "type": "image/png",
       "sizes": "180x180",
       "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "dir": "ltr",
+  "shortcuts": [
+    {
+      "name": "Aggiungi un farmaco",
+      "short_name": "Aggiungere",
+      "description": "Aggiungere rapidamente un nuovo farmaco",
+      "url": "/it/add-calendar",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Calendario",
+      "short_name": "Calendario",
+      "description": "Consulta il tuo programma di assunzione dei farmaci",
+      "url": "/it/calendars",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

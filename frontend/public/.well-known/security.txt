@@ -1,0 +1,14 @@
+Contact: mailto:mtx_26@outlook.be
+Expires: 2026-12-31T23:59:59.000Z
+Preferred-Languages: en, fr
+Canonical: https://meditime-app.com/.well-known/security.txt
+
+# Security Policy for MediTime
+# If you discover a security vulnerability, please report it responsibly.
+# We appreciate your efforts to make MediTime more secure.
+
+# Our security practices:
+# - All data is encrypted in transit (HTTPS/TLS)
+# - User data is stored securely with Supabase
+# - We follow OWASP security guidelines
+# - Regular security updates and dependency checks

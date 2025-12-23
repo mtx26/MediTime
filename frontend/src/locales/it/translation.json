@@ -862,5 +862,13 @@
   "restore_error": "Errore durante il ripristino",
   "restore_pillbox_description": "Questa azione annullerà l'ultima preparazione del portapillole e ripristinerà le quantità in magazzino.",
   "restore_pillbox_title": "Ripristinare il fortino?",
-  "pillbox_restored": "Pillbox ripristinato con successo"
+  "pillbox_restored": "Pillbox ripristinato con successo",
+  "shortcuts": {
+    "addMedication": "Aggiungi un farmaco",
+    "addMedicationShort": "Aggiungere",
+    "addMedicationDesc": "Aggiungere rapidamente un nuovo farmaco",
+    "calendar": "Calendario",
+    "calendarShort": "Calendario",
+    "calendarDesc": "Consulta il tuo programma di assunzione dei farmaci"
+  }
 }

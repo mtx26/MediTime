@@ -862,5 +862,13 @@
   "restore_error": "Error durante la restauración",
   "restore_pillbox_description": "Esta acción cancelará la última preparación del pastillero y restaurará las cantidades en stock.",
   "restore_pillbox_title": "¿Restaurar el pastillero?",
-  "pillbox_restored": "Pastillero restaurado con éxito"
+  "pillbox_restored": "Pastillero restaurado con éxito",
+  "shortcuts": {
+    "addMedication": "Añadir un medicamento",
+    "addMedicationShort": "Agregar",
+    "addMedicationDesc": "Añadir rápidamente un nuevo medicamento",
+    "calendar": "Calendario",
+    "calendarShort": "Calendario",
+    "calendarDesc": "Consulte su horario de medicación"
+  }
 }

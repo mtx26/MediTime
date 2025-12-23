@@ -862,5 +862,13 @@
   "restore_error": "Error during restoration",
   "restore_pillbox_description": "This action will cancel the last preparation of the pillbox and restore the quantities in stock.",
   "restore_pillbox_title": "Restore the pillbox?",
-  "pillbox_restored": "Pillbox successfully restored"
+  "pillbox_restored": "Pillbox successfully restored",
+  "shortcuts": {
+    "addMedication": "Add a drug",
+    "addMedicationShort": "Add",
+    "addMedicationDesc": "Quickly add a new drug",
+    "calendar": "Calendar",
+    "calendarShort": "Calendar",
+    "calendarDesc": "See your medication schedule"
+  }
 }
