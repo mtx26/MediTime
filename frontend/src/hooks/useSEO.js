@@ -27,9 +27,14 @@ export const useSEO = ({
 
     // 2. Meta de base
     upsertMetaTag('meta', 'name', 'description', { content: finalDescription });
-    upsertMetaTag('meta', 'name', 'robots', { content: 'index,follow' });
+    upsertMetaTag('meta', 'name', 'robots', { content: 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' });
+    upsertMetaTag('meta', 'name', 'googlebot', { content: 'index,follow' });
+    upsertMetaTag('meta', 'name', 'bingbot', { content: 'index,follow' });
     upsertMetaTag('meta', 'name', 'application-name', { content: t('app.shortName') });
     upsertMetaTag('meta', 'name', 'apple-mobile-web-app-title', { content: t('app.shortName') });
+    upsertMetaTag('meta', 'name', 'theme-color', { content: SEO_CONFIG.PWA.themeColor });
+    upsertMetaTag('meta', 'name', 'msapplication-TileColor', { content: SEO_CONFIG.PWA.themeColor });
+    upsertMetaTag('meta', 'name', 'author', { content: SEO_CONFIG.AUTHOR.name });
     
     // 3. Canonical et hreflang
     upsertMetaTag('link', 'rel', 'canonical', { href: finalUrl });
@@ -74,15 +79,20 @@ export const useSEO = ({
       content: `${SEO_CONFIG.BASE_URL}${SEO_CONFIG.META.ogImage}` 
     });
     upsertMetaTag('meta', 'name', 'twitter:site', { content: SEO_CONFIG.META.twitterSite });
+    upsertMetaTag('meta', 'name', 'twitter:creator', { content: SEO_CONFIG.META.twitterSite });
     upsertMetaTag('meta', 'name', 'twitter:image:alt', { 
       content: `${t('app.name')} - ${t('app.subtitle')}` 
     });
 
-    // 6. Pinterest
+    // 6. Pinterest & Rich Pins
     upsertMetaTag('meta', 'name', 'pinterest-rich-pin', { content: 'true' });
     upsertMetaTag('meta', 'name', 'pinterest:description', { content: finalDescription });
+    
+    // 7. Article/Page Meta (si applicable)
+    upsertMetaTag('meta', 'property', 'article:author', { content: SEO_CONFIG.AUTHOR.name });
+    upsertMetaTag('meta', 'property', 'article:publisher', { content: SEO_CONFIG.BASE_URL });
 
-    // 7. Meta personnalisées
+    // 8. Meta personnalisées
     Object.entries(customMeta).forEach(([key, value]) => {
       if (key.startsWith('og:')) {
         upsertMetaTag('meta', 'property', key, { content: value });
@@ -91,13 +101,13 @@ export const useSEO = ({
       }
     });
 
-    // 8. PWA Manifest
+    // 9. PWA Manifest
     const manifestUrl = enabledLanguageCodes.includes(lng) 
       ? `/manifests/manifest-${lng}.json`
       : '/manifest.json';
     upsertMetaTag('link', 'rel', 'manifest', { href: manifestUrl });
 
-    // 9. Schema.org JSON-LD
+    // 10. Schema.org JSON-LD
     updateSchemaOrg();
 
   }, [finalTitle, finalDescription, path, lng, t, customMeta]);
