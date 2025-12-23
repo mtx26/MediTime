@@ -9,8 +9,7 @@ import { toISO } from './utils/calendar/dateUtils';
 import RealtimeManager from './components/realtime/RealtimeManager';
 import { performApiCall } from './services/api/apiUtils';
 import { useTranslation } from 'react-i18next';
-import I18nHead from './components/common/I18nHead';
-import StructuredData from './components/common/StructuredData';
+import useSEO from './hooks/useSEO';
 import OnboardingTour from './components/onboarding/OnboardingTour';
 import { requestPermissionAndGetToken } from './services/firebase/firebase';
 
@@ -1006,15 +1005,16 @@ function App() {
     ? location.pathname.slice(lng.length + 1) || '/home'
     : location.pathname;
 
+  // Hook SEO unifié
+  useSEO({
+    title: t('home_meta.title'),
+    description: t('home_meta.description'),
+    path
+  });
+
   return (
     <div className="d-flex flex-column min-vh-100">
       <OnboardingTour isAppLoading={isInitialLoading} />
-      <I18nHead 
-        title={t('home_meta.title')} 
-        description={t('home_meta.description')} 
-        path={path} 
-      />
-      <StructuredData />
       <Navbar sharedProps={sharedProps} />
       <main className="flex-grow-1 d-flex flex-column safe-bottom">
         {userInfo && (

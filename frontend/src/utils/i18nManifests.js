@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { I18N_CONFIG, getPWAConfig } from '../config/i18nMeta.js';
+import { SEO_CONFIG, getShortcuts } from '../config/seo.js';
 import { enabledLanguageCodes } from '../config/languages.js';
 
 /**
@@ -37,8 +37,6 @@ export const generateI18nManifests = async () => {
       const translations = loadTranslations(langCode);
       
       if (!translations || !translations.app) {
-        console.warn(`⚠️  Traductions 'app' manquantes pour ${langCode}, utilisation des valeurs par défaut`);
-        
         // Utilise des valeurs par défaut si les traductions manquent
         const fallbackManifest = {
           name: "MediTime",
@@ -46,7 +44,8 @@ export const generateI18nManifests = async () => {
           description: "Medical treatment scheduling and sharing application",
           start_url: `/${langCode}/home`,
           lang: langCode,
-          ...getPWAConfig(langCode)
+          ...SEO_CONFIG.PWA,
+          shortcuts: []
         };
         
         fs.writeFileSync(
@@ -61,7 +60,8 @@ export const generateI18nManifests = async () => {
           description: translations.app.description || "Medical treatment application",
           start_url: `/${langCode}/home`,
           lang: langCode,
-          ...getPWAConfig(langCode, translations)
+          ...SEO_CONFIG.PWA,
+          shortcuts: getShortcuts(langCode, translations)
         };
         
         fs.writeFileSync(
@@ -87,7 +87,8 @@ export const generateI18nManifests = async () => {
     description: enTranslations?.app?.description || "Medical treatment application",
     start_url: '/en/home',
     lang: 'en',
-    ...getPWAConfig('en', enTranslations)
+    ...SEO_CONFIG.PWA,
+    shortcuts: enTranslations ? getShortcuts('en', enTranslations) : []
   };
   
   fs.writeFileSync(
@@ -126,7 +127,8 @@ export const generateManifestForLanguage = (language) => {
     description: translations?.app?.description || "Medical treatment application",
     start_url: `/${language}/home`,
     lang: language,
-    ...getPWAConfig(language, translations)
+    ...SEO_CONFIG.PWA,
+    shortcuts: translations ? getShortcuts(language, translations) : []
   };
 };
 
