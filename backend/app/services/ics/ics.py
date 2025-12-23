@@ -138,8 +138,6 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
             events = []
 
             def record_event(var, med, stock, at_date):
-                if var == events:
-                    print(f"Recording event for med {med['name']} on {at_date} due to stock {stock}")
                 var.append({
                     "date": at_date,
                     "name": med["name"],
@@ -156,8 +154,6 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                 is_active = False
                 
                 stock = med['stock_quantity']
-                print(f"Processing medication: {med['name']} with initial stock {stock}")
-                print(today, sunday)
                 if today <= sunday and stock_mode == 'weekly_pillbox':
                     if stock < 0:
                         record_event(events, med, stock, today)
