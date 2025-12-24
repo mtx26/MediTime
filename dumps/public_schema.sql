@@ -697,12 +697,6 @@ CREATE POLICY "Owners can manage their ics tokens" ON "public"."ics_tokens" TO "
 
 
 
-CREATE POLICY "Owners can update shared calendars" ON "public"."shared_calendars" FOR UPDATE USING ((EXISTS ( SELECT 1
-   FROM "public"."calendars" "c"
-  WHERE (("c"."id" = "shared_calendars"."calendar_id") AND ("c"."owner_uid" = "auth"."uid"())))));
-
-
-
 CREATE POLICY "Public access via ics token" ON "public"."calendars" FOR SELECT USING ((("deleted_at" IS NULL) AND (EXISTS ( SELECT 1
    FROM "public"."ics_tokens" "it"
   WHERE (("it"."calendar_id" = "calendars"."id") AND ("it"."token" = "current_setting"('app.current_ics_token'::"text", true)) AND ("it"."deleted_at" IS NULL))))));
@@ -907,7 +901,7 @@ CREATE POLICY "Users can update shared calendar settings" ON "public"."shared_ca
 
 
 
-CREATE POLICY "Users can update shared calendars" ON "public"."shared_calendars" FOR UPDATE USING (("receiver_uid" = "auth"."uid"()));
+CREATE POLICY "Users can update shared calendars" ON "public"."shared_calendars" FOR UPDATE USING ((("receiver_uid" = "auth"."uid"()) OR "public"."is_calendar_owner"("calendar_id")));
 
 
 
