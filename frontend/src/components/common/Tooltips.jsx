@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import PropTypes from 'prop-types';
 
-export default function Tooltips({ children, content, side = 'bottom', className = '' }) {
+export default function Tooltips({ children, content, side = 'bottom', className = '', propagation = true }) {
   const [open, setOpen] = useState(false);
   const isTouchDevice = 'ontouchstart' in globalThis || navigator.maxTouchPoints > 0;
   
@@ -18,8 +18,10 @@ export default function Tooltips({ children, content, side = 'bottom', className
             tabIndex={0}
             onClick={(e) => {
               if (isTouchDevice) {
-                e.preventDefault();
-                e.stopPropagation();
+                if (!propagation) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
                 setOpen(!open);
               }
             }}

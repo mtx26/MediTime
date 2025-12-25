@@ -107,7 +107,8 @@
       "expired": "Bedingung abgelaufen",
       "inactive": "Inaktiver Wirkstoff",
       "inactive_tooltip": "Alle Anweisungen zur Einnahme dieses Medikaments sind abgelaufen. Das Medikament ist völlig wirkungslos.",
-      "expired_tooltip": "Eine der Bedingungen für die Inanspruchnahme dieses Angebots ist nicht mehr erfüllt. Es ist nun deaktiviert."
+      "expired_tooltip": "Eine der Bedingungen für die Inanspruchnahme dieses Angebots ist nicht mehr erfüllt. Es ist nun deaktiviert.",
+      "expired_tooltip_one": "Diese Bedingung für die Annahme [des Angebots] ist abgelaufen und nicht mehr gültig."
     },
     "day": "Tag",
     "days": "Tage",

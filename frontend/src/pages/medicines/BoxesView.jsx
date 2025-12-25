@@ -51,7 +51,7 @@ const ActionCard = ({ borderColor, icon, color, text, onClick, hasTooltip, toolt
       <div className={`card h-100 shadow border border-${borderColor}`}>
         <div className="card-body d-flex flex-column justify-content-center align-items-center p-3 position-relative">
           {hasTooltip && (
-            <Tooltips content={tooltip} side="bottom" className="position-absolute top-0 end-0 m-1 p-1">
+            <Tooltips content={tooltip} side="bottom" className="position-absolute top-0 end-0 m-1 p-1" propagation={false}>
               <i className="bi bi-info-circle text-info" style={{ cursor: 'pointer' }}></i>
             </Tooltips>
           )}
@@ -1076,6 +1076,23 @@ function BoxCard({
         {/* Stock Badges */}
         {!isEditing && (
           <div className="d-flex mb-2 align-items-center w-100 gap-2 flex-wrap">
+            {box.conditions.filter((c) => c !== undefined).length === 0 && (
+              <button
+                className="btn p-0"
+                onClick={(e) => {
+                  setExpandedBoxes((p) => ({ ...p, [box.id]: true }));
+                  onEdit(box);
+                }}
+                aria-label={t('boxes.condition.add')}
+              >
+                <Badge
+                  color="warning"
+                  icon="info-circle"
+                  text={t('boxes.condition.none')}
+                  tooltip={t('boxes.condition_none_tooltip')}
+                />
+              </button>
+            )}
             {/* medic inactive (toutes les conditions sont desactiver) */}
             {box.conditions?.every((c) => {
               if (!c?.max_date) return false;
@@ -1096,12 +1113,20 @@ function BoxCard({
                 const maxDate = new Date(c.max_date);
                 return now > maxDate;
               }) ? (
-                <Badge
-                  color="info"
-                  icon="exclamation-circle"
-                  text={t('boxes.condition.expired')}
-                  tooltip={t('boxes.condition.expired_tooltip')}
-                />
+                <button
+                  className="btn p-0"
+                  onClick={() => {
+                    setExpandedBoxes((p) => ({ ...p, [box.id]: true }));
+                  }}
+                  aria-label={t('boxes.condition.add')}
+                >
+                  <Badge
+                    color="info"
+                    icon="exclamation-circle"
+                    text={t('boxes.condition.expired')}
+                    tooltip={t('boxes.condition.expired_tooltip')}
+                  />
+                </button>
               ) : (
                 <>
                   {box.box_capacity !== 0 && (
@@ -1135,24 +1160,6 @@ function BoxCard({
                           : t('boxes.stock.badge.tooltip.high')
                       }
                     />
-                  )}
-                  {box.conditions.filter((c) => c !== undefined).length === 0 && (
-                    <button
-                      className="btn p-0"
-                      onClick={() => {
-                        setExpandedBoxes((p) => ({ ...p, [box.id]: true }));
-                        onEdit(box);
-                      }}
-                      aria-label={t('boxes.condition.add')}
-                      title={t('boxes.condition.add')}
-                    >
-                      <Badge
-                        color="warning"
-                        icon="info-circle"
-                        text={t('boxes.condition.none')}
-                        tooltip={t('boxes.condition_none_tooltip')}
-                      />
-                    </button>
                   )}
                 </>
               )
@@ -1324,6 +1331,17 @@ function BoxCard({
                           {t('boxes.until')}{' '}
                           {new Date(cond.max_date).toLocaleDateString()}
                         </small>
+                      )}
+                      {/* Si la condition est expirée */}
+                      {cond.max_date && new Date() > new Date(cond.max_date) && (
+                        <div className="mt-2">
+                          <Badge
+                            color="info"
+                            icon="exclamation-circle"
+                            text={t('boxes.condition.expired')}
+                            tooltip={t('boxes.condition.expired_tooltip_one')}
+                          />
+                        </div>
                       )}
                     </div>
                   ))

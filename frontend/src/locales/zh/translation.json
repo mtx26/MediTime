@@ -107,7 +107,8 @@
       "expired": "条件已过期",
       "inactive": "非活性药物",
       "inactive_tooltip": "您服用此药的所有说明均已过期。该药物已完全失效。",
-      "expired_tooltip": "您享受此优惠的其中一项条件已过期，该优惠现已失效。"
+      "expired_tooltip": "您享受此优惠的其中一项条件已过期，该优惠现已失效。",
+      "expired_tooltip_one": "接受[该要约]的条件已过截止日期，不再有效。"
     },
     "day": "天",
     "days": "天",

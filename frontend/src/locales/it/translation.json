@@ -107,7 +107,8 @@
       "expired": "Condizione scaduta",
       "inactive": "Farmaco inattivo",
       "inactive_tooltip": "Tutte le istruzioni per l'assunzione di questo farmaco sono scadute. Il farmaco è completamente inattivo.",
-      "expired_tooltip": "Una delle condizioni per usufruire di questa offerta è scaduta. Ora è inattiva."
+      "expired_tooltip": "Una delle condizioni per usufruire di questa offerta è scaduta. Ora è inattiva.",
+      "expired_tooltip_one": "Questa condizione per accettare [l'offerta] è scaduta e non è più attiva."
     },
     "day": "giorno",
     "days": "giorni",

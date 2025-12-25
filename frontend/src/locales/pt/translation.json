@@ -107,7 +107,8 @@
       "expired": "Condição expirada",
       "inactive": "Medicamento inativo",
       "inactive_tooltip": "Todas as suas instruções para tomar este medicamento expiraram. O medicamento está completamente inativo.",
-      "expired_tooltip": "Uma das suas condições para usufruir desta oferta expirou. Agora está inativa."
+      "expired_tooltip": "Uma das suas condições para usufruir desta oferta expirou. Agora está inativa.",
+      "expired_tooltip_one": "Esta condição para aceitar [a oferta] expirou e já não está em vigor."
     },
     "day": "dia",
     "days": "dias",

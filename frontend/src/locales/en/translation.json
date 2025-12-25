@@ -107,7 +107,8 @@
       "expired": "Condition expired",
       "inactive": "Inactive drug",
       "inactive_tooltip": "All your instructions for taking this medication have expired. The medication is completely inactive.",
-      "expired_tooltip": "One of your conditions for taking advantage of this offer has expired. It is now inactive."
+      "expired_tooltip": "One of your conditions for taking advantage of this offer has expired. It is now inactive.",
+      "expired_tooltip_one": "This condition of taking [the offer] has passed its expiry date and is no longer active."
     },
     "day": "day",
     "days": "days",
