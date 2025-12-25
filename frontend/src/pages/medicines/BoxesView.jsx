@@ -403,8 +403,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       );
       
       if (res.success) {
-        // Supprimer la box temporaire et mettre à jour avec la vraie
-        setBoxes(prev => prev.filter(b => b.id !== editingBoxId));
         showAlert('success', res.message);
       } else {
         showAlert('danger', res.error);
@@ -438,12 +436,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     return res.success;
   };
 
-  const addScannedMedicines = async (medicines) => {
-    if (!medicines?.length) {
-      showAlert('Ajouter des médicaments', 'warning');
-      return { success: false };
-    }
-    
+  const addScannedMedicines = async (medicines) => {    
     // Fermer la modal
     setShowQRModal(false);
     
@@ -464,24 +457,10 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         error++;
       }
     }
-    
-    if (error === 0) {
-      showAlert('success', 'Médicaments ajoutés avec succès');
-    } else if (success === 0) {
-      showAlert('danger', 'Impossible d\'ajouter les médicaments');
-    } else {
-      showAlert('warning', `${success} médicament(s) ajouté(s), ${error} erreur(s)`);
-    }
-    
     return { success: error === 0, successCount: success, errorCount: error };
   };
 
-  const updateScannedMedicine = async (medicines) => {
-    if (!medicines?.length || !currentEditingBoxId) {
-      showAlert(t('boxes.no_medicines_selected'), 'warning');
-      return { success: false };
-    }
-    
+  const updateScannedMedicine = async (medicines) => {    
     const med = medicines[0];
     const currentBox = boxes.find(b => b.id === currentEditingBoxId);
     
@@ -501,12 +480,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     setShowQRModal(false);
     setCurrentEditingBoxId(null);
     setSingleScan(false);
-    
-    if (res.success) {
-      showAlert('success', 'Médicament mis à jour avec succès');
-    } else {
-      showAlert('danger', 'Impossible de mettre à jour le médicament');
-    }
     
     return {
       success: res.success,
@@ -933,20 +906,20 @@ function BoxCard({
   };
 
   const restockBox = async () => {
-    const r = await calendarSource.restockBox(calendarId, box.id);
-    if (r.success) {
-      showAlert('success', r.message);
+    const rep = await calendarSource.restockBox(calendarId, box.id);
+    if (rep.success) {
+      showAlert('success', t('boxes.restock_success'));
     } else {
-      showAlert('danger', r.error);
+      showAlert('danger', rep.error);
     }
   };
 
   const deleteBox = async () => {
-    const r = await calendarSource.deleteBox(calendarId, box.id);
-    if (r.success) {
-      showAlert('success', r.message);
+    const rep = await calendarSource.deleteBox(calendarId, box.id);
+    if (rep.success) {
+      showAlert('success', rep.message);
     } else {
-      showAlert('danger', r.error);
+      showAlert('danger', rep.error);
     }
   };
 

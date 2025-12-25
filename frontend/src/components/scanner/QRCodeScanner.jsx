@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } f
 import { useTranslation } from "react-i18next";
 import { readBarcodes } from "zxing-wasm/reader";
 import { fetchMedicaments } from "../../utils/api/scanner";
+import { useAlert } from "../../contexts/AlertContext";
 
 // Styles CSS pour les contrôles
 const controlsStyle = `
@@ -40,6 +41,7 @@ const QRCodeScanner = forwardRef(({
   onStateChange = null,
 }, ref) => {
   const { t } = useTranslation();
+  const { showAlert } = useAlert();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
@@ -73,12 +75,6 @@ const QRCodeScanner = forwardRef(({
     }, 3000); // Masquer après 3 secondes d'inactivité
   };
 
-  // Fonction pour afficher les contrôles
-  const showControlsTemporary = () => {
-    setShowControls(true);
-    autoHideControls();
-  };
-
   // Exposer handleAddAll au composant parent via useImperativeHandle
   useImperativeHandle(ref, () => ({
     handleAddAll
@@ -86,8 +82,8 @@ const QRCodeScanner = forwardRef(({
 
   // Fonction pour réinitialiser la liste des médicaments scannés
   const resetScannedMedicines = () => {
-      setGtins([]);
-      setMedicines(Object.create(null));
+    setGtins([]);
+    setMedicines(Object.create(null));
     setLoadingGtin(null);
     setError("");
   };
@@ -103,34 +99,63 @@ const QRCodeScanner = forwardRef(({
 
   useEffect(() => {
     // Fonction pour obtenir la liste des caméras disponibles
-    async function getCameras() {
+    async function getCameras(stream) {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const cameras = devices.filter(device => device.kind === 'videoinput');
+        let cameras = devices.filter(device => device.kind === 'videoinput');
         
-        // Trier les caméras pour privilégier la caméra arrière
-        const sortedCameras = cameras.sort((a, b) => {
+        // Filtrer pour ne garder QUE la caméra arrière principale sur iPhone
+        // Exclure ultra-wide, telephoto, etc.
+        const backCameras = cameras.filter(camera => {
+          const label = camera.label.toLowerCase();
+          const type = getCameraType(camera);
+          
+          // Si c'est une caméra arrière
+          if (type === 'back') {
+            // Exclure les caméras spécialisées (ultra-wide, telephoto, etc.)
+            const isSpecializedCamera = 
+              label.includes('ultra') || 
+              label.includes('telephoto') || 
+              label.includes('zoom') ||
+              label.includes('0.5') ||
+              label.includes('2x') ||
+              label.includes('3x');
+            
+            return !isSpecializedCamera; // Garder seulement la principale
+          }
+          return false;
+        });
+        
+        // Garder les caméras frontales aussi
+        const frontCameras = cameras.filter(camera => getCameraType(camera) === 'front');
+        
+        // Combiner : caméra arrière principale + caméras frontales
+        const filteredCameras = [...backCameras, ...frontCameras];
+        
+        // Si on n'a rien trouvé (cas rare), garder toutes les caméras
+        const finalCameras = filteredCameras.length > 0 ? filteredCameras : cameras;
+        
+        // Trier pour privilégier la caméra arrière
+        const sortedCameras = finalCameras.sort((a, b) => {
           const aType = getCameraType(a);
           const bType = getCameraType(b);
           
-          // Privilégier les caméras arrière
-          if (aType === 'back' && bType !== 'back') return -1; // a avant b
-          if (aType !== 'back' && bType === 'back') return 1;  // b avant a
-          return 0; // même priorité
+          if (aType === 'back' && bType !== 'back') return -1;
+          if (aType !== 'back' && bType === 'back') return 1;
+          return 0;
         });
         
         setAvailableCameras(sortedCameras);
         
-        // Sélectionner la première caméra (privilégie automatiquement 'back')
+        // Sélectionner la première caméra (caméra arrière principale)
         if (sortedCameras.length > 0 && !selectedCamera) {
           const defaultCamera = sortedCameras[0];
           setSelectedCamera(defaultCamera);
           
-          // Déterminer le type de caméra
           const cameraType = getCameraType(defaultCamera);
           const isFront = cameraType === 'front';
           
-          console.log('Caméra par défaut:', defaultCamera.label, 'type:', cameraType); // Debug
+          console.log('Caméra sélectionnée:', defaultCamera.label, 'type:', cameraType);
           setIsFrontCamera(isFront);
         }
       } catch (error) {
@@ -152,22 +177,22 @@ const QRCodeScanner = forwardRef(({
       }
 
       try {
-        // Obtenir les caméras disponibles
-        await getCameras();
-
-        const constraints = {
+        // IMPORTANT: D'abord demander les permissions avec getUserMedia
+        // Cela permet d'obtenir les vrais labels de caméras sur iOS
+        const initialConstraints = {
           video: {
             deviceId: selectedCamera ? { exact: selectedCamera.deviceId } : undefined,
             facingMode: selectedCamera ? undefined : { ideal: "environment" },
-            // Astuces mobiles utiles :
-            // width: { ideal: 1280 }, height: { ideal: 720 },
-            // frameRate: { ideal: 30 }
           },
           audio: false,
         };
 
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        const stream = await navigator.mediaDevices.getUserMedia(initialConstraints);
         streamRef.current = stream;
+        
+        // APRÈS avoir obtenu les permissions, énumérer les caméras
+        // Maintenant on aura les vrais labels
+        await getCameras(stream);
 
         if (!videoRef.current) {
           isLoadingRef.current = false;
@@ -274,8 +299,6 @@ const QRCodeScanner = forwardRef(({
     // Utiliser la fonction helper simplifiée
     const cameraType = getCameraType(camera);
     const isFront = cameraType === 'front';
-    
-    console.log('Changement caméra:', camera.label, 'type:', cameraType); // Debug
     setIsFrontCamera(isFront);
   };
 
@@ -383,7 +406,7 @@ const QRCodeScanner = forwardRef(({
 
           if (!sameAsLast) {
             const gtin = extractGTIN01(r.text);
-            if (gtin && isSafeKey(gtin)) {
+            if (gtin) {
               setGtins((prev) => {
                 if (prev.includes(gtin)) return prev;
                 searchMedicine(gtin);
@@ -446,19 +469,8 @@ const QRCodeScanner = forwardRef(({
     }
   }
 
-  // Vérifie que la clé est sûre pour être utilisée comme propriété d'objet
-  const isSafeKey = (key) => {
-    return typeof key === 'string' &&
-      /^\w+$/.test(key) &&
-      key !== '__proto__' &&
-      key !== 'prototype' &&
-      key !== 'constructor';
-  };
-
   // Fonction pour chercher le médicament associé au GTIN et créer directement une medicine_box
   const searchMedicine = async (gtin) => {
-    // Valide que la clé est sûre
-    if (!isSafeKey(gtin)) return;
     // Vérifier si le médicament est déjà en cours de recherche ou s'il est dans la liste active
     if (loadingGtin === gtin || (Object.prototype.hasOwnProperty.call(medicines, gtin) && gtins.includes(gtin))) return;
     
@@ -485,7 +497,6 @@ const QRCodeScanner = forwardRef(({
         };
 
     setMedicines(prev => {
-      if (!isSafeKey(gtin)) return prev;
       const updated = Object.assign(Object.create(null), prev);
       Object.defineProperty(updated, gtin, { value: medicineBox, enumerable: true, configurable: true, writable: true });
       return updated;
@@ -497,7 +508,6 @@ const QRCodeScanner = forwardRef(({
         }
       } else {
         setMedicines(prev => {
-          if (!isSafeKey(gtin)) return prev;
           const updated = Object.assign(Object.create(null), prev);
           Object.defineProperty(updated, gtin, { value: null, enumerable: true, configurable: true, writable: true });
           return updated;
@@ -506,7 +516,6 @@ const QRCodeScanner = forwardRef(({
     } catch (error) {
       console.error("Erreur lors de la recherche du médicament:", error);
       setMedicines(prev => {
-        if (!isSafeKey(gtin)) return prev;
         const updated = Object.assign(Object.create(null), prev);
         Object.defineProperty(updated, gtin, { value: null, enumerable: true, configurable: true, writable: true });
         return updated;
@@ -518,12 +527,11 @@ const QRCodeScanner = forwardRef(({
 
   // Fonction pour supprimer un médicament scanné
   const removeMedicine = (gtinToRemove) => {
-    if (!isSafeKey(gtinToRemove)) return;
     setGtins(prev => prev.filter(gtin => gtin !== gtinToRemove));
     setMedicines(prev => {
       if (!Object.prototype.hasOwnProperty.call(prev, gtinToRemove)) return prev;
       const rest = Object.entries(prev).reduce((acc, [k, v]) => {
-        if (k !== gtinToRemove && isSafeKey(k)) {
+        if (k !== gtinToRemove) {
           Object.defineProperty(acc, k, { value: v, enumerable: true, configurable: true, writable: true });
         }
         return acc;
@@ -539,18 +547,20 @@ const QRCodeScanner = forwardRef(({
   // Gérer l'ajout de tous les médicaments avec reset
   const handleAddAll = async () => {
     if (onAddAll) {
-      try {
-        // Récupérer les medicine_boxes valides (non null)
-        const medicineBoxes = Object.values(medicines).filter(med => med !== null);
-        
-        const result = await onAddAll(medicineBoxes);
-        // Reset seulement si l'ajout a réussi
-        if (result && result.success) {
-          resetScannedMedicines(); // Remettre à zéro après ajout réussi
-        }
-      } catch (error) {
-        console.error("Erreur lors de l'ajout des médicaments:", error);
-        // Ne pas reset en cas d'erreur pour permettre de réessayer
+      // Récupérer les medicine_boxes valides (non null)
+      const medicineBoxes = Object.values(medicines).filter(med => med !== null);
+      if (medicineBoxes.length === 0) {
+        showAlert('warning', t('boxes.no_medicines_selected'));
+        return;
+      }
+      
+      const rep = await onAddAll(medicineBoxes);
+      // Reset seulement si l'ajout a réussi
+      if (rep.success) {
+        showAlert('success', t('scanner.add_all_success'));
+        resetScannedMedicines(); // Remettre à zéro après ajout réussi
+      } else {
+        showAlert('danger', t('scanner.add_all_failed'));
       }
     }
   };
@@ -822,9 +832,7 @@ const QRCodeScanner = forwardRef(({
         {gtins.length > 0 && (
           <ul className="list-group">
             {gtins.map((gtin) => {
-              const medicine = isSafeKey(gtin)
-                ? Object.getOwnPropertyDescriptor(medicines, gtin)?.value
-                : undefined;
+              const medicine = Object.getOwnPropertyDescriptor(medicines, gtin)?.value;
               const isLoading = loadingGtin === gtin;
               
               return (

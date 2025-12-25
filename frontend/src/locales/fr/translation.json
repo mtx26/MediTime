@@ -547,6 +547,10 @@
   "rights_reserved": "Tous droits réservés",
   "scanner": {
     "add": "Ajouter tous les médicaments",
+    "add_all_error": "Erreur lors de l'ajout des médicaments",
+    "add_all_failed": "Échec de l'ajout des médicaments",
+    "add_all_partial": "{{success}} médicament(s) ajouté(s), {{error}} échec(s)",
+    "add_all_success": "Médicaments ajoutés avec succès",
     "camera": "Caméra",
     "camera_back": "Arrière",
     "camera_error": "Impossible d'accéder à la caméra.",
