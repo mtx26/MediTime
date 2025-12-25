@@ -372,7 +372,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         editingBox.box_capacity,
         editingBox.stock_alert_threshold,
         editingBox.stock_quantity,
-        editingBox.dose
+        editingBox.dose,
+        conditions
       );
       
       if (res.success) {
@@ -443,7 +444,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   const updateScannedMedicine = async (medicines) => {
     if (!medicines?.length || !currentEditingBoxId) {
-      showAlert('⚠️ Ajouter un médicament', 'warning');
+      showAlert(t('boxes.no_medicines_selected'), 'warning');
       return { success: false };
     }
     
@@ -685,11 +686,11 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                   const tempId = `temp-${Date.now()}`;
                   const newBox = {
                     id: tempId,
-                    name: t('boxes.new_box'),
+                    name: '',
                     dose: 0,
                     box_capacity: 0,
                     stock_quantity: 0,
-                    stock_alert_threshold: 0,
+                    stock_alert_threshold: 10,
                     conditions: [],
                   };
                   

@@ -153,7 +153,8 @@
     "tablets": "comprimés",
     "title": "Boîtes de médicaments",
     "condition_none_tooltip": "Aucune condition de prise définie. Cliquez ici pour en ajouter une afin de recevoir des rappels réguliers.",
-    "view_notice": "Voir la notice"
+    "view_notice": "Voir la notice",
+    "no_medicines_selected": "Aucun médicament sélectionné"
   },
   "calendar": {
     "add": "Ajouter un calendrier",

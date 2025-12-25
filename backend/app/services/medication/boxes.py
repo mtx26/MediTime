@@ -122,34 +122,31 @@ def create_box(calendar_id: str, box: dict) -> str:
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
+            # 1. Insérer d'abord la box
             cursor.execute("""
-              WITH ins_box AS (
-                INSERT INTO medicine_boxes (calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity)
-                VALUES (%s, %s, %s, %s, %s, %s)
-                RETURNING id
-              ),
-              ins_cond AS (
-                INSERT INTO medicine_box_conditions (id, box_id, tablet_count, interval_days, start_date, time_of_day, max_date)
-                SELECT
-                  COALESCE((c->>'id')::uuid, gen_random_uuid())        AS id,
-                  (SELECT id FROM ins_box)                             AS box_id,
-                  (c->>'tablet_count')::float8                         AS tablet_count,
-                  (c->>'interval_days')::int                           AS interval_days,
-                  NULLIF(c->>'start_date','')::date                    AS start_date,
-                  COALESCE(NULLIF(c->>'time_of_day',''), 'morning')    AS time_of_day,
-                  NULLIF(c->>'max_date','')::date                      AS max_date
-                FROM jsonb_array_elements(%s::jsonb) AS c
-                -- si le tableau est vide, cette clause n'insère rien (comportement OK)
-                RETURNING 1
-              )
-              SELECT id FROM ins_box;
-              """, (
-                  calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity,
-                  json.dumps(conditions)
-              ))
+              INSERT INTO medicine_boxes (calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity)
+              VALUES (%s, %s, %s, %s, %s, %s)
+              RETURNING id
+              """, (calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity))
+            
             row = cursor.fetchone()
-            # Selon votre cursor (tuple ou dict), récupère l'id proprement :
             box_id = row[0] if row and not isinstance(row, dict) else (row.get("id") if row else None)
+            
+            # 2. Puis insérer les conditions si elles existent
+            if conditions and box_id:
+                cursor.execute("""
+                  INSERT INTO medicine_box_conditions (id, box_id, tablet_count, interval_days, start_date, time_of_day, max_date)
+                  SELECT
+                    COALESCE((c->>'id')::uuid, gen_random_uuid())        AS id,
+                    %s::uuid                                             AS box_id,
+                    (c->>'tablet_count')::float8                         AS tablet_count,
+                    (c->>'interval_days')::int                           AS interval_days,
+                    NULLIF(c->>'start_date','')::timestamp               AS start_date,
+                    COALESCE(NULLIF(c->>'time_of_day',''), 'morning')    AS time_of_day,
+                    NULLIF(c->>'max_date','')::timestamp                 AS max_date
+                  FROM jsonb_array_elements(%s::jsonb) AS c
+                  """, (box_id, json.dumps(conditions)))
+            
             conn.commit()
 
     return box_id
