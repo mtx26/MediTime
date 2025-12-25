@@ -14,7 +14,7 @@
   <!-- Page d'accueil principale avec toutes les langues -->
   <url>
     <loc>https://meditime-app.com/en/home</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2025-12-24</lastmod>
     <changefreq>weekly</changefreq>
     <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/home" />
     <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/home" />
@@ -36,31 +36,49 @@
   <!-- Variantes linguistiques de la page d'accueil -->
   <url>
     <loc>https://meditime-app.com/fr/home</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2025-12-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://meditime-app.com/es/home</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2025-12-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://meditime-app.com/de/home</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2025-12-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://meditime-app.com/it/home</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/ja/home</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/zh/home</loc>
+    <lastmod>2025-12-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://meditime-app.com/pt/home</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/ru/home</loc>
+    <lastmod>2025-12-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -68,7 +86,7 @@
   <!-- Pages d'authentification (accessibles pour non-connectés) -->
   <url>
     <loc>https://meditime-app.com/en/login</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2025-12-24</lastmod>
     <changefreq>monthly</changefreq>
     <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/login" />
     <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/login" />
@@ -83,9 +101,59 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Variantes linguistiques login -->
+  <url>
+    <loc>https://meditime-app.com/fr/login</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/es/login</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/de/login</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/it/login</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/ja/login</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/zh/login</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/pt/login</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/ru/login</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <url>
     <loc>https://meditime-app.com/en/register</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2025-12-24</lastmod>
     <changefreq>monthly</changefreq>
     <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/register" />
     <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/register" />
@@ -99,10 +167,60 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://meditime-app.com/en/register" />
     <priority>0.8</priority>
   </url>
+
+  <!-- Variantes linguistiques register -->
+  <url>
+    <loc>https://meditime-app.com/fr/register</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/es/register</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/de/register</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/it/register</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/ja/register</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/zh/register</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/pt/register</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/ru/register</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
   <!-- Récupération de mot de passe -->
   <url>
     <loc>https://meditime-app.com/en/reset-password</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2025-12-24</lastmod>
     <changefreq>yearly</changefreq>
     <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/reset-password" />
     <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/reset-password" />
@@ -117,10 +235,60 @@
     <priority>0.3</priority>
   </url>
 
+  <!-- Variantes linguistiques reset-password -->
+  <url>
+    <loc>https://meditime-app.com/fr/reset-password</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/es/reset-password</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/de/reset-password</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/it/reset-password</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/ja/reset-password</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/zh/reset-password</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/pt/reset-password</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/ru/reset-password</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
   <!-- Pages légales -->
   <url>
     <loc>https://meditime-app.com/en/privacy</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2025-12-24</lastmod>
     <changefreq>yearly</changefreq>
     <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/privacy" />
     <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/privacy" />
@@ -135,9 +303,59 @@
     <priority>0.5</priority>
   </url>
 
+  <!-- Variantes linguistiques privacy -->
+  <url>
+    <loc>https://meditime-app.com/fr/privacy</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/es/privacy</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/de/privacy</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/it/privacy</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/ja/privacy</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/zh/privacy</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/pt/privacy</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/ru/privacy</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
   <url>
     <loc>https://meditime-app.com/en/terms</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2025-12-24</lastmod>
     <changefreq>yearly</changefreq>
     <xhtml:link rel="alternate" hreflang="en" href="https://meditime-app.com/en/terms" />
     <xhtml:link rel="alternate" hreflang="fr" href="https://meditime-app.com/fr/terms" />
@@ -149,6 +367,56 @@
     <xhtml:link rel="alternate" hreflang="pt" href="https://meditime-app.com/pt/terms" />
     <xhtml:link rel="alternate" hreflang="ru" href="https://meditime-app.com/ru/terms" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://meditime-app.com/en/terms" />
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Variantes linguistiques terms -->
+  <url>
+    <loc>https://meditime-app.com/fr/terms</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/es/terms</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/de/terms</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/it/terms</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/ja/terms</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/zh/terms</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/pt/terms</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://meditime-app.com/ru/terms</loc>
+    <lastmod>2025-12-24</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
