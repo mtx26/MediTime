@@ -286,6 +286,32 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   // HELPER FUNCTIONS
   // =========================================================================
 
+  // Fonction pour créer une box temporaire en mode édition
+  const createTemporaryBox = (medicineData = {}) => {
+    const tempId = `temp-${Date.now()}`;
+    const newBox = {
+      id: tempId,
+      name: medicineData.name || '',
+      dose: medicineData.dose || 0,
+      box_capacity: medicineData.box_capacity || 0,
+      stock_quantity: medicineData.stock_quantity || 0,
+      stock_alert_threshold: medicineData.stock_alert_threshold || 10,
+      conditions: medicineData.conditions || [],
+    };
+    
+    // Ajouter la box au state local
+    setBoxes((prev) => [...prev, newBox]);
+    
+    // Mettre en mode édition
+    initEditing(newBox);
+    setExpandedBoxes((p) => ({
+      ...p,
+      [tempId]: true,
+    }));
+
+    return tempId;
+  };
+
   // Fonction pour supprimer le calendrier avec confirmation
   const handleDeleteCalendar = () => {
     showConfirm(
@@ -418,6 +444,16 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       return { success: false };
     }
     
+    // Fermer la modal
+    setShowQRModal(false);
+    
+    // Si un seul médicament, créer une box temporaire en mode édition
+    if (medicines.length === 1) {
+      createTemporaryBox(medicines[0]);
+      return { success: true, successCount: 1, errorCount: 0 };
+    }
+    
+    // Sinon, ajouter tous les médicaments directement
     let success = 0;
     let error = 0;
     
@@ -428,8 +464,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         error++;
       }
     }
-    
-    setShowQRModal(false);
     
     if (error === 0) {
       showAlert('success', 'Médicaments ajoutés avec succès');
@@ -681,29 +715,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                 icon="plus-circle"
                 color="success"
                 text={t('boxes.add_manual')}
-                onClick={() => {
-                  // Créer une nouvelle box temporaire localement
-                  const tempId = `temp-${Date.now()}`;
-                  const newBox = {
-                    id: tempId,
-                    name: '',
-                    dose: 0,
-                    box_capacity: 0,
-                    stock_quantity: 0,
-                    stock_alert_threshold: 10,
-                    conditions: [],
-                  };
-                  
-                  // Ajouter la box au state local
-                  setBoxes((prev) => [...prev, newBox]);
-                  
-                  // Mettre en mode édition
-                  initEditing(newBox);
-                  setExpandedBoxes((p) => ({
-                    ...p,
-                    [tempId]: true,
-                  }));
-                }}
+                onClick={() => createTemporaryBox()}
                 ariaLabel={t('boxes.add_manual')}
                 hasTooltip={false}
                 dataTour="add-manual-btn"
