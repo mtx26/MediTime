@@ -349,7 +349,11 @@
     "title": "药物审查",
     "confirm_save_title": "保存日历？",
     "confirm_save_message": "分析结果将添加到您的用药日历中。如有需要，您可以稍后修改或删除它们。",
-    "save_success": "药物已成功添加！"
+    "save_success": "药物已成功添加！",
+    "confirm_delete_title": "停药吗？",
+    "confirm_delete_message": "您真的要从列表中删除“{{name}}”吗？此操作不可逆。",
+    "delete_medicine": "移除药物",
+    "delete_success": "成功停药"
   },
   "medicines": {
     "back_to_calendar": "返回日历",

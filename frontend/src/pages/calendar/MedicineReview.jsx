@@ -1,7 +1,6 @@
 import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 import ArrowControls from '../../components/calendar/ArrowControls';
 import { useAlert } from '../../contexts/AlertContext';
@@ -11,6 +10,9 @@ const DEFAULT_CONDITION = {
   interval_days: '',
   start_date: '',
   tablet_count: '',
+  max_date_mode: '',
+  max_date: null,
+  max_date_days: null,
 };
 
 export default function MedicineReview({ personalCalendars }) {
@@ -24,62 +26,13 @@ export default function MedicineReview({ personalCalendars }) {
   const { showAlert, showConfirm } = useAlert();
 
   const [medicines, setMedicines] = useState(medicineBoxes);
-  const [editMode, setEditMode] = useState(false);
-  const [initialMissing, setInitialMissing] = useState(new Set());
 
   const [index, setIndex] = useState(0);
   const current = medicines[index];
   const [suggestions, setSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const isMissing = (v) => !v?.toString().trim();
-
-  const CONDITION_FIELDS = ['time_of_day', 'interval_days', 'tablet_count', 'start_date'];
-
-  const isSafeKey = (key) => (
-    typeof key === 'string' &&
-    /^\w+$/.test(key) &&
-    key !== '__proto__' &&
-    key !== 'prototype' &&
-    key !== 'constructor'
-  );
-
-  const safeGet = (obj, key) => (
-    isSafeKey(key) ? Object.getOwnPropertyDescriptor(obj, key)?.value : undefined
-  );
-
-  const isConditionFieldMissing = (field, cond) => {
-    if (!CONDITION_FIELDS.includes(field)) return true;
-    if (field === 'start_date') {
-      return parseInt(safeGet(cond, 'interval_days')) > 1 && isMissing(safeGet(cond, 'start_date'));
-    }
-    // Pour time_of_day, on considère que c'est manquant si c'est vide ou la valeur par défaut
-    if (field === 'time_of_day') {
-      const v = safeGet(cond, field);
-      return !v || v === '' || v.toString().trim() === '';
-    }
-    return isMissing(safeGet(cond, field));
-  };
-
-  // Créer une clé unique pour identifier un champ
-  const getFieldKey = (medicineIndex, field, conditionIndex = null) => {
-    return conditionIndex !== null 
-      ? `${medicineIndex}_condition_${conditionIndex}_${field}`
-      : `${medicineIndex}_${field}`;
-  };
-
-  // Vérifier si un champ a été marqué comme initialement manquant
-  const wasInitiallyMissing = (medicineIndex, field, conditionIndex = null) => {
-    const key = getFieldKey(medicineIndex, field, conditionIndex);
-    return initialMissing.has(key);
-  };
-
-  // Marquer un champ comme manquant
-  const markAsMissing = (medicineIndex, field, conditionIndex = null) => {
-    const key = getFieldKey(medicineIndex, field, conditionIndex);
-    setInitialMissing(prev => new Set([...prev, key]));
-  };
-
+  const CONDITION_FIELDS = ['time_of_day', 'interval_days', 'tablet_count', 'start_date', 'max_date_mode', 'max_date', 'max_date_days'];
   const MAIN_FIELDS = ['name', 'dose', 'stock_quantity', 'stock_max', 'stock_alert_threshold'];
 
   const handleChange = (field, value) => {
@@ -92,6 +45,38 @@ export default function MedicineReview({ personalCalendars }) {
   const handleConditionChange = (i, field, value) => {
     if (!CONDITION_FIELDS.includes(field)) return;
     const updated = [...medicines];
+    
+    // Gestion spéciale pour interval_days
+    if (field === 'interval_days' && parseInt(value) <= 1) {
+      updated[index].conditions[i]['start_date'] = null;
+    }
+    
+    // Gestion spéciale pour max_date_mode
+    if (field === 'max_date_mode') {
+      updated[index].conditions[i]['max_date'] = null;
+      updated[index].conditions[i]['max_date_days'] = null;
+    }
+    
+    // Gestion spéciale pour max_date et max_date_days
+    if (field === 'max_date_days' && value) {
+      const cond = updated[index].conditions[i];
+      const now = new Date();
+      const target = new Date(now);
+      const hourByTime = { morning: 8, noon: 12, evening: 18 };
+      const targetHour = hourByTime[cond.time_of_day] ?? 8;
+      target.setHours(targetHour, 0, 0, 0);
+      const includeToday = now < target;
+      const endDate = new Date(now);
+      endDate.setDate(endDate.getDate() + (includeToday ? parseInt(value) - 1 : parseInt(value)));
+      endDate.setHours(23, 59, 59, 999);
+      updated[index].conditions[i]['max_date'] = endDate.toISOString();
+      updated[index].conditions[i]['max_date_days'] = parseInt(value);
+    } else if (field === 'max_date' && value) {
+      const selectedDate = new Date(value);
+      selectedDate.setHours(23, 59, 59, 999);
+      updated[index].conditions[i]['max_date'] = selectedDate.toISOString();
+    }
+    
     updated[index].conditions[i][field] = value;
     setMedicines(updated);
   };
@@ -102,28 +87,43 @@ export default function MedicineReview({ personalCalendars }) {
     setMedicines(updated);
   };
 
-  const isCurrentValid = () => {
-    const mainFieldsFilled =
-      current.name.trim() &&
-      current.dose.toString().trim();
+  const deleteCondition = (condIndex) => {
+    const updated = [...medicines];
+    updated[index].conditions.splice(condIndex, 1);
+    setMedicines(updated);
+  };
 
-    const conditionsValid = current.conditions.every((cond) =>
-      !CONDITION_FIELDS.some((field) =>
-        isConditionFieldMissing(field, cond)
-      )
+  const deleteMedicine = () => {
+    showConfirm(
+      'confirm-danger',
+      t('medicine_review.confirm_delete_title'),
+      t('medicine_review.confirm_delete_message', { name: current.name }),
+      () => {
+        const updated = [...medicines];
+        updated.splice(index, 1);
+        setMedicines(updated);
+        
+        // Ajuster l'index après suppression
+        if (updated.length === 0) {
+          // S'il n'y a plus de médicaments, retourner à la page précédente
+          navigate(-1);
+        } else if (index >= updated.length) {
+          // Si on était sur le dernier, aller au précédent
+          setIndex(updated.length - 1);
+        }
+        // Sinon, rester sur le même index (qui affichera le médicament suivant)
+        
+        showAlert('success', t('medicine_review.delete_success'));
+      }
     );
-
-    return mainFieldsFilled && conditionsValid;
   };
 
   const goPrev = () => {
     if (index > 0) setIndex(index - 1);
-    setEditMode(false);
   };
 
   const goNext = () => {
     if (index < medicines.length - 1) setIndex(index + 1);
-    setEditMode(false);
   };
 
   const handleSave = async () => {
@@ -141,10 +141,17 @@ export default function MedicineReview({ personalCalendars }) {
     );
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (index < medicines.length - 1) {
+      goNext();
+    } else {
+      handleSave();
+    }
+  };
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Réinitialiser le mode édition à false quand on change de médicament
-    setEditMode(false);
   }, [index]);
 
   useEffect(() => {
@@ -160,32 +167,6 @@ export default function MedicineReview({ personalCalendars }) {
     setMedicines(updated);
   }, [index]);
 
-  // Surveiller les champs manquants et les ajouter à initialMissing
-  useEffect(() => {
-    if (!current) return;
-
-    // Vérifier le nom
-    if (isMissing(current.name)) {
-      markAsMissing(index, 'name');
-    }
-
-    // Vérifier le dosage
-    if (isMissing(current.dose)) {
-      markAsMissing(index, 'dose');
-    }
-
-    // Vérifier les conditions
-    if (current.conditions) {
-      current.conditions.forEach((cond, condIndex) => {
-        CONDITION_FIELDS.forEach(field => {
-          if (isConditionFieldMissing(field, cond)) {
-            markAsMissing(index, field, condIndex);
-          }
-        });
-      });
-    }
-  }, [current, index, medicines]);
-
   useEffect(() => {
     if (!current.name || current.name.length < 2) {
       setSuggestions([]);
@@ -200,117 +181,73 @@ export default function MedicineReview({ personalCalendars }) {
     return () => clearTimeout(timeout);
   }, [current.name, current.dose]);
 
-  // Fonction pour obtenir la valeur affichée d'un champ
-  const getDisplayValue = (field, value, options = null) => {
-    if (!value && value !== 0) return '-';
-
-    if (options) {
-      const option = options.find(opt => opt.value === value);
-      return option?.label || value;
-    }
-
-    if (field === 'time_of_day') {
-      const timeOptions = {
-        'morning': t('morning'),
-        'noon': t('noon'),
-        'evening': t('evening')
-      };
-      const safeValue = isSafeKey(value)
-        ? Object.getOwnPropertyDescriptor(timeOptions, value)?.value
-        : undefined;
-      return safeValue !== undefined ? safeValue : value;
-    }
-
-    return value;
-  };
-
-  // Actions pour l'ActionSheet
-  const actionSheetActions = [
-    {
-      label: (
-        <>
-          <i className="bi bi-pencil me-2"></i>
-          {t('modify')}
-        </>
-      ),
-      onClick: () => setEditMode(true),
-      title: t('modify'),
-    },
-  ];
-
-
-
   return (
     <div className="text-center">
-      <div className="card mx-auto shadow p-4 mb-4" style={{ maxWidth: 500 }}>
-        {/* Header avec ActionSheet */}
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="text-center fw-bold">
+      <form onSubmit={handleSubmit} className="card mx-auto shadow p-4 mb-4" style={{ maxWidth: 500 }}>
+        {/* Header */}
+        <div className="mb-3 d-flex justify-content-between align-items-center">
+          <h5 className="text-center fw-bold mb-0">
             <i className="bi bi-pencil me-2"></i>
             {t('medicine_review.title')}
           </h5>
-          {!editMode && (
-            <ActionSheet 
-              actions={actionSheetActions}
-            />
-          )}
+          <button
+            type="button"
+            className="btn btn-danger btn-sm"
+            onClick={deleteMedicine}
+            title={t('medicine_review.delete_medicine')}
+            aria-label={t('medicine_review.delete_medicine')}
+          >
+            <i className="bi bi-trash"></i>
+          </button>
         </div>
         
         <div className="position-relative mb-3">
           <div className="row">
           <div className="col-12 col-md-6 mb-3 text-start">
             <label htmlFor="name">{t('boxes.name')} :</label><br />
-            {wasInitiallyMissing(index, 'name') || editMode ? (
-              <input
-                type="text"
-                className={`form-control form-control-sm ${isMissing(current.name) ? 'is-invalid' : ''}`}
-                value={current.name}
-                onChange={(e) => {
-                  handleChange('name', e.target.value);
-                  setShowDropdown(true);
-                }}
-                onClick={() => setShowDropdown(true)}
-                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                placeholder={t('boxes.start_typing')}
-              />
-            ) : (
-              <div className="form-control form-control-sm bg-light border">
-                <strong>{current.name}</strong>
-              </div>
-            )}
+            <input
+              type="text"
+              className={`form-control form-control-sm ${current.name.trim() === '' ? '' : 'border-success border-2'} `}
+              value={current.name}
+              onChange={(e) => {
+                handleChange('name', e.target.value);
+                setShowDropdown(true);
+              }}
+              onClick={() => setShowDropdown(true)}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+              placeholder={t('boxes.start_typing')}
+              required
+              title={t('boxes.name')}
+              aria-label={t('boxes.name')}
+            />
           </div>
 
           <div className="col-12 col-md-6 mb-3 text-start">
             <label htmlFor="dose">{t('boxes.dose')} :</label><br />
-            {wasInitiallyMissing(index, 'dose') || editMode ? (
-              <input
-                className={`form-control form-control-sm ${isMissing(current.dose) ? 'is-invalid' : ''}`}
-                type="number"
-                value={current.dose}
-                onChange={(e) => {
-                  handleChange('dose', e.target.value);
-                  if (current.name && current.name.length >= 2) {
-                    setShowDropdown(true);
-                  }
-                }}
-                onFocus={() => {
-                  // Afficher les suggestions si le nom est rempli et qu'il y en a
-                  if (current.name && current.name.length >= 2 && suggestions.length > 0) {
-                    setShowDropdown(true);
-                  }
-                }}
-                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                id="dose"
-                placeholder={t('mg')}
-                title={t('boxes.dose')}
-                aria-label={t('boxes.dose')}
-                min={0}
-              />
-            ) : (
-              <div className="form-control form-control-sm bg-light border">
-                <strong>{current.dose} {t('mg')}</strong>
-              </div>
-            )}
+            <input
+              className={`form-control form-control-sm ${current.dose && current.dose.toString().trim() !== '' ? 'border-success border-2' : ''}`}
+              type="number"
+              value={current.dose || ''}
+              onChange={(e) => {
+                handleChange('dose', e.target.value);
+                if (current.name && current.name.length >= 2) {
+                  setShowDropdown(true);
+                }
+              }}
+              onFocus={() => {
+                // Afficher les suggestions si le nom est rempli et qu'il y en a
+                if (current.name && current.name.length >= 2 && suggestions.length > 0) {
+                  setShowDropdown(true);
+                }
+              }}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+              id="dose"
+              placeholder={t('mg')}
+              title={t('boxes.dose')}
+              aria-label={t('boxes.dose')}
+              min={0}
+              required
+            />
           </div>
 
           </div>
@@ -360,25 +297,19 @@ export default function MedicineReview({ personalCalendars }) {
             type: 'number',
             min: '0',
             required: false,
-          }].map(({ label, field, type, min, required = true }) => (
+          }].map(({ label, field, type, min }) => (
             <div key={field} className="mb-2 text-start col-12 col-md-6 mb-3 text-muted">
               <label htmlFor={field}>{label} :</label><br />
-              {editMode || (required && isMissing(safeGet(current, field))) ? (
-                <input
-                  className={`form-control form-control-sm ${required && isMissing(safeGet(current, field)) ? 'is-invalid' : ''}`}
-                  type={type}
-                  value={safeGet(current, field) || ''}
-                  onChange={(e) => handleChange(field, e.target.value)}
-                  id={field}
-                  title={label}
-                  aria-label={label}
-                  min={min}
-                />
-              ) : (
-                <div className="form-control form-control-sm bg-light border">
-                  {getDisplayValue(field, safeGet(current, field))}
-                </div>
-              )}
+              <input
+                className="form-control form-control-sm"
+                type={type}
+                value={current[field] || ''}
+                onChange={(e) => handleChange(field, e.target.value)}
+                id={field}
+                title={label}
+                aria-label={label}
+                min={min}
+              />
             </div>
           ))}
         </div>
@@ -390,7 +321,14 @@ export default function MedicineReview({ personalCalendars }) {
         {current.conditions.map((cond, i) => (
           <div key={i} className="mb-3 border rounded p-3 text-start bg-light">
             {[{
-              label: t('medicine_review.time_of_day'),
+              label: t('boxes.condition.tablet_count'),
+              field: 'tablet_count',
+              type: 'number',
+              step: '0.25',
+              min: '0',
+              required: true,
+            }, {
+              label: t('boxes.condition.time_of_day'),
               field: 'time_of_day',
               type: 'select',
               options: [
@@ -399,93 +337,94 @@ export default function MedicineReview({ personalCalendars }) {
                 { value: 'noon', label: t('noon') },
                 { value: 'evening', label: t('evening') },
               ],
+              required: true,
             }, {
               label: t('boxes.condition.interval_days'),
               field: 'interval_days',
               type: 'number',
               min: '1',
+              required: true,
             }, {
-              label: t('medicine_review.start_date'),
+              label: t('boxes.condition.start_date'),
               field: 'start_date',
               type: 'date',
+              show: parseInt(cond.interval_days) > 1,
+              required: parseInt(cond.interval_days) > 1,
             }, {
-              label: t('boxes.condition.tablet_count'),
-              field: 'tablet_count',
-              type: 'number',
-              step: '0.25',
-              min: '0',
-            }].map(({ label, field, type, step, min, options }) => {
-              const missing = isConditionFieldMissing(field, cond);
-              const wasFieldInitiallyMissing = wasInitiallyMissing(index, field, i);
-              const disabled = field === 'start_date' && parseInt(safeGet(cond, 'interval_days')) === 1;
-
-              return (
-                <div key={field} className="mb-1">
-                  <label htmlFor={field}>{label} :</label><br />
-                  {wasFieldInitiallyMissing || editMode ? (
-                    type === 'select' ? (
-                      <select
-                        className={`form-select form-select-sm ${missing ? 'is-invalid' : ''}`}
-                        id={field}
-                        value={safeGet(cond, field) || ''}
-                        onChange={(e) => handleConditionChange(i, field, e.target.value)}
-                        title={label}
-                        aria-label={label}
-                      >
-                        {options.map(opt => (
-                          <option key={opt.value} value={opt.value}>{opt.label}</option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        type={type}
-                        className={`form-control form-control-sm ${missing ? 'is-invalid' : ''}`}
-                        id={field}
-                        value={safeGet(cond, field) || ''}
-                        onChange={(e) => handleConditionChange(i, field, e.target.value)}
-                        disabled={disabled}
-                        step={step}
-                        min={min}
-                        title={label}
-                        aria-label={label}
-                      />
-                    )
-                  ) : (
-                    <div className="form-control form-control-sm bg-white border">
-                      <strong>{getDisplayValue(field, safeGet(cond, field), options)}</strong>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-            {editMode && (
-              <button
-                className="btn btn-danger btn-sm mt-2"
-                onClick={() => {
-                  const updated = [...medicines];
-                  updated[index].conditions.splice(i, 1);
-                  setMedicines(updated);
-                }}
-                title={t('medicine_review.delete_condition')}
-                aria-label={t('medicine_review.delete_condition')}
-              >
-                <i className="bi bi-trash me-2"></i>
-                {t('delete')}
-              </button>
-            )}
+              label: t('boxes.condition.max_date_mode'),
+              field: 'max_date_mode',
+              type: 'select',
+              options: [
+                { value: '', label: t('boxes.condition.no_limit') },
+                { value: 'until_date', label: t('boxes.condition.until_date') },
+                { value: 'for_days', label: t('boxes.condition.for_days') },
+              ],
+              required: false,
+            }, {
+              label: cond.max_date_mode === 'until_date' 
+                ? t('boxes.condition.end_date') 
+                : t('boxes.condition.duration_days'),
+              field: cond.max_date_mode === 'until_date' ? 'max_date' : 'max_date_days',
+              type: cond.max_date_mode === 'until_date' ? 'date' : 'number',
+              min: '1',
+              step: '1',
+              show: cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
+              required: cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
+            }].filter(item => item.show !== false).map(({ label, field, type, step, min, options, required }) => (
+              <div key={field} className="mb-1">
+                <label htmlFor={field}>{label} :</label><br />
+                {type === 'select' ? (
+                  <select
+                    className="form-select form-select-sm"
+                    id={field}
+                    value={cond[field] || ''}
+                    onChange={(e) => handleConditionChange(i, field, e.target.value)}
+                    title={label}
+                    aria-label={label}
+                    required={required}
+                  >
+                    {options.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type={type}
+                    className="form-control form-control-sm"
+                    id={field}
+                    value={field === 'max_date' && cond[field] ? cond[field].split('T')[0] : (cond[field] || '')}
+                    onChange={(e) => handleConditionChange(i, field, e.target.value)}
+                    step={step}
+                    min={min}
+                    title={label}
+                    aria-label={label}
+                    required={required}
+                  />
+                )}
+              </div>
+            ))}
+            <button
+              className="btn btn-danger btn-sm mt-2"
+              onClick={() => deleteCondition(i)}
+              title={t('boxes.condition.delete')}
+              aria-label={t('boxes.condition.delete')}
+            >
+              <i className="bi bi-trash me-2"></i>
+              {t('boxes.condition.delete')}
+            </button>
           </div>
           ))}
 
-          {editMode && (
-            <button
-              type="button"
-              className="btn btn-outline-dark w-100"
-              onClick={addCondition}
-            >
-            <i className="bi bi-plus-lg me-2"></i>
-            {t('boxes.condition.add')}
-            </button>
-          )}
+        <button
+          type="button"
+          className="btn btn-sm bg-light border w-100 mt-2"
+          onClick={addCondition}
+          title={t('boxes.condition.add')}
+          aria-label={t('boxes.condition.add')}
+        >
+          <i className="bi bi-plus-lg me-2"></i>
+          {t('boxes.condition.add')}
+        </button>
 
         <hr />
         <ArrowControls
@@ -493,7 +432,8 @@ export default function MedicineReview({ personalCalendars }) {
           onRight={index < medicines.length - 1 ? goNext : handleSave}
         />
         <div className="d-flex justify-content-between gap-3">
-          <button 
+          <button
+            type="button"
             className="btn btn-secondary" 
             onClick={goPrev} 
             disabled={index === 0}
@@ -507,9 +447,8 @@ export default function MedicineReview({ personalCalendars }) {
             <span className="text-muted">{index + 1} / {medicines.length}</span>
           </div>
           <button
+            type="submit"
             className={`btn ${index < medicines.length - 1 ? "btn-primary" : "btn-success"}`}
-            onClick={index < medicines.length - 1 ? goNext : handleSave}
-            disabled={!isCurrentValid()}
             title={index < medicines.length - 1 ? t('next') : t('medicine_review.finish')}
             aria-label={t('next')}
           >
@@ -517,7 +456,7 @@ export default function MedicineReview({ personalCalendars }) {
             {index < medicines.length - 1 ? t('next') : t('medicine_review.finish')}
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

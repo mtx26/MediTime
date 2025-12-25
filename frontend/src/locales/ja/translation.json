@@ -349,7 +349,11 @@
     "title": "薬物レビュー",
     "confirm_save_title": "カレンダーを保存しますか?",
     "confirm_save_message": "分析された薬はカレンダーに追加されます。必要に応じて後で変更または削除できます。",
-    "save_success": "薬が正常に追加されました。"
+    "save_success": "薬が正常に追加されました。",
+    "confirm_delete_title": "薬を削除しますか？",
+    "confirm_delete_message": "本当に「{{name}}」をリストから削除しますか? この操作は元に戻せません。",
+    "delete_medicine": "薬を取り除く",
+    "delete_success": "薬の中止に成功"
   },
   "medicines": {
     "back_to_calendar": "カレンダーに戻る",

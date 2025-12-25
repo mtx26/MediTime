@@ -349,7 +349,11 @@
     "title": "Arzneimittelüberprüfung",
     "confirm_save_title": "Kalender speichern?",
     "confirm_save_message": "Die analysierten Medikamente werden Ihrem Kalender hinzugefügt. Sie können sie später bei Bedarf ändern oder löschen.",
-    "save_success": "Medikamente erfolgreich hinzugefügt!"
+    "save_success": "Medikamente erfolgreich hinzugefügt!",
+    "confirm_delete_title": "Medikamente absetzen?",
+    "confirm_delete_message": "Möchten Sie \"{{name}}\" wirklich aus der Liste entfernen? Diese Aktion ist unwiderruflich.",
+    "delete_medicine": "Entfernen Sie das Medikament.",
+    "delete_success": "Medikament erfolgreich abgesetzt"
   },
   "medicines": {
     "back_to_calendar": "Zurück zum Kalender",

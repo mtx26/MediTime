@@ -349,7 +349,11 @@
     "title": "Drug Review",
     "confirm_save_title": "Save the calendar?",
     "confirm_save_message": "The analyzed medications will be added to your calendar. You can modify or delete them later if necessary.",
-    "save_success": "Medications successfully added!"
+    "save_success": "Medications successfully added!",
+    "confirm_delete_title": "Remove the medication?",
+    "confirm_delete_message": "Do you really want to remove \"{{name}}\" from the list? This action is irreversible.",
+    "delete_medicine": "Remove the medication",
+    "delete_success": "Drug successfully discontinued"
   },
   "medicines": {
     "back_to_calendar": "Back to calendar",

@@ -349,7 +349,11 @@
     "title": "Revisão de Medicamentos",
     "confirm_save_title": "Salvar o calendário?",
     "confirm_save_message": "Os medicamentos analisados serão adicionados ao seu calendário. Você poderá modificá-los ou excluí-los posteriormente, se necessário.",
-    "save_success": "Medicamentos adicionados com sucesso!"
+    "save_success": "Medicamentos adicionados com sucesso!",
+    "confirm_delete_title": "Remover a medicação?",
+    "confirm_delete_message": "Tem mesmo vontade de remover \"{{name}}\" da lista? Esta ação é irreversível.",
+    "delete_medicine": "Remova a medicação.",
+    "delete_success": "Medicamento descontinuado com sucesso"
   },
   "medicines": {
     "back_to_calendar": "Voltar ao calendário",
