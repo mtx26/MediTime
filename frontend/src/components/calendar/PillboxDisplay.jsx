@@ -33,7 +33,7 @@ export default function PillboxDisplay({
   const [selectedMedIndex, setSelectedMedIndex] = useState(0);
   const [orderedMeds, setOrderedMeds] = useState([]);
   const [loading, setLoading] = useState(undefined);
-  const { showConfirm, showAlert } = useAlert();
+  const { showConfirm } = useAlert();
   const [isPillboxUsed, setIsPillboxUsed] = useState(false); // Indicateur d'utilisation de la boîte à pilules
   const [pillboxError, setPillboxError] = useState(false);
 
@@ -256,12 +256,8 @@ export default function PillboxDisplay({
                               t('pillbox_completion_description'),
                               async () => {
                                 const rep = await calendarSource.decreaseStock(calendarId, toISO(selectedDate));
-
-                                if (rep.success) {
-                                  showAlert('success', t('calendar_completed'));
-                                } else {
+                                if (!rep.success) {
                                   setPillboxError(true);
-                                  showAlert('danger', rep.error || t('calendar_completion_error'));
                                 }
                                 // Navigation propre au pillbox (effectuée même si rep.success est false, comme avant)
                                 if (type === 'pillbox') {

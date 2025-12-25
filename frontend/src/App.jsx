@@ -13,6 +13,7 @@ import I18nHead from './components/common/I18nHead';
 import StructuredData from './components/common/StructuredData';
 import OnboardingTour from './components/onboarding/OnboardingTour';
 import { requestPermissionAndGetToken } from './services/firebase/firebase';
+import { useAlert } from './contexts/AlertContext';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -28,6 +29,7 @@ function App() {
   const { t, i18n } = useTranslation();
   const { lng } = useParams();
   const location = useLocation();
+  const { showAlert } = useAlert();
   
   const [tokensList, setTokensList] = useState([]);
   const [calendarsData, setCalendarsData] = useState(null);
@@ -60,8 +62,9 @@ function App() {
       uid,
       analyticsEvent: 'add_calendar',
       analyticsData: { calendarName, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour supprimer un calendrier
   const deleteCalendar = useCallback(async (calendarId) => {
@@ -72,8 +75,9 @@ function App() {
       uid,
       analyticsEvent: 'delete_calendar',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
   
 
   // Fonction pour renommer un calendrier
@@ -90,8 +94,9 @@ function App() {
         newCalendarName,
         uid,
       },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
 
   // Fonction pour obtenir le calendrier lier au calendarId
@@ -113,19 +118,13 @@ function App() {
 
     if (result.success) {
       return {
-        success: true,
-        message: result.message,
-        code: result.code,
-        schedule: result.schedule ?? [],
-        calendarName: result.calendar_name ?? '',
-        table: result.table ?? {},
-        ifLowStock: result.if_low_stock ?? false,
+        ...result,
+        calendarName: result.calendar_name,
+        ifLowStock: result.if_low_stock,
       };
     } else {
       return {
-        success: false,
-        error: result.error,
-        code: result.code,
+        ...result,
         schedule: [],
         calendarName: '',
         table: {},
@@ -144,8 +143,9 @@ function App() {
       uid,
       analyticsEvent: 'update_personal_box',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
   
 
   // Fonction pour créer une boîte de médicaments
@@ -167,23 +167,18 @@ function App() {
       uid,
       analyticsEvent: 'create_personal_box',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
 
     if (result.success) {
       return {
-        success: true,
+        ...result,
         boxId: result.box_id,
-        message: result.message,
-        code: result.code,
       };
     } else {
-      return {
-        success: false,
-        error: result.error,
-        code: result.code,
-      };
+      return result;
     }
-  }, []);
+  }, [showAlert]);
   
 
   // Fonction pour supprimer une boîte
@@ -195,8 +190,9 @@ function App() {
       uid,
       analyticsEvent: 'delete_personal_box',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour récupérer si le pillbox d'un calendrier a été utilisé
   const fetchIfPersonalPillboxUsed = useCallback(async (calendarId, startDate = null) => {
@@ -208,8 +204,9 @@ function App() {
       uid,
       analyticsEvent: 'fetch_if_pillbox_used',
       analyticsData: { calendarId, uid, startDate: start },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // fonction pour diminuer le stock du pillulier
   const useMedicinesForPersonalPillbox   = useCallback(async (calendarId, startDate = null) => {
@@ -222,8 +219,9 @@ function App() {
       uid,
       analyticsEvent: 'use_pillbox_medication',
       analyticsData: { calendarId, uid, startDate: start },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour annuler l'utilisation du pillbox d'un calendrier
   const cancelUsePersonalPillbox = useCallback(async (calendarId, useId) => {
@@ -234,8 +232,9 @@ function App() {
       uid,
       analyticsEvent: 'cancel_use_personal_pillbox',
       analyticsData: { calendarId, useId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour recuperer la list des utilisations du pillbox
   const fetchPersonalPillboxUses = useCallback(async (calendarId) => {
@@ -246,8 +245,9 @@ function App() {
       uid,
       analyticsEvent: 'fetch_personal_pillbox_uses',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour récupérer la méthode de décrément de stock
   const fetchPersonalStockDecrementMethod = useCallback(async (calendarId) => {
@@ -258,8 +258,9 @@ function App() {
       uid,
       analyticsEvent: 'fetch_stock_decrement_method',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour mettre à jour la méthode de décrément de stock
   const updatePersonalStockDecrementMethod = useCallback(async (calendarId, method) => {
@@ -271,8 +272,9 @@ function App() {
       uid,
       analyticsEvent: 'update_stock_decrement_method',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour restocker une boîte
   const personalRestockBox = useCallback(async (calendarId, boxId) => {
@@ -283,8 +285,9 @@ function App() {
       uid,
       analyticsEvent: 'restock_personal_box',
       analyticsData: { calendarId, boxId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   const fetchPersonalNotificationsEnabled = useCallback(async (calendarId) => {
     return await performApiCall({
@@ -294,8 +297,9 @@ function App() {
       uid,
       analyticsEvent: 'fetch_personal_notifications_enabled',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   const updatePersonalNotificationsEnabled = useCallback(async (calendarId) => {
     return await performApiCall({
@@ -305,8 +309,9 @@ function App() {
       uid,
       analyticsEvent: 'update_personal_notifications_enabled',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -320,8 +325,9 @@ function App() {
       uid,
       analyticsEvent: 'get_ics_tokens',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   const createTokenIcs = useCallback(async (calendarId) => {
     return await performApiCall({
@@ -331,8 +337,9 @@ function App() {
       uid,
       analyticsEvent: 'create_ics_token',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   const deleteTokenIcs = useCallback(async (calendarId, tokenId) => {
     return await performApiCall({
@@ -342,8 +349,9 @@ function App() {
       uid,
       analyticsEvent: 'delete_ics_token',
       analyticsData: { calendarId, tokenId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   const getSharedTokensIcs = useCallback(async (calendarId) => {
     return await performApiCall({
@@ -353,8 +361,9 @@ function App() {
       uid,
       analyticsEvent: 'get_shared_ics_tokens',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   const createSharedTokenIcs = useCallback(async (calendarId) => {
     return await performApiCall({
@@ -364,8 +373,9 @@ function App() {
       uid,
       analyticsEvent: 'create_shared_ics_token',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   const deleteSharedTokenIcs = useCallback(async (calendarId, tokenId) => {
     return await performApiCall({
@@ -375,8 +385,9 @@ function App() {
       uid,
       analyticsEvent: 'delete_shared_ics_token',
       analyticsData: { calendarId, tokenId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -393,6 +404,7 @@ function App() {
         token,
         startTime: start,
       },
+      showAlert,
     });
 
     return {
@@ -404,7 +416,7 @@ function App() {
       table: result.table ?? {},
       error: result.error,
     };
-  }, []);
+  }, [showAlert]);
   
 
   // Fonction pour créer un lien de partage
@@ -416,8 +428,9 @@ function App() {
       origin: 'TOKEN_CREATE',
       analyticsEvent: 'create_token',
       analyticsData: { calendarId },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
   
 
   // Fonction pour supprimer un lien de partage
@@ -429,8 +442,9 @@ function App() {
       uid,
       analyticsEvent: 'delete_token',
       analyticsData: { token, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
   
 
   // Fonction pour mettre à jour l'expiration d'un token
@@ -443,8 +457,9 @@ function App() {
       uid,
       analyticsEvent: 'update_token_expiration',
       analyticsData: { token, uid, expiresAt },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
   
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -459,8 +474,9 @@ function App() {
       uid,
       analyticsEvent: 'send_invitation',
       analyticsData: { email, calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   /// login
 
@@ -473,8 +489,9 @@ function App() {
       uid,
       analyticsEvent: 'get_invitation',
       analyticsData: { token, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour supprimer un utilisateur partagé pour le owner
   const deleteLoginInvitation = useCallback(async (token) => {
@@ -485,8 +502,9 @@ function App() {
       uid,
       analyticsEvent: 'delete_shared_user',
       analyticsData: { token, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
   
 
   // Fonction pour accepter une invitation
@@ -498,8 +516,9 @@ function App() {
       uid,
       analyticsEvent: 'accept_invitation',
       analyticsData: { token, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
   
 
   // Fonction pour rejeter une invitation
@@ -511,8 +530,9 @@ function App() {
       uid,
       analyticsEvent: 'reject_invitation',
       analyticsData: { token, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   /// Registration
 
@@ -524,8 +544,9 @@ function App() {
       uid,
       analyticsEvent: 'get_invitation',
       analyticsData: { token, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   const deleteRegistrationInvitation = useCallback(async (token) => {
     return await performApiCall({
@@ -535,8 +556,9 @@ function App() {
       uid,
       analyticsEvent: 'delete_invitation',
       analyticsData: { token, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   const acceptRegistrationInvitation = useCallback(async (token) => {
     return await performApiCall({
@@ -546,8 +568,9 @@ function App() {
       uid,
       analyticsEvent: 'accept_invitation',
       analyticsData: { token, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   const rejectRegistrationInvitation = useCallback(async (token) => {
     return await performApiCall({
@@ -557,8 +580,9 @@ function App() {
       uid,
       analyticsEvent: 'reject_invitation',
       analyticsData: { token, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
@@ -572,8 +596,9 @@ function App() {
       uid,
       analyticsEvent: 'read_notification',
       analyticsData: { notificationId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
   
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -587,8 +612,9 @@ function App() {
       uid,
       analyticsEvent: 'delete_shared_calendar',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
   
 
   // Fonction pour récupérer les différentes utilisateurs ayant accès à un calendrier
@@ -600,8 +626,9 @@ function App() {
       uid,
       analyticsEvent: 'fetch_shared_users',
       analyticsData: { uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
   
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -618,14 +645,13 @@ function App() {
         uid,
         analyticsEvent: 'fetch_shared_user_calendar_schedule',
         analyticsData: { calendarId, uid, startDate: start },
+        showAlert,
       });
   
       if (response.success) {
         return {
           ...response,
-          schedule: response.schedule,
           calendarName: response.calendar_name,
-          table: response.table,
           ifLowStock: response.if_low_stock ?? false,
         };
       }
@@ -637,7 +663,7 @@ function App() {
         table: {},
       };
     },
-    []
+    [showAlert]
   );
   
 
@@ -651,8 +677,9 @@ function App() {
       uid,
       analyticsEvent: 'update_shared_user_box',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
   
 
   // Fonction pour créer une boite de médicaments
@@ -681,18 +708,19 @@ function App() {
         uid,
         analyticsEvent: 'create_shared_user_box',
         analyticsData: { calendarId, uid },
+        showAlert,
       });
   
       if (result.success) {
         return {
           ...result,
-          boxId: result?.data?.box_id ?? null,
+          boxId: result.box_id,
         };
       }
   
       return result;
     },
-    []
+    [showAlert]
   );
   
 
@@ -705,8 +733,9 @@ function App() {
       uid,
       analyticsEvent: 'delete_shared_user_box',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour récupérer si le pillbox d'un calendrier partagé a été utilisé
   const fetchIfSharedUserPillboxUsed = useCallback(async (calendarId, startDate = null) => {
@@ -718,8 +747,9 @@ function App() {
       uid,
       analyticsEvent: 'fetch_if_shared_user_pillbox_used',
       analyticsData: { calendarId, uid, startDate: start },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour diminuer le stock du pillulier
   const useMedicinesForSharedUserPillbox = useCallback(async (calendarId, startDate = null) => {
@@ -732,8 +762,9 @@ function App() {
       uid,
       analyticsEvent: 'use_shared_user_pillbox_medication',
       analyticsData: { calendarId, startDate: start },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour annuler l'utilisation du pillbox d'un calendrier partagé
   const cancelUseSharedUserPillbox = useCallback(async (calendarId, useId) => {
@@ -744,8 +775,9 @@ function App() {
       uid,
       analyticsEvent: 'cancel_use_shared_user_pillbox',
       analyticsData: { calendarId, useId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour récupérer la liste des utilisations du pillbox
   const fetchSharedUserPillboxUses = useCallback(async (calendarId) => {
@@ -756,8 +788,9 @@ function App() {
       uid,
       analyticsEvent: 'fetch_shared_user_pillbox_uses',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour restocker une boîte
   const sharedUserRestockBox = useCallback(async (calendarId, boxId) => {
@@ -768,8 +801,9 @@ function App() {
       uid,
       analyticsEvent: 'restock_shared_user_box',
       analyticsData: { calendarId, boxId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour récupérer les notifications activées
   const fetchSharedUserNotificationsEnabled = useCallback(async (calendarId) => {
@@ -780,8 +814,9 @@ function App() {
       uid,
       analyticsEvent: 'fetch_shared_user_notifications_enabled',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour mettre à jour les notifications activées
   const updateSharedUserNotificationsEnabled = useCallback(async (calendarId) => {
@@ -792,8 +827,9 @@ function App() {
       uid,
       analyticsEvent: 'update_shared_user_notifications_enabled',
       analyticsData: { calendarId, uid },
+      showAlert,
     });
-  }, []);
+  }, [showAlert]);
 
   // Fonction pour récupérer la méthode de décrément de stock
   const fetchSharedUserStockDecrementMethod = useCallback(async (calendarId) => {
@@ -803,9 +839,10 @@ function App() {
       origin: 'SHARED_USER_STOCK_DECREMENT_METHOD_FETCH',
       uid,
       analyticsEvent: 'fetch_shared_user_stock_decrement_method',
+      showAlert,
       analyticsData: { calendarId, uid },
     });
-  }, []);
+  }, [showAlert]);
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -820,8 +857,9 @@ function App() {
         uid,
         analyticsEvent: 'DOCUMENT_ANALYZE',
         analyticsData: { uid },
+        showAlert,
       });
-    }, []);
+    }, [showAlert]);
 
     const saveAnalysisResult = useCallback(async (calendarName, boxes) => {
       return await performApiCall({
@@ -832,8 +870,9 @@ function App() {
         uid,
         analyticsEvent: 'DOCUMENT_ANALYZE_SAVE',
         analyticsData: { uid },
+        showAlert,
       });
-    }, []);
+    }, [showAlert]);
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -856,8 +895,9 @@ function App() {
       uid,
       analyticsEvent: 'FCM_TOKEN_SEND',
       analyticsData: { uid, token },
+      showAlert,
     });
-  } , []);
+  } , [showAlert]);
   
 
   const sharedProps = {

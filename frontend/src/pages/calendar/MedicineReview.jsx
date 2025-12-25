@@ -112,7 +112,6 @@ export default function MedicineReview({ personalCalendars }) {
           setIndex(updated.length - 1);
         }
         // Sinon, rester sur le même index (qui affichera le médicament suivant)
-        
         showAlert('success', t('medicine_review.delete_success'));
       }
     );
@@ -134,7 +133,6 @@ export default function MedicineReview({ personalCalendars }) {
       async () => {
         const rep = await personalCalendars.saveAnalysisResult(calendarName, medicines);
         if (rep.success) {
-          showAlert('success', t('medicine_review.save_success'));
           navigate(`/${lng}/calendar/${rep.calendar_id}`);
         }
       }

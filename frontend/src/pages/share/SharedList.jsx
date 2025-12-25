@@ -55,12 +55,7 @@ function SharedList({
 
   // 📅 Mise à jour de la date d'expiration
   const handleUpdateTokenExpiration = async (tokenId, date) => {
-    const rep = await tokenCalendars.updateTokenExpiration(tokenId, date);
-    if (rep.success) {
-      showAlert('success', rep.message);
-    } else {
-      showAlert('danger', rep.error);
-    }
+    await tokenCalendars.updateTokenExpiration(tokenId, date);
   };
 
   const promptDeleteCalendar = ({
@@ -77,10 +72,7 @@ function SharedList({
       async () => {
         const rep = await personalCalendars.deleteCalendar(calendarId);
         if (rep.success) {
-          showAlert('success', rep.message);
           navigate(`/${lng}/calendars`);
-        } else {
-          showAlert('danger', rep.error);
         }
       }
     );
@@ -96,12 +88,7 @@ function SharedList({
   };
 
   const handleDeleteToken = async (tokenId) => {
-    const rep = await tokenCalendars.deleteToken(tokenId);
-    if (rep.success) {
-      showAlert('success', rep.message);
-    } else {
-      showAlert('danger', rep.error);
-    }
+    await tokenCalendars.deleteToken(tokenId);
     setSelectedModifyToken(null);
   };
 
@@ -115,13 +102,7 @@ function SharedList({
   };
 
   const handleDeleteLoginInvitation = async (token) => {
-    const rep = await sharedUserCalendars.deleteLoginInvitation(token);
-    if (rep.success) {
-      showAlert('success', rep.message);
-      setGroupedSharedFunction();
-    } else {
-      showAlert('danger', rep.error);
-    }
+    await sharedUserCalendars.deleteLoginInvitation(token);
   };
 
   const deleteRegistrationInvitationConfirmAction = (token) => {
@@ -136,10 +117,7 @@ function SharedList({
   const handledeleteRegistrationInvitation = async (token) => {
     const rep = await sharedUserCalendars.deleteRegistrationInvitation(token);
     if (rep.success) {
-      showAlert('success', rep.message);
       setGroupedSharedFunction();
-    } else {
-      showAlert('danger', rep.error);
     }
   };
 
@@ -148,25 +126,17 @@ function SharedList({
 
     const rep = await sharedUserCalendars.sendInvitation(email, calendarId);
     if (rep.success) {
-      showAlert('success', rep.message);
       setGroupedSharedFunction();
       setEmailsToInvite((prev) => ({ ...prev, [calendarId]: "" }));
-    } else {
-      showAlert('danger', rep.error);
     }
   };
 
   const handleCreateToken = async (calendarId) => {
-    const rep = await tokenCalendars.createToken(
+    await tokenCalendars.createToken(
       calendarId,
       expiresAt[calendarId],
       permissions[calendarId],
     );
-    if (rep.success) {
-      showAlert('success', rep.message);
-    } else {
-      showAlert('danger', rep.error);
-    }
   };
 
   // 🔄 Fonction pour mettre à jour les info de partage
@@ -197,11 +167,10 @@ function SharedList({
       setGroupedShared(rep.grouped);
     } else {
       setGroupedShared({});
-      showAlert('danger', rep.message);
     }
 
     setLoadingGroupedShared(false);
-  }, [sharedUserCalendars, t, calendarFromURL, showAlert]);
+  }, [sharedUserCalendars, t, calendarFromURL]);
 
 
   // 🔄 Chargement des données groupées

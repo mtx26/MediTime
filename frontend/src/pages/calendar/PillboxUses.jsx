@@ -15,7 +15,7 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
   const { lng } = params;
 
   const { userInfo } = useContext(UserContext);
-  const { showAlert, showConfirm } = useAlert();
+  const { showConfirm } = useAlert();
 
   const [pillboxUsesData, setPillboxUsesData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,11 +72,8 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
       async () => {
         const res = await calendarSource.cancelUse(calendarId, useId);
         if (res.success) {
-          showAlert('success', res.message || t('pillbox_restored'));
           setLoading(true);
           fetchData();
-        } else {
-          showAlert('danger', res.error || t('restore_error'));
         }
       }
     );

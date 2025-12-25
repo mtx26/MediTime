@@ -11,9 +11,9 @@ from app.utils.responses import success_response, error_response, warning_respon
 from app.utils.decorators import require_auth, verify_calendar_share, measure_time, with_query_origin
 
 
-ERROR_CALENDAR_NOT_FOUND = "calendrier non trouvé"
-ERROR_UNAUTHORIZED_ACCESS = "accès refusé"
-SUCCESS_SHARED_CALENDARS_LOAD = "calendriers partagés récupérés"
+ERROR_CALENDAR_NOT_FOUND = "calendar not found"
+ERROR_UNAUTHORIZED_ACCESS = "unauthorized access to shared calendar"
+SUCCESS_SHARED_CALENDARS_LOAD = "shared calendars retrieved"
 
 SELECT_SHARED_CALENDAR = "SELECT * FROM calendars WHERE id = %s"
 
@@ -59,7 +59,8 @@ def handle_shared_calendars():
             return success_response(
                 message=SUCCESS_SHARED_CALENDARS_LOAD,
                 code="SHARED_CALENDARS_LOAD_EMPTY",
-                data={"calendars": []}
+                data={"calendars": []},
+                i18n_key="api.shared_calendar.fetch_empty"
             )
 
         calendars_list = [
@@ -71,13 +72,16 @@ def handle_shared_calendars():
         return success_response(
             message=SUCCESS_SHARED_CALENDARS_LOAD,
             code="SHARED_CALENDARS_LOAD_SUCCESS",
-            data={"calendars": calendars_list}
+            data={"calendars": calendars_list},
+            i18n_key="api.shared_calendar.calendars_retrieved",
+            log_extra={"calendars_count": len(calendars_list)}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération des calendriers partagés",
+            message="Error retrieving shared calendars",
             code="SHARED_CALENDARS_ERROR",
+            i18n_key="api.shared_calendar.fetch_error",
             status_code=500,
             error=str(e)
         )
@@ -106,13 +110,15 @@ def handle_user_shared_calendar_schedule(calendar_id):
             message=SUCCESS_SHARED_CALENDARS_LOAD, 
             code="SHARED_CALENDARS_LOAD_SUCCESS", 
             data={"schedule": schedule, "table": table, "calendar_name": calendar_name, "if_low_stock": if_low_stock},
-            log_extra={"calendar_id": calendar_id}
+            log_extra={"calendar_id": calendar_id},
+            i18n_key="api.shared_calendar.calendars_retrieved"
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération du calendrier partagé",
-            code="SHARED_CALENDARS_ERROR", 
+            message="Error retrieving shared calendar",
+            code="SHARED_CALENDARS_ERROR",
+            i18n_key="api.shared_calendar.fetch_error", 
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -149,7 +155,8 @@ def handle_delete_user_shared_calendar(calendar_id):
                         message=ERROR_CALENDAR_NOT_FOUND,
                         code="SHARED_CALENDAR_DELETE_ERROR",
                         status_code=404,
-                        log_extra={"calendar_id": calendar_id}
+                        log_extra={"calendar_id": calendar_id},
+                        i18n_key="api.shared_calendar.invalid_id"
                     )
 
                 owner_uid = result.get("owner_uid")
@@ -166,15 +173,17 @@ def handle_delete_user_shared_calendar(calendar_id):
                 )
 
         return success_response(
-            message="calendrier partagé supprimé",
+            message="shared calendar removed",
             code="SHARED_CALENDAR_DELETE_SUCCESS",
+            i18n_key="api.shared_calendar.deleted",
             log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la suppression du calendrier partagé",
+            message="Error deleting shared calendar",
             code="SHARED_CALENDARS_DELETE_ERROR",
+            i18n_key="api.shared_calendar.delete_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -261,16 +270,18 @@ def handle_grouped_shared():
         }
 
         return success_response(
-            message="Données partagées groupées récupérées",
+            message="Grouped shared data retrieved",
             code="SHARED_GROUPED_LOAD_SUCCESS",
+            i18n_key="api.shared_calendar.grouped_data_retrieved",
             data={"grouped": grouped},
             log_extra={"calendar_count": len(grouped)}
         )
 
     except Exception as e:
         return error_response(
-            message="Erreur lors du chargement des données partagées groupées",
+            message="Error loading grouped shared data",
             code="SHARED_GROUPED_LOAD_ERROR",
+            i18n_key="api.shared_calendar.grouped_data_error",
             error=str(e)
         )
 
@@ -298,23 +309,26 @@ def handle_shared_user_notifications(calendar_id):
                 calendar = cursor.fetchone()
                 if not calendar:
                     return warning_response(
-                        message="calendrier partagé non trouvé",
+                        message="shared calendar not found",
                         code="CALENDAR_NOT_FOUND",
+                        i18n_key="api.shared_calendar.invalid_id",
                         status_code=404,
                         log_extra={"calendar_id": calendar_id}
                     )
                 notifications_enabled = calendar.get("notifications_enabled", False)
 
         return success_response(
-            message="notifications récupérées",
+            message="notifications retrieved",
             code="SHARED_CALENDARS_NOTIFICATIONS_SUCCESS",
+            i18n_key="api.shared_calendar.notifications_retrieved",
             data={"notifications-enabled": notifications_enabled},
             log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération des notifications",
+            message="error retrieving notifications",
             code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
+            i18n_key="api.shared_calendar.notifications_fetch_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -343,14 +357,16 @@ def handle_shared_user_notifications_update(calendar_id):
                 conn.commit()
 
         return success_response(
-            message="Notifications mises à jour",
+            message="Updated notifications",
             code="SHARED_CALENDARS_NOTIFICATIONS_SUCCESS",
+            i18n_key="api.shared_calendar.notifications_retrieved",
             log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
         return error_response(
-            message="Erreur lors de la mise à jour des notifications",
+            message="Error updating notifications",
             code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
+            i18n_key="api.shared_calendar.notifications_fetch_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -372,20 +388,23 @@ def get_shared_user_stock_decrement_method(calendar_id):
                         message=ERROR_CALENDAR_NOT_FOUND,
                         code="SHARED_USER_STOCK_DECREMENT_METHOD_FETCH_ERROR",
                         status_code=404,
-                        log_extra={"calendar_id": calendar_id}
+                        log_extra={"calendar_id": calendar_id},
+                        i18n_key="api.shared_calendar.invalid_id"
                     )
                 method = result.get("stock_decrement_method")
 
         return success_response(
-            message="méthode de diminution de stock récupérée",
+            message="inventory reduction method recovered",
             code="SHARED_USER_STOCK_DECREMENT_METHOD_FETCH_SUCCESS",
+            i18n_key="api.shared_calendar.stock_method_retrieved",
             data={"method": method},
             log_extra={"calendar_id": calendar_id, "method": method}
         )
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération de la méthode de diminution de stock",
+            message="error during retrieval of the stock reduction method",
             code="SHARED_USER_STOCK_DECREMENT_METHOD_FETCH_ERROR",
+            i18n_key="api.shared_calendar.stock_method_fetch_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}

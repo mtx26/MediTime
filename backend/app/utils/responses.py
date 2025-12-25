@@ -46,7 +46,8 @@ def success_response(
     uid: str | None = None,
     origin: str | None = None,
     data: dict | None = None,
-    log_extra: dict | None = None
+    log_extra: dict | None = None,
+    i18n_key: str | None = None
 ) -> tuple:
     """Retourne une réponse JSON de succès avec journalisation.
 
@@ -57,12 +58,15 @@ def success_response(
     - origin (str | None): Origine de la requête.
     - data (dict | None): Données supplémentaires à inclure dans la réponse.
     - log_extra (dict | None): Informations supplémentaires pour le log.
+    - i18n_key (str | None): Clé i18n pour la traduction du message.
 
     Retour:
     - tuple: Tuple contenant la réponse JSON et le code HTTP.
     """
     uid, origin = _defaults(uid, origin)
     payload = {"message": message, "code": code}
+    if i18n_key:
+        payload["i18n_key"] = i18n_key
 
     # Rétro-compat + progressif :
     # - si data est un dict : on met payload["data"]=data ET on aplati dans payload
@@ -91,7 +95,8 @@ def error_response(
     uid: str | None = None,
     origin: str | None = None,
     error: Exception | None = None,
-    log_extra: dict | None = None
+    log_extra: dict | None = None,
+    i18n_key: str | None = None
 ) -> tuple:
     """Retourne une réponse JSON d'erreur avec journalisation.
 
@@ -103,12 +108,15 @@ def error_response(
     - origin (str | None): Origine de la requête.
     - error (Exception | None): Exception associée à l'erreur.
     - log_extra (dict | None): Informations supplémentaires pour le log.
+    - i18n_key (str | None): Clé i18n pour la traduction du message.
 
     Retour:
     - tuple: Tuple contenant la réponse JSON et le code HTTP.
     """
     uid, origin = _defaults(uid, origin)
     payload = {"error": message, "code": code}
+    if i18n_key:
+        payload["i18n_key"] = i18n_key
 
     merged_extra = _merge_log_extra(log_extra)
     merged_extra["code"] = code
@@ -129,7 +137,8 @@ def warning_response(
     status_code: int = 400,
     uid: str | None = None,
     origin: str | None = None,
-    log_extra: dict | None = None
+    log_extra: dict | None = None,
+    i18n_key: str | None = None
 ) -> tuple:
     """Retourne une réponse JSON d'avertissement avec journalisation.
 
@@ -140,12 +149,15 @@ def warning_response(
     - uid (str | None): UID de l'utilisateur.
     - origin (str | None): Origine de la requête.
     - log_extra (dict | None): Informations supplémentaires pour le log.
+    - i18n_key (str | None): Clé i18n pour la traduction du message.
 
     Retour:
     - tuple: Tuple contenant la réponse JSON et le code HTTP.
     """
     uid, origin = _defaults(uid, origin)
     payload = {"error": message, "code": code}
+    if i18n_key:
+        payload["i18n_key"] = i18n_key
 
     merged_extra = _merge_log_extra(log_extra)
     merged_extra["code"] = code

@@ -12,7 +12,7 @@ function SelectCalendar({
 }) {
   const { lng } = useParams();
   const { t } = useTranslation();
-  const { showAlert, showConfirm } = useAlert();
+  const { showConfirm } = useAlert();
 
   // 📅 Gestion des calendriers
   const [renameValues, setRenameValues] = useState({}); // État pour les valeurs de renommage de calendrier
@@ -25,9 +25,6 @@ function SelectCalendar({
     );
     if (rep.success) {
       setRenameValues((prev) => ({ ...prev, [calendarId]: '' }));
-      showAlert('success', rep.message);
-    } else {
-      showAlert('danger', rep.error);
     }
   };
 
@@ -42,12 +39,7 @@ function SelectCalendar({
   };
 
   const deleteConfirmAction = async (calendarId) => {
-    const rep = await personalCalendars.deleteCalendar(calendarId);
-    if (rep.success) {
-      showAlert('success', rep.message);
-    } else {
-      showAlert('danger', rep.error);
-    }
+    await personalCalendars.deleteCalendar(calendarId);
   };
 
   const handleDeleteCalendarClick = (calendarId) => {
@@ -60,12 +52,7 @@ function SelectCalendar({
   };
 
   const deleteSharedCalendarConfirmAction = async (calendarId) => {
-    const rep = await sharedUserCalendars.deleteSharedCalendar(calendarId);
-    if (rep.success) {
-      showAlert('success', rep.message);
-    } else {
-      showAlert('danger', rep.error);
-    }
+    await sharedUserCalendars.deleteSharedCalendar(calendarId);
   };
 
   const handleDeleteSharedCalendarClick = (calendarId) => {

@@ -163,8 +163,9 @@ def _handle_registration_invite(cursor, calendar_id : str, receiver_email: str, 
     )
 
     return success_response(
-        message="invitation envoyée",
+        message="invitation sent",
         code="INVITATION_SEND_SUCCESS",
+        i18n_key="api.invitations.sent",
         log_extra={"calendar_id": calendar_id},
     )
 
@@ -181,8 +182,9 @@ def _handle_existing_user_invite(cursor, calendar_id: str, receiver_uid: str, ow
     # Invitation à soi-même
     if owner_uid == receiver_uid:
         return warning_response(
-            message="invitation à soi-même",
+            message="invitation to oneself",
             code="SELF_INVITATION_ERROR",
+            i18n_key="api.invitations.self_invitation",
             status_code=400,
             log_extra={"calendar_id": calendar_id},
         )
@@ -200,8 +202,9 @@ def _handle_existing_user_invite(cursor, calendar_id: str, receiver_uid: str, ow
         )
     if cursor.fetchone():
         return warning_response(
-            message="utilisateur déjà invité",
+            message="user already invited",
             code="ALREADY_INVITED",
+            i18n_key="api.invitations.already_invited",
             status_code=400,
             log_extra={"calendar_id": calendar_id},
         )
@@ -227,8 +230,9 @@ def _handle_existing_user_invite(cursor, calendar_id: str, receiver_uid: str, ow
     )
 
     return success_response(
-        message="invitation envoyée",
+        message="invitation sent",
         code="INVITATION_SEND_SUCCESS",
+        i18n_key="api.invitations.sent",
         log_extra={"calendar_id": calendar_id},
     )
 
@@ -267,8 +271,9 @@ def handle_send_invitation(calendar_id: str):
 
     except Exception as e:
         return error_response(
-            message="erreur lors de l'envoi de l'invitation",
+            message="Error sending invitation",
             code="INVITATION_SEND_ERROR",
+            i18n_key="api.invitations.send_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id},
@@ -311,22 +316,25 @@ def handle_login_invitation(token: str):
 
                 if not invitation:
                     return error_response(
-                        message="invitation non trouvée",
+                        message="Invitation not found",
                         code="INVITATION_LOGIN_NOT_FOUND",
+                        i18n_key="api.invitations.not_found",
                         status_code=404,
                     )
 
                 return success_response(
-                    message="invitation trouvée",
+                    message="invitation found",
                     code="INVITATION_LOGIN_FOUND",
+                    i18n_key="api.invitations.found",
                     data={"invitation": invitation},
                     log_extra={"token": token},
                 )
 
     except Exception as e:
         return error_response(
-            message="Erreur lors de la récupération de l'invitation",
+            message="Error retrieving invitation",
             code="INVITATION_LOGIN_FETCH_ERROR",
+            i18n_key="api.invitations.fetch_error",
             status_code=500,
             log_extra={"error": str(e)},
         )
@@ -370,15 +378,17 @@ def delete_login_invitation(token: str):
         )
 
         return success_response(
-            message="utilisateur partagé supprimé",
+            message="shared user deleted",
             code="SHARED_USERS_DELETE_SUCCESS",
+            i18n_key="api.invitations.shared_user_deleted",
             log_extra={"calendar_id": calendar_id},
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la suppression de l'utilisateur partagé",
+            message="Error deleting shared user",
             code="SHARED_USERS_DELETE_ERROR",
+            i18n_key="api.invitations.delete_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id},
@@ -434,16 +444,18 @@ def handle_accept_login_invitation(token: str):
         )
 
         return success_response(
-            message="invitation acceptée",
+            message="invitation accepted",
             code="INVITATION_ACCEPT_SUCCESS",
+            i18n_key="api.invitations.accepted",
             data={"calendar_id": calendar_id},
             log_extra={"token": token},
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de l'acceptation de l'invitation",
+            message="error when accepting the invitation",
             code="INVITATION_ACCEPT_ERROR",
+            i18n_key="api.invitations.accept_error",
             status_code=500,
             error=str(e),
             log_extra={"token": token},
@@ -495,15 +507,17 @@ def handle_reject_login_invitation(token: str):
         )
 
         return success_response(
-            message="invitation rejetée",
+            message="invitation rejected",
             code="INVITATION_REJECT_SUCCESS",
+            i18n_key="api.invitations.rejected",
             log_extra={"token": token},
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors du rejet de l'invitation",
+            message="error when rejecting the invitation",
             code="INVITATION_REJECT_ERROR",
+            i18n_key="api.invitations.reject_error",
             status_code=500,
             error=str(e),
             log_extra={"token": token},
@@ -546,22 +560,25 @@ def handle_registration_invitation(token: str):
 
                 if not invitation:
                     return error_response(
-                        message="invitation non trouvée",
+                        message="Invitation not found",
                         code="INVITATION_NOT_FOUND",
+                        i18n_key="api.invitations.not_found",
                         status_code=404,
                     )
 
                 return success_response(
-                    message="invitation trouvée",
+                    message="invitation found",
                     code="INVITATION_FOUND",
+                    i18n_key="api.invitations.found",
                     data={"invitation": invitation},
                     log_extra={"token": token},
                 )
 
     except Exception as e:
         return error_response(
-            message="Erreur lors de la récupération de l'invitation",
+            message="Error retrieving invitation",
             code="INVITATION_FETCH_ERROR",
+            i18n_key="api.invitations.fetch_error",
             status_code=500,
             log_extra={"error": str(e)},
         )
@@ -606,15 +623,17 @@ def delete_registration_invitation(token: str):
         )
 
         return success_response(
-            message="Invitation de calendrier supprimée",
+            message="Calendar invitation removed",
             code="SHARED_CALENDAR_INVITATION_DELETE_SUCCESS",
+            i18n_key="api.invitations.calendar_deleted",
             log_extra={"calendar_id": calendar_id},
         )
 
     except Exception as e:
         return error_response(
-            message="Erreur lors de la suppression de l'invitation",
+            message="Error deleting invitation",
             code="SHARED_CALENDAR_INVITATION_DELETE_ERROR",
+            i18n_key="api.invitations.calendar_delete_error",
             status_code=500,
             error=str(e),
         )
@@ -668,8 +687,9 @@ def accept_registration_invitation(token: str):
                 conn.commit()
                 if not calendar_id:
                     return error_response(
-                        message="invitation introuvable",
+                        message="invitation not found",
                         code="INVITATION_NOT_FOUND",
+                        i18n_key="api.invitations.not_found",
                         status_code=404,
                         log_extra={"token": token},
                     )
@@ -687,16 +707,18 @@ def accept_registration_invitation(token: str):
         )
 
         return success_response(
-            message="Invitation de calendrier acceptée",
+            message="Calendar invitation accepted",
             code="SHARED_CALENDAR_INVITATION_ACCEPT_SUCCESS",
+            i18n_key="api.invitations.calendar_accepted",
             data={"calendar_id": calendar_id},
             log_extra={"token": token},
         )
 
     except Exception as e:
         return error_response(
-            message="Erreur lors de l'acceptation de l'invitation",
+            message="Error accepting invitation",
             code="SHARED_CALENDAR_INVITATION_ACCEPT_ERROR",
+            i18n_key="api.invitations.calendar_accept_error",
             status_code=500,
             error=str(e),
         )
@@ -720,8 +742,9 @@ def reject_registration_invitation(token: str):
                 calendar_id, owner_uid = _delete_invitation_returning_calendar_owner(cursor, token)
                 if not calendar_id or not owner_uid:
                     return error_response(
-                        message="invitation introuvable",
+                        message="invitation not found",
                         code="INVITATION_NOT_FOUND",
+                        i18n_key="api.invitations.not_found",
                         status_code=404,
                         log_extra={"token": token},
                     )
@@ -741,15 +764,17 @@ def reject_registration_invitation(token: str):
         )
 
         return success_response(
-            message="Invitation de calendrier rejetée",
+            message="Calendar invitation rejected",
             code="SHARED_CALENDAR_INVITATION_REJECT_SUCCESS",
+            i18n_key="api.invitations.calendar_rejected",
             log_extra={"token": token},
         )
 
     except Exception as e:
         return error_response(
-            message="Erreur lors du rejet de l'invitation",
+            message="Error rejecting invitation",
             code="SHARED_CALENDAR_INVITATION_REJECT_ERROR",
+            i18n_key="api.invitations.calendar_reject_error",
             status_code=500,
             error=str(e),
         )

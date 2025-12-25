@@ -39,20 +39,23 @@ def handle_calendars():
 
                 if not calendars:
                     return success_response(
-                        message="calendriers récupérés",
+                        message="retrieved calendars",
                         code="CALENDAR_FETCH_SUCCESS",
+                        i18n_key="api.calendar.retrieved",
                         data={"calendars": []},
                     )
 
         return success_response(
-            message="calendriers récupérés",
+            message="retrieved calendars",
             code="CALENDAR_FETCH_SUCCESS",
+            i18n_key="api.calendar.retrieved",
             data={"calendars": calendars},
         )
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération des calendriers", 
-            code="CALENDAR_FETCH_ERROR", 
+            message="Error retrieving calendars", 
+            code="CALENDAR_FETCH_ERROR",
+            i18n_key="api.calendar.fetch_error", 
             status_code=500, 
             error=str(e)
         )
@@ -71,8 +74,9 @@ def handle_create_calendar():
 
         if not calendar_name:
             return warning_response(
-                message="nom de calendrier manquant", 
-                code="CALENDAR_CREATE_ERROR", 
+                message="calendar name missing", 
+                code="CALENDAR_CREATE_ERROR",
+                i18n_key="api.calendar.creation_error", 
                 status_code=400, 
                 log_extra={"calendar_name": calendar_name}
             )
@@ -84,16 +88,18 @@ def handle_create_calendar():
                 conn.commit()
 
         return success_response(
-            message="calendrier créé", 
-            code="CALENDAR_CREATE", 
+            message="calendar created", 
+            code="CALENDAR_CREATE",
+            i18n_key="api.calendar.created", 
             data={"calendarId": calendar_id, "calendarName": calendar_name},
             log_extra={"calendar_name": calendar_name}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la création du calendrier", 
-            code="CALENDAR_CREATE_ERROR", 
+            message="error while creating the calendar", 
+            code="CALENDAR_CREATE_ERROR",
+            i18n_key="api.calendar.creation_error", 
             status_code=500, 
             error=str(e)
         )
@@ -110,8 +116,9 @@ def handle_delete_calendar(calendar_id):
 
         if not calendar_id:
             return warning_response(
-                message="identifiant de calendrier invalide",
+                message="invalid calendar ID",
                 code="CALENDAR_DELETE_ERROR",
+                i18n_key="api.calendar.delete_error",
                 status_code=400,
                 log_extra={"calendar_id": calendar_id}
             )
@@ -138,15 +145,17 @@ def handle_delete_calendar(calendar_id):
             )
 
         return success_response(
-            message="calendrier supprimé",
+            message="calendar deleted",
             code="CALENDAR_DELETE_SUCCESS",
+            i18n_key="api.calendar.deleted",
             log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la suppression du calendrier",
+            message="Error deleting calendar",
             code="CALENDAR_DELETE_ERROR",
+            i18n_key="api.calendar.delete_error",
             status_code=500,
             error=str(e)
         )
@@ -165,8 +174,9 @@ def handle_rename_calendar(calendar_id):
 
         if not new_calendar_name:
             return warning_response(
-                message="nom de calendrier manquant",
+                message="calendar name missing",
                 code="CALENDAR_RENAME_ERROR",
+                i18n_key="api.calendar.rename_error",
                 status_code=400,
                 log_extra={"calendar_id": calendar_id, "new_calendar_name": new_calendar_name}
             )
@@ -209,14 +219,16 @@ def handle_rename_calendar(calendar_id):
                 message=ERROR_CALENDAR_NOT_FOUND,
                 code="CALENDAR_RENAME_ERROR",
                 status_code=404,
-                log_extra={"calendar_id": calendar_id, "new_calendar_name": new_calendar_name}
+                log_extra={"calendar_id": calendar_id, "new_calendar_name": new_calendar_name},
+                i18n_key="api.calendar.rename_error"
             )
 
         # Cas: même nom qu'avant
         if row.get("same"):
             return warning_response(
-                message="le nom de calendrier est déjà le même",
+                message="the calendar name is already the same",
                 code="CALENDAR_RENAME_ERROR",
+                i18n_key="api.calendar.rename_error",
                 status_code=400,
                 log_extra={
                     "calendar_id": calendar_id,
@@ -227,8 +239,9 @@ def handle_rename_calendar(calendar_id):
 
         # Succès
         return success_response(
-            message="calendrier renommé",
+            message="renowned calendar",
             code="CALENDAR_RENAME_SUCCESS",
+            i18n_key="api.calendar.renamed",
             log_extra={
                 "calendar_id": row.get("calendar_id") or calendar_id,
                 "old_calendar_name": row.get("old_name"),
@@ -238,8 +251,9 @@ def handle_rename_calendar(calendar_id):
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la renommation du calendrier",
+            message="error renaming calendar",
             code="CALENDAR_RENAME_ERROR",
+            i18n_key="api.calendar.rename_error",
             status_code=500,
             error=str(e)
         )
@@ -265,16 +279,18 @@ def handle_calendar_schedule(calendar_id):
         if_low_stock = check_if_stock_is_low(calendar_id)
 
         return success_response(
-            message="calendrier généré", 
+            message="calendar generated", 
             code="CALENDAR_GENERATE_SUCCESS",
+            i18n_key="api.calendar.calendar_generated",
             data={"schedule": schedule, "table": table, "calendar_name": calendar_name, "if_low_stock": if_low_stock},
             log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la génération du calendrier", 
-            code="CALENDAR_GENERATE_ERROR", 
+            message="error during calendar generation", 
+            code="CALENDAR_GENERATE_ERROR",
+            i18n_key="api.calendar.generation_error", 
             status_code=500, 
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -289,8 +305,9 @@ def download_pdf_calendar(calendar_id):
 
         if not calendar_id:
             return error_response(
-                message="calendar_id manquant",
+                message="missing calendar_id",
                 code="MISSING_CALENDAR_ID",
+                i18n_key="api.calendar.missing_id",
                 status_code=400,
             )
 
@@ -314,8 +331,9 @@ def download_pdf_calendar(calendar_id):
         )
     except Exception as e:
         return error_response(
-            message="Erreur lors du téléchargement du PDF",
+            message="Error downloading PDF",
             code="PDF_DOWNLOAD_ERROR_CALENDAR",
+            i18n_key="api.calendar.pdf_download_error",
             status_code=500,
             error=str(e)
         )
@@ -336,20 +354,23 @@ def get_personnal_stock_decrement_method(calendar_id):
                         message=ERROR_CALENDAR_NOT_FOUND,
                         code="PERSONNAL_STOCK_DECREMENT_METHOD_FETCH_ERROR",
                         status_code=404,
-                        log_extra={"calendar_id": calendar_id}
+                        log_extra={"calendar_id": calendar_id},
+                        i18n_key="api.calendar.stock_method_fetch_error"
                     )
                 method = result.get("stock_decrement_method")
 
         return success_response(
-            message="méthode de diminution de stock récupérée",
+            message="inventory reduction method recovered",
             code="PERSONNAL_STOCK_DECREMENT_METHOD_FETCH_SUCCESS",
+            i18n_key="api.calendar.stock_method_retrieved",
             data={"method": method},
             log_extra={"calendar_id": calendar_id, "method": method}
         )
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération de la méthode de diminution de stock",
+            message="error during retrieval of the stock reduction method",
             code="PERSONNAL_STOCK_DECREMENT_METHOD_FETCH_ERROR",
+            i18n_key="api.calendar.stock_method_fetch_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -369,8 +390,9 @@ def update_personnal_stock_decrement_method(calendar_id):
 
         if not method:
             return warning_response(
-                message="method manquant",
+                message="missing method",
                 code="PERSONNAL_STOCK_DECREMENT_METHOD_UPDATE_ERROR",
+                i18n_key="api.calendar.stock_method_update_error",
                 status_code=400,
                 log_extra={"calendar_id": calendar_id}
             )
@@ -378,14 +400,16 @@ def update_personnal_stock_decrement_method(calendar_id):
         update_stock_decrement_method(calendar_id, method)
 
         return success_response(
-            message="methode de diminution de stock mise à jour", 
+            message="updated inventory reduction method", 
             code="PERSONNAL_STOCK_DECREMENT_METHOD_UPDATE_SUCCESS",
+            i18n_key="api.calendar.stock_method_updated",
             log_extra={"calendar_id": calendar_id, "method": method}
         )
     except Exception as e:
         return error_response(
-            message="erreur lors de la mise à jour de la méthode de diminution de stock", 
-            code="PERSONNAL_STOCK_DECREMENT_METHOD_UPDATE_ERROR", 
+            message="Error during the update of the stock reduction method", 
+            code="PERSONNAL_STOCK_DECREMENT_METHOD_UPDATE_ERROR",
+            i18n_key="api.calendar.stock_method_update_error", 
             status_code=500, 
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -411,20 +435,23 @@ def fetch_personal_notifications_enabled(calendar_id):
                         message=ERROR_CALENDAR_NOT_FOUND,
                         code="PERSONAL_NOTIFICATIONS_ENABLED_FETCH_ERROR",
                         status_code=404,
-                        log_extra={"calendar_id": calendar_id}
+                        log_extra={"calendar_id": calendar_id},
+                        i18n_key="api.calendar.notifications_fetch_error"
                     )
                 enabled = result.get("notifications_enabled", False)
 
         return success_response(
-            message="paramètre de notifications récupéré",
+            message="notification settings retrieved",
             code="PERSONAL_NOTIFICATIONS_ENABLED_FETCH_SUCCESS",
+            i18n_key="api.calendar.notifications_retrieved",
             data={"notifications-enabled": enabled},
             log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération du paramètre de notifications",
+            message="Error retrieving notification settings",
             code="PERSONAL_NOTIFICATIONS_ENABLED_FETCH_ERROR",
+            i18n_key="api.calendar.notifications_fetch_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -447,14 +474,16 @@ def update_personal_notifications_enabled(calendar_id):
                 conn.commit()
 
         return success_response(
-            message="paramètre de notifications mis à jour", 
+            message="notification settings updated", 
             code="PERSONAL_NOTIFICATIONS_ENABLED_UPDATE_SUCCESS",
+            i18n_key="api.calendar.notifications_updated",
             log_extra={"calendar_id": calendar_id}
         )
     except Exception as e:
         return error_response(
-            message="erreur lors de la mise à jour du paramètre de notifications", 
-            code="PERSONAL_NOTIFICATIONS_ENABLED_UPDATE_ERROR", 
+            message="Error updating notification settings", 
+            code="PERSONAL_NOTIFICATIONS_ENABLED_UPDATE_ERROR",
+            i18n_key="api.calendar.notifications_update_error", 
             status_code=500, 
             error=str(e),
             log_extra={"calendar_id": calendar_id}

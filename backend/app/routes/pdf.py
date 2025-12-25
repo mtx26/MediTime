@@ -14,8 +14,9 @@ def proxy_pdf(box_id):
     try:
         if not box_id:
             return error_response(
-                message="box_id manquant",
+                message="missing box_id",
                 code="MISSING_BOX_ID",
+                i18n_key="api.pdf.missing_box_id",
                 status_code=400,
             )
 
@@ -35,8 +36,9 @@ def proxy_pdf(box_id):
 
         if not url_result or not url_result.get("url_notice_fr"):
             return error_response(
-                message="URL non trouvée",
+                message="URL not found",
                 code="URL_NOT_FOUND",
+                i18n_key="api.pdf.url_not_found",
                 status_code=404,
             )
 
@@ -64,8 +66,9 @@ def proxy_pdf(box_id):
 
     except Exception as e:
         return error_response(
-            message="Erreur lors du téléchargement du PDF",
+            message="Error downloading PDF",
             code="PDF_DOWNLOAD_ERROR",
+            i18n_key="api.pdf.download_error",
             status_code=500,
             error=str(e)
         )

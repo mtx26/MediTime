@@ -17,20 +17,23 @@ def get_user_info():
         user = fetch_user(uid)
         if not user:
             return error_response(
-                message="utilisateur introuvable",
+                message="user not found",
                 code="USER_NOT_FOUND",
                 status_code=404,
+                i18n_key="api.user.not_found"
             )
 
         return success_response(
-            message="informations utilisateur récupérées",
+            message="user information retrieved",
             code="USER_SYNC_SUCCESS",
+            i18n_key="api.user.info_retrieved",
             data={**user}
         )
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération des données utilisateur",
+            message="error retrieving user data",
             code="USER_SYNC_ERROR",
+            i18n_key="api.user.fetch_error",
             status_code=500,
             error=str(e),
         )
@@ -46,8 +49,9 @@ def update_user_info():
         payload = request.get_json(force=True)
         if not payload:
             return error_response(
-                message="aucune donnée reçue",
+                message="No data received",
                 code="USER_UPDATE_ERROR",
+                i18n_key="api.user.no_data",
                 status_code=400,
             )
 
@@ -65,15 +69,17 @@ def update_user_info():
             updated_user = insert_new_user(uid, display_name, email, photo_url, email_enabled, push_enabled)
 
         return success_response(
-            message="données utilisateur mises à jour",
+            message="updated user data",
             code="USER_UPDATE_SUCCESS",
+            i18n_key="api.user.updated",
             data={**updated_user}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la mise à jour",
+            message="error during update",
             code="USER_UPDATE_ERROR",
+            i18n_key="api.user.no_data",
             status_code=500,
             error=str(e),
         )
@@ -90,8 +96,9 @@ def handle_user_photo():
         photo = request.files.get("photo")
         if not photo:
             return error_response(
-                message="erreur lors de la récupération de la photo de l'utilisateur",
+                message="Error retrieving user photo",
                 code="USER_PHOTO_ERROR",
+                i18n_key="api.user.photo_error",
                 status_code=400,
             )
 
@@ -105,14 +112,16 @@ def handle_user_photo():
                 conn.commit()
 
         return success_response(
-            message="photo de l'utilisateur mise à jour",
+            message="user photo updated",
             code="USER_PHOTO_SUCCESS",
+            i18n_key="api.user.photo_success",
             data={"photo_url": photo_url}
         )
     except Exception as e:
         return error_response(
-            message="erreur lors de la mise à jour de la photo de l'utilisateur",
+            message="Error updating user photo",
             code="USER_PHOTO_ERROR",
+            i18n_key="api.user.photo_error",
             status_code=500,
             error=str(e),
         )

@@ -20,8 +20,9 @@ def handle_analyze_medical_document():
 
         if not base64_image:
             return warning_response(
-                message="image manquante",
+                message="missing image",
                 code="DOCUMENT_ANALYZE_ERROR",
+                i18n_key="api.ai.missing_image",
                 status_code=400,
             )
 
@@ -29,22 +30,25 @@ def handle_analyze_medical_document():
 
         if not analysis_result:
             return error_response(
-                message="Erreur lors de l'analyse du document médical avec Gemini",
+                message="Error during the analysis of the medical document with Gemini",
                 code="DOCUMENT_ANALYZE_GEMINI_ERROR",
+                i18n_key="api.ai.analyze_error",
                 status_code=500,
                 error="Erreur lors de l'analyse du document médical avec Gemini"
             )
 
         return success_response(
-            message="document médical analysé avec succès",
+            message="medical document successfully analyzed",
             code="DOCUMENT_ANALYZE_SUCCESS",
+            i18n_key="api.ai.analyze_success",
             data={"medicines": analysis_result}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur interne lors de l'analyse du document médical",
+            message="internal error during the analysis of the medical document",
             code="DOCUMENT_ANALYZE_INTERNAL_ERROR",
+            i18n_key="api.ai.internal_error",
             status_code=500,
             error=str(e)
         )
@@ -71,22 +75,25 @@ def handle_save_analysis_result():
         boxes = payload.get("boxes")
         if not isinstance(boxes, list) or not boxes:
             return warning_response(
-                message="Liste 'boxes' manquante ou vide",
+                message="List of 'boxes' missing or empty",
                 code="DOCUMENT_ANALYZE_SAVE_BAD_REQUEST",
+                i18n_key="api.ai.save_list_warning",
                 status_code=400,
             )
 
         calendar_id = save_analysis_result(owner_uid, calendar_name, boxes)
         
         return success_response(
-            message="Résultat de l'analyse enregistré avec succès",
+            message="Analysis result successfully recorded",
             code="DOCUMENT_ANALYZE_SAVE_SUCCESS",
+            i18n_key="api.ai.save_result",
             data={"calendar_id": calendar_id}
         )
     except Exception as e:
         return error_response(
-            message="Erreur lors de l'enregistrement du résultat de l'analyse",
+            message="Error saving analysis results",
             code="DOCUMENT_ANALYZE_SAVE_ERROR",
+            i18n_key="api.ai.save_error",
             status_code=500,
             error=str(e)
         )

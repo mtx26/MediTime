@@ -1,6 +1,32 @@
 // apiUtils.js
 import { getToken } from '../supabase/tokenUtils.js';
 import { log } from '../../utils/logger';
+import i18n from '../../i18n';
+
+/**
+ * Traduit automatiquement un message backend si une clé i18n est présente
+ * @param {Object} data - Réponse du backend
+ * @returns {Object} - Réponse avec message traduit
+ */
+function translateBackendMessage(data) {
+  if (!data) return data;
+  
+  // Si une clé i18n est fournie, traduire le message
+  if (data.i18n_key) {
+    const translated = i18n.t(data.i18n_key);
+    // Si la traduction existe et est différente de la clé, l'utiliser
+    if (translated !== data.i18n_key) {
+      if (data.message) {
+        data.message = translated;
+      }
+      if (data.error) {
+        data.error = translated;
+      }
+    }
+  }
+  
+  return data;
+}
 
 function withQuery(url, params) {
   const clean = Object.fromEntries(
@@ -114,6 +140,7 @@ export async function performApiCall({
   uid = null,        // => conservé uniquement pour les logs
   analyticsEvent = null,
   analyticsData = {},
+  showAlert = null,  // => fonction showAlert optionnelle pour gérer automatiquement les alertes
 }) {
   // --- MOCK DEMO START ---
   if (url?.includes('/calendars/demo')) return handleDemoMock(url, method);
@@ -137,8 +164,11 @@ export async function performApiCall({
 
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const err = new Error(data?.error || data?.message || `HTTP ${res.status}`);
-      err.code = data?.code;
+      // Traduire les messages d'erreur
+      const translatedData = translateBackendMessage(data);
+      const err = new Error(translatedData?.error || translatedData?.message || `HTTP ${res.status}`);
+      err.code = translatedData?.code;
+      err.i18nKey = translatedData?.i18nKey || translatedData?.i18n_key;
       throw err;
     }
 
@@ -153,12 +183,27 @@ export async function performApiCall({
       });
     }
 
+    // Traduire automatiquement les messages backend
+    const translatedData = translateBackendMessage(data);
+    
     // Logs (uid gardé tel quel, non envoyé au backend)
-    log.info(data?.message || 'Requête réussie', { origin, uid, ...analyticsData });
+    log.info(translatedData?.message || 'Requête réussie', { origin, uid, ...analyticsData });
 
-    return { success: true, ...data };
+    // Afficher l'alerte de succès si showAlert est fourni
+    // Uniquement pour les opérations qui modifient des données (POST, PUT, DELETE, PATCH)
+    if (showAlert && translatedData?.message && method !== 'GET') {
+      showAlert('success', translatedData.message);
+    }
+
+    return { success: true, ...translatedData };
   } catch (err) {
     log.error(err.message || 'Erreur API', err, { origin, uid, ...analyticsData });
+    
+    // Afficher l'alerte d'erreur si showAlert est fourni (toujours, même pour GET)
+    if (showAlert) {
+      showAlert('danger', err.message);
+    }
+    
     return { success: false, error: err.message, code: err.code || null };
   }
 }

@@ -202,7 +202,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   
   const [boxes, setBoxes] = useState([]);
   const [loadingBoxes, setLoadingBoxes] = useState(undefined);
-  const { showAlert, showConfirm } = useAlert();
+  const { showConfirm } = useAlert();
   const [showQRModal, setShowQRModal] = useState(false);
   const [singleScan, setSingleScan] = useState(false);
   const [currentEditingBoxId, setCurrentEditingBoxId] = useState(null);
@@ -321,10 +321,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       async () => {
         const r = await personalCalendars.deleteCalendar(calendarId);
         if (r.success) {
-          showAlert('success', t('calendar_deleted'));
           navigate(`/${lng}/calendars`);
-        } else {
-          showAlert('danger', r.error);
         }
       }
     );
@@ -339,10 +336,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       async () => {
         const r = await sharedUserCalendars.deleteSharedCalendar(calendarId);
         if (r.success) {
-          showAlert('success', t('calendar_deleted'));
           navigate(`/${lng}/calendars`);
-        } else {
-          showAlert('danger', r.error || t('calendar.error_deleting_calendar'));
         }
       }
     );
@@ -392,7 +386,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     
     // Si c'est une nouvelle box temporaire (ID commence par "temp-")
     if (editingBoxId.startsWith('temp-')) {
-      const res = await calendarSource.createBox(
+      await calendarSource.createBox(
         calendarId,
         editingBox.name,
         editingBox.box_capacity,
@@ -401,24 +395,13 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         editingBox.dose,
         conditions
       );
-      
-      if (res.success) {
-        showAlert('success', res.message);
-      } else {
-        showAlert('danger', res.error);
-      }
     } else {
       // Mise à jour d'une box existante
-      const res = await calendarSource.updateBox(
+      await calendarSource.updateBox(
         calendarId, 
         editingBoxId, 
         { ...editingBox, conditions }
       );
-      if (res.success) {
-        showAlert('success', res.message);
-      } else {
-        showAlert('danger', res.error);
-      }
     }
     
     resetEditing();
@@ -645,7 +628,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                     setExpandedBoxes={setExpandedBoxes}
                     calendarId={calendarId}
                     calendarSource={calendarSource}
-                    showAlert={showAlert}
                     onEdit={initEditing}
                     onUpdateScan={() => {
                       setSingleScan(true);
@@ -667,7 +649,6 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                   setExpandedBoxes={setExpandedBoxes}
                   calendarId={calendarId}
                   calendarSource={calendarSource}
-                  showAlert={showAlert}
                   onEdit={initEditing}
                   onUpdateScan={() => {
                     setSingleScan(true);
@@ -747,7 +728,6 @@ function BoxCard({
   calendarSource,
   onEdit,
   onUpdateScan,
-  showAlert,
   t,
 }) {
   const isEditing = editingBoxId === box.id && editingBox && editingBox.name !== undefined;
@@ -905,24 +885,6 @@ function BoxCard({
     }));
   };
 
-  const restockBox = async () => {
-    const rep = await calendarSource.restockBox(calendarId, box.id);
-    if (rep.success) {
-      showAlert('success', t('boxes.restock_success'));
-    } else {
-      showAlert('danger', rep.error);
-    }
-  };
-
-  const deleteBox = async () => {
-    const rep = await calendarSource.deleteBox(calendarId, box.id);
-    if (rep.success) {
-      showAlert('success', rep.message);
-    } else {
-      showAlert('danger', rep.error);
-    }
-  };
-
   const getBoxActions = () => [
     {
       label: (
@@ -964,7 +926,7 @@ function BoxCard({
           {t('boxes.delete')}
         </>
       ),
-      onClick: deleteBox,
+      onClick: async () => await calendarSource.deleteBox(calendarId, box.id),
       title: t('boxes.delete'),
       danger: true,
     },
@@ -1095,7 +1057,7 @@ function BoxCard({
                 className="btn btn-outline-success w-100"
                 icon="plus-circle"
                 text={t('boxes.restock')}
-                onClick={restockBox}
+                onClick={async () => await calendarSource.restockBox(calendarId, box.id)}
                 disabled={box.box_capacity === 0}
                 helpDisabled={t('boxes.restock_disabled_tooltip')}
               />
@@ -1418,7 +1380,6 @@ BoxCard.propTypes = {
   calendarSource: PropTypes.string.isRequired,
   onEdit: PropTypes.func.isRequired,
   onUpdateScan: PropTypes.func.isRequired,
-  showAlert: PropTypes.func.isRequired,
   t: PropTypes.func.isRequired,
 };
 

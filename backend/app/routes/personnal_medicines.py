@@ -19,16 +19,18 @@ def handle_boxes(calendar_id):
         boxes = get_boxes(calendar_id)
 
         return success_response(
-            message="boites de médicaments récupérées",
+            message="recovered medicine boxes",
             code="MEDICINE_BOXES_FETCHED",
+            i18n_key="api.boxes.retrieved",
             data={"boxes": boxes},
             log_extra={"calendar_id": calendar_id, "boxes_count": len(boxes) if boxes is not None else 0}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération des boites de médicaments",
+            message="error during the retrieval of medicine boxes",
             code="GET_MEDICINE_BOXES_ERROR",
+            i18n_key="api.boxes.fetch_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -49,8 +51,9 @@ def handle_update_box(calendar_id, box_id):
 
         if not box:
             return warning_response(
-                message="champs requis manquants",
+                message="Missing required fields",
                 code="MISSING_REQUIRED_FIELDS",
+                i18n_key="api.boxes.missing_fields",
                 status_code=400,
                 log_extra={"calendar_id": calendar_id, "box_id": box_id}
             )
@@ -58,15 +61,17 @@ def handle_update_box(calendar_id, box_id):
         update_box(box_id, calendar_id, box)
         
         return success_response(
-            message="boite de médicaments modifiée",
+            message="modified medicine box",
             code="MEDICINE_BOX_UPDATED",
+            i18n_key="api.boxes.updated",
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la modification de la boite de médicaments",
+            message="error during modification of the medicine box",
             code="UPDATE_MEDICINE_BOX_ERROR",
+            i18n_key="api.boxes.update_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
@@ -86,8 +91,9 @@ def handle_create_box(calendar_id):
 
         if not box:
             return warning_response(
-                message="champs requis manquants",
+                message="Missing required fields",
                 code="MISSING_REQUIRED_FIELDS",
+                i18n_key="api.boxes.missing_fields",
                 status_code=400,
                 log_extra={"calendar_id": calendar_id}
             )
@@ -95,16 +101,18 @@ def handle_create_box(calendar_id):
         box_id = create_box(calendar_id, box)
 
         return success_response(
-            message="boite de médicaments créée",
+            message="medicine box created",
             code="MEDICINE_BOX_CREATED",
+            i18n_key="api.boxes.created",
             data={"box_id": box_id},
             log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la création de la boite de médicaments",
+            message="error occurred while creating the medicine box",
             code="CREATE_MEDICINE_BOX_ERROR",
+            i18n_key="api.boxes.creation_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -122,15 +130,17 @@ def handle_delete_box(calendar_id, box_id):
         delete_box(box_id, calendar_id)
         
         return success_response(
-            message="boite de médicaments supprimée",
+            message="medicine box removed",
             code="MEDICINE_BOX_DELETED",
+            i18n_key="api.boxes.deleted",
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la suppression de la boite de médicaments",
+            message="Error while deleting the medicine box",
             code="DELETE_MEDICINE_BOX_ERROR",
+            i18n_key="api.boxes.delete_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
@@ -154,16 +164,18 @@ def handle_get_if_pillbox_used(calendar_id):
         if_pillbox_used = get_if_pillbox_is_used(calendar_id, start_date)
 
         return success_response(
-            message="statut d'utilisation du pillbox récupéré",
+            message="Pillbox usage status retrieved",
             code="PILLBOX_USED_STATUS_FETCHED",
+            i18n_key="api.boxes.status_retrieved",
             data={"if_pillbox_used": if_pillbox_used},
             log_extra={"calendar_id": calendar_id}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération du statut d'utilisation du pillbox",
+            message="Error retrieving Pillbox usage status",
             code="GET_PILLBOX_USED_STATUS_ERROR",
+            i18n_key="api.boxes.status_fetch_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -190,34 +202,39 @@ def handle_use_pillbox(calendar_id):
 
             if result == False:
                 return warning_response(
-                    message="aucun médicament à utiliser",
+                    message="no medication to use",
                     code="NO_MEDICATION_TO_USE",
+                    i18n_key="api.boxes.no_medication",
                     status_code=404,
                     log_extra={"calendar_id": calendar_id}
                 )
             elif result is None:
                 return warning_response(
-                    message="mode de décompte non supporté",
+                    message="Unsupported counting method",
                     code="UNSUPPORTED_DECREMENT_MODE",
+                    i18n_key="api.boxes.unsupported_counting_mode",
                     status_code=400,
                     log_extra={"calendar_id": calendar_id}
                 )
             return success_response(
-                message="médicaments utilisés",
+                message="medications used",
                 code="PILLBOX_MEDICATION_USED",
+                i18n_key="api.boxes.medications_used",
                 log_extra={"calendar_id": calendar_id}
             )
         else:
             return warning_response(
-                message="le pillbox a déjà été utilisé pour cette période",
+                message="The pillbox has already been used for this period.",
                 code="PILLBOX_ALREADY_USED",
+                i18n_key="api.boxes.pillbox_already_used",
                 status_code=400,
                 log_extra={"calendar_id": calendar_id}
             )
     except Exception as e:
         return error_response(
-            message="erreur lors de l'utilisation du pillbox",
+            message="error when using the pillbox",
             code="USE_PILLBOX_MEDICATION_ERROR",
+            i18n_key="api.boxes.use_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -233,21 +250,24 @@ def handle_cancel_pillbox_use(calendar_id, use_id):
     try:
         if delete_pillbox_use(calendar_id, use_id):
             return success_response(
-                message="utilisation du pillbox annulée",
+                message="Pillbox usage cancelled",
                 code="PILLBOX_USE_CANCELED",
+                i18n_key="api.boxes.usage_cancelled",
                 log_extra={"calendar_id": calendar_id, "use_id": use_id}
             )
         else:
             return warning_response(
-                message="utilisation du pillbox non trouvée",
+                message="Pillbox usage not found",
                 code="PILLBOX_USE_NOT_FOUND",
+                i18n_key="api.boxes.usage_not_found",
                 status_code=404,
                 log_extra={"calendar_id": calendar_id, "use_id": use_id}
             )
     except Exception as e:
         return error_response(
-            message="erreur lors de l'annulation de l'utilisation du pillbox",
+            message="Error while canceling the use of the pillbox",
             code="CANCEL_PILLBOX_USE_ERROR",
+            i18n_key="api.boxes.usage_cancel_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id, "use_id": use_id}
@@ -263,16 +283,18 @@ def handle_get_pillbox_uses(calendar_id):
     try:
         pillbox_uses = get_pillbox_uses(calendar_id)
         return success_response(
-            message="usages du pillbox récupérés",
+            message="Pillbox usage data recovered",
             code="PILLBOX_USES_FETCHED",
+            i18n_key="api.boxes.usages_retrieved",
             data={"pillbox_uses": pillbox_uses},
             log_extra={"calendar_id": calendar_id, "pillbox_uses_count": len(pillbox_uses)}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération des usages du pillbox",
+            message="Error retrieving Pillbox usage",
             code="GET_PILLBOX_USES_ERROR",
+            i18n_key="api.boxes.usages_fetch_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -289,22 +311,25 @@ def handle_restock_box(calendar_id, box_id):
 
         if not restock_box(box_id, calendar_id):
             return warning_response(
-                message="boite de médicaments non trouvée",
+                message="medicine box not found",
                 code="MEDICINE_BOX_NOT_FOUND",
+                i18n_key="api.boxes.box_not_found",
                 status_code=404,
                 log_extra={"calendar_id": calendar_id, "box_id": box_id}
             )
 
         return success_response(
-            message="boite de médicaments réapprovisionnée",
+            message="medicine box refilled",
             code="BOX_RESTOCKED_SUCCESS",
+            i18n_key="api.boxes.refilled",
             data={"box_id": box_id},
             log_extra={"calendar_id": calendar_id, "box_id": box_id}
         )
     except Exception as e:
         return error_response(
-            message="erreur lors du réapprovisionnement de la boite de médicaments",
+            message="error during restocking of the medicine box",
             code="BOX_RESTOCK_ERROR",
+            i18n_key="api.boxes.refill_error",
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id, "box_id": box_id}

@@ -161,15 +161,17 @@ def handle_notifications():
             rows = cursor.fetchall()
 
         return success_response(
-            message="notifications récupérées",
+            message="notifications retrieved",
             code="NOTIFICATIONS_FETCH_SUCCESS",
+            i18n_key="api.notifications.retrieved",
             data={"notifications": rows}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération des notifications",
+            message="error retrieving notifications",
             code="NOTIFICATIONS_FETCH_ERROR",
+            i18n_key="api.notifications.fetch_error",
             status_code=500,
             error=str(e)
         )
@@ -195,8 +197,9 @@ def handle_read_notification(notification_id):
 
                 if not notif:
                     return warning_response(
-                        message="notification non trouvée", 
-                        code="NOTIFICATION_READ_ERROR", 
+                        message="notification not found", 
+                        code="NOTIFICATION_READ_ERROR",
+                        i18n_key="api.notifications.not_found", 
                         status_code=404, 
                         log_extra={"notification_id": notification_id}
                     )
@@ -204,15 +207,17 @@ def handle_read_notification(notification_id):
             conn.commit()
 
         return success_response(
-            message="notification marquée comme lue", 
-            code="NOTIFICATION_READ_SUCCESS", 
+            message="notification marked as read", 
+            code="NOTIFICATION_READ_SUCCESS",
+            i18n_key="api.notifications.marked_read", 
             log_extra={"notification_id": notification_id}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la marque de la notification comme lue", 
-            code="NOTIFICATION_READ_ERROR", 
+            message="Error marking notification as read", 
+            code="NOTIFICATION_READ_ERROR",
+            i18n_key="api.notifications.not_found", 
             status_code=500,
             error=str(e)
         )
@@ -230,8 +235,9 @@ def register_token():
 
     if not token or not uid:
         return error_response(
-            message="données manquantes", 
+            message="missing data", 
             code="MISSING_DATA",
+            i18n_key="api.notifications.missing_data",
             status_code=400,
         )
 
@@ -246,15 +252,17 @@ def register_token():
                 conn.commit()
 
         return success_response(
-            message="token enregistré", 
+            message="token registered", 
             code="FCM_REGISTERED",
+            i18n_key="api.notifications.token_saved",
             log_extra={"token": token}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de l'enregistrement du token", 
+            message="error during token registration", 
             code="FCM_REGISTER_ERROR",
+            i18n_key="api.notifications.token_save_error",
             status_code=500,
             error=str(e)
         )

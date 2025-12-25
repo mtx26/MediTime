@@ -43,11 +43,9 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     const result = await calendarSource.getTokensIcs(calendarId);
     if (result.success) {
       setTokens(result.data.tokens || []);
-    } else {
-      showAlert('danger', t('ics.fetch_error'));
     }
     setLoading(false);
-  }, [calendarId, calendarSource.getTokensIcs, t, showAlert]);
+  }, [calendarId, calendarSource.getTokensIcs, t]);
 
   useEffect(() => {
     fetchTokens();
@@ -56,20 +54,14 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const handleCreateToken = async () => {
     const result = await calendarSource.createTokenIcs(calendarId);
     if (result.success) {
-      showAlert('success', t('ics.create_success'));
       fetchTokens();
-    } else {
-      showAlert('danger', t('ics.create_error'));
     }
   };
 
   const handleDeleteToken = async (tokenId) => {
     const result = await calendarSource.deleteTokenIcs(calendarId, tokenId);
     if (result.success) {
-      showAlert('success', t('ics.delete_success'));
       fetchTokens();
-    } else {
-      showAlert('danger', t('ics.delete_error'));
     }
   };
 
@@ -85,6 +77,8 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
       showAlert('success', t('link_copied'));
+    }).catch(() => {
+      showAlert('danger', t('copy_link_error'));
     });
   };
 

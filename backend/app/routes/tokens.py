@@ -21,15 +21,17 @@ def handle_tokens():
                 tokens_list = cursor.fetchall()
 
         return success_response(
-            message="tokens récupérés", 
-            code="TOKENS_FETCH", 
+            message="tokens recovered", 
+            code="TOKENS_FETCH",
+            i18n_key="api.tokens.retrieved", 
             data={"tokens": tokens_list}
         )
         
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération des tokens",
-            code="TOKENS_ERROR", 
+            message="Error retrieving tokens",
+            code="TOKENS_ERROR",
+            i18n_key="api.tokens.fetch_error", 
             status_code=500, 
             error=str(e)
         )
@@ -58,8 +60,9 @@ def handle_create_token(calendar_id):
                 token = cursor.fetchone()
                 if token:
                     return warning_response(
-                        message="token déjà partagé", 
-                        code="TOKEN_ALREADY_SHARED", 
+                        message="token already shared", 
+                        code="TOKEN_ALREADY_SHARED",
+                        i18n_key="api.tokens.already_shared", 
                         status_code=400, 
                         log_extra={"calendar_id": calendar_id}
                     )
@@ -74,15 +77,17 @@ def handle_create_token(calendar_id):
                 )
 
                 return success_response(
-                    message="token créé", 
-                    code="TOKEN_CREATED", 
+                    message="token created", 
+                    code="TOKEN_CREATED",
+                    i18n_key="api.tokens.created", 
                     log_extra={"calendar_id": calendar_id}
                 )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la création du token",
-            code="TOKEN_CREATE_ERROR", 
+            message="error during token creation",
+            code="TOKEN_CREATE_ERROR",
+            i18n_key="api.tokens.creation_error", 
             status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
@@ -115,15 +120,17 @@ def handle_update_token_expiration(token):
                 )
 
                 return success_response(
-                    message="expiration du token mise à jour", 
-                    code="TOKEN_EXPIRATION_UPDATED", 
+                    message="token expiration update", 
+                    code="TOKEN_EXPIRATION_UPDATED",
+                    i18n_key="api.tokens.expiration_updated", 
                     log_extra={"token": token}
                 )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la mise à jour de l'expiration du token",
-            code="TOKEN_EXPIRATION_UPDATE_ERROR", 
+            message="Error updating token expiration",
+            code="TOKEN_EXPIRATION_UPDATE_ERROR",
+            i18n_key="api.tokens.expiration_update_error", 
             status_code=500,
             error=str(e),
             log_extra={"token": token}
@@ -149,8 +156,9 @@ def handle_generate_token_schedule(token):
         schedule, table, calendar_name = generate_calendar_schedule(calendar_id, start_date)
 
         return success_response(
-            message="calendrier généré", 
-            code="TOKEN_GENERATE_SCHEDULE_SUCCESS", 
+            message="calendar generated", 
+            code="TOKEN_GENERATE_SCHEDULE_SUCCESS",
+            i18n_key="api.tokens.calendar_generated", 
             uid="unknown", 
             origin="TOKEN_GENERATE_SCHEDULE", 
             data={"schedule": schedule, "table": table, "calendar_name": calendar_name},
@@ -158,8 +166,9 @@ def handle_generate_token_schedule(token):
         )
     except Exception as e:
         return error_response(
-            message="erreur lors de la génération du calendrier",
-            code="TOKEN_GENERATE_SCHEDULE_ERROR", 
+            message="error during calendar generation",
+            code="TOKEN_GENERATE_SCHEDULE_ERROR",
+            i18n_key="api.tokens.calendar_generation_error", 
             status_code=500, 
             uid="unknown", 
             origin="TOKEN_GENERATE_SCHEDULE", 
@@ -188,8 +197,9 @@ def handle_get_token_metadata(token):
                 token_data = cursor.fetchone()
                 if not token_data:
                     return warning_response(
-                        message="token non trouvé", 
-                        code="TOKEN_NOT_FOUND", 
+                        message="token not found", 
+                        code="TOKEN_NOT_FOUND",
+                        i18n_key="api.tokens.not_found", 
                         status_code=404, 
                         uid="unknown", 
                         origin="TOKEN_METADATA_LOAD", 
@@ -199,8 +209,9 @@ def handle_get_token_metadata(token):
                 owner_uid = token_data.get("owner_uid")
 
                 return success_response(
-                    message="métadonnées du token récupérées",
+                    message="retrieved token metadata",
                     code="TOKEN_METADATA_SUCCESS",
+                    i18n_key="api.tokens.metadata_retrieved",
                     origin="TOKEN_METADATA_FETCH",
                     uid="unknown",
                     data={"calendar_id": calendar_id, "owner_uid": owner_uid},
@@ -208,8 +219,9 @@ def handle_get_token_metadata(token):
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération des métadonnées du token",
+            message="Error retrieving token metadata",
             code="TOKEN_METADATA_ERROR",
+            i18n_key="api.tokens.metadata_fetch_error",
             status_code=500,
             error=str(e),
             origin="TOKEN_METADATA_FETCH",
@@ -235,15 +247,17 @@ def handle_delete_token(token):
                 )
 
                 return success_response(
-                    message="token supprimé", 
+                    message="token removed", 
                     code="TOKEN_DELETE_SUCCESS",
+                    i18n_key="api.tokens.deleted",
                     log_extra={"token": token}
                 )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la suppression du token",
-            code="TOKEN_DELETE_ERROR", 
+            message="error while deleting the token",
+            code="TOKEN_DELETE_ERROR",
+            i18n_key="api.tokens.delete_error", 
             status_code=500,
             error=str(e),
             log_extra={"token": token}

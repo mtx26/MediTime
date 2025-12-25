@@ -120,30 +120,21 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
     }
 
     setIsProcessing(true);
-
-    try {
-      const analysisResult = await personalCalendars.analyzeImage(file);
-      
-      if (analysisResult.success) {
-        if (analysisResult.medicines && analysisResult.medicines.length > 0) {
-          navigate(`/${lng}/add-calendar/review`, {
-            state: { 
-              importedMedicines: analysisResult.medicines,
-              calendarName: calendarName 
-            },
-          });
-        } else {
-          showAlert('info', t('image_upload.no_medicines_found'));
-        }
+    const analysisResult = await personalCalendars.analyzeImage(file);
+    
+    if (analysisResult.success) {
+      if (analysisResult.medicines && analysisResult.medicines.length > 0) {
+        navigate(`/${lng}/add-calendar/review`, {
+          state: { 
+            importedMedicines: analysisResult.medicines,
+            calendarName: calendarName 
+          },
+        });
       } else {
-        showAlert('danger', analysisResult.error || t('image_upload.analysis_error'));
+        showAlert('info', t('image_upload.no_medicines_found'));
       }
-    } catch (error) {
-      console.error('Erreur lors de l\'analyse de l\'image:', error);
-      showAlert('danger', t('image_upload.file_analysis_error'));
-    } finally {
-      setIsProcessing(false);
     }
+    setIsProcessing(false);
   };
 
   const removeFile = () => {

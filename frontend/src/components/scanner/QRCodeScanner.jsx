@@ -557,10 +557,7 @@ const QRCodeScanner = forwardRef(({
       const rep = await onAddAll(medicineBoxes);
       // Reset seulement si l'ajout a réussi
       if (rep.success) {
-        showAlert('success', t('scanner.add_all_success'));
         resetScannedMedicines(); // Remettre à zéro après ajout réussi
-      } else {
-        showAlert('danger', t('scanner.add_all_failed'));
       }
     }
   };

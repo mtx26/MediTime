@@ -16,14 +16,16 @@ def create_ics_token_route(calendar_id):
         token_data = create_ics_token(calendar_id, g.uid)
         
         return success_response(
-            message="Lien calendrier créé avec succès",
+            message="Calendar link successfully created",
             code="ICS_TOKEN_CREATED",
+            i18n_key="api.ics.link_created",
             data=token_data
         )
     except Exception as e:
         return error_response(
-            message="Erreur lors de la création du lien calendrier",
+            message="Error creating calendar link",
             code="ICS_TOKEN_CREATION_ERROR",
+            i18n_key="api.ics.link_creation_error",
             status_code=500,
             error=str(e)
         )
@@ -38,14 +40,16 @@ def list_ics_tokens_route(calendar_id):
     try:
         tokens = get_ics_tokens(calendar_id, g.uid)
         return success_response(
-            message="Liste des liens calendrier",
+            message="List of calendar links",
             code="ICS_TOKENS_LISTED",
+            i18n_key="api.ics.links_list",
             data={"tokens": tokens}
         )
     except Exception as e:
         return error_response(
-            message="Erreur lors de la récupération des liens calendrier",
+            message="Error retrieving calendar links",
             code="ICS_TOKENS_FETCH_ERROR",
+            i18n_key="api.ics.links_fetch_error",
             status_code=500,
             error=str(e)
         )
@@ -61,19 +65,22 @@ def delete_ics_token_route(calendar_id, token_id):
         uid = g.uid
         if delete_ics_token(token_id, uid):
             return success_response(
-                message="Lien calendrier supprimé",
-                code="ICS_TOKEN_DELETED"
+                message="Calendar link removed",
+                code="ICS_TOKEN_DELETED",
+                i18n_key="api.ics.link_deleted"
             )
         else:
             return error_response(
-                message="Lien introuvable ou non autorisé",
+                message="Link not found or unauthorized",
                 code="ICS_TOKEN_NOT_FOUND",
+                i18n_key="api.ics.link_not_found",
                 status_code=404
             )
     except Exception as e:
         return error_response(
-            message="Erreur lors de la suppression du lien calendrier",
+            message="Error deleting calendar link",
             code="ICS_TOKEN_DELETE_ERROR",
+            i18n_key="api.ics.link_delete_error",
             status_code=500,
             error=str(e)
         )
@@ -88,14 +95,16 @@ def create_shared_ics_token_route(calendar_id):
     try:
         token_data = create_ics_token(calendar_id, g.uid)
         return success_response(
-            message="Lien calendrier partagé créé avec succès",
+            message="Shared calendar link successfully created",
             code="SHARED_ICS_TOKEN_CREATED",
+            i18n_key="api.ics.shared_link_created",
             data=token_data
         )
     except Exception as e:
         return error_response(
-            message="Erreur lors de la création du lien calendrier partagé",
+            message="Error creating shared calendar link",
             code="SHARED_ICS_TOKEN_CREATION_ERROR",
+            i18n_key="api.ics.shared_link_creation_error",
             status_code=500,
             error=str(e)
         )
@@ -110,14 +119,16 @@ def list_shared_ics_tokens_route(calendar_id):
     try:
         tokens = get_ics_tokens(calendar_id, g.uid)
         return success_response(
-            message="Liste des liens calendrier partagé",
+            message="List of shared calendar links",
             code="SHARED_ICS_TOKENS_LISTED",
+            i18n_key="api.ics.shared_links_list",
             data={"tokens": tokens}
         )
     except Exception as e:
         return error_response(
-            message="Erreur lors de la récupération des liens calendrier partagé",
+            message="Error retrieving shared calendar links",
             code="SHARED_ICS_TOKENS_FETCH_ERROR",
+            i18n_key="api.ics.shared_links_fetch_error",
             status_code=500,
             error=str(e)
         )
@@ -133,19 +144,22 @@ def delete_shared_ics_token_route(calendar_id, token_id):
         uid = g.uid
         if delete_ics_token(token_id, uid):
             return success_response(
-                message="Lien calendrier partagé supprimé",
-                code="SHARED_ICS_TOKEN_DELETED"
+                message="Shared calendar link removed",
+                code="SHARED_ICS_TOKEN_DELETED",
+                i18n_key="api.ics.shared_link_deleted"
             )
         else:
             return error_response(
-                message="Lien introuvable ou non autorisé",
+                message="Link not found or unauthorized",
                 code="SHARED_ICS_TOKEN_NOT_FOUND",
+                i18n_key="api.ics.shared_link_not_found",
                 status_code=404
             )
     except Exception as e:
         return error_response(
-            message="Erreur lors de la suppression du lien calendrier partagé",
+            message="Error deleting shared calendar link",
             code="SHARED_ICS_TOKEN_DELETE_ERROR",
+            i18n_key="api.ics.shared_link_delete_error",
             status_code=500,
             error=str(e)
         )
@@ -171,8 +185,9 @@ def get_calendar_ics(token):
         )
     except ValueError:
         return error_response(
-            message="Calendrier introuvable ou token invalide",
+            message="Calendar not found or token invalid",
             code="ICS_NOT_FOUND",
+            i18n_key="api.ics.calendar_not_found",
             status_code=404
         )
     except Exception as e:
@@ -180,5 +195,6 @@ def get_calendar_ics(token):
             message=f"Erreur interne lors de la génération du calendrier: {str(e)}",
             code="ICS_GENERATION_ERROR",
             status_code=500,
-            error=str(e)
+            error=str(e),
+            i18n_key="api.ics.generation_error"
         )

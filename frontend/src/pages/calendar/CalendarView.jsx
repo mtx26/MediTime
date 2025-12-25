@@ -41,7 +41,7 @@ function CalendarPage({
   const [calendarTable, setCalendarTable] = useState([]); // Événements du calendrier
   const [calendarName, setCalendarName] = useState(''); // Nom du calendrier
   const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
-  const { showAlert, showConfirm } = useAlert();
+  const { showConfirm } = useAlert();
 
   // Méthode de décrémentation du stock (pour affichage différencié)
   const [stockDecrementMethod, setStockDecrementMethod] = useState(false);
@@ -188,10 +188,7 @@ function CalendarPage({
       async () => {
         const rep = await personalCalendars.deleteCalendar(calendarId);
         if (rep.success) {
-          showAlert('success', t('calendar_deleted'));
           navigate(`/${lng}/calendars`);
-        } else {  
-          showAlert('danger', rep.error || t('calendar.error_deleting_calendar'));
         }
       }
     );
@@ -206,10 +203,7 @@ function CalendarPage({
       async () => {
         const rep = await sharedUserCalendars.deleteSharedCalendar(calendarId);
         if (rep.success) {
-          showAlert('success', t('calendar_deleted'));
           navigate(`/${lng}/calendars`);
-        } else {
-          showAlert('danger', rep.error || t('calendar.error_deleting_calendar'));
         }
       }
     );

@@ -34,16 +34,18 @@ def handle_token_medicines(token):
                 medicines = cursor.fetchall()
 
         return success_response(
-            message="médicaments récupérés",
+            message="retrieved medications",
             code="MEDICINES_SHARED_LOADED",
+            i18n_key="api.shared_boxes.retrieved",
             data={"medicines": medicines},
             log_extra={"token": token}
         )
 
     except Exception as e:
         return error_response(
-            message="erreur lors de la récupération des médicaments",
+            message="error during medication retrieval",
             code="MEDICINES_SHARED_ERROR",
+            i18n_key="api.shared_boxes.fetch_error",
             status_code=500,
             error=str(e),
             log_extra={"token": token}
