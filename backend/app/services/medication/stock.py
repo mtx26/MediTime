@@ -126,6 +126,14 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
                         AND m.box_capacity > 0
                         AND m.deleted_at IS NULL
                         AND c.deleted_at IS NULL
+                        AND EXISTS (
+                            SELECT 1 FROM medicine_box_conditions mbc
+                            WHERE mbc.box_id = m.id
+                                AND mbc.deleted_at IS NULL
+                                AND (
+                                    mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE
+                                )
+                            )
                     """,
                     (calendar_id,)
                 )
@@ -213,7 +221,7 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
 
 def check_if_stock_is_low(calendar_id: int) -> bool:
     """
-    Vérifie si le stock d'un calendrier est faible.
+    Vérifie si le stock d'un calendrier est faible et actif.
     
     Paramètres:
     - calendar_id: ID du calendrier à vérifier.
@@ -225,12 +233,20 @@ def check_if_stock_is_low(calendar_id: int) -> bool:
         with conn.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT COUNT(*) FROM medicine_boxes
-                WHERE calendar_id = %s 
-                    AND stock_quantity <= stock_alert_threshold 
-                    AND stock_alert_threshold > 0
-                    AND box_capacity > 0
-                    AND deleted_at IS NULL
+                SELECT COUNT(*) FROM medicine_boxes m
+                WHERE m.calendar_id = %s
+                    AND m.stock_quantity <= m.stock_alert_threshold
+                    AND m.stock_alert_threshold > 0
+                    AND m.box_capacity > 0
+                    AND m.deleted_at IS NULL
+                    AND EXISTS (
+                        SELECT 1 FROM medicine_box_conditions mbc
+                        WHERE mbc.box_id = m.id
+                            AND mbc.deleted_at IS NULL
+                            AND (
+                                mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE
+                            )
+                    )
                 """,
                 (calendar_id,)
             )

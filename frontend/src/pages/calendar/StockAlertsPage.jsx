@@ -82,7 +82,13 @@ function StockAlertsPage({
     (box) =>
       box.stock_alert_threshold > 0 &&
       box.stock_quantity <= box.stock_alert_threshold &&
-      box.box_capacity > 0
+      box.box_capacity > 0 &&
+      box.conditions?.every((c) => {
+        if (!c?.max_date) return true;
+        const now = new Date();
+        const maxDate = new Date(c.max_date);
+        return now <= maxDate;
+      })
   );
 
   const restockBox = (calendarId, boxId) => {
@@ -199,7 +205,7 @@ function StockAlertsPage({
                           <small className="d-block text-muted">{t('actual_stock')}</small>
                           <strong className="text-danger">{med.stock_quantity}</strong>
                         </div>
-  
+
                         <div className="col-6">
                           <IconButton
                             className="btn btn-outline-success w-100"

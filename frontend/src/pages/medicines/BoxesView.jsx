@@ -933,13 +933,21 @@ function BoxCard({
   ];
 
   const borderClass =
-    box.box_capacity === 0
-      ? ''
-      : box.stock_quantity <= 0
-      ? 'border-danger'
-      : box.stock_quantity <= box.stock_alert_threshold
-      ? 'border-warning'
-      : '';
+    box.conditions?.every((c) => {
+                if (!c?.max_date) return false;
+                const now = new Date();
+                const maxDate = new Date(c.max_date);
+                return now > maxDate;
+              })
+      ? 'border-secondary'
+      :
+      box.box_capacity === 0
+        ? ''
+        : box.stock_quantity <= 0
+        ? 'border-danger'
+        : box.stock_quantity <= box.stock_alert_threshold
+        ? 'border-warning'
+        : '';
 
   // =========================================================================
   // RENDER BOX CARD
@@ -1067,57 +1075,7 @@ function BoxCard({
 
         {/* Stock Badges */}
         {!isEditing && (
-          <div className="d-flex mb-2 align-items-center w-100 gap-2">
-            {box.box_capacity !== 0 && (
-              <Badge
-                color={
-                  box.stock_quantity <= 0
-                    ? 'danger'
-                    : box.stock_quantity <= box.stock_alert_threshold
-                    ? 'warning'
-                    : 'success'
-                }
-                icon={
-                  box.stock_quantity <= 0
-                    ? 'exclamation-triangle'
-                    : box.stock_quantity <= box.stock_alert_threshold
-                    ? 'exclamation-triangle'
-                    : 'check-circle'
-                }
-                text={
-                  box.stock_quantity <= 0
-                    ? t('boxes.stock.badge.out')
-                    : box.stock_quantity <= box.stock_alert_threshold
-                    ? t('boxes.stock.badge.low')
-                    : t('boxes.stock.badge.high')
-                }
-                tooltip={
-                  box.stock_quantity <= 0
-                    ? t('boxes.stock.badge.tooltip.out')
-                    : box.stock_quantity <= box.stock_alert_threshold
-                    ? t('boxes.stock.badge.tooltip.low')
-                    : t('boxes.stock.badge.tooltip.high')
-                }
-              />
-            )}
-            {box.conditions.filter((c) => c !== undefined).length === 0 && (
-              <button
-                className="btn p-0"
-                onClick={() => {
-                  setExpandedBoxes((p) => ({ ...p, [box.id]: true }));
-                  onEdit(box);
-                }}
-                aria-label={t('boxes.condition.add')}
-                title={t('boxes.condition.add')}
-              >
-                <Badge
-                  color="warning"
-                  icon="info-circle"
-                  text={t('boxes.condition.none')}
-                  tooltip={t('boxes.condition_none_tooltip')}
-                />
-              </button>
-            )}
+          <div className="d-flex mb-2 align-items-center w-100 gap-2 flex-wrap">
             {/* medic inactive (toutes les conditions sont desactiver) */}
             {box.conditions?.every((c) => {
               if (!c?.max_date) return false;
@@ -1126,7 +1084,7 @@ function BoxCard({
               return now > maxDate;
             }) ? (
               <Badge
-                color="warning"
+                color="secondary"
                 icon="pause-circle"
                 text={t('boxes.condition.inactive')}
                 tooltip={t('boxes.condition.inactive_tooltip')}
@@ -1137,13 +1095,66 @@ function BoxCard({
                 const now = new Date();
                 const maxDate = new Date(c.max_date);
                 return now > maxDate;
-              }) && (
+              }) ? (
                 <Badge
-                  color="secondary"
+                  color="info"
                   icon="exclamation-circle"
                   text={t('boxes.condition.expired')}
                   tooltip={t('boxes.condition.expired_tooltip')}
                 />
+              ) : (
+                <>
+                  {box.box_capacity !== 0 && (
+                    <Badge
+                      color={
+                        box.stock_quantity <= 0
+                          ? 'danger'
+                          : box.stock_quantity <= box.stock_alert_threshold
+                          ? 'warning'
+                          : 'success'
+                      }
+                      icon={
+                        box.stock_quantity <= 0
+                          ? 'exclamation-triangle'
+                          : box.stock_quantity <= box.stock_alert_threshold
+                          ? 'exclamation-triangle'
+                          : 'check-circle'
+                      }
+                      text={
+                        box.stock_quantity <= 0
+                          ? t('boxes.stock.badge.out')
+                          : box.stock_quantity <= box.stock_alert_threshold
+                          ? t('boxes.stock.badge.low')
+                          : t('boxes.stock.badge.high')
+                      }
+                      tooltip={
+                        box.stock_quantity <= 0
+                          ? t('boxes.stock.badge.tooltip.out')
+                          : box.stock_quantity <= box.stock_alert_threshold
+                          ? t('boxes.stock.badge.tooltip.low')
+                          : t('boxes.stock.badge.tooltip.high')
+                      }
+                    />
+                  )}
+                  {box.conditions.filter((c) => c !== undefined).length === 0 && (
+                    <button
+                      className="btn p-0"
+                      onClick={() => {
+                        setExpandedBoxes((p) => ({ ...p, [box.id]: true }));
+                        onEdit(box);
+                      }}
+                      aria-label={t('boxes.condition.add')}
+                      title={t('boxes.condition.add')}
+                    >
+                      <Badge
+                        color="warning"
+                        icon="info-circle"
+                        text={t('boxes.condition.none')}
+                        tooltip={t('boxes.condition_none_tooltip')}
+                      />
+                    </button>
+                  )}
+                </>
               )
             )}
             {/*Afficher si alart pour un medoc desactiver (box_capacity <= 0 ou stock_alert_threshold <= 0)*/}

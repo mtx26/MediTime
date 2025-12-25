@@ -34,8 +34,8 @@ def use_pillbox(calendar_id: str, start_date: str) -> bool | None:
                       ON mb.calendar_id = c.id
                       AND mb.box_capacity > 0
                       AND mb.deleted_at IS NULL
-                                        WHERE c.id = %s
-                                            AND c.deleted_at IS NULL
+                    WHERE c.id = %s
+                        AND c.deleted_at IS NULL
                     GROUP BY c.id, cs.stock_decrement_method
                 """, (calendar_id,))
                 row = cursor.fetchone()

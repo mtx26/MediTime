@@ -26,7 +26,22 @@ def handle_calendars():
                         c.*, 
                         cs.stock_decrement_method,
                         COUNT(mb.id) AS boxes_count,
-                        COALESCE(BOOL_OR(mb.stock_quantity <= mb.stock_alert_threshold AND mb.stock_alert_threshold > 0 AND mb.box_capacity > 0), FALSE) AS "ifLowStock"
+                        COALESCE(
+                            BOOL_OR(
+                                mb.stock_quantity <= mb.stock_alert_threshold 
+                                AND mb.stock_alert_threshold > 0 
+                                AND mb.box_capacity > 0
+                                AND mb.deleted_at IS NULL
+                                AND EXISTS (
+                                    SELECT 1 FROM medicine_box_conditions mbc
+                                    WHERE mbc.box_id = mb.id
+                                        AND mbc.deleted_at IS NULL
+                                        AND (
+                                            mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE
+                                        )
+                                    )
+                                ), FALSE
+                            ) AS "ifLowStock"
                     FROM calendars c
                     LEFT JOIN calendar_settings cs ON cs.calendar_id = c.id
                     LEFT JOIN medicine_boxes mb 
