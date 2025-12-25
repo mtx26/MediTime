@@ -68,7 +68,7 @@
     "register_with": "注册方式：",
     "show_password": "显示密码",
     "terms_link": "一般条件",
-    "verification_sent": "📩 验证链接已发送至您的电子邮件地址。",
+    "verification_sent": "验证链接已发送至您的电子邮件地址。",
     "with_discord": "与 Discord 连接",
     "with_facebook": "使用 Facebook 登录",
     "with_github": "与 Github 连接",
@@ -133,7 +133,7 @@
         "line": "{{name}} ({{dose}} mg) — {{count}} 单位库存",
         "line_negative": "{{name}} ({{dose}} 毫克) — {{count}} 单位（缺货）",
         "line_plural": "{{name}} ({{dose}} mg) — 库存有 {{count}} 件",
-        "title": "🔔 库存警报："
+        "title": "库存警报："
       },
       "badge": {
         "high": "高库存",
@@ -322,7 +322,7 @@
   },
   "link": "关联",
   "link_already_exists": "此日历的链接已存在。",
-  "link_copied": "🔗 链接已复制！",
+  "link_copied": "链接已复制！",
   "link_expiration": "链接过期",
   "link_will_be_generated": "将生成一个链接",
   "loading": "加载中...",
@@ -346,12 +346,15 @@
     "select_option": "选择...",
     "start_date": "开始",
     "time_of_day": "片刻",
-    "title": "药物审查"
+    "title": "药物审查",
+    "confirm_save_title": "保存日历？",
+    "confirm_save_message": "分析结果将添加到您的用药日历中。如有需要，您可以稍后修改或删除它们。",
+    "save_success": "药物已成功添加！"
   },
   "medicines": {
     "back_to_calendar": "返回日历",
     "label": "药物",
-    "list_empty": "❌ 此计划尚未添加任何药物。",
+    "list_empty": "此计划尚未添加任何药物。",
     "list_title": "药品清单"
   },
   "mg": "毫克",
@@ -558,7 +561,7 @@
     "new_password": {
       "placeholder": "输入新密码"
     },
-    "password_updated": "✅ 密码已成功更新。",
+    "password_updated": "密码已成功更新。",
     "title": "帐户管理",
     "update_password": "更新密码"
   },

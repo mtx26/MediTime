@@ -16,24 +16,57 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
   // Fonction pour valider une URL de prévisualisation d'image
   const isValidImagePreviewUrl = (url) => {
     if (!url) return false;
-    // Vérifier que l'URL est un blob URL créé par createObjectURL
-    return url.startsWith('blob:') && url.includes(window.location.origin);
+    // Vérifier strictement que l'URL est un blob URL créé par createObjectURL
+    // et provient de l'origine actuelle
+    if (!url.startsWith('blob:') || !url.includes(window.location.origin)) {
+      return false;
+    }
+    
+    // Vérifier que l'URL ne contient pas de caractères suspects
+    try {
+      const urlObj = new URL(url);
+      return urlObj.protocol === 'blob:';
+    } catch {
+      return false;
+    }
+  };
+
+  // Fonction pour valider strictement le type de fichier
+  const isValidImageFile = (file) => {
+    if (!file) return false;
+    
+    // Liste blanche des types MIME acceptés
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    
+    // Vérifier le type MIME
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      return false;
+    }
+    
+    // Vérifier l'extension du fichier
+    const fileName = file.name.toLowerCase();
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+    const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+    
+    return hasValidExtension;
   };
 
   useEffect(() => {
     if (file) {
-      // Valider que le fichier est bien une image avant de créer l'URL
-      if (file.type.startsWith('image/')) {
+      // Valider strictement que le fichier est bien une image
+      if (isValidImageFile(file)) {
         const url = URL.createObjectURL(file);
         setPreviewUrl(url);
         return () => URL.revokeObjectURL(url);
       } else {
         setPreviewUrl(null);
+        setFile(null);
+        showAlert('warning', t('image_upload.file_type_error'));
       }
     } else {
       setPreviewUrl(null);
     }
-  }, [file]);
+  }, [file, showAlert, t]);
 
   // Notify parent of state changes
   useEffect(() => {
@@ -48,7 +81,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile && droppedFile.type.startsWith('image/')) {
+    if (droppedFile && isValidImageFile(droppedFile)) {
       setFile(droppedFile);
     } else {
       showAlert('warning', t('image_upload.file_type_error'));
@@ -57,7 +90,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    if (selectedFile && selectedFile.type.startsWith('image/')) {
+    if (selectedFile && isValidImageFile(selectedFile)) {
       setFile(selectedFile);
     } else {
       showAlert('warning', t('image_upload.file_type_error'));
@@ -165,6 +198,8 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
                         alt={t('image_upload.preview_alt')}
                         className="img-fluid rounded border shadow-sm mb-3"
                         style={{ maxHeight: '200px', maxWidth: '100%', objectFit: 'cover' }}
+                        referrerPolicy="no-referrer"
+                        crossOrigin="anonymous"
                         onError={() => {
                           // En cas d'erreur de chargement, supprimer la prévisualisation
                           setPreviewUrl(null);

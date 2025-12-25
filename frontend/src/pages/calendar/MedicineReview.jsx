@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 import ArrowControls from '../../components/calendar/ArrowControls';
+import { useAlert } from '../../contexts/AlertContext';
 
 const DEFAULT_CONDITION = {
   time_of_day: '',
@@ -20,6 +21,7 @@ export default function MedicineReview({ personalCalendars }) {
   const medicineBoxes = location.state?.importedMedicines ?? [];
   const calendarName = location.state?.calendarName;
   const lng = params.lng;
+  const { showAlert, showConfirm } = useAlert();
 
   const [medicines, setMedicines] = useState(medicineBoxes);
   const [editMode, setEditMode] = useState(false);
@@ -125,10 +127,18 @@ export default function MedicineReview({ personalCalendars }) {
   };
 
   const handleSave = async () => {
-    const rep = await personalCalendars.saveAnalysisResult(calendarName, medicines);
-    if (rep.success) {
-      navigate(`/${lng}/calendar/${rep.calendar_id}`);
-    }
+    showConfirm(
+      'confirm',
+      t('medicine_review.confirm_save_title'),
+      t('medicine_review.confirm_save_message'),
+      async () => {
+        const rep = await personalCalendars.saveAnalysisResult(calendarName, medicines);
+        if (rep.success) {
+          showAlert('success', t('medicine_review.save_success'));
+          navigate(`/${lng}/calendar/${rep.calendar_id}`);
+        }
+      }
+    );
   };
 
   useEffect(() => {

@@ -68,7 +68,7 @@
     "register_with": "Registrieren mit:",
     "show_password": "Passwort anzeigen",
     "terms_link": "Allgemeine Geschäftsbedingungen",
-    "verification_sent": "📩 Ein Bestätigungslink wurde an Ihre E-Mail-Adresse gesendet.",
+    "verification_sent": "Ein Bestätigungslink wurde an Ihre E-Mail-Adresse gesendet.",
     "with_discord": "Mit Discord verbinden",
     "with_facebook": "Mit Facebook anmelden",
     "with_github": "Verbindung mit Github",
@@ -133,7 +133,7 @@
         "line": "{{name}} ({{dose}} mg) — {{count}} Einheit auf Lager",
         "line_negative": "{{name}} ({{dose}} mg) – {{count}} Einheiten (Vorrat überschritten)",
         "line_plural": "{{name}} ({{dose}} mg) — {{count}} Einheiten auf Lager",
-        "title": "🔔 Lagerbenachrichtigungen:"
+        "title": "Lagerbenachrichtigungen:"
       },
       "badge": {
         "high": "Hoher Lagerbestand",
@@ -322,7 +322,7 @@
   },
   "link": "Link",
   "link_already_exists": "Für diesen Kalender existiert bereits ein Link.",
-  "link_copied": "🔗 Link kopiert!",
+  "link_copied": "Link kopiert!",
   "link_expiration": "Linkablauf",
   "link_will_be_generated": "Es wird ein Link generiert für",
   "loading": "Laden...",
@@ -346,12 +346,15 @@
     "select_option": "Wählen...",
     "start_date": "Anfang",
     "time_of_day": "Moment",
-    "title": "Arzneimittelüberprüfung"
+    "title": "Arzneimittelüberprüfung",
+    "confirm_save_title": "Kalender speichern?",
+    "confirm_save_message": "Die analysierten Medikamente werden Ihrem Kalender hinzugefügt. Sie können sie später bei Bedarf ändern oder löschen.",
+    "save_success": "Medikamente erfolgreich hinzugefügt!"
   },
   "medicines": {
     "back_to_calendar": "Zurück zum Kalender",
     "label": "Drogen",
-    "list_empty": "❌ Für diesen Zeitplan wurden noch keine Medikamente hinzugefügt.",
+    "list_empty": "Für diesen Zeitplan wurden noch keine Medikamente hinzugefügt.",
     "list_title": "Liste der Medikamente"
   },
   "mg": "mg",
@@ -558,7 +561,7 @@
     "new_password": {
       "placeholder": "Geben Sie das neue Passwort ein"
     },
-    "password_updated": "✅ Passwort erfolgreich aktualisiert.",
+    "password_updated": "Passwort erfolgreich aktualisiert.",
     "title": "Kontoverwaltung",
     "update_password": "Kennwort aktualisieren"
   },

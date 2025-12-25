@@ -68,7 +68,7 @@
     "register_with": "Register with:",
     "show_password": "Show password",
     "terms_link": "general conditions",
-    "verification_sent": "📩 A verification link has been sent to your email address.",
+    "verification_sent": "A verification link has been sent to your email address.",
     "with_discord": "Connect with Discord",
     "with_facebook": "Login with Facebook",
     "with_github": "Connecting with Github",
@@ -133,7 +133,7 @@
         "line": "{{name}} ({{dose}} mg) — {{count}} unit in stock",
         "line_negative": "{{name}} ({{dose}} mg) — {{count}} units (out of stock)",
         "line_plural": "{{name}} ({{dose}} mg) — {{count}} units in stock",
-        "title": "🔔 Stock alerts:"
+        "title": "Stock alerts:"
       },
       "badge": {
         "high": "High stock",
@@ -322,7 +322,7 @@
   },
   "link": "Link",
   "link_already_exists": "A link already exists for this calendar.",
-  "link_copied": "🔗 Link copied!",
+  "link_copied": "Link copied!",
   "link_expiration": "Link Expiration",
   "link_will_be_generated": "A link will be generated for",
   "loading": "Loading...",
@@ -346,12 +346,15 @@
     "select_option": "Select...",
     "start_date": "Beginning",
     "time_of_day": "Moment",
-    "title": "Drug Review"
+    "title": "Drug Review",
+    "confirm_save_title": "Save the calendar?",
+    "confirm_save_message": "The analyzed medications will be added to your calendar. You can modify or delete them later if necessary.",
+    "save_success": "Medications successfully added!"
   },
   "medicines": {
     "back_to_calendar": "Back to calendar",
     "label": "Drugs",
-    "list_empty": "❌ No medications have been added for this schedule yet.",
+    "list_empty": "No medications have been added for this schedule yet.",
     "list_title": "List of medicines"
   },
   "mg": "mg",
@@ -558,7 +561,7 @@
     "new_password": {
       "placeholder": "Enter the new password"
     },
-    "password_updated": "✅ Password updated successfully.",
+    "password_updated": "Password updated successfully.",
     "title": "Account management",
     "update_password": "Update password"
   },

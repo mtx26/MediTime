@@ -68,7 +68,7 @@
     "register_with": "Registrati con:",
     "show_password": "Mostra password",
     "terms_link": "condizioni generali",
-    "verification_sent": "📩 Un link di verifica è stato inviato al tuo indirizzo email.",
+    "verification_sent": "Un link di verifica è stato inviato al tuo indirizzo email.",
     "with_discord": "Connettiti con Discord",
     "with_facebook": "Accedi con Facebook",
     "with_github": "Connessione con Github",
@@ -133,7 +133,7 @@
         "line": "{{name}} ({{dose}} mg) — {{count}} unità in magazzino",
         "line_negative": "{{name}} ({{dose}} mg) — {{count}} unità (esaurito)",
         "line_plural": "{{name}} ({{dose}} mg) — {{count}} unità in magazzino",
-        "title": "🔔 Avvisi sulle azioni:"
+        "title": "Avvisi sulle azioni:"
       },
       "badge": {
         "high": "Elevato stock",
@@ -322,7 +322,7 @@
   },
   "link": "Collegamento",
   "link_already_exists": "Esiste già un collegamento per questo calendario.",
-  "link_copied": "🔗 Link copiato!",
+  "link_copied": "Link copiato!",
   "link_expiration": "Scadenza del collegamento",
   "link_will_be_generated": "Verrà generato un collegamento per",
   "loading": "Caricamento...",
@@ -346,12 +346,15 @@
     "select_option": "Selezionare...",
     "start_date": "Inizio",
     "time_of_day": "Momento",
-    "title": "Revisione dei farmaci"
+    "title": "Revisione dei farmaci",
+    "confirm_save_title": "Salvare il calendario?",
+    "confirm_save_message": "I farmaci analizzati verranno aggiunti al tuo calendario. Potrai modificarli o eliminarli in seguito, se necessario.",
+    "save_success": "Farmaci aggiunti con successo!"
   },
   "medicines": {
     "back_to_calendar": "Torna al calendario",
     "label": "Droghe",
-    "list_empty": "❌ Non sono ancora stati aggiunti farmaci per questo programma.",
+    "list_empty": "Non sono ancora stati aggiunti farmaci per questo programma.",
     "list_title": "Elenco dei medicinali"
   },
   "mg": "mg",
@@ -558,7 +561,7 @@
     "new_password": {
       "placeholder": "Inserisci la nuova password"
     },
-    "password_updated": "✅ Password aggiornata con successo.",
+    "password_updated": "Password aggiornata con successo.",
     "title": "Gestione dell'account",
     "update_password": "Aggiorna password"
   },

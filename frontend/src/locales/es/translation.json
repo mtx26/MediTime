@@ -68,7 +68,7 @@
     "register_with": "Regístrate con:",
     "show_password": "Mostrar contraseña",
     "terms_link": "condiciones generales",
-    "verification_sent": "📩 Se ha enviado un enlace de verificación a su dirección de correo electrónico.",
+    "verification_sent": "Se ha enviado un enlace de verificación a su dirección de correo electrónico.",
     "with_discord": "Conectarse con Discord",
     "with_facebook": "Iniciar sesión con Facebook",
     "with_github": "Conectando con Github",
@@ -133,7 +133,7 @@
         "line": "{{name}} ({{dose}} mg) — {{count}} unidad en stock",
         "line_negative": "{{nombre}} ({{dosis}} mg) — {{cantidad}} unidades (agotado)",
         "line_plural": "{{nombre}} ({{dosis}} mg) — {{cantidad}} unidades en stock",
-        "title": "🔔 Alertas de stock:"
+        "title": "Alertas de stock:"
       },
       "badge": {
         "high": "Alto stock",
@@ -322,7 +322,7 @@
   },
   "link": "Enlace",
   "link_already_exists": "Ya existe un enlace para este calendario.",
-  "link_copied": "🔗 ¡Enlace copiado!",
+  "link_copied": "¡Enlace copiado!",
   "link_expiration": "Caducidad del enlace",
   "link_will_be_generated": "Se generará un enlace para",
   "loading": "Cargando...",
@@ -346,12 +346,15 @@
     "select_option": "Seleccionar...",
     "start_date": "Comienzo",
     "time_of_day": "Momento",
-    "title": "Revisión de medicamentos"
+    "title": "Revisión de medicamentos",
+    "confirm_save_title": "¿Guardar el calendario?",
+    "confirm_save_message": "Los medicamentos analizados se añadirán a su calendario. Puede modificarlos o eliminarlos más adelante si es necesario.",
+    "save_success": "¡Medicamentos añadidos exitosamente!"
   },
   "medicines": {
     "back_to_calendar": "Volver al calendario",
     "label": "Drogas",
-    "list_empty": "❌ Aún no se han agregado medicamentos para este cronograma.",
+    "list_empty": "Aún no se han agregado medicamentos para este cronograma.",
     "list_title": "Lista de medicamentos"
   },
   "mg": "mg",
@@ -558,7 +561,7 @@
     "new_password": {
       "placeholder": "Introduzca la nueva contraseña"
     },
-    "password_updated": "✅ Contraseña actualizada exitosamente.",
+    "password_updated": "Contraseña actualizada exitosamente.",
     "title": "Gestión de cuentas",
     "update_password": "Actualizar contraseña"
   },

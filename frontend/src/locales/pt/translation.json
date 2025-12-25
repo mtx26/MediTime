@@ -68,7 +68,7 @@
     "register_with": "Registre-se com:",
     "show_password": "Mostrar senha",
     "terms_link": "condições gerais",
-    "verification_sent": "📩 Um link de verificação foi enviado para seu endereço de e-mail.",
+    "verification_sent": "Um link de verificação foi enviado para seu endereço de e-mail.",
     "with_discord": "Conecte-se com o Discord",
     "with_facebook": "Entrar com o Facebook",
     "with_github": "Conectando com o Github",
@@ -133,7 +133,7 @@
         "line": "{{name}} ({{dose}} mg) — {{count}} unidade em estoque",
         "line_negative": "{{name}} ({{dose}} mg) — {{count}} unidades (fora de estoque)",
         "line_plural": "{{name}} ({{dose}} mg) — {{count}} unidades em estoque",
-        "title": "🔔 Alertas de ações:"
+        "title": "Alertas de ações:"
       },
       "badge": {
         "high": "Alto estoque",
@@ -322,7 +322,7 @@
   },
   "link": "Link",
   "link_already_exists": "Já existe um link para este calendário.",
-  "link_copied": "🔗 Link copiado!",
+  "link_copied": "Link copiado!",
   "link_expiration": "Expiração do link",
   "link_will_be_generated": "Será gerado um link para",
   "loading": "Carregando...",
@@ -346,12 +346,15 @@
     "select_option": "Selecione...",
     "start_date": "Começo",
     "time_of_day": "Momento",
-    "title": "Revisão de Medicamentos"
+    "title": "Revisão de Medicamentos",
+    "confirm_save_title": "Salvar o calendário?",
+    "confirm_save_message": "Os medicamentos analisados serão adicionados ao seu calendário. Você poderá modificá-los ou excluí-los posteriormente, se necessário.",
+    "save_success": "Medicamentos adicionados com sucesso!"
   },
   "medicines": {
     "back_to_calendar": "Voltar ao calendário",
     "label": "Drogas",
-    "list_empty": "❌ Nenhum medicamento foi adicionado para esta programação ainda.",
+    "list_empty": "Nenhum medicamento foi adicionado para esta programação ainda.",
     "list_title": "Lista de medicamentos"
   },
   "mg": "mg",
@@ -558,7 +561,7 @@
     "new_password": {
       "placeholder": "Digite a nova senha"
     },
-    "password_updated": "✅ Senha atualizada com sucesso.",
+    "password_updated": "Senha atualizada com sucesso.",
     "title": "Gerenciamento de contas",
     "update_password": "Atualizar senha"
   },

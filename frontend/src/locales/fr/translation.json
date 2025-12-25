@@ -68,7 +68,7 @@
     "register_with": "S'inscrire avec :",
     "show_password": "Afficher le mot de passe",
     "terms_link": "conditions générales",
-    "verification_sent": "📩 Un lien de vérification a été envoyé à votre adresse e-mail.",
+    "verification_sent": "Un lien de vérification a été envoyé à votre adresse e-mail.",
     "with_discord": "Connexion avec Discord",
     "with_facebook": "Connexion avec Facebook",
     "with_github": "Connexion avec Github",
@@ -134,7 +134,7 @@
         "line": "{{name}} ({{dose}} mg) — {{count}} unité en stock",
         "line_negative": "{{name}} ({{dose}} mg) — {{count}} unités (stock dépassé)",
         "line_plural": "{{name}} ({{dose}} mg) — {{count}} unités en stock",
-        "title": "🔔 Alertes de stock :"
+        "title": "Alertes de stock :"
       },
       "badge": {
         "high": "Stock élevé",
@@ -333,7 +333,7 @@
   },
   "link": "Lien",
   "link_already_exists": "Un lien existe déjà pour ce calendrier.",
-  "link_copied": "🔗 Lien copié !",
+  "link_copied": "Lien copié !",
   "link_expiration": "Expiration du lien",
   "link_will_be_generated": "Un lien sera généré pour",
   "loading": "Chargement...",
@@ -350,10 +350,13 @@
   "low_stock": "Stock faible",
   "manage_link": "Gérer le lien",
   "medicine_review": {
+    "confirm_save_title": "Enregistrer le calendrier ?",
+    "confirm_save_message": "Les médicaments analysés seront ajoutés à votre calendrier. Vous pourrez les modifier ou les supprimer ultérieurement si nécessaire.",
     "current_stock": "Stock actuel",
     "delete_condition": "Supprimer cette condition",
     "finish": "Terminer",
     "maximum_stock": "Stock maximum",
+    "save_success": "Médicaments ajoutés avec succès !",
     "select_option": "Sélectionner...",
     "start_date": "Début",
     "time_of_day": "Moment",
@@ -362,7 +365,7 @@
   "medicines": {
     "back_to_calendar": "Retour au calendrier",
     "label": "Médicaments",
-    "list_empty": "❌ Aucun médicament n’a encore été ajouté pour ce calendrier.",
+    "list_empty": "Aucun médicament n’a encore été ajouté pour ce calendrier.",
     "list_title": "Liste des médicaments"
   },
   "mg": "mg",
@@ -573,7 +576,7 @@
     "new_password": {
       "placeholder": "Entrez le nouveau mot de passe"
     },
-    "password_updated": "✅ Mot de passe mis à jour avec succès.",
+    "password_updated": "Mot de passe mis à jour avec succès.",
     "title": "Gestion de compte",
     "update_password": "Mettre à jour le mot de passe"
   },

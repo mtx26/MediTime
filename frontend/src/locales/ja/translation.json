@@ -68,7 +68,7 @@
     "register_with": "登録方法:",
     "show_password": "パスワードを表示",
     "terms_link": "一般条件",
-    "verification_sent": "📩 確認リンクがあなたのメールアドレスに送信されました。",
+    "verification_sent": "確認リンクがあなたのメールアドレスに送信されました。",
     "with_discord": "Discordに接続する",
     "with_facebook": "Facebookでログイン",
     "with_github": "Githubとの接続",
@@ -133,7 +133,7 @@
         "line": "{{name}} ({{dose}} mg) — 在庫数 {{count}} 個",
         "line_negative": "{{name}} ({{dose}} mg) — {{count}} 個 (在庫切れ)",
         "line_plural": "{{name}} ({{dose}} mg) — 在庫数 {{count}} 個",
-        "title": "🔔 株価アラート:"
+        "title": "株価アラート:"
       },
       "badge": {
         "high": "在庫が多い",
@@ -322,7 +322,7 @@
   },
   "link": "リンク",
   "link_already_exists": "このカレンダーへのリンクは既に存在します。",
-  "link_copied": "🔗 リンクをコピーしました!",
+  "link_copied": "リンクをコピーしました!",
   "link_expiration": "リンクの有効期限",
   "link_will_be_generated": "リンクが生成されます",
   "loading": "読み込み中...",
@@ -346,12 +346,15 @@
     "select_option": "選択...",
     "start_date": "始まり",
     "time_of_day": "一瞬",
-    "title": "薬物レビュー"
+    "title": "薬物レビュー",
+    "confirm_save_title": "カレンダーを保存しますか?",
+    "confirm_save_message": "分析された薬はカレンダーに追加されます。必要に応じて後で変更または削除できます。",
+    "save_success": "薬が正常に追加されました。"
   },
   "medicines": {
     "back_to_calendar": "カレンダーに戻る",
     "label": "薬物",
-    "list_empty": "❌ このスケジュールにはまだ薬が追加されていません。",
+    "list_empty": "このスケジュールにはまだ薬が追加されていません。",
     "list_title": "医薬品リスト"
   },
   "mg": "ミリグラム",
@@ -558,7 +561,7 @@
     "new_password": {
       "placeholder": "新しいパスワードを入力してください"
     },
-    "password_updated": "✅ パスワードが正常に更新されました。",
+    "password_updated": "パスワードが正常に更新されました。",
     "title": "アカウント管理",
     "update_password": "パスワードを更新する"
   },
