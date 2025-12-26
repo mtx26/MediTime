@@ -231,7 +231,7 @@ def handle_read_notification(notification_id):
 def register_token():
     data = request.json
     token = data.get("token")
-    uid = g.uid if hasattr(g, "uid") else None
+    uid = g.uid
 
     if not token or not uid:
         return error_response(

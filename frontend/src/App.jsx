@@ -881,10 +881,16 @@ function App() {
   }, []);
 
   // 🔐 Demande de permission et envoi du token
-  const sendTokenToBackend = useCallback(async () => {
-
+  const sendTokenToBackend = useCallback(async (maxRetries = 4) => {
+    if (!uid) return;
     const token = await requestPermissionAndGetToken(uid)
-    if (!token) console.warn('FCM token not available');
+    if (!token) {
+      if (maxRetries > 0) {
+        await sendTokenToBackend(maxRetries - 1);
+      } else {
+        return;
+      }
+    }
 
     return await performApiCall({
       url: `${API_URL}/api/notifications/register-token`,
@@ -1031,7 +1037,9 @@ function App() {
   useEffect(() => {
     const fcmNotificationsEnabled = window?.Notification?.permission === 'granted' || false;
     if (fcmNotificationsEnabled) {
-      sendTokenToBackend();
+      setTimeout(() => {
+        sendTokenToBackend();
+      }, 1000);
     }
   }, [window?.Notification?.permission, sendTokenToBackend]);
 
