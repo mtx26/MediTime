@@ -883,15 +883,17 @@ function App() {
   // 🔐 Demande de permission et envoi du token
   const sendTokenToBackend = useCallback(async (maxRetries = 4) => {
     if (!uid) return;
-    const token = await requestPermissionAndGetToken(uid)
+    const token = await requestPermissionAndGetToken(uid);
     if (!token) {
       if (maxRetries > 0) {
-        await sendTokenToBackend(maxRetries - 1);
+        return await sendTokenToBackend(maxRetries - 1);
       } else {
+        // Ne pas envoyer de requête si le token est toujours absent
         return;
       }
     }
 
+    // N'envoyer la requête que si le token est bien défini
     return await performApiCall({
       url: `${API_URL}/api/notifications/register-token`,
       method: 'POST',
@@ -902,7 +904,7 @@ function App() {
       analyticsData: { uid, token },
       showAlert,
     });
-  } , [showAlert]);
+  }, [showAlert]);
   
 
   const sharedProps = {
