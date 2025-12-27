@@ -138,7 +138,7 @@ export default function PillboxDisplay({
 
   return (
     <div className="relative">
-      <div className="container mx-auto text-center w-full mt-3">
+      <div className="container mx-auto text-center w-full">
         {isPillboxUsed ? (
           <div className="mb-6 p-3">
             <div className="flex flex-col justify-center items-center p-6">

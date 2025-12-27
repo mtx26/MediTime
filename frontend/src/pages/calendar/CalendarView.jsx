@@ -18,10 +18,12 @@ import PillboxDisplay from '../../components/calendar/PillboxDisplay';
 import ActionSheet from '../../components/common/ActionSheet';
 import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Pill, Grid3X3, CalendarDays, Share2, Download, AlertTriangle, Calendar, Clock, Settings, Trash2, ChevronRight, Pin } from 'lucide-react';
 import '../../styles/fullcalendar-custom.css';
+
+
 function CalendarPage({
   personalCalendars,
   sharedUserCalendars,
@@ -498,8 +500,8 @@ function CalendarPage({
             <>
               {/* Pilulier - Vue mobile */}
               {stockDecrementMethod === "weekly_pillbox" && (
-                <div className="block lg:hidden w-full lg:w-2/3 mb-4 lg:px-2">
-                  <div className="mb-2">
+                <div className="block lg:hidden w-full lg:w-2/3 lg:px-2">
+                  <div>
                     <h4 className="mb-3 font-bold flex items-center gap-2">
                       <Pill className="h-5 w-5" /> {t('pillbox.title')}
                     </h4>
@@ -726,12 +728,14 @@ function CalendarWeekSelector({
         <h4 className="mb-3 font-bold flex items-center gap-2">
           <CalendarDays className="h-5 w-5" /> {t('calendar.reference_week')}
         </h4>
-        <div className='shadow rounded-lg w-full'>
-          <WeekCalendarSelector
-            onWeekSelect={onWeekSelect}
-            selectedDate={selectedDate}
-          />
-        </div>
+        <Card className="shadow rounded-lg w-full p-0">
+          <CardContent className="p-0">
+            <WeekCalendarSelector
+              onWeekSelect={onWeekSelect}
+              selectedDate={selectedDate}
+            />
+          </CardContent>
+        </Card>
       </div>
     )
   )

@@ -54,6 +54,7 @@ function buildReturnToCalendarList(pathParts) {
     calendar: pathParts.length === 2 && pathParts[0] === 'calendar',
     sharedUserCalendar:
       pathParts.length === 2 && pathParts[0] === 'shared-user-calendar',
+    addCalendar: pathParts.length === 1 && pathParts[0] === 'add-calendar',
   };
 }
 
@@ -93,6 +94,7 @@ function Navbar({ sharedProps }) {
   const pathParts = pathAfterLang.split('/').filter(Boolean);
   const locationList = buildLocationList(pathWithSlash);
   const locationAvailableForReturnToCalendarList = buildReturnToCalendarList(pathParts);
+  const shouldShowReturnToCalendarList = Object.values(locationAvailableForReturnToCalendarList).some(Boolean);
   const locationAvailableForReturnToCalendar = buildReturnToCalendar(pathParts);
   const isPillboxPage = isPillbox(pathParts);
 
@@ -153,8 +155,7 @@ function Navbar({ sharedProps }) {
           <div className="flex h-16 w-full items-center justify-between">
             {/* Logo / Retour */}
             <div className="flex items-center">
-              {locationAvailableForReturnToCalendarList.calendar ||
-              locationAvailableForReturnToCalendarList.sharedUserCalendar ? (
+              {shouldShowReturnToCalendarList ? (
                 <Link to={`/${lng}/calendars`} className="flex items-center gap-2 text-lg font-semibold">
                   <ArrowLeft className="h-5 w-5" /> {t('back')}
                 </Link>
@@ -225,11 +226,11 @@ function Navbar({ sharedProps }) {
             {((calendarInfo && calendarInfo.id) || (locationList.tokenCalendar && tokenId)) && (
               <div className="flex lg:hidden flex-col items-end">
                 {calendarInfo && basePath && calendarInfo.id && (
-                  <h4 className="text-sm font-bold">
+                  <h3 className="text-sm font-bold">
                     <Link to={`/${lng}/${basePath}/${calendarInfo.id}`}>
                       {calendarInfo.name}
                     </Link>
-                  </h4>
+                  </h3>
                 )}
                 {locationList.sharedUserCalendar && (
                   <Badge variant="secondary" className="text-xs">
