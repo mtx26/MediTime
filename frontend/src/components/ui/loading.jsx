@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useId, useCallback, useMemo, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 
 const LoadingContext = createContext();
