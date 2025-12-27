@@ -155,7 +155,9 @@
     "view_notice": "查看说明",
     "restock_disabled_tooltip": "由于箱子容量为 0，补货按钮已禁用。请更改容量以重新启用补货功能。",
     "condition_none_tooltip": "服用这些药物没有具体条件。点击此处添加条件，即可定期收到提醒。",
-    "no_medicines_selected": "未选择任何药物"
+    "no_medicines_selected": "未选择任何药物",
+    "loading_medicine_boxes": "正在装载药品箱……",
+    "loading_stock_alerts": "正在加载股票提醒……"
   },
   "calendar": {
     "add": "添加日历",
@@ -203,7 +205,8 @@
     "rename_description": "新名称将对所有与您共享此日历的用户可见。",
     "delete_shared_title": "删除共享日历？",
     "delete_shared_description": "您将无法再访问此共享日历。日历所有者和其他用户仍可访问该日历。",
-    "error_deleting_calendar": "删除日历时出错。"
+    "error_deleting_calendar": "删除日历时出错。",
+    "loading_daily_view": "正在加载每日概览..."
   },
   "calendar_completed": "行事历成功完成！",
   "calendar_completed_this_week": "这周药盒已满！",
@@ -227,7 +230,9 @@
         "description": "当您重新填充药盒时，库存将每周手动减少。",
         "label": "每周（药盒）"
       }
-    }
+    },
+    "loading_notification_settings": "正在加载通知设置...",
+    "loading_stock_settings": "正在加载库存设置..."
   },
   "calendars": "日历",
   "cancel": "取消",
@@ -300,7 +305,8 @@
     "title": "ICS链接列表",
     "token_label": "留置权 ICS",
     "delete_title": "移除ICS链接？",
-    "delete_description": "该链接将被停用，无法再同步您的日历。您需要创建一个新链接才能重新激活同步功能。"
+    "delete_description": "该链接将被停用，无法再同步您的日历。您需要创建一个新链接才能重新激活同步功能。",
+    "loading_ics_tokens": "正在加载ICS链接……"
   },
   "image_upload": {
     "analysis_error": "解析图像时出错。",
@@ -320,7 +326,8 @@
   "invalid_or_expired_link": "此共享日历链接无效或已过期。",
   "invitation": {
     "invalid_or_expired": "邀请无效或已过期",
-    "title": "邀请"
+    "title": "邀请",
+    "loading": "正在加载邀请函……"
   },
   "link": "关联",
   "link_already_exists": "此日历的链接已存在。",

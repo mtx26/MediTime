@@ -155,7 +155,9 @@
     "view_notice": "Vea las instrucciones",
     "restock_disabled_tooltip": "El botón de reposición está deshabilitado porque la capacidad de la caja es 0. Cambie la capacidad para volver a habilitar la reposición.",
     "condition_none_tooltip": "No se han definido condiciones para realizarlas. Haga clic aquí para añadir una y recibir recordatorios periódicos.",
-    "no_medicines_selected": "No se seleccionó ningún medicamento"
+    "no_medicines_selected": "No se seleccionó ningún medicamento",
+    "loading_medicine_boxes": "Cargando las cajas de medicamentos...",
+    "loading_stock_alerts": "Cargando alertas de stock..."
   },
   "calendar": {
     "add": "Agregar un calendario",
@@ -203,7 +205,8 @@
     "rename_description": "El nuevo nombre será visible para todos los usuarios con quienes comparte este calendario.",
     "delete_shared_title": "¿Eliminar el calendario compartido?",
     "delete_shared_description": "Ya no tendrás acceso a este calendario compartido. El calendario seguirá siendo accesible para el propietario y otros usuarios.",
-    "error_deleting_calendar": "Error al eliminar el calendario."
+    "error_deleting_calendar": "Error al eliminar el calendario.",
+    "loading_daily_view": "Cargando vista diaria..."
   },
   "calendar_completed": "¡Calendario completado exitosamente!",
   "calendar_completed_this_week": "¡Pastillas llenas para esta semana!",
@@ -227,7 +230,9 @@
         "description": "El stock se reducirá manualmente cada semana cuando rellenes tu pastillero.",
         "label": "Semanal (Pastillero)"
       }
-    }
+    },
+    "loading_notification_settings": "Cargando configuración de notificaciones...",
+    "loading_stock_settings": "Cargando configuración de stock..."
   },
   "calendars": "Calendarios",
   "cancel": "Cancelar",
@@ -300,7 +305,8 @@
     "title": "Listas de enlaces de ICS",
     "token_label": "Derecho de retención",
     "delete_title": "¿Quitar el enlace ICS?",
-    "delete_description": "El enlace se desactivará y ya no podrá sincronizar tu calendario. Deberás crear un nuevo enlace para reactivar la sincronización."
+    "delete_description": "El enlace se desactivará y ya no podrá sincronizar tu calendario. Deberás crear un nuevo enlace para reactivar la sincronización.",
+    "loading_ics_tokens": "Cargando enlaces ICS..."
   },
   "image_upload": {
     "analysis_error": "Error al analizar la imagen.",
@@ -320,7 +326,8 @@
   "invalid_or_expired_link": "Este enlace de calendario compartido no es válido o ha expirado.",
   "invitation": {
     "invalid_or_expired": "Invitación no válida o vencida",
-    "title": "Invitación"
+    "title": "Invitación",
+    "loading": "Cargando invitación..."
   },
   "link": "Enlace",
   "link_already_exists": "Ya existe un enlace para este calendario.",

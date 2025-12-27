@@ -4,6 +4,7 @@ import './index.css';
 import Root from './Root';
 import { UserProvider } from './contexts/UserContext';
 import { AlertProvider } from './contexts/AlertContext';
+import { LoadingProvider } from '@/components/ui/loading';
 import { Toaster } from '@/components/ui/sonner';
 import './i18n';
 import { SpeedInsights } from "@vercel/speed-insights/react"
@@ -34,10 +35,12 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <AlertProvider>
     <UserProvider>
-      <div className="h-full">
-        <Root />
-        <SpeedInsights />
-      </div>
+      <LoadingProvider>
+        <div className="h-full">
+          <Root />
+          <SpeedInsights />
+        </div>
+      </LoadingProvider>
     </UserProvider>
     <Toaster position="bottom-right" closeButton />
   </AlertProvider>,

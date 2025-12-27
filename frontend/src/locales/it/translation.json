@@ -155,7 +155,9 @@
     "view_notice": "Vedi le istruzioni",
     "restock_disabled_tooltip": "Il pulsante di rifornimento è disabilitato perché la capacità della scatola è 0. Modificare la capacità per riattivare il rifornimento.",
     "condition_none_tooltip": "Non sono state definite condizioni per prenderli. Clicca qui per aggiungerne uno e ricevere promemoria regolari.",
-    "no_medicines_selected": "Nessun farmaco selezionato"
+    "no_medicines_selected": "Nessun farmaco selezionato",
+    "loading_medicine_boxes": "Caricamento delle scatole dei medicinali...",
+    "loading_stock_alerts": "Caricamento avvisi sulle azioni..."
   },
   "calendar": {
     "add": "Aggiungi un calendario",
@@ -203,7 +205,8 @@
     "rename_description": "Il nuovo nome sarà visibile a tutti gli utenti con cui condividi questo calendario.",
     "delete_shared_title": "Eliminare il calendario condiviso?",
     "delete_shared_description": "Non avrai più accesso a questo calendario condiviso. Il calendario rimarrà accessibile al proprietario e agli altri utenti.",
-    "error_deleting_calendar": "Errore durante l'eliminazione del calendario."
+    "error_deleting_calendar": "Errore durante l'eliminazione del calendario.",
+    "loading_daily_view": "Caricamento vista giornaliera..."
   },
   "calendar_completed": "Calendario completato con successo!",
   "calendar_completed_this_week": "Questa settimana il bunker è pieno!",
@@ -227,7 +230,9 @@
         "description": "La scorta verrà diminuita manualmente ogni settimana quando rifornirai il tuo portapillole.",
         "label": "Settimanale (Pillbox)"
       }
-    }
+    },
+    "loading_notification_settings": "Caricamento delle impostazioni di notifica...",
+    "loading_stock_settings": "Caricamento delle impostazioni di magazzino..."
   },
   "calendars": "Calendari",
   "cancel": "Cancellare",
@@ -300,7 +305,8 @@
     "title": "Elenchi di link ICS",
     "token_label": "Collegamento",
     "delete_title": "Rimuovere il collegamento ICS?",
-    "delete_description": "Il collegamento verrà disattivato e non sarà più possibile sincronizzare il tuo calendario. Dovrai creare un nuovo collegamento per riattivare la sincronizzazione."
+    "delete_description": "Il collegamento verrà disattivato e non sarà più possibile sincronizzare il tuo calendario. Dovrai creare un nuovo collegamento per riattivare la sincronizzazione.",
+    "loading_ics_tokens": "Caricamento dei link ICS..."
   },
   "image_upload": {
     "analysis_error": "Errore durante l'analisi dell'immagine.",
@@ -320,7 +326,8 @@
   "invalid_or_expired_link": "Questo collegamento al calendario condiviso non è valido o è scaduto.",
   "invitation": {
     "invalid_or_expired": "Invito non valido o scaduto",
-    "title": "Invito"
+    "title": "Invito",
+    "loading": "Caricamento invito in corso..."
   },
   "link": "Collegamento",
   "link_already_exists": "Esiste già un collegamento per questo calendario.",

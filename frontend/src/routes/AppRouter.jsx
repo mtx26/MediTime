@@ -1,8 +1,8 @@
 import React, { useContext, lazy, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
-
+import { useLoading } from '@/components/ui/loading';
+import { useTranslation } from 'react-i18next';
 import { UserContext } from '../contexts/UserContext';
 
 const HomePage = lazy(() => import('../pages/general/HomePage'));
@@ -62,13 +62,15 @@ function PrivateRoute({ element }) {
 }
 
 function RouteWithLoader({ element, isLoading }) {
+  const { showLoading } = useLoading();
+  const { t } = useTranslation();
+  
+  React.useEffect(() => {
+    showLoading(isLoading, t('loading'));
+  }, [isLoading, showLoading, t]);
+
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center grow min-h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-        <span className="sr-only">Chargement...</span>
-      </div>
-    );
+    return null;
   }
   return element;
 }
@@ -76,13 +78,20 @@ function RouteWithLoader({ element, isLoading }) {
 function AppRoutes({ sharedProps }) {
   const { userInfo } = useContext(UserContext);
   const { lng } = useParams();
+  const { t } = useTranslation();
+  const { showLoading } = useLoading();
+  const [suspenseLoading, setSuspenseLoading] = React.useState(false);
 
-  const fallback = (
-    <div className="flex justify-center items-center grow min-h-[60vh]">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" role="status" />
-      <span className="sr-only">Chargement...</span>
-    </div>
-  );
+  React.useEffect(() => {
+    showLoading(suspenseLoading, t('loading'));
+  }, [suspenseLoading, showLoading, t]);
+
+  React.useEffect(() => {
+    setSuspenseLoading(true);
+    return () => setSuspenseLoading(false);
+  }, []);
+
+  const fallback = null;
 
   return (
     <Suspense fallback={fallback}>

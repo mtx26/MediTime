@@ -155,7 +155,9 @@
     "title": "Boîtes de médicaments",
     "condition_none_tooltip": "Aucune condition de prise définie. Cliquez ici pour en ajouter une afin de recevoir des rappels réguliers.",
     "view_notice": "Voir la notice",
-    "no_medicines_selected": "Aucun médicament sélectionné"
+    "no_medicines_selected": "Aucun médicament sélectionné",
+    "loading_medicine_boxes": "Chargement des boîtes de médicaments...",
+    "loading_stock_alerts": "Chargement des alertes de stock..."
   },
   "calendar": {
     "add": "Ajouter un calendrier",
@@ -163,6 +165,7 @@
     "add_with_qr": "Créer un calendrier par scan QR",
     "calendar_name": "Nom du calendrier",
     "calendar_name_placeholder": "Entrez le nom du calendrier",
+    "loading_daily_view": "Chargement de la vue journalière...",
     "choose_image": "Choisir une image",
     "confirm_delete": "Supprimer le calendrier ?",
     "confirm_delete_shared": "Supprimer le calendrier partagé ?",
@@ -211,6 +214,8 @@
   "calendar_deleted": "Calendrier supprimé avec succès.",
   "calendar_settings": {
     "label": "Paramètres du calendrier",
+    "loading_notification_settings": "Chargement des paramètres de notifications...",
+    "loading_stock_settings": "Chargement des paramètres de stock...",
     "notifications": {
       "disabled": "Notifications désactivées",
       "enabled": "Notifications activées",
@@ -309,6 +314,7 @@
     "fetch_error": "Erreur lors du chargement des liens.",
     "info_description": "Ces liens vous permettent de synchroniser votre prise de médicaments avec votre calendrier personnel (Google Calendar, Outlook, Apple Calendar, etc.). Copiez le lien et ajoutez-le comme 'Abonnement à un calendrier' dans votre application préférée.",
     "info_title": "À propos des liens ICS",
+    "loading_ics_tokens": "Chargement des liens ICS...",
     "no_tokens": "Aucun lien ICS créé.",
     "title": "Listes de liens ICS",
     "token_label": "Lien"
@@ -331,6 +337,7 @@
   "invalid_or_expired_link": "Ce lien de calendrier partagé est invalide ou a expiré.",
   "invitation": {
     "invalid_or_expired": "Invitation invalide ou expirée",
+    "loading": "Chargement de l'invitation...",
     "title": "Invitation"
   },
   "link": "Lien",

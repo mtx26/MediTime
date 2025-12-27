@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 import { getMondayDate } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
@@ -9,7 +10,7 @@ import { UserContext } from '../../contexts/UserContext';
 import { useAlert } from '../../contexts/AlertContext';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Loader2, AlertTriangle, History, RotateCcw } from 'lucide-react';
+import { AlertTriangle, History, RotateCcw } from 'lucide-react';
 
 const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();
@@ -86,6 +87,12 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
     fetchData();
   }, [calendarId, calendarType, userInfo]);
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(loading === true && calendarId, t('loading_pillbox_uses'));
+  }, [loading, calendarId, showLoading, t]);
+
   if (loading === undefined && calendarId) {
     return (
       <div className="mt-5">
@@ -100,12 +107,7 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
   }
 
   if (loading === true && calendarId) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-           <span className="sr-only">{t('loading_pillbox_uses')}</span>
-      </div>
-    );
+    return null;
   }
   
   return (

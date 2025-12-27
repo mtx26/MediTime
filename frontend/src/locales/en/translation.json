@@ -155,7 +155,9 @@
     "view_notice": "See the instructions",
     "restock_disabled_tooltip": "The restocking button is disabled because the box capacity is 0. Change the capacity to re-enable restocking.",
     "condition_none_tooltip": "No conditions have been defined for taking these. Click here to add one in order to receive regular reminders.",
-    "no_medicines_selected": "No medication selected"
+    "no_medicines_selected": "No medication selected",
+    "loading_medicine_boxes": "Loading the medicine boxes...",
+    "loading_stock_alerts": "Loading stock alerts..."
   },
   "calendar": {
     "add": "Add a calendar",
@@ -203,7 +205,8 @@
     "rename_description": "The new name will be visible to all users with whom you share this calendar.",
     "delete_shared_title": "Delete the shared calendar?",
     "delete_shared_description": "You will no longer have access to this shared calendar. The calendar will remain accessible to the owner and other users.",
-    "error_deleting_calendar": "Error deleting calendar."
+    "error_deleting_calendar": "Error deleting calendar.",
+    "loading_daily_view": "Loading daily view..."
   },
   "calendar_completed": "Calendar successfully completed!",
   "calendar_completed_this_week": "Pillbox full for this week!",
@@ -227,7 +230,9 @@
         "description": "The stock will be manually decreased each week when you refill your pill box.",
         "label": "Weekly (Pillbox)"
       }
-    }
+    },
+    "loading_notification_settings": "Loading notification settings...",
+    "loading_stock_settings": "Loading stock settings..."
   },
   "calendars": "Calendars",
   "cancel": "Cancel",
@@ -300,7 +305,8 @@
     "title": "ICS Link Lists",
     "token_label": "Link",
     "delete_title": "Remove the ICS link?",
-    "delete_description": "The link will be deactivated and will no longer be able to sync your calendar. You will need to create a new link to reactivate synchronization."
+    "delete_description": "The link will be deactivated and will no longer be able to sync your calendar. You will need to create a new link to reactivate synchronization.",
+    "loading_ics_tokens": "Loading ICS links..."
   },
   "image_upload": {
     "analysis_error": "Error parsing image.",
@@ -320,7 +326,8 @@
   "invalid_or_expired_link": "This shared calendar link is invalid or has expired.",
   "invitation": {
     "invalid_or_expired": "Invalid or expired invitation",
-    "title": "Invitation"
+    "title": "Invitation",
+    "loading": "Loading invitation..."
   },
   "link": "Link",
   "link_already_exists": "A link already exists for this calendar.",

@@ -2,6 +2,7 @@ import React, { useEffect, useContext, useState, useCallback } from "react";
 import { UserContext } from "../../contexts/UserContext";
 import PropTypes from "prop-types";
 import { useAlert } from "../../contexts/AlertContext";
+import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from "../../components/common/HoveredUserProfile";
 import { toISO } from "../../utils/calendar/dateUtils";
 import { useTranslation } from "react-i18next";
@@ -12,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Users, Link2, Eye, Pill, Trash2, Plus, Clipboard, Mail, User } from 'lucide-react';
+import { Users, Link2, Eye, Pill, Trash2, Plus, Clipboard, Mail, User } from 'lucide-react';
 
 const VITE_URL = import.meta.env.VITE_VITE_URL;
 
@@ -31,6 +32,7 @@ function SharedList({
 
   // ⚠️ Alertes et confirmations
   const { showAlert, showConfirm } = useAlert();
+  const { showLoading } = useLoading();
 
   // 🔄 Chargement et données partagées groupées
   const [loadingGroupedShared, setLoadingGroupedShared] = useState(true); // État de chargement des partages groupés
@@ -222,14 +224,14 @@ function SharedList({
     }
   }, [personalCalendars.calendarsData, calendarFromURL]);
 
+  // Gérer l'affichage du spinner global
+  useEffect(() => {
+    showLoading(loadingGroupedShared, t('loading_calendars'));
+  }, [loadingGroupedShared, showLoading, t]);
+
 
   if (loadingGroupedShared) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="sr-only">{t("loading_calendars")}</span>
-      </div>
-    );
+    return null;
   }
 
   if (
@@ -591,13 +593,15 @@ function UserList({
                       email: user.receiver_email,
                     }}
                     trigger={
-                      <div className="flex items-center gap-2 cursor-pointer min-w-0">
+                      <div className="flex items-center gap-2 cursor-pointer min-w-0 max-w-[45vw]">
                         <img
                           src={user.receiver_photo_url}
-                          alt={t("profile")}
+                          alt={user.receiver_name}
                           className="rounded-full w-10 h-10 shrink-0"
                         />
-                        <strong className="truncate">{user.receiver_name}</strong>
+                        <strong className="truncate block flex-1 min-w-0">
+                          {user.receiver_name}
+                        </strong>
                       </div>
                     }
                   />
@@ -663,17 +667,30 @@ function UserList({
               <div className="sm:hidden">
                 <div className="flex items-center gap-2">
                   <div className="flex-1 flex items-center gap-2 min-w-0">
-                    <img
-                      src={avatarUrl}
-                      alt={t("profile")}
-                      className="rounded-full w-10 h-10 shrink-0"
+                    <HoveredUserProfile
+                      user={{
+                        photo_url: avatarUrl,
+                        display_name: displayName,
+                        email: null,
+                      }}
+                      trigger={
+                        <div className="flex items-center gap-2 cursor-pointer min-w-0 max-w-[45vw]">
+                          <img
+                            src={avatarUrl}
+                            alt={displayName}
+                            className="rounded-full w-10 h-10 shrink-0"
+                          />
+                          <strong className="truncate block flex-1 min-w-0">
+                            {displayName}
+                          </strong>
+                        </div>
+                      }
                     />
-                    <strong className="truncate">{displayName}</strong>
                   </div>
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="shrink-0"
+                    className="ml-auto shrink-0"
                     onClick={() => deleteRegistrationInvitationConfirmAction(invitation.token)}
                     aria-label={t("delete")}
                     title={t("delete")}
@@ -746,7 +763,7 @@ SharedList.propTypes = {
         id: PropTypes.string.isRequired,
         name: PropTypes.string,
       }),
-    ).isRequired,
+    ),
     deleteCalendar: PropTypes.func,
   }).isRequired,
   sharedUserCalendars: PropTypes.shape({

@@ -3,14 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useLocation } from 'react-router-dom';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useAlert } from '../../contexts/AlertContext';
+import { useLoading } from '@/components/ui/loading';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import PropTypes from 'prop-types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Link2, InfoIcon, Trash2, Clipboard, ExternalLink, PlusCircle, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Link2, InfoIcon, Trash2, Clipboard, ExternalLink, PlusCircle } from 'lucide-react';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -23,6 +23,7 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(true);
   const { showAlert, showConfirm } = useAlert();
+  const { showLoading } = useLoading();
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
@@ -93,13 +94,13 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     return url.replace(/^https?:\/\//, 'webcal://');
   };
 
+  // Gérer l'affichage du spinner global
+  useEffect(() => {
+    showLoading(loading, t('ics.loading_ics_tokens'));
+  }, [loading, showLoading, t]);
+
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="sr-only">{t('loading')}</span>
-      </div>
-    );
+    return null;
   }
 
   return (

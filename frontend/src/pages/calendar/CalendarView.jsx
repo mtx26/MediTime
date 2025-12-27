@@ -6,6 +6,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../contexts/UserContext';
+import { useLoading } from '@/components/ui/loading';
 import { toISO } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { useAlert } from '../../contexts/AlertContext';
@@ -17,10 +18,12 @@ import PillboxDisplay from '../../components/calendar/PillboxDisplay';
 import ActionSheet from '../../components/common/ActionSheet';
 import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Pill, Grid3X3, CalendarDays, Share2, Download, AlertTriangle, Calendar, Clock, Settings, Trash2, ChevronRight, Pin } from 'lucide-react';
+import { Pill, Grid3X3, CalendarDays, Share2, Download, AlertTriangle, Calendar, Clock, Settings, Trash2, ChevronRight, Pin } from 'lucide-react';
 import '../../styles/fullcalendar-custom.css';
+
+
 function CalendarPage({
   personalCalendars,
   sharedUserCalendars,
@@ -35,6 +38,7 @@ function CalendarPage({
 
   // 🔐 Contexte d'authentification
   const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
+  const { showLoading } = useLoading(); // Gestion du spinner global
 
   const calendarRef = useRef(null);
   // garder selectedDate comme objet Date pour manipulations faciles
@@ -149,6 +153,11 @@ function CalendarPage({
     load();
   }, [calendarId, calendarSource.fetchSchedule, userInfo, selectedDate]);
 
+  // Gérer l'affichage du spinner global
+  useEffect(() => {
+    showLoading((loading === true || loadingStockMethod === true) && calendarId, t('loading_calendar'));
+  }, [loading, loadingStockMethod, calendarId, showLoading, t]);
+
   // Charger la méthode de décrémentation du stock (si disponible)
   useEffect(() => {
     const fetchMethod = async () => {
@@ -246,15 +255,6 @@ function CalendarPage({
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>{t('invalid_or_expired_link')}</AlertDescription>
       </Alert>
-    );
-  }
-
-  if ((loading === true || loadingStockMethod === true) && calendarId) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="sr-only">{t('loading_calendar')}</span>
-      </div>
     );
   }
 
@@ -500,8 +500,8 @@ function CalendarPage({
             <>
               {/* Pilulier - Vue mobile */}
               {stockDecrementMethod === "weekly_pillbox" && (
-                <div className="block lg:hidden w-full lg:w-2/3 mb-4 lg:px-2">
-                  <div className="mb-2">
+                <div className="block lg:hidden w-full lg:w-2/3 lg:px-2">
+                  <div>
                     <h4 className="mb-3 font-bold flex items-center gap-2">
                       <Pill className="h-5 w-5" /> {t('pillbox.title')}
                     </h4>
@@ -728,12 +728,14 @@ function CalendarWeekSelector({
         <h4 className="mb-3 font-bold flex items-center gap-2">
           <CalendarDays className="h-5 w-5" /> {t('calendar.reference_week')}
         </h4>
-        <div className='shadow rounded-lg w-full'>
-          <WeekCalendarSelector
-            onWeekSelect={onWeekSelect}
-            selectedDate={selectedDate}
-          />
-        </div>
+        <Card className="shadow rounded-lg w-full p-0">
+          <CardContent className="p-0">
+            <WeekCalendarSelector
+              onWeekSelect={onWeekSelect}
+              selectedDate={selectedDate}
+            />
+          </CardContent>
+        </Card>
       </div>
     )
   )

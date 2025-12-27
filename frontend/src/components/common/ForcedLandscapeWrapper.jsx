@@ -1,29 +1,67 @@
 import React, { useEffect, useState } from 'react';
 
 export default function ForcedLandscapeWrapper({ children }) {
-  const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
-  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+  const [dimensions, setDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
 
-  const isPortrait = viewportHeight > viewportWidth;
+  const isPortrait = dimensions.height > dimensions.width;
 
   useEffect(() => {
     const handleResize = () => {
-      setViewportWidth(window.innerWidth);
-      setViewportHeight(window.innerHeight);
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
     };
 
+    // Forcer l'orientation paysage via Screen Orientation API
+    const lockOrientation = async () => {
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock('landscape').catch(() => {
+            // Silently fail if not supported or denied
+          });
+        }
+      } catch (e) {
+        // API non supportée
+      }
+    };
+
+    // Bloquer le scroll du body
+    document.body.style.overflow = 'hidden';
+
+    lockOrientation();
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+      
+      // Restaurer le scroll du body
+      document.body.style.overflow = '';
+      
+      // Déverrouiller l'orientation à la sortie
+      if (screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+      }
+    };
   }, []);
 
   if (isPortrait) {
     return (
       <div
-        className="fixed top-0 left-0 bg-background overflow-auto z-1000 rotate-90 origin-top-left"
+        className="fixed bg-background z-1000"
         style={{
-          width: viewportHeight,
-          height: viewportWidth,
-          transform: `translateX(${viewportWidth}px) rotate(90deg)`,
+          width: '100vh',
+          height: '100vw',
+          transform: 'rotate(90deg)',
+          transformOrigin: 'left top',
+          top: 0,
+          left: '100%',
+          overflowX: 'hidden',
         }}
       >
         {children}
@@ -31,5 +69,13 @@ export default function ForcedLandscapeWrapper({ children }) {
     );
   }
 
-  return <>{children}</>;
+  // Déjà en paysage - utiliser tout l'écran disponible
+  return (
+    <div
+      className="fixed inset-0 bg-background z-1000"
+    >
+      {children}
+    </div>
+  );
 }
+

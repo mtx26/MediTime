@@ -30,16 +30,18 @@ function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars })
 
   return (
     <ForcedLandscapeWrapper>
-      <PillboxDisplay
-        type="pillbox"
-        selectedDate={selectedDate}
-        calendarType={calendarType}
-        calendarId={calendarId}
-        basePath={basePath}
-        personalCalendars={personalCalendars}
-        sharedUserCalendars={sharedUserCalendars}
-        tokenCalendars={tokenCalendars}
-      />
+      <div className='p-2'>
+        <PillboxDisplay
+          type="pillbox"
+          selectedDate={selectedDate}
+          calendarType={calendarType}
+          calendarId={calendarId}
+          basePath={basePath}
+          personalCalendars={personalCalendars}
+          sharedUserCalendars={sharedUserCalendars}
+          tokenCalendars={tokenCalendars}
+        />
+      </div>
     </ForcedLandscapeWrapper>
   );
 }

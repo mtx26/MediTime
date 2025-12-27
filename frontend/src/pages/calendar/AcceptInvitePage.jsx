@@ -2,12 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Loader2, Mail, Calendar, AlertCircle, Check, X } from 'lucide-react';
+import { Mail, Calendar, AlertCircle, Check, X } from 'lucide-react';
 
 function AcceptInvitePage({sharedUserCalendars}) {
   const { t } = useTranslation();
@@ -84,13 +85,14 @@ function AcceptInvitePage({sharedUserCalendars}) {
     setLoading(false);
   }
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(loading === true, t('invitation.loading'));
+  }, [loading, showLoading, t]);
+
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 text-primary animate-spin" />
-        <span className="sr-only">{t('loading')}</span>
-      </div>
-    );
+    return null;
   }
 
   if (loading === false && !invitation) {

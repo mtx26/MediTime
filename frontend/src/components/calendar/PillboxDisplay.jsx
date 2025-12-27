@@ -1,5 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useLoading } from '@/components/ui/loading';
 import { UserContext } from '../../contexts/UserContext';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import isEqual from 'lodash/isEqual';
@@ -111,13 +112,14 @@ export default function PillboxDisplay({
     fetchPillboxUsage();
   }, [calendarId, calendarType, calendarSource.fetchIfPillboxUsed, selectedDate, userInfo]);
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(loading === undefined, t('loading_calendar'), '400px');
+  }, [loading, showLoading, t]);
+
   if (loading === undefined) {
-    return (
-      <div className="flex justify-center items-center h-[40vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-        <span className="sr-only">{t('loading_calendar')}</span>
-      </div>
-    );
+    return null;
   }
 
   if (loading === false) {
@@ -136,7 +138,7 @@ export default function PillboxDisplay({
 
   return (
     <div className="relative">
-      <div className="container mx-auto text-center w-full mt-3">
+      <div className="container mx-auto text-center w-full">
         {isPillboxUsed ? (
           <div className="mb-6 p-3">
             <div className="flex flex-col justify-center items-center p-6">

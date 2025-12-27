@@ -1,15 +1,15 @@
 
 import React, { useRef, useState, useEffect, useContext, useMemo, use } from 'react';
 import { useParams, useLocation, useNavigate, data, Link } from 'react-router-dom';
+import { useLoading } from '@/components/ui/loading';
 import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
 import { toISO, toDate, getMondayDate } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { UserContext } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import isEqual from 'lodash/isEqual';
-import { set } from 'lodash';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertTriangle, ChevronRight } from 'lucide-react';
+import { AlertTriangle, ChevronRight } from 'lucide-react';
 
 // Page d'affichage du mode "daily" (journalier)
 
@@ -149,13 +149,14 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
       setEventsForDay(filtered);
     }, [selectedDate, calendarEvents]);
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(loading === true && calendarId, t('calendar.loading_daily_view'));
+  }, [loading, calendarId, showLoading, t]);
+
   if ((loading === true && calendarId)) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <Loader2 className="h-8 w-8 text-primary animate-spin" />
-        <span className="sr-only">{t('loading_calendar')}</span>
-      </div>
-    );
+    return null;
   }
 
   if ((loading === undefined) && calendarId) {

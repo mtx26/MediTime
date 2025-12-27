@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '@/components/ui/loading';
 import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';
 import ActionSheet from '../../components/common/ActionSheet';
 import IconButton from '../../components/common/UtilityComponents';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle } from 'lucide-react';
 
 function StockAlertsPage({
   personalCalendars,
@@ -127,12 +127,15 @@ function StockAlertsPage({
     window.location.href = `sms:?&body=${encodedMessage}`;
   };
 
+  const { showLoading } = useLoading();
+
+  // Gérer l'affichage du spinner global
+  useEffect(() => {
+    showLoading(loadingBoxes === undefined, t('boxes.loading_stock_alerts'));
+  }, [loadingBoxes, showLoading, t]);
+
   if (loadingBoxes === undefined) {
-    return (
-      <div className="flex justify-center items-center" style={{ height: '60vh' }}>
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return null;
   }
 
   if (loadingBoxes === false) {

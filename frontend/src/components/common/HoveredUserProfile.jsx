@@ -63,12 +63,13 @@ export default function HoveredUserProfile({
       <PopoverContent
         sideOffset={10}
         align="center"
+        side="top"
         className="w-62.5 p-3"
         onClick={handleClick}
         onPointerEnter={handleMouseEnter}
         onPointerLeave={handleMouseLeave}
       >
-        <PopoverArrow width={12} height={6} />
+        <PopoverArrow width={36} height={18}/>
         <div className="flex flex-col items-center text-center gap-2">
           <img
             src={user.photo_url}

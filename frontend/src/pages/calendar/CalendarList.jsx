@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 import { useAlert } from '../../contexts/AlertContext';
+import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Calendar, Users, Pencil, Share, Pill, Download, AlertTriangle, Settings, Trash2, Plus, X, AlertCircle } from 'lucide-react';
+import { Calendar, Users, Pencil, Share, Pill, Download, AlertTriangle, Settings, Trash2, Plus, X, AlertCircle } from 'lucide-react';
 
 
 function SelectCalendar({
@@ -69,19 +71,20 @@ function SelectCalendar({
     );
   };
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(personalCalendars.calendarsData === null, t('loading_calendars'));
+  }, [personalCalendars.calendarsData, showLoading, t]);
+
   if (personalCalendars.calendarsData === null) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="sr-only">{t('loading_calendars')}</span>
-      </div>
-    );
+    return null;
   }
 
   return (
     <div className="flex flex-col items-center gap-6">
 
-      <div className="w-full max-w-3xl">
+      <div className="w-full max-w-2xl">
         <div className="flex items-center gap-2 mb-4">
           <Calendar className="h-6 w-6 text-primary" />
           <h4 className="text-xl font-bold">{t('my_calendars')}</h4>
@@ -102,14 +105,6 @@ function SelectCalendar({
                         {calendarData.boxes_count ?? '...'}
                       </span>
                     </div>
-                    {calendarData.ifLowStock && (
-                      <Link to={`/${lng}/calendar/${calendarData.id}/stock-alerts`}>
-                        <Badge variant="outline" className="mt-2 gap-1 bg-yellow-50 text-yellow-800 border-yellow-200">
-                          <AlertTriangle className="h-3 w-3" />
-                          {t('stock_alert')}
-                        </Badge>
-                      </Link>
-                    )}
                   </div>
 
                   {/* Bouton Ouvrir */}
@@ -199,8 +194,15 @@ function SelectCalendar({
                       },
                     ]}
                   />
-
                 </div>
+                {calendarData.ifLowStock && (
+                  <Link to={`/${lng}/calendar/${calendarData.id}/stock-alerts`}>
+                    <Badge variant="outline" className="mt-2 gap-1 bg-yellow-50 text-yellow-800 border-yellow-200">
+                      <AlertTriangle className="h-3 w-3" />
+                      {t('stock_alert')}
+                    </Badge>
+                  </Link>
+                )}
                 {/* afficher la form si on est en mode renommage */}
                 {renameMode === calendarData.id && (
                   <div className="flex justify-center pt-3 border-t">
@@ -266,7 +268,7 @@ function SelectCalendar({
         </div>
       </div>
 
-      <div className="w-full max-w-3xl">
+      <div className="w-full max-w-2xl">
         <div className="flex items-center gap-2 mb-4">
           <Users className="h-6 w-6 text-primary" />
           <h4 className="text-xl font-bold">{t('shared_calendars')}</h4>
@@ -290,7 +292,6 @@ function SelectCalendar({
                         </span>
                       </div>
                       <div className="text-sm text-muted-foreground flex items-center mt-1">
-                        {t('owner')}:{' '}
                         <HoveredUserProfile
                           user={{
                             email: calendarData.owner_email,
@@ -306,14 +307,6 @@ function SelectCalendar({
                           }
                         />
                       </div>
-                      {calendarData.ifLowStock && (
-                        <Link to={`/${lng}/shared-user-calendar/${calendarData.id}/stock-alerts`}>
-                          <Badge variant="outline" className="mt-2 gap-1 bg-yellow-50 text-yellow-800 border-yellow-200">
-                            <AlertTriangle className="h-3 w-3" />
-                            {t('stock_alert')}
-                          </Badge>
-                        </Link>
-                      )}
                     </div>
 
                     <Link to={`/${lng}/shared-user-calendar/${calendarData.id}`}>
@@ -380,6 +373,14 @@ function SelectCalendar({
                       ]}
                     />
                   </div>
+                  {calendarData.ifLowStock && (
+                    <Link to={`/${lng}/shared-user-calendar/${calendarData.id}/stock-alerts`}>
+                      <Badge variant="outline" className="mt-2 gap-1 bg-yellow-50 text-yellow-800 border-yellow-200">
+                        <AlertTriangle className="h-3 w-3" />
+                        {t('stock_alert')}
+                      </Badge>
+                    </Link>
+                  )}
                 </div>
               )
             )}
@@ -396,5 +397,14 @@ function SelectCalendar({
     </div>
   );
 }
+
+SelectCalendar.propTypes = {
+  personalCalendars: PropTypes.shape({
+    calendarsData: PropTypes.array,
+  }).isRequired,
+  sharedUserCalendars: PropTypes.shape({
+    sharedUserCalendarsData: PropTypes.array,
+  }).isRequired,
+};
 
 export default SelectCalendar;

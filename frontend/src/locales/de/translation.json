@@ -155,7 +155,9 @@
     "view_notice": "Siehe die Anweisungen",
     "restock_disabled_tooltip": "Die Schaltfläche zum Auffüllen ist deaktiviert, da die Boxkapazität 0 beträgt. Ändern Sie die Kapazität, um das Auffüllen wieder zu aktivieren.",
     "condition_none_tooltip": "Für die Einnahme dieser Produkte sind keine Bedingungen festgelegt. Klicken Sie hier, um eine Bedingung hinzuzufügen und regelmäßig Erinnerungen zu erhalten.",
-    "no_medicines_selected": "Keine Medikamente ausgewählt"
+    "no_medicines_selected": "Keine Medikamente ausgewählt",
+    "loading_medicine_boxes": "Die Medikamentenboxen werden geladen...",
+    "loading_stock_alerts": "Aktienbenachrichtigungen werden geladen..."
   },
   "calendar": {
     "add": "Einen Kalender hinzufügen",
@@ -203,7 +205,8 @@
     "rename_description": "Der neue Name wird für alle Nutzer sichtbar sein, mit denen Sie diesen Kalender teilen.",
     "delete_shared_title": "Den freigegebenen Kalender löschen?",
     "delete_shared_description": "Sie haben keinen Zugriff mehr auf diesen freigegebenen Kalender. Der Kalender bleibt für den Inhaber und andere Nutzer weiterhin zugänglich.",
-    "error_deleting_calendar": "Fehler beim Löschen des Kalenders."
+    "error_deleting_calendar": "Fehler beim Löschen des Kalenders.",
+    "loading_daily_view": "Tagesansicht wird geladen..."
   },
   "calendar_completed": "Kalender erfolgreich abgeschlossen!",
   "calendar_completed_this_week": "Pillendose für diese Woche voll!",
@@ -227,7 +230,9 @@
         "description": "Der Vorrat wird jede Woche manuell verringert, wenn Sie Ihre Pillendose auffüllen.",
         "label": "Wöchentlich (Pillbox)"
       }
-    }
+    },
+    "loading_notification_settings": "Benachrichtigungseinstellungen werden geladen...",
+    "loading_stock_settings": "Laden der Standardeinstellungen..."
   },
   "calendars": "Kalender",
   "cancel": "Stornieren",
@@ -300,7 +305,8 @@
     "title": "ICS-Linklisten",
     "token_label": "Pfandrecht",
     "delete_title": "ICS-Link entfernen?",
-    "delete_description": "Der Link wird deaktiviert und kann Ihren Kalender nicht mehr synchronisieren. Sie müssen einen neuen Link erstellen, um die Synchronisierung wieder zu aktivieren."
+    "delete_description": "Der Link wird deaktiviert und kann Ihren Kalender nicht mehr synchronisieren. Sie müssen einen neuen Link erstellen, um die Synchronisierung wieder zu aktivieren.",
+    "loading_ics_tokens": "ICS-Links werden geladen..."
   },
   "image_upload": {
     "analysis_error": "Fehler beim Parsen des Bildes.",
@@ -320,7 +326,8 @@
   "invalid_or_expired_link": "Dieser freigegebene Kalenderlink ist ungültig oder abgelaufen.",
   "invitation": {
     "invalid_or_expired": "Ungültige oder abgelaufene Einladung",
-    "title": "Einladung"
+    "title": "Einladung",
+    "loading": "Einladung wird geladen..."
   },
   "link": "Link",
   "link_already_exists": "Für diesen Kalender existiert bereits ein Link.",
