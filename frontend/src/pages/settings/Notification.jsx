@@ -3,6 +3,11 @@ import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import { updateUserInfo } from '../../services/auth/authService';
 import { getToken } from '../../services/supabase/tokenUtils';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Bell, RefreshCw, Loader2 } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -16,55 +21,53 @@ export default function Notification({ fcm }) {
 
   return (
     <div>
-      <h2 className="mb-4">{t('notifications')}</h2>
-      <p className="text-muted mb-4">{t('notification.instructions')}</p>
+      <h2 className="mb-4 text-2xl font-bold">{t('notifications')}</h2>
+      <p className="text-muted-foreground mb-4">{t('notification.instructions')}</p>
 
-      <div className="form-check form-switch mb-3">
-        <input
-          className="form-check-input fs-5"
-          type="checkbox"
+      <div className="flex items-center space-x-2 mb-3">
+        <Switch
           id="emailNotificationToggle"
           checked={userInfo?.emailEnabled}
-          onChange={() => {
+          onCheckedChange={() => {
             updateUserInfo({
               email_enabled: !userInfo?.emailEnabled,
               uid
             })
           }}
         />
-        <label className="form-check-label" htmlFor="emailNotificationToggle">
+        <Label htmlFor="emailNotificationToggle" className="cursor-pointer">
           {t('notification.email_toggle')}
-        </label>
+        </Label>
       </div>
 
-      <div className="form-check form-switch mb-4">
-        <input
-          className="form-check-input fs-5"
-          type="checkbox"
+      <div className="flex items-center space-x-2 mb-4">
+        <Switch
           id="pushNotificationToggle"
           checked={userInfo?.pushEnabled}
-          onChange={() => {
+          onCheckedChange={() => {
             updateUserInfo({
               push_enabled: !userInfo?.pushEnabled
             })
           }}
         />
-        <label className="form-check-label" htmlFor="pushNotificationToggle">
+        <Label htmlFor="pushNotificationToggle" className="cursor-pointer">
           {t('notification.push_toggle')}
-        </label>
+        </Label>
       </div>
       {notificationNotSupported ? null : (
-        <div className="card bg-light border-0 mb-3 p-0">
-          <div className="card-body d-flex flex-column flex-md-row align-items-center justify-content-between py-2 px-3 gap-3">
-            <div className="d-flex align-items-center mb-2 mb-md-0">
-              <i className="bi bi-bell-fill text-primary me-2" style={{fontSize: '1.3rem'}}></i>
+        <Card className="mb-3">
+          <CardContent className="flex flex-col md:flex-row items-center justify-between py-3 px-4 gap-3">
+            <div className="flex items-center mb-2 md:mb-0">
+              <Bell className="h-5 w-5 text-primary mr-2" />
               <div>
-                <div className="fw-semibold text-dark" style={{fontSize: '1rem'}}>{t('fcm.device_registration')}</div>
-                <div className="text-secondary small">{t('fcm.device_registration_desc')}</div>
+                <div className="font-semibold text-base">{t('fcm.device_registration')}</div>
+                <div className="text-muted-foreground text-sm">{t('fcm.device_registration_desc')}</div>
               </div>
             </div>
-            <button 
-              className={`btn btn-sm d-flex align-items-center ${notificationsEnabled ? 'btn-success' : 'btn-primary fw-bold'}`}
+            <Button
+              size="sm"
+              variant={notificationsEnabled ? "outline" : "default"}
+              className={`flex items-center rounded-full min-w-30 ${notificationsEnabled ? '' : 'font-bold'}`}
               onClick={async () => {
                 setIsRegistering(true);
                 await fcm.sendTokenToBackend()
@@ -72,24 +75,26 @@ export default function Notification({ fcm }) {
                 setNotificationsEnabled(window.Notification.permission === 'granted');
               }}
               disabled={isRegistering}
-              style={{fontSize: '0.95rem', borderRadius: '1.2rem', minWidth: '120px'}}
             >
               {notificationsEnabled ? (
                 <>
-                  <i className="bi bi-arrow-clockwise me-2"></i>
+                  <RefreshCw className="h-4 w-4 mr-2" />
                   {t('fcm.reload')}
                 </>
               ) : isRegistering ? (
-                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {t('fcm.enable_btn')}
+                </>
               ) : (
                 <>
-                  <i className="bi bi-bell me-2"></i>
+                  <Bell className="h-4 w-4 mr-2" />
                   {t('fcm.enable_btn')}
                 </>
               )}
-            </button>
-          </div>
-        </div>
+            </Button>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

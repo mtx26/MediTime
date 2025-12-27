@@ -1,75 +1,42 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
-import * as ToastPrimitive from '@radix-ui/react-toast';
+import { toast } from 'sonner';
 
-function Toast({ type = 'info', message, onClose, duration = 2000 }) {
+function Toast({ type = 'info', message, onClose, duration = 4000 }) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
   const lastMessageRef = useRef('');
 
   useEffect(() => {
-    // Ne rouvrir que si c'est un nouveau message
+    // Ne déclencher que si c'est un nouveau message
     if (message && message !== lastMessageRef.current) {
       lastMessageRef.current = message;
-      setOpen(true);
+      
+      const translatedMessage = t(message);
+      
+      // Déclencher le toast selon le type
+      switch (type) {
+        case 'success':
+          toast.success(translatedMessage, { duration, closeButton: true });
+          break;
+        case 'danger':
+          toast.error(translatedMessage, { duration, closeButton: true });
+          break;
+        case 'warning':
+          toast.warning(translatedMessage, { duration, closeButton: true });
+          break;
+        default:
+          toast.info(translatedMessage, { duration, closeButton: true });
+      }
+      
+      // Appeler onClose après la durée
+      setTimeout(onClose, duration);
     } else if (!message) {
       lastMessageRef.current = '';
-      setOpen(false);
     }
-  }, [message]);
+  }, [message, type, t, onClose, duration]);
 
-  const handleOpenChange = (isOpen) => {
-    if (!isOpen) {
-      setOpen(false);
-      onClose();
-    }
-  };
-
-  const getIcon = () => {
-    switch (type) {
-      case 'success':
-        return <i className="bi bi-check-circle-fill text-success"></i>;
-      case 'danger':
-        return <i className="bi bi-exclamation-circle-fill text-danger"></i>;
-      case 'warning':
-        return <i className="bi bi-exclamation-triangle-fill text-warning"></i>;
-      default:
-        return <i className="bi bi-info-circle-fill text-info"></i>;
-    }
-  };
-
-  if (!message) return null;
-
-  return (
-    <ToastPrimitive.Provider swipeDirection="right">
-      <ToastPrimitive.Root
-        open={open}
-        onOpenChange={handleOpenChange}
-        duration={duration}
-        className="bg-white shadow-lg rounded-3 p-3 d-flex align-items-center gap-3"
-        style={{
-          border: '1px solid rgba(0,0,0,0.1)',
-          minWidth: '300px',
-          maxWidth: '450px',
-        }}
-      >
-        <div style={{ fontSize: '1.25rem' }}>{getIcon()}</div>
-        <ToastPrimitive.Description className="flex-grow-1 mb-0">
-          {t(message)}
-        </ToastPrimitive.Description>
-        <ToastPrimitive.Close
-          className="btn-close"
-          aria-label={t('close')}
-        />
-      </ToastPrimitive.Root>
-
-      <ToastPrimitive.Viewport
-        className="position-fixed bottom-0 end-0 p-3 d-flex flex-column gap-2"
-        style={{ zIndex: 9999 }}
-      />
-    </ToastPrimitive.Provider>
-  );
+  return null;
 }
 
 Toast.propTypes = {

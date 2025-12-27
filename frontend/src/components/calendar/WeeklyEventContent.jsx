@@ -4,6 +4,10 @@ import WeekDayCircles from './WeekDayCircles';
 import { getMondayDate, toISO } from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 export default function WeeklyEventContent({
   ifModal,
@@ -37,29 +41,30 @@ export default function WeeklyEventContent({
       <ArrowControls onLeft={isFirstDay ? getPastWeek : onPrev} onRight={isLastDay ? getNextWeek : onNext} />
 
       {/* Week day selector (hidden in modal mode) */}
-      <div className="mb-2 d-flex justify-content-center">
+      <div className="mb-2 flex justify-center">
         <WeekDayCircles selectedDate={selDate} onSelectDate={onSelectDate} />
       </div>
 
       {/* Header: big date + prev/next tactile buttons */}
-      <div className="d-flex align-items-center justify-content-between mb-3">
-        <button
-          className="btn btn-outline-secondary"
+      <div className="flex items-center justify-between mb-3">
+        <Button
+          variant="outline"
+          size="sm"
           onClick={isFirstDay ? getPastWeek : onPrev}
           aria-label={t('previous_day')}
           title={t('previous_day')}
-          style={{ minWidth: 40, padding: '0.25rem 0.35rem' }}
+          className="min-w-10 px-1.5 py-1"
         >
-          <i className="bi bi-arrow-left" aria-hidden="true"></i>
-        </button>
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        </Button>
 
-        <div className="text-center flex-grow-1 px-2">
-          <div className="d-flex align-items-center justify-content-center">
+        <div className="text-center grow px-2">
+          <div className="flex items-center justify-center">
             <div>
-              <div className="text-muted" style={{ fontSize: 12, textTransform: 'capitalize' }}>
+              <div className="text-muted-foreground text-xs capitalize">
                 {selDate.toLocaleDateString(i18n.language || undefined, { weekday: 'long' })}
               </div>
-              <div style={{ fontWeight: 600, fontSize: 16 }}>
+              <div className="font-semibold text-base">
                 {selDate.toLocaleDateString(i18n.language || undefined, {
                   day: '2-digit',
                   month: 'long',
@@ -70,15 +75,16 @@ export default function WeeklyEventContent({
           </div>
         </div>
 
-        <button
-          className="btn btn-outline-secondary"
+        <Button
+          variant="outline"
+          size="sm"
           onClick={isLastDay ? getNextWeek : onNext}
           aria-label={t('next_day')}
           title={t('next_day')}
-          style={{ minWidth: 40, padding: '0.25rem 0.35rem' }}
+          className="min-w-10 px-1.5 py-1"
         >
-          <i className="bi bi-arrow-right" aria-hidden="true"></i>
-        </button>
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </Button>
       </div>
 
   {/* No expand/collapse control — show details by default */}
@@ -86,57 +92,50 @@ export default function WeeklyEventContent({
       {/* Events: card-style, mobile-first */}
       <div>
         {eventsForDay.length > 0 ? (
-          <div className="d-grid" style={{ gap: 8 }}>
+          <div className="grid gap-2">
             {eventsForDay.map((event, index) => {
               const time = new Date(event.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
               return (
-                <div
+                <Card
                   key={index}
-                  className="card"
                   role="group"
                   aria-label={`${event.title} ${time}`}
-                  style={{ borderRadius: 8, padding: 10 }}
+                  className="rounded-lg p-2.5"
                 >
-                  <div className="d-flex align-items-start">
-                    <div style={{ width: 64, flexShrink: 0 }} className="me-3">
+                  <div className="flex items-start">
+                    <div className="w-16 shrink-0 mr-3">
                       <div
-                        style={{
-                          backgroundColor: event.color || '#6c757d',
-                          color: 'white',
-                          padding: '6px 8px',
-                          borderRadius: 6,
-                          textAlign: 'center',
-                          fontWeight: 600,
-                        }}
+                        className="text-white px-2 py-1.5 rounded-md text-center font-semibold text-sm"
+                        style={{ backgroundColor: event.color || '#6c757d' }}
                       >
                         {time}
                       </div>
                     </div>
 
-                    <div className="flex-grow-1">
-                      <div style={{ fontWeight: 600 }}>
+                    <div className="grow">
+                      <div className="font-semibold">
                         {event.title}
                       </div>
                       {event.dose != null && (
-                        <div className="text-muted" style={{ fontSize: 13 }}>{event.dose} mg</div>
+                        <div className="text-muted-foreground text-sm">{event.dose} mg</div>
                       )}
                       {event.notes && (
-                        <div className="text-muted mt-1" style={{ fontSize: 13 }}>{event.notes}</div>
+                        <div className="text-muted-foreground mt-1 text-sm">{event.notes}</div>
                       )}
                     </div>
 
-                    <div style={{ marginLeft: 12 }} className="text-end">
-                      <div className="badge bg-secondary" style={{ padding: '6px 8px' }}>
+                    <div className="ml-3 text-right">
+                      <Badge variant="secondary" className="px-2 py-1.5">
                         {event.tablet_count}
-                      </div>
+                      </Badge>
                     </div>
                   </div>
-                </div>
+                </Card>
               );
             })}
           </div>
         ) : (
-          <p className="text-muted text-center mb-0">{t('no_events_today')}</p>
+          <p className="text-muted-foreground text-center mb-0">{t('no_events_today')}</p>
         )}
       </div>
     </>

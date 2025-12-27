@@ -4,6 +4,10 @@ import { supabase } from '../../services/supabase/supabaseClient';
 import { useAlert } from '../../contexts/AlertContext';
 import { log } from '../../utils/logger';
 import { useTranslation } from 'react-i18next';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Lock } from 'lucide-react';
 
 export default function ResetPasswordConfirm() {
   const [password, setPassword] = useState('');
@@ -62,36 +66,36 @@ export default function ResetPasswordConfirm() {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center my-5">
-      <div className="card shadow" style={{ maxWidth: '500px', width: '100%', borderRadius: '1rem' }}>
-        <div className="card-body p-4">
-          <h5 className="text-center mb-3">🔐 {t('reset_password_confirm.title')}</h5>
-          <p className="text-muted text-center">
+    <div className="container mx-auto flex justify-center items-center my-10">
+      <div className="w-full max-w-md rounded-xl border bg-card text-card-foreground shadow">
+        <div className="p-6">
+          <h5 className="text-center mb-3 text-lg font-semibold">🔐 {t('reset_password_confirm.title')}</h5>
+          <p className="text-muted-foreground text-center">
             {t('reset_password_confirm.instructions')}
           </p>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label htmlFor="password" className="form-label">
-                {t('reset_password_confirm.new_password_label')}
-              </label>
-              <input
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="password">{t('reset_password_confirm.new_password_label')}</Label>
+              <Input
                 type="password"
                 id="password"
-                className="form-control"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
               />
             </div>
-            <button
+            <Button
               type="submit"
-              className="btn btn-primary w-100"
+              variant="outline"
+              className="w-full gap-2"
               disabled={loading || !sessionReady}
             >
+              <Lock className="h-4 w-4" />
               {loading
                 ? t('reset_password_confirm.saving')
                 : t('reset_password_confirm.save_password')}
-            </button>
+            </Button>
           </form>
         </div>
       </div>

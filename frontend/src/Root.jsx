@@ -9,7 +9,6 @@ import {
 import App from './App';
 import { useTranslation } from 'react-i18next';
 import { enabledLanguageCodes, DEFAULT_LANG } from './config/languages';
-import { AlertProvider } from './contexts/AlertContext';
 
 function LanguageRoutes() {
   const location = useLocation();
@@ -37,9 +36,7 @@ function LanguageRoutes() {
 export default function Root() {
   return (
     <BrowserRouter>
-      <AlertProvider>
-        <LanguageRoutes />
-      </AlertProvider>
+      <LanguageRoutes />
     </BrowserRouter>
   );
 }

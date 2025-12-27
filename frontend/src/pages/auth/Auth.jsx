@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useLocation, useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useParams, useNavigate, Link } from 'react-router-dom';
 import {
   GoogleHandleLogin,
   registerWithEmail,
@@ -12,10 +12,19 @@ import {
 } from '../../services/auth/authService';
 import { useAlert } from '../../contexts/AlertContext';
 import { log } from '../../utils/logger';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../contexts/UserContext';
 import { getValidRedirect } from '../../utils/redirect';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
+import { FcGoogle } from 'react-icons/fc';
+import { SiGithub, SiDiscord, SiFacebook } from 'react-icons/si';
+import { FaMicrosoft } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 
 function Auth() {
   const { userInfo } = useContext(UserContext);
@@ -93,248 +102,113 @@ function Auth() {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center my-5">
-      <div
-        className="card shadow-sm w-100"
-        style={{ maxWidth: '500px', borderRadius: '1rem' }}
-      >
-        <div className="card-body p-4">
-          {/* Tabs */}
-          <ul className="nav nav-pills nav-justified mb-4">
-            <li className="nav-item">
-              <button
-                className={` shadow-sm nav-link ${activeTab === 'login' ? 'active' : ''}`}
-                onClick={() => switchTab('login')}
-                aria-label={t('auth.login')}
-                title={t('auth.login')}
-              >
-                <i className="bi bi-box-arrow-in-right"></i>
-                <span> {t('auth.login')}</span>
-              </button>
-            </li>
-            <li className="nav-item">
-              <button
-                className={` shadow-sm nav-link ${activeTab === 'register' ? 'active' : ''}`}
-                onClick={() => switchTab('register')}
-                aria-label={t('auth.register')}
-                title={t('auth.register')}
-              >
-                <i className="bi bi-person-plus"></i>
-                <span> {t('auth.register')}</span>
-              </button>
-            </li>
-          </ul>
+    <div className="container mx-auto flex justify-center items-center my-10">
+      <div className="w-full max-w-md rounded-xl border bg-card text-card-foreground shadow-sm">
+        <div className="p-6">
+          <Tabs value={activeTab} onValueChange={switchTab} className="w-full">
+            <TabsList className="mx-auto mb-4 gap-2">
+              <TabsTrigger value="login">
+                <LogIn className="h-4 w-4" /> {t('auth.login')}
+              </TabsTrigger>
+              <TabsTrigger value="register">
+                <UserPlus className="h-4 w-4" /> {t('auth.register')}
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Auth Form */}
-          <div className="text-center mb-3">
-            <p>
-              {activeTab === 'login'
-                ? t('auth.login_with')
-                : t('auth.register_with')}
-            </p>
-            <div className="gap-1 d-flex justify-content-center align-items-center flex-wrap">
-              <div className="d-flex flex-column align-items-center">
-                <div className="px-2">
-                  <button
-                    className="btn btn-outline-danger rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
-                    onClick={() => GoogleHandleLogin(redirect)}
-                    aria-label={t('auth.with_google')}
-                    title={t('auth.with_google')}
-                  >
-                    <i className="bi bi-google fs-4"></i>
-                  </button>
+            <div className="text-center mb-4">
+              <p>{activeTab === 'login' ? t('auth.login_with') : t('auth.register_with')}</p>
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mt-2 place-items-center">
+                <div className="flex flex-col items-center">
+                  <Button variant="outline" size="icon" onClick={() => GoogleHandleLogin(redirect)} aria-label={t('auth.with_google')} title={t('auth.with_google')}>
+                    <FcGoogle className="h-5 w-5" />
+                  </Button>
+                  <span className="mt-1 text-xs w-full text-center truncate">{t('auth.provider.google')}</span>
                 </div>
-                <span>{t('auth.provider.google')}</span>
-              </div>
-              <div className="d-flex flex-column align-items-center">
-                <div className="px-2">
-                  <button
-                    className="btn btn-outline-secondary rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
-                    onClick={() => GithubHandleLogin(redirect)}
-                    aria-label={t('auth.with_github')}
-                    title={t('auth.with_github')}
-                  >
-                    <i className="bi bi-github fs-4"></i>
-                  </button>
+                <div className="flex flex-col items-center">
+                  <Button variant="outline" size="icon" onClick={() => GithubHandleLogin(redirect)} aria-label={t('auth.with_github')} title={t('auth.with_github')}>
+                    <SiGithub className="h-5 w-5 text-black" />
+                  </Button>
+                  <span className="mt-1 text-xs w-full text-center truncate">{t('auth.provider.github')}</span>
                 </div>
-                <span>{t('auth.provider.github')}</span>
-              </div>
-              <div className="d-flex flex-column align-items-center">
-                <div className="px-2">
-                  <button
-                    className="btn btn-outline-primary rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
-                    onClick={() => DiscordHandleLogin(redirect)}
-                    aria-label={t('auth.with_discord')}
-                    title={t('auth.with_discord')}
-                  >
-                    <i className="bi bi-discord fs-4"></i>
-                  </button>
+                <div className="flex flex-col items-center">
+                  <Button variant="outline" size="icon" onClick={() => DiscordHandleLogin(redirect)} aria-label={t('auth.with_discord')} title={t('auth.with_discord')}>
+                    <SiDiscord className="h-5 w-5 text-[#5865F2]" />
+                  </Button>
+                  <span className="mt-1 text-xs w-full text-center truncate">{t('auth.provider.discord')}</span>
                 </div>
-                <span>{t('auth.provider.discord')}</span>
-              </div>
-              <div className="d-flex flex-column align-items-center">
-                <div className="px-2">
-                  <button
-                    className="btn btn-outline-info rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
-                    onClick={() => TwitterHandleLogin(redirect)}
-                    aria-label={t('auth.with_twitter')}
-                    title={t('auth.with_twitter')}
-                  >
-                    <i className="bi bi-twitter fs-4"></i>
-                  </button>
+                <div className="flex flex-col items-center">
+                  <Button variant="outline" size="icon" onClick={() => TwitterHandleLogin(redirect)} aria-label={t('auth.with_twitter')} title={t('auth.with_twitter')}>
+                    <FaXTwitter className="h-5 w-5 text-black" />
+                  </Button>
+                  <span className="mt-1 text-xs w-full text-center truncate">{t('auth.provider.twitter')}</span>
                 </div>
-                <span>{t('auth.provider.twitter')}</span>
-              </div>
-              <div className="d-flex flex-column align-items-center">
-                <div className="px-2">
-                  <button
-                    className="btn btn-outline-primary rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
-                    onClick={() => FacebookHandleLogin(redirect)}
-                    aria-label={t('auth.with_facebook')}
-                    title={t('auth.with_facebook')}
-                  >
-                    <i className="bi bi-facebook fs-4"></i>
-                  </button>
+                <div className="flex flex-col items-center">
+                  <Button variant="outline" size="icon" onClick={() => FacebookHandleLogin(redirect)} aria-label={t('auth.with_facebook')} title={t('auth.with_facebook')}>
+                    <SiFacebook className="h-5 w-5 text-[#1877F2]" />
+                  </Button>
+                  <span className="mt-1 text-xs w-full text-center truncate">{t('auth.provider.facebook')}</span>
                 </div>
-                <span>{t('auth.provider.facebook')}</span>
-              </div>
-              
-              <div className="d-flex flex-column align-items-center">
-                <div className="px-2">
-                  <button
-                    className="btn btn-outline-dark rounded-pill py-1 d-flex align-items-center justify-content-center gap-2"
-                    onClick={() => MicrosoftHandleLogin(redirect)}
-                    aria-label={t('auth.with_microsoft')}
-                    title={t('auth.with_microsoft')}
-                  >
-                    <i className="bi bi-microsoft fs-4"></i>
-                  </button>
+                <div className="flex flex-col items-center">
+                  <Button variant="outline" size="icon" onClick={() => MicrosoftHandleLogin(redirect)} aria-label={t('auth.with_microsoft')} title={t('auth.with_microsoft')}>
+                    <FaMicrosoft className="h-5 w-5 text-[#5E5E5E]" />
+                  </Button>
+                  <span className="mt-1 text-xs w-full text-center truncate">{t('auth.provider.microsoft')}</span>
                 </div>
-                <span>{t('auth.provider.microsoft')}</span>
               </div>
-              
-            </div>
-            <p className="text-center mt-3 mb-0 text-muted">{t('auth.or_with_email')}</p>
-          </div>
-
-            <form onSubmit={handleSubmit}>
-            {activeTab === 'register' && (
-              <div className="mb-3">
-                <label htmlFor="name" className="form-label">
-                  {t('auth.name')}
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="name"
-                  aria-label={t('auth.name')}
-                  required
-                  value={name}
-                  autoComplete={activeTab === 'login' ? 'name' : 'new-name'}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-            )}
-
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label">
-                {t('auth.email')}
-              </label>
-              <input
-                type="email"
-                className="form-control"
-                id="email"
-                aria-label={t('auth.email')}
-                required
-                value={email}
-                autoComplete={activeTab === 'login' ? 'email' : 'new-email'}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <p className="text-center mt-3 mb-0 text-muted-foreground">{t('auth.or_with_email')}</p>
             </div>
 
-            <div className="mb-3 position-relative">
-              <label htmlFor="password" className="form-label">
-                {t('auth.password')}
-              </label>
-              <input
-                type={passwordVisible ? 'text' : 'password'}
-                className="form-control"
-                id="password"
-                aria-label={t('auth.password')}
-                required
-                value={password}
-                autoComplete={activeTab === 'login' ? 'current-password' : 'new-password'}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <i
-                className={`bi bi-${passwordVisible ? 'eye-slash' : 'eye'} position-absolute`}
-                role="button"
-                tabIndex="0"
-                aria-label={
-                  passwordVisible
-                    ? t('auth.hide_password')
-                    : t('auth.show_password')
-                }
-                style={{
-                  top: '38px',
-                  right: '15px',
-                  cursor: 'pointer',
-                  color: '#6c757d',
-                }}
-                onClick={() => setPasswordVisible(!passwordVisible)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setPasswordVisible(!passwordVisible);
-                  }
-                }}
-              ></i>
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {activeTab === 'register' && (
+                <div className="space-y-2">
+                  <Label htmlFor="name">{t('auth.name')}</Label>
+                  <Input id="name" type="text" required value={name} autoComplete={activeTab === 'login' ? 'name' : 'new-name'} onChange={(e) => setName(e.target.value)} aria-label={t('auth.name')} />
+                </div>
+              )}
 
-            {activeTab === 'login' && (
-              <div className="mb-3 text-end">
-                <Link to={`/${lng}/reset-password`} className="text-decoration-none">
-                  {t('auth.forgot_password')}
-                </Link>
+              <div className="space-y-2">
+                <Label htmlFor="email">{t('auth.email')}</Label>
+                <Input id="email" type="email" required value={email} autoComplete={activeTab === 'login' ? 'email' : 'new-email'} onChange={(e) => setEmail(e.target.value)} aria-label={t('auth.email')} />
               </div>
-            )}
 
-            {activeTab === 'register' && (
-              <div
-                className="form-check mb-3 text-left"
-                style={{ cursor: 'pointer' }}
-              >
-                <input
-                  className="form-check-input"
-                  style={{ cursor: 'pointer' }}
-                  type="checkbox"
-                  required
-                  id="terms"
-                  name="terms"
-                  aria-label={t('auth.accept_terms_aria')}
-                />
-                <label
-                  className="form-check-label"
-                  style={{ cursor: 'pointer' }}
-                  htmlFor="terms"
-                >
-                  {t('auth.accept_terms')}
-                  <Link to={`/${lng}/terms`} className="text-decoration-none">
-                    {t('auth.terms_link')}
+              <div className="space-y-2">
+                <Label htmlFor="password">{t('auth.password')}</Label>
+                <div className="relative">
+                  <Input id="password" type={passwordVisible ? 'text' : 'password'} required value={password} autoComplete={activeTab === 'login' ? 'current-password' : 'new-password'} onChange={(e) => setPassword(e.target.value)} aria-label={t('auth.password')} />
+                  <button type="button" className="absolute top-2.5 right-3 text-muted-foreground" aria-label={passwordVisible ? t('auth.hide_password') : t('auth.show_password')} onClick={() => setPasswordVisible(!passwordVisible)}>
+                    {passwordVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {activeTab === 'login' && (
+                <div className="text-end">
+                  <Link to={`/${lng}/reset-password`} className="no-underline hover:underline">
+                    {t('auth.forgot_password')}
                   </Link>
-                </label>
-              </div>
-            )}
+                </div>
+              )}
 
-            <button
-              type="submit"
-              className="btn btn-outline-primary w-100 shadow-sm"
-              aria-label={activeTab === 'login' ? t('auth.login') : t('auth.register')}
-              title={activeTab === 'login' ? t('auth.login') : t('auth.register')}
-            >
-              {activeTab === 'login' ? t('auth.login') : t('auth.register')}
-            </button>
-          </form>
+              {activeTab === 'register' && (
+                <div className="flex items-start gap-2">
+                  <Checkbox id="terms" required aria-label={t('auth.accept_terms_aria')} />
+                  <Label htmlFor="terms" className="cursor-pointer">
+                    {t('auth.accept_terms')}{' '}
+                    <Link to={`/${lng}/terms`} className="no-underline hover:underline">
+                      {t('auth.terms_link')}
+                    </Link>
+                  </Label>
+                </div>
+              )}
+
+              <Button type="submit" variant="outline" className="w-full shadow-sm" aria-label={activeTab === 'login' ? t('auth.login') : t('auth.register')} title={activeTab === 'login' ? t('auth.login') : t('auth.register')}>
+                {activeTab === 'login' ? t('auth.login') : t('auth.register')}
+              </Button>
+            </form>
+
+            <TabsContent value="login" />
+            <TabsContent value="register" />
+          </Tabs>
         </div>
       </div>
     </div>

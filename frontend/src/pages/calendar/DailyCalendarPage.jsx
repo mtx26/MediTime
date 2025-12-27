@@ -8,6 +8,8 @@ import { UserContext } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import isEqual from 'lodash/isEqual';
 import { set } from 'lodash';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, AlertTriangle, ChevronRight } from 'lucide-react';
 
 // Page d'affichage du mode "daily" (journalier)
 
@@ -149,18 +151,21 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
 
   if ((loading === true && calendarId)) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '60vh' }}>
-        <div className="spinner-border text-primary">
-          <span className="visually-hidden">{t('loading_calendar')}</span>
-        </div>
+      <div className="flex justify-center items-center h-[60vh]">
+        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+        <span className="sr-only">{t('loading_calendar')}</span>
       </div>
     );
   }
 
   if ((loading === undefined) && calendarId) {
     return (
-      <div className="alert alert-danger text-center mt-5" role="alert">
-        ❌ {t('invalid_or_expired_link')}
+      <div className="mt-5">
+        <Alert variant="destructive">
+          <AlertDescription className="text-center">
+            ❌ {t('invalid_or_expired_link')}
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
@@ -170,20 +175,21 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
       {/* Affichage alert stock */}
       {isLowStock && (
         <Link
-          className="alert w-100 alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow"
+          className="block w-full"
           to={`/${params.lng || 'fr'}/${basePath}/${calendarId}/stock-alerts`}
           title={t('stock_alert_tooltip')}
           aria-label={t('stock_alert')}
-          style={{ textDecoration: 'none' }}
         >
-          <div className="d-flex align-items-center">
-            <i className="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
-            <span className="fw-semibold">{t('stock_alert')}</span>
-          </div>
-          <i className="bi bi-chevron-right ms-2"></i>
+          <Alert className="flex items-center justify-between bg-yellow-50 border-yellow-200 hover:bg-yellow-100 transition cursor-pointer">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-600" />
+              <span className="font-semibold text-yellow-900">{t('stock_alert')}</span>
+            </div>
+            <ChevronRight className="h-5 w-5 text-yellow-600" />
+          </Alert>
         </Link>
       )}
-      <div className='container border shadow rounded my-4 p-3' style={{maxWidth: '800px'}}>
+      <div className="max-w-200 mx-auto border shadow rounded my-4 p-3">
         <WeeklyEventContent
           ifModal={false}
           selectedDate={selectedDate}

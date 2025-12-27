@@ -1,6 +1,8 @@
 import { getMondayDate } from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export default function WeekDayCircles({ selectedDate, onSelectDate }) {
   const { i18n } = useTranslation();
@@ -21,24 +23,10 @@ export default function WeekDayCircles({ selectedDate, onSelectDate }) {
   });
 
   return (
-    <div
-      className="d-flex"
-      style={{
-        width: '100%',
-        overflow: 'hidden',
-        gap: 4,
-        padding: '4px 0',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}
-    >
+    <div className="flex w-full overflow-hidden gap-1 py-1 justify-between items-center">
       {weekDates.map((day, index) => {
         const isSelected = day.getTime() === normalizedSelectedDate.getTime();
         const isToday = day.getTime() === today.getTime();
-
-        const baseClassStart = 'btn btn-sm rounded-pill d-inline-flex align-items-center justify-content-center shadow-sm';
-        const colorClass = isToday ? 'btn-success text-white' : isSelected ? 'btn-primary text-white' : 'btn-light text-dark';
-        const baseClass = `${baseClassStart} ${colorClass} ${isToday ? 'shadow-lg' : ''}`;
 
         const ariaLabel = `Aller au ${new Date(day).toLocaleDateString(i18n.language || undefined, {
           weekday: 'long',
@@ -46,42 +34,35 @@ export default function WeekDayCircles({ selectedDate, onSelectDate }) {
           month: 'long',
         })}`;
 
-        // Use Bootstrap shadow utilities for consistent appearance
-        const pillStyle = {
-          flex: '0 0 calc((100% - 24px) / 7)',
-          maxWidth: 120,
-          minWidth: 28,
-          height: 30,
-          padding: '2px 6px',
-          flexShrink: 0,
-          fontSize: '0.68rem',
-        };
-
         return (
-          <button
+          <Button
             key={index}
             type="button"
-            className={baseClass}
-            role="button"
-            tabIndex={0}
+            variant={isToday || isSelected ? "default" : "outline"}
+            size="sm"
+            className={cn(
+              "rounded-full inline-flex items-center justify-center shadow-sm shrink-0 h-7.5 min-w-7 max-w-30 px-1.5 py-0.5 text-[0.68rem]",
+              isToday && "bg-green-500 text-white hover:bg-green-600 shadow-lg border-green-600",
+              isSelected && !isToday && "bg-primary text-primary-foreground hover:bg-primary/90",
+            )}
             aria-label={ariaLabel}
             onClick={() => onSelectDate(day)}
             onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+              if (e.key === 'Enter' || e.key === ' ') {
                 onSelectDate(day);
               }
             }}
-            style={pillStyle}
+            style={{ flex: '0 0 calc((100% - 24px) / 7)' }}
           >
-            <div className="d-flex flex-column align-items-center justify-content-center">
-              <div style={{ fontSize: 9, lineHeight: 1, textTransform: 'capitalize' }}>
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-[9px] leading-none capitalize">
                 {day.toLocaleDateString(i18n.language || undefined, { weekday: 'short' })}
               </div>
-              <div style={{ fontWeight: 700, lineHeight: 1 }}>
+              <div className="font-bold leading-none">
                 {day.getDate()}
               </div>
             </div>
-          </button>
+          </Button>
         );
       })}
     </div>

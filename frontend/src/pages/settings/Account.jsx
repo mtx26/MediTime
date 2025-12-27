@@ -6,6 +6,12 @@ import { log } from '../../utils/logger';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '../../utils/files/cropImage';
 import { updateUserInfo } from '../../services/auth/authService';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Slider } from '@/components/ui/slider';
+import { Pencil, Check, X } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -115,123 +121,116 @@ export default function Account() {
   return (
     <>
       <div>
-        <h2 className="mb-4">{t('settings.account')}</h2>
-        <p className="text-muted mb-4">{t('account.instructions')}</p>
+        <h2 className="mb-4 text-2xl font-bold">{t('settings.account')}</h2>
+        <p className="text-muted-foreground mb-4">{t('account.instructions')}</p>
 
-        <form className="row gap-3 align-items-center" onSubmit={handleSubmit}>
-          <button
-            className="position-relative d-inline-block rounded-circle overflow-hidden m-0 p-0 border-0"
-            style={{ width: '100px', height: '100px', cursor: 'pointer' }}
-            type="button"
-            onClick={() => {
-              setShowOverlay(!showOverlay);
-              if (showOverlay) {
-                openFilePicker();
-              }
-            }}
-            onMouseEnter={() => setShowOverlay(true)}
-            onMouseLeave={() => setShowOverlay(false)}
-            onBlur={() => setShowOverlay(false)}
-          >
-            <img
-              src={previewURL}
-              alt={t('account.profile_alt')}
-              className="w-100 h-100 rounded-circle"
-              style={{ objectFit: 'cover' }}
-            />
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <div className="flex items-center gap-4">
+            <button
+              className="relative inline-block rounded-full overflow-hidden m-0 p-0 border-0"
+              style={{ width: '100px', height: '100px', cursor: 'pointer' }}
+              type="button"
+              onClick={() => {
+                setShowOverlay(!showOverlay);
+                if (showOverlay) {
+                  openFilePicker();
+                }
+              }}
+              onMouseEnter={() => setShowOverlay(true)}
+              onMouseLeave={() => setShowOverlay(false)}
+              onBlur={() => setShowOverlay(false)}
+            >
+              <img
+                src={previewURL}
+                alt={t('account.profile_alt')}
+                className="w-full h-full rounded-full"
+                style={{ objectFit: 'cover' }}
+              />
 
-            {showOverlay && (
-              <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-75">
-                <i className="bi bi-pencil text-white fs-3"></i>
-              </div>
-            )}
-          </button>
+              {showOverlay && (
+                <div className="absolute top-0 left-0 w-full h-full flex items-center justify-content bg-black/75">
+                  <Pencil className="w-8 h-8 text-white mx-auto" />
+                </div>
+              )}
+            </button>
 
-          <div className="col">
-            <label htmlFor="displayName" className="form-label">
-              {t('account.display_name.label')}
-            </label>
-            <input
-              type="text"
-              id="displayName"
-              className="form-control"
-              placeholder={t('account.display_name.placeholder')}
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-            />
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="displayName ">
+                {t('account.display_name.label')}
+              </Label>
+              <Input
+                type="text"
+                id="displayName"
+                placeholder={t('account.display_name.placeholder')}
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+              />
+            </div>
           </div>
+          
           {isModified && (
-            <div className="d-flex gap-2 justify-content-end">
-              <button type="submit" className="btn btn-outline-primary">
-                <i className="bi bi-check-lg"></i> {t('account.save_changes')}
-              </button>
-              <button
+            <div className="flex gap-2 justify-end">
+              <Button type="submit" variant="outline" className="gap-2">
+                <Check className="w-4 h-4" /> {t('account.save_changes')}
+              </Button>
+              <Button
                 type="button"
-                className="btn btn-outline-danger"
+                variant="outline"
+                className="gap-2"
                 onClick={() => {
                   setDisplayName(userInfo?.displayName);
                   setPreviewURL(userInfo?.photoUrl);
                   setIsModified(false);
                 }}
               >
-                <i className="bi bi-x-lg"></i> {t('cancel')}
-              </button>
+                <X className="w-4 h-4" /> {t('cancel')}
+              </Button>
             </div>
           )}
         </form>
       </div>
-      {showCropModal && (
-        <div
-          className="modal fade show d-block"
-          tabIndex="-1"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-        >
-          <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div className="modal-content bg-white">
-              <div className="modal-header">
-                <h5 className="modal-title">{t('account.crop.title')}</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowCropModal(false)}
-                ></button>
-              </div>
-              <div
-                className="modal-body"
-                style={{ height: '400px', position: 'relative' }}
-              >
-                <Cropper
-                  image={rawImage}
-                  crop={crop}
-                  zoom={zoom}
-                  aspect={1}
-                  cropShape="round"
-                  showGrid={false}
-                  onCropChange={setCrop}
-                  onZoomChange={setZoom}
-                  onCropComplete={(_, croppedPixels) =>
-                    setCroppedAreaPixels(croppedPixels)
-                  }
-                />
-              </div>
-              <div className="modal-footer">
-                <input
-                  type="range"
-                  min="1"
-                  max="3"
-                  step="0.1"
-                  value={zoom}
-                  onChange={(e) => setZoom(e.target.value)}
-                  className="form-range w-50"
-                />
-                <button className="btn btn-primary" onClick={handleCropConfirm}>
-                  {t('account.crop.use')}
-                </button>
-              </div>
-            </div>
+      <Dialog open={showCropModal} onOpenChange={setShowCropModal}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{t('account.crop.title')}</DialogTitle>
+            <DialogDescription className="sr-only">
+              {t('account.crop.title')}
+            </DialogDescription>
+          </DialogHeader>
+          <div
+            className="relative"
+            style={{ height: '400px' }}
+          >
+            <Cropper
+              image={rawImage}
+              crop={crop}
+              zoom={zoom}
+              aspect={1}
+              cropShape="round"
+              showGrid={false}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={(_, croppedPixels) =>
+                setCroppedAreaPixels(croppedPixels)
+              }
+            />
           </div>
-        </div>
-      )}
+          <DialogFooter className="flex-col sm:flex-row gap-4">
+            <div className="flex-1 max-w-xs">
+              <Slider
+                min={1}
+                max={3}
+                step={0.1}
+                value={[zoom]}
+                onValueChange={(value) => setZoom(value[0])}
+              />
+            </div>
+            <Button onClick={handleCropConfirm}>
+              {t('account.crop.use')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

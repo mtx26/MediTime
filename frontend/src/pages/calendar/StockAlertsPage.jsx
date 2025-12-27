@@ -5,6 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';
 import ActionSheet from '../../components/common/ActionSheet';
 import IconButton from '../../components/common/UtilityComponents';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle } from 'lucide-react';
 
 function StockAlertsPage({
   personalCalendars,
@@ -124,40 +129,41 @@ function StockAlertsPage({
 
   if (loadingBoxes === undefined) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: '60vh' }}
-      >
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">{t('loading_medicines')}</span>
-        </div>
+      <div className="flex justify-center items-center" style={{ height: '60vh' }}>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (loadingBoxes === false) {
     return (
-      <div className="alert alert-danger text-center mt-5" role="alert">
-        {t('invalid_or_expired_link')}
+      <div className="flex justify-center mt-5">
+        <Alert variant="destructive" className="max-w-150">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>{t('invalid_or_expired_link')}</AlertDescription>
+        </Alert>
       </div>
     );
   }
 
   return (
-    <div className="container py-4">
-      <div className="mb-4 d-flex justify-content-between align-items-center">
-        <h2 className="text-danger">
-          <i className="bi bi-exclamation-triangle-fill me-2"></i>
-          {t('stock_alerts')}
-        </h2>
+    <div className="container mx-auto max-w-7xl">
+      <div className="mb-4 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="h-6 w-6" />        
+          <h4 className="text-xl font-bold">
+            {t('stock_alerts')}
+          </h4>
+        </div>
         <ActionSheet
           dataTour="stock-alerts-actions-btn"
           actions={[
             {
               label: (
-                <>
-                  <i className="bi bi-pencil me-2"></i> {t('send_sms')}
-                </>
+                <div className="flex items-center gap-2">
+                  <Pencil className="h-4 w-4" />
+                  {t('send_sms')}
+                </div>
               ),
               onClick: () => sendStockAlertsSMS(),
               title: t('send_sms'),
@@ -165,9 +171,10 @@ function StockAlertsPage({
             },
             {
               label: (
-                <>
-                  <i className="bi bi-calendar3 me-2" /> {t('ics.calendar_ics')}
-                </>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  {t('ics.calendar_ics')}
+                </div>
               ),
               linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
               title: t('ics.calendar_ics'),
@@ -175,62 +182,68 @@ function StockAlertsPage({
             },
           ]}
         />
-
       </div>
 
-
       {alerts.length === 0 ? (
-        <div className="alert alert-success" role="alert">
-          {t('no_low_stock')}
-        </div>
+        <Alert className="max-w-150">
+          <CheckCircle className="h-4 w-4" />
+          <AlertDescription>{t('no_low_stock')}</AlertDescription>
+        </Alert>
       ) : (
-        <div className="row g-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {alerts.map((med) => (
-            <div key={med.id} className="col-12 col-lg-6">
-              <div className={`card shadow h-100 ${med.stock_quantity <= 0 ? 'border-danger' : ''}`}>
-                <div className="card-body d-flex flex-column justify-content-between">
-                  <div>
-                    <h5 className="card-title mb-2">{med.name} ({med.dose} mg)</h5>
-                    <div className="mb-2">
-                      <div className="row g-2 text-sm">
-                        <div className="col-6">
-                          <small className="d-block text-muted">{t('boxes.capacity')}</small>
-                          <strong>{med.box_capacity}</strong>
-                        </div>
-                        <div className="col-6">
-                          <small className="d-block text-muted">{t('boxes.alert_threshold')}</small>
-                          <strong>{med.stock_alert_threshold}</strong>
-                        </div>
-                        <div className="col-6">
-                          <small className="d-block text-muted">{t('actual_stock')}</small>
-                          <strong className="text-danger">{med.stock_quantity}</strong>
-                        </div>
-
-                        <div className="col-6">
-                          <IconButton
-                            className="btn btn-outline-success w-100"
-                            icon="plus-circle"
-                            text={t('boxes.restock')}
-                            onClick={() => restockBox(calendarId, med.id)}
-                            disabled={med.box_capacity === 0}
-                            helpDisabled={t('boxes.restock_disabled_tooltip')}
-                          />
-                        </div>
-                      </div>
+            <Card
+              key={med.id}
+              className={med.stock_quantity <= 0 ? 'border-destructive' : 'border-amber-500'}
+            >
+              <CardContent className="flex flex-col justify-between h-full">
+                <div>
+                  <h5 className="font-semibold mb-4 text-lg">
+                    {med.name} ({med.dose} mg)
+                  </h5>
+                  <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                    <div>
+                      <small className="block text-muted-foreground mb-1">
+                        {t('boxes.capacity')}
+                      </small>
+                      <strong>{med.box_capacity}</strong>
                     </div>
-                    <span
-                      className={`badge ${
-                        med.stock_quantity <= 0 ? 'bg-danger' : 'bg-secondary'
-                      }`}
-                    >
-                      {med.stock_quantity <= 0
-                        ? t('critical_stock')
-                        : t('low_stock')}
-                    </span>
+                    <div>
+                      <small className="block text-muted-foreground mb-1">
+                        {t('boxes.alert_threshold')}
+                      </small>
+                      <strong>{med.stock_alert_threshold}</strong>
+                    </div>
+                    <div>
+                      <small className="block text-muted-foreground mb-1">
+                        {t('actual_stock')}
+                      </small>
+                      <strong className={med.stock_quantity <= 0 ? 'text-destructive' : ''}>
+                        {med.stock_quantity}
+                      </strong>
+                    </div>
+                    <div>
+                      <IconButton
+                        className="w-full border-green-500 text-green-600 hover:bg-green-50"
+                        icon={PlusCircle}
+                        text={t('boxes.restock')}
+                        onClick={() => restockBox(calendarId, med.id)}
+                        disabled={med.box_capacity === 0}
+                        helpDisabled={t('boxes.restock_disabled_tooltip')}
+                      />
+                    </div>
                   </div>
+                  <Badge
+                    variant={med.stock_quantity <= 0 ? 'destructive' : ''}
+                    className={med.stock_quantity > 0 ? 'bg-amber-500 text-white hover:bg-amber-600' : ''}
+                  >
+                    {med.stock_quantity <= 0
+                      ? t('critical_stock')
+                      : t('low_stock')}
+                  </Badge>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}

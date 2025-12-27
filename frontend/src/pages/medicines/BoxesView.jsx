@@ -9,19 +9,65 @@ import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 import QRCodeScanner from '../../components/scanner/QRCodeScanner';
 import Tooltips from '../../components/common/Tooltips';
-import IconButton from '../../components/common/UtilityComponents';
 import PropTypes from 'prop-types';
+import IconButton from '../../components/common/UtilityComponents';
+
+// Composants shadcn/ui
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+
+// Icônes Lucide
+import { 
+  Package, 
+  Plus, 
+  QrCode, 
+  Info, 
+  AlertTriangle, 
+  CheckCircle, 
+  PauseCircle, 
+  AlertCircle, 
+  BellOff,
+  ChevronUp, 
+  ChevronDown, 
+  Trash2, 
+  Save, 
+  X,
+  PlusCircle,
+  Download,
+  Share2,
+  Calendar,
+  Settings,
+  FileText,
+  Pencil,
+  ScanLine
+} from 'lucide-react';
 
 // ============================================================================
 // UTILITY COMPONENTS
 // ============================================================================
 
-const Badge = ({ color, icon, text, tooltip }) => {
+const StatusBadge = ({ variant, icon: Icon, text, tooltip }) => {
+  const variantMap = {
+    warning: 'bg-amber-500 text-white hover:bg-amber-600',
+    danger: 'bg-destructive text-white',
+    success: 'bg-green-500 text-white hover:bg-green-600',
+    secondary: 'bg-secondary text-secondary-foreground',
+    info: 'bg-blue-500 text-white hover:bg-blue-600',
+  };
+
   const content = (
-    <span className={`badge bg-${color}`}>
-      <i className={`bi bi-${icon}`} /> {text}
-    </span>
+    <Badge className={cn('gap-1', variantMap[variant] || variantMap.secondary)}>
+      {Icon && <Icon className="h-3 w-3" />}
+      {text}
+    </Badge>
   );
+
   return tooltip ? (
     <Tooltips content={tooltip} side="bottom">
       {content}
@@ -31,50 +77,58 @@ const Badge = ({ color, icon, text, tooltip }) => {
   );
 };
 
-Badge.propTypes = {
-  color: PropTypes.string.isRequired,
-  icon: PropTypes.string.isRequired,
+StatusBadge.propTypes = {
+  variant: PropTypes.string.isRequired,
+  icon: PropTypes.elementType,
   text: PropTypes.string.isRequired,
   tooltip: PropTypes.string,
 };
 
-const ActionCard = ({ borderColor, icon, color, text, onClick, hasTooltip, tooltip, dataTour, t }) => {
+const ActionCard = ({ variant, icon: Icon, text, onClick, hasTooltip, tooltip, dataTour }) => {
+  const variantStyles = {
+    success: 'border-green-500',
+    primary: 'border-primary',
+  };
+
+  const iconStyles = {
+    success: 'text-green-500',
+    primary: 'text-primary',
+  };
+
   return (
     <button 
       type="button" 
       onClick={onClick} 
-      className="btn p-0 border-0 bg-transparent text-start flex-fill" 
+      className="w-full p-0 border-0 bg-transparent text-left flex-1 cursor-pointer" 
       data-tour={dataTour}
       aria-label={text}
       title={text}
     >
-      <div className={`card h-100 shadow border border-${borderColor}`}>
-        <div className="card-body d-flex flex-column justify-content-center align-items-center p-3 position-relative">
+      <Card className={cn('h-full shadow-sm border-2 transition-colors relative', variantStyles[variant])}>
+        <CardContent className="flex flex-col justify-center items-center">
           {hasTooltip && (
-            <Tooltips content={tooltip} side="bottom" className="position-absolute top-0 end-0 m-1 p-1" propagation={false}>
-              <i className="bi bi-info-circle text-info" style={{ cursor: 'pointer' }}></i>
-            </Tooltips>
+            <Tooltips content={tooltip} side="bottom" className="absolute top-1 right-1 p-1" propagation={false}>
+              <Info className="h-4 w-4 text-blue-500" />
+            </Tooltips> 
           )}
-          <i className={`bi bi-${icon} text-${color} fs-1`}></i>
-          <p className={`text-${color} fw-bold mt-2 mb-0 text-center`}>
+          <Icon className={cn('h-10 w-10', iconStyles[variant])} />
+          <p className={cn('font-semibold mt-2 mb-0 text-center', iconStyles[variant])}>
             {text}
           </p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </button>
   );
 };
 
 ActionCard.propTypes = {
-  borderColor: PropTypes.string.isRequired,
-  icon: PropTypes.string.isRequired,
-  color: PropTypes.string.isRequired,
+  variant: PropTypes.string.isRequired,
+  icon: PropTypes.elementType.isRequired,
   text: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
   hasTooltip: PropTypes.bool,
   tooltip: PropTypes.string,
   dataTour: PropTypes.string,
-  t: PropTypes.func.isRequired,
 };
 
 const InputDropdown = ({
@@ -89,24 +143,28 @@ const InputDropdown = ({
   const { t } = useTranslation();
   const [suggestions, setSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const inputRef = useRef();
+  const [inputValue, setInputValue] = useState(name);
+  const inputRef = useRef(null);
 
   useEffect(() => {
-    // Focus automatique sur le champ name
+    setInputValue(name);
+  }, [name]);
+
+  useEffect(() => {
     inputRef.current?.focus();
-    // Scroll pour placer le champ en vue (le scroll-padding du HTML gère l'espace pour header/footer)
     inputRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
   const handleSelect = (item) => {
     const onlyNumbers = parseInt(item.dose.replace(/\D/g, ''));
-    onChangeName(item.name);
+    const itemName = item.name;
+    setInputValue(itemName);
+    onChangeName(itemName);
     onChangeDose(onlyNumbers);
     onChangeBoxCapacity(item.conditionnement);
     onChangeStockQuantity(item.conditionnement);
     setShowDropdown(false);
     setSuggestions([]);
-    inputRef.current.value = item.name;
   };
 
   useEffect(() => {
@@ -121,21 +179,21 @@ const InputDropdown = ({
       setSuggestions(results);
     };
 
-    const timeout = setTimeout(fetchData, 300); // anti-spam
+    const timeout = setTimeout(fetchData, 300);
     return () => clearTimeout(timeout);
   }, [name, dose]);
 
   return (
-    <div className="position-relative d-flex mb-2 gap-2">
-      <div className="w-50">
-        <small className="text-muted">{t('boxes.name')}</small>
-        <br />
-        <input
+    <div className="relative flex mb-3 gap-3">
+      <div className="flex-1">
+        <Label className="text-muted-foreground text-xs">{t('boxes.name')}</Label>
+        <Input
           ref={inputRef}
           type="text"
-          className="form-control form-control-sm w-75 scroll-target"
-          defaultValue={name}
+          size="sm"
+          value={inputValue}
           onChange={(e) => {
+            setInputValue(e.target.value);
             onChangeName(e.target.value);
             setShowDropdown(true);
           }}
@@ -143,43 +201,33 @@ const InputDropdown = ({
           onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
           placeholder={t('boxes.start_typing')}
           aria-label={t('boxes.name')}
-          title={t('boxes.name')}
         />
       </div>
-      <div className="w-50">
-        <small className="text-muted">{t('boxes.dose')}</small>
-        <br />
-        <input
+      <div className="w-24">
+        <Label className="text-muted-foreground text-xs">{t('boxes.dose')}</Label>
+        <Input
           type="number"
-          className="form-control form-control-sm w-75"
+          size="sm"
           value={dose}
-          onChange={(e) => {
-            onChangeDose(parseInt(e.target.value));
-          }}
+          onChange={(e) => onChangeDose(parseInt(e.target.value))}
           onClick={() => setTimeout(() => setShowDropdown(true), 300)}
           onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
           aria-label={t('boxes.dose')}
-          title={t('boxes.dose')}
         />
       </div>
       {showDropdown && suggestions.length > 0 && (
-        <ul
-          className="dropdown-menu show position-absolute top-100 start-0 w-100"
-          style={{ maxHeight: 200, overflowY: 'auto' }}
-        >
+        <div className="absolute top-full left-0 w-full z-50 mt-1 bg-popover border rounded-md shadow-md max-h-50 overflow-y-auto">
           {suggestions.map((item, i) => (
-            <li key={i}>
-              <button
-                type="button"
-                className="dropdown-item text-wrap"
-                onClick={() => handleSelect(item)}
-              >
-                {item.name} - {item.dose} - {item.conditionnement}{' '}
-                {item.forme_pharmaceutique}
-              </button>
-            </li>
+            <button
+              key={i}
+              type="button"
+              className="w-full px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+              onClick={() => handleSelect(item)}
+            >
+              {item.name} - {item.dose} - {item.conditionnement} {item.forme_pharmaceutique}
+            </button>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
@@ -357,7 +405,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
             ...c,
             max_date_mode: c.max_date 
               ? (c.max_date_days ? 'for_days' : 'until_date')
-              : '',
+              : 'none',
           }
         }), 
         {}
@@ -476,7 +524,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       {
         label: (
           <>
-            <i className="bi bi-download me-2" />
+            <Download className="h-4 w-4 mr-2" />
             {t('boxes.export_pdf')}
           </>
         ),
@@ -489,7 +537,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       actions.unshift({
         label: (
           <>
-            <i className="bi bi-box-arrow-up me-2" />
+            <Share2 className="h-4 w-4 mr-2" />
             {t('share')}
           </>
         ),
@@ -501,7 +549,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         {
           label: (
             <>
-              <i className="bi bi-exclamation-triangle me-2" />
+              <AlertTriangle className="h-4 w-4 mr-2" />
               {t('stock')}
             </>
           ),
@@ -515,7 +563,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       {
         label: (
           <>
-            <i className="bi bi-calendar3 me-2" />
+            <Calendar className="h-4 w-4 mr-2" />
             {t('ics.calendar_ics')}
           </>
         ),
@@ -526,7 +574,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       {
         label: (
           <>
-            <i className="bi bi-gear me-2" />
+            <Settings className="h-4 w-4 mr-2" />
             {t('settings.label')}
           </>
         ),
@@ -540,7 +588,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       actions.push({
         label: (
           <>
-            <i className="bi bi-trash me-2" />
+            <Trash2 className="h-4 w-4 mr-2" />
             {t('delete')}
           </>
         ),
@@ -552,7 +600,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       actions.push({
         label: (
           <>
-            <i className="bi bi-trash3 me-2" />
+            <Trash2 className="h-4 w-4 mr-2" />
             {t('delete')}
           </>
         ),
@@ -571,22 +619,16 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   
   if (loadingBoxes === undefined) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: '60vh' }}
-      >
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">
-            {t('loading_medicines')}
-          </span>
-        </div>
+      <div className="flex justify-center items-center h-[60vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="sr-only">{t('loading_medicines')}</span>
       </div>
     );
   }
 
   if (loadingBoxes === false) {
     return (
-      <div className="alert alert-danger text-center mt-5" role="alert">
+      <div className="bg-destructive/10 border border-destructive text-destructive text-center p-4 rounded-md mt-8">
         {t('invalid_or_expired_link')}
       </div>
     );
@@ -597,25 +639,25 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   // =========================================================================
   
   return (
-    <div className="container align-items-center d-flex flex-column gap-3">
-      <div className="p-1 w-100" style={{ maxWidth: '800px' }}>
+    <div className="container mx-auto flex flex-col items-center gap-4">
+      <div className="w-full max-w-3xl">
         
         {/* Header */}
         <div
-          className="d-flex justify-content-between align-items-center mb-3 flex-wrap"
+          className="flex justify-between items-center mb-4 flex-wrap gap-2"
           data-tour="stock-view-title"
         >
-          <h4 className="mb-0 fw-bold">
-            <i className="bi bi-box-seam me-2"></i>
+          <h4 className="text-xl font-bold flex items-center gap-2">
+            <Package className="h-5 w-5" />
             {t('boxes.title')}
           </h4>
           <ActionSheet actions={getCommonActions()} />
         </div>
 
         {/* Boxes Grid */}
-        <div className="row row-cols-1 row-cols-md-2 g-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {boxes.map((box) => (
-            <div className="col-12 col-md-6 mb-3" key={box.id}>
+            <div key={box.id}>
               {editingBoxId === box.id ? (
                 <form onSubmit={handleSubmit}>
                   <BoxCard
@@ -662,36 +704,28 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
           ))}
 
           {/* Action Cards */}
-          <div className="col-12 col-md-6">
-            <div className="d-flex flex-column gap-2 h-100">
-              <ActionCard
-                borderColor="success"
-                icon="plus-circle"
-                color="success"
-                text={t('boxes.add_manual')}
-                onClick={() => createTemporaryBox()}
-                ariaLabel={t('boxes.add_manual')}
-                hasTooltip={false}
-                dataTour="add-manual-btn"
-                t={t}
-              />
-              <ActionCard
-                borderColor="primary"
-                icon="qr-code-scan"
-                color="primary"
-                text={t('boxes.add_with_qr')}
-                onClick={() => {
-                  setSingleScan(false);
-                  setCurrentEditingBoxId(null);
-                  setShowQRModal(true);
-                }}
-                ariaLabel={t('boxes.add_with_qr')}
-                hasTooltip={true}
-                tooltip={t('boxes.qr_code_help_text')}
-                dataTour="add-qr-btn"
-                t={t}
-              />
-            </div>
+          <div className="flex flex-col gap-3 h-full">
+            <ActionCard
+              variant="success"
+              icon={PlusCircle}
+              text={t('boxes.add_manual')}
+              onClick={() => createTemporaryBox()}
+              hasTooltip={false}
+              dataTour="add-manual-btn"
+            />
+            <ActionCard
+              variant="primary"
+              icon={QrCode}
+              text={t('boxes.add_with_qr')}
+              onClick={() => {
+                setSingleScan(false);
+                setCurrentEditingBoxId(null);
+                setShowQRModal(true);
+              }}
+              hasTooltip={true}
+              tooltip={t('boxes.qr_code_help_text')}
+              dataTour="add-qr-btn"
+            />
           </div>
         </div>
       </div>
@@ -767,7 +801,6 @@ function BoxCard({
       step: '1',
       format: 'int',
       onChange: (cond, value, updateFn) => {
-        // Si interval_days devient <= 1, mettre start_date à null
         if (value <= 1) {
           updateFn('start_date', null);
         }
@@ -786,7 +819,7 @@ function BoxCard({
       field: 'max_date_mode',
       type: 'select',
       options: [
-        { value: '', label: t('boxes.condition.no_limit') },
+        { value: 'none', label: t('boxes.condition.no_limit') },
         { value: 'until_date', label: t('boxes.condition.until_date') },
         { value: 'for_days', label: t('boxes.condition.for_days') },
       ],
@@ -813,7 +846,6 @@ function BoxCard({
         }
         
         if (cond.max_date_mode === 'for_days') {
-          // Calculer la date de fin en fonction de la ou on se situe dans la journé
           const now = new Date();
           const target = new Date(now);
           const hourByTime = { morning: 8, noon: 12, evening: 18 };
@@ -861,7 +893,7 @@ function BoxCard({
           start_date: null,
           time_of_day: 'morning',
           max_date: null,
-          max_date_mode: '',
+          max_date_mode: 'none',
           max_date_days: null,
         },
       },
@@ -889,7 +921,7 @@ function BoxCard({
     {
       label: (
         <>
-          <i className="bi bi-qr-code-scan me-2" />
+          <ScanLine className="h-4 w-4 mr-2" />
           {t('boxes.scan_qr_code')}
         </>
       ),
@@ -900,7 +932,7 @@ function BoxCard({
     {
       label: (
         <>
-          <i className="bi bi-pencil me-2" />
+          <Pencil className="h-4 w-4 mr-2" />
           {t('boxes.edit')}
         </>
       ),
@@ -911,7 +943,7 @@ function BoxCard({
     {
       label: (
         <>
-          <i className="bi bi-file-earmark-pdf me-2" />
+          <FileText className="h-4 w-4 mr-2" />
           {t('boxes.view_notice')}
         </>
       ),
@@ -922,7 +954,7 @@ function BoxCard({
     {
       label: (
         <>
-          <i className="bi bi-trash me-2" />
+          <Trash2 className="h-4 w-4 mr-2" />
           {t('boxes.delete')}
         </>
       ),
@@ -932,34 +964,30 @@ function BoxCard({
     },
   ];
 
-  const borderClass =
-    box.conditions?.every((c) => {
-                if (!c?.max_date) return false;
-                const now = new Date();
-                const maxDate = new Date(c.max_date);
-                return now > maxDate;
-              })
-      ? 'border-secondary'
-      :
-      box.box_capacity === 0
-        ? ''
-        : box.stock_quantity <= 0
-        ? 'border-danger'
-        : box.stock_quantity <= box.stock_alert_threshold
-        ? 'border-warning'
-        : '';
+  const getBorderClass = () => {
+    const allExpired = box.conditions?.every((c) => {
+      if (!c?.max_date) return false;
+      return new Date() > new Date(c.max_date);
+    });
+    
+    if (allExpired) return 'border-blue-500';
+    if (box.box_capacity === 0) return '';
+    if (box.stock_quantity <= 0) return 'border-destructive';
+    if (box.stock_quantity <= box.stock_alert_threshold) return 'border-amber-500';
+    return '';
+  };
 
   // =========================================================================
   // RENDER BOX CARD
   // =========================================================================
   
   return (
-    <div className={`card h-100 shadow border ${borderClass}`}>
-      <div className="card-body position-relative">
+    <Card className={cn('h-full shadow-sm', getBorderClass())}>
+      <CardContent className="relative">
         
         {/* Action Menu */}
         {!isEditing && (
-          <div className="position-absolute top-0 end-0 m-2">
+          <div className="absolute top-0 right-2">
             <ActionSheet buttonSize="sm" actions={getBoxActions()} />
           </div>
         )}
@@ -984,88 +1012,81 @@ function BoxCard({
             fetchSuggestions={fetchSuggestions}
           />
         ) : (
-          <h5 className="card-title fs-semibold mb-1">
+          <h5 className="font-semibold text-lg mb-2 pr-8">
             {`${box.name}${box.dose > 0 ? ' (' + box.dose + ' mg)' : ''}`}
           </h5>
         )}
 
-
         {/* Capacity and Alert Threshold */}
-        <div className="d-flex mb-2 gap-2">
-          <div className="w-50">
-            <small className="text-muted">{t('boxes.capacity')}</small>
-            <br />
+        <div className="flex gap-4 mb-3">
+          <div className="flex-1">
+            <Label className="text-muted-foreground text-xs">{t('boxes.capacity')}</Label>
             {isEditing ? (
-              <input
+              <Input
                 type="number"
-                className="form-control form-control-sm w-75"
+                size="sm"
                 value={editingBox.box_capacity}
                 onChange={(e) =>
                   setEditingBox((p) => ({
                     ...p,
-                    box_capacity: parseInt(e.target.value),
+                    box_capacity: parseFloat(e.target.value),
                   }))
                 }
                 aria-label={t('boxes.capacity')}
-                title={t('boxes.capacity')}
               />
             ) : (
-              <strong>{box.box_capacity}</strong>
+              <p className="font-semibold">{box.box_capacity}</p>
             )}
           </div>
-          <div className="w-50">
-            <small className="text-muted">{t('boxes.alert_threshold')}</small>
-            <br />
+          <div className="flex-1">
+            <Label className="text-muted-foreground text-xs">{t('boxes.alert_threshold')}</Label>
             {isEditing ? (
-              <input
+              <Input
                 type="number"
-                className="form-control form-control-sm w-75"
+                size="sm"
                 value={editingBox.stock_alert_threshold}
                 onChange={(e) =>
                   setEditingBox((p) => ({
                     ...p,
-                    stock_alert_threshold: parseInt(e.target.value),
+                    stock_alert_threshold: parseFloat(e.target.value),
                   }))
                 }
                 aria-label={t('boxes.alert_threshold')}
-                title={t('boxes.alert_threshold')}
               />
             ) : (
-              <strong>{box.stock_alert_threshold}</strong>
+              <p className="font-semibold">{box.stock_alert_threshold}</p>
             )}
           </div>
         </div>
 
         {/* Stock Quantity and Restock Button */}
-        <div className="d-flex mb-2 gap-2 align-items-center">
-          <div className="w-50">
-            <small className="text-muted">{t('boxes.remaining_qty')}</small>
-            <br />
+        <div className="flex gap-4 mb-3 items-end">
+          <div className="flex-1">
+            <Label className="text-muted-foreground text-xs">{t('boxes.remaining_qty')}</Label>
             {isEditing ? (
-              <input
+              <Input
                 type="number"
-                className="form-control form-control-sm w-75"
+                size="sm"
                 value={editingBox.stock_quantity}
                 onChange={(e) =>
                   setEditingBox((p) => ({
                     ...p,
-                    stock_quantity: parseInt(e.target.value),
+                    stock_quantity: parseFloat(e.target.value),
                   }))
                 }
                 aria-label={t('boxes.remaining_qty')}
-                title={t('boxes.remaining_qty')}
               />
             ) : (
-              <strong>{box.stock_quantity}</strong>
+              <p className="font-semibold">{box.stock_quantity}</p>
             )}
           </div>
           {!isEditing && (
-            <div className="w-50">
+            <div className="flex-1">
               <IconButton
-                className="btn btn-outline-success w-100"
-                icon="plus-circle"
+                className="w-full border-green-500 text-green-600 hover:bg-green-50"
+                icon={PlusCircle}
                 text={t('boxes.restock')}
-                onClick={async () => await calendarSource.restockBox(calendarId, box.id)}
+                onClick={() => calendarSource.restockBox(calendarId, box.id)}
                 disabled={box.box_capacity === 0}
                 helpDisabled={t('boxes.restock_disabled_tooltip')}
               />
@@ -1075,54 +1096,48 @@ function BoxCard({
 
         {/* Stock Badges */}
         {!isEditing && (
-          <div className="d-flex mb-2 align-items-center w-100 gap-2 flex-wrap">
+          <div className="flex flex-wrap gap-2 mb-3">
             {box.conditions.filter((c) => c !== undefined).length === 0 && (
               <button
-                className="btn p-0"
-                onClick={(e) => {
+                className="p-0 border-0 bg-transparent"
+                onClick={() => {
                   setExpandedBoxes((p) => ({ ...p, [box.id]: true }));
                   onEdit(box);
                 }}
                 aria-label={t('boxes.condition.add')}
               >
-                <Badge
-                  color="warning"
-                  icon="info-circle"
+                <StatusBadge
+                  variant="warning"
+                  icon={Info}
                   text={t('boxes.condition.none')}
                   tooltip={t('boxes.condition_none_tooltip')}
                 />
               </button>
             )}
-            {/* medic inactive (toutes les conditions sont desactiver) */}
+            
             {box.conditions?.every((c) => {
               if (!c?.max_date) return false;
-              const now = new Date();
-              const maxDate = new Date(c.max_date);
-              return now > maxDate;
+              return new Date() > new Date(c.max_date);
             }) ? (
-              <Badge
-                color="secondary"
-                icon="pause-circle"
+              <StatusBadge
+                variant="info"
+                icon={PauseCircle}
                 text={t('boxes.condition.inactive')}
                 tooltip={t('boxes.condition.inactive_tooltip')}
               />
             ) : (
               box.conditions?.some((c) => {
                 if (!c?.max_date) return false;
-                const now = new Date();
-                const maxDate = new Date(c.max_date);
-                return now > maxDate;
+                return new Date() > new Date(c.max_date);
               }) ? (
                 <button
-                  className="btn p-0"
-                  onClick={() => {
-                    setExpandedBoxes((p) => ({ ...p, [box.id]: true }));
-                  }}
+                  className="p-0 border-0 bg-transparent"
+                  onClick={() => setExpandedBoxes((p) => ({ ...p, [box.id]: true }))}
                   aria-label={t('boxes.condition.add')}
                 >
-                  <Badge
-                    color="info"
-                    icon="exclamation-circle"
+                  <StatusBadge
+                    variant="info"
+                    icon={AlertCircle}
                     text={t('boxes.condition.expired')}
                     tooltip={t('boxes.condition.expired_tooltip')}
                   />
@@ -1130,8 +1145,8 @@ function BoxCard({
               ) : (
                 <>
                   {box.box_capacity !== 0 && (
-                    <Badge
-                      color={
+                    <StatusBadge
+                      variant={
                         box.stock_quantity <= 0
                           ? 'danger'
                           : box.stock_quantity <= box.stock_alert_threshold
@@ -1140,10 +1155,10 @@ function BoxCard({
                       }
                       icon={
                         box.stock_quantity <= 0
-                          ? 'exclamation-triangle'
+                          ? AlertTriangle
                           : box.stock_quantity <= box.stock_alert_threshold
-                          ? 'exclamation-triangle'
-                          : 'check-circle'
+                          ? AlertTriangle
+                          : CheckCircle
                       }
                       text={
                         box.stock_quantity <= 0
@@ -1164,11 +1179,11 @@ function BoxCard({
                 </>
               )
             )}
-            {/*Afficher si alart pour un medoc desactiver (box_capacity <= 0 ou stock_alert_threshold <= 0)*/}
+            
             {(box.box_capacity <= 0 || box.stock_alert_threshold <= 0) && (
-              <Badge
-                color="info"
-                icon="slash-circle"
+              <StatusBadge
+                variant="info"
+                icon={BellOff}
                 text={t('boxes.stock.badge.alerts_disabled')}
                 tooltip={t('boxes.stock.badge.tooltip.alerts_disabled')}
               />
@@ -1177,27 +1192,26 @@ function BoxCard({
         )}
 
         {/* Conditions Section */}
-        <div className="mt-4 mb-2">
-          <hr className="border-dark mb-0" />
-          <h5 className="w-100">
+        <div className="mt-4">
+          <div className="border-t border-border pt-2">
             <button
-              className="btn w-100 text-start d-flex justify-content-between align-items-center border-0 bg-transparent px-0 pb-0 mb-0"
+              className="w-full flex justify-between items-center py-2 bg-transparent border-0 cursor-pointer"
               type="button"
               title={t('boxes.intake_conditions')}
               onClick={toggleExpand}
               data-tour="box-condition-toggle"
             >
-              <span>{t('boxes.intake_conditions')}</span>
-              <i
-                className={`bi bi-chevron-${
-                  expandedBoxes[box.id] ? 'up' : 'down'
-                }`}
-              ></i>
+              <span className="font-medium">{t('boxes.intake_conditions')}</span>
+              {expandedBoxes[box.id] ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
             </button>
-          </h5>
+          </div>
 
           {expandedBoxes[box.id] && (
-            <div className="mt-2">
+            <div className="mt-3 space-y-3">
               {isEditing ? (
                 <>
                   {Object.values(editingBox.conditions || {})
@@ -1205,16 +1219,14 @@ function BoxCard({
                     .map((cond) => (
                       <div
                         key={cond.id}
-                        className="mb-2 p-3 border rounded bg-light shadow"
+                        className="p-3 border rounded-md bg-muted/50 space-y-3"
                       >
                         {conditionFields.map(
-                          ({ label, field, type, min, step, format, options, ifComplete, onChange, required}, idx) => {
-                            // Si ifComplete est défini et retourne false, ne pas afficher le champ
+                          ({ label, field, type, min, step, format, options, ifComplete, onChange, required }, idx) => {
                             if (ifComplete && !ifComplete(cond)) {
                               return null;
                             }
                             
-                            // Résoudre les valeurs dynamiques
                             const resolvedLabel = typeof label === 'function' ? label(cond) : label;
                             const resolvedField = typeof field === 'function' ? field(cond) : field;
                             const resolvedType = typeof type === 'function' ? type(cond) : type;
@@ -1222,78 +1234,83 @@ function BoxCard({
                             const resolvedRequired = typeof required === 'function' ? required(cond) : required;
                             
                             return (
-                            <div key={`${cond.id}-${resolvedField}-${idx}`}>
-                              <label>{resolvedLabel}</label>
-                              {resolvedType === 'select' ? (
-                                <select
-                                  className="form-control form-control-sm"
-                                  value={cond[resolvedField] ?? ''}
-                                  onChange={(e) => {
-                                    updateCondition(cond.id, resolvedField, e.target.value);
-                                    if (onChange) {
-                                      onChange(cond, e.target.value, (f, v) => updateCondition(cond.id, f, v));
+                              <div key={`${cond.id}-${resolvedField}-${idx}`} className="space-y-1">
+                                <Label className="text-sm">{resolvedLabel}</Label>
+                                {resolvedType === 'select' ? (
+                                  <Select
+                                    value={cond[resolvedField] || 'none'}
+                                    onValueChange={(value) => {
+                                      updateCondition(cond.id, resolvedField, value);
+                                      if (onChange) {
+                                        onChange(cond, value, (f, v) => updateCondition(cond.id, f, v));
+                                      }
+                                    }}
+                                    required={resolvedRequired}
+                                  >
+                                    <SelectTrigger size="sm" className="w-full">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {options.map((o) => (
+                                        <SelectItem key={o.value} value={o.value}>
+                                          {o.label}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                ) : (
+                                  <Input
+                                    type={resolvedType}
+                                    size="sm"
+                                    value={
+                                      (resolvedField === 'start_date' || (resolvedField === 'max_date' && resolvedType === 'date')) && cond[resolvedField]
+                                        ? new Date(cond[resolvedField]).toISOString().split('T')[0]
+                                        : cond[resolvedField] ?? ''
                                     }
-                                  }}
-                                  aria-label={resolvedLabel}
-                                  title={resolvedLabel}
-                                  required={resolvedRequired}
-                                >
-                                  {options.map((o) => (
-                                    <option key={o.value} value={o.value}>
-                                      {o.label}
-                                    </option>
-                                  ))}
-                                </select>
-                              ) : (
-                                <input
-                                  type={resolvedType}
-                                  className="form-control form-control-sm"
-                                  value={
-                                    (resolvedField === 'start_date' || (resolvedField === 'max_date' && resolvedType === 'date')) && cond[resolvedField]
-                                      ? new Date(cond[resolvedField])
-                                          .toISOString()
-                                          .split('T')[0]
-                                      : cond[resolvedField] ?? ''
-                                  }
-                                  min={min}
-                                  step={step}
-                                  onChange={(e) => {
-                                    let value = e.target.value;
-                                    // Parser selon le format
-                                    if (resolvedFormat === 'int') {
-                                      value = parseInt(value);
-                                    } else if (resolvedFormat === 'float') {
-                                      value = parseFloat(value);
-                                    }
-                                    updateCondition(cond.id, resolvedField, value);
-                                    if (onChange) {
-                                      onChange(cond, value, (f, v) => updateCondition(cond.id, f, v));
-                                    }
-                                  }}
-                                  aria-label={resolvedLabel}
-                                  title={resolvedLabel}
-                                  required={resolvedRequired}
-                                />
-                              )}
-                            </div>
-                          );
+                                    min={min}
+                                    step={step}
+                                    onChange={(e) => {
+                                      let value = e.target.value;
+                                      if (resolvedFormat === 'int') {
+                                        value = parseInt(value);
+                                      } else if (resolvedFormat === 'float') {
+                                        value = parseFloat(value);
+                                      }
+                                      updateCondition(cond.id, resolvedField, value);
+                                      if (onChange) {
+                                        onChange(cond, value, (f, v) => updateCondition(cond.id, f, v));
+                                      }
+                                    }}
+                                    aria-label={resolvedLabel}
+                                    required={resolvedRequired}
+                                  />
+                                )}
+                              </div>
+                            );
                           }
                         )}
-                        <IconButton
-                          className="btn btn-danger btn-sm mt-2"
-                          icon="trash"
-                          text={t('boxes.condition.delete')}
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
                           onClick={() => deleteCondition(cond.id)}
-                        />
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          {t('boxes.condition.delete')}
+                        </Button>
                       </div>
                     ))
                   }
-                  <IconButton
-                    className="btn btn-sm bg-light border w-100 mt-2"
-                    icon="plus-lg"
-                    text={t('boxes.condition.add')}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
                     onClick={addCondition}
-                  />
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    {t('boxes.condition.add')}
+                  </Button>
                 </>
               ) : box.conditions.filter((c) => c !== undefined).length > 0 ? (
                 box.conditions
@@ -1301,43 +1318,32 @@ function BoxCard({
                   .map((cond) => (
                     <div
                       key={cond.id}
-                      className="mb-3 p-3 border rounded bg-light shadow"
+                      className="p-3 border rounded-md bg-muted/50"
                     >
-                      <strong>
-                        {cond.tablet_count}{' '}
-                        {cond.tablet_count > 1
-                          ? t('boxes.tablets')
-                          : t('boxes.tablet')}
-                      </strong>{' '}
-                      {t('boxes.every')}{' '}
-                      <strong>
-                        {cond.interval_days}{' '}
-                        {cond.interval_days > 1
-                          ? t('boxes.days')
-                          : t('boxes.day')}
-                      </strong>{' '}
-                      {t('boxes.each')}{' '}
-                      <strong>{timeOfDayMap[cond.time_of_day]}</strong>
-                      {cond.interval_days > 1 && <br />}
+                      <p className="mb-1">
+                        <strong>{cond.tablet_count}</strong>{' '}
+                        {cond.tablet_count > 1 ? t('boxes.tablets') : t('boxes.tablet')}{' '}
+                        {t('boxes.every')}{' '}
+                        <strong>{cond.interval_days}</strong>{' '}
+                        {cond.interval_days > 1 ? t('boxes.days') : t('boxes.day')}{' '}
+                        {t('boxes.each')}{' '}
+                        <strong>{timeOfDayMap[cond.time_of_day]}</strong>
+                      </p>
                       {cond.interval_days > 1 && (
-                        <small className="text-muted">
-                          {t('boxes.from')}{' '}
-                          {new Date(cond.start_date).toLocaleDateString()}
-                        </small>
+                        <p className="text-sm text-muted-foreground">
+                          {t('boxes.from')} {new Date(cond.start_date).toLocaleDateString()}
+                        </p>
                       )}
-                      {cond.max_date && <br />}
                       {cond.max_date && (
-                        <small className="text-muted">
-                          {t('boxes.until')}{' '}
-                          {new Date(cond.max_date).toLocaleDateString()}
-                        </small>
+                        <p className="text-sm text-muted-foreground">
+                          {t('boxes.until')} {new Date(cond.max_date).toLocaleDateString()}
+                        </p>
                       )}
-                      {/* Si la condition est expirée */}
                       {cond.max_date && new Date() > new Date(cond.max_date) && (
                         <div className="mt-2">
-                          <Badge
-                            color="info"
-                            icon="exclamation-circle"
+                          <StatusBadge
+                            variant="info"
+                            icon={AlertCircle}
                             text={t('boxes.condition.expired')}
                             tooltip={t('boxes.condition.expired_tooltip_one')}
                           />
@@ -1346,8 +1352,8 @@ function BoxCard({
                     </div>
                   ))
               ) : (
-                <div className="border rounded bg-light d-flex justify-content-start align-items-center p-2 mb-2">
-                  <p className="text-muted mb-0">
+                <div className="border rounded-md bg-muted/50 p-3">
+                  <p className="text-muted-foreground text-sm">
                     {t('boxes.condition.none')}
                   </p>
                 </div>
@@ -1358,28 +1364,32 @@ function BoxCard({
 
         {/* Save/Cancel Buttons */}
         {isEditing && (
-          <>
-            <hr />
-            <div className="d-flex gap-2">
-              <button
+          <div className="border-t border-border mt-4 pt-4">
+            <div className="flex gap-2">
+              <Button
                 type="submit"
-                className="btn btn-success btn-sm w-50"
-                aria-label={t('boxes.save')}
-                title={t('boxes.save')}
+                variant="default"
+                size="sm"
+                className="flex-1 bg-green-600 hover:bg-green-700"
               >
-                <i className="bi bi-save"></i> {t('boxes.save')}
-              </button>
-              <IconButton
-                className="btn btn-secondary btn-sm w-50"
-                icon="x"
-                text={t('boxes.cancel')}
+                <Save className="h-4 w-4 mr-1" />
+                {t('boxes.save')}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="flex-1"
                 onClick={onCancel}
-              />
+              >
+                <X className="h-4 w-4 mr-1" />
+                {t('boxes.cancel')}
+              </Button>
             </div>
-          </>
+          </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -1387,7 +1397,7 @@ BoxCard.propTypes = {
   box: PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,
-    dose: PropTypes.string,
+    dose: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     box_capacity: PropTypes.number,
     stock_quantity: PropTypes.number,
     stock_alert_threshold: PropTypes.number,
@@ -1406,7 +1416,7 @@ BoxCard.propTypes = {
   expandedBoxes: PropTypes.object.isRequired,
   setExpandedBoxes: PropTypes.func.isRequired,
   calendarId: PropTypes.string.isRequired,
-  calendarSource: PropTypes.string.isRequired,
+  calendarSource: PropTypes.object.isRequired,
   onEdit: PropTypes.func.isRequired,
   onUpdateScan: PropTypes.func.isRequired,
   t: PropTypes.func.isRequired,

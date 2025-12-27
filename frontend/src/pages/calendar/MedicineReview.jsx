@@ -4,6 +4,13 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ArrowControls from '../../components/calendar/ArrowControls';
 import { useAlert } from '../../contexts/AlertContext';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { Pencil, Trash2, Plus, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
 
 const DEFAULT_CONDITION = {
   time_of_day: '',
@@ -31,6 +38,7 @@ export default function MedicineReview({ personalCalendars }) {
   const current = medicines[index];
   const [suggestions, setSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [openDropdownKey, setOpenDropdownKey] = useState(null);
 
   const CONDITION_FIELDS = ['time_of_day', 'interval_days', 'tablet_count', 'start_date', 'max_date_mode', 'max_date', 'max_date_days'];
   const MAIN_FIELDS = ['name', 'dose', 'stock_quantity', 'stock_max', 'stock_alert_threshold'];
@@ -181,279 +189,324 @@ export default function MedicineReview({ personalCalendars }) {
 
   return (
     <div className="text-center">
-      <form onSubmit={handleSubmit} className="card mx-auto shadow p-4 mb-4" style={{ maxWidth: 500 }}>
-        {/* Header */}
-        <div className="mb-3 d-flex justify-content-between align-items-center">
-          <h5 className="text-center fw-bold mb-0">
-            <i className="bi bi-pencil me-2"></i>
-            {t('medicine_review.title')}
-          </h5>
-          <button
-            type="button"
-            className="btn btn-danger btn-sm"
-            onClick={deleteMedicine}
-            title={t('medicine_review.delete_medicine')}
-            aria-label={t('medicine_review.delete_medicine')}
-          >
-            <i className="bi bi-trash"></i>
-          </button>
-        </div>
-        
-        <div className="position-relative mb-3">
-          <div className="row">
-          <div className="col-12 col-md-6 mb-3 text-start">
-            <label htmlFor="name">{t('boxes.name')} :</label><br />
-            <input
-              type="text"
-              className={`form-control form-control-sm ${current.name.trim() === '' ? '' : 'border-success border-2'} `}
-              value={current.name}
-              onChange={(e) => {
-                handleChange('name', e.target.value);
-                setShowDropdown(true);
-              }}
-              onClick={() => setShowDropdown(true)}
-              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-              placeholder={t('boxes.start_typing')}
-              required
-              title={t('boxes.name')}
-              aria-label={t('boxes.name')}
-            />
-          </div>
+      <form onSubmit={handleSubmit} className="max-w-125 mx-auto mb-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <Pencil className="h-4 w-4" />
+              {t('medicine_review.title')}
+            </CardTitle>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={deleteMedicine}
+              title={t('medicine_review.delete_medicine')}
+              aria-label={t('medicine_review.delete_medicine')}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              {t('boxes.condition.delete')}
+            </Button>
+          </CardHeader>
 
-          <div className="col-12 col-md-6 mb-3 text-start">
-            <label htmlFor="dose">{t('boxes.dose')} :</label><br />
-            <input
-              className={`form-control form-control-sm ${current.dose && current.dose.toString().trim() !== '' ? 'border-success border-2' : ''}`}
-              type="number"
-              value={current.dose || ''}
-              onChange={(e) => {
-                handleChange('dose', e.target.value);
-                if (current.name && current.name.length >= 2) {
-                  setShowDropdown(true);
-                }
-              }}
-              onFocus={() => {
-                // Afficher les suggestions si le nom est rempli et qu'il y en a
-                if (current.name && current.name.length >= 2 && suggestions.length > 0) {
-                  setShowDropdown(true);
-                }
-              }}
-              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-              id="dose"
-              placeholder={t('mg')}
-              title={t('boxes.dose')}
-              aria-label={t('boxes.dose')}
-              min={0}
-              required
-            />
-          </div>
-
-          </div>
-
-          {/* Dropdown des suggestions juste en dessous */}
-          {showDropdown && suggestions.length > 0 && (
-            <ul className="dropdown-menu show w-100 position-absolute z-3" style={{ maxHeight: 200, overflowY: 'auto', top: '100%', left: 0, right: 0 }}>
-              {suggestions.map((item, i) => (
-                <li key={i}>
-                  <button
-                    type="button"
-                    className="dropdown-item text-wrap"
-                    onClick={() => {
-                      const onlyNumbers = parseInt(item.dose.replace(/\D/g, ''));
-                      handleChange('name', item.name);
-                      handleChange('dose', onlyNumbers);
-                      handleChange('stock_max', item.conditionnement);
-                      handleChange('stock_quantity', item.conditionnement);
-                      setShowDropdown(false);
-                      setSuggestions([]);
-                    }}
-                  >
-                  {item.name} - {item.dose} - {item.conditionnement}{' '}
-                  {item.forme_pharmaceutique}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="row mb-3">
-          {[{
-            label: t('medicine_review.current_stock'),
-            field: 'stock_quantity',
-            type: 'number',
-            required: false,
-          }, {
-            label: t('medicine_review.maximum_stock'),
-            field: 'stock_max',
-            type: 'number',
-            min: '0',
-            required: false,
-          }, {
-            label: t('boxes.alert_threshold'),
-            field: 'stock_alert_threshold',
-            type: 'number',
-            min: '0',
-            required: false,
-          }].map(({ label, field, type, min }) => (
-            <div key={field} className="mb-2 text-start col-12 col-md-6 mb-3 text-muted">
-              <label htmlFor={field}>{label} :</label><br />
-              <input
-                className="form-control form-control-sm"
-                type={type}
-                value={current[field] || ''}
-                onChange={(e) => handleChange(field, e.target.value)}
-                id={field}
-                title={label}
-                aria-label={label}
-                min={min}
-              />
-            </div>
-          ))}
-        </div>
-        <hr />
-        <div className="mb-2 text-start d-flex justify-content-between align-items-center">
-          <strong>{t('boxes.intake_conditions')} :</strong>
-        </div>
-
-        {current.conditions.map((cond, i) => (
-          <div key={i} className="mb-3 border rounded p-3 text-start bg-light">
-            {[{
-              label: t('boxes.condition.tablet_count'),
-              field: 'tablet_count',
-              type: 'number',
-              step: '0.25',
-              min: '0',
-              required: true,
-            }, {
-              label: t('boxes.condition.time_of_day'),
-              field: 'time_of_day',
-              type: 'select',
-              options: [
-                { value: '', label: t('medicine_review.select_option') },
-                { value: 'morning', label: t('morning') },
-                { value: 'noon', label: t('noon') },
-                { value: 'evening', label: t('evening') },
-              ],
-              required: true,
-            }, {
-              label: t('boxes.condition.interval_days'),
-              field: 'interval_days',
-              type: 'number',
-              min: '1',
-              required: true,
-            }, {
-              label: t('boxes.condition.start_date'),
-              field: 'start_date',
-              type: 'date',
-              show: parseInt(cond.interval_days) > 1,
-              required: parseInt(cond.interval_days) > 1,
-            }, {
-              label: t('boxes.condition.max_date_mode'),
-              field: 'max_date_mode',
-              type: 'select',
-              options: [
-                { value: '', label: t('boxes.condition.no_limit') },
-                { value: 'until_date', label: t('boxes.condition.until_date') },
-                { value: 'for_days', label: t('boxes.condition.for_days') },
-              ],
-              required: false,
-            }, {
-              label: cond.max_date_mode === 'until_date' 
-                ? t('boxes.condition.end_date') 
-                : t('boxes.condition.duration_days'),
-              field: cond.max_date_mode === 'until_date' ? 'max_date' : 'max_date_days',
-              type: cond.max_date_mode === 'until_date' ? 'date' : 'number',
-              min: '1',
-              step: '1',
-              show: cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
-              required: cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
-            }].filter(item => item.show !== false).map(({ label, field, type, step, min, options, required }) => (
-              <div key={field} className="mb-1">
-                <label htmlFor={field}>{label} :</label><br />
-                {type === 'select' ? (
-                  <select
-                    className="form-select form-select-sm"
-                    id={field}
-                    value={cond[field] || ''}
-                    onChange={(e) => handleConditionChange(i, field, e.target.value)}
-                    title={label}
-                    aria-label={label}
-                    required={required}
-                  >
-                    {options.map(opt => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+          <CardContent className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-3 text-start">
+              <div className="relative">
+                <Label htmlFor="name">{t('boxes.name')} :</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={current.name}
+                  onChange={(e) => {
+                    handleChange('name', e.target.value);
+                    setShowDropdown(true);
+                  }}
+                  onClick={() => setShowDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                  placeholder={t('boxes.start_typing')}
+                  required
+                  title={t('boxes.name')}
+                  aria-label={t('boxes.name')}
+                />
+                {showDropdown && suggestions.length > 0 && (
+                  <div className="absolute z-10 w-full max-h-52 overflow-y-auto border rounded-md bg-popover text-popover-foreground shadow top-full left-0">
+                    {suggestions.map((item, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        className="w-full text-left px-3 py-2 hover:bg-accent"
+                        onClick={() => {
+                          const onlyNumbers = parseInt(item.dose.replace(/\D/g, ''));
+                          handleChange('name', item.name);
+                          handleChange('dose', onlyNumbers);
+                          handleChange('stock_max', item.conditionnement);
+                          handleChange('stock_quantity', item.conditionnement);
+                          setShowDropdown(false);
+                          setSuggestions([]);
+                        }}
+                      >
+                        {item.name} - {item.dose} - {item.conditionnement}{' '}
+                        {item.forme_pharmaceutique}
+                      </button>
                     ))}
-                  </select>
-                ) : (
-                  <input
-                    type={type}
-                    className="form-control form-control-sm"
-                    id={field}
-                    value={field === 'max_date' && cond[field] ? cond[field].split('T')[0] : (cond[field] || '')}
-                    onChange={(e) => handleConditionChange(i, field, e.target.value)}
-                    step={step}
-                    min={min}
-                    title={label}
-                    aria-label={label}
-                    required={required}
-                  />
+                  </div>
                 )}
               </div>
+
+              <div>
+                <Label htmlFor="dose">{t('boxes.dose')} :</Label>
+                <Input
+                  id="dose"
+                  type="number"
+                  value={current.dose || ''}
+                  onChange={(e) => {
+                    handleChange('dose', e.target.value);
+                    if (current.name && current.name.length >= 2) {
+                      setShowDropdown(true);
+                    }
+                  }}
+                  onFocus={() => {
+                    if (current.name && current.name.length >= 2 && suggestions.length > 0) {
+                      setShowDropdown(true);
+                    }
+                  }}
+                  onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                  placeholder={t('mg')}
+                  title={t('boxes.dose')}
+                  aria-label={t('boxes.dose')}
+                  min={0}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-3 text-start">
+              {[{
+                label: t('medicine_review.current_stock'),
+                field: 'stock_quantity',
+                type: 'number',
+                required: false,
+              }, {
+                label: t('medicine_review.maximum_stock'),
+                field: 'stock_max',
+                type: 'number',
+                min: '0',
+                required: false,
+              }, {
+                label: t('boxes.alert_threshold'),
+                field: 'stock_alert_threshold',
+                type: 'number',
+                min: '0',
+                required: false,
+              }].map(({ label, field, type, min }) => (
+                <div key={field} className="text-start">
+                  <Label htmlFor={field}>{label} :</Label>
+                  <Input
+                    id={field}
+                    type={type}
+                    value={current[field] || ''}
+                    onChange={(e) => handleChange(field, e.target.value)}
+                    title={label}
+                    aria-label={label}
+                    min={min}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t" />
+            <div className="mb-2 text-start flex items-center justify-between">
+              <strong>{t('boxes.intake_conditions')} :</strong>
+            </div>
+
+            {current.conditions.map((cond, i) => (
+              <div key={i} className="mb-3 border rounded p-3 text-start bg-muted/30">
+                {[{
+                  label: t('boxes.condition.tablet_count'),
+                  field: 'tablet_count',
+                  type: 'number',
+                  step: '0.25',
+                  min: '0',
+                  required: true,
+                }, {
+                  label: t('boxes.condition.time_of_day'),
+                  field: 'time_of_day',
+                  type: 'select',
+                  options: [
+                    { value: 'morning', label: t('morning') },
+                    { value: 'noon', label: t('noon') },
+                    { value: 'evening', label: t('evening') },
+                  ],
+                  required: true,
+                }, {
+                  label: t('boxes.condition.interval_days'),
+                  field: 'interval_days',
+                  type: 'number',
+                  min: '1',
+                  required: true,
+                }, {
+                  label: t('boxes.condition.start_date'),
+                  field: 'start_date',
+                  type: 'date',
+                  show: parseInt(cond.interval_days) > 1,
+                  required: parseInt(cond.interval_days) > 1,
+                }, {
+                  label: t('boxes.condition.max_date_mode'),
+                  field: 'max_date_mode',
+                  type: 'select',
+                  options: [
+                    { value: 'none', label: t('boxes.condition.no_limit') },
+                    { value: 'until_date', label: t('boxes.condition.until_date') },
+                    { value: 'for_days', label: t('boxes.condition.for_days') },
+                  ],
+                  required: false,
+                }, {
+                  label: cond.max_date_mode === 'until_date' 
+                    ? t('boxes.condition.end_date') 
+                    : t('boxes.condition.duration_days'),
+                  field: cond.max_date_mode === 'until_date' ? 'max_date' : 'max_date_days',
+                  type: cond.max_date_mode === 'until_date' ? 'date' : 'number',
+                  min: '1',
+                  step: '1',
+                  show: cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
+                  required: cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
+                }].filter(item => item.show !== false).map(({ label, field, type, step, min, options, required }) => (
+                  <div key={field} className="mb-2">
+                    <Label htmlFor={field}>{label} :</Label>
+                    {type === 'select' ? (
+                      <Select
+                        value={cond[field] || ''}
+                        onValueChange={(val) => handleConditionChange(i, field, (field === 'max_date_mode' && val === 'none') ? '' : val)}
+                      >
+                        <SelectTrigger id={field} size="sm" className="w-full mt-1">
+                          <SelectValue placeholder={field === 'time_of_day' ? t('medicine_review.select_option') : (options?.[0]?.label || '')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {options?.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : type === 'date' ? (
+                      <div className="mt-1">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="w-full justify-start"
+                          onClick={() => setOpenDropdownKey(`${i}:${field}:${cond[field] || ''}:${Date.now()}`)}
+                          aria-label={label}
+                        >
+                          {(cond[field] && (field !== 'max_date' ? cond[field] : cond[field].split('T')[0])) || t('medicine_review.select_option')}
+                        </Button>
+                        {/* Inline popover calendar */}
+                        <div className="relative">
+                          {/* Simple toggle: render when last opened matches this field */}
+                          {openDropdownKey?.startsWith(`${i}:${field}`) && (
+                            <div className="absolute z-20 mt-2 border rounded-md bg-popover p-2 shadow">
+                              <Calendar
+                                mode="single"
+                                selected={cond[field] ? new Date(field === 'max_date' ? cond[field] : cond[field]) : undefined}
+                                onSelect={(date) => {
+                                  if (!date) return;
+                                  if (field === 'max_date') {
+                                    const d = new Date(date);
+                                    d.setHours(23, 59, 59, 999);
+                                    handleConditionChange(i, field, d.toISOString());
+                                  } else {
+                                    const yyyy = date.getFullYear();
+                                    const mm = String(date.getMonth() + 1).padStart(2, '0');
+                                    const dd = String(date.getDate()).padStart(2, '0');
+                                    handleConditionChange(i, field, `${yyyy}-${mm}-${dd}`);
+                                  }
+                                  setOpenDropdownKey(null);
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <Input
+                        id={field}
+                        type={type}
+                        value={field === 'max_date' && cond[field] ? cond[field].split('T')[0] : (cond[field] || '')}
+                        onChange={(e) => handleConditionChange(i, field, e.target.value)}
+                        step={step}
+                        min={min}
+                        title={label}
+                        aria-label={label}
+                        required={required}
+                        size="sm"
+                        className="mt-1"
+                      />
+                    )}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => deleteCondition(i)}
+                  title={t('boxes.condition.delete')}
+                  aria-label={t('boxes.condition.delete')}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {t('boxes.condition.delete')}
+                </Button>
+              </div>
             ))}
-            <button
-              className="btn btn-danger btn-sm mt-2"
-              onClick={() => deleteCondition(i)}
-              title={t('boxes.condition.delete')}
-              aria-label={t('boxes.condition.delete')}
+
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="w-full mt-2"
+              onClick={addCondition}
+              title={t('boxes.condition.add')}
+              aria-label={t('boxes.condition.add')}
             >
-              <i className="bi bi-trash me-2"></i>
-              {t('boxes.condition.delete')}
-            </button>
-          </div>
-          ))}
+              <Plus className="h-4 w-4 mr-2" />
+              {t('boxes.condition.add')}
+            </Button>
 
-        <button
-          type="button"
-          className="btn btn-sm bg-light border w-100 mt-2"
-          onClick={addCondition}
-          title={t('boxes.condition.add')}
-          aria-label={t('boxes.condition.add')}
-        >
-          <i className="bi bi-plus-lg me-2"></i>
-          {t('boxes.condition.add')}
-        </button>
-
-        <hr />
-        <ArrowControls
-          onLeft={goPrev}
-          onRight={index < medicines.length - 1 ? goNext : handleSave}
-        />
-        <div className="d-flex justify-content-between gap-3">
-          <button
-            type="button"
-            className="btn btn-secondary" 
-            onClick={goPrev} 
-            disabled={index === 0}
-            title={t('previous')}
-            aria-label={t('previous')}
-          >
-            <i className="bi bi-chevron-left me-2"></i>
-            {t('previous')}
-          </button>
-          <div className="d-flex align-items-center">
-            <span className="text-muted">{index + 1} / {medicines.length}</span>
-          </div>
-          <button
-            type="submit"
-            className={`btn ${index < medicines.length - 1 ? "btn-primary" : "btn-success"}`}
-            title={index < medicines.length - 1 ? t('next') : t('medicine_review.finish')}
-            aria-label={t('next')}
-          >
-            {index < medicines.length - 1 ? <i className="bi bi-chevron-right me-2"></i> : <i className="bi bi-check2-circle me-2"></i>}
-            {index < medicines.length - 1 ? t('next') : t('medicine_review.finish')}
-          </button>
-        </div>
+            <div className="border-t" />
+            <ArrowControls
+              onLeft={goPrev}
+              onRight={index < medicines.length - 1 ? goNext : handleSave}
+            />
+            <div className="flex justify-between items-center gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={goPrev}
+                disabled={index === 0}
+                title={t('previous')}
+                aria-label={t('previous')}
+              >
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                {t('previous')}
+              </Button>
+              <div className="flex items-center">
+                <span className="text-muted-foreground">{index + 1} / {medicines.length}</span>
+              </div>
+              <Button
+                type="submit"
+                title={index < medicines.length - 1 ? t('next') : t('medicine_review.finish')}
+                aria-label={t('next')}
+                className={index < medicines.length - 1 ? '' : 'bg-green-600 hover:bg-green-700'}
+              >
+                {index < medicines.length - 1 ? (
+                  <ChevronRight className="h-4 w-4 mr-2" />
+                ) : (
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                )}
+                {index < medicines.length - 1 ? t('next') : t('medicine_review.finish')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </form>
     </div>
   );

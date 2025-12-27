@@ -1,110 +1,77 @@
-import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { MoreVertical } from 'lucide-react';
 
 function ActionSheet({ actions, buttonSize, dataTour }) {
-  const [show, setShow] = useState(false);
-  const buttonRef = useRef(null);
-  const dropdownRef = useRef(null);
   const { t } = useTranslation();
 
-  const toggleDropdown = () => {
-    setShow((prev) => !prev);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        buttonRef.current &&
-        !buttonRef.current.contains(e.target) &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target) &&
-        !e.target.closest('.react-joyride__tooltip')
-      ) {
-        setShow(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   return (
-<>
-  <span className="position-relative d-inline-block">
-    <button
-      className={`btn btn-outline-dark ${buttonSize === 'sm' ? 'btn-sm' : ''}`}
-      ref={buttonRef}
-      onClick={toggleDropdown}
-      label={t('Actions')}
-      title={t('Actions')}
-      data-tour={dataTour}
-    >
-      <i className="bi bi-three-dots-vertical"></i>
-    </button>
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size={buttonSize === 'sm' ? 'sm' : 'default'}
+          aria-label={t('Actions')}
+          title={t('Actions')}
+          data-tour={dataTour}
+          className="px-2"
+        >
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
 
-
-
-    {show && (
-      <ul
-        className="dropdown-menu show shadow"
-        ref={dropdownRef}
-        style={{
-          position: 'absolute',
-          top: '100%',
-          right: 0,
-          minWidth: '12rem',
-          zIndex: 1055,
-        }}
+      <DropdownMenuContent 
+        className="w-56" 
+        align="start"
+        side="bottom"
+        sideOffset={8}
+        alignOffset={0}
       >
         {actions.map((action, index) => {
           if (action.separator) {
-            return (
-              <li key={`separator-${index}`}>
-                <hr className="dropdown-divider" />
-              </li>
-            );
+            return <DropdownMenuSeparator key={`separator-${index}`} />;
           }
 
           if (action.linkTo) {
             return (
-              <li key={index}>
+              <DropdownMenuItem key={index} asChild>
                 <Link
                   to={action.linkTo}
-                  onClick={() => setShow(false)}
-                  className={`dropdown-item ${action.danger ? 'text-danger' : ''}`}
+                  className={action.danger ? 'text-red-600 focus:text-red-600 hover:text-red-800' : ''}
                   title={action.title}
                   aria-label={action.title}
                   data-tour={action.dataTour}
                 >
                   {action.label}
                 </Link>
-              </li>
+              </DropdownMenuItem>
             );
           }
 
           return (
-            <li key={index}>
-              <button
-                className={`dropdown-item btn btn-outline-dark ${action.danger ? 'text-danger' : ''}`}
-                onClick={() => {
-                  action.onClick?.();
-                  setShow(false);
-                }}
-                title={action.title}
-                aria-label={action.title}
-                data-tour={action.dataTour}
-              >
-                {action.label}
-              </button>
-            </li>
+            <DropdownMenuItem
+              key={index}
+              onClick={action.onClick}
+              className={action.danger ? 'text-red-600 focus:text-red-600 hover:text-red-800' : ''}
+              title={action.title}
+              aria-label={action.title}
+              data-tour={action.dataTour}
+            >
+              {action.label}
+            </DropdownMenuItem>
           );
         })}
-      </ul>
-    )}
-  </span>
-</>
-
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

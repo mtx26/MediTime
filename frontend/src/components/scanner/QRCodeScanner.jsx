@@ -3,6 +3,27 @@ import { useTranslation } from "react-i18next";
 import { readBarcodes } from "zxing-wasm/reader";
 import { fetchMedicaments } from "../../utils/api/scanner";
 import { useAlert } from "../../contexts/AlertContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { cn } from "@/lib/utils";
+import { 
+  QrCode, 
+  Camera, 
+  ZoomIn, 
+  ArrowLeftRight, 
+  Settings, 
+  X, 
+  Trash2, 
+  PlusCircle, 
+  Pencil, 
+  XCircle, 
+  Loader2,
+  AlertTriangle
+} from "lucide-react";
 
 // Styles CSS pour les contrôles
 const controlsStyle = `
@@ -594,41 +615,24 @@ const QRCodeScanner = forwardRef(({
   return (
     <>
       {modal ? (
-        // Mode Modal Bootstrap
-        <>
-          <div 
-            className={`modal fade ${show ? 'show' : ''}`} 
-            style={{ display: show ? 'block' : 'none' }} 
-            tabIndex="-1"
-          >
-            <div className="modal-dialog modal-dialog-centered modal-lg" style={{ maxWidth: '500px' }}>
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">
-                    <i className="bi bi-qr-code-scan me-2"></i>
-                    {t('scanner.title')}
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    onClick={handleClose}
-                    aria-label={t('scanner.close')}
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  {renderScannerContent()}
-                </div>
-                <div className="modal-footer">
-                  {renderFooterButtons()}
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Overlay pour modal Bootstrap */}
-          {show && <div className="modal-backdrop fade show"></div>}
-        </>
+        <Dialog open={show} onOpenChange={(open) => !open && handleClose()}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <QrCode className="h-5 w-5" />
+                {t('scanner.title')}
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                {t('scanner.camera_instruction')}
+              </DialogDescription>
+            </DialogHeader>
+            {renderScannerContent()}
+            <DialogFooter>
+              {renderFooterButtons()}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       ) : (
-        // Mode Non-modal (intégré directement)
         <div>
           {renderScannerContent()}
           {renderFooterButtons()}
@@ -643,48 +647,35 @@ const QRCodeScanner = forwardRef(({
       <div>
         {/* Aperçu caméra avec contrôles */}
         <div 
-          className="position-relative mb-3 mx-auto" 
-          style={{ 
-            borderRadius: 8, 
-            overflow: "hidden", 
-            aspectRatio: "16/10", 
-            maxWidth: "400px",
-            width: "100%"
-          }}
+          className="relative mb-3 mx-auto rounded-lg overflow-hidden w-full max-w-md"
+          style={{ aspectRatio: "16/10" }}
         >
           <video
             ref={videoRef}
             playsInline
             muted
-            className="w-100 h-100 bg-dark"
+            className="w-full h-full bg-black object-cover"
             style={{ 
-              objectFit: "cover",
-              transform: `scale(${zoom}) ${isFrontCamera ? 'scaleX(-1)' : ''}`, // Inverser horizontalement pour caméra frontale
+              transform: `scale(${zoom}) ${isFrontCamera ? 'scaleX(-1)' : ''}`,
               transformOrigin: "center center"
             }}
           />
           <canvas
             ref={canvasRef}
-            className="position-absolute top-0 start-0 w-100 h-100"
+            className="absolute top-0 left-0 w-full h-full object-cover"
             style={{ 
-              objectFit: "cover",
-              transform: `scale(${zoom}) ${isFrontCamera ? 'scaleX(-1)' : ''}`, // Inverser horizontalement pour caméra frontale
+              transform: `scale(${zoom}) ${isFrontCamera ? 'scaleX(-1)' : ''}`,
               transformOrigin: "center center"
             }}
           />
           
           {/* Contrôles discrets */}
           <div 
-            className={`scanner-controls position-absolute top-0 end-0 p-2 transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'}`}
-            style={{ 
-              background: 'rgba(0,0,0,0.8)', 
-              borderRadius: '0 8px 0 12px',
-              transition: 'all 0.3s ease',
-              backdropFilter: 'blur(6px)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              minWidth: '140px',
-              pointerEvents: showControls ? 'auto' : 'none'
-            }}
+            className={cn(
+              "scanner-controls absolute top-0 right-0 p-2 min-w-35 rounded-bl-xl transition-all duration-300",
+              "bg-black/80 backdrop-blur-md border border-white/10",
+              showControls ? "opacity-100" : "opacity-0 pointer-events-none"
+            )}
             onMouseEnter={() => {
               if (showControls && hideControlsTimeoutRef.current) {
                 clearTimeout(hideControlsTimeoutRef.current);
@@ -698,70 +689,76 @@ const QRCodeScanner = forwardRef(({
           >
             {/* Contrôle de zoom */}
             <div className="mb-2 text-center">
-              <label className="form-label text-white small mb-1 d-block">
-                <i className="bi bi-zoom-in me-1"></i>
+              <Label className="text-white text-xs mb-1 flex items-center justify-center gap-1">
+                <ZoomIn className="h-3 w-3" />
                 {t('scanner.controls.zoom')}: {zoom}x
-              </label>
-              <input
-                type="range"
-                className="form-range"
-                min="1"
-                max="5"
-                step="0.5"
-                value={zoom}
-                onChange={(e) => {
-                  handleZoomChange(parseFloat(e.target.value));
-                  autoHideControls(); // Réinitialiser le timer
+              </Label>
+              <Slider
+                value={[zoom]}
+                onValueChange={([value]) => {
+                  handleZoomChange(value);
+                  autoHideControls();
                 }}
+                min={1}
+                max={5}
+                step={0.5}
+                className="w-30"
               />
             </div>
             
             {/* Bouton pour inverser manuellement */}
-            <div className="mb-2 text-center">
-              <button
+            <div className="mb-2">
+              <Button
                 type="button"
-                className={`btn btn-sm w-100 ${isFrontCamera ? 'btn-warning' : 'btn-outline-light'}`}
+                variant={isFrontCamera ? "default" : "outline"}
+                size="sm"
+                className="w-full text-xs py-1 px-2"
                 onClick={() => {
                   setIsFrontCamera(!isFrontCamera);
                   autoHideControls();
                 }}
-                style={{ fontSize: '11px', padding: '2px 8px' }}
               >
-                <i className="bi bi-arrow-left-right me-1"></i>
+                <ArrowLeftRight className="h-3 w-3 mr-1" />
                 {isFrontCamera ? t('scanner.camera_inverted') : t('scanner.camera_normal')}
-              </button>
+              </Button>
             </div>
             
             {/* Sélection de caméra */}
             {availableCameras.length > 1 && (
               <div className="text-center">
-                <label className="form-label text-white small mb-1 d-block">
-                  <i className="bi bi-camera me-1"></i>
+                <Label className="text-white text-xs mb-1 flex items-center justify-center gap-1">
+                  <Camera className="h-3 w-3" />
                   {t('scanner.controls.camera')}
-                </label>
-                <select
-                  className="form-select form-select-sm"
+                </Label>
+                <Select
                   value={selectedCamera?.deviceId || ''}
-                  onChange={(e) => {
-                    const camera = availableCameras.find(c => c.deviceId === e.target.value);
+                  onValueChange={(deviceId) => {
+                    const camera = availableCameras.find(c => c.deviceId === deviceId);
                     handleCameraChange(camera);
-                    autoHideControls(); // Réinitialiser le timer
+                    autoHideControls();
                   }}
                 >
-                  {availableCameras.map((camera, index) => (
-                    <option key={camera.deviceId} value={camera.deviceId}>
-                      {getCameraDisplayName(camera, index)}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger size="sm" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableCameras.map((camera, index) => (
+                      <SelectItem key={camera.deviceId} value={camera.deviceId}>
+                        {getCameraDisplayName(camera, index)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
           </div>
           
           {/* Bouton discret pour ouvrir/fermer les contrôles */}
-          <button
+          <Button
             type="button"
-            className="btn position-absolute"
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 left-2 h-9 w-9 rounded-full bg-black/70 hover:bg-black/85 text-white border border-white/30 hover:border-white/50 backdrop-blur-sm transition-all z-1000"
             onClick={(e) => {
               e.stopPropagation();
               if (showControls) {
@@ -774,101 +771,73 @@ const QRCodeScanner = forwardRef(({
                 autoHideControls();
               }
             }}
-            style={{ 
-              top: '8px',
-              left: '8px', // Déplacé à gauche pour éviter le conflit avec le menu
-              width: '36px',
-              height: '36px',
-              padding: '0',
-              background: 'rgba(0,0,0,0.7)',
-              border: '1px solid rgba(255,255,255,0.3)',
-              borderRadius: '50%',
-              color: 'white',
-              fontSize: '16px',
-              backdropFilter: 'blur(4px)',
-              transition: 'all 0.2s ease',
-              cursor: 'pointer',
-              zIndex: 1000
-            }}
-            onMouseDown={(e) => {
-              e.target.style.transform = 'scale(0.95)';
-            }}
-            onMouseUp={(e) => {
-              e.target.style.transform = 'scale(1)';
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = 'rgba(0,0,0,0.85)';
-              e.target.style.borderColor = 'rgba(255,255,255,0.5)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = 'rgba(0,0,0,0.7)';
-              e.target.style.borderColor = 'rgba(255,255,255,0.3)';
-            }}
           >
-            <i className={`bi ${showControls ? 'bi-x' : 'bi-gear'}`}></i>
-          </button>
+            {showControls ? <X className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
+          </Button>
         </div>
 
         {/* Messages d'erreur */}
         {error && (
-          <div className="alert alert-danger">
-            <i className="bi bi-exclamation-triangle me-2"></i>
-            {error}
-          </div>
+          <Alert variant="destructive" className="mb-3">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
         {/* Instructions */}
         {gtins.length === 0 && !error && (
-          <div className="text-center text-muted mb-3">
-            <i className="bi bi-camera me-2"></i>
+          <div className="text-center text-muted-foreground mb-3 flex items-center justify-center gap-2">
+            <Camera className="h-4 w-4" />
             {t('scanner.camera_instruction')}
           </div>
         )}
 
         {/* Résultats */}
         {gtins.length > 0 && (
-          <ul className="list-group">
+          <div className="space-y-2">
             {gtins.map((gtin) => {
               const medicine = Object.getOwnPropertyDescriptor(medicines, gtin)?.value;
               const isLoading = loadingGtin === gtin;
               
               return (
-                <li key={gtin} className="list-group-item d-flex justify-content-between align-items-center">
+                <div key={gtin} className="flex justify-between items-center p-3 border rounded-md bg-card">
                   {isLoading ? (
-                    <div className="d-flex align-items-center">
-                      <div className="spinner-border spinner-border-sm me-2"></div>
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
                       {t('scanner.searching')}
                     </div>
                   ) : medicine ? (
-                    <div>
-                      <h6 className="mb-1 text-primary">
+                    <div className="flex-1">
+                      <h6 className="font-semibold text-primary mb-1">
                         {medicine.name}
                         {medicine.dose && ` (${medicine.dose} mg)`}
                       </h6>
                       {medicine.box_capacity && (
-                        <small className="text-muted">{t('scanner.quantity', { quantity: medicine.box_capacity })}</small>
+                        <p className="text-sm text-muted-foreground">{t('scanner.quantity', { quantity: medicine.box_capacity })}</p>
                       )}
                     </div>
                   ) : (
-                    <div className="text-warning">
-                      <i className="bi bi-exclamation-triangle me-2"></i>
+                    <div className="flex items-center gap-2 text-amber-500">
+                      <AlertTriangle className="h-4 w-4" />
                       {t('scanner.medicine_not_found')}
                     </div>
                   )}
                   
                   {medicine && (
-                    <button
-                      className="btn btn-outline-danger btn-sm"
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
                       onClick={() => removeMedicine(gtin)}
                       title={t('scanner.remove_from_list')}
                     >
-                      <i className="bi bi-trash"></i>
-                    </button>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   )}
-                </li>
+                </div>
               );
             })}
-          </ul>
+          </div>
         )}
       </div>
     );
@@ -879,26 +848,27 @@ const QRCodeScanner = forwardRef(({
     const validMedicines = Object.values(medicines).filter(med => med !== null);
     
     return (
-      <div className={modal ? "" : "mt-3 d-flex justify-content-end gap-2"}>
+      <div className={modal ? "w-full" : "mt-3 flex justify-end gap-2"}>
         {modal && (
           validMedicines.length > 0 && onAddAll ? (
-            <button
+            <Button
               type="button"
-              className="btn btn-success w-100"
+              className="w-full bg-green-600 hover:bg-green-700"
               onClick={handleAddAll}
             >
-              <i className={`bi bi-${singleScan ? 'pencil' : 'plus-circle'} me-2`}></i>
+              {singleScan ? <Pencil className="h-4 w-4 mr-2" /> : <PlusCircle className="h-4 w-4 mr-2" />}
               {singleScan ? t('modify') : t('scanner.add')}
-            </button>
+            </Button>
           ) : (
-            <button
-                type="button"
-                className="btn btn-secondary w-100"
-                onClick={handleClose}
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full"
+              onClick={handleClose}
             >
-              <i className="bi bi-x-circle me-2"></i>
+              <XCircle className="h-4 w-4 mr-2" />
               {modal ? t('scanner.cancel') : t('scanner.close')}
-            </button>
+            </Button>
           )
         )}
       </div>

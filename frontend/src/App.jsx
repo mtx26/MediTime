@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import Navbar from './components/common/Header';
 import Footer from './components/common/Footer';
+import MobileNavBar from './components/common/MobileNavBar';
 import AppRoutes from './routes/AppRouter';
 import { UserContext } from './contexts/UserContext';
 import { toISO } from './utils/calendar/dateUtils';
@@ -1054,10 +1055,10 @@ function App() {
   });
 
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div className="flex flex-col min-h-screen">
       <OnboardingTour isAppLoading={isInitialLoading} />
       <Navbar sharedProps={sharedProps} />
-      <main className="flex-grow-1 d-flex flex-column safe-bottom">
+      <main className="grow flex flex-col pb-24 lg:pb-0">
         {userInfo && (
           <RealtimeManager
             setCalendarsData={setCalendarsData}
@@ -1070,11 +1071,12 @@ function App() {
           />
         )}
 
-        <div className="container mt-4 mb-3">
+        <div className="container mx-auto px-4 mt-4 mb-3">
           <AppRoutes sharedProps={sharedProps} />
         </div>
       </main>
       <Footer />
+      <MobileNavBar />
     </div>
   );
 }

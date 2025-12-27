@@ -3,6 +3,19 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import QRScanImport from '../../components/calendar/import/QRScanImport';
 import ImageUploadImport from '../../components/calendar/import/ImageUploadImport';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { CalendarPlus, Plus, QrCode, Upload, AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 
 function AddCalendarPage({ personalCalendars }) {
   const { t } = useTranslation();
@@ -40,16 +53,16 @@ function AddCalendarPage({ personalCalendars }) {
   };
 
   return (
-    <div className="container" style={{ maxWidth: '800px' }}>
-      <div className="card shadow">
-        <div className="card-header text-center">
-          <h4 className="mb-0 fw-bold">
-            <i className="bi bi-calendar-plus me-2"></i>
-            {t('calendar.add_calendar')}
-          </h4>
-        </div>
+    <div className="flex justify-center items-center min-h-screen p-4">
+      <Card className="w-full max-w-2xl">
+        <CardHeader className="text-center border-b">
+          <div className="flex justify-center mb-3">
+            <CalendarPlus className="h-8 w-8 text-primary" />
+          </div>
+          <CardTitle className="text-2xl">{t('calendar.add_calendar')}</CardTitle>
+        </CardHeader>
 
-        <div className="card-body">
+        <CardContent className="py-8">
           {/* Form principal pour le nom du calendrier - toujours visible */}
           <form
             onSubmit={(e) => {
@@ -57,72 +70,64 @@ function AddCalendarPage({ personalCalendars }) {
               handleSubmit();
             }}
           >
-            <div className="row g-3 mb-4">
-              <div className="col-md-8">
-                <label htmlFor="newCalendarName" className="form-label">
-                  {t('calendar.name')} <span className="text-danger">*</span>
-                </label>
-                <input
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <Label htmlFor="newCalendarName">
+                  {t('calendar.name')} <span className="text-destructive">*</span>
+                </Label>
+                <Input
                   id="newCalendarName"
                   type="text"
-                  className="form-control"
                   placeholder={t('calendar.name')}
                   required
                   value={newCalendarName}
                   onChange={(e) => setNewCalendarName(e.target.value)}
                   data-tour="calendar-name-input"
+                  className="mt-2"
                 />
               </div>
 
-              <div className="col-md-4">
-                <label htmlFor="importType" className="form-label">
-                  {t('calendar.import_type')} <span className="text-danger">*</span>
-                </label>
-                <select
-                  className="form-select"
-                  id="importType"
-                  onChange={(e) => setImportType(e.target.value)}
-                  value={importType}
-                  data-tour="import-type-select"
-                >
-                  <option value="manual">{t('calendar.import_type_manual')}</option>
-                  <option value="qr">{t('calendar.scan_qr_option')}</option>
-                  <option value="file">{t('calendar.import_type_file')}</option>
-                </select>
+              <div>
+                <Label htmlFor="importType">
+                  {t('calendar.import_type')} <span className="text-destructive">*</span>
+                </Label>
+                <Select value={importType} onValueChange={setImportType}>
+                  <SelectTrigger id="importType" className="mt-2 w-full" data-tour="import-type-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="manual">{t('calendar.import_type_manual')}</SelectItem>
+                    <SelectItem value="qr">{t('calendar.scan_qr_option')}</SelectItem>
+                    <SelectItem value="file">{t('calendar.import_type_file')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
             {/* Mode manuel */}
             {importType === 'manual' && (
               <div>
-                <div className="row mb-4">
-                  <div className="col-12 d-flex justify-content-center">
-                    <button
-                      type="submit"
-                      className="btn btn-success w-100"
-                      data-tour="submit-calendar-btn"
-                    >
-                      <i className="bi bi-plus-lg me-2"></i>
-                      {t('add')}
-                    </button>
-                  </div>
+                <div className="mb-6">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="gap-2 w-full"
+                    data-tour="submit-calendar-btn"
+                  >
+                    <Plus className="h-5 w-5" />
+                    {t('add')}
+                  </Button>
                 </div>
 
-                <div className="row">
-                  <div className="col-12">
-                    <div className="alert alert-info mt-3">
-                      <div className="d-flex align-items-center">
-                        <i className="bi bi-info-circle me-2"></i>
-                        <div>
-                          <strong>{t('calendar.import_type_manual')}</strong>
-                          <p className="mb-0 small mt-1">
-                            {t('calendar.import_type_manual_description')}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                <Alert>
+                  <AlertCircle className="h-5 w-5" />
+                  <div className="ml-4">
+                    <strong>{t('calendar.import_type_manual')}</strong>
+                    <AlertDescription className="mt-1">
+                      {t('calendar.import_type_manual_description')}
+                    </AlertDescription>
                   </div>
-                </div>
+                </Alert>
               </div>
             )}
 
@@ -137,41 +142,39 @@ function AddCalendarPage({ personalCalendars }) {
                 />
                 
                 {/* Bouton pour créer le calendrier avec les médicaments scannés */}
-                <div className="row mt-4">
-                  <div className="col-12 d-flex justify-content-center">
-                    <button
-                      type="submit"
-                      className="btn btn-success w-100"
-                      disabled={!qrScanState.hasMedicine}
-                    >
-                      <i className="bi bi-plus-circle me-2"></i>
-                      {t('add')}
-                    </button>
-                  </div>
+                <div className="my-6">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="gap-2 w-full"
+                    disabled={!qrScanState.hasMedicine}
+                  >
+                    <QrCode className="h-5 w-5" />
+                    {t('add')}
+                  </Button>
                 </div>
                 
                 {/* Alert explicative en dessous */}
-                <div className="alert alert-success mt-3">
-                  <div className="d-flex align-items-center">
-                    <i className="bi bi-info-circle me-3"></i>
-                    <div>
-                      <strong>{t('calendar.scan_qr_option')}</strong>
-                      <p className="mb-0 small mt-1">
-                        {t('calendar.import_type_qr_description')}
-                      </p>
+                <Alert>
+                  <CheckCircle className="h-5 w-5" />
+                  <div className="ml-4">
+                    <strong>{t('calendar.scan_qr_option')}</strong>
+                    <AlertDescription className="mt-1">
+                      {t('calendar.import_type_qr_description')}
+                    </AlertDescription>
+                    <div className="mt-4 text-center">
+                      <img 
+                        src="/icons/datamatrix.webp" 
+                        alt="Data Matrix QR Code" 
+                        className="mx-auto"
+                        style={{ maxHeight: '160px' }}
+                      />
                     </div>
                   </div>
-                  <div className="mt-3 text-center">
-                    <img 
-                      src="/icons/datamatrix.webp" 
-                      alt="Data Matrix QR Code" 
-                      className="img-fluid"
-                      style={{ maxHeight: '160px' }}
-                    />
-                  </div>
-                </div>
+                </Alert>
               </>
             )}
+
             {importType === 'file' && (
               <>
                 <ImageUploadImport
@@ -182,36 +185,33 @@ function AddCalendarPage({ personalCalendars }) {
                 />
                 
                 {/* Bouton d'import pour les fichiers */}
-                <div className="row mt-4">
-                  <div className="col-12 d-flex justify-content-center">
-                    <button
-                      type="submit"
-                      className="btn btn-success w-100"
-                      disabled={!imageImportState.hasFile || imageImportState.isProcessing}
-                    >
-                      <i className="bi bi-upload me-2"></i>
-                      {t('add')}
-                    </button>
-                  </div>
+                <div className="my-6">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="gap-2 w-full"
+                    disabled={!imageImportState.hasFile || imageImportState.isProcessing}
+                  >
+                    <Upload className="h-5 w-5" />
+                    {t('add')}
+                  </Button>
                 </div>
 
                 {/* Alert explicative en dessous */}
-                <div className="alert alert-warning mt-3">
-                  <div className="d-flex align-items-center">
-                    <i className="bi bi-info-circle me-3"></i>
-                    <div>
-                      <strong>{t('calendar.import_type_file')}</strong>
-                      <p className="mb-0 small mt-1">
-                        {t('calendar.import_type_file_description')}
-                      </p>
-                    </div>
+                <Alert>
+                  <AlertTriangle className="h-5 w-5" />
+                  <div className="ml-4">
+                    <strong>{t('calendar.import_type_file')}</strong>
+                    <AlertDescription className="mt-1">
+                      {t('calendar.import_type_file_description')}
+                    </AlertDescription>
                   </div>
-                </div>
+                </Alert>
               </>
             )}
           </form>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -599,7 +599,13 @@
     "language_note": "La langue sélectionnée s’appliquera à toute l’interface.",
     "preferences": "Préférences",
     "preferences_desc": "Personnalisez votre expérience sur MediTime.",
-    "security": "Sécurité"
+    "security": "Sécurité",
+    "theme": "Thème",
+    "theme_toggle": "Cliquez pour changer le thème"
+  },
+  "theme": {
+    "dark": "Mode sombre",
+    "light": "Mode clair"
   },
   "share": "Partager",
   "share_calendar": "Partager le calendrier",

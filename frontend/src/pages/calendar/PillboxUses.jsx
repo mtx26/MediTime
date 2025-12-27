@@ -7,6 +7,9 @@ import { getMondayDate } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { UserContext } from '../../contexts/UserContext';
 import { useAlert } from '../../contexts/AlertContext';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Loader2, AlertTriangle, History, RotateCcw } from 'lucide-react';
 
 const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();
@@ -85,69 +88,69 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
 
   if (loading === undefined && calendarId) {
     return (
-      <div className="alert alert-danger text-center mt-5" role="alert">
-        ❌ {t('invalid_or_expired_link')}
+      <div className="mt-5">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription className="text-center">
+            {t('invalid_or_expired_link')}
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
 
   if (loading === true && calendarId) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: '60vh' }}
-      >
-        <div className="spinner-border text-primary">
-          <span className="visually-hidden">{t('loading_pillbox_uses')}</span>
-        </div>
+      <div className="flex justify-center items-center h-[60vh]">
+        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+        <span className="sr-only">{t('loading_pillbox_uses')}</span>
       </div>
     );
   }
   
   return (
-    <div className="container mt-4" style={{ maxWidth: '700px' }}>
-      <h4 className="mb-3 fw-bold">
-        <i className="bi bi-grid-3x3-gap me-2"></i>
+    <div className="max-w-175 mx-auto">
+      <h4 className="mb-3 font-bold flex items-center gap-2">
+        <History className="h-5 w-5" />
         {t('pillbox_uses')}
-    </h4>
+      </h4>
       {pillboxUsesData.length === 0 ? (
-        <div className="text-center py-5">
-          <div className="text-muted mb-3">
-            <i className="bi bi-clock-history display-1 opacity-25"></i>
-          </div>
-          <p className="lead text-muted mb-4">
-            {t("you_have_no_pillbox_use_history")}
+        <div className="text-center py-12">
+          <History className="h-16 w-16 text-muted-foreground/30 mx-auto mb-3" />
+          <p className="text-lg text-muted-foreground mb-4">
+            {t('you_have_no_pillbox_use_history')}
           </p>
         </div>
       ) : (
-        <div className="table-responsive">
-          <table className="table table-hover align-middle">
-            <thead className="table-light">
+        <div className="overflow-x-auto border rounded-lg">
+          <table className="w-full text-sm">
+            <thead className="bg-muted border-b">
               <tr>
-                <th>{t('week')}</th>
-                <th>{t('prepared_by')}</th>
-                <th className="text-end">{t('actions')}</th>
+                <th className="px-4 py-3 text-left font-semibold">{t('week')}</th>
+                <th className="px-4 py-3 text-left font-semibold">{t('prepared_by')}</th>
+                <th className="px-4 py-3 text-right font-semibold">{t('actions')}</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y">
               {pillboxUsesData.sort((a, b) => new Date(b.prepared_at) - new Date(a.prepared_at)).map((use) => (
-                <tr key={use.id}>
-                  <td>{formatWeek(use.prepared_at)}</td>
-                  <td>
+                <tr key={use.id} className="hover:bg-muted/50 transition">
+                  <td className="px-4 py-3">{formatWeek(use.prepared_at)}</td>
+                  <td className="px-4 py-3">
                     <HoveredUserProfile
                       user={use.prepared_by}
                       trigger={<span>{use.prepared_by.display_name}</span>}
                     />
                   </td>
-                  <td className="text-end">
-                    <button
-                      className="btn btn-sm btn-outline-primary"
+                  <td className="px-4 py-3 text-right">
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => cancelUse(use.id)}
                       title={t('restore')}
                     >
-                      <i className="bi bi-arrow-counterclockwise me-1"></i>
+                      <RotateCcw className="h-4 w-4 mr-2" />
                       {t('restore')}
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -160,9 +163,9 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
 };
 
 PillboxUses.propTypes = {
-  personalCalendars: PropTypes.array,
-  sharedUserCalendars: PropTypes.array,
-  tokenCalendars: PropTypes.array,
+  personalCalendars: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
+  sharedUserCalendars: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
+  tokenCalendars: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
 };
 
 export default PillboxUses;

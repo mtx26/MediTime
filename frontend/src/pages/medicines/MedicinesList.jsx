@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useRealtimeTokenMedicines } from '../../hooks/realtime/useRealtimeMedicines';
 import { useTranslation } from 'react-i18next';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent } from '@/components/ui/card';
+import { Loader2, Pill, AlertCircle } from 'lucide-react';
 
 function MedicinesList() {
   // 📍 Paramètres d’URL et navigation
@@ -24,22 +27,19 @@ function MedicinesList() {
 
   if (loadingMedicines === undefined && sharedToken) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: '60vh' }}
-      >
-        <div className="spinner-border text-primary">
-          <span className="visually-hidden">{t('loading_medicines')}</span>
-        </div>
+      <div className="flex justify-center items-center h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="sr-only">{t('loading_medicines')}</span>
       </div>
     );
   }
 
   if (loadingMedicines === false && sharedToken) {
     return (
-      <div className="alert alert-danger text-center mt-5" role="alert">
-        {t('invalid_or_expired_link')}
-      </div>
+      <Alert variant="destructive" className="text-center mt-8 max-w-2xl mx-auto">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{t('invalid_or_expired_link')}</AlertDescription>
+      </Alert>
     );
   }
 
@@ -48,49 +48,51 @@ function MedicinesList() {
     : {};
 
   return (
-    <div className="container mt-4">
-      <h4>
-        <i className="bi bi-capsule"></i>
-        <span> {t('medicines.list_title')}</span>
+    <div className="container mx-auto mt-4 px-4">
+      <h4 className="text-xl font-bold flex items-center gap-2 mb-4">
+        <Pill className="h-5 w-5" />
+        <span>{t('medicines.list_title')}</span>
       </h4>
 
       {Object.keys(groupedMedicines).length === 0 ? (
-        <div className="text-center mt-5 text-muted">
+        <div className="text-center mt-8 text-muted-foreground">
           {t('medicines.list_empty')}
         </div>
       ) : (
-        <ul className="list-group mt-3">
+        <div className="space-y-3 mt-4">
           {Object.keys(groupedMedicines).map((key, index) => (
-            <li key={index} className="list-group-item align-items-center">
-              <strong>
-                {key}{' '}
-                {groupedMedicines[key][0].dose != null
-                  ? `${groupedMedicines[key][0].dose} ${t('mg')}`
-                  : ''}
-              </strong>
-              {groupedMedicines[key].map((med, index) => (
-                <div key={index} className="text-muted small">
-                  {med.time_of_day[0] === 'morning' ? t('morning') : t('evening')} -{' '}
-                  {med.tablet_count}{' '}
-                  {med.tablet_count > 1 ? t('boxes.tablets') : t('boxes.tablet')} -{' '}
-                  {t('boxes.every')} {med.interval_days}{' '}
-                  {med.interval_days > 1 ? t('boxes.days') : t('boxes.day')}
-                  {med.start_date && (
-                    <>
-                      {' '}
-                      {t('boxes.from')} {' '}
-                      {new Date(med.start_date).toLocaleDateString(i18n.language, {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                      })}
-                    </>
-                  )}
-                </div>
-              ))}
-            </li>
+            <Card key={index}>
+              <CardContent className="p-4">
+                <strong className="block mb-2">
+                  {key}{' '}
+                  {groupedMedicines[key][0].dose != null
+                    ? `${groupedMedicines[key][0].dose} ${t('mg')}`
+                    : ''}
+                </strong>
+                {groupedMedicines[key].map((med, index) => (
+                  <div key={index} className="text-muted-foreground text-sm">
+                    {med.time_of_day[0] === 'morning' ? t('morning') : t('evening')} -{' '}
+                    {med.tablet_count}{' '}
+                    {med.tablet_count > 1 ? t('boxes.tablets') : t('boxes.tablet')} -{' '}
+                    {t('boxes.every')} {med.interval_days}{' '}
+                    {med.interval_days > 1 ? t('boxes.days') : t('boxes.day')}
+                    {med.start_date && (
+                      <>
+                        {' '}
+                        {t('boxes.from')} {' '}
+                        {new Date(med.start_date).toLocaleDateString(i18n.language, {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </>
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

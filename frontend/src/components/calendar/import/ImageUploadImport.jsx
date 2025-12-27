@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } f
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAlert } from '../../../contexts/AlertContext';
+import { Button } from "@/components/ui/button";
+import { CloudUpload, CheckCircle, X } from 'lucide-react';
 
 const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onStateChange }, ref) => {
   const { t } = useTranslation();
@@ -146,21 +148,21 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
   };
 
   return (
-    <div className="row">
-      <hr/>
-      <div className="col-12">
+    <div className="w-full">
+      <hr className="my-4 border-border"/>
+      <div className="w-full">
         <div>
           <div>
-            <h5 className="mb-3 text-center">
-              <i className="bi bi-cloud-upload me-2"></i>
+            <h5 className="mb-6 text-center text-lg font-semibold flex items-center justify-center gap-2">
+              <CloudUpload className="h-5 w-5" />
               {t('image_upload.title')}
             </h5>
 
-            <div className="row">
-              <div className="col-12">
+            <div className="w-full">
+              <div className="w-full">
                 <div
-                  className="border border-2 border-dashed rounded p-4 text-center bg-light"
-                  style={{ minHeight: '200px', cursor: 'pointer' }}
+                  className="border-2 border-dashed border-border rounded-lg p-8 text-center bg-muted/20 hover:bg-muted/30 transition-colors cursor-pointer"
+                  style={{ minHeight: '200px' }}
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                   onClick={() => fileInputRef.current?.click()}
@@ -179,16 +181,15 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
                     ref={fileInputRef}
                     onChange={handleFileChange}
                     accept="image/*,.jpg,.jpeg,.png,.webp,.gif"
-                    style={{ display: 'none' }}
+                    className="hidden"
                   />
                   
                   {previewUrl && isValidImagePreviewUrl(previewUrl) ? (
-                    <div className="position-relative d-inline-block">
+                    <div className="relative inline-block">
                       <img
                         src={previewUrl}
                         alt={t('image_upload.preview_alt')}
-                        className="img-fluid rounded border shadow-sm mb-3"
-                        style={{ maxHeight: '200px', maxWidth: '100%', objectFit: 'cover' }}
+                        className="w-auto h-auto max-h-50 max-w-full object-cover rounded-lg border border-border shadow-sm mb-3"
                         referrerPolicy="no-referrer"
                         crossOrigin="anonymous"
                         onError={() => {
@@ -198,30 +199,32 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
                           showAlert('warning', t('image_upload.preview_error'));
                         }}
                       />
-                      <button
+                      <Button
                         type="button"
-                        className="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2"
                         onClick={(e) => {
                           e.stopPropagation(); // Empêcher le clic sur la zone de drop
                           removeFile();
                         }}
                         title={t('image_upload.remove_image')}
                       >
-                        <i className="bi bi-x"></i>
-                      </button>
+                        <X className="h-4 w-4" />
+                      </Button>
                       <div className="mt-2">
-                        <p className="mb-1 fw-semibold text-success">
-                          <i className="bi bi-check-circle me-2"></i>
+                        <p className="mb-1 font-semibold text-green-600 flex items-center justify-center gap-2">
+                          <CheckCircle className="h-5 w-5" />
                           {t('image_upload.file_selected')}
                         </p>
-                        <small className="text-muted">{t('image_upload.click_to_change')}</small>
+                        <small className="text-muted-foreground">{t('image_upload.click_to_change')}</small>
                       </div>
                     </div>
                   ) : (
                     <div>
-                      <i className="bi bi-cloud-upload display-4 text-muted mb-3"></i>
-                      <p className="mb-1 fw-semibold">{t('calendar.drag_and_drop')}</p>
-                      <small className="text-muted">{t('image_upload.file_types')}</small>
+                      <CloudUpload className="h-16 w-16 text-muted-foreground mb-3 mx-auto" />
+                      <p className="mb-1 font-semibold text-foreground">{t('calendar.drag_and_drop')}</p>
+                      <small className="text-muted-foreground">{t('image_upload.file_types')}</small>
                     </div>
                   )}
                 </div>

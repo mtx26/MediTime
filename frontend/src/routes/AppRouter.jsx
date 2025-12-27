@@ -1,6 +1,7 @@
 import React, { useContext, lazy, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 import { UserContext } from '../contexts/UserContext';
 
@@ -63,13 +64,9 @@ function PrivateRoute({ element }) {
 function RouteWithLoader({ element, isLoading }) {
   if (isLoading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ flexGrow: 1, minHeight: '60vh' }}
-      >
-        <span className="spinner-border text-primary">
-          <span className="visually-hidden">Chargement...</span>
-        </span>
+      <div className="flex justify-center items-center grow min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="sr-only">Chargement...</span>
       </div>
     );
   }
@@ -81,13 +78,9 @@ function AppRoutes({ sharedProps }) {
   const { lng } = useParams();
 
   const fallback = (
-    <div
-      className="d-flex justify-content-center align-items-center"
-      style={{ flexGrow: 1, minHeight: '60vh' }}
-    >
-      <span className="spinner-border text-primary" role="status">
-        <span className="visually-hidden">Chargement...</span>
-      </span>
+    <div className="flex justify-center items-center grow min-h-[60vh]">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" role="status" />
+      <span className="sr-only">Chargement...</span>
     </div>
   );
 

@@ -5,6 +5,8 @@ import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
 import { useAlert } from '../../contexts/AlertContext';
 import { log } from '../../utils/logger';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { Mail } from 'lucide-react';
 
 function VerifyEmail() {
   // 🔐 Contexte utilisateur
@@ -74,27 +76,25 @@ function VerifyEmail() {
   }, []);
 
   return (
-    <div className="container d-flex justify-content-center align-items-center my-5">
-      <div
-        className="card shadow"
-        style={{ maxWidth: '500px', width: '100%', borderRadius: '1rem' }}
-      >
-        <div className="card-body p-4">
+    <div className="container mx-auto flex justify-center items-center my-10">
+      <div className="w-full max-w-md rounded-xl border bg-card text-card-foreground shadow">
+        <div className="p-6">
           <div className="text-center mb-4">
-            <h5>{t('verify_email.title')}</h5>
-            <p>{t('verify_email.instructions')}</p>
+            <h5 className="text-lg font-semibold">{t('verify_email.title')}</h5>
+            <p className="text-muted-foreground">{t('verify_email.instructions')}</p>
           </div>
 
           <form onSubmit={handleSendVerification}>
-            <button
+            <Button
               type="submit"
-              className="btn btn-outline-primary w-100 mt-3"
+              variant="outline"
+              className="w-full gap-2 mt-3"
               aria-label={t('verify_email.resend_link')}
               title={t('verify_email.resend_link')}
             >
-              <i className="bi bi-envelope-paper"></i>
-              <span> {t('verify_email.resend_link')}</span>
-            </button>
+              <Mail className="h-4 w-4" />
+              {t('verify_email.resend_link')}
+            </Button>
           </form>
         </div>
       </div>

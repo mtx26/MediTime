@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import NotificationLine from '../../components/common/NotificationLine';
 import ActionSheet from '../../components/common/ActionSheet';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, Bell, Settings, Info } from 'lucide-react';
 
 function NotificationsPage({ notifications }) {
   const { t } = useTranslation();
@@ -11,31 +13,27 @@ function NotificationsPage({ notifications }) {
 
   if (notifications.notificationsData === null) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: '60vh' }}
-      >
-        <div className="spinner-border text-primary">
-          <span className="visually-hidden">
-            {t('loading_notifications')}
-          </span>
-        </div>
+      <div className="flex justify-center items-center h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="sr-only">
+          {t('loading_notifications')}
+        </span>
       </div>
     );
   }
 
   return (
-    <div className="container py-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="fw-bold">
-          <i className="bi bi-bell-fill me-2"></i> {t('notifications')}
+    <div className="container mx-auto py-4 px-4">
+      <div className="flex justify-between items-center mb-3">
+        <h4 className="font-bold text-xl flex items-center gap-2">
+          <Bell className="h-5 w-5" /> {t('notifications')}
         </h4>
         <ActionSheet
           actions={[
             {
               label: (
                 <>
-                  <i className="bi bi-gear-fill me-2"></i> {t('settings.label')}
+                  <Settings className="h-4 w-4 mr-2" /> {t('settings.label')}
                 </>
               ),
               linkTo: `/${lng}/settings?tab=notifications`,
@@ -46,11 +44,12 @@ function NotificationsPage({ notifications }) {
       </div>
 
       {notifications.notificationsData.length === 0 ? (
-        <div className="alert alert-info text-center">
-          {t('no_notifications')}
-        </div>
+        <Alert className="text-center">
+          <Info className="h-4 w-4" />
+          <AlertDescription>{t('no_notifications')}</AlertDescription>
+        </Alert>
       ) : (
-        <ul className="list-group">
+        <div className="space-y-2">
           {notifications.notificationsData.map((notif) => (
             <NotificationLine
               key={notif.notification_id}
@@ -59,7 +58,7 @@ function NotificationsPage({ notifications }) {
               navigate={navigate}
             />
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

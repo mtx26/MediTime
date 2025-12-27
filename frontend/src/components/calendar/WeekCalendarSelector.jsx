@@ -1,12 +1,9 @@
 import React from 'react';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import {
-  getMondayDate,
-  toISO,
-} from '../../utils/calendar/dateUtils';
+import { Calendar } from '@/components/ui/calendar';
+import { getMondayDate } from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
+import { getDateLocale } from '../../config/languages';
 
 export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
   // Accept Date or ISO; normalize to Date for calendar operations
@@ -18,31 +15,29 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
     d.setHours(0,0,0,0);
     return d;
   });
-  const todayIso = toISO(new Date());
-  const { t } = useTranslation();
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const { i18n } = useTranslation();
 
-  const handleChange = (date) => {
-    onWeekSelect(date);
+  const handleSelect = (date) => {
+    if (date) {
+      onWeekSelect(date);
+    }
   };
 
   return (
     <Calendar
-      onClickDay={handleChange}
-      value={selDate}
-      locale={t('locale')}
-      tileClassName={({ date, view }) => {
-        if (view === 'month') {
-          const date_iso = toISO(date);
-
-          if (todayIso === date_iso) {
-            return 'bg-success text-white';
-          }
-          if (weekDates.map(d => toISO(d)).includes(date_iso)) {
-            return 'bg-primary text-white';
-          }
-        }
-        return null;
+      mode="single"
+      selected={selDate}
+      onSelect={handleSelect}
+      locale={getDateLocale(i18n.language)}
+      modifiers={{
+        weekSelected: weekDates
       }}
+      modifiersClassNames={{
+        weekSelected: 'bg-primary text-primary-foreground hover:bg-primary/90 data-[selected=true]:bg-primary rounded-md'
+      }}
+      className="border rounded-lg w-full"
     />
   );
 }

@@ -1,24 +1,34 @@
 import React from 'react';
-import Tooltips from './Tooltips';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import PropTypes from 'prop-types';
 
-export default function IconButton({ className, icon, text, onClick, title, disabled, helpDisabled}) {
+export default function IconButton({ className, icon: Icon, text, onClick, title, disabled, helpDisabled }) {
   const content = (
-    <button 
-      type="button" 
-      className={`${className} shadow`} 
-      onClick={onClick} 
-      aria-label={text} 
+    <Button
+      type="button"
+      className={`inline-flex items-center gap-2 ${className || ''}`}
+      onClick={onClick}
+      aria-label={text}
       title={title || text}
       disabled={disabled}
+      variant="outline"
+      size="sm"
     >
-      <i className={`bi bi-${icon}`}></i> {text}
-    </button>
+      {Icon && <Icon className="w-4 h-4" />}
+      {text}
+    </Button>
   );
+
   return (disabled && helpDisabled) ? (
-    <Tooltips content={helpDisabled} side="top" className="d-block w-100">
-      {content}
-    </Tooltips>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        {content}
+      </TooltipTrigger>
+      <TooltipContent side="top">
+        {helpDisabled}
+      </TooltipContent>
+    </Tooltip>
   ) : (
     content
   );
@@ -26,7 +36,7 @@ export default function IconButton({ className, icon, text, onClick, title, disa
 
 IconButton.propTypes = {
   className: PropTypes.string,
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.elementType,
   text: PropTypes.string.isRequired,
   onClick: PropTypes.func,
   title: PropTypes.string,

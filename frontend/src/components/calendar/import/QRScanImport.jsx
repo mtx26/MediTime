@@ -2,6 +2,7 @@ import React, { useState, forwardRef, useImperativeHandle, useRef } from 'react'
 import { useTranslation } from 'react-i18next';
 import QRCodeScanner from '../../scanner/QRCodeScanner';
 import { useNavigate, useParams } from 'react-router-dom';
+import { QrCode } from 'lucide-react';
 
 const QRScanImport = forwardRef(({ calendarName, personalCalendars, onStateChange }, ref) => {
   const { t } = useTranslation();
@@ -77,23 +78,22 @@ const QRScanImport = forwardRef(({ calendarName, personalCalendars, onStateChang
   if (isCreating) {
     return (
       <div 
-        className="d-flex justify-content-center align-items-center"
-        style={{ flexGrow: 1, minHeight: '40vh' }}
+        className="flex justify-center items-center grow min-h-[40vh]"
       >
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">{t('calendar.creating_calendar')}</span>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" role="status">
+          <span className="sr-only">{t('calendar.creating_calendar')}</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="row">
-		<hr/>
-      <div className="col-12">
+    <div className="w-full">
+		<hr className="my-4 border-border"/>
+      <div className="w-full">
 				<div>
-					<h5 className="mb-3 text-center">
-						<i className="bi bi-qr-code-scan me-2"></i>
+					<h5 className="mb-6 text-center text-lg font-semibold flex items-center justify-center gap-2">
+						<QrCode className="h-5 w-5" />
 						{t('scanner.title')}
 					</h5>         
 					<QRCodeScanner
