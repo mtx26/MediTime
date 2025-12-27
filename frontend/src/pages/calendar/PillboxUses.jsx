@@ -87,6 +87,12 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
     fetchData();
   }, [calendarId, calendarType, userInfo]);
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(loading === true && calendarId, t('loading_pillbox_uses'));
+  }, [loading, calendarId, showLoading, t]);
+
   if (loading === undefined && calendarId) {
     return (
       <div className="mt-5">
@@ -99,12 +105,6 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
       </div>
     );
   }
-
-  const { showLoading } = useLoading();
-
-  useEffect(() => {
-    showLoading(loading === true && calendarId, t('loading_pillbox_uses'));
-  }, [loading, calendarId, showLoading, t]);
 
   if (loading === true && calendarId) {
     return null;

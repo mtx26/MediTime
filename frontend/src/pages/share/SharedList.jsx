@@ -596,6 +596,7 @@ function UserList({
                       <div className="flex items-center gap-2 cursor-pointer min-w-0 max-w-[45vw]">
                         <img
                           src={user.receiver_photo_url}
+                          alt={user.receiver_name}
                           className="rounded-full w-10 h-10 shrink-0"
                         />
                         <strong className="truncate block flex-1 min-w-0">
@@ -676,6 +677,7 @@ function UserList({
                         <div className="flex items-center gap-2 cursor-pointer min-w-0 max-w-[45vw]">
                           <img
                             src={avatarUrl}
+                            alt={displayName}
                             className="rounded-full w-10 h-10 shrink-0"
                           />
                           <strong className="truncate block flex-1 min-w-0">

@@ -18,7 +18,7 @@ import PillboxDisplay from '../../components/calendar/PillboxDisplay';
 import ActionSheet from '../../components/common/ActionSheet';
 import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Pill, Grid3X3, CalendarDays, Share2, Download, AlertTriangle, Calendar, Clock, Settings, Trash2, ChevronRight, Pin } from 'lucide-react';
 import '../../styles/fullcalendar-custom.css';

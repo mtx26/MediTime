@@ -86,11 +86,12 @@ function AppRoutes({ sharedProps }) {
     showLoading(suspenseLoading, t('loading'));
   }, [suspenseLoading, showLoading, t]);
 
-  const fallback = (
-    <div style={{ display: 'none' }} onLoad={() => setSuspenseLoading(true)}>
-      <span className="sr-only">{t('loading')}</span>
-    </div>
-  );
+  React.useEffect(() => {
+    setSuspenseLoading(true);
+    return () => setSuspenseLoading(false);
+  }, []);
+
+  const fallback = null;
 
   return (
     <Suspense fallback={fallback}>

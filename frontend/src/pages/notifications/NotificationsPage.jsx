@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
+import PropTypes from 'prop-types';
 import NotificationLine from '../../components/common/NotificationLine';
 import ActionSheet from '../../components/common/ActionSheet';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -62,5 +63,12 @@ function NotificationsPage({ notifications }) {
     </div>
   );
 }
+
+NotificationsPage.propTypes = {
+  notifications: PropTypes.shape({
+    notificationsData: PropTypes.array,
+    readNotification: PropTypes.func,
+  }).isRequired,
+};
 
 export default NotificationsPage;

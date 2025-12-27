@@ -5,6 +5,7 @@ import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 import { useAlert } from '../../contexts/AlertContext';
+import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -396,5 +397,14 @@ function SelectCalendar({
     </div>
   );
 }
+
+SelectCalendar.propTypes = {
+  personalCalendars: PropTypes.shape({
+    calendarsData: PropTypes.array,
+  }).isRequired,
+  sharedUserCalendars: PropTypes.shape({
+    sharedUserCalendarsData: PropTypes.array,
+  }).isRequired,
+};
 
 export default SelectCalendar;

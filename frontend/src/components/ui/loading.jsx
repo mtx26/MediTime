@@ -35,7 +35,6 @@ export function useLoading() {
  */
 export function LoadingProvider({ children }) {
   const [loadingStates, setLoadingStates] = useState(new Map());
-  const { t } = useTranslation();
 
   const updateLoading = useCallback((id, condition, message, height) => {
     setLoadingStates(prev => {
@@ -52,8 +51,8 @@ export function LoadingProvider({ children }) {
   const contextValue = useMemo(() => ({ updateLoading }), [updateLoading]);
 
   // Récupérer le premier état de chargement actif
-  const firstLoading = loadingStates.size > 0 ? Array.from(loadingStates.values())[0] : null;
-  const isLoading = loadingStates.size > 0;
+  const firstLoading = loadingStates?.size > 0 ? Array.from(loadingStates.values())?.[0] : null;
+  const isLoading = loadingStates?.size > 0;
 
   return (
     <LoadingContext.Provider value={contextValue}>
@@ -61,11 +60,11 @@ export function LoadingProvider({ children }) {
       {isLoading && firstLoading && (
         <div 
           className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center"
-          style={{ minHeight: firstLoading.height }}
+          style={{ minHeight: firstLoading?.height }}
         >
           <div className="flex flex-col items-center gap-2">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            {firstLoading.message && (
+            {firstLoading?.message && (
               <p className="text-sm text-muted-foreground">{firstLoading.message}</p>
             )}
           </div>
