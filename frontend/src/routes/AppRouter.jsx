@@ -1,7 +1,6 @@
 import React, { useContext, lazy, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 
 import { UserContext } from '../contexts/UserContext';
 

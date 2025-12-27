@@ -9,8 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Link2, InfoIcon, Trash2, Clipboard, ExternalLink, PlusCircle, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Link2, InfoIcon, Trash2, Clipboard, ExternalLink, PlusCircle } from 'lucide-react';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 

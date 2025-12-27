@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import NotificationLine from '../../components/common/NotificationLine';
 import ActionSheet from '../../components/common/ActionSheet';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Bell, Settings, Info } from 'lucide-react';
+import { Bell, Settings, Info } from 'lucide-react';
 
 function NotificationsPage({ notifications }) {
   const { t } = useTranslation();
@@ -14,7 +14,7 @@ function NotificationsPage({ notifications }) {
   if (notifications.notificationsData === null) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         <span className="sr-only">
           {t('loading_notifications')}
         </span>
@@ -23,7 +23,7 @@ function NotificationsPage({ notifications }) {
   }
 
   return (
-    <div className="container mx-auto py-4 px-4">
+    <div className="container mx-auto">
       <div className="flex justify-between items-center mb-3">
         <h4 className="font-bold text-xl flex items-center gap-2">
           <Bell className="h-5 w-5" /> {t('notifications')}

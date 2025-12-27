@@ -4,7 +4,7 @@ import { useRealtimeTokenMedicines } from '../../hooks/realtime/useRealtimeMedic
 import { useTranslation } from 'react-i18next';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Pill, AlertCircle } from 'lucide-react';
+import { Pill, AlertCircle } from 'lucide-react';
 
 function MedicinesList() {
   // 📍 Paramètres d’URL et navigation
@@ -28,7 +28,7 @@ function MedicinesList() {
   if (loadingMedicines === undefined && sharedToken) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         <span className="sr-only">{t('loading_medicines')}</span>
       </div>
     );

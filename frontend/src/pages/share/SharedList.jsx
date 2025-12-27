@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Users, Link2, Eye, Pill, Trash2, Plus, Clipboard, Mail, User } from 'lucide-react';
+import { Users, Link2, Eye, Pill, Trash2, Plus, Clipboard, Mail, User } from 'lucide-react';
 
 const VITE_URL = import.meta.env.VITE_VITE_URL;
 
@@ -591,13 +591,14 @@ function UserList({
                       email: user.receiver_email,
                     }}
                     trigger={
-                      <div className="flex items-center gap-2 cursor-pointer min-w-0">
+                      <div className="flex items-center gap-2 cursor-pointer min-w-0 max-w-[45vw]">
                         <img
                           src={user.receiver_photo_url}
-                          alt={t("profile")}
                           className="rounded-full w-10 h-10 shrink-0"
                         />
-                        <strong className="truncate">{user.receiver_name}</strong>
+                        <strong className="truncate block flex-1 min-w-0">
+                          {user.receiver_name}
+                        </strong>
                       </div>
                     }
                   />
@@ -663,17 +664,29 @@ function UserList({
               <div className="sm:hidden">
                 <div className="flex items-center gap-2">
                   <div className="flex-1 flex items-center gap-2 min-w-0">
-                    <img
-                      src={avatarUrl}
-                      alt={t("profile")}
-                      className="rounded-full w-10 h-10 shrink-0"
+                    <HoveredUserProfile
+                      user={{
+                        photo_url: avatarUrl,
+                        display_name: displayName,
+                        email: null,
+                      }}
+                      trigger={
+                        <div className="flex items-center gap-2 cursor-pointer min-w-0 max-w-[45vw]">
+                          <img
+                            src={avatarUrl}
+                            className="rounded-full w-10 h-10 shrink-0"
+                          />
+                          <strong className="truncate block flex-1 min-w-0">
+                            {displayName}
+                          </strong>
+                        </div>
+                      }
                     />
-                    <strong className="truncate">{displayName}</strong>
                   </div>
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="shrink-0"
+                    className="ml-auto shrink-0"
                     onClick={() => deleteRegistrationInvitationConfirmAction(invitation.token)}
                     aria-label={t("delete")}
                     title={t("delete")}

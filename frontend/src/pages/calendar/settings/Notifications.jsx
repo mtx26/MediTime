@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getCalendarSourceMap } from '../../../utils/calendar/calendarSourceMap';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-// import Loader2 supprimé
+
 
 const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();

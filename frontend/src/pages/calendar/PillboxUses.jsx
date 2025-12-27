@@ -9,7 +9,7 @@ import { UserContext } from '../../contexts/UserContext';
 import { useAlert } from '../../contexts/AlertContext';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Loader2, AlertTriangle, History, RotateCcw } from 'lucide-react';
+import { AlertTriangle, History, RotateCcw } from 'lucide-react';
 
 const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();

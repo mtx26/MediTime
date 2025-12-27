@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Loader2, Mail, Calendar, AlertCircle, Check, X } from 'lucide-react';
+import { Mail, Calendar, AlertCircle, Check, X } from 'lucide-react';
 
 function AcceptInvitePage({sharedUserCalendars}) {
   const { t } = useTranslation();
@@ -87,7 +87,7 @@ function AcceptInvitePage({sharedUserCalendars}) {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         <span className="sr-only">{t('loading')}</span>
       </div>
     );

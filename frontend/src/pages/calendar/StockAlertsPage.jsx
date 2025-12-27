@@ -6,10 +6,9 @@ import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesS
 import ActionSheet from '../../components/common/ActionSheet';
 import IconButton from '../../components/common/UtilityComponents';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle } from 'lucide-react';
 
 function StockAlertsPage({
   personalCalendars,
@@ -130,7 +129,7 @@ function StockAlertsPage({
   if (loadingBoxes === undefined) {
     return (
       <div className="flex justify-center items-center" style={{ height: '60vh' }}>
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }

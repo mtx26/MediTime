@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-// import Loader2 supprimé
+
 
 const Stock = ({ personalCalendars }) => {
   const { t } = useTranslation();

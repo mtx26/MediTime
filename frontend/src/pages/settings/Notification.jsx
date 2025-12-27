@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Bell, RefreshCw, Loader2 } from 'lucide-react';
+import { Bell, RefreshCw } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -83,7 +83,7 @@ export default function Notification({ fcm }) {
                 </>
               ) : isRegistering ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-b-2 border-primary"></div>
                   {t('fcm.enable_btn')}
                 </>
               ) : (

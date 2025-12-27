@@ -7,9 +7,8 @@ import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { UserContext } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import isEqual from 'lodash/isEqual';
-import { set } from 'lodash';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertTriangle, ChevronRight } from 'lucide-react';
+import { AlertTriangle, ChevronRight } from 'lucide-react';
 
 // Page d'affichage du mode "daily" (journalier)
 
@@ -152,7 +151,7 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
   if ((loading === true && calendarId)) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
-        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         <span className="sr-only">{t('loading_calendar')}</span>
       </div>
     );

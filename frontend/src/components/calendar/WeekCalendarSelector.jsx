@@ -34,16 +34,8 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
       selected={selDate || today}
       onSelect={handleSelect}
       locale={getDateLocale(i18n.language)}
-      showOutsideDays
-      className="relative overflow-hidden border rounded-lg w-full"
-      classNames={{
-        months: "flex flex-col",
-        month: "space-y-4",
-        table: "w-full border-collapse",
-        tbody: "relative",
-        cell: "relative p-0 text-center",
-        day: "h-9 w-9 rounded-md",
-      }}
+      showOutsideDays={true}
+      className="relative overflow-hidden w-full max-w-full"
       modifiers={{
         weekSelected: weekDates
       }}
