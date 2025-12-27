@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 import ActionSheet from '../../components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
@@ -69,13 +70,14 @@ function SelectCalendar({
     );
   };
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(personalCalendars.calendarsData === null, t('loading_calendars'));
+  }, [personalCalendars.calendarsData, showLoading, t]);
+
   if (personalCalendars.calendarsData === null) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="sr-only">{t('loading_calendars')}</span>
-      </div>
-    );
+    return null;
   }
 
   return (

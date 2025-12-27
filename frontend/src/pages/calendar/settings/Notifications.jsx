@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '@/components/ui/loading';
 import { getCalendarSourceMap } from '../../../utils/calendar/calendarSourceMap';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -55,13 +56,14 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars 
     }
   };
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(loading === undefined && calendarId, t('calendar_settings.loading_notification_settings'), '200px');
+  }, [loading, calendarId, showLoading, t]);
+
   if (loading === undefined && calendarId) {
-    return (
-      <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
-        <span className="sr-only">{t('loading_settings')}</span>
-      </div>
-    );
+    return null;
   }
 
   if (loading) return null;

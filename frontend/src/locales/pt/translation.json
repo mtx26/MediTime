@@ -155,7 +155,9 @@
     "view_notice": "Veja as instruções",
     "restock_disabled_tooltip": "O botão de reabastecimento está desativado porque a capacidade da caixa é 0. Altere a capacidade para reativar o reabastecimento.",
     "condition_none_tooltip": "Não foram definidas condições para a realização destes exercícios. Clique aqui para adicionar um e receber lembretes regulares.",
-    "no_medicines_selected": "Nenhum medicamento selecionado"
+    "no_medicines_selected": "Nenhum medicamento selecionado",
+    "loading_medicine_boxes": "Carregando as caixas de medicamentos...",
+    "loading_stock_alerts": "Carregando alertas de estoque..."
   },
   "calendar": {
     "add": "Adicionar um calendário",
@@ -203,7 +205,8 @@
     "rename_description": "O novo nome ficará visível para todos os usuários com quem você compartilhar este calendário.",
     "delete_shared_title": "Excluir o calendário compartilhado?",
     "delete_shared_description": "Você não terá mais acesso a este calendário compartilhado. O calendário permanecerá acessível ao proprietário e aos demais usuários.",
-    "error_deleting_calendar": "Erro ao excluir o calendário."
+    "error_deleting_calendar": "Erro ao excluir o calendário.",
+    "loading_daily_view": "Carregando a visualização diária..."
   },
   "calendar_completed": "Calendário concluído com sucesso!",
   "calendar_completed_this_week": "Caixa de comprimidos cheia para esta semana!",
@@ -227,7 +230,9 @@
         "description": "O estoque será diminuído manualmente a cada semana quando você reabastecer sua caixa de comprimidos.",
         "label": "Semanal (Caixa de comprimidos)"
       }
-    }
+    },
+    "loading_notification_settings": "Carregando configurações de notificação...",
+    "loading_stock_settings": "Carregando configurações de estoque..."
   },
   "calendars": "Calendários",
   "cancel": "Cancelar",
@@ -300,7 +305,8 @@
     "title": "Listas de links ICS",
     "token_label": "Penhora",
     "delete_title": "Remover o link do ICS?",
-    "delete_description": "O link será desativado e não poderá mais sincronizar seu calendário. Você precisará criar um novo link para reativar a sincronização."
+    "delete_description": "O link será desativado e não poderá mais sincronizar seu calendário. Você precisará criar um novo link para reativar a sincronização.",
+    "loading_ics_tokens": "Carregando links ICS..."
   },
   "image_upload": {
     "analysis_error": "Erro ao analisar a imagem.",
@@ -320,7 +326,8 @@
   "invalid_or_expired_link": "Este link de calendário compartilhado é inválido ou expirou.",
   "invitation": {
     "invalid_or_expired": "Convite inválido ou expirado",
-    "title": "Convite"
+    "title": "Convite",
+    "loading": "Carregando convite..."
   },
   "link": "Link",
   "link_already_exists": "Já existe um link para este calendário.",

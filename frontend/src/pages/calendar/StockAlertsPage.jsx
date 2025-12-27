@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '@/components/ui/loading';
 import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';
 import ActionSheet from '../../components/common/ActionSheet';
 import IconButton from '../../components/common/UtilityComponents';
@@ -126,12 +127,15 @@ function StockAlertsPage({
     window.location.href = `sms:?&body=${encodedMessage}`;
   };
 
+  const { showLoading } = useLoading();
+
+  // Gérer l'affichage du spinner global
+  useEffect(() => {
+    showLoading(loadingBoxes === undefined, t('boxes.loading_stock_alerts'));
+  }, [loadingBoxes, showLoading, t]);
+
   if (loadingBoxes === undefined) {
-    return (
-      <div className="flex justify-center items-center" style={{ height: '60vh' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return null;
   }
 
   if (loadingBoxes === false) {

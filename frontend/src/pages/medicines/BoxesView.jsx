@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';
 import { useAlert } from '../../contexts/AlertContext';
+import { useLoading } from '@/components/ui/loading';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { v4 as uuidv4 } from 'uuid';
 import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
@@ -617,13 +618,15 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   // LOADING STATES
   // =========================================================================
   
+  const { showLoading } = useLoading();
+
+  // Gérer l'affichage du spinner global
+  useEffect(() => {
+    showLoading(loadingBoxes === undefined, t('boxes.loading_medicine_boxes'));
+  }, [loadingBoxes, showLoading, t]);
+
   if (loadingBoxes === undefined) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="sr-only">{t('loading_medicines')}</span>
-      </div>
-    );
+    return null;
   }
 
   if (loadingBoxes === false) {

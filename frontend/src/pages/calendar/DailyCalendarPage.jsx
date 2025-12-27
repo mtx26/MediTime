@@ -1,6 +1,7 @@
 
 import React, { useRef, useState, useEffect, useContext, useMemo, use } from 'react';
 import { useParams, useLocation, useNavigate, data, Link } from 'react-router-dom';
+import { useLoading } from '@/components/ui/loading';
 import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
 import { toISO, toDate, getMondayDate } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
@@ -148,13 +149,14 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
       setEventsForDay(filtered);
     }, [selectedDate, calendarEvents]);
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(loading === true && calendarId, t('calendar.loading_daily_view'));
+  }, [loading, calendarId, showLoading, t]);
+
   if ((loading === true && calendarId)) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="sr-only">{t('loading_calendar')}</span>
-      </div>
-    );
+    return null;
   }
 
   if ((loading === undefined) && calendarId) {

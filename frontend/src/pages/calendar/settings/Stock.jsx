@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '@/components/ui/loading';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 
@@ -45,13 +46,14 @@ const Stock = ({ personalCalendars }) => {
 
   }, [calendarId, personalCalendars.fetchPersonalStockDecrementMethod, selectedMethod]);
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(loading === undefined && calendarId, t('calendar_settings.loading_stock_settings'), '200px');
+  }, [loading, calendarId, showLoading, t]);
+
   if (loading === undefined && calendarId) {
-    return (
-      <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
-        <span className="sr-only">{t('loading_calendar')}</span>
-      </div>
-    );
+    return null;
   }
 
   if (loading && calendarId) return null;

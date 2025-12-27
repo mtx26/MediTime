@@ -2,6 +2,7 @@ import React, { useEffect, useContext, useState, useCallback } from "react";
 import { UserContext } from "../../contexts/UserContext";
 import PropTypes from "prop-types";
 import { useAlert } from "../../contexts/AlertContext";
+import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from "../../components/common/HoveredUserProfile";
 import { toISO } from "../../utils/calendar/dateUtils";
 import { useTranslation } from "react-i18next";
@@ -31,6 +32,7 @@ function SharedList({
 
   // ⚠️ Alertes et confirmations
   const { showAlert, showConfirm } = useAlert();
+  const { showLoading } = useLoading();
 
   // 🔄 Chargement et données partagées groupées
   const [loadingGroupedShared, setLoadingGroupedShared] = useState(true); // État de chargement des partages groupés
@@ -222,14 +224,14 @@ function SharedList({
     }
   }, [personalCalendars.calendarsData, calendarFromURL]);
 
+  // Gérer l'affichage du spinner global
+  useEffect(() => {
+    showLoading(loadingGroupedShared, t('loading_calendars'));
+  }, [loadingGroupedShared, showLoading, t]);
+
 
   if (loadingGroupedShared) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="sr-only">{t("loading_calendars")}</span>
-      </div>
-    );
+    return null;
   }
 
   if (
@@ -759,7 +761,7 @@ SharedList.propTypes = {
         id: PropTypes.string.isRequired,
         name: PropTypes.string,
       }),
-    ).isRequired,
+    ),
     deleteCalendar: PropTypes.func,
   }).isRequired,
   sharedUserCalendars: PropTypes.shape({

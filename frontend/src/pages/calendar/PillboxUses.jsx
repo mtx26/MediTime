@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 import { getMondayDate } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
@@ -99,13 +100,14 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
     );
   }
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(loading === true && calendarId, t('loading_pillbox_uses'));
+  }, [loading, calendarId, showLoading, t]);
+
   if (loading === true && calendarId) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-           <span className="sr-only">{t('loading_pillbox_uses')}</span>
-      </div>
-    );
+    return null;
   }
   
   return (

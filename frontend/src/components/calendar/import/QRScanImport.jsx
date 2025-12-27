@@ -1,5 +1,6 @@
-import React, { useState, forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '@/components/ui/loading';
 import QRCodeScanner from '../../scanner/QRCodeScanner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { QrCode } from 'lucide-react';
@@ -75,16 +76,14 @@ const QRScanImport = forwardRef(({ calendarName, personalCalendars, onStateChang
     }
   };
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(isCreating, t('calendar.creating_calendar'), '400px');
+  }, [isCreating, showLoading, t]);
+
   if (isCreating) {
-    return (
-      <div 
-        className="flex justify-center items-center grow min-h-[40vh]"
-      >
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" role="status">
-          <span className="sr-only">{t('calendar.creating_calendar')}</span>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (

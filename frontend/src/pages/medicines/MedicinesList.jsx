@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useRealtimeTokenMedicines } from '../../hooks/realtime/useRealtimeMedicines';
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
+import { useLoading } from '@/components/ui/loading';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
 import { Pill, AlertCircle } from 'lucide-react';
@@ -25,13 +27,14 @@ function MedicinesList() {
     }, {});
   };
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(loadingMedicines === undefined && sharedToken, t('loading_medicines'));
+  }, [loadingMedicines, sharedToken, showLoading, t]);
+
   if (loadingMedicines === undefined && sharedToken) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="sr-only">{t('loading_medicines')}</span>
-      </div>
-    );
+    return null;
   }
 
   if (loadingMedicines === false && sharedToken) {

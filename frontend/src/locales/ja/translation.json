@@ -155,7 +155,9 @@
     "view_notice": "説明書をご覧ください",
     "restock_disabled_tooltip": "ボックスの容量が 0 のため、補充ボタンは無効になっています。補充を再度有効にするには、容量を変更してください。",
     "condition_none_tooltip": "受講条件は設定されていません。定期的にリマインダーを受け取るには、こちらをクリックして条件を追加してください。",
-    "no_medicines_selected": "薬が選択されていません"
+    "no_medicines_selected": "薬が選択されていません",
+    "loading_medicine_boxes": "薬箱を積んでいます…",
+    "loading_stock_alerts": "株価アラートを読み込んでいます..."
   },
   "calendar": {
     "add": "カレンダーを追加する",
@@ -203,7 +205,8 @@
     "rename_description": "新しい名前は、このカレンダーを共有するすべてのユーザーに表示されます。",
     "delete_shared_title": "共有カレンダーを削除しますか?",
     "delete_shared_description": "この共有カレンダーにアクセスできなくなります。カレンダーの所有者と他のユーザーは引き続きアクセスできます。",
-    "error_deleting_calendar": "カレンダーの削除中にエラーが発生しました。"
+    "error_deleting_calendar": "カレンダーの削除中にエラーが発生しました。",
+    "loading_daily_view": "日次ビューを読み込んでいます..."
   },
   "calendar_completed": "カレンダーが無事完成しました！",
   "calendar_completed_this_week": "今週はピルボックスがいっぱいです！",
@@ -227,7 +230,9 @@
         "description": "毎週薬箱を補充すると、在庫は手動で減らされます。",
         "label": "週刊（ピルボックス）"
       }
-    }
+    },
+    "loading_notification_settings": "通知設定を読み込んでいます...",
+    "loading_stock_settings": "ストック設定を読み込んでいます..."
   },
   "calendars": "カレンダー",
   "cancel": "キャンセル",
@@ -300,7 +305,8 @@
     "title": "ICSリンクリスト",
     "token_label": "先取特権ICS",
     "delete_title": "ICS リンクを削除しますか?",
-    "delete_description": "リンクは無効化され、カレンダーを同期できなくなります。同期を再開するには、新しいリンクを作成する必要があります。"
+    "delete_description": "リンクは無効化され、カレンダーを同期できなくなります。同期を再開するには、新しいリンクを作成する必要があります。",
+    "loading_ics_tokens": "ICS リンクを読み込んでいます..."
   },
   "image_upload": {
     "analysis_error": "画像の解析中にエラーが発生しました。",
@@ -320,7 +326,8 @@
   "invalid_or_expired_link": "この共有カレンダーのリンクは無効か期限が切れています。",
   "invitation": {
     "invalid_or_expired": "無効または期限切れの招待",
-    "title": "招待"
+    "title": "招待",
+    "loading": "招待状を読み込んでいます..."
   },
   "link": "リンク",
   "link_already_exists": "このカレンダーへのリンクは既に存在します。",

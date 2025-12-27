@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from '../../components/common/HoveredUserProfile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -84,13 +85,14 @@ function AcceptInvitePage({sharedUserCalendars}) {
     setLoading(false);
   }
 
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(loading === true, t('invitation.loading'));
+  }, [loading, showLoading, t]);
+
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="sr-only">{t('loading')}</span>
-      </div>
-    );
+    return null;
   }
 
   if (loading === false && !invitation) {

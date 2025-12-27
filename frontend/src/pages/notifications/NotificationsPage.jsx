@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '@/components/ui/loading';
 import NotificationLine from '../../components/common/NotificationLine';
 import ActionSheet from '../../components/common/ActionSheet';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -10,16 +11,14 @@ function NotificationsPage({ notifications }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { lng } = useParams();
+  const { showLoading } = useLoading();
+
+  useEffect(() => {
+    showLoading(notifications.notificationsData === null, t('loading_notifications'));
+  }, [notifications.notificationsData, showLoading, t]);
 
   if (notifications.notificationsData === null) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="sr-only">
-          {t('loading_notifications')}
-        </span>
-      </div>
-    );
+    return null;
   }
 
   return (

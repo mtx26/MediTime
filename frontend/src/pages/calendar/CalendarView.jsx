@@ -6,6 +6,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../contexts/UserContext';
+import { useLoading } from '@/components/ui/loading';
 import { toISO } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { useAlert } from '../../contexts/AlertContext';
@@ -35,6 +36,7 @@ function CalendarPage({
 
   // 🔐 Contexte d'authentification
   const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
+  const { showLoading } = useLoading(); // Gestion du spinner global
 
   const calendarRef = useRef(null);
   // garder selectedDate comme objet Date pour manipulations faciles
@@ -149,6 +151,11 @@ function CalendarPage({
     load();
   }, [calendarId, calendarSource.fetchSchedule, userInfo, selectedDate]);
 
+  // Gérer l'affichage du spinner global
+  useEffect(() => {
+    showLoading((loading === true || loadingStockMethod === true) && calendarId, t('loading_calendar'));
+  }, [loading, loadingStockMethod, calendarId, showLoading, t]);
+
   // Charger la méthode de décrémentation du stock (si disponible)
   useEffect(() => {
     const fetchMethod = async () => {
@@ -246,15 +253,6 @@ function CalendarPage({
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>{t('invalid_or_expired_link')}</AlertDescription>
       </Alert>
-    );
-  }
-
-  if ((loading === true || loadingStockMethod === true) && calendarId) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="sr-only">{t('loading_calendar')}</span>
-      </div>
     );
   }
 
