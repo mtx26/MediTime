@@ -406,7 +406,7 @@ export default function MedicineReview({ personalCalendars }) {
                             <div className="absolute z-20 mt-2 border rounded-md bg-popover p-2 shadow">
                               <Calendar
                                 mode="single"
-                                selected={cond[field] ? new Date(field === 'max_date' ? cond[field] : cond[field]) : undefined}
+                                selected={cond[field] ? new Date(cond[field]) : undefined}
                                 onSelect={(date) => {
                                   if (!date) return;
                                   if (field === 'max_date') {
