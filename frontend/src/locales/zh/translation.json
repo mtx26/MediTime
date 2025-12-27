@@ -584,7 +584,9 @@
     "language_note": "所选语言将应用于整个界面。",
     "preferences": "偏好设置",
     "preferences_desc": "个性化您在 MediTime 上的体验。",
-    "security": "安全"
+    "security": "安全",
+    "theme": "主题",
+    "theme_toggle": "点击更改主题"
   },
   "share": "分享",
   "share_calendar": "共享日历",
@@ -1057,5 +1059,9 @@
       "photo_error": "用户照片更新错误",
       "photo_success": "用户照片已更新"
     }
+  },
+  "theme": {
+    "dark": "深色模式",
+    "light": "模式清晰"
   }
 }

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getCalendarSourceMap } from '../../../utils/calendar/calendarSourceMap';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
+// import Loader2 supprimé
 
 const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();
@@ -58,7 +58,7 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars 
   if (loading === undefined && calendarId) {
     return (
       <div className="flex justify-center items-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
         <span className="sr-only">{t('loading_settings')}</span>
       </div>
     );

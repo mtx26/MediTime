@@ -102,8 +102,8 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
   if (loading === true && calendarId) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
-        <Loader2 className="h-8 w-8 text-primary animate-spin" />
-        <span className="sr-only">{t('loading_pillbox_uses')}</span>
+           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+           <span className="sr-only">{t('loading_pillbox_uses')}</span>
       </div>
     );
   }

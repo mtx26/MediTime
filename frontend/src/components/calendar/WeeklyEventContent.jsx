@@ -144,7 +144,12 @@ export default function WeeklyEventContent({
 
 WeeklyEventContent.propTypes = {
   ifModal: PropTypes.bool.isRequired,
-  selectedDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
+  selectedDate: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.instanceOf(Date),
+    PropTypes.number,
+    PropTypes.oneOf([undefined, null])
+  ]).isRequired,
   eventsForDay: PropTypes.array.isRequired,
   onSelectDate: PropTypes.func.isRequired,
   onNext: PropTypes.func.isRequired,

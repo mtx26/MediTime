@@ -89,71 +89,69 @@ function CalendarSettingsPage({
   };
 
   return (
-    <div className="flex justify-center">
-      <div className="w-full max-w-2xl">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">{t('calendar_settings.label')}</CardTitle>
-              </CardHeader>
-              <CardContent className="p-3 space-y-1">
+    <div className="container mx-auto">
+      <div className="flex flex-wrap gap-4">
+        <div className="w-full md:w-1/4 mb-3">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">{t('calendar_settings.label')}</CardTitle>
+            </CardHeader>
+            <CardContent className="p-3 space-y-1">
 
-                {calendarType === 'personal' && (
-                  <Link
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors",
-                      activeTab === 'stock' 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'hover:bg-accent'
-                    )}
-                    to={`/${lng}/${basePath}/${calendarId}/settings?tab=stock`}
-                  >
-                    <Pill className="h-4 w-4" />
-                    {t('calendar_settings.stock.label')}
-                  </Link>
-                )}
-
-                {calendarType !== 'token' && (
-                  <Link
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors",
-                      activeTab === 'notifications' 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'hover:bg-accent'
-                    )}
-                    to={`/${lng}/${basePath}/${calendarId}/settings?tab=notifications`}
-                  >
-                    <Bell className="h-4 w-4" />
-                    {t('calendar_settings.notifications.label')}
-                  </Link>
-                )}
-
-                {/* 
+              {calendarType === 'personal' && (
                 <Link
                   className={cn(
-                    "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
-                    activeTab === 'sharing' 
+                    "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors",
+                    activeTab === 'stock' 
                       ? 'bg-primary text-primary-foreground' 
                       : 'hover:bg-accent'
                   )}
-                  to={`/${lng}/${basePath}/${calendarId}/settings?tab=sharing`}
+                  to={`/${lng}/${basePath}/${calendarId}/settings?tab=stock`}
                 >
-                  <Share className="h-4 w-4" />
-                  {t('calendar_settings.sharing.label')}
+                  <Pill className="h-4 w-4" />
+                  {t('calendar_settings.stock.label')}
                 </Link>
-                */}
-              </CardContent>
-            </Card>
-          </div>
+              )}
 
-          <div className="md:col-span-3">
-            <Card>
-              <CardContent>
-                {renderTab()}
-              </CardContent>
-            </Card>
-          </div>
+              {calendarType !== 'token' && (
+                <Link
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors",
+                    activeTab === 'notifications' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'hover:bg-accent'
+                  )}
+                  to={`/${lng}/${basePath}/${calendarId}/settings?tab=notifications`}
+                >
+                  <Bell className="h-4 w-4" />
+                  {t('calendar_settings.notifications.label')}
+                </Link>
+              )}
+
+              {/* 
+              <Link
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
+                  activeTab === 'sharing' 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'hover:bg-accent'
+                )}
+                to={`/${lng}/${basePath}/${calendarId}/settings?tab=sharing`}
+              >
+                <Share className="h-4 w-4" />
+                {t('calendar_settings.sharing.label')}
+              </Link>
+              */}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="w-full md:flex-1">
+          <Card>
+            <CardContent>
+              {renderTab()}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
+// import Loader2 supprimé
 
 const Stock = ({ personalCalendars }) => {
   const { t } = useTranslation();
@@ -49,7 +49,7 @@ const Stock = ({ personalCalendars }) => {
   if (loading === undefined && calendarId) {
     return (
       <div className="flex justify-center items-center py-8">
-        <Loader2 className="h-6 w-6 text-primary animate-spin" />
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
         <span className="sr-only">{t('loading_calendar')}</span>
       </div>
     );

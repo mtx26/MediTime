@@ -51,7 +51,7 @@ function LanguageSelector() {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
           {CurrentFlag && <CurrentFlag className="w-5 h-4" />}
-          <span className="hidden sm:inline">{currentLang?.label}</span>
+          <span>{currentLang?.label}</span>
           <Languages className="w-4 h-4" />
         </Button>
       </DropdownMenuTrigger>

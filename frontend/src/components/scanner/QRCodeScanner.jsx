@@ -21,7 +21,6 @@ import {
   PlusCircle, 
   Pencil, 
   XCircle, 
-  Loader2,
   AlertTriangle
 } from "lucide-react";
 
@@ -803,7 +802,7 @@ const QRCodeScanner = forwardRef(({
                 <div key={gtin} className="flex justify-between items-center p-3 border rounded-md bg-card">
                   {isLoading ? (
                     <div className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
                       {t('scanner.searching')}
                     </div>
                   ) : medicine ? (

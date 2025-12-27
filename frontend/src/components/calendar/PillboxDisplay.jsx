@@ -8,7 +8,7 @@ import { getMondayDate, toISO } from '../../utils/calendar/dateUtils';
 import { useAlert } from '../../contexts/AlertContext';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, AlertTriangle, RefreshCw, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { CheckCircle, AlertTriangle, RefreshCw, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const pill_count = {
@@ -114,7 +114,7 @@ export default function PillboxDisplay({
   if (loading === undefined) {
     return (
       <div className="flex justify-center items-center h-[40vh]">
-        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         <span className="sr-only">{t('loading_calendar')}</span>
       </div>
     );

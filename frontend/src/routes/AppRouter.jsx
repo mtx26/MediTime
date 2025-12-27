@@ -65,7 +65,7 @@ function RouteWithLoader({ element, isLoading }) {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center grow min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         <span className="sr-only">Chargement...</span>
       </div>
     );
@@ -79,7 +79,7 @@ function AppRoutes({ sharedProps }) {
 
   const fallback = (
     <div className="flex justify-center items-center grow min-h-[60vh]">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" role="status" />
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" role="status" />
       <span className="sr-only">Chargement...</span>
     </div>
   );

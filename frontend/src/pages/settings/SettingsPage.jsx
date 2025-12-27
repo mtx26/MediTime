@@ -47,7 +47,7 @@ export default function SettingsPage( sharedProps ) {
   };
 
   return (
-    <div className="container mx-auto px-4 mt-4">
+    <div className="container mx-auto">
       <div className="flex flex-wrap gap-4">
         {/* 🧭 Onglets verticaux */}
         <div className="w-full md:w-1/4 mb-3">

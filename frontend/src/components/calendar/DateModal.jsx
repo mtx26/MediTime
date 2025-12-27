@@ -88,8 +88,10 @@ export default DateModal
 
 DateModal.propTypes = {
   selectedDate: PropTypes.oneOfType([
+    PropTypes.string,
     PropTypes.instanceOf(Date),
-    PropTypes.string
+    PropTypes.number,
+    PropTypes.oneOf([undefined, null])
   ]).isRequired,
   eventsForDay: PropTypes.array.isRequired,
   onNext: PropTypes.func.isRequired,

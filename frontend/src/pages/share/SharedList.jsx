@@ -226,7 +226,7 @@ function SharedList({
   if (loadingGroupedShared) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         <span className="sr-only">{t("loading_calendars")}</span>
       </div>
     );

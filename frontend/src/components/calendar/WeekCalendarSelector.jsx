@@ -28,7 +28,7 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
   return (
     <Calendar
       mode="single"
-      selected={selDate}
+      selected={selDate || today}
       onSelect={handleSelect}
       locale={getDateLocale(i18n.language)}
       modifiers={{
@@ -43,7 +43,12 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
 }
 
 WeekCalendarSelector.propTypes = {
-  selectedDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
+  selectedDate: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.instanceOf(Date),
+    PropTypes.number,
+    PropTypes.oneOf([undefined, null])
+  ]),
   onWeekSelect: PropTypes.func.isRequired,
   monday: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
 };

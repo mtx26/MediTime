@@ -72,7 +72,7 @@ function SelectCalendar({
   if (personalCalendars.calendarsData === null) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         <span className="sr-only">{t('loading_calendars')}</span>
       </div>
     );
