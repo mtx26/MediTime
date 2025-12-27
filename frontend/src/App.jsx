@@ -1069,7 +1069,7 @@ function App() {
     <div className="flex flex-col min-h-screen">
       <OnboardingTour isAppLoading={isInitialLoading} />
       <Navbar sharedProps={sharedProps} />
-      <ScrollArea className="h-72 w-full grow flex flex-col">
+      <ScrollArea className="h-full w-full grow flex flex-col">
         <main className="grow flex flex-col">
           {userInfo && (
             <RealtimeManager
