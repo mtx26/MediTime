@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { getMondayDate } from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
@@ -12,24 +12,18 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
   const selDate = selectedDate
     ? (selectedDate instanceof Date ? selectedDate : new Date(selectedDate))
     : today;
-  const [month, setMonth] = useState(selDate);
-
-  useEffect(() => {
-    setMonth(selDate);
-  }, [selDate]);
-
   const mondayDate = getMondayDate(selDate);
   const weekDates = [...Array(7)].map((_, i) => {
     const d = new Date(mondayDate);
-    d.setDate(d.getDate() + i); 
-    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() + i);
+    d.setHours(0, 0, 0, 0);
     return d;
   });
+
   const { i18n } = useTranslation();
 
   const handleSelect = (date) => {
     if (date) {
-      setMonth(date);
       onWeekSelect(date);
     }
   };
@@ -39,9 +33,8 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
       mode="single"
       selected={selDate || today}
       onSelect={handleSelect}
-      month={month}
-      onMonthChange={setMonth}
       locale={getDateLocale(i18n.language)}
+      showOutsideDays
       modifiers={{
         weekSelected: weekDates
       }}
