@@ -1,9 +1,14 @@
-import React from 'react';
-import ArrowControls from './ArrowControls';
-import WeekDayCircles from './WeekDayCircles';
-import { getMondayDate, toISO } from '../../utils/calendar/dateUtils';
-import PropTypes from 'prop-types';
-import { useTranslation } from 'react-i18next';
+import React from "react"
+import PropTypes from "prop-types"
+import { useTranslation } from "react-i18next"
+import ArrowControls from "./ArrowControls"
+import WeekDayCircles from "./WeekDayCircles"
+import { getMondayDate, toISO } from "../../utils/calendar/dateUtils"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { ArrowLeft, ArrowRight } from "lucide-react"
 
 export default function WeeklyEventContent({
   ifModal,
@@ -15,141 +20,141 @@ export default function WeeklyEventContent({
   getPastWeek,
   getNextWeek,
 }) {
-  const { t, i18n } = useTranslation();
-  // work with Date objects internally
-  const selDate = selectedDate instanceof Date ? selectedDate : new Date(selectedDate);
-  const weekDates = [...Array(7)].map((_, i) => {
-    const d = new Date(getMondayDate(selDate));
-    d.setDate(d.getDate() + i);
-    d.setHours(0,0,0,0);
-    return d;
-  });
-  const selIso = toISO(selDate);
-  const weekIsos = weekDates.map((d) => toISO(d));
-  const isFirstDay = weekIsos[0] === selIso;
-  const isLastDay = weekIsos[6] === selIso;
+  const { t, i18n } = useTranslation()
 
-  // Presentation: no expand/collapse state, always show details when present
+  const selDate =
+    selectedDate instanceof Date ? selectedDate : new Date(selectedDate)
+
+  const weekDates = [...Array(7)].map((_, i) => {
+    const d = new Date(getMondayDate(selDate))
+    d.setDate(d.getDate() + i)
+    d.setHours(0, 0, 0, 0)
+    return d
+  })
+
+  const selIso = toISO(selDate)
+  const weekIsos = weekDates.map(toISO)
+  const isFirstDay = weekIsos[0] === selIso
+  const isLastDay = weekIsos[6] === selIso
 
   return (
-    <>
-      {/* Navigation arrows (kept for keyboard/assistive users) */}
-      <ArrowControls onLeft={isFirstDay ? getPastWeek : onPrev} onRight={isLastDay ? getNextWeek : onNext} />
+    <div className="flex flex-col h-full">
+      {/* Sticky header */}
+      <div className="sticky top-0 z-10 bg-background pb-2">
+        <ArrowControls
+          onLeft={isFirstDay ? getPastWeek : onPrev}
+          onRight={isLastDay ? getNextWeek : onNext}
+        />
 
-      {/* Week day selector (hidden in modal mode) */}
-      <div className="mb-2 d-flex justify-content-center">
-        <WeekDayCircles selectedDate={selDate} onSelectDate={onSelectDate} />
-      </div>
-
-      {/* Header: big date + prev/next tactile buttons */}
-      <div className="d-flex align-items-center justify-content-between mb-3">
-        <button
-          className="btn btn-outline-secondary"
-          onClick={isFirstDay ? getPastWeek : onPrev}
-          aria-label={t('previous_day')}
-          title={t('previous_day')}
-          style={{ minWidth: 40, padding: '0.25rem 0.35rem' }}
-        >
-          <i className="bi bi-arrow-left" aria-hidden="true"></i>
-        </button>
-
-        <div className="text-center flex-grow-1 px-2">
-          <div className="d-flex align-items-center justify-content-center">
-            <div>
-              <div className="text-muted" style={{ fontSize: 12, textTransform: 'capitalize' }}>
-                {selDate.toLocaleDateString(i18n.language || undefined, { weekday: 'long' })}
-              </div>
-              <div style={{ fontWeight: 600, fontSize: 16 }}>
-                {selDate.toLocaleDateString(i18n.language || undefined, {
-                  day: '2-digit',
-                  month: 'long',
-                  year: 'numeric',
-                })}
-              </div>
-            </div>
-          </div>
+        <div className="mb-2 flex justify-center">
+          <WeekDayCircles
+            selectedDate={selDate}
+            onSelectDate={onSelectDate}
+          />
         </div>
 
-        <button
-          className="btn btn-outline-secondary"
-          onClick={isLastDay ? getNextWeek : onNext}
-          aria-label={t('next_day')}
-          title={t('next_day')}
-          style={{ minWidth: 40, padding: '0.25rem 0.35rem' }}
-        >
-          <i className="bi bi-arrow-right" aria-hidden="true"></i>
-        </button>
+        <div className="flex items-center justify-between mb-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={isFirstDay ? getPastWeek : onPrev}
+            className="min-w-10 px-1.5 py-1"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+
+          <div className="text-center grow px-2">
+            <div className="text-muted-foreground text-xs capitalize">
+              {selDate.toLocaleDateString(i18n.language, { weekday: "long" })}
+            </div>
+            <div className="font-semibold text-base">
+              {selDate.toLocaleDateString(i18n.language, {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}
+            </div>
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={isLastDay ? getNextWeek : onNext}
+            className="min-w-10 px-1.5 py-1"
+          >
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
-  {/* No expand/collapse control — show details by default */}
-
-      {/* Events: card-style, mobile-first */}
-      <div>
+      {/* ✅ ScrollArea remontée AU-DESSUS du footer */}
+      <ScrollArea className="h-full pr-3">
         {eventsForDay.length > 0 ? (
-          <div className="d-grid" style={{ gap: 8 }}>
+          <div className="grid gap-2 px-1 pb-28">
             {eventsForDay.map((event, index) => {
-              const time = new Date(event.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              const time = new Date(event.start).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+
               return (
-                <div
-                  key={index}
-                  className="card"
-                  role="group"
-                  aria-label={`${event.title} ${time}`}
-                  style={{ borderRadius: 8, padding: 10 }}
-                >
-                  <div className="d-flex align-items-start">
-                    <div style={{ width: 64, flexShrink: 0 }} className="me-3">
+                <Card key={index} className="rounded-lg p-2.5">
+                  <div className="flex items-start">
+                    <div className="w-16 shrink-0 mr-3">
                       <div
-                        style={{
-                          backgroundColor: event.color || '#6c757d',
-                          color: 'white',
-                          padding: '6px 8px',
-                          borderRadius: 6,
-                          textAlign: 'center',
-                          fontWeight: 600,
-                        }}
+                        className="text-white px-2 py-1.5 rounded-md text-center font-semibold text-sm"
+                        style={{ backgroundColor: event.color || "#6c757d" }}
                       >
                         {time}
                       </div>
                     </div>
 
-                    <div className="flex-grow-1">
-                      <div style={{ fontWeight: 600 }}>
-                        {event.title}
-                      </div>
+                    <div className="grow">
+                      <div className="font-semibold">{event.title}</div>
                       {event.dose != null && (
-                        <div className="text-muted" style={{ fontSize: 13 }}>{event.dose} mg</div>
+                        <div className="text-muted-foreground text-sm">
+                          {event.dose} mg
+                        </div>
                       )}
                       {event.notes && (
-                        <div className="text-muted mt-1" style={{ fontSize: 13 }}>{event.notes}</div>
+                        <div className="text-muted-foreground mt-1 text-sm">
+                          {event.notes}
+                        </div>
                       )}
                     </div>
 
-                    <div style={{ marginLeft: 12 }} className="text-end">
-                      <div className="badge bg-secondary" style={{ padding: '6px 8px' }}>
+                    <div className="ml-3">
+                      <Badge variant="secondary" className="px-2 py-1.5">
                         {event.tablet_count}
-                      </div>
+                      </Badge>
                     </div>
                   </div>
-                </div>
-              );
+                </Card>
+              )
             })}
           </div>
         ) : (
-          <p className="text-muted text-center mb-0">{t('no_events_today')}</p>
+          <p className="text-muted-foreground text-center">
+            {t("no_events_today")}
+          </p>
         )}
-      </div>
-    </>
-  );
+      </ScrollArea>
+    </div>
+  )
 }
 
 WeeklyEventContent.propTypes = {
   ifModal: PropTypes.bool.isRequired,
-  selectedDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
+  selectedDate: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.instanceOf(Date),
+    PropTypes.number,
+    PropTypes.oneOf([undefined, null]),
+  ]).isRequired,
   eventsForDay: PropTypes.array.isRequired,
   onSelectDate: PropTypes.func.isRequired,
   onNext: PropTypes.func.isRequired,
   onPrev: PropTypes.func.isRequired,
   getPastWeek: PropTypes.func.isRequired,
   getNextWeek: PropTypes.func.isRequired,
-};
+}

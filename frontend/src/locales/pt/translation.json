@@ -584,7 +584,9 @@
     "language_note": "O idioma selecionado será aplicado a toda a interface.",
     "preferences": "Preferências",
     "preferences_desc": "Personalize sua experiência no MediTime.",
-    "security": "Segurança"
+    "security": "Segurança",
+    "theme": "Tema",
+    "theme_toggle": "Clique para alterar o tema."
   },
   "share": "Compartilhar",
   "share_calendar": "Compartilhe o calendário",
@@ -1057,5 +1059,9 @@
       "photo_error": "Erro ao atualizar a foto do usuário",
       "photo_success": "Foto do usuário atualizada"
     }
+  },
+  "theme": {
+    "dark": "Modo escuro",
+    "light": "Modo claro"
   }
 }

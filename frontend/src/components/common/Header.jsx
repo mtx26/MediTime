@@ -1,12 +1,45 @@
-import React, { useContext, useEffect, useState, useRef, useCallback } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { handleLogout } from '../../services/auth/authService';
 import HoveredUserProfile from './HoveredUserProfile';
 import NotificationLine from './NotificationLine';
-import PropTypes from 'prop-types';
 import LanguageSelector from './LanguageSelector.jsx';
+import ThemeToggle from './ThemeToggle';
 import { useTranslation } from 'react-i18next';
+import PropTypes from 'prop-types';
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from '@/components/ui/navigation-menu';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  ArrowLeft,
+  Pill,
+  Calendar,
+  Share2,
+  Bell,
+  User,
+  Settings,
+  LogOut,
+  UserPlus,
+  LogIn,
+  Shield,
+  X,
+  ChevronDown,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 function buildLocationList(pathWithSlash) {
   return {
@@ -50,21 +83,18 @@ function Navbar({ sharedProps }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { lng } = useParams();
-    const { t } = useTranslation();
-    const [calendarInfo, setCalendarInfo] = useState(null);
-    const [basePath, setBasePath] = useState(null);
-    const [showNotifDropdown, setShowNotifDropdown] = useState(false);
-    const [showUserDropdown, setShowUserDropdown] = useState(false);
-    const notifRef = useRef();
-    const userRef = useRef();
-    const [tokenId, setTokenId] = useState(null);
-    const pathAfterLang = location.pathname.split('/').slice(2).join('/');
-    const pathWithSlash = '/' + pathAfterLang;
-    const pathParts = pathAfterLang.split('/').filter(Boolean);
-    const locationList = buildLocationList(pathWithSlash);
-    const locationAvailableForReturnToCalendarList = buildReturnToCalendarList(pathParts);
-    const locationAvailableForReturnToCalendar = buildReturnToCalendar(pathParts);
-    const isPillboxPage = isPillbox(pathParts);
+  const { t } = useTranslation();
+  const [calendarInfo, setCalendarInfo] = useState(null);
+  const [basePath, setBasePath] = useState(null);
+  const [tokenId, setTokenId] = useState(null);
+  
+  const pathAfterLang = location.pathname.split('/').slice(2).join('/');
+  const pathWithSlash = '/' + pathAfterLang;
+  const pathParts = pathAfterLang.split('/').filter(Boolean);
+  const locationList = buildLocationList(pathWithSlash);
+  const locationAvailableForReturnToCalendarList = buildReturnToCalendarList(pathParts);
+  const locationAvailableForReturnToCalendar = buildReturnToCalendar(pathParts);
+  const isPillboxPage = isPillbox(pathParts);
 
   useEffect(() => {
     if (locationList.calendar && sharedProps.personalCalendars.calendarsData) {
@@ -98,134 +128,79 @@ function Navbar({ sharedProps }) {
     sharedProps.sharedUserCalendars.sharedCalendarsData,
   ]);
 
-    const handleClickOutside = useCallback((e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) {
-        setShowNotifDropdown(false);
-      }
-      if (userRef.current && !userRef.current.contains(e.target)) {
-        setShowUserDropdown(false);
-      }
-    }, []);
-
-    useEffect(() => {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [handleClickOutside]);
-
   const { notificationsData, readNotification } = sharedProps.notifications;
+  const unreadCount = notificationsData?.filter((n) => !n.read).length || 0;
 
+  // Pillbox close button
   if (isPillboxPage) {
     return (
       <Link
         to={`/${lng}/${basePath}/${calendarInfo?.id}`}
-        className="fs-2 text-dark align-self-end"
-        style={{
-          position: 'fixed',
-          top: '1rem',
-          right: '1rem',
-          zIndex: 1050,
-        }}
+        className="fixed top-4 right-4 z-1050 text-2xl text-foreground"
         aria-label="Fermer"
       >
-        <i className="bi bi-x-lg" aria-hidden="true"></i>
-        <span className="visually-hidden">Fermer</span>
+        <X className="h-8 w-8" />
+        <span className="sr-only">Fermer</span>
       </Link>
     );
   }
-  
+
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-2 sticky-top">
-        <div className="container-fluid d-flex align-items-center justify-content-between">
-          {/* Logo / Retour */}
-          {locationAvailableForReturnToCalendarList.calendar ||
-          locationAvailableForReturnToCalendarList.sharedUserCalendar ? (
-            <Link to={`/${lng}/calendars`} className="navbar-brand fs-4">
-              <i className="bi bi-arrow-left"></i> {t('back')}
-            </Link>
-          ) : calendarInfo?.id &&
-            basePath &&
-            (locationAvailableForReturnToCalendar.calendar ||
-              locationAvailableForReturnToCalendar.sharedUserCalendar) ? (
-            <Link
-              to={`/${lng}/${basePath}/${calendarInfo.id}`}
-              className="navbar-brand fs-4"
-            >
-              <i className="bi bi-arrow-left"></i> {t('back')}
-            </Link>
-          ) : locationList.tokenCalendar &&
-            tokenId &&
-            locationAvailableForReturnToCalendar.tokenCalendar ? (
-            <Link
-              to={`/${lng}/shared-token-calendar/${tokenId}`}
-              className="navbar-brand fs-4"
-            >
-              <i className="bi bi-arrow-left"></i> {t('back')}
-            </Link>
-          ) : (
-            <Link to={`/${lng}/`} className="navbar-brand fw-bold text-primary fs-4">
-              <i className="bi bi-capsule"></i> {t('app.title')}
-            </Link>
-          )}
+      {/* Desktop Header */}
+      <nav className="sticky top-0 z-40 w-full bg-background border-b shadow-sm">
+        <div className="w-full px-4">
+          <div className="flex h-16 w-full items-center justify-between">
+            {/* Logo / Retour */}
+            <div className="flex items-center">
+              {locationAvailableForReturnToCalendarList.calendar ||
+              locationAvailableForReturnToCalendarList.sharedUserCalendar ? (
+                <Link to={`/${lng}/calendars`} className="flex items-center gap-2 text-lg font-semibold">
+                  <ArrowLeft className="h-5 w-5" /> {t('back')}
+                </Link>
+              ) : calendarInfo?.id &&
+                basePath &&
+                (locationAvailableForReturnToCalendar.calendar ||
+                  locationAvailableForReturnToCalendar.sharedUserCalendar) ? (
+                <Link
+                  to={`/${lng}/${basePath}/${calendarInfo.id}`}
+                  className="flex items-center gap-2 text-lg font-semibold"
+                >
+                  <ArrowLeft className="h-5 w-5" /> {t('back')}
+                </Link>
+              ) : locationList.tokenCalendar &&
+                tokenId &&
+                locationAvailableForReturnToCalendar.tokenCalendar ? (
+                <Link
+                  to={`/${lng}/shared-token-calendar/${tokenId}`}
+                  className="flex items-center gap-2 text-lg font-semibold"
+                >
+                  <ArrowLeft className="h-5 w-5" /> {t('back')}
+                </Link>
+              ) : (
+                <Link to={`/${lng}/`} className="flex items-center">
+                  <img src="/icons/og-image.png" alt="MediTime" className="h-20" />
+                </Link>
+              )}
+            </div>
 
-          {/* Titre calendrier + badge */}
-          {((calendarInfo && calendarInfo.id) ||
-            (locationList.tokenCalendar && tokenId)) && (
-            <>
-              {/* Titre calendrier pour desktop + badge desktop */}
-              <div className="d-none d-lg-flex justify-content-center text-decoration-none text-dark">
-                <div className="d-flex flex-column align-items-start w-auto">
-                  <h4 className="m-0">
-                    {calendarInfo && basePath && calendarInfo.id && (
-                      <Link
-                        to={`/${lng}/${basePath}/${calendarInfo.id}`}
-                        className="text-decoration-none text-dark"
-                      >
-                        <span className="text-muted">{t('calendar.label')} : </span>
-                        <span className="fw-bold">{calendarInfo.name}</span>
-                      </Link>
-                    )}
-                  </h4>
-                  {locationList.sharedUserCalendar && (
-                    <div className="badge bg-info mt-2">
-                      {t('shared_by')}{' '}
-                      <HoveredUserProfile
-                        user={{
-                          email: calendarInfo.owner_email,
-                          display_name: calendarInfo.owner_name,
-                          photo_url: calendarInfo.owner_photo_url,
-                        }}
-                        trigger={<span>{calendarInfo.owner_name}</span>}
-                      />
-                    </div>
-                  )}
-                  {locationList.tokenCalendar && tokenId && (
-                    <Link
-                      to={`/${lng}/shared-token-calendar/${tokenId}`}
-                      className="text-decoration-none text-dark"
-                    >
-                      <div className="badge bg-info mt-2">
-                        {t('shared_by_token')}
-                      </div>
-                    </Link>
-                  )}
-                </div>
-              </div>
-
-              {/* Titre calendrier pour mobile + badge mobile */}
-              <div className="d-flex d-lg-none flex-column align-items-end w-auto text-decoration-none text-dark">
-                {calendarInfo && basePath && calendarInfo.id && (
-                  <h4 className="m-1 fw-bold">
+            {/* Calendar Title (Desktop) */}
+            {((calendarInfo && calendarInfo.id) || (locationList.tokenCalendar && tokenId)) && (
+              <div className="hidden lg:flex flex-col items-start">
+                <h4 className="text-lg font-semibold">
+                  {calendarInfo && basePath && calendarInfo.id && (
                     <Link
                       to={`/${lng}/${basePath}/${calendarInfo.id}`}
-                      className="text-decoration-none text-dark"
+                      className="hover:underline"
                     >
-                      {calendarInfo.name}
+                      <span className="text-muted-foreground">{t('calendar.label')} : </span>
+                      <span className="font-bold">{calendarInfo.name}</span>
                     </Link>
-                  </h4>
-                )}
+                  )}
+                </h4>
                 {locationList.sharedUserCalendar && (
-                  <div className="badge bg-info d-flex flex-column align-items-end">
+                  <Badge variant="secondary" className="mt-1">
+                    {t('shared_by')}{' '}
                     <HoveredUserProfile
                       user={{
                         email: calendarInfo.owner_email,
@@ -234,268 +209,199 @@ function Navbar({ sharedProps }) {
                       }}
                       trigger={<span>{calendarInfo.owner_name}</span>}
                     />
-                  </div>
+                  </Badge>
                 )}
                 {locationList.tokenCalendar && tokenId && (
-                  <Link
-                    to={`/${lng}/shared-token-calendar/${tokenId}`}
-                    className="text-decoration-none text-dark"
-                  >
-                    <div className="badge bg-info">
+                  <Link to={`/${lng}/shared-token-calendar/${tokenId}`}>
+                    <Badge variant="secondary" className="mt-1">
                       {t('shared_by_token')}
-                    </div>
+                    </Badge>
                   </Link>
                 )}
               </div>
-            </>
-          )}
+            )}
 
-          {/* Liens navigation + notifs + profil */}
-          <div className="d-none d-lg-flex align-items-center">
-            <ul className="navbar-nav align-items-center gap-2">
-              <li className="nav-item">
-                <Link to={`/${lng}/calendars`} className="nav-link">
-                  <i className="bi bi-calendar-date fs-5"></i> {t('calendars')}
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link to={`/${lng}/shared-calendars`} className="nav-link">
-                  <i className="bi bi-box-arrow-up fs-5"></i> {t('shared')}
-                </Link>
-              </li>
-              {userInfo?.role === 'admin' && (
-                <li className="nav-item">
-                  <Link to={`/${lng}/admin`} className="nav-link">
-                    <i className="bi bi-lock fs-5"></i> {t('admin')}
+            {/* Calendar Title (Mobile) */}
+            {((calendarInfo && calendarInfo.id) || (locationList.tokenCalendar && tokenId)) && (
+              <div className="flex lg:hidden flex-col items-end">
+                {calendarInfo && basePath && calendarInfo.id && (
+                  <h4 className="text-sm font-bold">
+                    <Link to={`/${lng}/${basePath}/${calendarInfo.id}`}>
+                      {calendarInfo.name}
+                    </Link>
+                  </h4>
+                )}
+                {locationList.sharedUserCalendar && (
+                  <Badge variant="secondary" className="text-xs">
+                    <HoveredUserProfile
+                      user={{
+                        email: calendarInfo.owner_email,
+                        display_name: calendarInfo.owner_name,
+                        photo_url: calendarInfo.owner_photo_url,
+                      }}
+                      trigger={<span>{calendarInfo.owner_name}</span>}
+                    />
+                  </Badge>
+                )}
+                {locationList.tokenCalendar && tokenId && (
+                  <Link to={`/${lng}/shared-token-calendar/${tokenId}`}>
+                    <Badge variant="secondary" className="text-xs">
+                      {t('shared_by_token')}
+                    </Badge>
                   </Link>
-                </li>
-              )}
+                )}
+              </div>
+            )}
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-4">
+              <NavigationMenu>
+                <NavigationMenuList className="flex flex-row items-center gap-1">
+                  <NavigationMenuItem>
+                    <NavigationMenuLink asChild>
+                      <Link to={`/${lng}/calendars`} className="flex flex-row items-center gap-2 px-3 py-2 rounded-md hover:bg-accent whitespace-nowrap">
+                        <Calendar className="h-4 w-4 shrink-0" />
+                        <span>{t('calendars')}</span>
+                      </Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink asChild>
+                      <Link to={`/${lng}/shared-calendars`} className="flex flex-row items-center gap-2 px-3 py-2 rounded-md hover:bg-accent whitespace-nowrap">
+                        <Share2 className="h-4 w-4 shrink-0" />
+                        <span>{t('shared')}</span>
+                      </Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                  {userInfo?.role === 'admin' && (
+                    <NavigationMenuItem>
+                      <NavigationMenuLink asChild>
+                        <Link to={`/${lng}/admin`} className="flex flex-row items-center gap-2 px-3 py-2 rounded-md hover:bg-accent whitespace-nowrap">
+                          <Shield className="h-4 w-4 shrink-0" />
+                          <span>{t('admin')}</span>
+                        </Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  )}
+                </NavigationMenuList>
+              </NavigationMenu>
+
+              <ThemeToggle />
               <LanguageSelector />
 
-              {/* Notifs */}
-              <li
-                className="nav-item dropdown position-relative"
-                ref={notifRef}
-              >
-                <button
-                  aria-label="Notifications"
-                  title="Notifications"
-                  className="nav-link bg-transparent border-0 position-relative"
-                  onClick={() => setShowNotifDropdown(!showNotifDropdown)}
-                >
-                  <i className="bi bi-bell fs-5"></i>
-                  {notificationsData &&
-                    notificationsData.filter((notif) => !notif.read).length >
-                      0 && (
-                      <span className="position-absolute top-10 start-90 translate-middle badge rounded-pill bg-danger fs-7">
-                        {
-                          notificationsData.filter((notif) => !notif.read)
-                            .length
-                        }
-                      </span>
-                    )}
-                </button>
-                {showNotifDropdown && (
-                  <ul
-                    className="dropdown-menu dropdown-menu-end p-2 show"
-                    style={{
-                      minWidth: '500px',
-                      right: '0',
-                      left: 'auto',
-                    }}
-                  >
-                    {notificationsData === null ? (
-                      <li className="dropdown-item text-muted fs-6">
-                        {t('loading_notifications')}
-                      </li>
-                    ) : (
-                      notificationsData
-                        .filter((notif) => !notif.read)
-                        .slice(0, 5)
-                        .map((notif) => (
-                          <NotificationLine
-                            key={notif.notification_id}
-                            notif={notif}
-                            onRead={readNotification}
-                            navigate={navigate}
-                          />
-                        ))
-                    )}
-                    {notificationsData &&
-                      notificationsData.filter((notif) => !notif.read)
-                        .length === 0 && (
-                        <li className="dropdown-item text-muted fs-6">
-                          {t('no_notifications')}
-                        </li>
-                      )}
-                    <li>
-                      <hr className="dropdown-divider" />
-                    </li>
-                    <li className="text-center">
-                      <Link
-                        className="btn btn-sm btn-outline-primary w-100"
-                        aria-label="Ouvrir les notifications"
-                        title="Ouvrir les notifications"
-                        to={`/${lng}/notifications`}
-                        onClick={() => setShowNotifDropdown(false)}
+              {/* Notifications Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="h-5 w-5" />
+                    {unreadCount > 0 && (
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
                       >
-                        <i className="bi bi-bell"></i> {t('open_notifications')}
-                      </Link>
-                    </li>
-                  </ul>
-                )}
-              </li>
+                        {unreadCount}
+                      </Badge>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-125">
+                  {notificationsData === null ? (
+                    <DropdownMenuItem disabled>
+                      {t('loading_notifications')}
+                    </DropdownMenuItem>
+                  ) : notificationsData.filter((n) => !n.read).length === 0 ? (
+                    <DropdownMenuItem disabled>
+                      {t('no_notifications')}
+                    </DropdownMenuItem>
+                  ) : (
+                    notificationsData
+                      .filter((n) => !n.read)
+                      .slice(0, 5)
+                      .map((notif) => (
+                        <NotificationLine
+                          key={notif.notification_id}
+                          notif={notif}
+                          onRead={readNotification}
+                          navigate={navigate}
+                        />
+                      ))
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to={`/${lng}/notifications`} className="w-full flex items-center justify-center gap-2">
+                      <Bell className="h-4 w-4" /> {t('open_notifications')}
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-              {/* Profil */}
-              <li className="nav-item dropdown position-relative" ref={userRef}>
-                <button
-                  className="nav-link d-flex align-items-center border-0 bg-transparent"
-                  aria-label="Profil"
-                  title="Profil"
-                  onClick={() => setShowUserDropdown(!showUserDropdown)}
-                >
+              {/* User Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2">
+                    {userInfo ? (
+                      <>
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={userInfo.photoUrl} alt={userInfo.displayName} referrerPolicy="no-referrer" />
+                          <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm">{userInfo.displayName || t('user')}</span>
+                        <ChevronDown className="h-4 w-4" />
+                      </>
+                    ) : (
+                      <>
+                        <User className="h-5 w-5" />
+                        <span>{t('account.label')}</span>
+                      </>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
                   {userInfo ? (
                     <>
-                      <img
-                        src={
-                          userInfo.photoUrl ||
-                          'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg'
-                        }
-                        alt="Profil"
-                        className="rounded-circle me-2"
-                        width="32"
-                        height="32"
-                        referrerPolicy="no-referrer"
-                        loading="lazy"
-                      />
-                      <span className="text-muted">
-                        {userInfo.displayName || t('user')}
-                      </span>
-                      <i className="bi bi-caret-down-fill ms-2"></i>
+                      <DropdownMenuItem asChild>
+                        <Link to={`/${lng}/profile`} className="flex items-center gap-2">
+                          <User className="h-4 w-4" /> {t('profile')}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to={`/${lng}/settings`} className="flex items-center gap-2">
+                          <Settings className="h-4 w-4" /> {t('settings.label')}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 text-red-600 focus:text-red-600 hover:text-red-800">
+                        <LogOut className="h-4 w-4" /> {t('logout')}
+                      </DropdownMenuItem>
                     </>
                   ) : (
                     <>
-                      <i className="bi bi-person-circle fs-3 me-2"></i>
-                      <span className="text-muted">{t('account.label')}</span>
+                      <DropdownMenuItem asChild>
+                        <Link to={`/${lng}/login`} className="flex items-center gap-2">
+                          <LogIn className="h-4 w-4" /> {t('login')}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to={`/${lng}/register`} className="flex items-center gap-2">
+                          <UserPlus className="h-4 w-4" /> {t('register')}
+                        </Link>
+                      </DropdownMenuItem>
                     </>
                   )}
-                </button>
-                {showUserDropdown && (
-                  <ul
-                    className="dropdown-menu dropdown-menu-end p-2 show"
-                    style={{
-                      maxHeight: '400px',
-                      overflowY: 'auto',
-                      right: '0',
-                      left: 'auto',
-                    }}
-                  >
-                    {userInfo ? (
-                      <>
-                        <li>
-                          <Link className="dropdown-item" to={`/${lng}/profile`}>
-                            <i className="bi bi-person fs-5 me-2"></i> {t('profile')}
-                          </Link>
-                        </li>
-                        <li>
-                          <Link className="dropdown-item" to={`/${lng}/settings`}>
-                            <i className="bi bi-gear fs-5 me-2"></i> {t('settings.label')}
-                          </Link>
-                        </li>
-                        <li>
-                          <hr className="dropdown-divider" />
-                        </li>
-                        <li>
-                          <button
-                            className="dropdown-item"
-                            aria-label="Déconnexion"
-                            title="Déconnexion"
-                            onClick={handleLogout}
-                          >
-                            <i className="bi bi-unlock fs-5 me-2"></i>{' '}
-                            {t('logout')}
-                          </button>
-                        </li>
-                      </>
-                    ) : (
-                      <>
-                        <li>
-                          <Link className="dropdown-item" to={`/${lng}/login`}>
-                            <i className="bi bi-box-arrow-in-right fs-5 me-2"></i>{' '}
-                            {t('login')}
-                          </Link>
-                        </li>
-                        <li>
-                          <Link className="dropdown-item" to={`/${lng}/register`}>
-                            <i className="bi bi-person-plus fs-5 me-2"></i>{' '}
-                            {t('register')}
-                          </Link>
-                        </li>
-                      </>
-                    )}
-                  </ul>
-                )}
-              </li>
-            </ul>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </nav>
 
-      <nav className="navbar fixed-bottom bg-white shadow-sm py-2 border-top border-2 d-lg-none">
-        <div className="container-fluid d-flex justify-content-around mb-3">
-          <Link
-            to={`/${lng}/calendars`}
-            className="text-center text-dark text-decoration-none link-hover"
-          >
-            <i className="bi bi-calendar-event fs-1"></i>
-          </Link>
-          <Link
-            to={`/${lng}/shared-calendars`}
-            className="text-center text-dark text-decoration-none link-hover"
-          >
-            <i className="bi bi-people fs-1"></i>
-          </Link>
-          <Link
-            to={`/${lng}/notifications`}
-            className="text-center text-dark text-decoration-none link-hover position-relative"
-          >
-            <i className="bi bi-bell fs-1"></i>
-            {notificationsData !== null &&
-              notificationsData.filter((notif) => !notif.read).length > 0 && (
-                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger fs-7">
-                  {notificationsData.filter((notif) => !notif.read).length}
-                </span>
-              )}
-          </Link>
-          <Link
-            to={`/${lng}/settings`}
-            className="text-center text-dark text-decoration-none link-hover"
-          >
-            {userInfo ? (
-              <img
-                src={
-                  userInfo?.photoUrl ||
-                  'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg'
-                }
-                alt="Profil"
-                className="rounded-circle"
-                width="38"
-                height="38"
-                referrerPolicy="no-referrer"
-                loading="lazy"
-              />
-            ) : (
-              <i className="bi bi-person-circle fs-1"></i>
-            )}
-          </Link>
-        </div>
-      </nav>
+      {/* Mobile Bottom Navigation moved to Footer */}
     </>
   );
 }
 
-export default Navbar;
-
 Navbar.propTypes = {
   sharedProps: PropTypes.object.isRequired,
 };
+
+export default Navbar;

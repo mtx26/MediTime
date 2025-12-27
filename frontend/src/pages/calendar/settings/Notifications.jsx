@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getCalendarSourceMap } from '../../../utils/calendar/calendarSourceMap';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+// import Loader2 supprimé
 
 const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();
@@ -54,12 +57,9 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars 
 
   if (loading === undefined && calendarId) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-      >
-        <div className="spinner-border text-primary">
-          <span className="visually-hidden">{t('loading_settings')}</span>
-        </div>
+      <div className="flex justify-center items-center py-8">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+        <span className="sr-only">{t('loading_settings')}</span>
       </div>
     );
   }
@@ -68,21 +68,12 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars 
 
   return (
     <div>
-      <h5 className="mb-4">{t('calendar_settings.notifications.label')}</h5>
-      <div className="form-check form-switch" data-tour="settings-notifications-toggle">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          role="switch"
-          id="notifToggle"
-          checked={enabled}
-          onChange={toggleNotifications}
-        />
-        <label className="form-check-label" htmlFor="notifToggle">
-          {enabled
-            ? t('calendar_settings.notifications.enabled')
-            : t('calendar_settings.notifications.disabled')}
-        </label>
+      <h5 className="text-lg font-semibold mb-4">{t('calendar_settings.notifications.label')}</h5>
+      <div className="flex items-center gap-3" data-tour="settings-notifications-toggle">
+        <Switch id="notifToggle" checked={enabled} onCheckedChange={toggleNotifications} />
+        <Label htmlFor="notifToggle" className="cursor-pointer">
+          {enabled ? t('calendar_settings.notifications.enabled') : t('calendar_settings.notifications.disabled')}
+        </Label>
       </div>
     </div>
   );

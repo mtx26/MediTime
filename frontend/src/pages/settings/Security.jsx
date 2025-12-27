@@ -4,6 +4,11 @@ import { UserContext } from '../../contexts/UserContext';
 import { useAlert } from '../../contexts/AlertContext';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Eye, EyeOff, Info } from 'lucide-react';
 
 export default function Security() {
   const { t } = useTranslation();
@@ -49,126 +54,105 @@ export default function Security() {
   }
 
   return (
-    <div>
-      <h2 className="mb-4">{t('security.title')}</h2>
-      <p className="text-muted mb-4">{t('security.instructions')}</p>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold">{t('security.title')}</h2>
+        <p className="text-muted-foreground mt-1">{t('security.instructions')}</p>
+      </div>
 
-      <div className="mb-4">
-        <h5>{t('security.current_email')}</h5>
+      <div className="space-y-1">
+        <h5 className="text-lg font-semibold">{t('security.current_email')}</h5>
         <p>{userInfo.email}</p>
       </div>
 
       {isGoogleUser ? (
-        <div className="alert alert-info">
-          {t('security.google_warning')}
-        </div>
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertDescription>{t('security.google_warning')}</AlertDescription>
+        </Alert>
       ) : (
-        <form onSubmit={handleUpdatePassword}>
+        <form onSubmit={handleUpdatePassword} className="space-y-4">
           {/* Champ Username visible */}
-          <div className="mb-3">
-            <label htmlFor="email" className="form-label">
+          <div className="space-y-2">
+            <Label htmlFor="email">
               {t('auth.email')}
-            </label>
-            <input
+            </Label>
+            <Input
               type="email"
               id="email"
               name="email"
               aria-label="Email"
               autoComplete="email"
-              className="form-control"
               value={userInfo?.email || ''}
               readOnly
             />
           </div>
 
           {/* Ancien mot de passe */}
-          <div className="mb-3 position-relative">
-            <label htmlFor="oldPassword" className="form-label">
+          <div className="space-y-2">
+            <Label htmlFor="oldPassword">
               {t('security.current_password.label')}
-            </label>
-            <input
-              type={oldPasswordVisible ? 'text' : 'password'}
-              className="form-control"
-              id="oldPassword"
-              name="current-password"
-              aria-label={t('security.current_password.label')}
-              autoComplete="current-password"
-              required
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-              placeholder={t('security.current_password.placeholder')}
-            />
-            <i
-              className={`bi bi-${oldPasswordVisible ? 'eye-slash' : 'eye'} position-absolute`}
-              role="button"
-              tabIndex="0"
-              aria-label={
-                oldPasswordVisible ? t('auth.hide_password') : t('auth.show_password')
-              }
-              style={{
-                top: '38px',
-                right: '15px',
-                cursor: 'pointer',
-                color: '#6c757d',
-              }}
-              onClick={() => setOldPasswordVisible(!oldPasswordVisible)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setOldPasswordVisible(!oldPasswordVisible);
-                }
-              }}
-            ></i>
+            </Label>
+            <div className="relative">
+              <Input
+                type={oldPasswordVisible ? 'text' : 'password'}
+                id="oldPassword"
+                name="current-password"
+                aria-label={t('security.current_password.label')}
+                autoComplete="current-password"
+                required
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                placeholder={t('security.current_password.placeholder')}
+              />
+              <button
+                type="button"
+                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                onClick={() => setOldPasswordVisible(!oldPasswordVisible)}
+                aria-label={oldPasswordVisible ? t('auth.hide_password') : t('auth.show_password')}
+              >
+                {oldPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           {/* Nouveau mot de passe */}
-          <div className="mb-3 position-relative">
-            <label htmlFor="newPassword" className="form-label">
+          <div className="space-y-2">
+            <Label htmlFor="newPassword">
               {t('reset_password_confirm.new_password_label')}
-            </label>
-            <input
-              type={newPasswordVisible ? 'text' : 'password'}
-              className="form-control"
-              id="newPassword"
-              name="new-password"
-              aria-label={t('reset_password_confirm.new_password_label')}
-              autoComplete="new-password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder={t('security.new_password.placeholder')}
-              required
-            />
-            <i
-              className={`bi bi-${newPasswordVisible ? 'eye-slash' : 'eye'} position-absolute`}
-              role="button"
-              tabIndex="0"
-              aria-label={
-                newPasswordVisible ? t('auth.hide_password') : t('auth.show_password')
-              }
-              style={{
-                top: '38px',
-                right: '15px',
-                cursor: 'pointer',
-                color: '#6c757d',
-              }}
-              onClick={() => setNewPasswordVisible(!newPasswordVisible)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setNewPasswordVisible(!newPasswordVisible);
-                }
-              }}
-            ></i>
+            </Label>
+            <div className="relative">
+              <Input
+                type={newPasswordVisible ? 'text' : 'password'}
+                id="newPassword"
+                name="new-password"
+                aria-label={t('reset_password_confirm.new_password_label')}
+                autoComplete="new-password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder={t('security.new_password.placeholder')}
+                required
+              />
+              <button
+                type="button"
+                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                onClick={() => setNewPasswordVisible(!newPasswordVisible)}
+                aria-label={newPasswordVisible ? t('auth.hide_password') : t('auth.show_password')}
+              >
+                {newPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
-          <button
+          <Button
             type="submit"
-            className="btn btn-outline-primary mt-2"
+            variant="outline"
+            className="mt-2"
             aria-label={t('security.update_password')}
             title={t('security.update_password')}
           >
             {t('security.update_password')}
-          </button>
+          </Button>
         </form>
       )}
     </div>

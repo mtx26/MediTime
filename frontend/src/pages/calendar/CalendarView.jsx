@@ -10,14 +10,17 @@ import { toISO } from '../../utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import { useAlert } from '../../contexts/AlertContext';
 import isEqual from 'lodash/isEqual';
-import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import DateModal from '../../components/calendar/DateModal';
 import WeekCalendarSelector from '../../components/calendar/WeekCalendarSelector';
 import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
 import PillboxDisplay from '../../components/calendar/PillboxDisplay';
 import ActionSheet from '../../components/common/ActionSheet';
 import PropTypes from 'prop-types';
-
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, Pill, Grid3X3, CalendarDays, Share2, Download, AlertTriangle, Calendar, Clock, Settings, Trash2, ChevronRight, Pin } from 'lucide-react';
+import '../../styles/fullcalendar-custom.css';
 function CalendarPage({
   personalCalendars,
   sharedUserCalendars,
@@ -239,21 +242,18 @@ function CalendarPage({
 
   if ((loading === undefined || loadingStockMethod === undefined) && calendarId) {
     return (
-      <div className="alert alert-danger text-center mt-5" role="alert">
-        {t('invalid_or_expired_link')}
-      </div>
+      <Alert variant="destructive" className="text-center mt-8 max-w-2xl mx-auto">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>{t('invalid_or_expired_link')}</AlertDescription>
+      </Alert>
     );
   }
 
   if ((loading === true || loadingStockMethod === true) && calendarId) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: '60vh' }}
-      >
-        <div className="spinner-border text-primary">
-          <span className="visually-hidden">{t('loading_calendar')}</span>
-        </div>
+      <div className="flex justify-center items-center h-[60vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="sr-only">{t('loading_calendar')}</span>
       </div>
     );
   }
@@ -261,23 +261,26 @@ function CalendarPage({
   return (
     <>
 
-      <div className="container mt-2">
-        <div className="row justify-content-center">
-          <div className="col-12 col-lg-4 mb-2">
+      <div className="container mx-auto mt-2">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full lg:w-1/3 mb-2 lg:px-2">
             <div className="mb-3">
               {/* Boutons de navigation et partage */}
-              <div className="d-flex align-items-center gap-2 mb-3">
+              <div className="flex items-center gap-2 mb-3">
                 {/* Bouton Médicaments qui prend tout l'espace dispo */}
-                <Link
-                  className="btn btn-outline-secondary flex-grow-1 me-auto"
-                  to={`/${lng}/${basePath}/${calendarId}/boxes`}
+                <Button
+                  asChild
+                  variant="outline"
+                  className="grow mr-auto gap-2"
                   aria-label={t('medicines.label')}
                   title={t('medicines.label')}
                   data-tour="nav-medicines-btn"
                 >
-                  <i className="bi bi-capsule"></i>
-                  <span> {t('medicines.label')}</span>
-                </Link>
+                  <Link to={`/${lng}/${basePath}/${calendarId}/boxes`}>
+                    <Pill className="h-4 w-4" />
+                    <span>{t('medicines.label')}</span>
+                  </Link>
+                </Button>
 
                 {/* Bouton pour afficher le menu déroulant */}
                 {calendarType === 'personal' && (
@@ -288,7 +291,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-grid-3x3-gap me-2" /> {t('pillbox.title')}
+                            <Grid3X3 className="h-4 w-4 mr-2" /> {t('pillbox.title')}
                           </>
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`,
@@ -297,7 +300,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-calendar-day me-2" /> {t('day_view.title')}
+                            <CalendarDays className="h-4 w-4 mr-2" /> {t('day_view.title')}
                           </>
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/daily?date=${toISO(new Date().setHours(0,0,0,0))}`,
@@ -307,7 +310,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-box-arrow-up me-2" /> {t('share')}
+                            <Share2 className="h-4 w-4 mr-2" /> {t('share')}
                           </>
                         ),
                         linkTo: `/${lng}/shared-calendars?calendar=${calendarId}`,
@@ -318,7 +321,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+                            <Download className="h-4 w-4 mr-2" /> {t('boxes.export_pdf')}
                           </>
                         ),
                         onClick: () => calendarSource.downloadCalendarPdf(calendarId),
@@ -328,7 +331,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-exclamation-triangle me-2" /> {t('stock')}
+                            <AlertTriangle className="h-4 w-4 mr-2" /> {t('stock')}
                           </>
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/stock-alerts`,
@@ -338,7 +341,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-calendar3 me-2" /> {t('ics.calendar_ics')}
+                            <Calendar className="h-4 w-4 mr-2" /> {t('ics.calendar_ics')}
                           </>
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
@@ -347,7 +350,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-clock-history me-2" /> {t('pillbox_uses')}
+                            <Clock className="h-4 w-4 mr-2" /> {t('pillbox_uses')}
                           </>
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/pillbox-uses`,
@@ -358,7 +361,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-gear me-2" /> {t('settings.label')}
+                            <Settings className="h-4 w-4 mr-2" /> {t('settings.label')}
                           </>
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
@@ -369,7 +372,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-trash me-2" /> {t('delete')}
+                            <Trash2 className="h-4 w-4 mr-2" /> {t('delete')}
                           </>
                         ),
                         onClick: handleDeleteCalendar,
@@ -386,7 +389,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-grid-3x3-gap me-2" /> {t('pillbox.title')}
+                            <Grid3X3 className="h-4 w-4 mr-2" /> {t('pillbox.title')}
                           </>
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`,
@@ -395,7 +398,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-calendar-day me-2" /> {t('day_view.title')}
+                            <CalendarDays className="h-4 w-4 mr-2" /> {t('day_view.title')}
                           </>
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/daily?date=${toISO(new Date().setHours(0,0,0,0))}`,
@@ -405,7 +408,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-download me-2" /> {t('boxes.export_pdf')}
+                            <Download className="h-4 w-4 mr-2" /> {t('boxes.export_pdf')}
                           </>
                         ),
                         onClick: () => calendarSource.downloadCalendarPdf(calendarId),
@@ -414,7 +417,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-calendar3 me-2" /> {t('ics.calendar_ics')}
+                            <Calendar className="h-4 w-4 mr-2" /> {t('ics.calendar_ics')}
                           </>
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
@@ -423,7 +426,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-clock-history me-2" /> {t('pillbox_uses')}
+                            <Clock className="h-4 w-4 mr-2" /> {t('pillbox_uses')}
                           </>
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/pillbox-uses`,
@@ -433,7 +436,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-gear me-2" /> {t('settings.label')}
+                            <Settings className="h-4 w-4 mr-2" /> {t('settings.label')}
                           </>
                         ),
                         linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
@@ -442,7 +445,7 @@ function CalendarPage({
                       {
                         label: (
                           <>
-                            <i className="bi bi-trash3 me-2"></i> {t('delete')}
+                            <Trash2 className="h-4 w-4 mr-2" /> {t('delete')}
                           </>
                         ),
                         onClick: handleDeleteSharedCalendar,
@@ -456,24 +459,23 @@ function CalendarPage({
               {/* Affichage alert stock */}
               {isLowStock && (
                 <Link
-                  className="alert w-100 alert-warning d-flex align-items-center justify-content-between px-3 py-2 shadow"
+                  className="flex items-center justify-between w-full px-3 py-2 rounded-md bg-yellow-500/15 border border-yellow-500/50 text-foreground no-underline shadow"
                   to={`/${lng}/${basePath}/${calendarId}/stock-alerts`}
                   title={t('stock_alert_tooltip')}
                   aria-label={t('stock_alert')}
-                  style={{ textDecoration: 'none' }}
                 >
-                  <div className="d-flex align-items-center">
-                    <i className="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
-                    <span className="fw-semibold">{t('stock_alert')}</span>
+                  <div className="flex items-center">
+                    <AlertTriangle className="h-5 w-5 mr-2 text-yellow-600" />
+                    <span className="font-semibold">{t('stock_alert')}</span>
                   </div>
-                  <i className="bi bi-chevron-right ms-2"></i>
+                  <ChevronRight className="h-4 w-4 ml-2" />
                 </Link>
               )}
 
             </div>
             {/* Bouton pour naviguer vers la semaine suivante ou precedente */}
             {stockDecrementMethod === "weekly_pillbox" && (
-              <div className='d-flex d-lg-none justify-content-center align-items-center' data-tour="calendar-week-selector">
+              <div className='flex lg:hidden justify-center items-center' data-tour="calendar-week-selector">
                 <CalendarWeekSelector
                   calendarTable={calendarTable}
                   onWeekSelect={onWeekSelect}
@@ -482,7 +484,7 @@ function CalendarPage({
                 />
               </div>
             )}
-            <div className='d-none d-lg-flex justify-content-center align-items-center' data-tour="calendar-week-selector">
+            <div className='hidden lg:flex justify-center items-center' data-tour="calendar-week-selector">
               <CalendarWeekSelector
                 calendarTable={calendarTable}
                 onWeekSelect={onWeekSelect}
@@ -498,41 +500,46 @@ function CalendarPage({
             <>
               {/* Pilulier - Vue mobile */}
               {stockDecrementMethod === "weekly_pillbox" && (
-                <div className="d-block d-lg-none col-12 col-lg-8 mb-4">
+                <div className="block lg:hidden w-full lg:w-2/3 mb-4 lg:px-2">
                   <div className="mb-2">
-                    <h4 className="mb-3 fw-bold">
-                      <i className="bi bi-capsule"></i> {t('pillbox.title')}
+                    <h4 className="mb-3 font-bold flex items-center gap-2">
+                      <Pill className="h-5 w-5" /> {t('pillbox.title')}
                     </h4>
-                    <Link
-                      className="btn btn-outline-success w-100"
-                      to={`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`}
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="w-full gap-2"
                       aria-label={t('pillbox.fill')}
                       title={t('pillbox.fill')}
                       data-tour="calendar-grid-mobile-btn"
                     >
-                      <i className="bi bi-capsule"></i> {t('pillbox.fill')}
-                    </Link>
+                      <Link to={`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`}>
+                        <Pill className="h-4 w-4" /> {t('pillbox.fill')}
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               )}
 
               {/* Pilulier - Vue desktop */}
-              <div className="d-none d-lg-block col-12 col-lg-8 mb-4" data-tour="calendar-grid-desktop">
-                <h4 className="mb-3 fw-bold">
-                  <i className="bi bi-capsule"></i> {t('pillbox.title')}
+              <div className="hidden lg:block w-full lg:w-2/3 mb-4 lg:px-2" data-tour="calendar-grid-desktop">
+                <h4 className="mb-3 font-bold flex items-center gap-2">
+                  <Pill className="h-5 w-5" /> {t('pillbox.title')}
                 </h4>
-                <div className='border rounded pb-3 shadow'>
-                  <PillboxDisplay
-                    type="calendar"
-                    selectedDate={selectedDate}
-                    calendarType={calendarType}
-                    calendarId={calendarId}
-                    basePath={basePath}
-                    personalCalendars={personalCalendars}
-                    sharedUserCalendars={sharedUserCalendars}
-                    tokenCalendars={tokenCalendars}
-                  />
-                </div>
+                <Card className="shadow p-1">
+                  <CardContent className="pb-3 p-1">
+                    <PillboxDisplay
+                      type="calendar"
+                      selectedDate={selectedDate}
+                      calendarType={calendarType}
+                      calendarId={calendarId}
+                      basePath={basePath}
+                      personalCalendars={personalCalendars}
+                      sharedUserCalendars={sharedUserCalendars}
+                      tokenCalendars={tokenCalendars}
+                    />
+                  </CardContent>
+                </Card>
               </div>
             </>
           )}
@@ -615,27 +622,26 @@ function CalendarPage({
       {/* Calendrier par semaine */}
       {Object.keys(calendarTable).filter((key) => calendarTable[key].length > 0)
         .length > 0 ? (
-        <div className="container mt-4">
+        <div className="container mx-auto mt-4">
           {/* Calendrier mensuel */}
-          <div className="container d-none d-lg-block">
-            <h4 className="mb-3 fw-bold">
-              <i className="bi bi-calendar-week"></i> {t('calendar.weekly_view')}
+          <div className="hidden lg:block">
+            <h4 className="mb-3 font-bold flex items-center gap-2">
+              <CalendarDays className="h-5 w-5" /> {t('calendar.weekly_view')}
             </h4>
-            <div className="alert alert-info mt-4 mb-4 shadow" role="alert">
-              <i className="bi bi-pin-angle-fill"></i>
-              <span>{' '}{t('calendar.weekly_help')}</span>
-            </div>
-            <div className="card shadow">
-              <div className="card-body">
+            <Card className="shadow">
+              <CardContent>
+                <Alert>
+                  <Pin/>
+                  <AlertDescription>{t('calendar.weekly_help')}</AlertDescription>
+                </Alert>
                 <FullCalendar
                   /* Force le recalcul de l'instance quand la date sélectionnée change */
                   key={selectedDate ? toISO(selectedDate) : 'calendar'}
                   ref={calendarRef}
-                  plugins={[dayGridPlugin, interactionPlugin, bootstrap5Plugin]}
+                  plugins={[dayGridPlugin, interactionPlugin]}
                   initialView="dayGridWeek"
                   /* Date initiale correcte au montage */
                   initialDate={selectedDate || new Date()}
-                  themeSystem="bootstrap5"
                   events={memoizedEvents}
                   headerToolbar={{
                     left: '',
@@ -645,7 +651,7 @@ function CalendarPage({
                   locale={t('locale')}
                   firstDay={1}
                   dateClick={handleDateClick}
-                  height={400}
+                  height="auto"
                   // click sur les événements
                   eventClick={(info) => {
                     const clickedDate = info.event.startStr.slice(0, 10); // format YYYY-MM-DD
@@ -658,8 +664,8 @@ function CalendarPage({
                     day: t('calendar.day'),
                   }}
                 />
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Modal pour afficher les médicaments d'une date */}
             <DateModal
@@ -676,13 +682,13 @@ function CalendarPage({
 
           {/* Calendrier - Vue mobile uniquement */}
           {stockDecrementMethod  === "daily_midnight" && (
-            <div className="d-block d-lg-none">
-              <h4 className="mb-3 fw-bold">
-                <i className="bi bi-calendar-week"></i> {t('calendar.daily_view')}
+            <div className="block lg:hidden">
+              <h4 className="mb-3 font-bold flex items-center gap-2">
+                <CalendarDays className="h-5 w-5" /> {t('calendar.daily_view')}
               </h4>
 
-              <div className="card shadow">
-                <div className="card-body">
+              <Card className="shadow">
+                <CardContent className="p-2">
                   <WeeklyEventContent
                     ifModal={false}
                     selectedDate={selectedDate}
@@ -693,16 +699,16 @@ function CalendarPage({
                     getPastWeek={() => navigateWeek(-1)}
                     getNextWeek={() => navigateWeek(1)}
                   />
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
           )}
         </div>
       ) : (
-        <div className="alert alert-info mt-4 mb-0" role="alert">
-          <i className="bi bi-pin-angle-fill"></i>
-          <span> {t('no_medicines')}</span>
-        </div>
+        <Alert className="mt-4 mb-0">
+          <Pin className="h-4 w-4" />
+          <AlertDescription>{t('no_medicines')}</AlertDescription>
+        </Alert>
       )}
     </>
   );
@@ -718,11 +724,11 @@ function CalendarWeekSelector({
     Object.keys(calendarTable).filter(
       (key) => calendarTable[key].length > 0
     ).length > 0 && (
-      <div className="mb-2">
-        <h4 className="mb-3 fw-bold">
-          <i className="bi bi-calendar-date"></i> {t('calendar.reference_week')}
+      <div className="mb-2 w-full">
+        <h4 className="mb-3 font-bold flex items-center gap-2">
+          <CalendarDays className="h-5 w-5" /> {t('calendar.reference_week')}
         </h4>
-        <div className='shadow'>
+        <div className='shadow rounded-lg w-full'>
           <WeekCalendarSelector
             onWeekSelect={onWeekSelect}
             selectedDate={selectedDate}

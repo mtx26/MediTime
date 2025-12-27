@@ -59,7 +59,7 @@ export function AlertProvider({ children }) {
           type={alertType}
           message={alertMessage}
           onClose={closeAlert}
-          duration={8000}
+          duration={4000}
         />
       )}
     </AlertContext.Provider>

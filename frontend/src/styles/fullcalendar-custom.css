@@ -1,0 +1,177 @@
+th.fc-col-header-cell {
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--secondary));
+  padding: 0.25rem;
+}
+
+.fc .fc-event {
+  background-color: hsl(var(--primary));
+  border: 1px solid hsl(var(--border));
+}
+
+.fc-timegrid-axis {
+  background-color: hsl(var(--secondary));
+}
+
+.fc-popover {
+  background-color: hsl(var(--secondary));
+  border-radius: 0.5rem;
+  z-index: 10;
+  max-width: 28rem !important;
+}
+
+.fc-popover-body {
+  background-color: hsl(var(--secondary));
+}
+
+.fc {
+  --fc-border-color: hsl(var(--border));
+  --fc-button-text-color: hsl(var(--primary-foreground));
+  --fc-button-bg-color: hsl(var(--primary));
+  --fc-button-border-color: hsl(var(--primary));
+  --fc-button-hover-bg-color: hsl(var(--primary) / 0.9);
+  --fc-button-hover-border-color: hsl(var(--primary) / 0.9);
+  --fc-button-active-bg-color: hsl(var(--primary) / 0.9);
+  --fc-button-active-border-color: hsl(var(--primary) / 0.9);
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: hsl(var(--muted));
+  --fc-neutral-text-color: hsl(var(--muted-foreground));
+  --fc-today-bg-color: hsl(var(--primary) / 0.1);
+  height: 100%;
+  position: relative;
+  width: 100%;
+}
+
+.fc .fc-button {
+  font-weight: 500;
+  border-radius: 0.375rem;
+  height: 2.25rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  text-transform: none;
+  transition: background-color 0.2s;
+}
+
+.fc .fc-button:focus {
+  box-shadow: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.fc .fc-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fc .fc-list-event {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: black;
+}
+
+.fc .fc-list-event:hover {
+  color: black;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+  background-color: hsl(var(--accent) / 0.1);
+}
+
+.fc .fc-col-header-cell {
+  padding: 0.5rem;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+}
+
+.fc .fc-scrollgrid {
+  border: none !important;
+}
+
+.fc .fc-scrollgrid td:last-of-type {
+  border-right: none;
+}
+
+.fc .fc-scrollgrid tr:last-child td {
+  border-bottom: none;
+}
+
+.fc .fc-daygrid-day-frame {
+  padding: 0.25rem;
+}
+
+.fc .fc-daygrid-day-number {
+  color: hsl(var(--foreground));
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.fc .fc-event {
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  color: hsl(var(--primary-foreground));
+  background-color: hsl(var(--primary));
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.fc .fc-event:hover {
+  opacity: 1;
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.18), 0 1.5px 6px 0 rgba(0,0,0,0.12);
+  border: 2px solid hsl(var(--accent-foreground));
+  filter: brightness(1.08) saturate(1.2);
+  z-index: 2;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, border 0.15s;
+}
+
+.fc .fc-timegrid-slot-label {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.75rem;
+}
+
+.fc .fc-timegrid-axis {
+  border-right: none;
+}
+
+.fc .fc-timegrid-now-indicator-line {
+  border-color: hsl(var(--destructive));
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  border-color: hsl(var(--destructive));
+}
+
+@media (max-width: 640px) {
+  .fc .fc-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0;
+  }
+
+  .fc .fc-toolbar-chunk {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .fc .fc-button {
+    padding: 0.5rem;
+  }
+}

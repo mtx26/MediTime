@@ -1,5 +1,8 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { UserPlus, CheckCircle, XCircle, Trash2, AlertTriangle, ArrowRightCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import HoveredUserProfile from './HoveredUserProfile';
 import { useTranslation, Trans } from 'react-i18next';
 
@@ -20,7 +23,7 @@ export default function NotificationLine({
     minute: '2-digit',
   });
 
-  const user = (
+  const user = notif.sender_name ? (
     <HoveredUserProfile
       user={{
         photo_url: notif.sender_photo_url,
@@ -29,9 +32,9 @@ export default function NotificationLine({
       }}
       trigger={<strong>{notif.sender_name}</strong>}
     />
+  ) : (
+    <strong>{t('unknown_user')}</strong>
   );
-
-  const iconStyle = { verticalAlign: 'middle' };
 
   let icon = null;
   let message = null;
@@ -40,9 +43,7 @@ export default function NotificationLine({
 
   switch (notif.notification_type) {
     case 'calendar_invitation':
-      icon = (
-        <i className="bi bi-person-plus-fill text-primary me-2" style={iconStyle}></i>
-      );
+      icon = <UserPlus className="w-5 h-5 text-primary mr-2 inline" />;
       if (!notif.accepted) {
         message = (
           <Trans
@@ -53,17 +54,20 @@ export default function NotificationLine({
         );
         actions = (
           <div className="mt-2">
-            <Link
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="gap-2"
               aria-label={t('accept')}
               title={t('accept')}
-              className="btn btn-sm btn-outline-success me-2"
-              to={`/accept-invite?token=${notif.token}&type=login`}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <i className="bi bi-arrow-right-circle me-2 text-success"></i> {t('accept')}
-            </Link>
+              <Link to={`/accept-invite?token=${notif.token}&type=login`}>
+                <ArrowRightCircle className="w-4 h-4 text-green-600" />
+                {t('accept')}
+              </Link>
+            </Button>
           </div>
         );
         link = `/accept-invite?token=${notif.token}&type=login`;
@@ -77,17 +81,20 @@ export default function NotificationLine({
         );
         actions = (
           <div className="mt-2">
-            <Link
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="gap-2"
               aria-label={t('open')}
               title={t('open')}
-              className="btn btn-sm btn-outline-success me-2"
-              to={`/${lng}/shared-user-calendar/${notif.calendar_id}`}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <i className="bi bi-arrow-right-circle me-2 text-success"></i> {t('open')}
-            </Link>
+              <Link to={`/${lng}/shared-user-calendar/${notif.calendar_id}`}>
+                <ArrowRightCircle className="w-4 h-4 text-green-600" />
+                {t('open')}
+              </Link>
+            </Button>
           </div>
         );
         link = `/${lng}/shared-user-calendar/${notif.calendar_id}`;
@@ -95,9 +102,7 @@ export default function NotificationLine({
       break;
 
     case 'calendar_invitation_accepted':
-      icon = (
-        <i className="bi bi-check-circle-fill text-success me-2" style={iconStyle}></i>
-      );
+      icon = <CheckCircle className="w-5 h-5 text-green-600 mr-2 inline" />;
       message = (
         <Trans
           i18nKey="notif.invite_accepted"
@@ -108,9 +113,7 @@ export default function NotificationLine({
       break;
 
     case 'calendar_invitation_rejected':
-      icon = (
-        <i className="bi bi-x-circle-fill text-danger me-2" style={iconStyle}></i>
-      );
+      icon = <XCircle className="w-5 h-5 text-destructive mr-2 inline" />;
       message = (
         <Trans
           i18nKey="notif.invite_rejected"
@@ -121,9 +124,7 @@ export default function NotificationLine({
       break;
 
     case 'calendar_shared_deleted_by_owner':
-      icon = (
-        <i className="bi bi-trash-fill text-danger me-2" style={iconStyle}></i>
-      );
+      icon = <Trash2 className="w-5 h-5 text-destructive mr-2 inline" />;
       message = (
         <Trans
           i18nKey="notif.share_removed_by_owner"
@@ -134,9 +135,7 @@ export default function NotificationLine({
       break;
 
     case 'calendar_shared_deleted_by_receiver':
-      icon = (
-        <i className="bi bi-trash-fill text-danger me-2" style={iconStyle}></i>
-      );
+      icon = <Trash2 className="w-5 h-5 text-destructive mr-2 inline" />;
       message = (
         <Trans
           i18nKey="notif.share_removed_by_you"
@@ -147,9 +146,7 @@ export default function NotificationLine({
       break;
 
     case 'low_stock':
-      icon = (
-        <i className="bi bi-exclamation-triangle-fill text-warning me-2" style={iconStyle}></i>
-      );
+      icon = <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2 inline" />;
       message = (
         <Trans
           i18nKey="notif.low_stock"
@@ -168,52 +165,55 @@ export default function NotificationLine({
   }
 
   return (
-    <li
-      className={`list-group-item list-group-item-action border-0 border-start border-4 ${
+    <Card
+      className={`border-l-4 p-1 transition-colors ${
         isUnread
-          ? 'bg-unread border-primary p-2 rounded'
-          : 'bg-light text-muted'
+          ? 'bg-primary/10 border-l-primary'
+          : 'bg-muted/50 text-muted-foreground border-l-transparent'
       }`}
     >
-      {link ? (
-        <Link
-          to={link}
-          onClick={(e) => {
-            e.stopPropagation();
-            isUnread && onRead(notif.notification_id);
-          }}
-          style={{ cursor: isUnread || link ? 'pointer' : 'default' }}
-          className="text-decoration-none d-block text-reset"
-          tabIndex={0}
-        >
-          <p className="mb-0">
-            {icon}
-            {message}
-          </p>
-          {actions}
-          <small className="text-muted d-block mt-2">{timestamp}</small>
-        </Link>  
-      ) : (
-        <div
-          onClick={() => {
-            isUnread && onRead(notif.notification_id);
-          }}
-          style={{ cursor: isUnread || link ? 'pointer' : 'default' }}
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
+      <CardContent className="p-1">
+        {link ? (
+          <Link
+            to={link}
+            onClick={(e) => {
+              e.stopPropagation();
               isUnread && onRead(notif.notification_id);
-            }
-          }}
-        >
-          <p className="mb-0">
-            {icon}
-            {message}
-          </p>
-          {actions}
-          <small className="text-muted d-block mt-2">{timestamp}</small>
-        </div>
-      )}
-    </li>
+            }}
+            style={{ cursor: isUnread || link ? 'pointer' : 'default' }}
+            className="no-underline block text-foreground"
+            tabIndex={0}
+          >
+            <p className="m-0">
+              {icon}
+              {message}
+            </p>
+            {actions}
+            <small className="text-muted-foreground block mt-2">{timestamp}</small>
+          </Link>  
+        ) : (
+          <div
+            onClick={() => {
+              isUnread && onRead(notif.notification_id);
+            }}
+            style={{ cursor: isUnread || link ? 'pointer' : 'default' }}
+            className="no-underline block text-foreground"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                isUnread && onRead(notif.notification_id);
+              }
+            }}
+          >
+            <p className="m-0">
+              {icon}
+              {message}
+            </p>
+            {actions}
+            <small className="text-muted-foreground block mt-2">{timestamp}</small>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

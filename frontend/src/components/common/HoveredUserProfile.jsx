@@ -1,5 +1,6 @@
-import * as Popover from '@radix-ui/react-popover';
 import { useState } from 'react';
+import { Info } from 'lucide-react';
+import { Popover, PopoverTrigger, PopoverContent, PopoverArrow } from '@/components/ui/popover';
 import useIsTouchDevice from '../../hooks/device/useIsTouchDevice';
 import PropTypes from 'prop-types';
 
@@ -26,8 +27,8 @@ export default function HoveredUserProfile({
   };
 
   return (
-    <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <button
           type="button"
           onClick={(e) => {
@@ -42,64 +43,45 @@ export default function HoveredUserProfile({
           }}
           onPointerEnter={handleMouseEnter}
           onPointerLeave={handleMouseLeave}
-          className="bg-transparent border-0 p-0 m-0 d-inline-flex align-items-center gap-1 text-start"
+          className={`bg-transparent border-0 p-0 m-0 inline-flex items-center gap-1 text-start cursor-pointer ${
+            open ? 'underline text-primary' : ''
+          }`}
           aria-label="Afficher le profil de l'utilisateur"
           style={{
-            textDecoration: open ? 'underline' : 'none',
-            color: open ? '#0d6efd' : 'inherit',
-            cursor: 'pointer',
             font: 'inherit',
             lineHeight: 'inherit',
+            transition: 'color 0.2s, text-decoration 0.2s',
           }}
         >
-          <span
-            style={{
-              cursor: 'pointer',
-              textDecoration: open ? 'underline' : 'none',
-              color: open ? '#0d6efd' : 'inherit',
-              transition: 'color 0.2s, text-decoration 0.2s',
-            }}
-            className="d-flex align-items-center gap-1"
-          >
+          <span className="flex items-center gap-1">
             {trigger}{' '}
-            <i
-              className="bi bi-info-circle"
-              style={{ fontSize: '0.9em', color: '#6c757d' }}
-            ></i>
+            <Info className="w-3.5 h-3.5 text-muted-foreground" />
           </span>
         </button>
-      </Popover.Trigger>
+      </PopoverTrigger>
 
-      <Popover.Portal container={containerRef?.current}>
-        <Popover.Content
-          sideOffset={0}
-          align="center"
-          className="shadow-lg rounded-3 bg-white border p-3"
-          style={{
-            width: 250,
-            zIndex: 9999,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          }}
-          onClick={handleClick}
-          onPointerEnter={handleMouseEnter}
-          onPointerLeave={handleMouseLeave}
-        >
-          <div className="d-flex flex-column align-items-center text-center gap-2">
-            <img
-              src={user.photo_url}
-              alt="Profil"
-              className="rounded-circle"
-              style={{ width: '70px', height: '70px', objectFit: 'cover' }}
-            />
-            <div>
-              <h6 className="mb-0">{user.display_name}</h6>
-              <small className="text-muted">{user.email}</small>
-            </div>
+      <PopoverContent
+        sideOffset={10}
+        align="center"
+        className="w-62.5 p-3"
+        onClick={handleClick}
+        onPointerEnter={handleMouseEnter}
+        onPointerLeave={handleMouseLeave}
+      >
+        <PopoverArrow width={12} height={6} />
+        <div className="flex flex-col items-center text-center gap-2">
+          <img
+            src={user.photo_url}
+            alt="Profil"
+            className="rounded-full w-17.5 h-17.5 object-cover"
+          />
+          <div>
+            <h6 className="mb-0 font-semibold">{user.display_name}</h6>
+            <small className="text-muted-foreground">{user.email}</small>
           </div>
-          <Popover.Arrow width={20} height={10}/>
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -107,7 +89,7 @@ HoveredUserProfile.propTypes = {
   user: PropTypes.shape({
     photo_url: PropTypes.string.isRequired,
     display_name: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
+    email: PropTypes.string,
   }).isRequired,
   trigger: PropTypes.node.isRequired,
   containerRef: PropTypes.object,

@@ -584,7 +584,9 @@
     "language_note": "Die ausgewählte Sprache gilt für die gesamte Benutzeroberfläche.",
     "preferences": "Einstellungen",
     "preferences_desc": "Personalisieren Sie Ihr Erlebnis auf MediTime.",
-    "security": "Sicherheit"
+    "security": "Sicherheit",
+    "theme": "Thema",
+    "theme_toggle": "Klicken Sie hier, um das Design zu ändern."
   },
   "share": "Aktie",
   "share_calendar": "Den Kalender freigeben",
@@ -1057,5 +1059,9 @@
       "photo_error": "Fehler beim Aktualisieren des Benutzerfotos",
       "photo_success": "Benutzerfoto aktualisiert"
     }
+  },
+  "theme": {
+    "dark": "Dunkelmodus",
+    "light": "Mode clair"
   }
 }

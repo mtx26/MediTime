@@ -1,8 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactFlagsSelect from 'react-flags-select';
+import { Languages, Check } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 import { LANGUAGES } from '../../config/languages';
 import { useNavigate, useLocation } from 'react-router-dom';
+import * as Flags from 'country-flag-icons/react/3x2';
+
+// Mapping des codes de pays vers les composants de drapeaux
+const FLAG_COMPONENTS = {
+  FR: Flags.FR,
+  US: Flags.US,
+  ES: Flags.ES,
+  DE: Flags.DE,
+  IT: Flags.IT,
+  JP: Flags.JP,
+  CN: Flags.CN,
+  PT: Flags.PT,
+  RU: Flags.RU
+};
 
 function LanguageSelector() {
   const { i18n } = useTranslation();
@@ -27,24 +43,35 @@ function LanguageSelector() {
     }
   };
 
-  const enabledFlags = LANGUAGES.map(lang => lang.flag);
-  const customLabels = Object.fromEntries(LANGUAGES.map(lang => [lang.flag, lang.label]));
+  const currentLang = LANGUAGES.find(lang => lang.flag === selected);
+  const CurrentFlag = FLAG_COMPONENTS[selected];
 
   return (
-  <>
-    <ReactFlagsSelect
-      selected={selected}
-      onSelect={onSelect}
-      countries={enabledFlags}
-      customLabels={customLabels}
-      searchable={false}
-      showSelectedLabel
-      showOptionLabel
-      optionsSize={14}
-      selectedSize={14}
-      alignOptions="right"
-    />
-  </>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2">
+          {CurrentFlag && <CurrentFlag className="w-5 h-4" />}
+          <span>{currentLang?.label}</span>
+          <Languages className="w-4 h-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        {LANGUAGES.map((lang) => {
+          const FlagComponent = FLAG_COMPONENTS[lang.flag];
+          return (
+            <DropdownMenuItem
+              key={lang.flag}
+              onClick={() => onSelect(lang.flag)}
+              className="gap-2 cursor-pointer"
+            >
+              {FlagComponent && <FlagComponent className="w-5 h-4" />}
+              <span className="flex-1">{lang.label}</span>
+              {selected === lang.flag && <Check className="w-4 h-4" />}
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

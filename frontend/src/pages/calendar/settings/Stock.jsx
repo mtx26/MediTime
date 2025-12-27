@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+// import Loader2 supprimé
 
 const Stock = ({ personalCalendars }) => {
   const { t } = useTranslation();
@@ -41,63 +44,49 @@ const Stock = ({ personalCalendars }) => {
     }
     initialize();
 
-  } , [calendarId, personalCalendars.fetchPersonalStockDecrementMethod, selectedMethod]);
+  }, [calendarId, personalCalendars.fetchPersonalStockDecrementMethod, selectedMethod]);
 
   if (loading === undefined && calendarId) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-      >
-        <div className="spinner-border text-primary">
-          <span className="visually-hidden">{t('loading_calendar')}</span>
-        </div>
+      <div className="flex justify-center items-center py-8">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+        <span className="sr-only">{t('loading_calendar')}</span>
       </div>
     );
   }
 
   if (loading && calendarId) return null;
-    
 
   return (
     <div>
-      <h5 className="mb-4">{t('calendar_settings.stock.label')}</h5>
-      <div data-tour="settings-stock-methods">
-        <div className="form-check mb-3" style={{ cursor: 'pointer' }}>
-          <input
-            className="form-check-input"
-            type="radio"
-            name="stockDecrementMethod"
-            id="weeklyPillbox"
-            value="weekly_pillbox"
-            checked={selectedMethod === 'weekly_pillbox'}
-            onChange={() => modifyStockDecrementMethod('weekly_pillbox')}
-            style={{ cursor: 'pointer' }}
-          />
-          <label className="form-check-label" htmlFor="weeklyPillbox" style={{ cursor: 'pointer' }}>
-            <strong>{t('calendar_settings.stock.weekly.label')}</strong>
-            <br />
-            <small className="text-muted">{t('calendar_settings.stock.weekly.description')}</small>
-          </label>
-        </div>
+      <h5 className="mb-4 text-lg font-semibold">{t('calendar_settings.stock.label')}</h5>
+      <RadioGroup value={selectedMethod} onValueChange={modifyStockDecrementMethod} data-tour="settings-stock-methods" className="space-y-3">
+        <label 
+          htmlFor="weeklyPillbox" 
+          className="flex items-start gap-3 p-4 border rounded-lg hover:bg-accent/50 transition cursor-pointer"
+        >
+          <RadioGroupItem value="weekly_pillbox" id="weeklyPillbox" className="mt-1" />
+          <div className="flex-1">
+            <div className="font-semibold">{t('calendar_settings.stock.weekly.label')}</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              {t('calendar_settings.stock.weekly.description')}
+            </p>
+          </div>
+        </label>
 
-        <div className="form-check" style={{ cursor: 'pointer' }}>
-          <input
-            className="form-check-input"
-            type="radio"
-            name="stockDecrementMethod"
-            id="dailyMidnight"
-            value="daily_midnight"
-            checked={selectedMethod === 'daily_midnight'}
-            onChange={() => modifyStockDecrementMethod('daily_midnight')}
-            style={{ cursor: 'pointer' }}
-          />
-          <label className="form-check-label" htmlFor="dailyMidnight" style={{ cursor: 'pointer' }}>
-            <strong>{t('calendar_settings.stock.daily.label')}</strong>
-            <br />
-            <small className="text-muted">{t('calendar_settings.stock.daily.description')}</small>
-          </label>
-        </div>
-      </div>
+        <label 
+          htmlFor="dailyMidnight" 
+          className="flex items-start gap-3 p-4 border rounded-lg hover:bg-accent/50 transition cursor-pointer"
+        >
+          <RadioGroupItem value="daily_midnight" id="dailyMidnight" className="mt-1" />
+          <div className="flex-1">
+            <div className="font-semibold">{t('calendar_settings.stock.daily.label')}</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              {t('calendar_settings.stock.daily.description')}
+            </p>
+          </div>
+        </label>
+      </RadioGroup>
     </div>
   );
 };

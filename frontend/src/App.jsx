@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import Navbar from './components/common/Header';
 import Footer from './components/common/Footer';
+import MobileNavBar from './components/common/MobileNavBar';
 import AppRoutes from './routes/AppRouter';
 import { UserContext } from './contexts/UserContext';
 import { toISO } from './utils/calendar/dateUtils';
@@ -13,6 +14,7 @@ import useSEO from './hooks/useSEO';
 import OnboardingTour from './components/onboarding/OnboardingTour';
 import { requestPermissionAndGetToken } from './services/firebase/firebase';
 import { useAlert } from './contexts/AlertContext';
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -1064,27 +1066,32 @@ function App() {
   });
 
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div className="flex flex-col min-h-screen">
       <OnboardingTour isAppLoading={isInitialLoading} />
       <Navbar sharedProps={sharedProps} />
-      <main className="flex-grow-1 d-flex flex-column safe-bottom">
-        {userInfo && (
-          <RealtimeManager
-            setCalendarsData={setCalendarsData}
-            setSharedCalendarsData={setSharedCalendarsData}
-            setNotificationsData={setNotificationsData}
-            setTokensList={setTokensList}
-            setLoadingStates={setLoadingStates}
-            calendarsData={calendarsData}
-            sharedCalendarsData={sharedCalendarsData}
-          />
-        )}
+      <ScrollArea className="h-72 w-full grow flex flex-col">
+        <main className="grow flex flex-col">
+          {userInfo && (
+            <RealtimeManager
+              setCalendarsData={setCalendarsData}
+              setSharedCalendarsData={setSharedCalendarsData}
+              setNotificationsData={setNotificationsData}
+              setTokensList={setTokensList}
+              setLoadingStates={setLoadingStates}
+              calendarsData={calendarsData}
+              sharedCalendarsData={sharedCalendarsData}
+            />
+          )}
 
-        <div className="container mt-4 mb-3">
-          <AppRoutes sharedProps={sharedProps} />
-        </div>
-      </main>
-      <Footer />
+          <div className="container mx-auto px-4 mt-4">
+            <AppRoutes sharedProps={sharedProps} />
+          </div>
+        </main>
+        <Footer />
+      </ScrollArea>
+      <div className="pt-24 lg:pt-0">
+        <MobileNavBar/>
+      </div>
     </div>
   );
 }

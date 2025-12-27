@@ -7,6 +7,12 @@ import { toISO } from "../../utils/calendar/dateUtils";
 import { useTranslation } from "react-i18next";
 import ActionSheet from '../../components/common/ActionSheet';
 import { useSearchParams, useNavigate, useParams, Link } from "react-router-dom";
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, Users, Link2, Eye, Pill, Trash2, Plus, Clipboard, Mail, User } from 'lucide-react';
 
 const VITE_URL = import.meta.env.VITE_VITE_URL;
 
@@ -219,13 +225,9 @@ function SharedList({
 
   if (loadingGroupedShared) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: "60vh" }}
-      >
-        <div className="spinner-border text-primary">
-          <span className="visually-hidden">{t("loading_calendars")}</span>
-        </div>
+      <div className="flex justify-center items-center h-[60vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="sr-only">{t("loading_calendars")}</span>
       </div>
     );
   }
@@ -236,51 +238,50 @@ function SharedList({
     calendarFromURL !== 'demo'
   ) {
     return (
-      <div className="container mt-4 text-center">
-        <h3 className="text-muted">{t("no_calendar_found")}</h3>
-        <p className="text-muted">{t("no_calendar_found_cta")}</p>
+      <div className="container mx-auto mt-4 text-center">
+        <h3 className="text-muted-foreground">{t("no_calendar_found")}</h3>
+        <p className="text-muted-foreground">{t("no_calendar_found_cta")}</p>
       </div>
     );
   }
 
   return (
-    <div className="container" style={{ maxWidth: '800px' }}>
+    <div className="container mx-auto max-w-3xl">
       <div className="mb-2 pb-2">
-        <div
-          className="d-flex flex-nowrap gap-2 p-1 overflow-auto"
-          style={{ scrollBehavior: 'smooth' }}
-        >
+        <div className="flex flex-nowrap gap-2 p-1 overflow-auto scroll-smooth">
           {/* --- MOCK DEMO START --- */}
           {calendarFromURL === 'demo' && (
-            <Link
-              key="demo"
-              to="?calendar=demo"
-              className="btn rounded-pill px-3 py-1 fw-semibold shadow-sm text-nowrap btn-primary"
-              title={t("tour.calendar_name")}
+            <Button
+              asChild
+              variant="default"
+              className="rounded-full px-3 py-1 font-semibold shadow-sm whitespace-nowrap"
             >
-              {t("tour.calendar_name")}
-            </Link>
+              <Link to="?calendar=demo" title={t("tour.calendar_name")}>
+                {t("tour.calendar_name")}
+              </Link>
+            </Button>
           )}
           {/* --- MOCK DEMO END --- */}
           {(personalCalendars?.calendarsData || []).map((calendar) => (
-            <Link
+            <Button
               key={calendar.id}
-              to={`?calendar=${calendar.id}`}
-              className={`btn rounded-pill px-3 py-1 fw-semibold shadow-sm text-nowrap ${
-                selectedCalendarId === calendar.id ? 'btn-primary' : 'btn-outline-primary'
-              }`}
-              onClick={() => {
-                setSelectedCalendarId(calendar.id);
-              }}
-              title={calendar.name}
+              asChild
+              variant={selectedCalendarId === calendar.id ? 'default' : 'outline'}
+              className="rounded-full px-3 py-1 font-semibold shadow-sm whitespace-nowrap"
             >
-              {calendar.name.length > 20 ? calendar.name.slice(0, 17) + '…' : calendar.name}
-            </Link>
+              <Link
+                to={`?calendar=${calendar.id}`}
+                onClick={() => setSelectedCalendarId(calendar.id)}
+                title={calendar.name}
+              >
+                {calendar.name.length > 20 ? calendar.name.slice(0, 17) + '…' : calendar.name}
+              </Link>
+            </Button>
           ))}
         </div>
       </div>
 
-      <div className="row g-4">
+      <div className="space-y-4">
         {Object.entries(groupedShared)
           .filter(([calendarId]) => calendarId === selectedCalendarId)
           .map(([calendarId, data]) => (
@@ -324,7 +325,7 @@ const calendarActions = ({
     {
       label: (
         <>
-          <i className="bi bi-eye me-2"></i> {t("open")}
+          <Eye className="h-4 w-4 mr-2" /> {t("open")}
         </>
       ),
       linkTo: `/${lng}/calendar/${calendarId}`,
@@ -333,7 +334,7 @@ const calendarActions = ({
     {
       label: (
         <>
-          <i className="bi bi-capsule me-2"></i> {t("medicines.label")}
+          <Pill className="h-4 w-4 mr-2" /> {t("medicines.label")}
         </>
       ),
       linkTo: `/${lng}/calendar/${calendarId}/boxes`,
@@ -343,7 +344,7 @@ const calendarActions = ({
     {
       label: (
         <>
-          <i className="bi bi-trash me-2"></i> {t("delete")}
+          <Trash2 className="h-4 w-4 mr-2" /> {t("delete")}
         </>
       ),
       onClick: () =>
@@ -373,27 +374,25 @@ function CalendarCard({
   const tokenProps = { handleCopyLink, handleUpdateTokenExpiration, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyToken, setSelectedModifyToken, tokenCalendars };
   const userProps = { handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
   return (
-    <div>
-      <div className="card-body">
-          <h4 className="mb-4 fw-bold justify-content-between d-flex align-items-center">
-            <span>
-              <i className="bi bi-people-fill me-2"></i>
-              {t("shared_calendar", { name: data.calendar_name })}
-            </span>
-            <ActionSheet
-              actions={calendarActions({
-                calendarId,
-                navigate,
-                personalCalendars,
-                promptDeleteCalendar,
-                t,
-                lng,
-              })}
-            />
-          </h4>
-        <TokenList {...tokenProps} />
-        <UserList {...userProps} />
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h4 className="text-xl font-bold flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          {t("shared_calendar", { name: data.calendar_name })}
+        </h4>
+        <ActionSheet
+          actions={calendarActions({
+            calendarId,
+            navigate,
+            personalCalendars,
+            promptDeleteCalendar,
+            t,
+            lng,
+          })}
+        />
       </div>
+      <TokenList {...tokenProps} />
+      <UserList {...userProps} />
     </div>
   );
 }
@@ -416,87 +415,79 @@ function TokenList({
   return (
     data.tokens.length !== 0 ? (
       (data.tokens || []).map((token) => (
-        <div className="card p-3 mb-3 shadow" key={token.id}>
-          <ul className="list-group">
-            <h5 className="mb-3 d-flex justify-content-between align-items-center">
-              <div>
-                <i className="bi bi-link-45deg me-2"></i>
+        <Card key={token.id} className="shadow">
+          <CardContent>
+            <h5 className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Link2 className="h-4 w-4" />
                 {t("public_links")} :
               </div>
-              <ActionSheet
-                actions={[
-                  {
-                    label: (
-                      <>
-                        <i className="bi bi-trash me-2"></i> {t('delete')}
-                      </>
-                    ),
-                    onClick: () => deleteTokenConfirmAction(token.id),
-                    title: t('delete'),
-                    danger: true,
-                  },
-                ]}
-                buttonSize="sm"
-              />
             </h5>
-            <div key={token.id}>
+            <div>
               {/* Lien */}
-              <div className="input-group col-md-6 mb-2" data-tour="share-public-links">
-                <input
+              <div className="flex mt-1 mb-2" data-tour="share-public-links">
+                <Input
                   id={"tokenLink" + token.id}
                   type="text"
-                  className={`form-control border-2 ${
+                  className={`flex-1 min-w-0 rounded-r-none border-2 text-sm ${
                     token.expires_at && new Date(token.expires_at) < new Date()
-                      ? "border-danger"
-                      : "border-success"
+                      ? "border-destructive"
+                      : "border-green-500"
                   }`}
                   aria-label={t("shared_link_label")}
                   title={t("shared_link_label")}
                   value={`${VITE_URL}/${lng}/shared-token-calendar/${token.id}`}
                   readOnly
                 />
-                <button
-                  className={`btn ${
-                    token.expires_at && new Date(token.expires_at) < new Date()
-                      ? "btn-outline-danger"
-                      : "btn-outline-success"
-                  }`}
+                <Button
+                  variant={token.expires_at && new Date(token.expires_at) < new Date() ? "destructive" : "outline"}
+                  className={`rounded-l-none shrink-0 ${!(token.expires_at && new Date(token.expires_at) < new Date()) && "border-green-500 text-green-600 hover:bg-green-50"}`}
                   onClick={() => handleCopyLink(token)}
                   aria-label={t("copy_link")}
                   title={t("copy_link")}
                 >
-                  <i className="bi bi-clipboard"></i>
-                </button>
+                  <Clipboard className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="ml-2"
+                  onClick={() => deleteTokenConfirmAction(token.id)}
+                  aria-label={t("delete")}
+                  title={t("delete")}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
 
               {/* Expiration */}
-              <div className="d-flex align-items-center gap-2 mb-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <label
                   htmlFor={`tokenExpiration${token.id}`}
-                  className="form-label mb-0 fw-semibold"
+                  className="font-semibold whitespace-nowrap"
                 >
                   {t("expiration")}:
                 </label>
-                <select
-                  id={`tokenExpiration${token.id}`}
-                  className="form-select w-auto"
-                  value={token.expires_at === null ? "" : "date"}
-                  onChange={(e) => {
-                    const value = e.target.value;
+                <Select
+                  value={token.expires_at === null ? "never" : "date"}
+                  onValueChange={(value) => {
                     handleUpdateTokenExpiration(
                       token.id,
-                      value === "" ? null : today,
+                      value === "never" ? null : today,
                     );
                   }}
                 >
-                  <option value="">{t("never")}</option>
-                  <option value="date">{t("date")}</option>
-                </select>
+                  <SelectTrigger className="w-auto">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="never">{t("never")}</SelectItem>
+                    <SelectItem value="date">{t("date")}</SelectItem>
+                  </SelectContent>
+                </Select>
                 {token.expires_at && (
-                  <input
+                  <Input
                     type="date"
-                    className="form-control w-auto"
-                    style={{ minWidth: "130px" }}
+                    className="w-full sm:w-auto min-w-32"
                     value={toISO(token.expires_at)}
                     onChange={(e) =>
                       handleUpdateTokenExpiration(
@@ -509,25 +500,28 @@ function TokenList({
                 )}
               </div>
             </div>
-          </ul>
-        </div>
+          </CardContent>
+        </Card>
       ))
     ) : (
-      <div className="card p-3 mb-3 shadow">
-        <h5 className="mb-3 d-flex align-items-center">
-          <i className="bi bi-link-45deg me-2"></i>
-          {t("public_links")} :
-        </h5>
-        <button
-          className="btn btn-outline-dark w-100"
-          onClick={() => handleCreateToken(calendarId)}
-          aria-label={t("create_share_link")}
-          title={t("create_share_link")}
-        >
-          <i className="bi bi-plus-lg me-2"></i>
-          {t("create_share_link")}
-        </button>
-      </div>
+      <Card className="shadow">
+        <CardContent className="p-4 space-y-3">
+          <h5 className="flex items-center gap-2">
+            <Link2 className="h-4 w-4" />
+            {t("public_links")} :
+          </h5>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => handleCreateToken(calendarId)}
+            aria-label={t("create_share_link")}
+            title={t("create_share_link")}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            {t("create_share_link")}
+          </Button>
+        </CardContent>
+      </Card>
     )
   );
 }
@@ -543,17 +537,18 @@ function UserList({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="card p-3 shadow">
-      <ul className="list-group">
-        <h5>
-          <i className="bi bi-person me-2"></i>
+    <Card className="shadow">
+      <CardContent>
+        <h5 className="flex items-center gap-2">
+          <User className="h-4 w-4" />
           {t("shared_users")}:
         </h5>
         {/* Liste des utilisateurs partagés */}
         {(data.users || []).map((user) => (
-          <li className="list-group-item" key={user.token} data-tour="share-users-list">
-            <div className="row align-items-center col-md-12 d-flex">
-              <div className="col-8 d-flex align-items-center gap-2 p-0">
+          <div className="border rounded-lg p-2 mt-2" key={user.token} data-tour="share-users-list">
+            {/* Desktop: tout sur une ligne */}
+            <div className="hidden sm:flex items-center gap-2">
+              <div className="flex-1 flex items-center gap-2 min-w-0">
                 <HoveredUserProfile
                   user={{
                     photo_url: user.receiver_photo_url,
@@ -561,53 +556,70 @@ function UserList({
                     email: user.receiver_email,
                   }}
                   trigger={
-                    <div className="d-flex align-items-center gap-2">
-                      <div>
-                        <img
-                          src={user.receiver_photo_url}
-                          alt={t("profile")}
-                          className="rounded-circle"
-                          style={{ width: "40px", height: "40px" }}
-                        />
-                      </div>
-
-                      <div>
-                        <strong>{user.receiver_name}</strong>
-                      </div>
+                    <div className="flex items-center gap-2 cursor-pointer min-w-0">
+                      <img
+                        src={user.receiver_photo_url}
+                        alt={t("profile")}
+                        className="rounded-full w-10 h-10 shrink-0"
+                      />
+                      <strong className="truncate">{user.receiver_name}</strong>
                     </div>
                   }
                 />
               </div>
-
-              {/* Statut */}
-              <div className="col-2 d-flex align-items-center justify-content-center">
-                <span
-                  className={`badge rounded-pill ${user.accepted ? "bg-success" : "bg-warning text-dark"}`}
+              <Badge variant={user.accepted ? "default" : "secondary"} className={user.accepted ? "bg-green-500" : "bg-yellow-500 text-foreground"}>
+                {user.accepted ? t("accepted") : t("pending")}
+              </Badge>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => deleteLoginInvitationConfirmAction(user.token)}
+                aria-label={t("delete")}
+                title={t("delete")}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            {/* Mobile: nom + delete, puis statut centré */}
+            <div className="sm:hidden">
+              <div className="flex items-center gap-2">
+                <div className="flex-1 flex items-center gap-2 min-w-0">
+                  <HoveredUserProfile
+                    user={{
+                      photo_url: user.receiver_photo_url,
+                      display_name: user.receiver_name,
+                      email: user.receiver_email,
+                    }}
+                    trigger={
+                      <div className="flex items-center gap-2 cursor-pointer min-w-0">
+                        <img
+                          src={user.receiver_photo_url}
+                          alt={t("profile")}
+                          className="rounded-full w-10 h-10 shrink-0"
+                        />
+                        <strong className="truncate">{user.receiver_name}</strong>
+                      </div>
+                    }
+                  />
+                </div>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="shrink-0"
+                  onClick={() => deleteLoginInvitationConfirmAction(user.token)}
+                  aria-label={t("delete")}
+                  title={t("delete")}
                 >
-                  {user.accepted ? t("accepted") : t("pending")}
-                </span>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
-
-              {/* Supprimer */}
-              <div className="col-2 justify-content-end d-flex p-0">
-                <ActionSheet
-                  actions={[
-                    {
-                      label: (
-                        <>
-                          <i className="bi bi-trash"></i> {t('delete')}
-                        </>
-                      ),
-                      onClick: () => deleteLoginInvitationConfirmAction(user.token),
-                      title: t('delete'),
-                      danger: true,
-                    },
-                  ]}
-                  buttonSize="sm"
-                />
+              <div className="flex justify-center mt-2">
+                <Badge variant={user.accepted ? "default" : "secondary"} className={user.accepted ? "bg-green-500" : "bg-yellow-500 text-foreground"}>
+                  {user.accepted ? t("accepted") : t("pending")}
+                </Badge>
               </div>
             </div>
-          </li>
+          </div>
         ))}
         {/* Liste des utilisateurs invités */}
         {(data.invitation || []).map((invitation) => {
@@ -620,103 +632,104 @@ function UserList({
 
 
           return (
-            <li
-              className="list-group-item"
+            <div
+              className="border rounded-lg p-2 mt-2"
               key={invitation.token}
             >
-              <div className="row align-items-center col-md-12 d-flex">
-                {/* Colonne gauche : image + infos */}
-                <div className="col-8 d-flex align-items-center gap-2 p-0">
+              {/* Desktop: tout sur une ligne */}
+              <div className="hidden sm:flex items-center gap-2">
+                <div className="flex-1 flex items-center gap-2 min-w-0">
                   <img
                     src={avatarUrl}
                     alt={t("profile")}
-                    className="rounded-circle"
-                    style={{ width: "40px", height: "40px" }}
+                    className="rounded-full w-10 h-10 shrink-0"
                   />
-                  <div>
-                    <strong>{displayName}</strong>
+                  <strong className="truncate">{displayName}</strong>
+                </div>
+                <Badge variant="secondary" className="bg-yellow-500 text-foreground">
+                  {t("pending")}
+                </Badge>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => deleteRegistrationInvitationConfirmAction(invitation.token)}
+                  aria-label={t("delete")}
+                  title={t("delete")}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+              {/* Mobile: email + delete, puis statut centré */}
+              <div className="sm:hidden">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 flex items-center gap-2 min-w-0">
+                    <img
+                      src={avatarUrl}
+                      alt={t("profile")}
+                      className="rounded-full w-10 h-10 shrink-0"
+                    />
+                    <strong className="truncate">{displayName}</strong>
                   </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={() => deleteRegistrationInvitationConfirmAction(invitation.token)}
+                    aria-label={t("delete")}
+                    title={t("delete")}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-
-                {/* Colonne statut */}
-                <div className="col-2 d-flex align-items-center justify-content-center">
-                  <span className={`badge rounded-pill bg-warning text-dark`}>
+                <div className="flex justify-center mt-2">
+                  <Badge variant="secondary" className="bg-yellow-500 text-foreground">
                     {t("pending")}
-                  </span>
-                </div>
-
-                {/* Colonne actions */}
-                <div className="col-2 d-flex justify-content-end p-0">
-                  <ActionSheet
-                    actions={[
-                      {
-                        label: (
-                          <>
-                            <i className="bi bi-trash"></i> {t("delete")}
-                          </>
-                        ),
-                        onClick: () => deleteRegistrationInvitationConfirmAction(invitation.token),
-                        title: t('delete'),
-                        danger: true,
-                      },
-                    ]}
-                    buttonSize="sm"
-                  />
+                  </Badge>
                 </div>
               </div>
-            </li>
+            </div>
           );
         })}
 
 
 
         {/* Ajouter un utilisateur */}
-        <div>
-          <div className="row align-items-center mt-2">
-            <div className="col-md-12">
-              <form
-                data-tour="share-invite-user-form"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSendInvitation(calendarId);
-                }}
-              >
-                <div className="input-group ">
-                  <input
-                    id={"emailToInvite" + calendarId}
-                    type="email"
-                    className={`form-control`}
-                    placeholder={t("recipient_email")}
-                    aria-label={t("recipient_email")}
-                    onChange={(e) =>
-                      setEmailsToInvite((prev) => ({
-                        ...prev,
-                        [calendarId]: e.target.value,
-                      }))
-                    }
-                    value={emailsToInvite[calendarId] ?? ""}
-                    required
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleSendInvitation(calendarId);
-                      }
-                    }}
-                  />
-                  <button
-                    className={`btn btn-primary`}
-                    aria-label={t("send_invitation")}
-                    title={t("send_invitation")}
-                    type="submit"
-                  >
-                    <i className="bi bi-envelope-paper"></i>
-                  </button>
-                </div>
-              </form>
-            </div>
+        <form
+          data-tour="share-invite-user-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSendInvitation(calendarId);
+          }}
+          className="mt-2"
+        >
+          <div className="flex gap-0">
+            <Input
+              id={"emailToInvite" + calendarId}
+              type="email"
+              className="rounded-r-none"
+              placeholder={t("recipient_email")}
+              aria-label={t("recipient_email")}
+              onChange={(e) =>
+                setEmailsToInvite((prev) => ({
+                  ...prev,
+                  [calendarId]: e.target.value,
+                }))
+              }
+              value={emailsToInvite[calendarId] ?? ""}
+              required
+            />
+            <Button
+              className="rounded-l-none"
+              aria-label={t("send_invitation")}
+              title={t("send_invitation")}
+              type="submit"
+            >
+              <Mail className="h-4 w-4" />
+            </Button>
           </div>
-        </div>
-      </ul>
-    </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -737,9 +750,10 @@ SharedList.propTypes = {
     deleteCalendar: PropTypes.func,
   }).isRequired,
   sharedUserCalendars: PropTypes.shape({
-    fetchSharedUsers: PropTypes.func.isRequired,
     deleteLoginInvitation: PropTypes.func.isRequired,
     sendInvitation: PropTypes.func.isRequired,
+    deleteRegistrationInvitation: PropTypes.func.isRequired,
+    fetchGroupedSharedCalendars: PropTypes.func.isRequired,
   }).isRequired,
 };
 

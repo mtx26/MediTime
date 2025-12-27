@@ -19,17 +19,11 @@ export default function ForcedLandscapeWrapper({ children }) {
   if (isPortrait) {
     return (
       <div
+        className="fixed top-0 left-0 bg-background overflow-auto z-1000 rotate-90 origin-top-left"
         style={{
-          position: 'fixed',
           width: viewportHeight,
           height: viewportWidth,
-          top: 0,
-          left: 0,
           transform: `translateX(${viewportWidth}px) rotate(90deg)`,
-          transformOrigin: 'top left',
-          backgroundColor: 'white',
-          overflow: 'auto',
-          zIndex: 1000,
         }}
       >
         {children}

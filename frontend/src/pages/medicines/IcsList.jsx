@@ -5,6 +5,12 @@ import ActionSheet from '../../components/common/ActionSheet';
 import { useAlert } from '../../contexts/AlertContext';
 import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
 import PropTypes from 'prop-types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Link2, InfoIcon, Trash2, Clipboard, ExternalLink, PlusCircle, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -89,109 +95,96 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: '60vh' }}
-      >
-        <div className="spinner-border text-primary">
-          <span className="visually-hidden">{t('loading')}</span>
-        </div>
+      <div className="flex justify-center items-center h-[60vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="sr-only">{t('loading')}</span>
       </div>
     );
   }
 
   return (
-    <div className="container mt-4" style={{ maxWidth: '800px' }}>
+    <div className="container mx-auto max-w-3xl">
       <div className="mb-4">
-        <h4 className="mb-3 fw-bold">
-          <i className="bi bi-link-45deg me-2"></i>
+        <h4 className="mb-3 text-xl font-bold flex items-center gap-2">
+          <Link2 className="h-5 w-5" />
           {t('ics.title')}
         </h4>
       </div>
 
-      <div className="alert alert-info shadow-sm mb-4">
-        <div className="d-flex">
-          <div className="me-3">
-            <i className="bi bi-info-circle-fill fs-4"></i>
-          </div>
-          <div>
-            <h5 className="alert-heading">{t('ics.info_title')}</h5>
-            <p className="mb-0">{t('ics.info_description')}</p>
-          </div>
-        </div>
-      </div>
+      <Alert className="mb-4">
+        <InfoIcon className="h-4 w-4" />
+        <AlertDescription>
+          <h5 className="font-semibold mb-1">{t('ics.info_title')}</h5>
+          <p className="text-sm">{t('ics.info_description')}</p>
+        </AlertDescription>
+      </Alert>
 
       {tokens.map((token) => (
-        <div className="card p-3 mb-3 shadow" key={token.id}>
-          <ul className="list-group">
-            <h5 className="mb-3 d-flex justify-content-between align-items-center">
-              <div>
-                <i className="bi bi-link-45deg me-2"></i>
+        <Card key={token.id} className="mb-3 shadow-sm">
+          <CardContent>
+            <h5 className="mb-3 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Link2 className="h-4 w-4" />
                 {t('ics.token_label')}
               </div>
-              <ActionSheet
-                actions={[
-                  {
-                    label: (
-                      <>
-                        <i className="bi bi-trash me-2"></i> {t('delete')}
-                      </>
-                    ),
-                    onClick: () => openDeleteActionSheet(token),
-                    title: t('delete'),
-                    danger: true,
-                  },
-                ]}
-                buttonSize="sm"
-              />
             </h5>
-            <div>
-              <div className="input-group col-md-6 mb-2">
-                <input
-                  type="text"
-                  className="form-control border-2 border-success"
-                  value={getWebcalUrl(token.token)}
-                  readOnly
-                  aria-label={t('ics.token_label')}
-                />
-                <button
-                  className="btn btn-outline-success"
-                  onClick={() => copyToClipboard(getWebcalUrl(token.token))}
-                  title={t('copy_link')}
-                  aria-label={t('copy_link')}
-                >
-                  <i className="bi bi-clipboard"></i>
-                </button>
+            <div className="flex">
+              <Input
+                type="text"
+                className="flex-1 rounded-r-none border-2 border-green-500 focus-visible:ring-green-500"
+                value={getWebcalUrl(token.token)}
+                readOnly
+                aria-label={t('ics.token_label')}
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-l-none border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-950"
+                onClick={() => copyToClipboard(getWebcalUrl(token.token))}
+                title={t('copy_link')}
+                aria-label={t('copy_link')}
+              >
+                <Clipboard className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="border-primary text-primary hover:bg-primary/5 ml-2"
+                asChild
+              >
                 <a
                   href={getWebcalUrl(token.token)}
-                  className="btn btn-outline-primary"
                   title={t('open')}
                   aria-label={t('open')}
                 >
-                  <i className="bi bi-box-arrow-up-right"></i>
+                  <ExternalLink className="h-4 w-4" />
                 </a>
-              </div>
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="border-destructive text-destructive hover:bg-destructive/10 ml-2"
+                onClick={() => openDeleteActionSheet(token)}
+                title={t('delete')}
+                aria-label={t('delete')}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
-          </ul>
-        </div>
+          </CardContent>
+        </Card>
       ))}
 
-      <div className="card p-3 mb-3 shadow">
-        <h5 className="mb-3 d-flex align-items-center">
-          <i className="bi bi-plus-circle me-2"></i>
-          {t('ics.add_token')}
-        </h5>
-        <button
-          className="btn btn-outline-dark w-100"
-          onClick={handleCreateToken}
-          aria-label={t('ics.add_token')}
-          title={t('ics.add_token')}
-        >
-          <i className="bi bi-plus-lg me-2"></i>
-          {t('ics.add_token')}
-        </button>
-
-      </div>
+      <Button
+        variant="outline"
+        className="w-full mb-3"
+        onClick={handleCreateToken}
+        aria-label={t('ics.add_token')}
+        title={t('ics.add_token')}
+      >
+        <PlusCircle className="h-4 w-4 mr-2" />
+        {t('ics.add_token')}
+      </Button>
     </div>
   );
 }

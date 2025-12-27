@@ -6,6 +6,9 @@ import isEqual from 'lodash/isEqual';
 import { useTranslation } from 'react-i18next';
 import { getMondayDate, toISO } from '../../utils/calendar/dateUtils';
 import { useAlert } from '../../contexts/AlertContext';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { CheckCircle, AlertTriangle, RefreshCw, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const pill_count = {
@@ -110,51 +113,58 @@ export default function PillboxDisplay({
 
   if (loading === undefined) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '40vh' }}>
-        <div className="spinner-border text-primary">
-          <span className="visually-hidden">{t('loading_calendar')}</span>
-        </div>
+      <div className="flex justify-center items-center h-[40vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        <span className="sr-only">{t('loading_calendar')}</span>
       </div>
     );
   }
 
   if (loading === false) {
     return (
-      <div className="alert alert-danger text-center mt-5" role="alert">
-        {t('invalid_or_expired_link')}
+      <div className="mt-8">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>{t('error')}</AlertTitle>
+          <AlertDescription className="text-center">
+            {t('invalid_or_expired_link')}
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
 
   return (
-    <div className="position-relative">
-      <div className="container-fluid text-center w-100 mt-3">
+    <div className="relative">
+      <div className="container mx-auto text-center w-full mt-3">
         {isPillboxUsed ? (
-          <div className="mb-3 p-3">
-            <div className="card-body d-flex flex-column justify-content-center align-items-center p-4">
-              <i className="bi bi-check-circle text-success fs-1"></i>
-              <span className="text-success fw-bold mt-2 mb-0 text-center">{t('calendar_completed_this_week')}</span>
+          <div className="mb-6 p-3">
+            <div className="flex flex-col justify-center items-center p-6">
+              <CheckCircle className="h-16 w-16 text-green-600" />
+              <span className="text-green-600 font-bold mt-2 mb-0 text-center">{t('calendar_completed_this_week')}</span>
             </div>
           </div>
         ) : (
           <>
             {pillboxError ? (
-              <div className="card-body d-flex flex-column justify-content-center align-items-center p-2">
-                <button
-                  className='btn'
+              <div className="flex flex-col justify-center items-center p-4">
+                <Alert variant="destructive" className="w-full max-w-md">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>{t('error')}</AlertTitle>
+                  <AlertDescription>
+                    {t('pillbox_error_message')}
+                  </AlertDescription>
+                </Alert>
+                <Button
+                  variant="outline"
+                  className="mt-3"
                   onClick={() => setPillboxError(false)}
                   aria-label={t('retry')}
                   title={t('retry')}
                 >
-                  <div className="d-flex flex-column align-items-center">
-                    <i className="bi bi-exclamation-triangle text-danger fs-1 mb-2"></i>
-                    <span className="text-danger fw-bold mb-2 text-center">{t('pillbox_error_message')}</span>
-                    <span className="d-flex align-items-center justify-content-center mb-2">
-                      <i className="bi bi-arrow-clockwise fs-4 text-danger me-2"></i>
-                      <span className="text-danger fw-bold">{t('retry')}</span>
-                    </span>
-                  </div>
-                </button>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  {t('retry')}
+                </Button>
               </div>
             ) : (
               <>
@@ -162,24 +172,24 @@ export default function PillboxDisplay({
                   <>
                     <div 
                       className={
-                        `rounded-top px-3 py-2 ${
-                        orderedMeds[selectedMedIndex].moment === 'morning' ? 'bg-danger text-white' :
-                        orderedMeds[selectedMedIndex].moment === 'noon' ? 'bg-success text-white' :
-                        orderedMeds[selectedMedIndex].moment === 'evening' ? 'bg-info text-white' :
+                        `rounded-t-lg px-3 py-2 ${
+                        orderedMeds[selectedMedIndex].moment === 'morning' ? 'bg-red-500 text-white' :
+                        orderedMeds[selectedMedIndex].moment === 'noon' ? 'bg-green-500 text-white' :
+                        orderedMeds[selectedMedIndex].moment === 'evening' ? 'bg-blue-400 text-white' :
                         'bg-white text-primary'}`
                       }
                     >
-                      <h4 className="mb-0"><strong>{t(orderedMeds[selectedMedIndex].moment)}</strong></h4>
+                      <h4 className="mb-0 text-lg font-bold">{t(orderedMeds[selectedMedIndex].moment)}</h4>
                     </div>
-                    <div className="bg-primary text-white px-3 py-3 rounded-bottom mb-4">
-                      <h4 className="mb-0"><strong>{orderedMeds[selectedMedIndex].title}</strong></h4>
+                    <div className="bg-primary text-primary-foreground px-3 py-3 rounded-b-lg mb-6">
+                      <h4 className="mb-0 text-lg font-bold">{orderedMeds[selectedMedIndex].title}</h4>
                     </div>
-                    <div className="row row-cols-7 g-3 align-items-stretch text-center">
+                    <div className="grid grid-cols-7 gap-3 items-stretch text-center">
                       {days.map((day, idx) => (
-                        <div key={day} className="col">
-                          <div className="d-flex flex-column h-100">
-                            <h6 className="mb-1">{t(day)}</h6>
-                            <div className='text-secondary rounded mb-2' >
+                        <div key={day} className="flex flex-col">
+                          <div className="flex flex-col h-full">
+                            <h6 className="mb-1 text-sm font-semibold">{t(day)}</h6>
+                            <div className='text-muted-foreground rounded mb-2 text-sm' >
                               {weekDates[idx] && (
                                 weekDates[idx].toLocaleDateString(t('locale'), {
                                   month: 'numeric',
@@ -187,13 +197,13 @@ export default function PillboxDisplay({
                                 })
                               )}
                             </div>
-                            <div className="shadow-sm border rounded bg-light p-2 flex-grow-1 d-flex align-items-center justify-content-center">
+                            <div className="shadow-sm border rounded bg-muted/20 p-2 grow flex items-center justify-center">
                               {orderedMeds[selectedMedIndex].cells[day] !== undefined && (
-                                <div className="w-100 ratio ratio-1x1">
+                                <div className="w-full aspect-square">
                                   <img
                                     src={`/icons/pills/${pill_count[orderedMeds[selectedMedIndex].cells[day]]}_pills.svg`}
                                     alt="Pills"
-                                    className="img-fluid object-fit-contain"
+                                    className="w-full h-full object-contain"
                                   />
                                 </div>
                               )}
@@ -202,16 +212,17 @@ export default function PillboxDisplay({
                         </div>
                       ))}
                     </div>
-                    <div className="d-flex gap-3 justify-content-between text-center">
-                      <button 
-                        className="btn btn-outline-primary mt-4" 
+                    <div className="flex gap-3 justify-between text-center">
+                      <Button 
+                        variant="outline"
+                        className="mt-4"
                         onClick={handlePreviousMed} 
                         disabled={selectedMedIndex === 0}
                         aria-label={t('previous')}
                         title={t('previous')}
                       >
-                        <i className="bi bi-arrow-left"></i> {t('previous')}
-                      </button>
+                        <ArrowLeft className="h-4 w-4 mr-2" /> {t('previous')}
+                      </Button>
                       {selectedMedIndex < orderedMeds.length - 1 ? (
                         (() => {
                           const currentMoment = orderedMeds[selectedMedIndex].moment;
@@ -219,36 +230,37 @@ export default function PillboxDisplay({
 
                           if (currentMoment === nextMoment) {
                             return (
-                              <button 
-                                className="btn btn-outline-primary mt-4" 
+                              <Button 
+                                variant="outline"
+                                className="mt-4"
                                 onClick={handleNextMed}
                                 aria-label={t('next')}
                                 title={t('next')}
                               >
-                                {t('next')} <i className="bi bi-arrow-right"></i>
-                              </button>
+                                {t('next')} <ArrowRight className="h-4 w-4 ml-2" />
+                              </Button>
                             );
                           } else {
                             return (
-                              <button
-                                className={`btn ${
-                                  nextMoment === 'morning' ? 'btn-danger text-white' :
-                                  nextMoment === 'noon' ? 'btn-success text-white' :
-                                  nextMoment === 'evening' ? 'btn-info text-white' :
-                                  'btn-primary text-white'
-                                } mt-4`} 
+                              <Button
+                                className={`${
+                                  nextMoment === 'morning' ? 'bg-red-500 hover:bg-red-600 text-white' :
+                                  nextMoment === 'noon' ? 'bg-green-500 hover:bg-green-600 text-white' :
+                                  nextMoment === 'evening' ? 'bg-blue-400 hover:bg-blue-500 text-white' :
+                                  'bg-primary hover:bg-primary/90 text-primary-foreground'
+                                } mt-4`}
                                 onClick={handleNextMed}
                                 aria-label={t('next')}
                                 title={t('next')}
                               >
-                                {t(nextMoment)} <i className="bi bi-arrow-right"></i>
-                              </button>
+                                {t(nextMoment)} <ArrowRight className="h-4 w-4 ml-2" />
+                              </Button>
                             );
                           }
                         })()
                       ) : (
-                        <button
-                          className="btn btn-success mt-4"
+                        <Button
+                          className="bg-green-500 hover:bg-green-600 text-white mt-4"
                           onClick={() => {
                             showConfirm(
                               'confirm-safe',
@@ -269,13 +281,13 @@ export default function PillboxDisplay({
                           aria-label={t('done')}
                           title={t('done')}
                         >
-                          <i className="bi bi-check-circle"></i> {t('done')}
-                        </button>
+                          <CheckCircle className="h-4 w-4 mr-2" /> {t('done')}
+                        </Button>
                       )}
                     </div>
                   </>
                 )}
-                {orderedMeds.length === 0 && <p className="mt-5">{t('no_medicines')}</p>}
+                {orderedMeds.length === 0 && <p className="mt-8 text-muted-foreground">{t('no_medicines')}</p>}
               </>
             )}
           </>

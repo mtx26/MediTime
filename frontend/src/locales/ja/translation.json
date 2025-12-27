@@ -584,7 +584,9 @@
     "language_note": "選択した言語はインターフェース全体に適用されます。",
     "preferences": "設定",
     "preferences_desc": "MediTime での体験をカスタマイズします。",
-    "security": "安全"
+    "security": "安全",
+    "theme": "テーマ",
+    "theme_toggle": "テーマを変更するにはクリックしてください"
   },
   "share": "共有",
   "share_calendar": "カレンダーを共有する",
@@ -1057,5 +1059,9 @@
       "photo_error": "ユーザー写真の更新中にエラーが発生しました",
       "photo_success": "ユーザーの写真が更新されました"
     }
+  },
+  "theme": {
+    "dark": "ダークモード",
+    "light": "モードクレール"
   }
 }

@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { resetPassword } from '../../services/auth/authService';
 import { useAlert } from '../../contexts/AlertContext';
 import { useTranslation } from 'react-i18next';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Mail } from 'lucide-react';
 
 function ResetPassword() {
   const { t } = useTranslation();
@@ -24,42 +28,38 @@ function ResetPassword() {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center my-5">
-      <div
-        className="card shadow"
-        style={{ maxWidth: '500px', width: '100%', borderRadius: '1rem' }}
-      >
-        <div className="card-body p-4">
+    <div className="container mx-auto flex justify-center items-center my-10">
+      <div className="w-full max-w-md rounded-xl border bg-card text-card-foreground shadow">
+        <div className="p-6">
           <div className="text-center mb-4">
-            <h5>{t('reset_password.title')}</h5>
-            <p>{t('reset_password.instructions')}</p>
+            <h5 className="text-lg font-semibold">{t('reset_password.title')}</h5>
+            <p className="text-muted-foreground">{t('reset_password.instructions')}</p>
           </div>
-          <form onSubmit={handleReset}>
-            <div className="mb-3">
-              <label htmlFor="emailInput" className="form-label">
-                {t('auth.email')}
-              </label>
-              <input
-                type="email"
-                className={`form-control ${!formValid ? 'is-invalid' : ''}`}
+          <form onSubmit={handleReset} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="emailInput">{t('auth.email')}</Label>
+              <Input
                 id="emailInput"
+                type="email"
                 aria-label={t('auth.email')}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className={!formValid ? 'border-destructive focus-visible:ring-destructive/50' : ''}
               />
             </div>
 
-            <button
-              className="btn btn-outline-primary w-100"
+            <Button
               type="submit"
+              variant="outline"
+              className="w-full gap-2"
               disabled={!formValid}
               aria-label={t('reset_password.send_link')}
               title={t('reset_password.send_link')}
             >
-              <i className="bi bi-envelope-paper"></i>
-              <span> {t('reset_password.send_link')}</span>
-            </button>
+              <Mail className="h-4 w-4" />
+              {t('reset_password.send_link')}
+            </Button>
           </form>
         </div>
       </div>
