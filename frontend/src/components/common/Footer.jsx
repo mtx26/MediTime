@@ -38,7 +38,7 @@ function Footer() {
   return (
     <>
     {shouldShowFooter && (
-      <footer className="bg-muted/50 border-t pt-4 pb-3 hidden lg:block">
+      <footer className="bg-muted/50 border-t pt-4 mt-3 pb-3 hidden lg:block">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
           {/* Colonne liens */}

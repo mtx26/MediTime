@@ -23,7 +23,7 @@ export default function WeekDayCircles({ selectedDate, onSelectDate }) {
   });
 
   return (
-    <div className="flex w-full overflow-hidden gap-1 py-1 justify-between items-center">
+    <div className="flex w-full overflow-hidden gap-1 p-1 justify-between items-center">
       {weekDates.map((day, index) => {
         const isSelected = day.getTime() === normalizedSelectedDate.getTime();
         const isToday = day.getTime() === today.getTime();

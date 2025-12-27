@@ -128,8 +128,16 @@ th.fc-col-header-cell {
   text-overflow: ellipsis;
 }
 
+
 .fc .fc-event:hover {
-  opacity: 0.9;
+  opacity: 1;
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.18), 0 1.5px 6px 0 rgba(0,0,0,0.12);
+  border: 2px solid hsl(var(--accent-foreground));
+  filter: brightness(1.08) saturate(1.2);
+  z-index: 2;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, border 0.15s;
 }
 
 .fc .fc-timegrid-slot-label {

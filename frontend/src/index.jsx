@@ -7,7 +7,6 @@ import { AlertProvider } from './contexts/AlertContext';
 import { Toaster } from '@/components/ui/sonner';
 import './i18n';
 import { SpeedInsights } from "@vercel/speed-insights/react"
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Initialiser le thème depuis localStorage ou préférence système
 const savedTheme = localStorage.getItem('theme');
@@ -35,12 +34,10 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <AlertProvider>
     <UserProvider>
-      <ScrollArea className="h-screen w-screen" style={{ scrollbarGutter: 'stable both-edges' }}>
-        <div className="h-full">
-          <Root />
-          <SpeedInsights />
-        </div>
-      </ScrollArea>
+      <div className="h-full">
+        <Root />
+        <SpeedInsights />
+      </div>
     </UserProvider>
     <Toaster position="bottom-right" closeButton />
   </AlertProvider>,

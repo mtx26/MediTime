@@ -14,6 +14,7 @@ import useSEO from './hooks/useSEO';
 import OnboardingTour from './components/onboarding/OnboardingTour';
 import { requestPermissionAndGetToken } from './services/firebase/firebase';
 import { useAlert } from './contexts/AlertContext';
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -1058,25 +1059,29 @@ function App() {
     <div className="flex flex-col min-h-screen">
       <OnboardingTour isAppLoading={isInitialLoading} />
       <Navbar sharedProps={sharedProps} />
-      <main className="grow flex flex-col pb-24 lg:pb-0">
-        {userInfo && (
-          <RealtimeManager
-            setCalendarsData={setCalendarsData}
-            setSharedCalendarsData={setSharedCalendarsData}
-            setNotificationsData={setNotificationsData}
-            setTokensList={setTokensList}
-            setLoadingStates={setLoadingStates}
-            calendarsData={calendarsData}
-            sharedCalendarsData={sharedCalendarsData}
-          />
-        )}
+      <ScrollArea className="h-72 w-full grow flex flex-col">
+        <main className="grow flex flex-col">
+          {userInfo && (
+            <RealtimeManager
+              setCalendarsData={setCalendarsData}
+              setSharedCalendarsData={setSharedCalendarsData}
+              setNotificationsData={setNotificationsData}
+              setTokensList={setTokensList}
+              setLoadingStates={setLoadingStates}
+              calendarsData={calendarsData}
+              sharedCalendarsData={sharedCalendarsData}
+            />
+          )}
 
-        <div className="container mx-auto px-4 mt-4 mb-3">
-          <AppRoutes sharedProps={sharedProps} />
-        </div>
-      </main>
-      <Footer />
-      <MobileNavBar />
+          <div className="container mx-auto px-4 mt-4">
+            <AppRoutes sharedProps={sharedProps} />
+          </div>
+        </main>
+        <Footer />
+      </ScrollArea>
+      <div className="pt-24 lg:pt-0">
+        <MobileNavBar/>
+      </div>
     </div>
   );
 }
