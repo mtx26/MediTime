@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useRealtimeTokenMedicines } from '../../hooks/realtime/useRealtimeMedicines';
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
 import { useLoading } from '@/components/ui/loading';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
