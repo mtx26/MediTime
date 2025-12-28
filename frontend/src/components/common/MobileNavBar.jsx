@@ -50,7 +50,7 @@ function MobileNavBar() {
 
   const nav = (
     <nav
-      className="lg:hidden fixed bottom-0 left-1/2 -translate-x-1/2 z-1000 pb-[env(safe-area-inset-bottom)]"
+      className="lg:hidden fixed bottom-0 left-1/2 -translate-x-1/2 z-500 pb-[env(safe-area-inset-bottom)]"
       style={{ bottom: bottomOffset }}
     >
       <div className="w-[min(100vw-8px,40rem)] mx-auto px-2">

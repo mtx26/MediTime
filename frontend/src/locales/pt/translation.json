@@ -1070,5 +1070,8 @@
   "theme": {
     "dark": "Modo escuro",
     "light": "Modo claro"
-  }
+  },
+  "user_profile_aria": "Ver perfil do usuário",
+  "confirmation": "Confirmação",
+  "loading_pillbox": "Carregando o porta-comprimidos..."
 }

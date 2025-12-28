@@ -1,20 +1,20 @@
 
-import React, { useRef, useState, useEffect, useContext, useMemo, use } from 'react';
-import { useParams, useLocation, useNavigate, data, Link } from 'react-router-dom';
+import React, { useRef, useState, useEffect, useContext } from 'react';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
-import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
-import { toISO, toDate, getMondayDate } from '../../utils/calendar/dateUtils';
-import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
-import { UserContext } from '../../contexts/UserContext';
+import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
+import { toISO, toDate } from '@/utils/calendar/dateUtils';
+import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
+import { UserContext } from '@/contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import isEqual from 'lodash/isEqual';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert } from '@/components/ui/alert';
 import { AlertTriangle, ChevronRight } from 'lucide-react';
+import NotFound from '@/pages/general/NotFound';
 
 // Page d'affichage du mode "daily" (journalier)
 
 export default function DailyCalendarPage({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
-  const navigate = useNavigate(); // Hook de navigation
   const location = useLocation();
   const params = useParams();
   const { t } = useTranslation();
@@ -46,6 +46,7 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
 
   // 🔄 Références et chargement
   const [loading, setLoading] = useState(true); // État de chargement du calendrier
+  const [notFound, setNotFound] = useState(false); // Erreur 404 si le calendrier n'existe pas
 
 	  let calendarType = 'personal';
     let calendarId = params.calendarId;
@@ -125,8 +126,14 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
             setIsLowStock(rep.ifLowStock);
             // TODO: Hook pour alerte stock faible en temps réel
           }
+          setLoading(false);
+        } else {
+          // Si l'API retourne un 404, le calendrier n'existe pas
+          if (rep.status === 404) {
+            setNotFound(true);
+          }
+          setLoading(false);
         }
-        setLoading(rep.success ? false : undefined);
       };
   
       load();
@@ -155,20 +162,12 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
     showLoading(loading === true && calendarId, t('calendar.loading_daily_view'));
   }, [loading, calendarId, showLoading, t]);
 
-  if ((loading === true && calendarId)) {
+  if (loading === true && calendarId) {
     return null;
   }
 
-  if ((loading === undefined) && calendarId) {
-    return (
-      <div className="mt-5">
-        <Alert variant="destructive">
-          <AlertDescription className="text-center">
-            ❌ {t('invalid_or_expired_link')}
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
+  if (notFound) {
+    return <NotFound />;
   }
 
   return (

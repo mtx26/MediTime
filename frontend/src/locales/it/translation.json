@@ -1070,5 +1070,8 @@
   "theme": {
     "dark": "Modalità scura",
     "light": "Modalità chiara"
-  }
+  },
+  "user_profile_aria": "Visualizza il profilo utente",
+  "confirmation": "Conferma",
+  "loading_pillbox": "Caricamento del fortino..."
 }

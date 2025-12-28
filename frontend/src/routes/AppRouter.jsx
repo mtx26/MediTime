@@ -1,4 +1,4 @@
-import React, { useContext, lazy, Suspense } from 'react';
+import React, { useContext, lazy, Suspense, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
@@ -14,28 +14,28 @@ const VerifyEmail = lazy(() => import('../pages/auth/VerifyEmail'));
 
 const NotificationsPage = lazy(() => import('../pages/notifications/NotificationsPage'));
 const SettingsPage = lazy(() => import('../pages/settings/SettingsPage'));
-const AddCalendarPage = lazy(() => import('../pages/calendar/AddCalendarPage'));
-const MedicineReview = lazy(() => import('../pages/calendar/MedicineReview'));
-const AcceptInvitePage = lazy(() => import('../pages/calendar/AcceptInvitePage'));
+const AddCalendarPage = lazy(() => import('../pages/calendars/AddCalendarPage'));
+const MedicineReview = lazy(() => import('../pages/calendars/MedicineReview'));
+const AcceptInvitePage = lazy(() => import('../pages/calendars/calendar/share/AcceptInvitePage'));
 
-const CalendarView = lazy(() => import('../pages/calendar/CalendarView'));
-const PillboxPage = lazy(() => import('../pages/calendar/Pillbox'));
-const DailyCalendarPage = lazy(() => import('../pages/calendar/DailyCalendarPage'));
-const CalendarList = lazy(() => import('../pages/calendar/CalendarList'));
-const SharedList = lazy(() => import('../pages/share/SharedList'));
-const StockAlertsPage = lazy(() => import('../pages/calendar/StockAlertsPage'));
-const PillboxUses = lazy(() => import('../pages/calendar/PillboxUses'));
+const CalendarView = lazy(() => import('../pages/calendars/calendar/CalendarView'));
+const PillboxPage = lazy(() => import('../pages/calendars/calendar/pillbox/Pillbox'));
+const DailyCalendarPage = lazy(() => import('../pages/calendars/calendar/DailyCalendarPage'));
+const CalendarList = lazy(() => import('../pages/calendars/CalendarList'));
+const SharedList = lazy(() => import('../pages/calendars/calendar/share/SharedList'));
+const StockAlertsPage = lazy(() => import('../pages/calendars/calendar/StockAlertsPage'));
+const PillboxUses = lazy(() => import('../pages/calendars/calendar/pillbox/PillboxUses'));
 
-const MedicinesList = lazy(() => import('../pages/medicines/MedicinesList'));
-const BoxesView = lazy(() => import('../pages/medicines/BoxesView'));
-const IcsList = lazy(() => import('../pages/medicines/IcsList'));
+const MedicinesList = lazy(() => import('../pages/calendars/calendar/medicines/MedicinesList'));
+const BoxesView = lazy(() => import('../pages/calendars/calendar/medicines/BoxesView'));
+const IcsList = lazy(() => import('../pages/calendars/calendar/medicines/IcsList'));
 const NotFound = lazy(() => import('../pages/general/NotFound'));
 
 const PrivacyPage = lazy(() => import('../pages/general/PrivacyPage'));
 const TermsPage = lazy(() => import('../pages/general/TermsPage'));
 
 const AuthCallback = lazy(() => import('../pages/auth/AuthCallback'));
-const CalendarSettingsPage = lazy(() => import('../pages/calendar/CalendarSettingsPage'));
+const CalendarSettingsPage = lazy(() => import('../pages/calendars/calendar/settings/CalendarSettingsPage'));
 
 function buildFullPath(loc) {
   const path = loc.pathname || '/';
@@ -61,11 +61,23 @@ function PrivateRoute({ element }) {
   return element;
 }
 
+function SuspenseFallback() {
+  const { showLoading } = useLoading();
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    showLoading(true, t('loading'));
+    return () => showLoading(false, '');
+  }, [showLoading, t]);
+
+  return null;
+}
+
 function RouteWithLoader({ element, isLoading }) {
   const { showLoading } = useLoading();
   const { t } = useTranslation();
   
-  React.useEffect(() => {
+  useEffect(() => {
     showLoading(isLoading, t('loading'));
   }, [isLoading, showLoading, t]);
 
@@ -78,23 +90,9 @@ function RouteWithLoader({ element, isLoading }) {
 function AppRoutes({ sharedProps }) {
   const { userInfo } = useContext(UserContext);
   const { lng } = useParams();
-  const { t } = useTranslation();
-  const { showLoading } = useLoading();
-  const [suspenseLoading, setSuspenseLoading] = React.useState(false);
-
-  React.useEffect(() => {
-    showLoading(suspenseLoading, t('loading'));
-  }, [suspenseLoading, showLoading, t]);
-
-  React.useEffect(() => {
-    setSuspenseLoading(true);
-    return () => setSuspenseLoading(false);
-  }, []);
-
-  const fallback = null;
 
   return (
-    <Suspense fallback={fallback}>
+    <Suspense fallback={<SuspenseFallback />}>
       <Routes>
       <Route
         path="login"

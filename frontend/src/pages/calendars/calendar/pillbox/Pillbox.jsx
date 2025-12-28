@@ -1,12 +1,15 @@
 // pages/PillboxPage.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import ForcedLandscapeWrapper from '../../components/common/ForcedLandscapeWrapper';
-import PillboxDisplay from '../../components/calendar/PillboxDisplay';
+import ForcedLandscapeWrapper from '@/components/common/ForcedLandscapeWrapper';
+import PillboxDisplay from '@/components/calendar/PillboxDisplay';
+import NotFound from '@/pages/general/NotFound';
 
 function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const location = useLocation();
   const params = useParams();
+
+  const [notFound, setNotFound] = useState(false);
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
@@ -28,6 +31,10 @@ function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars })
   const selectedDateParam = new URLSearchParams(location.search).get('date');
   const selectedDate = selectedDateParam ? new Date(selectedDateParam) : undefined;
 
+  if (notFound) {
+    return <NotFound />;
+  }
+
   return (
     <ForcedLandscapeWrapper>
       <div className='p-2'>
@@ -40,6 +47,7 @@ function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars })
           personalCalendars={personalCalendars}
           sharedUserCalendars={sharedUserCalendars}
           tokenCalendars={tokenCalendars}
+          setNotFound={setNotFound}
         />
       </div>
     </ForcedLandscapeWrapper>

@@ -8,7 +8,8 @@ export const useRealtimeBoxesSwitcher = (
   calendarType,
   calendarId,
   setBoxes,
-  setLoadingBoxes
+  setLoadingBoxes,
+  setRep
 ) => {
   // Appels inconditionnels
   const isPersonal = calendarType === 'personal';
@@ -17,11 +18,13 @@ export const useRealtimeBoxesSwitcher = (
   useRealtimePersonalBoxes(
     isPersonal ? calendarId : null,
     setBoxes,
-    setLoadingBoxes
+    setLoadingBoxes,
+    setRep
   );
   useRealtimeSharedBoxes(
     isShared ? calendarId : null,
     setBoxes,
-    setLoadingBoxes
+    setLoadingBoxes,
+    setRep
   );
 };

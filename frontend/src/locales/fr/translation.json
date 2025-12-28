@@ -11,6 +11,7 @@
   "accept": "Accepter",
   "accepted": "Accepté",
   "access": "Accès",
+  "user_profile_aria": "Afficher le profil de l'utilisateur",
   "account": {
     "crop": {
       "title": "Recadrer la photo",
@@ -155,9 +156,7 @@
     "title": "Boîtes de médicaments",
     "condition_none_tooltip": "Aucune condition de prise définie. Cliquez ici pour en ajouter une afin de recevoir des rappels réguliers.",
     "view_notice": "Voir la notice",
-    "no_medicines_selected": "Aucun médicament sélectionné",
-    "loading_medicine_boxes": "Chargement des boîtes de médicaments...",
-    "loading_stock_alerts": "Chargement des alertes de stock..."
+    "no_medicines_selected": "Aucun médicament sélectionné"
   },
   "calendar": {
     "add": "Ajouter un calendrier",
@@ -165,7 +164,6 @@
     "add_with_qr": "Créer un calendrier par scan QR",
     "calendar_name": "Nom du calendrier",
     "calendar_name_placeholder": "Entrez le nom du calendrier",
-    "loading_daily_view": "Chargement de la vue journalière...",
     "choose_image": "Choisir une image",
     "confirm_delete": "Supprimer le calendrier ?",
     "confirm_delete_shared": "Supprimer le calendrier partagé ?",
@@ -214,8 +212,6 @@
   "calendar_deleted": "Calendrier supprimé avec succès.",
   "calendar_settings": {
     "label": "Paramètres du calendrier",
-    "loading_notification_settings": "Chargement des paramètres de notifications...",
-    "loading_stock_settings": "Chargement des paramètres de stock...",
     "notifications": {
       "disabled": "Notifications désactivées",
       "enabled": "Notifications activées",
@@ -239,6 +235,7 @@
   "calendars": "Calendriers",
   "cancel": "Annuler",
   "choose_date": "Choisir une date",
+  "confirmation": "Confirmation",
   "close": "Fermer",
   "confirm_calendar_completion": "Confirmer la complétion du calendrier",
   "pillbox_completion_description": "Le stock de tous les médicaments de cette semaine sera diminué selon votre planning. Cette action est irréversible.",
@@ -314,7 +311,6 @@
     "fetch_error": "Erreur lors du chargement des liens.",
     "info_description": "Ces liens vous permettent de synchroniser votre prise de médicaments avec votre calendrier personnel (Google Calendar, Outlook, Apple Calendar, etc.). Copiez le lien et ajoutez-le comme 'Abonnement à un calendrier' dans votre application préférée.",
     "info_title": "À propos des liens ICS",
-    "loading_ics_tokens": "Chargement des liens ICS...",
     "no_tokens": "Aucun lien ICS créé.",
     "title": "Listes de liens ICS",
     "token_label": "Lien"
@@ -337,7 +333,6 @@
   "invalid_or_expired_link": "Ce lien de calendrier partagé est invalide ou a expiré.",
   "invitation": {
     "invalid_or_expired": "Invitation invalide ou expirée",
-    "loading": "Chargement de l'invitation...",
     "title": "Invitation"
   },
   "link": "Lien",
@@ -350,6 +345,7 @@
   "loading_calendars": "Chargement des calendriers...",
   "loading_medicines": "Chargement des médicaments...",
   "loading_notifications": "Chargement des notifications...",
+  "loading_pillbox": "Chargement du pilulier...",
   "loading_pillbox_uses": "Chargement de l'historique du pilulier...",
   "loading_settings": "Chargement des paramètres...",
   "loading_share": "Chargement du partage...",

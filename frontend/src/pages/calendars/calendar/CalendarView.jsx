@@ -5,23 +5,24 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useTranslation } from 'react-i18next';
-import { UserContext } from '../../contexts/UserContext';
+import { UserContext } from '@/contexts/UserContext';
 import { useLoading } from '@/components/ui/loading';
-import { toISO } from '../../utils/calendar/dateUtils';
-import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
-import { useAlert } from '../../contexts/AlertContext';
+import { toISO } from '@/utils/calendar/dateUtils';
+import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
+import { useAlert } from '@/contexts/AlertContext';
 import isEqual from 'lodash/isEqual';
-import DateModal from '../../components/calendar/DateModal';
-import WeekCalendarSelector from '../../components/calendar/WeekCalendarSelector';
-import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
-import PillboxDisplay from '../../components/calendar/PillboxDisplay';
-import ActionSheet from '../../components/common/ActionSheet';
+import DateModal from '@/components/calendar/DateModal';
+import WeekCalendarSelector from '@/components/calendar/WeekCalendarSelector';
+import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
+import PillboxDisplay from '@/components/calendar/PillboxDisplay';
+import ActionSheet from '@/components/common/ActionSheet';
+import NotFound from '@/pages/general/NotFound.jsx';
 import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Pill, Grid3X3, CalendarDays, Share2, Download, AlertTriangle, Calendar, Clock, Settings, Trash2, ChevronRight, Pin } from 'lucide-react';
-import '../../styles/fullcalendar-custom.css';
+import '@/styles/fullcalendar-custom.css';
 
 
 function CalendarPage({
@@ -57,6 +58,7 @@ function CalendarPage({
   // 🔄 Références et chargement
   const dateModalRef = useRef(null);
   const [loading, setLoading] = useState(true); // État de chargement du calendrier
+  const [notFound, setNotFound] = useState(false);
   const initialNextDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0);
   
   let calendarType = 'personal';
@@ -125,8 +127,8 @@ function CalendarPage({
 
   // Fonction pour charger le calendrier lorsque l'utilisateur est connecté ou que le calendrier est un token
   useEffect(() => {
-    if (!calendarId) return setLoading(true);
-    if (!selectedDate) return setLoading(true);
+    if (!calendarId) return setLoading(false);
+    if (!selectedDate) return 
     if (calendarType === 'personal' || calendarType === 'sharedUser') {
       if (!userInfo) return setLoading(true);
     }
@@ -146,8 +148,13 @@ function CalendarPage({
           setIsLowStock(rep.ifLowStock);
           // TODO: Hook pour alerte stock faible en temps réel
         }
+      } else {;
+        // Si l'API retourne un 404, le calendrier n'existe pas
+        if (rep.status === 404) {
+          setNotFound(true);
+        }
       }
-      setLoading(rep.success ? false : undefined);
+      setLoading(false);
     };
 
     load();
@@ -155,7 +162,7 @@ function CalendarPage({
 
   // Gérer l'affichage du spinner global
   useEffect(() => {
-    showLoading((loading === true || loadingStockMethod === true) && calendarId, t('loading_calendar'));
+    showLoading(((loading === true || loadingStockMethod === true) && calendarId), t('loading_calendar'));
   }, [loading, loadingStockMethod, calendarId, showLoading, t]);
 
   // Charger la méthode de décrémentation du stock (si disponible)
@@ -163,16 +170,18 @@ function CalendarPage({
     const fetchMethod = async () => {
       if (!calendarId) return setLoadingStockMethod(false);
       if (calendarType === 'personal' || calendarType === 'sharedUser') {
-        if (!userInfo) return setLoading(true);
+        if (!userInfo) return setLoadingStockMethod(true);
       }
       // On tente pour les calendriers personal et sharedUser en appelant l'API exposée
       const rep = await calendarSource.fetchStockDecrementMethod(calendarId);
       if (rep.success) {
         setStockDecrementMethod(rep.method);
+      } else if (rep.status === 404) {
+        setNotFound(true);
+        setSelectedDate(new Date().setHours(0,0,0,0));
       }
-      setLoadingStockMethod((rep.success ? false : undefined));
+      setLoadingStockMethod(false);
     };
-
     fetchMethod();
   }, [calendarId, calendarType, userInfo]);
 
@@ -249,13 +258,9 @@ function CalendarPage({
     }));
   }, [calendarEvents]);
 
-  if ((loading === undefined || loadingStockMethod === undefined) && calendarId) {
-    return (
-      <Alert variant="destructive" className="text-center mt-8 max-w-2xl mx-auto">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>{t('invalid_or_expired_link')}</AlertDescription>
-      </Alert>
-    );
+  // Affichage de la page 404 si le calendrier n'existe pas
+  if (notFound) {
+    return <NotFound />;
   }
 
   return (
@@ -537,6 +542,7 @@ function CalendarPage({
                       personalCalendars={personalCalendars}
                       sharedUserCalendars={sharedUserCalendars}
                       tokenCalendars={tokenCalendars}
+                      setNotFound={setNotFound}
                     />
                   </CardContent>
                 </Card>

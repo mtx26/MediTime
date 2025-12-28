@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
+import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
-import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';
-import ActionSheet from '../../components/common/ActionSheet';
-import IconButton from '../../components/common/UtilityComponents';
+import { useRealtimeBoxesSwitcher } from '@/hooks/realtime/useRealtimeBoxesSwitcher';
+import ActionSheet from '@/components/common/ActionSheet';
+import IconButton from '@/components/common/UtilityComponents';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle } from 'lucide-react';
+import NotFound from '@/pages/general/NotFound';
 
 function StockAlertsPage({
   personalCalendars,
@@ -23,6 +24,8 @@ function StockAlertsPage({
 
   const [boxes, setBoxes] = useState([]);
   const [loadingBoxes, setLoadingBoxes] = useState(true);
+  const [rep, setRep] = useState(null);
+  const [notFound, setNotFound] = useState(false);
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
@@ -79,8 +82,16 @@ function StockAlertsPage({
     isDemo ? null : calendarType,
     calendarId,
     setBoxes,
-    isDemo ? () => { /* no-op */ } : setLoadingBoxes
+    setLoadingBoxes,
+    setRep
   );
+
+  useEffect(() => {
+    if (rep && rep.status === 404) {
+      setNotFound(true);
+      setLoadingBoxes(false);
+    }
+  }, [rep]);
 
   // On filtre les boîtes qui sont en stock faible
   const alerts = boxes.filter(
@@ -138,15 +149,8 @@ function StockAlertsPage({
     return null;
   }
 
-  if (loadingBoxes === false) {
-    return (
-      <div className="flex justify-center mt-5">
-        <Alert variant="destructive" className="max-w-150">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{t('invalid_or_expired_link')}</AlertDescription>
-        </Alert>
-      </div>
-    );
+  if (notFound) {
+    return <NotFound />;
   }
 
   return (

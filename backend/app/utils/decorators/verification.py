@@ -230,6 +230,7 @@ def verify_calendar_share(calendar_id: str = None, receiver_uid: str = None) -> 
                 return warning_response(
                     message=ACCESS_DENIED_MSG,
                     code="SHARED_VERIFY_DENIED",
+                    status_code=404,
                     uid=uid,
                     origin="SHARED_VERIFY",
                 )
@@ -261,6 +262,7 @@ def verify_calendar(calendar_id: str = None, uid: str = None) -> bool:
                 return warning_response(
                     message=ACCESS_DENIED_MSG,
                     code="CALENDAR_VERIFY_DENIED",
+                    status_code=404,
                     uid=user_id,
                     origin="CALENDAR_VERIFY",
                 )
@@ -293,6 +295,7 @@ def verify_token(token: str = None) -> str | bool:
                 return warning_response(
                     message="token invalide",
                     code="TOKEN_VERIFY_DENIED",
+                    status_code=404,
                     origin="TOKEN_VERIFY",
                 )
             g.calendar_id = calendar_id
@@ -324,6 +327,7 @@ def verify_token_owner(token: str = None, uid: str = None) -> bool:
                 return warning_response(
                     message=ACCESS_DENIED_MSG,
                     code="TOKEN_OWNER_VERIFY_DENIED",
+                    status_code=404,
                     uid=user_id,
                     origin="TOKEN_OWNER_VERIFY",
                 )
@@ -405,6 +409,7 @@ def verify_login_invitation_owner(token: str = None, uid: str = None) -> dict | 
                 return warning_response(
                     message=ACCESS_DENIED_MSG,
                     code="LOGIN_INVITE_OWNER_VERIFY_DENIED",
+                    status_code=404,
                     uid=user_id,
                     origin="LOGIN_INVITE_OWNER_VERIFY",
                 )
@@ -491,6 +496,7 @@ def verify_registration_invitation_owner(token: str = None, uid: str = None) -> 
                 return warning_response(
                     message=ACCESS_DENIED_MSG,
                     code="REG_INVITE_OWNER_VERIFY_DENIED",
+                    status_code=404,
                     uid=user_id,
                     origin="REG_INVITE_OWNER_VERIFY",
                 )
@@ -578,6 +584,7 @@ def verify_login_invitation_receiver(token: str = None, uid: str = None) -> dict
                 return warning_response(
                     message=ACCESS_DENIED_MSG,
                     code="LOGIN_INVITE_RECEIVER_VERIFY_DENIED",
+                    status_code=404,
                     uid=user_id,
                     origin="LOGIN_INVITE_RECEIVER_VERIFY",
                 )

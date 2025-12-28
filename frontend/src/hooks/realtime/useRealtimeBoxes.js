@@ -12,6 +12,7 @@ const fetchBoxes = async ({
   setBoxes,
   setLoadingBoxes,
   sourceType,
+  setRep
 }) => {
   try {
     const {
@@ -29,7 +30,7 @@ const fetchBoxes = async ({
         Authorization: `Bearer ${session.access_token}`,
       },
     });
-
+    setRep(res);
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
 
@@ -88,7 +89,8 @@ const useRealtimeBoxes = (
   sourceType,
   calendarId,
   setBoxes,
-  setLoadingBoxes
+  setLoadingBoxes,
+  setRep
 ) => {
   const { userInfo } = useContext(UserContext);
 
@@ -102,8 +104,8 @@ const useRealtimeBoxes = (
 
   const fetchData = useCallback(() => {
     if (!uid || !calendarId) return;
-    fetchBoxes({ uid, calendarId, setBoxes, setLoadingBoxes, sourceType });
-  }, [uid, calendarId, setBoxes, setLoadingBoxes, sourceType]);
+    fetchBoxes({ uid, calendarId, setBoxes, setLoadingBoxes, sourceType, setRep });
+  }, [uid, calendarId, setBoxes, setLoadingBoxes, sourceType, setRep]);
 
   const baseChannel =
     sourceType === 'personal' ? 'personal-meds' : 'shared-meds';
@@ -133,15 +135,17 @@ const useRealtimeBoxes = (
 export const useRealtimePersonalBoxes = (
   calendarId,
   setBoxes,
-  setLoadingBoxes
+  setLoadingBoxes,
+  setRep
 ) => {
-  useRealtimeBoxes('personal', calendarId, setBoxes, setLoadingBoxes);
+  useRealtimeBoxes('personal', calendarId, setBoxes, setLoadingBoxes, setRep);
 };
 
 export const useRealtimeSharedBoxes = (
   calendarId,
   setBoxes,
-  setLoadingBoxes
+  setLoadingBoxes,
+  setRep
 ) => {
-  useRealtimeBoxes('shared', calendarId, setBoxes, setLoadingBoxes);
+  useRealtimeBoxes('shared', calendarId, setBoxes, setLoadingBoxes, setRep);
 };

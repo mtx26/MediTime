@@ -1070,5 +1070,8 @@
   "theme": {
     "dark": "ダークモード",
     "light": "モードクレール"
-  }
+  },
+  "user_profile_aria": "ユーザープロフィールを表示",
+  "confirmation": "確認",
+  "loading_pillbox": "トーチカを積んでいます..."
 }

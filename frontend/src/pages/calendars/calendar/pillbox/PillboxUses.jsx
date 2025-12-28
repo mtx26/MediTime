@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
-import HoveredUserProfile from '../../components/common/HoveredUserProfile';
-import { getMondayDate } from '../../utils/calendar/dateUtils';
-import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
-import { UserContext } from '../../contexts/UserContext';
-import { useAlert } from '../../contexts/AlertContext';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import HoveredUserProfile from '@/components/common/HoveredUserProfile';
+import { getMondayDate } from '@/utils/calendar/dateUtils';
+import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
+import { UserContext } from '@/contexts/UserContext';
+import { useAlert } from '@/contexts/AlertContext';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, History, RotateCcw } from 'lucide-react';
+import { History, RotateCcw } from 'lucide-react';
+import NotFound from '@/pages/general/NotFound';
 
 const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();
@@ -23,6 +23,7 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
 
   const [pillboxUsesData, setPillboxUsesData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
@@ -62,8 +63,14 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
     const rep = await calendarSource.fetchPillboxUses(calendarId); 
     if (rep.success) {
       setPillboxUsesData(rep.pillbox_uses);
+      setLoading(false);
+    } else {
+      console.error('Error fetching pillbox uses:', rep.status);
+      if (rep.status === 404) {
+        setNotFound(true);
+      }
+      setLoading(false);
     }
-    setLoading((rep.success ? false : undefined))
   };
 
   const cancelUse = (useId) => {
@@ -91,23 +98,14 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
 
   useEffect(() => {
     showLoading(loading === true && calendarId, t('loading_pillbox_uses'));
-  }, [loading, calendarId, showLoading, t]);
-
-  if (loading === undefined && calendarId) {
-    return (
-      <div className="mt-5">
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription className="text-center">
-            {t('invalid_or_expired_link')}
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
+  }, [loading, calendarId, showLoading, t, notFound]);
 
   if (loading === true && calendarId) {
     return null;
+  }
+
+  if (notFound) {
+    return <NotFound />;
   }
   
   return (

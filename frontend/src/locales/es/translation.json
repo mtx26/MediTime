@@ -1070,5 +1070,8 @@
   "theme": {
     "dark": "Modo oscuro",
     "light": "Modo claro"
-  }
+  },
+  "user_profile_aria": "Ver perfil de usuario",
+  "confirmation": "Confirmación",
+  "loading_pillbox": "Cargando el pastillero..."
 }

@@ -1,9 +1,9 @@
-import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
+import { fetchSuggestions } from '@/utils/api/fetchSuggestions';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import ArrowControls from '../../components/calendar/ArrowControls';
-import { useAlert } from '../../contexts/AlertContext';
+import ArrowControls from '@/components/calendar/ArrowControls';
+import { useAlert } from '@/contexts/AlertContext';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

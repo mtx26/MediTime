@@ -168,6 +168,7 @@ export async function performApiCall({
       const translatedData = translateBackendMessage(data);
       const err = new Error(translatedData?.error || translatedData?.message || `HTTP ${res.status}`);
       err.code = translatedData?.code;
+      err.status = res.status; // Status HTTP pour détecter les 404
       err.i18nKey = translatedData?.i18nKey || translatedData?.i18n_key;
       throw err;
     }
@@ -204,6 +205,6 @@ export async function performApiCall({
       showAlert('danger', err.message);
     }
     
-    return { success: false, error: err.message, code: err.code || null };
+    return { success: false, error: err.message, code: err.code || null, status: err.status || null };
   }
 }

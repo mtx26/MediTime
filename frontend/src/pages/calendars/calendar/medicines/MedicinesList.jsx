@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useRealtimeTokenMedicines } from '../../hooks/realtime/useRealtimeMedicines';
+import { useRealtimeTokenMedicines } from '@/hooks/realtime/useRealtimeMedicines';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import { Alert, AlertDescription } from '@/components/ui/alert';

@@ -1069,7 +1069,7 @@ function App() {
     <div className="flex flex-col min-h-screen">
       <OnboardingTour isAppLoading={isInitialLoading} />
       <Navbar sharedProps={sharedProps} />
-      <ScrollArea className="h-100 w-full grow flex flex-col mb-24">
+      <ScrollArea className="h-100 w-full grow flex flex-col mb-24 lg:mb-0">
         <main className="grow flex flex-col">
           {userInfo && (
             <RealtimeManager
@@ -1089,7 +1089,7 @@ function App() {
         </main>
         <Footer />
       </ScrollArea>
-      {!location.pathname.includes('/pillbox') && <MobileNavBar/>}
+      {<MobileNavBar/>}
     </div>
   );
 }

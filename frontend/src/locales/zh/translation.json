@@ -1070,5 +1070,8 @@
   "theme": {
     "dark": "深色模式",
     "light": "模式清晰"
-  }
+  },
+  "user_profile_aria": "查看用户个人资料",
+  "confirmation": "确认",
+  "loading_pillbox": "正在装填药盒……"
 }

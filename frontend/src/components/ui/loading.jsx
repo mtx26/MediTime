@@ -1,78 +1,160 @@
-import React, { createContext, useContext, useState, useId, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useSyncExternalStore } from 'react';
 import PropTypes from 'prop-types';
 
-const LoadingContext = createContext();
+// Store global synchrone pour chaque provider (pattern Zustand/Radix)
+const stores = new Map();
+
+function createLoadingStore(name) {
+  const listeners = new Set();
+  let state = new Map(); // Map<id, {message}>
+
+  return {
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    getSnapshot() {
+      return state;
+    },
+    update(id, condition, message) {
+      const newState = new Map(state);
+      if (condition) {
+        newState.set(id, { message });
+      } else {
+        newState.delete(id);
+      }
+      state = newState;
+      listeners.forEach(listener => listener());
+    },
+  };
+}
+
+function getStore(name = 'default') {
+  if (!stores.has(name)) {
+    stores.set(name, createLoadingStore(name));
+  }
+  return stores.get(name);
+}
 
 /**
- * Hook pour accéder au contexte de chargement
- * @returns {Object} { showLoading }
+ * Hook pour contrôler le loading (toujours disponible, aucun problème de timing)
  */
 export function useLoading() {
-  const context = useContext(LoadingContext);
-  const componentId = useId();
-  
-  if (!context) {
-    throw new Error('useLoading doit être utilisé dans un LoadingProvider');
-  }
+  const componentId = React.useId();
+  const activeKeys = React.useRef(new Map()); // Map<providerName, Set<keys>>
 
-  // Cleanup automatique au démontage du composant
   useEffect(() => {
     return () => {
-      context.updateLoading(componentId, false, '', '60vh');
+      // Cleanup au démontage
+      activeKeys.current.forEach((keys, providerName) => {
+        const store = getStore(providerName);
+        keys.forEach(key => {
+          store.update(`${componentId}-${key}`, false, '');
+        });
+      });
     };
-  }, [componentId, context]);
+  }, [componentId]);
 
-  const showLoading = useCallback((condition, message = '', height = '60vh') => {
-    context.updateLoading(componentId, condition, message, height);
-  }, [componentId, context]);
+  const showLoading = useCallback((condition, message = '', providerName = 'default') => {
+    const key = 'main';
+    const fullId = `${componentId}-${key}`;
+    const store = getStore(providerName);
+
+    // Tracking
+    if (condition) {
+      if (!activeKeys.current.has(providerName)) {
+        activeKeys.current.set(providerName, new Set());
+      }
+      activeKeys.current.get(providerName).add(key);
+    } else {
+      const keys = activeKeys.current.get(providerName);
+      if (keys) {
+        keys.delete(key);
+        if (keys.size === 0) {
+          activeKeys.current.delete(providerName);
+        }
+      }
+    }
+
+    store.update(fullId, condition, message);
+  }, [componentId]);
 
   return { showLoading };
 }
 
 /**
- * Provider pour gérer l'état de chargement global avec overlay
+ * Provider de loading avec overlay
+ * @param {string} name - Nom du provider (par défaut 'default')
+ * @param {string} className - Classes Tailwind pour l'overlay
  */
-export function LoadingProvider({ children }) {
-  const [loadingStates, setLoadingStates] = useState(new Map());
+export function LoadingProvider({ children, name = 'default', className = '' }) {
+  const store = getStore(name);
+  const loadingStates = useSyncExternalStore(
+    store.subscribe,
+    store.getSnapshot,
+    store.getSnapshot
+  );
 
-  const updateLoading = useCallback((id, condition, message, height) => {
-    setLoadingStates(prev => {
-      const newStates = new Map(prev);
-      if (condition) {
-        newStates.set(id, { message, height });
-      } else {
-        newStates.delete(id);
-      }
-      return newStates;
-    });
-  }, []);
+  const isLoading = loadingStates.size > 0;
+  const uniqueMessages = [...new Set(
+    Array.from(loadingStates.values()).map(l => l.message).filter(Boolean)
+  )];
 
-  const contextValue = useMemo(() => ({ updateLoading }), [updateLoading]);
+  // Debug
+  React.useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log(`[LoadingProvider ${name}] isLoading:`, isLoading, 'messages:', uniqueMessages);
+    }
+  }, [isLoading, name, uniqueMessages]);
 
-  // Récupérer le premier état de chargement actif
-  const firstLoading = loadingStates?.size > 0 ? Array.from(loadingStates.values())?.[0] : null;
-  const isLoading = loadingStates?.size > 0;
+  // Provider 'default' = fixed (plein écran), autres = absolute (scoped)
+  const positionClass = name === 'default' ? 'fixed' : 'absolute';
+  const backdropClass = name === 'default' ? 'bg-background/80 backdrop-blur-sm' : '';
+  
+  // Pour les providers locaux, appliquer className seulement pendant le loading
+  const containerClass = name === 'default' 
+    ? 'contents' 
+    : isLoading 
+      ? `relative w-full ${className}` 
+      : 'relative w-full';
 
   return (
-    <LoadingContext.Provider value={contextValue}>
+    <div className={containerClass}>
       {children}
-      {isLoading && firstLoading && (
-        <div 
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center"
-          style={{ minHeight: firstLoading?.height }}
+      {isLoading && (
+        <div
+          className={`${positionClass} inset-0 ${backdropClass} z-10000 flex items-center justify-center`}
+          role="status"
+          aria-live="polite"
+          aria-busy={true}
+          aria-label={uniqueMessages.join(', ') || 'Loading'}
         >
-          <div className="flex flex-col items-center gap-2">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            {firstLoading?.message && (
-              <p className="text-sm text-muted-foreground">{firstLoading.message}</p>
+          <div className="flex flex-col items-center gap-3">
+            <div 
+              className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"
+              aria-hidden="true"
+            />
+            {uniqueMessages.length > 0 && (
+              <div className="flex flex-col items-center gap-1 max-w-xs">
+                {uniqueMessages.map((msg, idx) => (
+                  <p 
+                    key={idx} 
+                    className="text-xs text-muted-foreground text-center animate-in fade-in duration-200"
+                  >
+                    {msg}
+                  </p>
+                ))}
+              </div>
             )}
           </div>
         </div>
       )}
-    </LoadingContext.Provider>
+    </div>
   );
 }
 
 LoadingProvider.propTypes = {
   children: PropTypes.node.isRequired,
+  name: PropTypes.string,
+  className: PropTypes.string,
 };

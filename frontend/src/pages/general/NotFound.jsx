@@ -8,7 +8,7 @@ function NotFound() {
   const { lng } = useParams();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="flex items-center justify-center bg-background px-8">
       <div className="text-center max-w-2xl">
         <AlertTriangle className="h-24 w-24 text-destructive mx-auto mb-6" />
         
@@ -25,7 +25,7 @@ function NotFound() {
         </p>
         
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link to={`/${lng}/`} asChild>
+          <Link to={`/${lng}/`}>
             <Button size="lg" className="gap-2">
               <Home className="h-4 w-4" />
               {t('home')}
