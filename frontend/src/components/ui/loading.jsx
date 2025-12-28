@@ -112,11 +112,12 @@ export function LoadingProvider({ children, name = 'default', className = '' }) 
   const backdropClass = name === 'default' ? 'bg-background/80 backdrop-blur-sm' : '';
   
   // Pour les providers locaux, appliquer className seulement pendant le loading
-  const containerClass = name === 'default' 
-    ? 'contents' 
-    : isLoading 
-      ? `relative w-full ${className}` 
-      : 'relative w-full';
+  const containerClass =
+    name === 'default'
+      ? 'relative w-full'
+      : isLoading
+        ? `relative w-full ${className}`
+        : 'relative w-full';
 
   return (
     <div className={containerClass}>
