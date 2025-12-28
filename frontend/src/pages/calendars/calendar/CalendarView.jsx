@@ -734,14 +734,12 @@ function CalendarWeekSelector({
         <h4 className="mb-3 font-bold flex items-center gap-2">
           <CalendarDays className="h-5 w-5" /> {t('calendar.reference_week')}
         </h4>
-        <Card className="shadow rounded-lg w-full p-0">
-          <CardContent className="p-0">
-            <div className="relative w-full overflow-visible">
-              <WeekCalendarSelector
-                onWeekSelect={onWeekSelect}
-                selectedDate={selectedDate}
-              />
-            </div>
+        <Card className="shadow rounded-lg w-full p-0 min-h-fit">
+          <CardContent className="p-0 min-h-fit">
+            <WeekCalendarSelector
+              onWeekSelect={onWeekSelect}
+              selectedDate={selectedDate}
+            />
           </CardContent>
         </Card>
       </div>
