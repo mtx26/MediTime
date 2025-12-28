@@ -79,7 +79,7 @@ const QRScanImport = forwardRef(({ calendarName, personalCalendars, onStateChang
   const { showLoading } = useLoading();
 
   useEffect(() => {
-    showLoading(isCreating, t('calendar.creating_calendar'), '400px');
+    showLoading(isCreating, t('calendar.creating_calendar'));
   }, [isCreating, showLoading, t]);
 
   if (isCreating) {

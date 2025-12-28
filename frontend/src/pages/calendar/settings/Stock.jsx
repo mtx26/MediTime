@@ -49,7 +49,7 @@ const Stock = ({ personalCalendars }) => {
   const { showLoading } = useLoading();
 
   useEffect(() => {
-    showLoading(loading === undefined && calendarId, t('calendar_settings.loading_stock_settings'), '200px');
+    showLoading(loading === undefined && calendarId, t('calendar_settings.loading_stock_settings'));
   }, [loading, calendarId, showLoading, t]);
 
   if (loading === undefined && calendarId) {

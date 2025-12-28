@@ -59,7 +59,7 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars 
   const { showLoading } = useLoading();
 
   useEffect(() => {
-    showLoading(loading === undefined && calendarId, t('calendar_settings.loading_notification_settings'), '200px');
+    showLoading(loading === undefined && calendarId, t('calendar_settings.loading_notification_settings'));
   }, [loading, calendarId, showLoading, t]);
 
   if (loading === undefined && calendarId) {

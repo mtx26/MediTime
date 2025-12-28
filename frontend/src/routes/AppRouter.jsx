@@ -1,4 +1,4 @@
-import React, { useContext, lazy, Suspense } from 'react';
+import React, { useContext, lazy, Suspense, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
@@ -61,11 +61,23 @@ function PrivateRoute({ element }) {
   return element;
 }
 
+function SuspenseFallback() {
+  const { showLoading } = useLoading();
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    showLoading(true, t('loading'));
+    return () => showLoading(false, '');
+  }, [showLoading, t]);
+
+  return null;
+}
+
 function RouteWithLoader({ element, isLoading }) {
   const { showLoading } = useLoading();
   const { t } = useTranslation();
   
-  React.useEffect(() => {
+  useEffect(() => {
     showLoading(isLoading, t('loading'));
   }, [isLoading, showLoading, t]);
 
@@ -78,23 +90,9 @@ function RouteWithLoader({ element, isLoading }) {
 function AppRoutes({ sharedProps }) {
   const { userInfo } = useContext(UserContext);
   const { lng } = useParams();
-  const { t } = useTranslation();
-  const { showLoading } = useLoading();
-  const [suspenseLoading, setSuspenseLoading] = React.useState(false);
-
-  React.useEffect(() => {
-    showLoading(suspenseLoading, t('loading'));
-  }, [suspenseLoading, showLoading, t]);
-
-  React.useEffect(() => {
-    setSuspenseLoading(true);
-    return () => setSuspenseLoading(false);
-  }, []);
-
-  const fallback = null;
 
   return (
-    <Suspense fallback={fallback}>
+    <Suspense fallback={<SuspenseFallback />}>
       <Routes>
       <Route
         path="login"

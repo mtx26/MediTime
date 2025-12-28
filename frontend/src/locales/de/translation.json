@@ -1070,5 +1070,8 @@
   "theme": {
     "dark": "Dunkelmodus",
     "light": "Mode clair"
-  }
+  },
+  "user_profile_aria": "Benutzerprofil anzeigen",
+  "confirmation": "Bestätigung",
+  "loading_pillbox": "Den Bunker laden..."
 }

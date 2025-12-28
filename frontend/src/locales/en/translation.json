@@ -1070,5 +1070,8 @@
   "theme": {
     "dark": "Dark Mode",
     "light": "Mode clair"
-  }
+  },
+  "user_profile_aria": "View user profile",
+  "confirmation": "Confirmation",
+  "loading_pillbox": "Loading the pillbox..."
 }
