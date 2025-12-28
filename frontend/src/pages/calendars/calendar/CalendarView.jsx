@@ -23,7 +23,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Pill, Grid3X3, CalendarDays, Share2, Download, AlertTriangle, Calendar, Clock, Settings, Trash2, ChevronRight, Pin } from 'lucide-react';
 import '@/styles/fullcalendar-custom.css';
-import { Calendar as CalendarSelector } from '@/components/ui/calendar';
 
 
 function CalendarPage({
