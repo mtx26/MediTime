@@ -14,7 +14,6 @@ import useSEO from './hooks/useSEO';
 import OnboardingTour from './components/onboarding/OnboardingTour';
 import { requestPermissionAndGetToken } from './services/firebase/firebase';
 import { useAlert } from './contexts/AlertContext';
-import { ScrollArea } from '@/components/ui/scroll-area'
 
 const API_URL = import.meta.env.VITE_API_URL;
 
