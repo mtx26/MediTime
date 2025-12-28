@@ -23,6 +23,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Pill, Grid3X3, CalendarDays, Share2, Download, AlertTriangle, Calendar, Clock, Settings, Trash2, ChevronRight, Pin } from 'lucide-react';
 import '@/styles/fullcalendar-custom.css';
+import { Calendar as CalendarSelector } from '@/components/ui/calendar';
 
 
 function CalendarPage({
@@ -478,6 +479,13 @@ function CalendarPage({
               )}
 
             </div>
+                            <CalendarSelector
+                  mode="single"
+                  selected={selectedDate || new Date()}
+                  onSelect={onWeekSelect}
+                  locale={t('locale')}
+                  showOutsideDays
+                />
             {/* Bouton pour naviguer vers la semaine suivante ou precedente */}
             {stockDecrementMethod === "weekly_pillbox" && (
               <div className='flex lg:hidden justify-center items-center' data-tour="calendar-week-selector">
@@ -736,7 +744,7 @@ function CalendarWeekSelector({
         </h4>
         <Card className="shadow rounded-lg w-full p-0">
           <CardContent className="p-0">
-            <div className="h-[calc(100dvh-17rem)] lg:h-[calc(100dvh-20rem)] overflow-auto">
+            <div className="h-full overflow-auto">
               <WeekCalendarSelector onWeekSelect={onWeekSelect} selectedDate={selectedDate} />
             </div>
           </CardContent>
