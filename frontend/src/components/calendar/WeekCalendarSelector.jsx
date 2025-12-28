@@ -37,9 +37,13 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
   showOutsideDays
   className="relative border rounded-lg w-full"
   classNames={{
-    table: "w-full border-collapse",
-    cell: "p-0 text-center",
+    table: "w-full border-collapse table-fixed",
+    tbody: "table-row-group",
+    row: "table-row",          // 🔥 IMPORTANT
+    cell: "table-cell p-0 text-center align-middle",
     day: "w-full h-full appearance-none leading-none",
+    weekdays: "table-header-group",
+    weekday: "table-cell",
   }}
   modifiers={{ weekSelected: weekDates }}
   modifiersClassNames={{
