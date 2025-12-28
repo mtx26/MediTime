@@ -34,22 +34,14 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
       selected={selDate || today}
       onSelect={handleSelect}
       locale={getDateLocale(i18n.language)}
-      className="h-full w-full flex"
-      classNames={{
-        months:
-          "flex w-full flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 flex-1",
-        month: "space-y-4 w-full flex flex-col",
-        table: "w-full h-full border-collapse space-y-1",
-        head_row: "",
-        row: "w-full mt-2",
-      }}
       showOutsideDays
       modifiers={{ weekSelected: weekDates }}
       modifiersClassNames={{
         weekSelected:
-          'bg-primary text-primary-foreground hover:bg-primary/90 data-[selected=true]:bg-primary rounded-md'
+          "bg-primary text-primary-foreground hover:bg-primary/90 data-[selected=true]:bg-primary rounded-md",
       }}
     />
+
   );
 }
 
