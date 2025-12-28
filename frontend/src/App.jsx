@@ -1070,7 +1070,7 @@ function App() {
       <OnboardingTour isAppLoading={isInitialLoading} />
       <Navbar sharedProps={sharedProps} />
       <ScrollArea className="h-100 w-full grow flex flex-col mb-24 lg:mb-0">
-        <main className="grow flex flex-col">
+        <main className="flex-grow flex flex-col">
           {userInfo && (
             <RealtimeManager
               setCalendarsData={setCalendarsData}
