@@ -29,28 +29,26 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
   };
 
   return (
-    <Calendar
-      mode="single"
-      selected={selDate || today}
-      onSelect={handleSelect}
-      locale={getDateLocale(i18n.language)}
-      showOutsideDays
-      className="relative overflow-hidden border rounded-lg w-full"
-      classNames={{
-        months: "flex flex-col",
-        month: "space-y-4",
-        table: "w-full border-collapse",
-        tbody: "relative",
-        cell: "relative p-0 text-center",
-        day: "h-9 w-9 rounded-md",
-      }}
-      modifiers={{
-        weekSelected: weekDates
-      }}
-      modifiersClassNames={{
-        weekSelected: 'bg-primary text-primary-foreground hover:bg-primary/90 data-[selected=true]:bg-primary rounded-md'
-      }}
-    />
+<Calendar
+  mode="single"
+  selected={selDate || today}
+  onSelect={handleSelect}
+  locale={getDateLocale(i18n.language)}
+  showOutsideDays
+  className="relative border rounded-lg w-full"
+  classNames={{
+    table: "w-full border-collapse",
+    cell: "p-0 text-center",
+    day: "w-full h-full appearance-none leading-none",
+  }}
+  modifiers={{ weekSelected: weekDates }}
+  modifiersClassNames={{
+    weekSelected:
+      "bg-primary text-primary-foreground hover:bg-primary/90 data-[selected=true]:bg-primary rounded-md",
+  }}
+/>
+
+
   );
 }
 
