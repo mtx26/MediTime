@@ -1069,8 +1069,7 @@ function App() {
     <div className="flex flex-col min-h-screen">
       <OnboardingTour isAppLoading={isInitialLoading} />
       <Navbar sharedProps={sharedProps} />
-      <ScrollArea className="h-full w-full grow flex flex-col mb-24 lg:mb-0">
-        <main className="flex-grow flex flex-col">
+        <main className="flex flex-col min-h-0 mb-24 lg:mb-0 flex-grow">
           {userInfo && (
             <RealtimeManager
               setCalendarsData={setCalendarsData}
@@ -1088,7 +1087,6 @@ function App() {
           </div>
         </main>
         <Footer />
-      </ScrollArea>
       <MobileNavBar/>
     </div>
   );

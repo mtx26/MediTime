@@ -202,7 +202,7 @@ function PillboxContent({
                                   })
                                 )}
                               </div>
-                              <div className="shadow-sm border rounded bg-muted/20 p-2 grow flex items-center justify-center">
+                              <div className="shadow-sm border rounded bg-muted/20 p-2 w-full h-full flex items-center justify-center">
                                 {orderedMeds[selectedMedIndex].cells[day] !== undefined && (
                                   <div className="w-full aspect-square">
                                     <img
