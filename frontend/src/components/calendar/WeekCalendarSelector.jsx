@@ -29,13 +29,18 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
   };
 
   return (
-<Calendar
-  mode="single"
-  selected={selDate || today}
-  onSelect={handleSelect}
-/>
-
-
+    <Calendar
+      mode="single"
+      selected={selDate || today}
+      onSelect={handleSelect}
+      locale={getDateLocale(i18n.language)}
+      showOutsideDays
+      modifiers={{ weekSelected: weekDates }}
+      modifiersClassNames={{
+        weekSelected:
+          'bg-primary text-primary-foreground hover:bg-primary/90 data-[selected=true]:bg-primary rounded-md'
+      }}
+    />
   );
 }
 
