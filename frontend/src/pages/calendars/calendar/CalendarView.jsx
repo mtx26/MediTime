@@ -5,24 +5,24 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useTranslation } from 'react-i18next';
-import { UserContext } from '../../contexts/UserContext';
+import { UserContext } from '@/contexts/UserContext';
 import { useLoading } from '@/components/ui/loading';
-import { toISO } from '../../utils/calendar/dateUtils';
-import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
-import { useAlert } from '../../contexts/AlertContext';
+import { toISO } from '@/utils/calendar/dateUtils';
+import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
+import { useAlert } from '@/contexts/AlertContext';
 import isEqual from 'lodash/isEqual';
-import DateModal from '../../components/calendar/DateModal';
-import WeekCalendarSelector from '../../components/calendar/WeekCalendarSelector';
-import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
-import PillboxDisplay from '../../components/calendar/PillboxDisplay';
-import ActionSheet from '../../components/common/ActionSheet';
-import NotFound from '../general/NotFound';
+import DateModal from '@/components/calendar/DateModal';
+import WeekCalendarSelector from '@/components/calendar/WeekCalendarSelector';
+import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
+import PillboxDisplay from '@/components/calendar/PillboxDisplay';
+import ActionSheet from '@/components/common/ActionSheet';
+import NotFound from '@/pages/general/NotFound.jsx';
 import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Pill, Grid3X3, CalendarDays, Share2, Download, AlertTriangle, Calendar, Clock, Settings, Trash2, ChevronRight, Pin } from 'lucide-react';
-import '../../styles/fullcalendar-custom.css';
+import '@/styles/fullcalendar-custom.css';
 
 
 function CalendarPage({

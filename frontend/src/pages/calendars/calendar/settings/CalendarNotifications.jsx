@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
-import { getCalendarSourceMap } from '../../../utils/calendar/calendarSourceMap';
+import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import NotFound from '../../general/NotFound';
+import NotFound from '@/pages/general/NotFound';
 
 
 const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {

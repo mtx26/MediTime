@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import Stock from './settings/Stock';
-import Notifications from './settings/Notifications.jsx';
+import Stock from './CalendarStock';
+import Notifications from './CalendarNotifications.jsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pill, Bell, Share } from 'lucide-react';
 import { cn } from '@/lib/utils';

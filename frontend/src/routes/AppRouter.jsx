@@ -14,28 +14,28 @@ const VerifyEmail = lazy(() => import('../pages/auth/VerifyEmail'));
 
 const NotificationsPage = lazy(() => import('../pages/notifications/NotificationsPage'));
 const SettingsPage = lazy(() => import('../pages/settings/SettingsPage'));
-const AddCalendarPage = lazy(() => import('../pages/calendar/AddCalendarPage'));
-const MedicineReview = lazy(() => import('../pages/calendar/MedicineReview'));
-const AcceptInvitePage = lazy(() => import('../pages/calendar/AcceptInvitePage'));
+const AddCalendarPage = lazy(() => import('../pages/calendars/AddCalendarPage'));
+const MedicineReview = lazy(() => import('../pages/calendars/MedicineReview'));
+const AcceptInvitePage = lazy(() => import('../pages/calendars/calendar/share/AcceptInvitePage'));
 
-const CalendarView = lazy(() => import('../pages/calendar/CalendarView'));
-const PillboxPage = lazy(() => import('../pages/calendar/Pillbox'));
-const DailyCalendarPage = lazy(() => import('../pages/calendar/DailyCalendarPage'));
-const CalendarList = lazy(() => import('../pages/calendar/CalendarList'));
-const SharedList = lazy(() => import('../pages/share/SharedList'));
-const StockAlertsPage = lazy(() => import('../pages/calendar/StockAlertsPage'));
-const PillboxUses = lazy(() => import('../pages/calendar/PillboxUses'));
+const CalendarView = lazy(() => import('../pages/calendars/calendar/CalendarView'));
+const PillboxPage = lazy(() => import('../pages/calendars/calendar/pillbox/Pillbox'));
+const DailyCalendarPage = lazy(() => import('../pages/calendars/calendar/DailyCalendarPage'));
+const CalendarList = lazy(() => import('../pages/calendars/CalendarList'));
+const SharedList = lazy(() => import('../pages/calendars/calendar/share/SharedList'));
+const StockAlertsPage = lazy(() => import('../pages/calendars/calendar/StockAlertsPage'));
+const PillboxUses = lazy(() => import('../pages/calendars/calendar/pillbox/PillboxUses'));
 
-const MedicinesList = lazy(() => import('../pages/medicines/MedicinesList'));
-const BoxesView = lazy(() => import('../pages/medicines/BoxesView'));
-const IcsList = lazy(() => import('../pages/medicines/IcsList'));
+const MedicinesList = lazy(() => import('../pages/calendars/calendar/medicines/MedicinesList'));
+const BoxesView = lazy(() => import('../pages/calendars/calendar/medicines/BoxesView'));
+const IcsList = lazy(() => import('../pages/calendars/calendar/medicines/IcsList'));
 const NotFound = lazy(() => import('../pages/general/NotFound'));
 
 const PrivacyPage = lazy(() => import('../pages/general/PrivacyPage'));
 const TermsPage = lazy(() => import('../pages/general/TermsPage'));
 
 const AuthCallback = lazy(() => import('../pages/auth/AuthCallback'));
-const CalendarSettingsPage = lazy(() => import('../pages/calendar/CalendarSettingsPage'));
+const CalendarSettingsPage = lazy(() => import('../pages/calendars/calendar/settings/CalendarSettingsPage'));
 
 function buildFullPath(loc) {
   const path = loc.pathname || '/';

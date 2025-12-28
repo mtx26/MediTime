@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import QRScanImport from '../../components/calendar/import/QRScanImport';
-import ImageUploadImport from '../../components/calendar/import/ImageUploadImport';
+import QRScanImport from '@/components/calendar/import/QRScanImport';
+import ImageUploadImport from '@/components/calendar/import/ImageUploadImport';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useLocation } from 'react-router-dom';
-import ActionSheet from '../../components/common/ActionSheet';
-import { useAlert } from '../../contexts/AlertContext';
+import { useAlert } from '@/contexts/AlertContext';
 import { useLoading } from '@/components/ui/loading';
-import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
+import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
 import PropTypes from 'prop-types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';

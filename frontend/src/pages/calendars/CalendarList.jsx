@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
-import HoveredUserProfile from '../../components/common/HoveredUserProfile';
-import ActionSheet from '../../components/common/ActionSheet';
+import HoveredUserProfile from '@/components/common/HoveredUserProfile';
+import ActionSheet from '@/components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
-import { useAlert } from '../../contexts/AlertContext';
+import { useAlert } from '@/contexts/AlertContext';
 import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

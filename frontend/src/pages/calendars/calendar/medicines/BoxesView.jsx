@@ -1,26 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';
-import { useAlert } from '../../contexts/AlertContext';
+import { useRealtimeBoxesSwitcher } from '@/hooks/realtime/useRealtimeBoxesSwitcher';
+import { useAlert } from '@/contexts/AlertContext';
 import { useLoading } from '@/components/ui/loading';
-import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
+import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
 import { v4 as uuidv4 } from 'uuid';
-import { fetchSuggestions } from '../../utils/api/fetchSuggestions';
-import ActionSheet from '../../components/common/ActionSheet';
+import { fetchSuggestions } from '@/utils/api/fetchSuggestions';
+import ActionSheet from '@/components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
-import QRCodeScanner from '../../components/scanner/QRCodeScanner';
-import Tooltips from '../../components/common/Tooltips';
+import QRCodeScanner from '@/components/scanner/QRCodeScanner';
+import Tooltips from '@/components/common/Tooltips';
 import PropTypes from 'prop-types';
-import IconButton from '../../components/common/UtilityComponents';
+import IconButton from '@/components/common/UtilityComponents';
 
 // Composants shadcn/ui
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 // Icônes Lucide
@@ -48,7 +47,7 @@ import {
   Pencil,
   ScanLine
 } from 'lucide-react';
-import NotFound from '../general/NotFound';
+import NotFound from '../../../general/NotFound';
 
 // ============================================================================
 // UTILITY COMPONENTS

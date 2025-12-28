@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
+import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
-import { useRealtimeBoxesSwitcher } from '../../hooks/realtime/useRealtimeBoxesSwitcher';
-import ActionSheet from '../../components/common/ActionSheet';
-import IconButton from '../../components/common/UtilityComponents';
+import { useRealtimeBoxesSwitcher } from '@/hooks/realtime/useRealtimeBoxesSwitcher';
+import ActionSheet from '@/components/common/ActionSheet';
+import IconButton from '@/components/common/UtilityComponents';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle } from 'lucide-react';
-import NotFound from '../general/NotFound';
+import NotFound from '@/general/NotFound';
 
 function StockAlertsPage({
   personalCalendars,

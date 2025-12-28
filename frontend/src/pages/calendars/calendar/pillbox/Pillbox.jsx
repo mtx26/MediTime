@@ -1,8 +1,8 @@
 // pages/PillboxPage.jsx
 import React from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import ForcedLandscapeWrapper from '../../components/common/ForcedLandscapeWrapper';
-import PillboxDisplay from '../../components/calendar/PillboxDisplay';
+import ForcedLandscapeWrapper from '@/components/common/ForcedLandscapeWrapper';
+import PillboxDisplay from '@/components/calendar/PillboxDisplay';
 
 function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const location = useLocation();
