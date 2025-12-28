@@ -479,13 +479,6 @@ function CalendarPage({
               )}
 
             </div>
-                            <CalendarSelector
-                  mode="single"
-                  selected={selectedDate || new Date()}
-                  onSelect={onWeekSelect}
-                  locale={t('locale')}
-                  showOutsideDays
-                />
             {/* Bouton pour naviguer vers la semaine suivante ou precedente */}
             {stockDecrementMethod === "weekly_pillbox" && (
               <div className='flex lg:hidden justify-center items-center' data-tour="calendar-week-selector">
@@ -738,13 +731,13 @@ function CalendarWeekSelector({
     Object.keys(calendarTable).filter(
       (key) => calendarTable[key].length > 0
     ).length > 0 && (
-      <div className="mb-2 w-full">
+      <div className="mb-2 w-full max-w-100">
         <h4 className="mb-3 font-bold flex items-center gap-2">
           <CalendarDays className="h-5 w-5" /> {t('calendar.reference_week')}
         </h4>
         <Card className="shadow rounded-lg w-full p-0">
           <CardContent className="p-0">
-            <div className="h-full overflow-auto">
+            <div className="h-full w-full">
               <WeekCalendarSelector onWeekSelect={onWeekSelect} selectedDate={selectedDate} />
             </div>
           </CardContent>
