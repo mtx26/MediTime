@@ -35,21 +35,6 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
   onSelect={handleSelect}
   locale={getDateLocale(i18n.language)}
   showOutsideDays
-  className="relative border rounded-lg w-full"
-  classNames={{
-    table: "w-full border-collapse table-fixed",
-    tbody: "table-row-group",
-    row: "table-row",          // 🔥 IMPORTANT
-    cell: "table-cell p-0 text-center align-middle",
-    day: "w-full h-full appearance-none leading-none",
-    weekdays: "table-header-group",
-    weekday: "table-cell",
-  }}
-  modifiers={{ weekSelected: weekDates }}
-  modifiersClassNames={{
-    weekSelected:
-      "bg-primary text-primary-foreground hover:bg-primary/90 data-[selected=true]:bg-primary rounded-md",
-  }}
 />
 
 
