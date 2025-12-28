@@ -282,7 +282,7 @@ function SelectCalendar({
               (calendarData, index) => (
                 <div key={index} className="border-b last:border-b-0 p-3 hover:bg-accent/50 transition">
 
-                  <div className="flex justify-between items-center gap-3">
+                  <div className="flex flex-wrap justify-between items-center gap-3">
                     <div className="grow">
                       <h5 className="font-semibold text-lg mb-1">{calendarData.name}</h5>
                       <div className="text-sm text-muted-foreground">
