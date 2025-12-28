@@ -58,7 +58,7 @@ function CalendarPage({
   // 🔄 Références et chargement
   const dateModalRef = useRef(null);
   const [loading, setLoading] = useState(true); // État de chargement du calendrier
-  const [notFound, setNotFound] = useState(false); // Erreur 404 si le calendrier n'existe pas
+  const [notFound, setNotFound] = useState(false);
   const initialNextDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0);
   
   let calendarType = 'personal';
@@ -127,8 +127,8 @@ function CalendarPage({
 
   // Fonction pour charger le calendrier lorsque l'utilisateur est connecté ou que le calendrier est un token
   useEffect(() => {
-    if (!calendarId) return setLoading(true);
-    if (!selectedDate) return setLoading(true);
+    if (!calendarId) return setLoading(false);
+    if (!selectedDate) return 
     if (calendarType === 'personal' || calendarType === 'sharedUser') {
       if (!userInfo) return setLoading(true);
     }
@@ -148,14 +148,13 @@ function CalendarPage({
           setIsLowStock(rep.ifLowStock);
           // TODO: Hook pour alerte stock faible en temps réel
         }
-        setLoading(false);
-      } else {
-        setLoading(false);
+      } else {;
         // Si l'API retourne un 404, le calendrier n'existe pas
         if (rep.status === 404) {
           setNotFound(true);
         }
       }
+      setLoading(false);
     };
 
     load();
@@ -163,30 +162,26 @@ function CalendarPage({
 
   // Gérer l'affichage du spinner global
   useEffect(() => {
-    showLoading(((loading === true || loadingStockMethod === true) && calendarId) && !notFound, t('loading_calendar'));
-  }, [loading, loadingStockMethod, calendarId, showLoading, t, notFound]);
+    showLoading(((loading === true || loadingStockMethod === true) && calendarId), t('loading_calendar'));
+  }, [loading, loadingStockMethod, calendarId, showLoading, t]);
 
   // Charger la méthode de décrémentation du stock (si disponible)
   useEffect(() => {
     const fetchMethod = async () => {
       if (!calendarId) return setLoadingStockMethod(false);
       if (calendarType === 'personal' || calendarType === 'sharedUser') {
-        if (!userInfo) return setLoading(true);
+        if (!userInfo) return setLoadingStockMethod(true);
       }
       // On tente pour les calendriers personal et sharedUser en appelant l'API exposée
       const rep = await calendarSource.fetchStockDecrementMethod(calendarId);
       if (rep.success) {
         setStockDecrementMethod(rep.method);
-        setLoadingStockMethod(false);
-      } else {
-        // Si l'API retourne un 404, le calendrier n'existe pas
-        if (rep.status === 404) {
-          setNotFound(true);
-        }
-        setLoadingStockMethod(false);
+      } else if (rep.status === 404) {
+        setNotFound(true);
+        setSelectedDate(new Date().setHours(0,0,0,0));
       }
+      setLoadingStockMethod(false);
     };
-
     fetchMethod();
   }, [calendarId, calendarType, userInfo]);
 
@@ -264,7 +259,7 @@ function CalendarPage({
   }, [calendarEvents]);
 
   // Affichage de la page 404 si le calendrier n'existe pas
-  if (notFound && calendarId) {
+  if (notFound) {
     return <NotFound />;
   }
 
@@ -547,6 +542,7 @@ function CalendarPage({
                       personalCalendars={personalCalendars}
                       sharedUserCalendars={sharedUserCalendars}
                       tokenCalendars={tokenCalendars}
+                      setNotFound={setNotFound}
                     />
                   </CardContent>
                 </Card>

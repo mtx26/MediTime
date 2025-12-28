@@ -1,6 +1,6 @@
 // src/pages/AcceptInvitePage.jsx
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from '@/components/common/HoveredUserProfile';
@@ -9,26 +9,29 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Mail, Calendar, AlertCircle, Check, X } from 'lucide-react';
+import NotFound from '@/pages/general/NotFound';
 
 function AcceptInvitePage({sharedUserCalendars}) {
   const { t } = useTranslation();
 
-  const [token, setToken] = useState('');
-  const [type, setType] = useState('');
+  const [token, setToken] = useState(undefined);
+  const [type, setType] = useState(undefined);
   const [loading, setLoading] = useState(true);
   const [invitation, setInvitation] = useState(null);
+  const [notFound, setNotFound] = useState(false);
 
   const navigate = useNavigate();
   const { lng } = useParams();
+  const [searchParams] = useSearchParams();
+
+    useEffect(() => {
+      setToken(searchParams.get('token') || '');
+      setType(searchParams.get('type') || '');
+    }, [searchParams]);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setToken(params.get('token') || '');
-    setType(params.get('type') || '');
-  }, []);
-
-  useEffect(() => {
-    if (!token || !type) {
+    if (token === '' || type === '') {
+      setNotFound(true);
       return;
     }
     getInvitation();
@@ -44,6 +47,8 @@ function AcceptInvitePage({sharedUserCalendars}) {
       const rep = await sharedUserCalendars.getRegistrationInvitation(token);
       if (rep.success) {
         setInvitation(rep.invitation);
+      } else if (rep.status === 404) {
+        setNotFound(true);
       }
     }
     setLoading(false);
@@ -91,21 +96,11 @@ function AcceptInvitePage({sharedUserCalendars}) {
     showLoading(loading === true, t('invitation.loading'));
   }, [loading, showLoading, t]);
 
-  if (loading) {
-    return null;
+  if (notFound) {
+    return <NotFound />;
   }
-
-  if (loading === false && !invitation) {
-    return (
-      <div className="max-w-md mx-auto mt-8">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            {t('invitation.invalid_or_expired')}
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
+  if (!invitation) {
+    return null;
   }
 
   return (

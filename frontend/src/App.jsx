@@ -1089,7 +1089,7 @@ function App() {
         </main>
         <Footer />
       </ScrollArea>
-      {!location.pathname.includes('/pillbox') && <MobileNavBar/>}
+      {<MobileNavBar/>}
     </div>
   );
 }

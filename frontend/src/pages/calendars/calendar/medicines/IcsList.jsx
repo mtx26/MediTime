@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Link2, InfoIcon, Trash2, Clipboard, ExternalLink, PlusCircle } from 'lucide-react';
+import NotFound from '@/pages/general/NotFound';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -23,6 +24,7 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const [loading, setLoading] = useState(true);
   const { showAlert, showConfirm } = useAlert();
   const { showLoading } = useLoading();
+  const [notFound, setNotFound] = useState(false);
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
@@ -49,6 +51,8 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     const result = await calendarSource.getTokensIcs(calendarId);
     if (result.success) {
       setTokens(result.data.tokens || []);
+    } else if (result.status === 404) {
+      setNotFound(true);
     }
     setLoading(false);
   }, [calendarId, calendarSource.getTokensIcs, t]);
@@ -98,8 +102,8 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     showLoading(loading, t('ics.loading_ics_tokens'));
   }, [loading, showLoading, t]);
 
-  if (loading) {
-    return null;
+  if (notFound) {
+    return <NotFound />;
   }
 
   return (

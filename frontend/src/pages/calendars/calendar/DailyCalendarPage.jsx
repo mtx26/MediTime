@@ -1,21 +1,20 @@
 
 import React, { useRef, useState, useEffect, useContext } from 'react';
-import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
-import { toISO, toDate, getMondayDate } from '@/utils/calendar/dateUtils';
+import { toISO, toDate } from '@/utils/calendar/dateUtils';
 import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
 import { UserContext } from '@/contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import isEqual from 'lodash/isEqual';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert } from '@/components/ui/alert';
 import { AlertTriangle, ChevronRight } from 'lucide-react';
-import NotFound from '../general/NotFound';
+import NotFound from '@/pages/general/NotFound';
 
 // Page d'affichage du mode "daily" (journalier)
 
 export default function DailyCalendarPage({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
-  const navigate = useNavigate(); // Hook de navigation
   const location = useLocation();
   const params = useParams();
   const { t } = useTranslation();
@@ -160,20 +159,14 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
   const { showLoading } = useLoading();
 
   useEffect(() => {
-    // Ne pas afficher le spinner si le calendrier n'existe pas (404)
-    if (notFound) {
-      showLoading(false);
-      return;
-    }
     showLoading(loading === true && calendarId, t('calendar.loading_daily_view'));
-  }, [loading, calendarId, showLoading, t, notFound]);
+  }, [loading, calendarId, showLoading, t]);
 
   if (loading === true && calendarId) {
     return null;
   }
 
-  // Affichage de la page 404 si le calendrier n'existe pas
-  if (notFound && calendarId) {
+  if (notFound) {
     return <NotFound />;
   }
 

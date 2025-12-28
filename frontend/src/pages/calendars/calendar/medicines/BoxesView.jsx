@@ -258,6 +258,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   const [expandedBoxes, setExpandedBoxes] = useState({});
   const [editingBoxId, setEditingBoxId] = useState(null);
   const [editingBox, setEditingBox] = useState(null);
+  const [rep, setRep] = useState(null);
+  const [notFound, setNotFound] = useState(false);
 
   // =========================================================================
   // CALENDAR DETECTION
@@ -293,8 +295,16 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     isDemo ? null : calendarType, 
     calendarId, 
     setBoxes, 
-    isDemo ? () => {} : setLoadingBoxes
+    setLoadingBoxes,
+    setRep
   );
+  
+  useEffect(() => {
+    if (rep && rep.status === 404) {
+      setNotFound(true);
+      setLoadingBoxes(false);
+    }
+  }, [rep]);
 
   useEffect(() => {
     if (isDemo) {
@@ -625,12 +635,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     showLoading(loadingBoxes === undefined, t('boxes.loading_medicine_boxes'));
   }, [loadingBoxes, showLoading, t]);
 
-  if (loadingBoxes === undefined) {
-    return null;
-  }
-
   // Affichage de la page 404 si le calendrier n'existe pas
-  if (loadingBoxes === false) {
+  if (notFound) {
     return <NotFound />;
   }
 

@@ -123,7 +123,7 @@ export function LoadingProvider({ children, name = 'default', className = '' }) 
       {children}
       {isLoading && (
         <div
-          className={`${positionClass} inset-0 ${backdropClass} z-50 flex items-center justify-center`}
+          className={`${positionClass} inset-0 ${backdropClass} z-10000 flex items-center justify-center`}
           role="status"
           aria-live="polite"
           aria-busy={true}

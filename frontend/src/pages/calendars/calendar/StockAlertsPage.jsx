@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle } from 'lucide-react';
-import NotFound from '@/general/NotFound';
+import NotFound from '@/pages/general/NotFound';
 
 function StockAlertsPage({
   personalCalendars,
@@ -24,6 +24,8 @@ function StockAlertsPage({
 
   const [boxes, setBoxes] = useState([]);
   const [loadingBoxes, setLoadingBoxes] = useState(true);
+  const [rep, setRep] = useState(null);
+  const [notFound, setNotFound] = useState(false);
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
@@ -80,8 +82,16 @@ function StockAlertsPage({
     isDemo ? null : calendarType,
     calendarId,
     setBoxes,
-    isDemo ? () => { /* no-op */ } : setLoadingBoxes
+    setLoadingBoxes,
+    setRep
   );
+
+  useEffect(() => {
+    if (rep && rep.status === 404) {
+      setNotFound(true);
+      setLoadingBoxes(false);
+    }
+  }, [rep]);
 
   // On filtre les boîtes qui sont en stock faible
   const alerts = boxes.filter(
@@ -139,8 +149,7 @@ function StockAlertsPage({
     return null;
   }
 
-  // Affichage de la page 404 si le calendrier n'existe pas
-  if (loadingBoxes === false) {
+  if (notFound) {
     return <NotFound />;
   }
 

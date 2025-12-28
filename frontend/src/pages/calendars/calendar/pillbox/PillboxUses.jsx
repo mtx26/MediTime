@@ -10,7 +10,7 @@ import { UserContext } from '@/contexts/UserContext';
 import { useAlert } from '@/contexts/AlertContext';
 import { Button } from '@/components/ui/button';
 import { History, RotateCcw } from 'lucide-react';
-import NotFound from '../general/NotFound';
+import NotFound from '@/pages/general/NotFound';
 
 const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();
@@ -23,7 +23,7 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
 
   const [pillboxUsesData, setPillboxUsesData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false); // Erreur 404 si le calendrier n'existe pas
+  const [notFound, setNotFound] = useState(false);
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
@@ -65,7 +65,7 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
       setPillboxUsesData(rep.pillbox_uses);
       setLoading(false);
     } else {
-      // Si l'API retourne un 404, le calendrier n'existe pas
+      console.error('Error fetching pillbox uses:', rep.status);
       if (rep.status === 404) {
         setNotFound(true);
       }
@@ -97,21 +97,15 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
   const { showLoading } = useLoading();
 
   useEffect(() => {
-    // Ne pas afficher le spinner si le calendrier n'existe pas (404)
-    if (notFound) {
-      showLoading(false);
-      return;
-    }
     showLoading(loading === true && calendarId, t('loading_pillbox_uses'));
   }, [loading, calendarId, showLoading, t, notFound]);
 
-  // Affichage de la page 404 si le calendrier n'existe pas
-  if (notFound && calendarId) {
-    return <NotFound />;
-  }
-
   if (loading === true && calendarId) {
     return null;
+  }
+
+  if (notFound) {
+    return <NotFound />;
   }
   
   return (

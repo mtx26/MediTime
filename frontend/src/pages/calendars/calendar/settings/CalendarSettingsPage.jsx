@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import Stock from './CalendarStock';
 import Notifications from './CalendarNotifications.jsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Pill, Bell, Share } from 'lucide-react';
+import { Pill, Bell, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import NotFound from '@/pages/general/NotFound';
 // import Sharing from './calendar-settings/Sharing';
 
 function CalendarSettingsPage({
@@ -17,6 +18,8 @@ function CalendarSettingsPage({
   const location = useLocation();
   const params = useParams();
   const { lng } = params;
+
+  const [notFound, setNotFound] = useState(false);
 
   const sharedProps = {
     personalCalendars,
@@ -68,25 +71,29 @@ function CalendarSettingsPage({
     switch (activeTab) {
       case 'stock':
         if (calendarType === 'personal') {
-          return <Stock {...sharedProps} />;
+          return <Stock {...sharedProps} setNotFound={setNotFound}/>;
         }
         break;
       case 'notifications':
         if (calendarType !== 'token') {
-          return <Notifications {...sharedProps} />;
+          return <Notifications {...sharedProps} setNotFound={setNotFound}/>;
         }
         break;
       // case 'sharing':
       //   return <Sharing {...sharedProps} />;
       default:
         if (calendarType === 'personal') {
-          return <Stock {...sharedProps} />;
+          return <Stock {...sharedProps} setNotFound={setNotFound} />;
         } else if (calendarType === 'sharedUser') {
-          return <Notifications {...sharedProps} />;
+          return <Notifications {...sharedProps} setNotFound={setNotFound} />;
         }
         return null;
     }
   };
+
+  if (notFound) {
+    return <NotFound />;
+  }
 
   return (
     <div className="container mx-auto">
@@ -94,7 +101,10 @@ function CalendarSettingsPage({
         <div className="w-full md:w-1/4 mb-3">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">{t('calendar_settings.label')}</CardTitle>
+              <CardTitle className="text-lg">
+                <Settings className="inline-block mr-2 mb-1" />
+                {t('calendar_settings.label')
+                }</CardTitle>
             </CardHeader>
             <CardContent className="p-3 space-y-1">
 

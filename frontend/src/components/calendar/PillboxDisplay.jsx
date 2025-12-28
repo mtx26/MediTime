@@ -29,6 +29,7 @@ function PillboxContent({
   personalCalendars,
   sharedUserCalendars,
   tokenCalendars,
+  setNotFound,
 }) {
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
@@ -73,6 +74,8 @@ function PillboxContent({
       const rep = await calendarSource.fetchSchedule(calendarId, toISO(selectedDate));
       if (rep.success && !isEqual(rep.table, calendarTable)) {
         setCalendarTable(rep.table);
+      } else if (rep.status === 404) {
+        setNotFound(true);
       }
       setLoading(rep.success);
     };

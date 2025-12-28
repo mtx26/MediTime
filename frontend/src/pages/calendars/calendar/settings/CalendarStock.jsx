@@ -3,9 +3,11 @@ import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+// stock icon
+import { Box } from 'lucide-react';
 
 
-const Stock = ({ personalCalendars }) => {
+const Stock = ({ personalCalendars, setNotFound }) => {
   const { t } = useTranslation();
   const [selectedMethod, setSelectedMethod] = useState('');
   const params = useParams();
@@ -39,6 +41,9 @@ const Stock = ({ personalCalendars }) => {
         setSelectedMethod(rep.method);
         setLoading(false);
       } else {
+        if (rep.status === 404) {
+          setNotFound(true);
+        }
         setLoading(true);
       }
     }
@@ -52,15 +57,12 @@ const Stock = ({ personalCalendars }) => {
     showLoading(loading === undefined && calendarId, t('calendar_settings.loading_stock_settings'));
   }, [loading, calendarId, showLoading, t]);
 
-  if (loading === undefined && calendarId) {
-    return null;
-  }
-
-  if (loading && calendarId) return null;
-
   return (
     <div>
-      <h5 className="mb-4 text-lg font-semibold">{t('calendar_settings.stock.label')}</h5>
+      <h5 className="mb-4 text-lg font-semibold">
+        <Box className="inline-block mr-2 mb-1" />
+        {t('calendar_settings.stock.label')}
+      </h5>
       <RadioGroup value={selectedMethod} onValueChange={modifyStockDecrementMethod} data-tour="settings-stock-methods" className="space-y-3">
         <label 
           htmlFor="weeklyPillbox" 

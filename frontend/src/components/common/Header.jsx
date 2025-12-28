@@ -133,20 +133,6 @@ function Navbar({ sharedProps }) {
   const { notificationsData, readNotification } = sharedProps.notifications;
   const unreadCount = notificationsData?.filter((n) => !n.read).length || 0;
 
-  // Pillbox close button
-  if (isPillboxPage) {
-    return (
-      <Link
-        to={`/${lng}/${basePath}/${calendarInfo?.id}`}
-        className="fixed top-4 right-4 z-1050 text-2xl text-foreground"
-        aria-label="Fermer"
-      >
-        <X className="h-8 w-8" />
-        <span className="sr-only">Fermer</span>
-      </Link>
-    );
-  }
-
   return (
     <>
       {/* Desktop Header */}
@@ -395,6 +381,16 @@ function Navbar({ sharedProps }) {
           </div>
         </div>
       </nav>
+      {isPillboxPage && (
+        <Link
+          to={`/${lng}/${basePath}/${calendarInfo?.id}`}
+          className="fixed top-4 right-4 z-4000 text-2xl text-foreground"
+          aria-label="Fermer"
+        >
+          <X className="h-8 w-8" />
+          <span className="sr-only">Fermer</span>
+        </Link>
+      )}
 
       {/* Mobile Bottom Navigation moved to Footer */}
     </>
