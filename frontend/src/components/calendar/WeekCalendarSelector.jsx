@@ -35,7 +35,7 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
       onSelect={handleSelect}
       locale={getDateLocale(i18n.language)}
       showOutsideDays={true}
-      className="relative w-full max-w-full"
+      className="relative overflow-hidden w-full max-w-full"
       modifiers={{
         weekSelected: weekDates
       }}
