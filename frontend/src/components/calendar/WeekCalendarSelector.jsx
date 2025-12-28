@@ -33,8 +33,6 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
   mode="single"
   selected={selDate || today}
   onSelect={handleSelect}
-  locale={getDateLocale(i18n.language)}
-  showOutsideDays
 />
 
 
