@@ -1,0 +1,178 @@
+{
+  "name": "pages",
+  "type": "folder",
+  "children": [
+    {
+      "name": "auth",
+      "type": "folder",
+      "children": [
+        {
+          "name": "Auth.jsx",
+          "type": "file"
+        },
+        {
+          "name": "AuthCallback.jsx",
+          "type": "file"
+        },
+        {
+          "name": "ResetPassword.jsx",
+          "type": "file"
+        },
+        {
+          "name": "ResetPasswordConfirm.jsx",
+          "type": "file"
+        },
+        {
+          "name": "VerifyEmail.jsx",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "calendar",
+      "type": "folder",
+      "children": [
+        {
+          "name": "AcceptInvitePage.jsx",
+          "type": "file"
+        },
+        {
+          "name": "AddCalendarPage.jsx",
+          "type": "file"
+        },
+        {
+          "name": "CalendarList.jsx",
+          "type": "file"
+        },
+        {
+          "name": "CalendarSettingsPage.jsx",
+          "type": "file"
+        },
+        {
+          "name": "CalendarView.jsx",
+          "type": "file"
+        },
+        {
+          "name": "DailyCalendarPage.jsx",
+          "type": "file"
+        },
+        {
+          "name": "MedicineReview.jsx",
+          "type": "file"
+        },
+        {
+          "name": "Pillbox.jsx",
+          "type": "file"
+        },
+        {
+          "name": "PillboxUses.jsx",
+          "type": "file"
+        },
+        {
+          "name": "settings",
+          "type": "folder",
+          "children": [
+            {
+              "name": "Notifications.jsx",
+              "type": "file"
+            },
+            {
+              "name": "Stock.jsx",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "StockAlertsPage.jsx",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "general",
+      "type": "folder",
+      "children": [
+        {
+          "name": "HomePage.jsx",
+          "type": "file"
+        },
+        {
+          "name": "NotFound.jsx",
+          "type": "file"
+        },
+        {
+          "name": "PrivacyPage.jsx",
+          "type": "file"
+        },
+        {
+          "name": "TermsPage.jsx",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "medicines",
+      "type": "folder",
+      "children": [
+        {
+          "name": "BoxesView.jsx",
+          "type": "file"
+        },
+        {
+          "name": "IcsList.jsx",
+          "type": "file"
+        },
+        {
+          "name": "MedicinesList.jsx",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "notifications",
+      "type": "folder",
+      "children": [
+        {
+          "name": "NotificationsPage.jsx",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "settings",
+      "type": "folder",
+      "children": [
+        {
+          "name": "Account.jsx",
+          "type": "file"
+        },
+        {
+          "name": "Notification.jsx",
+          "type": "file"
+        },
+        {
+          "name": "Preferences.jsx",
+          "type": "file"
+        },
+        {
+          "name": "Security.jsx",
+          "type": "file"
+        },
+        {
+          "name": "SettingsPage.jsx",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "share",
+      "type": "folder",
+      "children": [
+        {
+          "name": "SharedList.jsx",
+          "type": "file"
+        }
+      ]
+    }
+  ]
+}

@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle } from 'lucide-react';
+import NotFound from '../general/NotFound';
 
 function StockAlertsPage({
   personalCalendars,
@@ -138,15 +139,9 @@ function StockAlertsPage({
     return null;
   }
 
+  // Affichage de la page 404 si le calendrier n'existe pas
   if (loadingBoxes === false) {
-    return (
-      <div className="flex justify-center mt-5">
-        <Alert variant="destructive" className="max-w-150">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{t('invalid_or_expired_link')}</AlertDescription>
-        </Alert>
-      </div>
-    );
+    return <NotFound />;
   }
 
   return (

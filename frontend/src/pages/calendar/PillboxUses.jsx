@@ -11,6 +11,7 @@ import { useAlert } from '../../contexts/AlertContext';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, History, RotateCcw } from 'lucide-react';
+import NotFound from '../general/NotFound';
 
 const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();
@@ -23,6 +24,7 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
 
   const [pillboxUsesData, setPillboxUsesData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false); // Erreur 404 si le calendrier n'existe pas
 
   let calendarType = 'personal';
   let calendarId = params.calendarId;
@@ -62,8 +64,14 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
     const rep = await calendarSource.fetchPillboxUses(calendarId); 
     if (rep.success) {
       setPillboxUsesData(rep.pillbox_uses);
+      setLoading(false);
+    } else {
+      // Si l'API retourne un 404, le calendrier n'existe pas
+      if (rep.status === 404) {
+        setNotFound(true);
+      }
+      setLoading(false);
     }
-    setLoading((rep.success ? false : undefined))
   };
 
   const cancelUse = (useId) => {
@@ -90,20 +98,17 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
   const { showLoading } = useLoading();
 
   useEffect(() => {
+    // Ne pas afficher le spinner si le calendrier n'existe pas (404)
+    if (notFound) {
+      showLoading(false);
+      return;
+    }
     showLoading(loading === true && calendarId, t('loading_pillbox_uses'));
-  }, [loading, calendarId, showLoading, t]);
+  }, [loading, calendarId, showLoading, t, notFound]);
 
-  if (loading === undefined && calendarId) {
-    return (
-      <div className="mt-5">
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription className="text-center">
-            {t('invalid_or_expired_link')}
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
+  // Affichage de la page 404 si le calendrier n'existe pas
+  if (notFound && calendarId) {
+    return <NotFound />;
   }
 
   if (loading === true && calendarId) {

@@ -16,6 +16,7 @@ import WeekCalendarSelector from '../../components/calendar/WeekCalendarSelector
 import WeeklyEventContent from '../../components/calendar/WeeklyEventContent';
 import PillboxDisplay from '../../components/calendar/PillboxDisplay';
 import ActionSheet from '../../components/common/ActionSheet';
+import NotFound from '../general/NotFound';
 import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -57,6 +58,7 @@ function CalendarPage({
   // 🔄 Références et chargement
   const dateModalRef = useRef(null);
   const [loading, setLoading] = useState(true); // État de chargement du calendrier
+  const [notFound, setNotFound] = useState(false); // Erreur 404 si le calendrier n'existe pas
   const initialNextDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0);
   
   let calendarType = 'personal';
@@ -146,8 +148,14 @@ function CalendarPage({
           setIsLowStock(rep.ifLowStock);
           // TODO: Hook pour alerte stock faible en temps réel
         }
+        setLoading(false);
+      } else {
+        setLoading(false);
+        // Si l'API retourne un 404, le calendrier n'existe pas
+        if (rep.status === 404) {
+          setNotFound(true);
+        }
       }
-      setLoading(rep.success ? false : undefined);
     };
 
     load();
@@ -155,8 +163,8 @@ function CalendarPage({
 
   // Gérer l'affichage du spinner global
   useEffect(() => {
-    showLoading((loading === true || loadingStockMethod === true) && calendarId, t('loading_calendar'));
-  }, [loading, loadingStockMethod, calendarId, showLoading, t]);
+    showLoading(((loading === true || loadingStockMethod === true) && calendarId) && !notFound, t('loading_calendar'));
+  }, [loading, loadingStockMethod, calendarId, showLoading, t, notFound]);
 
   // Charger la méthode de décrémentation du stock (si disponible)
   useEffect(() => {
@@ -169,8 +177,14 @@ function CalendarPage({
       const rep = await calendarSource.fetchStockDecrementMethod(calendarId);
       if (rep.success) {
         setStockDecrementMethod(rep.method);
+        setLoadingStockMethod(false);
+      } else {
+        // Si l'API retourne un 404, le calendrier n'existe pas
+        if (rep.status === 404) {
+          setNotFound(true);
+        }
+        setLoadingStockMethod(false);
       }
-      setLoadingStockMethod((rep.success ? false : undefined));
     };
 
     fetchMethod();
@@ -249,13 +263,9 @@ function CalendarPage({
     }));
   }, [calendarEvents]);
 
-  if ((loading === undefined || loadingStockMethod === undefined) && calendarId) {
-    return (
-      <Alert variant="destructive" className="text-center mt-8 max-w-2xl mx-auto">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>{t('invalid_or_expired_link')}</AlertDescription>
-      </Alert>
-    );
+  // Affichage de la page 404 si le calendrier n'existe pas
+  if (notFound && calendarId) {
+    return <NotFound />;
   }
 
   return (

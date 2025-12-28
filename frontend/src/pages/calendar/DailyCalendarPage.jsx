@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import isEqual from 'lodash/isEqual';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, ChevronRight } from 'lucide-react';
+import NotFound from '../general/NotFound';
 
 // Page d'affichage du mode "daily" (journalier)
 
@@ -46,6 +47,7 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
 
   // 🔄 Références et chargement
   const [loading, setLoading] = useState(true); // État de chargement du calendrier
+  const [notFound, setNotFound] = useState(false); // Erreur 404 si le calendrier n'existe pas
 
 	  let calendarType = 'personal';
     let calendarId = params.calendarId;
@@ -125,8 +127,14 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
             setIsLowStock(rep.ifLowStock);
             // TODO: Hook pour alerte stock faible en temps réel
           }
+          setLoading(false);
+        } else {
+          // Si l'API retourne un 404, le calendrier n'existe pas
+          if (rep.status === 404) {
+            setNotFound(true);
+          }
+          setLoading(false);
         }
-        setLoading(rep.success ? false : undefined);
       };
   
       load();
@@ -152,23 +160,21 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
   const { showLoading } = useLoading();
 
   useEffect(() => {
+    // Ne pas afficher le spinner si le calendrier n'existe pas (404)
+    if (notFound) {
+      showLoading(false);
+      return;
+    }
     showLoading(loading === true && calendarId, t('calendar.loading_daily_view'));
-  }, [loading, calendarId, showLoading, t]);
+  }, [loading, calendarId, showLoading, t, notFound]);
 
-  if ((loading === true && calendarId)) {
+  if (loading === true && calendarId) {
     return null;
   }
 
-  if ((loading === undefined) && calendarId) {
-    return (
-      <div className="mt-5">
-        <Alert variant="destructive">
-          <AlertDescription className="text-center">
-            ❌ {t('invalid_or_expired_link')}
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
+  // Affichage de la page 404 si le calendrier n'existe pas
+  if (notFound && calendarId) {
+    return <NotFound />;
   }
 
   return (

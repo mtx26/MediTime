@@ -5,12 +5,14 @@ import { useLoading } from '@/components/ui/loading';
 import { getCalendarSourceMap } from '../../../utils/calendar/calendarSourceMap';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import NotFound from '../../general/NotFound';
 
 
 const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
   const { t } = useTranslation();
   const [enabled, setEnabled] = useState(true);
   const [loading, setLoading] = useState(undefined);
+  const [notFound, setNotFound] = useState(false); // Erreur 404 si le calendrier n'existe pas
   const params = useParams();
   const location = useLocation();
 
@@ -40,7 +42,11 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars 
         setEnabled(rep["notifications-enabled"]);
         setLoading(false);
       } else {
-        setLoading(true);
+        // Si l'API retourne un 404, le calendrier n'existe pas
+        if (rep.status === 404) {
+          setNotFound(true);
+        }
+        setLoading(false);
       }
     };
 
@@ -59,11 +65,21 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars 
   const { showLoading } = useLoading();
 
   useEffect(() => {
+    // Ne pas afficher le spinner si le calendrier n'existe pas (404)
+    if (notFound) {
+      showLoading(false);
+      return;
+    }
     showLoading(loading === undefined && calendarId, t('calendar_settings.loading_notification_settings'));
-  }, [loading, calendarId, showLoading, t]);
+  }, [loading, calendarId, showLoading, t, notFound]);
 
   if (loading === undefined && calendarId) {
     return null;
+  }
+
+  // Affichage de la page 404 si le calendrier n'existe pas
+  if (notFound && calendarId) {
+    return <NotFound />;
   }
 
   if (loading) return null;

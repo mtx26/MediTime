@@ -48,6 +48,7 @@ import {
   Pencil,
   ScanLine
 } from 'lucide-react';
+import NotFound from '../general/NotFound';
 
 // ============================================================================
 // UTILITY COMPONENTS
@@ -629,12 +630,9 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     return null;
   }
 
+  // Affichage de la page 404 si le calendrier n'existe pas
   if (loadingBoxes === false) {
-    return (
-      <div className="bg-destructive/10 border border-destructive text-destructive text-center p-4 rounded-md mt-8">
-        {t('invalid_or_expired_link')}
-      </div>
-    );
+    return <NotFound />;
   }
 
   // =========================================================================
