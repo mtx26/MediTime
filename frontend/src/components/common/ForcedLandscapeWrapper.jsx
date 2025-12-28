@@ -53,10 +53,8 @@ export default function ForcedLandscapeWrapper({ children }) {
   if (isPortrait) {
     return (
       <div
-        className="fixed bg-background z-1000"
+        className="fixed bg-background z-1000 min-h-[100dvh] min-w-[100dvw] flex items-center justify-center"
         style={{
-          width: '100vh',
-          height: '100vw',
           transform: 'rotate(90deg)',
           transformOrigin: 'left top',
           top: 0,
