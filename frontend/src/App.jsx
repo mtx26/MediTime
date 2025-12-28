@@ -1089,7 +1089,7 @@ function App() {
         </main>
         <Footer />
       </ScrollArea>
-      {<MobileNavBar/>}
+      <MobileNavBar/>
     </div>
   );
 }
