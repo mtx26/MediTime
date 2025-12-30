@@ -22,26 +22,46 @@ def get_boxes(calendar_id: str) -> list:
                   mb.calendar_id,
                   c.name AS calendar_name,
                   mb.dose,
-                  /* conditions: EXACTEMENT la liste des lignes de medicine_box_conditions */
-                  COALESCE((
-                    SELECT jsonb_agg(to_jsonb(mbc) ORDER BY mbc.created_at)
-                    FROM medicine_box_conditions mbc
-                    WHERE mbc.box_id = mb.id AND mbc.deleted_at IS NULL
-                  ), '[]'::jsonb) AS conditions,
-                  /* url_notice_fr liée au nom de la boîte (équivalent à ILIKE sans wildcard) */
-                  (
-                    SELECT maf."url_notice_fr"
-                    FROM medicaments_afmps maf
-                    WHERE maf."name" ILIKE mb.name
-                    LIMIT 1
-                  ) AS url_notice_fr
+
+                  /* conditions : EXACTEMENT identiques à la version originale */
+                  COALESCE(
+                    jsonb_agg(to_jsonb(mbc) ORDER BY mbc.created_at)
+                      FILTER (WHERE mbc.id IS NOT NULL),
+                    '[]'::jsonb
+                  ) AS conditions,
+
+                  maf.url_notice_fr
+
                 FROM medicine_boxes mb
-                JOIN calendars c ON c.id = mb.calendar_id
+
+                JOIN calendars c
+                  ON c.id = mb.calendar_id
+                 AND c.deleted_at IS NULL
+
+                /* récupération des conditions en une seule passe */
+                LEFT JOIN medicine_box_conditions mbc
+                  ON mbc.box_id = mb.id
+                 AND mbc.deleted_at IS NULL
+
+                /* équivalent STRICT du SELECT … LIMIT 1 */
+                LEFT JOIN LATERAL (
+                  SELECT maf."url_notice_fr"
+                  FROM medicaments_afmps maf
+                  WHERE maf."name" ILIKE mb.name
+                  LIMIT 1
+                ) maf ON true
+
                 WHERE mb.calendar_id = %s
                   AND mb.deleted_at IS NULL
-                  AND c.deleted_at IS NULL
+
+                GROUP BY
+                  mb.id,
+                  c.name,
+                  maf.url_notice_fr
+
                 ORDER BY mb.created_at;
             """, (calendar_id,))
+
             boxes = cursor.fetchall()
 
     return boxes or []
