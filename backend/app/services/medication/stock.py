@@ -22,7 +22,7 @@ def process_box_decrement(cursor, id_box: str, qty: int, start_date: str, days: 
         return
 
     cursor.execute("""
-        SELECT tablet_count, start_date, interval_days
+        SELECT *
         FROM medicine_box_conditions
         WHERE box_id = %s AND deleted_at IS NULL
     """, (id_box,))
@@ -63,7 +63,7 @@ def process_box_increment(cursor, id_box: str, qty: int, start_date: str, days: 
         return
 
     cursor.execute("""
-        SELECT tablet_count, start_date, interval_days
+        SELECT *
         FROM medicine_box_conditions
         WHERE box_id = %s AND deleted_at IS NULL
     """, (id_box,))
@@ -161,12 +161,13 @@ def check_low_stock_and_notify_for_calendar(calendar_id: int):
         for result in results:
             med_id = result.get("id")
             link = f"/calendar/{calendar_id}/stock-alerts"
+            stock_quantity = result.get("stock_quantity")
             uid_owner = result.get("owner_uid")
 
             notif = {
                 "link": link,
                 "medication_id": med_id,
-                "medication_qty": result.get("stock_quantity"),
+                "medication_qty": stock_quantity,
                 "calendar_id": calendar_id,
                 "sender_uid": Config.SYSTEM_UID,
             }

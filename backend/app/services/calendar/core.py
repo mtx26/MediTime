@@ -1,7 +1,31 @@
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from app.utils.logging import log_backend as logger
 from app.db.connection import get_connection
 
+def normalize_date(input_date: str) -> date | None:
+    """
+    Normalise une date au format date.
+
+    Paramètres:
+    - input_date (str): La date en format 'DD-MM-YYYY'.
+
+    Retour:
+    - date | None: La date normalisée ou None si le format est invalide.
+    """
+    try:
+        if isinstance(input_date, datetime):
+            return input_date.date()
+        if isinstance(input_date, date):
+            return input_date
+        return None
+    except Exception as e:
+        logger.error(f"Erreur lors de la normalisation de la date: {e}", {
+            "origin": "DATE_NORMALIZATION_ERROR",
+            "error": str(e),
+            "input_date": input_date
+        })
+    
+    return None
 def generate_calendar_schedule(calendar_id: str, start_date: date) -> tuple[list, list, str | None]:
     """
     Génère le planning et le tableau de prise de médicaments pour un calendrier donné à partir d'une date de début.
@@ -75,21 +99,19 @@ def is_medication_due(med: dict, current_date: date) -> bool:
     - bool: True si le médicament doit être pris à la date donnée, False sinon.
     """
     try:
-        start_date = med.get("start_date", "")
-        if isinstance(start_date, date):
-            sd = start_date
-        else:
-            sd = current_date
+        start_date = med.get("start_date", None)
+        start_date = normalize_date(start_date)
 
         # Fin de validité optionnelle: max_date est soit une date, soit absent/None
-        max_date = med.get("max_date")
+        max_date = med.get("max_date", None)
         if max_date:
-            # Convertir max_date en date si c'est un datetime (depuis la BD)
-            max_date_only = max_date.date() if hasattr(max_date, 'date') else max_date
-            if current_date > max_date_only:
+            max_date = normalize_date(max_date)
+            
+            if current_date > max_date:
                 return False
-
-        delta_days = (current_date - sd).days
+        if not start_date:
+            return True
+        delta_days = (current_date - start_date).days
 
         if delta_days < 0:
             return False
