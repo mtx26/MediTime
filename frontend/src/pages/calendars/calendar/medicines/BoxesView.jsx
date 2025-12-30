@@ -139,6 +139,7 @@ const InputDropdown = ({
   onChangeDose,
   onChangeBoxCapacity,
   onChangeStockQuantity,
+  onChangeCodeFmd,
   fetchSuggestions,
 }) => {
   const { t } = useTranslation();
@@ -164,6 +165,9 @@ const InputDropdown = ({
     onChangeDose(onlyNumbers);
     onChangeBoxCapacity(item.conditionnement);
     onChangeStockQuantity(item.conditionnement);
+    if (item.code_fmd) {
+      onChangeCodeFmd(item.code_fmd);
+    }
     setShowDropdown(false);
     setSuggestions([]);
   };
@@ -355,6 +359,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       box_capacity: medicineData.box_capacity || 0,
       stock_quantity: medicineData.stock_quantity || 0,
       stock_alert_threshold: medicineData.stock_alert_threshold || 10,
+      code_fmd: medicineData.code_fmd || null,
       conditions: medicineData.conditions || [],
     };
     
@@ -409,6 +414,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       box_capacity: box.box_capacity,
       stock_alert_threshold: box.stock_alert_threshold,
       stock_quantity: box.stock_quantity,
+      code_fmd: box.code_fmd || null,
       conditions: box.conditions.reduce(
         (acc, c) => ({
           ...acc,
@@ -452,7 +458,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         editingBox.stock_alert_threshold,
         editingBox.stock_quantity,
         editingBox.dose,
-        conditions
+        conditions,
+        editingBox.code_fmd
       );
     } else {
       // Mise à jour d'une box existante
@@ -473,7 +480,9 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       med.box_capacity,
       med.stock_alert_threshold,
       med.stock_quantity,
-      med.dose
+      med.dose,
+      [],
+      med.code_fmd
     );
     return res.success;
   };
@@ -515,6 +524,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         box_capacity: med.box_capacity,
         stock_alert_threshold: med.stock_alert_threshold,
         stock_quantity: med.stock_quantity,
+        code_fmd: med.code_fmd,
         conditions: currentBox?.conditions || [],
       }
     );
@@ -1014,6 +1024,9 @@ function BoxCard({
             }
             onChangeStockQuantity={(value) =>
               setEditingBox((p) => ({ ...p, stock_quantity: value }))
+            }
+            onChangeCodeFmd={(value) =>
+              setEditingBox((p) => ({ ...p, code_fmd: value }))
             }
             fetchSuggestions={fetchSuggestions}
           />

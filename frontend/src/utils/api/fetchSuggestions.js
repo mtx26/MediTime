@@ -5,7 +5,7 @@ export const fetchSuggestions = async (name, dose) => {
   if (!name || name.length < 2) return [];
   if (!dose) dose = null;
 
-  let url = `${SUPABASE_URL}/rest/v1/medicaments_afmps?select=name,dose,conditionnement,forme_pharmaceutique`;
+  let url = `${SUPABASE_URL}/rest/v1/medicaments_afmps?select=name,dose,conditionnement,forme_pharmaceutique,code_fmd`;
   url += `&name=ilike.*${encodeURIComponent(name)}*`;
 
   if (dose !== null && dose !== 0 && dose !== undefined && dose !== '') {

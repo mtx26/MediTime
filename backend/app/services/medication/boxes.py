@@ -43,11 +43,14 @@ def get_boxes(calendar_id: str) -> list:
                   ON mbc.box_id = mb.id
                  AND mbc.deleted_at IS NULL
 
-                /* équivalent STRICT du SELECT … LIMIT 1 */
+                /* Recherche de l'URL : d'abord par code_fmd (rapide), sinon par nom */
                 LEFT JOIN LATERAL (
                   SELECT maf."url_notice_fr"
                   FROM medicaments_afmps maf
-                  WHERE maf."name" ILIKE mb.name
+                  WHERE CASE 
+                    WHEN mb.code_fmd IS NOT NULL THEN maf.code_fmd = mb.code_fmd
+                    ELSE maf."name" ILIKE mb.name
+                  END
                   LIMIT 1
                 ) maf ON true
 
@@ -79,6 +82,7 @@ def update_box(box_id: str, calendar_id: str, box: dict):
     box_capacity = box.get("box_capacity") or 0
     stock_alert_threshold = box.get("stock_alert_threshold") or 10
     stock_quantity = box.get("stock_quantity") or 0
+    code_fmd = box.get("code_fmd") or None
     conditions = box.get("conditions") or []
 
     with get_connection() as conn:
@@ -90,7 +94,8 @@ def update_box(box_id: str, calendar_id: str, box: dict):
                     dose = %s,
                     box_capacity = %s,
                     stock_alert_threshold = %s,
-                    stock_quantity = %s
+                    stock_quantity = %s,
+                    code_fmd = %s
                 WHERE id = %s AND calendar_id = %s AND deleted_at IS NULL
                 RETURNING id
               ),
@@ -115,7 +120,7 @@ def update_box(box_id: str, calendar_id: str, box: dict):
               )
               SELECT 1;
             """, (
-                name, dose, box_capacity, stock_alert_threshold, stock_quantity,
+                name, dose, box_capacity, stock_alert_threshold, stock_quantity, code_fmd,
                 box_id, calendar_id,      # upd WHERE
                 box_id,                   # ins (box_id)
                 json.dumps(conditions)    # ins (payload)
@@ -138,16 +143,17 @@ def create_box(calendar_id: str, box: dict) -> str:
     box_capacity = box.get("box_capacity") or 0
     stock_alert_threshold = box.get("stock_alert_threshold") or 10
     stock_quantity = box.get("stock_quantity") or 0
+    code_fmd = box.get("code_fmd") or None
     conditions = box.get("conditions") or []
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
             # 1. Insérer d'abord la box
             cursor.execute("""
-              INSERT INTO medicine_boxes (calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity)
-              VALUES (%s, %s, %s, %s, %s, %s)
+              INSERT INTO medicine_boxes (calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity, code_fmd)
+              VALUES (%s, %s, %s, %s, %s, %s, %s)
               RETURNING id
-              """, (calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity))
+              """, (calendar_id, name, dose, box_capacity, stock_alert_threshold, stock_quantity, code_fmd))
             
             row = cursor.fetchone()
             box_id = row[0] if row and not isinstance(row, dict) else (row.get("id") if row else None)

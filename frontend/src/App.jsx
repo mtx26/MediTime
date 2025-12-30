@@ -149,7 +149,7 @@ function App() {
   
 
   // Fonction pour créer une boîte de médicaments
-  const createPersonalBox = useCallback(async (calendarId, name, boxCapacity, stockAlertThreshold, stockQuantity, dose, conditions ) => {
+  const createPersonalBox = useCallback(async (calendarId, name, boxCapacity, stockAlertThreshold, stockQuantity, dose, conditions, codeFmd ) => {
     const result = await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/boxes`,
       method: 'POST',
@@ -160,6 +160,7 @@ function App() {
           box_capacity: boxCapacity,
           stock_alert_threshold: stockAlertThreshold,
           stock_quantity: stockQuantity,
+          code_fmd: codeFmd,
           conditions,
         }
       },
@@ -690,7 +691,9 @@ function App() {
       boxCapacity,
       stockAlertThreshold,
       stockQuantity,
-      dose
+      dose,
+      conditions,
+      codeFmd
     ) => {
       const result = await performApiCall({
         url: `${API_URL}/api/shared/users/calendars/${calendarId}/boxes`,
@@ -702,6 +705,8 @@ function App() {
             box_capacity: boxCapacity,
             stock_alert_threshold: stockAlertThreshold,
             stock_quantity: stockQuantity,
+            code_fmd: codeFmd,
+            conditions,
           },
         },
         origin: 'BOX_CREATE',
