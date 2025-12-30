@@ -187,7 +187,7 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                         should_alert = should_alert and check_date.weekday() == 0
                     
                     if should_alert:
-                        record_event(events, med, stock, check_date)
+                        record_event(events_temp, med, stock, check_date)
                         stock += med['box_capacity']
                 
                     
