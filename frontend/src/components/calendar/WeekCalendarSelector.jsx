@@ -27,7 +27,6 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
       onWeekSelect(date);
     }
   };
-
   return (
     <Calendar
       mode="single"
@@ -40,6 +39,7 @@ export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
         weekSelected:
           "bg-primary text-primary-foreground hover:bg-primary/90 data-[selected=true]:bg-primary rounded-md",
       }}
+      defaultMonth={new Date(mondayDate.getTime() + 6 * 24 * 60 * 60 * 1000)}
     />
 
   );

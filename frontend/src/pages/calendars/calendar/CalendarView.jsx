@@ -59,8 +59,8 @@ function CalendarPage({
   const dateModalRef = useRef(null);
   const [loading, setLoading] = useState(true); // État de chargement du calendrier
   const [notFound, setNotFound] = useState(false);
-  const initialNextDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0);
-  
+  const initialNextDate = new Date(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0));
+
   let calendarType = 'personal';
   let calendarId = params.calendarId;
   let basePath = 'calendar';
@@ -176,29 +176,19 @@ function CalendarPage({
       const rep = await calendarSource.fetchStockDecrementMethod(calendarId);
       if (rep.success) {
         setStockDecrementMethod(rep.method);
+        if (rep.method == 'weekly_pillbox') {
+          setSelectedDate(new Date(initialNextDate));
+        } else {
+          setSelectedDate(new Date(new Date().setHours(0,0,0,0)));
+        }
       } else if (rep.status === 404) {
         setNotFound(true);
-        setSelectedDate(new Date().setHours(0,0,0,0));
+        setSelectedDate(new Date(new Date().setHours(0,0,0,0)));
       }
       setLoadingStockMethod(false);
     };
     fetchMethod();
   }, [calendarId, calendarType, userInfo]);
-
-  // Si la méthode est weekly_pillbox et que l'utilisateur n'a pas choisi
-  // explicitement une date (on est encore sur aujourd'hui), on bascule
-  // la sélection sur le lundi initial (semaine suivante). Simple et non intrusif.
-  // Ce useEffect ne se déclenche qu'une fois lors du chargement de stockDecrementMethod
-  useEffect(() => {
-    if (!stockDecrementMethod) return;
-    if (!selectedDate) {
-      if (stockDecrementMethod == 'weekly_pillbox') {
-        setSelectedDate(initialNextDate);
-      } else {
-        setSelectedDate(new Date().setHours(0,0,0,0));
-      }
-    }
-  }, [stockDecrementMethod, initialNextDate, selectedDate]);
 
   // Fonction pour supprimer le calendrier avec confirmation
   const handleDeleteCalendar = () => {

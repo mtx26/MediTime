@@ -101,11 +101,12 @@ export function LoadingProvider({ children, name = 'default', className = '' }) 
   )];
 
   // Debug
+  /*
   React.useEffect(() => {
     if (import.meta.env.DEV) {
       console.log(`[LoadingProvider ${name}] isLoading:`, isLoading, 'messages:', uniqueMessages);
     }
-  }, [isLoading, name, uniqueMessages]);
+  }, [isLoading, name, uniqueMessages]); */
 
   // Provider 'default' = fixed (plein écran), autres = absolute (scoped)
   const positionClass = name === 'default' ? 'fixed' : 'absolute';
