@@ -4,6 +4,8 @@ import unicodedata
 from datetime import datetime
 from typing import Optional, Dict, Any, Tuple
 import pandas as pd
+import requests
+import tempfile
 from psycopg2.extras import execute_values
 from psycopg2 import sql
 from app.db.connection import get_connection
@@ -33,7 +35,7 @@ def to_snake(s: str) -> str:
 
 
 def extract_name_and_dose(name: str) -> Tuple[str, str]:
-    """Extrait le nom du médicament et la dose"""
+    """Extrait le nom du médicament et la dose (uniquement les chiffres)"""
     name = "" if name is None else str(name)
     # Fixed regex to prevent ReDoS attacks by using non-overlapping pattern matching
     m = re.search(
@@ -42,7 +44,12 @@ def extract_name_and_dose(name: str) -> Tuple[str, str]:
         re.IGNORECASE,
     )
     if m:
-        dose = m.group().strip()
+        dose_full = m.group().strip()
+        # Extraire uniquement les chiffres (et décimales)
+        dose_numbers = re.findall(r"\d+(?:[.,]\d+)?", dose_full)
+        dose = dose_numbers[0] if dose_numbers else ""
+        # Normaliser le séparateur décimal (virgule -> point)
+        dose = dose.replace(",", ".") if dose else ""
         med_name = name[: m.start()].strip().strip("-_/")
         return med_name, dose
     return name.strip(), ""
@@ -69,6 +76,26 @@ def clean_code_fmd(val: str) -> str:
     # supprime guillemets et caractères de contrôle GS1 (ASCII 29)
     val = val.replace('"', "").replace("'", "").replace("\x1D", "")
     return val if val else None
+
+
+def download_afmps_csv(url: str = "https://basededonneesdesmedicaments.be/download/human/packs") -> str:
+    """Télécharge le fichier CSV AFMPS et retourne le chemin du fichier temporaire"""
+    print(f"Téléchargement du fichier depuis {url}...")
+    
+    try:
+        response = requests.get(url, timeout=60)
+        response.raise_for_status()
+        
+        # Créer un fichier temporaire
+        temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False, encoding='utf-8')
+        temp_file.write(response.text)
+        temp_file.close()
+        
+        print(f"✓ Fichier téléchargé: {temp_file.name} ({len(response.text)} caractères)")
+        return temp_file.name
+        
+    except requests.RequestException as e:
+        raise Exception(f"Erreur lors du téléchargement du fichier CSV: {e}")
 
 
 def detect_csv_separator(csv_path: str) -> str:
@@ -129,6 +156,31 @@ def get_column_mappings() -> Tuple[Dict[str, str], list]:
     return csv_to_sql, columns_sql
 
 
+def deduplicate_by_fmd(df_sql: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, Dict[str, int]]:
+    """Déduplique les lignes avec FMD et sépare celles sans FMD"""
+    stats = {
+        "total_rows": len(df_sql),
+        "rows_without_fmd": 0,
+        "duplicate_fmd": 0,
+        "unique_fmd": 0
+    }
+    
+    # Séparer les lignes avec et sans code_fmd
+    df_with_fmd = df_sql[df_sql["code_fmd"].notna() & (df_sql["code_fmd"] != "")].copy()
+    df_without_fmd = df_sql[df_sql["code_fmd"].isna() | (df_sql["code_fmd"] == "")].copy()
+    
+    stats["rows_without_fmd"] = len(df_without_fmd)
+    
+    # Dédupliquer par code_fmd (garde la dernière occurrence)
+    initial_count = len(df_with_fmd)
+    df_deduped = df_with_fmd.drop_duplicates(subset=["code_fmd"], keep="last")
+    
+    stats["duplicate_fmd"] = initial_count - len(df_deduped)
+    stats["unique_fmd"] = len(df_deduped)
+    
+    return df_deduped, df_without_fmd, stats
+
+
 def map_csv_to_sql_columns(df: pd.DataFrame) -> Tuple[pd.DataFrame, list]:
     """Mappe les colonnes CSV aux colonnes SQL"""
     csv_to_sql, columns_sql = get_column_mappings()
@@ -184,58 +236,128 @@ def row_to_tuple(row, columns_sql: list) -> tuple:
     return tuple(vals)
 
 
-def clear_existing_data(table_name: str) -> None:
-    """Supprime les données existantes de la table de façon sécurisée"""
+def insert_data_without_fmd(df_sql: pd.DataFrame, table_name: str,
+                           columns_sql: list, chunk_size: int) -> int:
+    """Insère les données sans code_fmd (INSERT simple)"""
+    total = len(df_sql)
+    if total == 0:
+        return 0
+    
+    processed = 0
+
+    # Créer les identifiants SQL
     schema_table = table_name.split('.')
     if len(schema_table) == 2:
-        identifier = sql.Identifier(schema_table[0], schema_table[1])
+        table_identifier = sql.Identifier(schema_table[0], schema_table[1])
     else:
-        identifier = sql.Identifier(table_name)
+        table_identifier = sql.Identifier(table_name)
+
+    # Template INSERT simple
+    insert_template = sql.SQL(
+        "INSERT INTO {} ({}) VALUES %s"
+    ).format(
+        table_identifier,
+        sql.SQL(", ").join(map(sql.Identifier, columns_sql))
+    )
 
     # SCRIPT ADMIN: skip_rls=True
     with get_connection(skip_rls=True) as conn:
         with conn.cursor() as cur:
-            delete_query = sql.Composed([sql.SQL("DELETE FROM "), identifier])
-            cur.execute(delete_query)
-            conn.commit()
-
-
-def insert_data_chunks(df_sql: pd.DataFrame, insert_sql_template: sql.Composable,
-                      columns_sql: list, chunk_size: int) -> int:
-    """Insère les données par chunks"""
-    total = len(df_sql)
-    inserted = 0
-
-    # SCRIPT ADMIN: skip_rls=True
-    with get_connection(skip_rls=True) as conn:
-        with conn.cursor() as cur:
-            print("Deleted existing rows in the table.")
-
             for start in range(0, total, chunk_size):
                 chunk = df_sql.iloc[start:start+chunk_size]
                 records = [row_to_tuple(r, columns_sql) for _, r in chunk.iterrows()]
+                
                 if records:
-                    execute_values(cur, insert_sql_template, records)
-                    inserted += len(records)
+                    execute_values(cur, insert_template, records)
+                    processed += len(records)
+                    print(f"Traité {processed} lignes sans FMD sur {total}...")
+            
+            conn.commit()
 
-                print(f"Inserted {inserted} rows so far...")
-        conn.commit()
+    return processed
 
-    return inserted
+
+def upsert_data_chunks(df_sql: pd.DataFrame, table_name: str,
+                      columns_sql: list, chunk_size: int) -> Dict[str, int]:
+    """Insère ou met à jour les données par chunks avec UPSERT basé sur code_fmd"""
+    total = len(df_sql)
+    stats = {"inserted": 0, "updated": 0, "total_processed": 0}
+
+    # Créer les identifiants SQL
+    schema_table = table_name.split('.')
+    if len(schema_table) == 2:
+        table_identifier = sql.Identifier(schema_table[0], schema_table[1])
+    else:
+        table_identifier = sql.Identifier(table_name)
+
+    # Colonnes à mettre à jour (toutes sauf code_fmd qui est la clé)
+    update_cols = [c for c in columns_sql if c != "code_fmd"]
+
+    # Template UPSERT avec WHERE pour supporter l'index partiel
+    upsert_template = sql.SQL(
+        "INSERT INTO {} ({}) VALUES %s "
+        "ON CONFLICT (code_fmd) WHERE code_fmd IS NOT NULL DO UPDATE SET {}"
+    ).format(
+        table_identifier,
+        sql.SQL(", ").join(map(sql.Identifier, columns_sql)),
+        sql.SQL(", ").join(
+            sql.SQL("{} = EXCLUDED.{}").format(sql.Identifier(c), sql.Identifier(c))
+            for c in update_cols
+        )
+    )
+
+    # SCRIPT ADMIN: skip_rls=True
+    with get_connection(skip_rls=True) as conn:
+        with conn.cursor() as cur:
+            for start in range(0, total, chunk_size):
+                chunk = df_sql.iloc[start:start+chunk_size]
+                records = [row_to_tuple(r, columns_sql) for _, r in chunk.iterrows()]
+                
+                if records:
+                    execute_values(cur, upsert_template, records)
+                    stats["total_processed"] += len(records)
+                    print(f"Traité {stats['total_processed']} lignes sur {total}...")
+            
+            conn.commit()
+
+    # Impossible de distinguer INSERT vs UPDATE avec execute_values, on compte tout
+    stats["inserted"] = stats["total_processed"]
+    return stats
 
 
 def import_afmps_to_bis(
-    csv_path: str,
-    table_name: str = "public.bis_medicaments_afmps",
+    csv_path: Optional[str] = None,
+    table_name: str = "public.temp_medicaments_afmps",
     sep: Optional[str] = None,
     chunk_size: int = 5000,
+    auto_download: bool = True,
 ) -> Dict[str, Any]:
     """
     Importe un fichier AFMPS (CSV) dans la table public.bis_medicaments_afmps.
-
-    Nettoie accents, aligne colonnes, parse dates, retire les guillemets de code_fmd.
+    
+    Args:
+        csv_path: Chemin vers le fichier CSV local (optionnel si auto_download=True)
+        table_name: Nom de la table cible
+        sep: Séparateur CSV (détecté automatiquement si None)
+        chunk_size: Taille des chunks pour l'import
+        auto_download: Si True et csv_path est None, télécharge depuis l'URL AFMPS
+    
+    Utilise un UPSERT basé sur code_fmd pour mettre à jour les données existantes.
+    Filtre les doublons et les lignes sans code_fmd.
     """
-    print(f"Importing AFMPS data from {csv_path} into {table_name}...")
+    temp_file_to_cleanup = None
+    
+    # Téléchargement automatique si aucun fichier n'est fourni
+    if csv_path is None and auto_download:
+        csv_path = download_afmps_csv()
+        temp_file_to_cleanup = csv_path
+    elif csv_path is None:
+        raise ValueError("csv_path doit être fourni ou auto_download doit être True")
+    
+    print(f"\n{'='*60}")
+    print(f"Import AFMPS: {csv_path}")
+    print(f"Table cible: {table_name}")
+    print(f"{'='*60}\n")
 
     # Validation sécurité
     if not validate_table_name(table_name):
@@ -244,30 +366,70 @@ def import_afmps_to_bis(
     # Détection automatique du séparateur
     if sep is None:
         sep = detect_csv_separator(csv_path)
+        print(f"Séparateur détecté: '{sep}'")
 
     # Lecture et préparation du CSV
+    print("Lecture du fichier CSV...")
     df = pd.read_csv(csv_path, sep=sep, encoding="utf-8", dtype=str)
+    print(f"✓ {len(df)} lignes lues depuis le CSV")
+    
     df = prepare_dataframe(df)
     df_sql, columns_sql = map_csv_to_sql_columns(df)
 
-    # Création des identifiants SQL sécurisés
-    table_identifier, insert_sql_template = create_sql_identifiers(table_name, columns_sql)
+    # Déduplication par code_fmd
+    print("\nDéduplication des données...")
+    df_with_fmd, df_without_fmd, dedup_stats = deduplicate_by_fmd(df_sql)
+    
+    print(f"✓ Lignes totales: {dedup_stats['total_rows']}")
+    print(f"✓ Lignes sans code FMD: {dedup_stats['rows_without_fmd']}")
+    print(f"✓ Doublons FMD (supprimés): {dedup_stats['duplicate_fmd']}")
+    print(f"✓ Codes FMD uniques à importer: {dedup_stats['unique_fmd']}")
 
-    # Suppression des données existantes
-    clear_existing_data(table_name)
+    total_processed = 0
 
-    # Insertion des nouvelles données
-    total = len(df_sql)
-    inserted = insert_data_chunks(df_sql, insert_sql_template, columns_sql, chunk_size)
+    # UPSERT des données avec FMD
+    if len(df_with_fmd) > 0:
+        print(f"\nImport des données avec FMD (UPSERT)...")
+        upsert_stats = upsert_data_chunks(df_with_fmd, table_name, columns_sql, chunk_size)
+        total_processed += upsert_stats['total_processed']
+    else:
+        print("\n⚠ Aucune donnée avec code FMD.")
 
-    # Message de fin sécurisé
+    # INSERT des données sans FMD
+    if len(df_without_fmd) > 0:
+        print(f"\nImport des données sans FMD (INSERT)...")
+        inserted_without_fmd = insert_data_without_fmd(df_without_fmd, table_name, columns_sql, chunk_size)
+        total_processed += inserted_without_fmd
+    else:
+        inserted_without_fmd = 0
+
+    # Résumé final
     abs_path = os.path.abspath(csv_path)
-    print(f"Importé {inserted} lignes sur {total} lues depuis le fichier CSV")
+    print(f"\n{'='*60}")
+    print(f"✓ Import terminé avec succès!")
+    print(f"  - Lignes totales traitées: {total_processed}")
+    print(f"  - Avec FMD (UPSERT): {dedup_stats['unique_fmd']}")
+    print(f"  - Sans FMD (INSERT): {inserted_without_fmd}")
+    print(f"  - Doublons supprimés: {dedup_stats['duplicate_fmd']}")
+    print(f"{'='*60}\n")
 
-    return {
+    result = {
         "table": table_name,
         "path": abs_path,
-        "rows_read": total,
-        "rows_inserted": inserted,
+        "rows_read": len(df),
+        "rows_with_fmd": dedup_stats['unique_fmd'],
+        "rows_without_fmd": inserted_without_fmd,
+        "duplicates_removed": dedup_stats['duplicate_fmd'],
+        "rows_processed": total_processed,
         "separator_used": sep,
     }
+    
+    # Nettoyage du fichier temporaire si téléchargé
+    if temp_file_to_cleanup:
+        try:
+            os.unlink(temp_file_to_cleanup)
+            print("Fichier temporaire supprimé.")
+        except Exception as e:
+            print(f"Avertissement: impossible de supprimer le fichier temporaire: {e}")
+    
+    return result
