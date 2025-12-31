@@ -22,6 +22,7 @@ jobs:
           mkdir -p dumps
           pg_dump "$SUPABASE_DB_URL" \
             --schema=public \
+            --schema-only \
             --clean \
             --if-exists \
             --no-owner \
