@@ -346,7 +346,8 @@ CREATE TABLE IF NOT EXISTS "public"."medicine_boxes" (
     "updated_at" timestamp with time zone DEFAULT "now"(),
     "box_capacity" integer DEFAULT 0 NOT NULL,
     "dose" integer,
-    "deleted_at" timestamp with time zone
+    "deleted_at" timestamp with time zone,
+    "code_fmd" "text"
 );
 
 
@@ -427,6 +428,54 @@ CREATE TABLE IF NOT EXISTS "public"."shared_tokens" (
 ALTER TABLE "public"."shared_tokens" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."temp_medicaments_afmps" (
+    "id" integer NOT NULL,
+    "name" "text",
+    "dose" "text",
+    "forme_pharmaceutique" "text",
+    "voie_administration" "text",
+    "conditionnement" "text",
+    "substance_active" "text",
+    "code_atc" "text",
+    "code_cnk" "text",
+    "code_fmd" "text",
+    "url_notice_fr" "text",
+    "url_notice_nl" "text",
+    "url_notice_de" "text",
+    "url_rcp" "text",
+    "url_summary_rmp_fr" "text",
+    "url_summary_rmp_nl" "text",
+    "url_summary_rmp_de" "text",
+    "date_derniere_publication_rcp_notice" "date",
+    "date_derniere_approbation_rcp_notice" "date",
+    "created_at" timestamp without time zone DEFAULT "now"(),
+    "updated_at" timestamp without time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."temp_medicaments_afmps" OWNER TO "postgres";
+
+
+CREATE SEQUENCE IF NOT EXISTS "public"."temp_medicaments_afmps_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE "public"."temp_medicaments_afmps_id_seq" OWNER TO "postgres";
+
+
+ALTER SEQUENCE "public"."temp_medicaments_afmps_id_seq" OWNED BY "public"."temp_medicaments_afmps"."id";
+
+
+
+ALTER TABLE ONLY "public"."temp_medicaments_afmps" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."temp_medicaments_afmps_id_seq"'::"regclass");
+
+
+
 ALTER TABLE ONLY "public"."calendar_settings"
     ADD CONSTRAINT "calendar_settings_pkey" PRIMARY KEY ("calendar_id");
 
@@ -472,6 +521,11 @@ ALTER TABLE ONLY "public"."invitations"
 
 
 
+ALTER TABLE ONLY "public"."medicaments_afmps"
+    ADD CONSTRAINT "medicaments_afmps_code_fmd_key" UNIQUE ("code_fmd");
+
+
+
 ALTER TABLE ONLY "public"."medicine_box_conditions"
     ADD CONSTRAINT "medicine_box_conditions_pkey" PRIMARY KEY ("id");
 
@@ -507,8 +561,37 @@ ALTER TABLE ONLY "public"."shared_tokens"
 
 
 
+ALTER TABLE ONLY "public"."temp_medicaments_afmps"
+    ADD CONSTRAINT "temp_medicaments_afmps_pkey" PRIMARY KEY ("id");
+
+
+
 ALTER TABLE ONLY "public"."users"
     ADD CONSTRAINT "users_pkey" PRIMARY KEY ("id");
+
+
+
+CREATE INDEX "idx_medicaments_afmps_name_pattern" ON "public"."medicaments_afmps" USING "btree" ("name" "text_pattern_ops");
+
+
+
+CREATE UNIQUE INDEX "idx_temp_medicaments_afmps_code_fmd_unique" ON "public"."temp_medicaments_afmps" USING "btree" ("code_fmd") WHERE ("code_fmd" IS NOT NULL);
+
+
+
+CREATE INDEX "idx_temp_medicaments_code_atc" ON "public"."temp_medicaments_afmps" USING "btree" ("code_atc");
+
+
+
+CREATE INDEX "idx_temp_medicaments_code_cnk" ON "public"."temp_medicaments_afmps" USING "btree" ("code_cnk");
+
+
+
+CREATE UNIQUE INDEX "idx_temp_medicaments_code_fmd_unique" ON "public"."temp_medicaments_afmps" USING "btree" ("code_fmd") WHERE ("code_fmd" IS NOT NULL);
+
+
+
+CREATE INDEX "idx_temp_medicaments_name" ON "public"."temp_medicaments_afmps" USING "btree" ("name");
 
 
 
@@ -606,6 +689,11 @@ ALTER TABLE ONLY "public"."calendars"
 
 ALTER TABLE ONLY "public"."fcm_tokens"
     ADD CONSTRAINT "fcm_tokens_uid_fkey" FOREIGN KEY ("uid") REFERENCES "public"."users"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."medicine_boxes"
+    ADD CONSTRAINT "fk_medicine_boxes_code_fmd" FOREIGN KEY ("code_fmd") REFERENCES "public"."medicaments_afmps"("code_fmd") ON DELETE SET NULL;
 
 
 
@@ -1199,6 +1287,18 @@ GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public".
 GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."shared_tokens" TO "anon";
 GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."shared_tokens" TO "authenticated";
 GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."shared_tokens" TO "service_role";
+
+
+
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."temp_medicaments_afmps" TO "anon";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."temp_medicaments_afmps" TO "authenticated";
+GRANT SELECT,INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,UPDATE ON TABLE "public"."temp_medicaments_afmps" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."temp_medicaments_afmps_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."temp_medicaments_afmps_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."temp_medicaments_afmps_id_seq" TO "service_role";
 
 
 
