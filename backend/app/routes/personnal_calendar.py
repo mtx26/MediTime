@@ -25,29 +25,26 @@ def handle_calendars():
                     SELECT 
                         c.*, 
                         cs.stock_decrement_method,
-                        COUNT(mb.id) AS boxes_count,
+                        COUNT(DISTINCT mb.id) AS boxes_count,
                         COALESCE(
                             BOOL_OR(
                                 mb.stock_quantity <= mb.stock_alert_threshold 
                                 AND mb.stock_alert_threshold > 0 
                                 AND mb.box_capacity > 0
                                 AND mb.deleted_at IS NULL
-                                AND EXISTS (
-                                    SELECT 1 FROM medicine_box_conditions mbc
-                                    WHERE mbc.box_id = mb.id
-                                        AND mbc.deleted_at IS NULL
-                                        AND (
-                                            mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE
-                                        )
-                                    )
-                                ), FALSE
-                            ) AS "ifLowStock"
+                                AND mbc.id IS NOT NULL
+                            ), FALSE
+                        ) AS "ifLowStock"
                     FROM calendars c
                     LEFT JOIN calendar_settings cs ON cs.calendar_id = c.id
                     LEFT JOIN medicine_boxes mb 
                         ON mb.calendar_id = c.id
                         AND mb.deleted_at IS NULL
-                    WHERE c.owner_uid = %s and c.deleted_at IS NULL
+                    LEFT JOIN medicine_box_conditions mbc 
+                        ON mbc.box_id = mb.id
+                        AND mbc.deleted_at IS NULL
+                        AND (mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE)
+                    WHERE c.owner_uid = %s AND c.deleted_at IS NULL
                     GROUP BY c.id, cs.stock_decrement_method
                 """, (uid,))
                 calendars = cursor.fetchall()
