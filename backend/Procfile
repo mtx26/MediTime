@@ -1,1 +1,2 @@
-web: gunicorn -w 2 -b 0.0.0.0:5000 app.main:app
+web: gunicorn -w 9 --threads 2 -b 0.0.0.0:5000 --timeout 120 --access-logfile - --error-logfile - app.main:app
+scheduler: python scheduler.py

@@ -1,12 +1,18 @@
 # app.py
-from flask import Flask, jsonify
-from flask_cors import CORS
-from app.config.config import Config
+"""
+Point d'entrée de l'API Flask MediTime.
+
+Ce fichier déclare uniquement l'application Flask et lance le serveur en local.
+Les initialisations (DB, Firebase, Vertex) sont dans app/core/.
+Le scheduler est dans un processus séparé (scheduler.py).
+"""
+
+from flask import Flask
+from app import create_app
 from app.utils.logging import log_backend as logger
 import os
-from app.db.connection import get_connection
-from app import create_app
 
+# Création de l'application Flask
 app = create_app()
 
 
@@ -17,8 +23,8 @@ if __name__ == "__main__":
     if "--check" in sys.argv:
         print("✔ Flask ready to run")
     else:
-        app.run(host="0.0.0.0", port=port)
         logger.info("Lancement de l'application Flask en local", {
             "origin": "FLASK_START",
             "port": port
         })
+        app.run(host="0.0.0.0", port=port)

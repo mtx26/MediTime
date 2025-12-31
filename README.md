@@ -72,18 +72,61 @@ MediTime/
 
 ## ⚙️ Quick Setup
 
+### 🚀 Automatic Launch (Recommended)
 ```bash
-# Backend
+# Windows - Launches API (Gunicorn), Scheduler, and Frontend
+.\MediTime\launch.bat
+```
+
+### 🛠️ Manual Setup
+
+#### Backend API
+```bash
 cd backend
 python -m venv .venv
 .venv\Scripts\activate         # or source .venv/bin/activate on macOS/Linux
 pip install -r requirements.txt
-python -m app.main
 
-# Frontend
+# Launch API with Gunicorn (9 workers optimized for 4 CPU / 8 GB RAM)
+gunicorn -w 9 --threads 2 -b 0.0.0.0:5000 --timeout 120 --reload app.main:app
+```
+
+#### Scheduler (separate process)
+```bash
+cd backend
+.venv\Scripts\activate
+python scheduler.py
+```
+
+#### Frontend
+```bash
 cd frontend
 npm install
 npm run dev
+```
+
+---
+
+## 🏗️ Architecture
+
+MediTime uses a **dual-process architecture** for better scalability and separation of concerns:
+
+1. **API Flask** (`app/main.py`) - HTTP requests via Gunicorn
+   - 9 workers `(2 × CPU + 1)` for I/O-bound workloads
+   - 2 threads per worker = 18 concurrent requests
+   - Optimized for VPS: 4 CPU cores / 8 GB RAM
+
+2. **Scheduler** (`scheduler.py`) - Independent cron process
+   - Standalone Python script (no Flask dependency)
+   - APScheduler with BlockingScheduler
+   - Daily tasks: stock decrease at midnight
+
+**Shared modules** (`app/core/`): DB connection, Firebase Admin, Vertex AI
+
+**Production deployment** (Render/Heroku):
+```
+web: gunicorn -w 9 --threads 2 -b 0.0.0.0:5000 --timeout 120 app.main:app
+scheduler: python scheduler.py
 ```
 
 ---

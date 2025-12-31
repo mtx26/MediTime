@@ -4,11 +4,12 @@ from flask import Flask, request
 from flask_compress import Compress
 from app.config.config import Config
 from app.routes import register_routes
-from app.auth.google_services import init_firebase, init_vertex_ai
+from app.core.firebase_init import init_firebase
+from app.core.vertex_init import init_vertex_ai
+from app.core.db_init import verify_db_connection
 # from app.scripts import import_afmps_to_bis
 # from app.vertex import test_analyze_medical_document
 from flask_cors import CORS
-from app.cron import start_cron
 
 def create_app():
     app = Flask(__name__)
@@ -18,11 +19,13 @@ def create_app():
     # 🌍 Active CORS avec cookies
     CORS(app, supports_credentials=True)
 
-    # 🔧 Enregistrement des routes et services
-    register_routes(app)
+    # 🔧 Initialisation des services partagés (DB, Firebase, Vertex)
+    verify_db_connection()
     init_firebase()
     init_vertex_ai()
-    start_cron()
+    
+    # 🔧 Enregistrement des routes
+    register_routes(app)
 
     # Importation des médicaments AFMPS dans la base de données
     # import_afmps_to_bis("C:/Users/mtx_2/Documents/Code/Medic/MediTime/backend/app/scripts/A.csv")
