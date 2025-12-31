@@ -13,8 +13,8 @@ def _get_pool():
     global _connection_pool
     if _connection_pool is None:
         _connection_pool = pool.ThreadedConnectionPool(
-            minconn=2,
-            maxconn=20,  # Max 20 connexions simultanées (2 par worker)
+            minconn=1,
+            maxconn=2,  # Max 2 connexions par worker (9 workers × 2 = 18 total, sous la limite Supabase)
             host=Config.SUPABASE_DB_HOST,
             dbname=Config.SUPABASE_DB_NAME,
             user=Config.SUPABASE_DB_USER,
