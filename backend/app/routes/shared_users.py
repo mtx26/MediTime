@@ -38,35 +38,35 @@ def handle_shared_calendars():
                         u.email AS owner_email,
                         COALESCE(u.photo_url, 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg') AS owner_photo_url,
                         scs.notifications_enabled,
-                        COUNT(mb.id) AS "boxes_count",
-                        COALESCE(
-                            BOOL_OR(
-                                mb.stock_quantity <= mb.stock_alert_threshold 
-                                AND mb.stock_alert_threshold > 0 
-                                AND mb.box_capacity > 0
+                        (
+                            SELECT COUNT(*)
+                            FROM medicine_boxes mb
+                            WHERE mb.calendar_id = c.id
                                 AND mb.deleted_at IS NULL
+                        ) AS "boxes_count",
+                        EXISTS (
+                            SELECT 1
+                            FROM medicine_boxes mb
+                            WHERE mb.calendar_id = c.id
+                                AND mb.deleted_at IS NULL
+                                AND mb.stock_quantity <= mb.stock_alert_threshold
+                                AND mb.stock_alert_threshold > 0
+                                AND mb.box_capacity > 0
                                 AND EXISTS (
-                                    SELECT 1 FROM medicine_box_conditions mbc
+                                    SELECT 1 
+                                    FROM medicine_box_conditions mbc
                                     WHERE mbc.box_id = mb.id
                                         AND mbc.deleted_at IS NULL
-                                        AND (
-                                            mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE
-                                        )
-                                    )
-                                ), FALSE
-                            ) AS "ifLowStock"
+                                        AND (mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE)
+                                )
+                        ) AS "ifLowStock"
                     FROM shared_calendars sc
-                    JOIN calendars c            ON sc.calendar_id = c.id
-                    JOIN users u                ON c.owner_uid = u.id
-                    JOIN shared_calendar_settings scs ON scs.shared_calendar_id = sc.id
-                    LEFT JOIN medicine_boxes mb ON mb.calendar_id = c.id AND mb.deleted_at IS NULL
+                    INNER JOIN calendars c ON sc.calendar_id = c.id AND c.deleted_at IS NULL
+                    INNER JOIN users u ON c.owner_uid = u.id
+                    INNER JOIN shared_calendar_settings scs ON scs.shared_calendar_id = sc.id
                     WHERE sc.receiver_uid = %s
                         AND sc.accepted_at IS NOT NULL
                         AND sc.deleted_at IS NULL
-                        AND c.deleted_at IS NULL
-                    GROUP BY
-                        sc.calendar_id, sc.access, c.id, c.name, c.owner_uid,
-                        u.display_name, u.email, u.photo_url, scs.notifications_enabled
                 """, (uid,))
                 rows = cursor.fetchall()
 

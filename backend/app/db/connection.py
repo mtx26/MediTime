@@ -1,11 +1,32 @@
 # db.py
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from psycopg2 import pool
 from app.config import Config
 from flask import g, has_request_context
 
+# Connection pool pour réutiliser les connexions (améliore les perfs)
+_connection_pool = None
+
+def _get_pool():
+    """Retourne le pool de connexions, le crée si nécessaire."""
+    global _connection_pool
+    if _connection_pool is None:
+        _connection_pool = pool.ThreadedConnectionPool(
+            minconn=2,
+            maxconn=20,  # Max 20 connexions simultanées (2 par worker)
+            host=Config.SUPABASE_DB_HOST,
+            dbname=Config.SUPABASE_DB_NAME,
+            user=Config.SUPABASE_DB_USER,
+            password=Config.SUPABASE_DB_PASSWORD,
+            port=Config.SUPABASE_DB_PORT,
+            sslmode="require",
+            cursor_factory=RealDictCursor
+        )
+    return _connection_pool
+
 def get_connection(uid: str = None, skip_rls: bool = False) -> psycopg2.extensions.connection:
-    """Établit une connexion à la base de données Supabase PostgreSQL.
+    """Établit une connexion à la base de données Supabase PostgreSQL depuis le pool.
 
     Paramètres:
     - uid (str, optionnel): L'ID de l'utilisateur pour le contexte RLS.
@@ -16,15 +37,9 @@ def get_connection(uid: str = None, skip_rls: bool = False) -> psycopg2.extensio
     - psycopg2.extensions.connection: Objet de connexion à la base de données.
     """
 
-    conn = psycopg2.connect(
-        host=Config.SUPABASE_DB_HOST,
-        dbname=Config.SUPABASE_DB_NAME,
-        user=Config.SUPABASE_DB_USER,
-        password=Config.SUPABASE_DB_PASSWORD,
-        port=Config.SUPABASE_DB_PORT,
-        sslmode="require",
-        cursor_factory=RealDictCursor
-    )
+    # Récupérer une connexion du pool au lieu d'en créer une nouvelle
+    pool = _get_pool()
+    conn = pool.getconn()
 
     # Si on demande explicitement de sauter le RLS, on retourne la connexion telle quelle (Admin)
     if skip_rls:
