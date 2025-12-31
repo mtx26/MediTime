@@ -14,17 +14,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Supabase CLI
-        run: |
-          curl -sL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz \
-          | tar -xz && sudo mv supabase /usr/local/bin/supabase
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
-      - name: Dump public (schema only)
+      - name: Dump public schema
         run: |
           mkdir -p dumps
-          supabase db dump --db-url "$SUPABASE_DB_URL" \
-            --schema public \
-            --file dumps/public_schema.sql
+          pg_dump "$SUPABASE_DB_URL" \
+            --schema=public \
+            --clean \
+            --if-exists \
+            --no-owner \
+            --no-privileges \
+            --file=dumps/public_schema.sql
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
 
