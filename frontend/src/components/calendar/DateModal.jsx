@@ -63,15 +63,6 @@ const DateModal = forwardRef(({
             getNextWeek={getNextWeek}
           />
         </div>
-
-        {/* FOOTER TOUJOURS VISIBLE */}
-        <DialogFooter className="shrink-0">
-          <DialogClose asChild>
-            <Button variant="secondary" className="w-full">
-              {t("close")}
-            </Button>
-          </DialogClose>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

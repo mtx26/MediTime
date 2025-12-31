@@ -6,6 +6,7 @@ import { getGlobalReloadUser, UserContext } from '../../contexts/UserContext';
 import { log } from '../../utils/logger';
 import { useTranslation } from 'react-i18next';
 import { getValidRedirect } from '../../utils/redirect';
+import { useLoading } from '@/components/ui/loading';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -13,11 +14,13 @@ const AuthCallback = () => {
   const { t } = useTranslation();
   const { userInfo, recoveryEvent } = useContext(UserContext);
   const reloadUser = getGlobalReloadUser();
+  const { showLoading } = useLoading();
 
   // Pour stocker redirect et type
   const redirectRef = useRef(null);
   const typeRef = useRef(null);
   const [isUrlProcessed, setIsUrlProcessed] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const redirectMap = new Map([
     ['recovery', '/reset-password-confirm'],
@@ -59,6 +62,7 @@ const AuthCallback = () => {
           origin: 'CALLBACK_ERROR',
           uid: null,
         });
+        setIsLoading(false);
         return navigate(`/${lng}/login`, { replace: true });
       }
 
@@ -89,17 +93,21 @@ const AuthCallback = () => {
     if (redirect) {
       if (redirect.startsWith('/')) {
         const cleaned = redirect.replace(/^\/[a-z]{2}(?=\/|$)/, '');
+        showLoading(false);
         navigate(`/${lng}${cleaned}`, { replace: true });
       } else {
+        showLoading(false);
         navigate(redirect, { replace: true });
       }
       return;
     }
-
+    showLoading(false);
     navigate(`/${lng}${getRedirectPath(type)}`, { replace: true });
-  }, [userInfo, isUrlProcessed, navigate]);
+  }, [userInfo, isUrlProcessed, navigate, lng, showLoading]);
 
-  return <p>{t('auth_callback.loading')}</p>;
+  useEffect(() => {
+    showLoading(isLoading, t('auth_callback.loading'));
+  }, [isLoading, showLoading, t]);
 };
 
 export default AuthCallback;

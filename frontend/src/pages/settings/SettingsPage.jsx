@@ -94,7 +94,7 @@ export default function SettingsPage( sharedProps ) {
                 <hr className="my-2" />
                 <Button
                   variant="outline"
-                  className="justify-start"
+                  className="justify-start text-red-600! [&_svg]:text-red-600!"
                   aria-label={t('logout')}
                   title={t('logout')}
                   onClick={handleLogout}

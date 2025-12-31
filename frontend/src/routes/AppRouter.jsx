@@ -88,7 +88,8 @@ function RouteWithLoader({ element, isLoading }) {
 }
 
 function AppRoutes({ sharedProps }) {
-  const { userInfo } = useContext(UserContext);
+  const context = useContext(UserContext);
+  const userInfo = context?.userInfo || null;
   const { lng } = useParams();
 
   return (

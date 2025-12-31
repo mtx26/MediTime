@@ -102,7 +102,7 @@ function Auth() {
   };
 
   return (
-    <div className="container mx-auto flex justify-center items-center my-10">
+    <div className="container mx-auto flex justify-center items-center">
       <div className="w-full max-w-md rounded-xl border bg-card text-card-foreground shadow-sm">
         <div className="p-6">
           <Tabs value={activeTab} onValueChange={switchTab} className="w-full">
@@ -119,38 +119,38 @@ function Auth() {
               <p>{activeTab === 'login' ? t('auth.login_with') : t('auth.register_with')}</p>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mt-2 place-items-center">
                 <div className="flex flex-col items-center">
-                  <Button variant="outline" size="icon" onClick={() => GoogleHandleLogin(redirect)} aria-label={t('auth.with_google')} title={t('auth.with_google')}>
-                    <FcGoogle className="h-5 w-5" />
+                  <Button variant="outline" className="h-12 w-12" onClick={() => GoogleHandleLogin(redirect)} aria-label={t('auth.with_google')} title={t('auth.with_google')}>
+                    <FcGoogle className="size-8" />
                   </Button>
                   <span className="mt-1 text-xs w-full text-center truncate">{t('auth.provider.google')}</span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <Button variant="outline" size="icon" onClick={() => GithubHandleLogin(redirect)} aria-label={t('auth.with_github')} title={t('auth.with_github')}>
-                    <SiGithub className="h-5 w-5 text-black" />
+                  <Button variant="outline" className="h-12 w-12" onClick={() => GithubHandleLogin(redirect)} aria-label={t('auth.with_github')} title={t('auth.with_github')}>
+                    <SiGithub className="size-8 text-black" />
                   </Button>
                   <span className="mt-1 text-xs w-full text-center truncate">{t('auth.provider.github')}</span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <Button variant="outline" size="icon" onClick={() => DiscordHandleLogin(redirect)} aria-label={t('auth.with_discord')} title={t('auth.with_discord')}>
-                    <SiDiscord className="h-5 w-5 text-[#5865F2]" />
+                  <Button variant="outline" className="h-12 w-12" onClick={() => DiscordHandleLogin(redirect)} aria-label={t('auth.with_discord')} title={t('auth.with_discord')}>
+                    <SiDiscord className="size-8 text-[#5865F2]" />
                   </Button>
                   <span className="mt-1 text-xs w-full text-center truncate">{t('auth.provider.discord')}</span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <Button variant="outline" size="icon" onClick={() => TwitterHandleLogin(redirect)} aria-label={t('auth.with_twitter')} title={t('auth.with_twitter')}>
-                    <FaXTwitter className="h-5 w-5 text-black" />
+                  <Button variant="outline" className="h-12 w-12" onClick={() => TwitterHandleLogin(redirect)} aria-label={t('auth.with_twitter')} title={t('auth.with_twitter')}>
+                    <FaXTwitter className="size-8 text-black" />
                   </Button>
                   <span className="mt-1 text-xs w-full text-center truncate">{t('auth.provider.twitter')}</span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <Button variant="outline" size="icon" onClick={() => FacebookHandleLogin(redirect)} aria-label={t('auth.with_facebook')} title={t('auth.with_facebook')}>
-                    <SiFacebook className="h-5 w-5 text-[#1877F2]" />
+                  <Button variant="outline" className="h-12 w-12" onClick={() => FacebookHandleLogin(redirect)} aria-label={t('auth.with_facebook')} title={t('auth.with_facebook')}>
+                    <SiFacebook className="size-8 text-[#1877F2]" />
                   </Button>
                   <span className="mt-1 text-xs w-full text-center truncate">{t('auth.provider.facebook')}</span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <Button variant="outline" size="icon" onClick={() => MicrosoftHandleLogin(redirect)} aria-label={t('auth.with_microsoft')} title={t('auth.with_microsoft')}>
-                    <FaMicrosoft className="h-5 w-5 text-[#5E5E5E]" />
+                  <Button variant="outline" className="h-12 w-12" onClick={() => MicrosoftHandleLogin(redirect)} aria-label={t('auth.with_microsoft')} title={t('auth.with_microsoft')}>
+                    <FaMicrosoft className="size-8 text-[#5E5E5E]" />
                   </Button>
                   <span className="mt-1 text-xs w-full text-center truncate">{t('auth.provider.microsoft')}</span>
                 </div>

@@ -53,7 +53,7 @@ export default function ForcedLandscapeWrapper({ children }) {
   if (isPortrait) {
     return (
       <div
-        className="fixed bg-background z-1000"
+        className="fixed bg-background z-30"
         style={{
           width: '100vh',
           height: '100vw',
@@ -72,7 +72,7 @@ export default function ForcedLandscapeWrapper({ children }) {
   // Déjà en paysage - utiliser tout l'écran disponible
   return (
     <div
-      className="fixed inset-0 bg-background z-1000"
+      className="fixed inset-0 bg-background z-30"
     >
       {children}
     </div>

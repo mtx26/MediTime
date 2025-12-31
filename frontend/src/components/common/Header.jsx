@@ -136,7 +136,7 @@ function Navbar({ sharedProps }) {
   return (
     <>
       {/* Desktop Header */}
-      <nav className="sticky top-0 z-40 w-full bg-background border-b shadow-sm">
+      <nav className="sticky top-0 z-10 w-full bg-background border-b shadow-sm">
         <div className="w-full px-4">
           <div className="flex h-16 w-full items-center justify-between">
             {/* Logo / Retour */}
@@ -384,11 +384,11 @@ function Navbar({ sharedProps }) {
       {isPillboxPage && (
         <Link
           to={`/${lng}/${basePath}/${calendarInfo?.id}`}
-          className="fixed top-4 right-4 z-4000 text-2xl text-foreground"
+          className="fixed top-4 right-4 z-40 text-2xl text-foreground"
           aria-label="Fermer"
         >
           <X className="h-8 w-8" />
-          <span className="sr-only">Fermer</span>
+          <span className="sr-only">{t("close")}</span>
         </Link>
       )}
 

@@ -88,9 +88,9 @@ export default function WeeklyEventContent({
       </div>
 
       {/* ✅ ScrollArea remontée AU-DESSUS du footer */}
-      <ScrollArea className="h-full pr-3">
+      <ScrollArea className="flex-1 pr-3 overflow-auto">
         {eventsForDay.length > 0 ? (
-          <div className="grid gap-2 px-1 pb-28">
+          <div className="grid gap-2 px-1 over">
             {eventsForDay.map((event, index) => {
               const time = new Date(event.start).toLocaleTimeString([], {
                 hour: "2-digit",

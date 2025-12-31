@@ -1069,29 +1069,36 @@ function App() {
     path
   });
 
+  // Vérifier si on est sur une page pillbox
+  const isPillboxPage = location.pathname.includes('/pillbox');
+
   return (
     <div className="flex flex-col min-h-screen">
       <OnboardingTour isAppLoading={isInitialLoading} />
-      <Navbar sharedProps={sharedProps} />
-        <main className="flex flex-col min-h-0 mb-24 lg:mb-0 flex-grow">
-          {userInfo && (
-            <RealtimeManager
-              setCalendarsData={setCalendarsData}
-              setSharedCalendarsData={setSharedCalendarsData}
-              setNotificationsData={setNotificationsData}
-              setTokensList={setTokensList}
-              setLoadingStates={setLoadingStates}
-              calendarsData={calendarsData}
-              sharedCalendarsData={sharedCalendarsData}
-            />
-          )}
+      <Navbar sharedProps={sharedProps}/>
+      <main className="flex flex-col min-h-0 grow">
+        {userInfo && (
+          <RealtimeManager
+            setCalendarsData={setCalendarsData}
+            setSharedCalendarsData={setSharedCalendarsData}
+            setNotificationsData={setNotificationsData}
+            setTokensList={setTokensList}
+            setLoadingStates={setLoadingStates}
+            calendarsData={calendarsData}
+            sharedCalendarsData={sharedCalendarsData}
+          />
+        )}
 
-          <div className="container mx-auto px-4 mt-4">
-            <AppRoutes sharedProps={sharedProps} />
-          </div>
-        </main>
-        <Footer />
-      <MobileNavBar/>
+        <div className="container mx-auto px-4 my-4">
+          <AppRoutes sharedProps={sharedProps} />
+        </div>
+      </main>
+      <Footer />
+      {location.pathname !== `/${lng}/login` && location.pathname !== `/${lng}/register` && !isPillboxPage &&
+        <div className='mt-24 lg:mt-0'>
+          <MobileNavBar/>
+        </div>
+      }
     </div>
   );
 }
