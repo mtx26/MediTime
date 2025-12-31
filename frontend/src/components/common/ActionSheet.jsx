@@ -30,7 +30,6 @@ function ActionSheet({ actions, buttonSize, dataTour }) {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent 
-        className="w-56" 
         align="start"
         side="bottom"
         sideOffset={8}
@@ -46,7 +45,7 @@ function ActionSheet({ actions, buttonSize, dataTour }) {
               <DropdownMenuItem key={index} asChild>
                 <Link
                   to={action.linkTo}
-                  className={action.danger ? 'text-red-600 focus:text-red-600 hover:text-red-800' : ''}
+                  className={action.danger ? 'text-red-600! [&_svg]:text-red-600!' : ''}
                   title={action.title}
                   aria-label={action.title}
                   data-tour={action.dataTour}
@@ -61,7 +60,7 @@ function ActionSheet({ actions, buttonSize, dataTour }) {
             <DropdownMenuItem
               key={index}
               onClick={action.onClick}
-              className={action.danger ? 'text-red-600 focus:text-red-600 hover:text-red-800' : ''}
+              className={action.danger ? 'text-red-600! [&_svg]:text-red-600!' : ''}
               title={action.title}
               aria-label={action.title}
               data-tour={action.dataTour}

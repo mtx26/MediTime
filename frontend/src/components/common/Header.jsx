@@ -212,11 +212,11 @@ function Navbar({ sharedProps }) {
             {((calendarInfo && calendarInfo.id) || (locationList.tokenCalendar && tokenId)) && (
               <div className="flex lg:hidden flex-col items-end">
                 {calendarInfo && basePath && calendarInfo.id && (
-                  <h3 className="text-sm font-bold">
+                  <h2 className="font-bold">
                     <Link to={`/${lng}/${basePath}/${calendarInfo.id}`}>
                       {calendarInfo.name}
                     </Link>
-                  </h3>
+                  </h2>
                 )}
                 {locationList.sharedUserCalendar && (
                   <Badge variant="secondary" className="text-xs">
@@ -343,7 +343,7 @@ function Navbar({ sharedProps }) {
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end">
                   {userInfo ? (
                     <>
                       <DropdownMenuItem asChild>
@@ -357,7 +357,7 @@ function Navbar({ sharedProps }) {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 text-red-600 focus:text-red-600 hover:text-red-800">
+                      <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 text-red-600! [&_svg]:text-red-600!">
                         <LogOut className="h-4 w-4" /> {t('logout')}
                       </DropdownMenuItem>
                     </>

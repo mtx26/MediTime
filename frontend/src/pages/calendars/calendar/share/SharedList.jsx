@@ -189,9 +189,7 @@ function SharedList({
   }, [
     userInfo,
     personalCalendars.calendarsData,
-    tokenCalendars.tokensList,
-    setGroupedSharedFunction,
-    calendarFromURL
+    tokenCalendars.tokensList
   ]);
 
   // 🔄 Initialisation des permissions et des dates d'expiration
