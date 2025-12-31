@@ -17,7 +17,7 @@ class Config:
     SUPABASE_DB_NAME = os.getenv("PG_DATABASE")
     SUPABASE_DB_USER = os.getenv("PG_USER")
     SUPABASE_DB_PASSWORD = os.getenv("PG_PASSWORD")
-    SUPABASE_DB_PORT = os.getenv("PG_PORT", 5432)
+    SUPABASE_DB_PORT = os.getenv("PG_PORT", 6543)  # Port 6543 = Transaction Mode (200+ connexions)
     SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET")
     # Firebase
     GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
