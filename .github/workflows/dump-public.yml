@@ -31,6 +31,16 @@ jobs:
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
 
+      - name: Clean dump for Supabase
+        run: |
+          # Supprimer les lignes \restrict et \unrestrict
+          sed -i '/\\restrict/d' dumps/public_schema.sql
+          sed -i '/\\unrestrict/d' dumps/public_schema.sql
+          
+          # Supprimer le CREATE SCHEMA public et son COMMENT
+          sed -i '/^CREATE SCHEMA public;$/d' dumps/public_schema.sql
+          sed -i '/^COMMENT ON SCHEMA public/,/^$/d' dumps/public_schema.sql
+
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"

@@ -1,15 +1,10 @@
 import logging
 import os
 import sys
-from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
-
-# Crée le dossier des logs s'il n'existe pas
-os.makedirs("logs", exist_ok=True)
 
 # Charge les variables d'environnement
 load_dotenv()
-env = os.environ.get("ENV", "production")
 
 
 # 🔍 Détection de Railway via variable unique
@@ -97,13 +92,6 @@ def color_line(text: str, source: str | None = None, level: str | None = None) -
 # === Logger principal
 base_logger = logging.getLogger("medic_logger")
 base_logger.setLevel(logging.DEBUG)
-
-# Fichier log seulement en local
-if env == "development" and not is_railway():
-    file_handler = RotatingFileHandler("logs/app.log", maxBytes=1_000_000, backupCount=5, delay=True)
-    file_formatter = ColoredFileFormatter("%(asctime)s [%(levelname)s] %(message)s", "%Y-%m-%d %H:%M:%S")
-    file_handler.setFormatter(file_formatter)
-    base_logger.addHandler(file_handler)
 
 # Console toujours présente
 console_stream = sys.stdout  # Railway exige stdout pour ne pas afficher rouge

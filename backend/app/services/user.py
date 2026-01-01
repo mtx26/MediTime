@@ -29,7 +29,7 @@ def fetch_public_user_info(uid: str) -> dict:
     """
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM get_public_user_info(%s)", (uid,))
+            cursor.execute("SELECT display_name, photo_url FROM users WHERE id = %s", (uid,))
             user = cursor.fetchone() or {}
             return user
 
@@ -58,7 +58,7 @@ def update_existing_user(
     Retour:
     - dict: Dictionnaire représentant l'utilisateur mis à jour.
     """
-    with get_connection() as conn:
+    with get_connection(skip_rls=True) as conn:
         with conn.cursor() as cursor:
             updates = {}
 
@@ -110,7 +110,7 @@ def insert_new_user(uid: str, display_name: str, email: str, photo_url: str | No
     if photo_url is not None:
         photo_url = upload_logo(photo_url)
 
-    with get_connection() as conn:
+    with get_connection(skip_rls=True) as conn:
         with conn.cursor() as cursor:
             cursor.execute(
                 """

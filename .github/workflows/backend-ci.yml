@@ -19,21 +19,26 @@ jobs:
         working-directory: backend
 
     env:
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      ENV: ${{ secrets.ENV }}
-      DEBUG: ${{ secrets.DEBUG }}
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-      PG_HOST: ${{ secrets.PG_HOST }}
-      PG_DATABASE: ${{ secrets.PG_DATABASE }}
-      PG_USER: ${{ secrets.PG_USER }}
-      PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
-      PG_PORT: ${{ secrets.PG_PORT }}
+      SUPABASE_DB_HOST: ${{ secrets.SUPABASE_DB_HOST }}
+      SUPABASE_DB_NAME: ${{ secrets.SUPABASE_DB_NAME }}
+      SUPABASE_DB_USER: ${{ secrets.SUPABASE_DB_USER }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_DB_PORT: ${{ secrets.SUPABASE_DB_PORT }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
-      LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
       SYSTEM_UID: ${{ secrets.SYSTEM_UID }}
       FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      NOTIFICATION_EMAIL_ADDRESS: ${{ secrets.NOTIFICATION_EMAIL_ADDRESS }}
+      NOTIFICATION_EMAIL_PASSWORD: ${{ secrets.NOTIFICATION_EMAIL_PASSWORD }}
+      TWILIO_API_KEY_SID: ${{ secrets.TWILIO_API_KEY_SID }}
+      TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}
+      TWILIO_MESSAGING_SERVICE_SID: ${{ secrets.TWILIO_MESSAGING_SERVICE_SID }}
 
     steps:
       - uses: actions/checkout@v3
@@ -50,21 +55,26 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "SECRET_KEY=${SECRET_KEY}" > .env
-          echo "ENV=${ENV}" >> .env
-          echo "DEBUG=${DEBUG}" >> .env
           echo "GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}" >> .env
-          echo "PG_HOST=${PG_HOST}" >> .env
-          echo "PG_DATABASE=${PG_DATABASE}" >> .env
-          echo "PG_USER=${PG_USER}" >> .env
-          echo "PG_PASSWORD=${PG_PASSWORD}" >> .env
-          echo "PG_PORT=${PG_PORT}" >> .env
+          echo "SUPABASE_DB_HOST=${SUPABASE_DB_HOST}" >> .env
+          echo "SUPABASE_DB_NAME=${SUPABASE_DB_NAME}" >> .env
+          echo "SUPABASE_DB_USER=${SUPABASE_DB_USER}" >> .env
+          echo "SUPABASE_DB_PASSWORD=${SUPABASE_DB_PASSWORD}" >> .env
+          echo "SUPABASE_DB_PORT=${SUPABASE_DB_PORT}" >> .env
+          echo "SUPABASE_URL=${SUPABASE_URL}" >> .env
+          echo "SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}" >> .env
           echo "CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}" >> .env
           echo "CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}" >> .env
           echo "CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}" >> .env
-          echo "LOG_LEVEL=${LOG_LEVEL}" >> .env
           echo "SYSTEM_UID=${SYSTEM_UID}" >> .env
           echo "FRONTEND_URL=${FRONTEND_URL}" >> .env
+          echo "SMTP_HOST=${SMTP_HOST}" >> .env
+          echo "SMTP_PORT=${SMTP_PORT}" >> .env
+          echo "NOTIFICATION_EMAIL_ADDRESS=${NOTIFICATION_EMAIL_ADDRESS}" >> .env
+          echo "NOTIFICATION_EMAIL_PASSWORD=${NOTIFICATION_EMAIL_PASSWORD}" >> .env
+          echo "TWILIO_API_KEY_SID=${TWILIO_API_KEY_SID}" >> .env
+          echo "TWILIO_API_KEY_SECRET=${TWILIO_API_KEY_SECRET}" >> .env
+          echo "TWILIO_MESSAGING_SERVICE_SID=${TWILIO_MESSAGING_SERVICE_SID}" >> .env
 
       - name: Debug .env
         run: cat .env

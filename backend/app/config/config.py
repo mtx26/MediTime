@@ -8,17 +8,17 @@ load_dotenv()  # Charge les variables du fichier .env
 class Config:
     """Classe de configuration pour l'application Flask.
     """
-    # Flask
-    SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
-    DEBUG = os.getenv("DEBUG", "True") == "True"
-
     # Supabase (utilisé avec psycopg2)
-    SUPABASE_DB_HOST = os.getenv("PG_HOST")
-    SUPABASE_DB_NAME = os.getenv("PG_DATABASE")
-    SUPABASE_DB_USER = os.getenv("PG_USER")
-    SUPABASE_DB_PASSWORD = os.getenv("PG_PASSWORD")
-    SUPABASE_DB_PORT = os.getenv("PG_PORT", 6543)  # Port 6543 = Transaction Mode (200+ connexions)
-    SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET")
+    SUPABASE_DB_HOST = os.getenv("SUPABASE_DB_HOST")
+    SUPABASE_DB_NAME = os.getenv("SUPABASE_DB_NAME")
+    SUPABASE_DB_USER = os.getenv("SUPABASE_DB_USER")
+    SUPABASE_DB_PASSWORD = os.getenv("SUPABASE_DB_PASSWORD")
+    SUPABASE_DB_PORT = os.getenv("SUPABASE_DB_PORT", 6543)  # Port 6543 = Transaction Mode (200+ connexions)
+    
+    # Supabase Auth (pour vérification JWT)
+    SUPABASE_URL = os.getenv("SUPABASE_URL")
+    SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
+    
     # Firebase
     GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     GOOGLE_CLOUD_LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
@@ -29,7 +29,6 @@ class Config:
     CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
 
     # Autres options
-    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
     SYSTEM_UID = os.getenv("SYSTEM_UID")
 
     # Frontend URL
