@@ -231,7 +231,10 @@
     "notifications": {
       "disabled": "Notificaciones deshabilitadas",
       "enabled": "Notificaciones habilitadas",
-      "label": "Notificaciones"
+      "label": "Notificaciones",
+      "description": "Administrar notificaciones para este calendario médico.",
+      "enabled_hint": "Recibirá recordatorios para tomar su medicación.",
+      "disabled_hint": "No se enviarán notificaciones para este calendario."
     },
     "sharing": {
       "label": "Intercambio"
@@ -245,7 +248,8 @@
       "weekly": {
         "description": "El stock se reducirá manualmente cada semana cuando rellenes tu pastillero.",
         "label": "Semanal (Pastillero)"
-      }
+      },
+      "description": "Elija cómo debe reducirse su stock de medicamentos."
     },
     "loading_notification_settings": "Cargando configuración de notificaciones...",
     "loading_stock_settings": "Cargando configuración de stock..."

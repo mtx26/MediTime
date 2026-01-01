@@ -231,7 +231,10 @@
     "notifications": {
       "disabled": "Benachrichtigungen deaktiviert",
       "enabled": "Benachrichtigungen aktiviert",
-      "label": "Benachrichtigungen"
+      "label": "Benachrichtigungen",
+      "description": "Benachrichtigungen für diesen medizinischen Kalender verwalten.",
+      "enabled_hint": "Sie erhalten Erinnerungen zur Einnahme Ihrer Medikamente.",
+      "disabled_hint": "Für diesen Kalender werden keine Benachrichtigungen versendet."
     },
     "sharing": {
       "label": "Weitergabe"
@@ -245,7 +248,8 @@
       "weekly": {
         "description": "Der Vorrat wird jede Woche manuell verringert, wenn Sie Ihre Pillendose auffüllen.",
         "label": "Wöchentlich (Pillbox)"
-      }
+      },
+      "description": "Wählen Sie aus, wie Ihr Medikamentenbestand reduziert werden soll."
     },
     "loading_notification_settings": "Benachrichtigungseinstellungen werden geladen...",
     "loading_stock_settings": "Laden der Standardeinstellungen..."

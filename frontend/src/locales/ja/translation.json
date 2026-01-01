@@ -231,7 +231,10 @@
     "notifications": {
       "disabled": "通知が無効になっています",
       "enabled": "通知が有効",
-      "label": "通知"
+      "label": "通知",
+      "description": "この医療カレンダーの通知を管理します。",
+      "enabled_hint": "薬を服用するためのリマインダーが届きます。",
+      "disabled_hint": "このカレンダーに関する通知は送信されません。"
     },
     "sharing": {
       "label": "共有"
@@ -245,7 +248,8 @@
       "weekly": {
         "description": "毎週薬箱を補充すると、在庫は手動で減らされます。",
         "label": "週刊（ピルボックス）"
-      }
+      },
+      "description": "医薬品の在庫をどのように減らすかを選択します。"
     },
     "loading_notification_settings": "通知設定を読み込んでいます...",
     "loading_stock_settings": "ストック設定を読み込んでいます..."

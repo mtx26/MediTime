@@ -5,7 +5,7 @@ import { useLoading } from '@/components/ui/loading';
 import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-// notification icon
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell } from 'lucide-react';
 
 
@@ -69,18 +69,30 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars,
   }, [loading, calendarId, showLoading, t]);
 
   return (
-    <div>
-      <h5 className="text-lg font-semibold mb-4">
-        <Bell className="inline-block mr-2 mb-1" />
-        {t('calendar_settings.notifications.label')}
-      </h5>
-      <div className="flex items-center gap-3" data-tour="settings-notifications-toggle">
-        <Switch id="notifToggle" checked={enabled} onCheckedChange={toggleNotifications} />
-        <Label htmlFor="notifToggle" className="cursor-pointer">
-          {enabled ? t('calendar_settings.notifications.enabled') : t('calendar_settings.notifications.disabled')}
-        </Label>
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Bell className="h-5 w-5 text-primary" />
+          <CardTitle>{t('calendar_settings.notifications.label')}</CardTitle>
+        </div>
+        <CardDescription>{t('calendar_settings.notifications.description')}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="p-4 border rounded-lg bg-accent/20">
+          <div className="flex items-center gap-3" data-tour="settings-notifications-toggle">
+            <Switch id="notifToggle" checked={enabled} onCheckedChange={toggleNotifications} />
+            <div className="flex-1">
+              <Label htmlFor="notifToggle" className="cursor-pointer font-medium">
+                {enabled ? t('calendar_settings.notifications.enabled') : t('calendar_settings.notifications.disabled')}
+              </Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                {enabled ? t('calendar_settings.notifications.enabled_hint') : t('calendar_settings.notifications.disabled_hint')}
+              </p>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

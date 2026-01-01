@@ -231,7 +231,10 @@
     "notifications": {
       "disabled": "Notifications disabled",
       "enabled": "Notifications enabled",
-      "label": "Notifications"
+      "label": "Notifications",
+      "description": "Manage notifications for this medical calendar.",
+      "enabled_hint": "You will receive reminders to take your medication.",
+      "disabled_hint": "No notifications will be sent for this calendar."
     },
     "sharing": {
       "label": "Sharing"
@@ -245,7 +248,8 @@
       "weekly": {
         "description": "The stock will be manually decreased each week when you refill your pill box.",
         "label": "Weekly (Pillbox)"
-      }
+      },
+      "description": "Choose how your medication stock should be reduced."
     },
     "loading_notification_settings": "Loading notification settings...",
     "loading_stock_settings": "Loading stock settings..."

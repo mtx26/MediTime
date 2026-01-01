@@ -231,7 +231,10 @@
     "notifications": {
       "disabled": "已禁用通知",
       "enabled": "已启用通知",
-      "label": "通知"
+      "label": "通知",
+      "description": "管理此医疗日历的通知。",
+      "enabled_hint": "您将收到服药提醒。",
+      "disabled_hint": "此日历不会发送任何通知。"
     },
     "sharing": {
       "label": "共享"
@@ -245,7 +248,8 @@
       "weekly": {
         "description": "当您重新填充药盒时，库存将每周手动减少。",
         "label": "每周（药盒）"
-      }
+      },
+      "description": "选择如何减少您的药品库存。"
     },
     "loading_notification_settings": "正在加载通知设置...",
     "loading_stock_settings": "正在加载库存设置..."

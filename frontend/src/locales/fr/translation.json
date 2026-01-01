@@ -231,7 +231,10 @@
     "notifications": {
       "disabled": "Notifications désactivées",
       "enabled": "Notifications activées",
-      "label": "Notifications"
+      "label": "Notifications",
+      "description": "Gérez les notifications pour ce calendrier médical.",
+      "enabled_hint": "Vous recevrez des rappels pour les prises de médicaments.",
+      "disabled_hint": "Aucune notification ne sera envoyée pour ce calendrier."
     },
     "sharing": {
       "label": "Partage"
@@ -242,6 +245,7 @@
         "label": "Quotidien (Minuit)"
       },
       "label": "Décompte du stock",
+      "description": "Choisissez comment le stock de vos médicaments doit être diminué.",
       "weekly": {
         "description": "Le stock sera diminué manuellement chaque semaine lorsque vous remplirez votre pillulier.",
         "label": "Hebdomadaire (Pillulier)"

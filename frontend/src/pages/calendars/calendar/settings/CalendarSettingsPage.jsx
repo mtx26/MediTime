@@ -157,11 +157,7 @@ function CalendarSettingsPage({
         </div>
 
         <div className="w-full md:flex-1">
-          <Card>
-            <CardContent>
-              {renderTab()}
-            </CardContent>
-          </Card>
+          {renderTab()}
         </div>
       </div>
     </div>

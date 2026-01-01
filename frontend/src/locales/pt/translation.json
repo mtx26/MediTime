@@ -231,7 +231,10 @@
     "notifications": {
       "disabled": "Notificações desabilitadas",
       "enabled": "Notificações habilitadas",
-      "label": "Notificações"
+      "label": "Notificações",
+      "description": "Gerenciar notificações para este calendário médico.",
+      "enabled_hint": "Você receberá lembretes para tomar sua medicação.",
+      "disabled_hint": "Nenhuma notificação será enviada para este calendário."
     },
     "sharing": {
       "label": "Compartilhamento"
@@ -245,7 +248,8 @@
       "weekly": {
         "description": "O estoque será diminuído manualmente a cada semana quando você reabastecer sua caixa de comprimidos.",
         "label": "Semanal (Caixa de comprimidos)"
-      }
+      },
+      "description": "Escolha como seu estoque de medicamentos deve ser reduzido."
     },
     "loading_notification_settings": "Carregando configurações de notificação...",
     "loading_stock_settings": "Carregando configurações de estoque..."

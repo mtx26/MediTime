@@ -3,8 +3,8 @@ import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-// stock icon
-import { Box } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Box, Package } from 'lucide-react';
 
 
 const Stock = ({ personalCalendars, setNotFound }) => {
@@ -58,39 +58,44 @@ const Stock = ({ personalCalendars, setNotFound }) => {
   }, [loading, calendarId, showLoading, t]);
 
   return (
-    <div>
-      <h5 className="mb-4 text-lg font-semibold">
-        <Box className="inline-block mr-2 mb-1" />
-        {t('calendar_settings.stock.label')}
-      </h5>
-      <RadioGroup value={selectedMethod} onValueChange={modifyStockDecrementMethod} data-tour="settings-stock-methods" className="space-y-3">
-        <label 
-          htmlFor="weeklyPillbox" 
-          className="flex items-start gap-3 p-4 border rounded-lg hover:bg-accent/50 transition cursor-pointer"
-        >
-          <RadioGroupItem value="weekly_pillbox" id="weeklyPillbox" className="mt-1" />
-          <div className="flex-1">
-            <div className="font-semibold">{t('calendar_settings.stock.weekly.label')}</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('calendar_settings.stock.weekly.description')}
-            </p>
-          </div>
-        </label>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Package className="h-5 w-5 text-primary" />
+          <CardTitle>{t('calendar_settings.stock.label')}</CardTitle>
+        </div>
+        <CardDescription>{t('calendar_settings.stock.description')}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <RadioGroup value={selectedMethod} onValueChange={modifyStockDecrementMethod} data-tour="settings-stock-methods" className="space-y-3">
+          <label 
+            htmlFor="weeklyPillbox" 
+            className="flex items-start gap-3 p-4 border rounded-lg hover:bg-accent/50 transition cursor-pointer"
+          >
+            <RadioGroupItem value="weekly_pillbox" id="weeklyPillbox" className="mt-1" />
+            <div className="flex-1">
+              <div className="font-semibold">{t('calendar_settings.stock.weekly.label')}</div>
+              <p className="text-sm text-muted-foreground mt-1">
+                {t('calendar_settings.stock.weekly.description')}
+              </p>
+            </div>
+          </label>
 
-        <label 
-          htmlFor="dailyMidnight" 
-          className="flex items-start gap-3 p-4 border rounded-lg hover:bg-accent/50 transition cursor-pointer"
-        >
-          <RadioGroupItem value="daily_midnight" id="dailyMidnight" className="mt-1" />
-          <div className="flex-1">
-            <div className="font-semibold">{t('calendar_settings.stock.daily.label')}</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('calendar_settings.stock.daily.description')}
-            </p>
-          </div>
-        </label>
-      </RadioGroup>
-    </div>
+          <label 
+            htmlFor="dailyMidnight" 
+            className="flex items-start gap-3 p-4 border rounded-lg hover:bg-accent/50 transition cursor-pointer"
+          >
+            <RadioGroupItem value="daily_midnight" id="dailyMidnight" className="mt-1" />
+            <div className="flex-1">
+              <div className="font-semibold">{t('calendar_settings.stock.daily.label')}</div>
+              <p className="text-sm text-muted-foreground mt-1">
+                {t('calendar_settings.stock.daily.description')}
+              </p>
+            </div>
+          </label>
+        </RadioGroup>
+      </CardContent>
+    </Card>
   );
 };
 

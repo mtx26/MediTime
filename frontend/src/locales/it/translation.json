@@ -231,7 +231,10 @@
     "notifications": {
       "disabled": "Notifiche disabilitate",
       "enabled": "Notifiche abilitate",
-      "label": "Notifiche"
+      "label": "Notifiche",
+      "description": "Gestisci le notifiche per questo calendario medico.",
+      "enabled_hint": "Riceverai dei promemoria per assumere i farmaci.",
+      "disabled_hint": "Non verranno inviate notifiche per questo calendario."
     },
     "sharing": {
       "label": "Condivisione"
@@ -245,7 +248,8 @@
       "weekly": {
         "description": "La scorta verrà diminuita manualmente ogni settimana quando rifornirai il tuo portapillole.",
         "label": "Settimanale (Pillbox)"
-      }
+      },
+      "description": "Scegli come ridurre le tue scorte di farmaci."
     },
     "loading_notification_settings": "Caricamento delle impostazioni di notifica...",
     "loading_stock_settings": "Caricamento delle impostazioni di magazzino..."
