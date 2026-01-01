@@ -2,31 +2,70 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import LanguageSelector from '../../components/common/LanguageSelector';
 import ThemeToggle from '../../components/common/ThemeToggle';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Settings, Languages, Palette } from 'lucide-react';
 
 export default function Preferences() {
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">{t('settings.preferences')}</h2>
-        <p className="text-muted-foreground mt-1">{t('settings.preferences_desc')}</p>
+    <div className="max-w-4xl mx-auto space-y-8 pb-8">
+      {/* En-tête */}
+      <div className="space-y-2">
+        <h2 className="text-3xl font-bold tracking-tight">{t('settings.preferences')}</h2>
+        <p className="text-muted-foreground">{t('settings.preferences_desc')}</p>
       </div>
 
-      <div className="space-y-2">
-        <Label className="font-semibold">{t('settings.language')}</Label>
-        <LanguageSelector />
-        <p className="text-muted-foreground text-sm">{t('settings.language_note')}</p>
-      </div>
+      {/* Section Langue */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Languages className="h-5 w-5 text-primary" />
+            <CardTitle>{t('settings.language')}</CardTitle>
+          </div>
+          <CardDescription>{t('settings.language_note')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-3 p-4 border rounded-lg bg-accent/20">
+            <div className="p-2 bg-background rounded-lg border">
+              <Languages className="h-4 w-4 text-primary" />
+            </div>
+            <div className="flex-1">
+              <LanguageSelector />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="space-y-2">
-        <Label className="font-semibold">{t('settings.theme')}</Label>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <span className="text-sm text-muted-foreground">{t('settings.theme_toggle')}</span>
-        </div>
-      </div>
+      {/* Section Thème */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Palette className="h-5 w-5 text-primary" />
+            <CardTitle>{t('settings.theme')}</CardTitle>
+          </div>
+          <CardDescription>{t('settings.theme_description')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between p-4 border rounded-lg bg-accent/20">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-background rounded-lg border">
+                <Palette className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <Label className="font-medium text-sm cursor-pointer">
+                  {t('settings.theme_toggle')}
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {t('settings.theme_help')}
+                </p>
+              </div>
+            </div>
+            <ThemeToggle />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

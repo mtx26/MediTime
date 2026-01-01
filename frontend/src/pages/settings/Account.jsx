@@ -6,12 +6,14 @@ import { log } from '../../utils/logger';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '../../utils/files/cropImage';
 import { updateUserInfo } from '../../services/auth/authService';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
-import { Pencil, Check, X } from 'lucide-react';
+import { Pencil, Check, X, User, Camera, UserCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -43,51 +45,73 @@ export default function Account() {
   }, [displayName, userInfo?.displayName]);
 
   const uploadPhoto = async (file) => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const formData = new FormData();
-    formData.append('photo', file);
-    const response = await fetch(`${API_URL}/api/user/photo`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: formData,
-    });
-    const data = await response.json();
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const formData = new FormData();
+      formData.append('photo', file);
+      const response = await fetch(`${API_URL}/api/user/photo`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: formData,
+      });
+      const data = await response.json();
 
-    const reloadUser = getGlobalReloadUser();
-    reloadUser();
-    
-    log.info(data.message, {
-      origin: 'USER_PHOTO',
-      code: 'PHOTO_UPLOAD_SUCCESS',
-      uid: userInfo.uid,
-    });
+      if (response.ok) {
+        const reloadUser = getGlobalReloadUser();
+        reloadUser();
+        
+        toast.success(t('account.photo_updated'));
+        
+        log.info(data.message, {
+          origin: 'USER_PHOTO',
+          code: 'PHOTO_UPLOAD_SUCCESS',
+          uid: userInfo.uid,
+        });
+      } else {
+        toast.error(t('account.photo_error'));
+      }
+    } catch (error) {
+      toast.error(t('account.photo_error'));
+      log.error('Error uploading photo', {
+        origin: 'USER_PHOTO',
+        code: 'PHOTO_UPLOAD_ERROR',
+        error: error.message,
+      });
+    }
   };
 
   const handleCropConfirm = async () => {
     const croppedImage = await getCroppedImg(rawImage, croppedAreaPixels);
-    setPreviewURL(croppedImage);
-    setPhotoFile(await fetch(croppedImage).then((r) => r.blob()));
+    setPreviewURL(croppedImage); 
+    const blob = await fetch(croppedImage).then((r) => r.blob());
     setShowCropModal(false);
-    setIsModified(true);
+    await uploadPhoto(blob);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (photoFile) {
-      await uploadPhoto(photoFile);
-    }
     if (displayName !== userInfo?.displayName) {
-      const rep = await updateUserInfo({
-        display_name: displayName,
-        uid
-      });
+      try {
+        await updateUserInfo({
+          display_name: displayName,
+          uid
+        });
+        toast.success(t('account.profile_updated'));
+      } catch (error) {
+        toast.error(t('account.profile_error'));
+        log.error('Error updating profile', {
+          origin: 'USER_PROFILE',
+          code: 'PROFILE_UPDATE_ERROR',
+          error: error.message,
+        });
+        return;
+      }
     }
     setIsModified(false);
-    setPhotoFile(null);
   };
 
   const openFilePicker = () => {
@@ -99,7 +123,7 @@ export default function Account() {
       if (file) {
         const maxSize = 1024 * 1024 * 5; // 5MB
         if (file.size > maxSize) {
-          alert(t('account.image_size_error'));
+          toast.error(t('account.image_size_error'));
           return;
         }
         const imageURL = URL.createObjectURL(file);
@@ -120,75 +144,121 @@ export default function Account() {
 
   return (
     <>
-      <div>
-        <h2 className="mb-4 text-2xl font-bold">{t('settings.account')}</h2>
-        <p className="text-muted-foreground mb-4">{t('account.instructions')}</p>
+      <div className="max-w-4xl mx-auto space-y-8 pb-8">
+        {/* En-tête */}
+        <div className="space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight">{t('settings.account')}</h2>
+          <p className="text-muted-foreground">{t('account.instructions')}</p>
+        </div>
 
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <div className="flex items-center gap-4">
-            <button
-              className="relative inline-block rounded-full overflow-hidden m-0 p-0 border-0"
-              style={{ width: '100px', height: '100px', cursor: 'pointer' }}
-              type="button"
-              onClick={() => {
-                setShowOverlay(!showOverlay);
-                if (showOverlay) {
-                  openFilePicker();
-                }
-              }}
-              onMouseEnter={() => setShowOverlay(true)}
-              onMouseLeave={() => setShowOverlay(false)}
-              onBlur={() => setShowOverlay(false)}
-            >
-              <img
-                src={previewURL}
-                alt={t('account.profile_alt')}
-                className="w-full h-full rounded-full"
-                style={{ objectFit: 'cover' }}
-              />
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Section Photo de profil */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Camera className="h-5 w-5 text-primary" />
+                <CardTitle>{t('account.profile_photo.title')}</CardTitle>
+              </div>
+              <CardDescription>{t('account.profile_photo.description')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row items-center gap-6 p-4 border rounded-lg bg-accent/20">
+                <button
+                  className="relative rounded-full overflow-hidden border-4 border-background shadow-lg hover:shadow-xl transition-shadow"
+                  style={{ width: '120px', height: '120px', cursor: 'pointer' }}
+                  type="button"
+                  onClick={() => {
+                    setShowOverlay(!showOverlay);
+                    if (showOverlay) {
+                      openFilePicker();
+                    }
+                  }}
+                  onMouseEnter={() => setShowOverlay(true)}
+                  onMouseLeave={() => setShowOverlay(false)}
+                  onBlur={() => setShowOverlay(false)}
+                >
+                  <img
+                    src={previewURL}
+                    alt={t('account.profile_alt')}
+                    className="w-full h-full"
+                    style={{ objectFit: 'cover' }}
+                  />
 
-              {showOverlay && (
-                <div className="absolute top-0 left-0 w-full h-full flex items-center justify-content bg-black/75">
-                  <Pencil className="w-8 h-8 text-white mx-auto" />
+                  {showOverlay && (
+                    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                      <div className="text-center text-white">
+                        <Pencil className="w-8 h-8 mx-auto mb-1" />
+                        <span className="text-xs font-medium">{t('account.change_photo')}</span>
+                      </div>
+                    </div>
+                  )}
+                </button>
+
+                <div className="flex-1 text-center sm:text-left">
+                  <p className="text-sm font-medium mb-1">{t('account.profile_photo.hint')}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t('account.profile_photo.size_limit')}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Section Informations personnelles */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <UserCircle className="h-5 w-5 text-primary" />
+                <CardTitle>{t('account.personal_info.title')}</CardTitle>
+              </div>
+              <CardDescription>{t('account.personal_info.description')}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="displayName" className="text-sm font-medium">
+                  {t('account.display_name.label')}
+                </Label>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-background rounded-lg border">
+                    <User className="h-4 w-4 text-primary" />
+                  </div>
+                  <Input
+                    type="text"
+                    id="displayName"
+                    placeholder={t('account.display_name.placeholder')}
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className="flex-1"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {t('account.display_name.hint')}
+                </p>
+              </div>
+
+              {isModified && (
+                <div className="flex gap-2 justify-end pt-4 border-t">
+                  <Button type="submit" className="gap-2">
+                    <Check className="w-4 h-4" /> {t('account.save_changes')}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="gap-2"
+                    onClick={() => {
+                      setDisplayName(userInfo?.displayName);
+                      setIsModified(false);
+                    }}
+                  >
+                    <X className="w-4 h-4" /> {t('cancel')}
+                  </Button>
                 </div>
               )}
-            </button>
-
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="displayName ">
-                {t('account.display_name.label')}
-              </Label>
-              <Input
-                type="text"
-                id="displayName"
-                placeholder={t('account.display_name.placeholder')}
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          {isModified && (
-            <div className="flex gap-2 justify-end">
-              <Button type="submit" variant="outline" className="gap-2">
-                <Check className="w-4 h-4" /> {t('account.save_changes')}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="gap-2"
-                onClick={() => {
-                  setDisplayName(userInfo?.displayName);
-                  setPreviewURL(userInfo?.photoUrl);
-                  setIsModified(false);
-                }}
-              >
-                <X className="w-4 h-4" /> {t('cancel')}
-              </Button>
-            </div>
-          )}
+            </CardContent>
+          </Card>
         </form>
       </div>
+
       <Dialog open={showCropModal} onOpenChange={setShowCropModal}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>

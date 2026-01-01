@@ -18,13 +18,29 @@
     },
     "display_name": {
       "label": "Pseudo",
-      "placeholder": "Geben Sie Ihren Benutzernamen ein"
+      "placeholder": "Geben Sie Ihren Benutzernamen ein",
+      "hint": "Dieser Name wird für andere Benutzer sichtbar sein."
     },
     "image_size_error": "Die Bildgröße darf 5 MB nicht überschreiten",
     "instructions": "Hier können Sie Ihre persönlichen Daten ändern.",
     "label": "Konto",
     "profile_alt": "Profil",
-    "save_changes": "Änderungen speichern"
+    "save_changes": "Änderungen speichern",
+    "change_photo": "Modifikator",
+    "profile_photo": {
+      "title": "Profilbild",
+      "description": "Personalisiere dein Profilbild. Klicke auf das Bild, um es zu ändern.",
+      "hint": "Akzeptierte Formate: JPG, PNG, GIF",
+      "size_limit": "Maximale Größe: 5 MB"
+    },
+    "personal_info": {
+      "title": "Persönliche Daten",
+      "description": "Bearbeiten Sie Ihre Profilinformationen, die für andere Nutzer sichtbar sind."
+    },
+    "photo_updated": "Profilbild erfolgreich aktualisiert",
+    "photo_error": "Fehler beim Aktualisieren des Fotos",
+    "profile_updated": "Profil erfolgreich aktualisiert",
+    "profile_error": "Fehler beim Aktualisieren des Profils"
   },
   "accounts": "Konten",
   "actions": "Aktionen",
@@ -275,7 +291,11 @@
     "sw_error": "Fehler bei der Registrierung von Service Workern",
     "sw_registered": "Registrierter Dienstleistungsarbeiter",
     "token_registered": "[FCM] Token auf der Backend-Seite registriert",
-    "token_send_error": "[FCM] Fehler beim Senden des Tokens"
+    "token_send_error": "[FCM] Fehler beim Senden des Tokens",
+    "status_disabled": "Benachrichtigungen deaktiviert",
+    "status_disabled_desc": "Klicken Sie auf die Schaltfläche, um Push-Benachrichtigungen auf diesem Gerät zu aktivieren.",
+    "status_enabled": "Benachrichtigungen aktiviert",
+    "status_enabled_desc": "Sie erhalten Push-Benachrichtigungen auf diesem Gerät."
   },
   "features": {
     "desc1": "Planen Sie Ihre Aufnahmen, erhalten Sie Erinnerungen und seien Sie beruhigt.",
@@ -427,7 +447,13 @@
   "notification": {
     "email_toggle": "E-Mail-Benachrichtigungen aktivieren",
     "instructions": "Aktivieren oder deaktivieren Sie E-Mail- oder Push-Benachrichtigungen entsprechend Ihren Wünschen.",
-    "push_toggle": "Aktivieren Sie Web-Push-Benachrichtigungen"
+    "push_toggle": "Aktivieren Sie Web-Push-Benachrichtigungen",
+    "email_description": "Erhalten Sie Erinnerungen und Benachrichtigungen per E-Mail.",
+    "preferences": {
+      "description": "Wählen Sie aus, wie Sie Ihre Medikamentenerinnerungen erhalten möchten.",
+      "title": "Benachrichtigungseinstellungen"
+    },
+    "push_description": "Empfangen Sie Push-Benachrichtigungen auf Ihren Geräten."
   },
   "notifications": "Benachrichtigungen",
   "open": "Offen",
@@ -571,7 +597,8 @@
     "current_password": {
       "label": "Aktuelles Passwort",
       "placeholder": "Aktuelles Passwort eingeben",
-      "required": "Altes Passwort erforderlich."
+      "required": "Altes Passwort erforderlich.",
+      "incorrect": "Das aktuelle Passwort ist falsch."
     },
     "google_warning": "Mit Google angemeldet. Sie können Ihre E-Mail-Adresse oder Ihr Passwort nicht ändern.",
     "instructions": "Überprüfen Sie die mit Ihrem Konto verknüpfte E-Mail-Adresse und ändern Sie gegebenenfalls Ihr Passwort.",
@@ -580,7 +607,28 @@
     },
     "password_updated": "Passwort erfolgreich aktualisiert.",
     "title": "Kontoverwaltung",
-    "update_password": "Kennwort aktualisieren"
+    "update_password": "Kennwort aktualisieren",
+    "email_auth": {
+      "description": "Verwalten Sie Ihre E-Mail-Adresse und die mit Ihrem Konto verknüpften Anmeldemethoden.",
+      "title": "E-Mail und Authentifizierung"
+    },
+    "password_section": {
+      "description": "Ändern Sie Ihr Passwort, um die Sicherheit Ihres Kontos zu erhöhen.",
+      "hint": "Verwenden Sie mindestens 8 Zeichen mit Buchstaben, Zahlen und Symbolen.",
+      "same_password_error": "Das neue Passwort muss sich vom alten unterscheiden.",
+      "title": "Passwort"
+    },
+    "providers": {
+      "connect": "Verbinden",
+      "connected": "Verbunden",
+      "connecting": "Verbindung...",
+      "connection_error": "Fehler beim Verbinden mit dem Anbieter",
+      "description": "Verwalten Sie die mit Ihrem Konto verknüpften Anmeldemethoden.",
+      "help_text": "Verknüpfen Sie mehrere Konten für ein einfaches Anmelden.",
+      "not_connected": "Nicht verbunden",
+      "section_title": "Authentifizierungsanbieter",
+      "title": "Verbindungsmethoden"
+    }
   },
   "send_invitation": "Senden einer Einladung",
   "send_sms": "Per SMS senden",
@@ -593,7 +641,9 @@
     "preferences_desc": "Personalisieren Sie Ihr Erlebnis auf MediTime.",
     "security": "Sicherheit",
     "theme": "Thema",
-    "theme_toggle": "Klicken Sie hier, um das Design zu ändern."
+    "theme_toggle": "Klicken Sie hier, um das Design zu ändern.",
+    "theme_description": "Wählen Sie zwischen hellem und dunklem Modus.",
+    "theme_help": "Das Thema gilt für die gesamte Anwendung."
   },
   "share": "Aktie",
   "share_calendar": "Den Kalender freigeben",

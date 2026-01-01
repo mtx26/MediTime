@@ -18,13 +18,29 @@
     },
     "display_name": {
       "label": "Pseudo",
-      "placeholder": "Enter your username"
+      "placeholder": "Enter your username",
+      "hint": "This name will be visible to other users."
     },
     "image_size_error": "Image size must not exceed 5MB",
     "instructions": "You can change your personal information here.",
     "label": "Account",
     "profile_alt": "Profile",
-    "save_changes": "Save changes"
+    "save_changes": "Save changes",
+    "change_photo": "Modifier",
+    "profile_photo": {
+      "title": "Profile picture",
+      "description": "Personalize your profile picture. Click on the image to change it.",
+      "hint": "Accepted formats: JPG, PNG, GIF",
+      "size_limit": "Maximum size: 5 MB"
+    },
+    "personal_info": {
+      "title": "Personal information",
+      "description": "Edit your profile information that is visible to other users."
+    },
+    "photo_updated": "Profile picture successfully updated",
+    "photo_error": "Error updating photo",
+    "profile_updated": "Profile successfully updated",
+    "profile_error": "Error updating profile"
   },
   "accounts": "Accounts",
   "actions": "Actions",
@@ -275,7 +291,11 @@
     "sw_error": "Service Worker registration error",
     "sw_registered": "Registered Service Worker",
     "token_registered": "[FCM] Token registered on the backend side",
-    "token_send_error": "[FCM] Error sending token"
+    "token_send_error": "[FCM] Error sending token",
+    "status_disabled": "Notifications disabled",
+    "status_disabled_desc": "Click the button to enable push notifications on this device.",
+    "status_enabled": "Notifications enabled",
+    "status_enabled_desc": "You receive push notifications on this device."
   },
   "features": {
     "desc1": "Schedule your shots, receive reminders and have peace of mind.",
@@ -427,7 +447,13 @@
   "notification": {
     "email_toggle": "Enable email notifications",
     "instructions": "Enable or disable email or push notifications according to your preferences.",
-    "push_toggle": "Enable web push notifications"
+    "push_toggle": "Enable web push notifications",
+    "email_description": "Receive reminders and alerts by email.",
+    "preferences": {
+      "description": "Choose how you would like to receive your medication reminders.",
+      "title": "Notification preferences"
+    },
+    "push_description": "Receive push notifications on your devices."
   },
   "notifications": "Notifications",
   "open": "Open",
@@ -571,7 +597,8 @@
     "current_password": {
       "label": "Current password",
       "placeholder": "Enter current password",
-      "required": "Old password required."
+      "required": "Old password required.",
+      "incorrect": "Incorrect current password."
     },
     "google_warning": "Signed in with Google. You cannot change your email or password.",
     "instructions": "Check the email address associated with your account and change your password if necessary.",
@@ -580,7 +607,28 @@
     },
     "password_updated": "Password updated successfully.",
     "title": "Account management",
-    "update_password": "Update password"
+    "update_password": "Update password",
+    "email_auth": {
+      "description": "Manage your email address and the login methods associated with your account.",
+      "title": "Email and authentication"
+    },
+    "password_section": {
+      "description": "Change your password to strengthen the security of your account.",
+      "hint": "Use at least 8 characters with letters, numbers and symbols.",
+      "same_password_error": "The new password must be different from the old one.",
+      "title": "Password"
+    },
+    "providers": {
+      "connect": "Connect",
+      "connected": "Connected",
+      "connecting": "Connexion...",
+      "connection_error": "Error connecting to the provider",
+      "description": "Manage the login methods associated with your account.",
+      "help_text": "Link multiple accounts for easy login.",
+      "not_connected": "Not connected",
+      "section_title": "Authentication providers",
+      "title": "Connection methods"
+    }
   },
   "send_invitation": "Send an invitation",
   "send_sms": "Send by SMS",
@@ -593,7 +641,9 @@
     "preferences_desc": "Personalize your experience on MediTime.",
     "security": "Security",
     "theme": "Theme",
-    "theme_toggle": "Click to change the theme"
+    "theme_toggle": "Click to change the theme",
+    "theme_description": "Choose between light mode and dark mode.",
+    "theme_help": "The theme applies to the entire application."
   },
   "share": "Share",
   "share_calendar": "Share the calendar",

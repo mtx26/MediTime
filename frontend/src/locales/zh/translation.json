@@ -18,13 +18,29 @@
     },
     "display_name": {
       "label": "伪",
-      "placeholder": "输入您的用户名"
+      "placeholder": "输入您的用户名",
+      "hint": "其他用户将可以看到此名称。"
     },
     "image_size_error": "图片大小不得超过 5MB",
     "instructions": "您可以在这里更改您的个人信息。",
     "label": "帐户",
     "profile_alt": "轮廓",
-    "save_changes": "保存更改"
+    "save_changes": "保存更改",
+    "change_photo": "修饰符",
+    "profile_photo": {
+      "title": "头像",
+      "description": "个性化您的个人资料图片。点击图片即可更改。",
+      "hint": "接受的格式：JPG、PNG、GIF",
+      "size_limit": "最大大小：5 MB"
+    },
+    "personal_info": {
+      "title": "个人信息",
+      "description": "编辑其他用户可见的个人资料信息。"
+    },
+    "photo_updated": "个人资料图片已成功更新",
+    "photo_error": "照片更新错误",
+    "profile_updated": "个人资料已成功更新",
+    "profile_error": "更新配置文件时出错"
   },
   "accounts": "账户",
   "actions": "行动",
@@ -275,7 +291,11 @@
     "sw_error": "服务工作线程注册错误",
     "sw_registered": "注册服务人员",
     "token_registered": "[FCM] 在后端注册的令牌",
-    "token_send_error": "[FCM] 发送令牌时出错"
+    "token_send_error": "[FCM] 发送令牌时出错",
+    "status_disabled": "通知已禁用",
+    "status_disabled_desc": "点击按钮即可在此设备上启用推送通知。",
+    "status_enabled": "已启用通知",
+    "status_enabled_desc": "您将在此设备上接收推送通知。"
   },
   "features": {
     "desc1": "安排您的拍摄，接收提醒并安心。",
@@ -427,7 +447,13 @@
   "notification": {
     "email_toggle": "启用电子邮件通知",
     "instructions": "根据您的喜好启用或禁用电子邮件或推送通知。",
-    "push_toggle": "启用 Web 推送通知"
+    "push_toggle": "启用 Web 推送通知",
+    "email_description": "通过电子邮件接收提醒和通知。",
+    "preferences": {
+      "description": "选择您希望接收用药提醒的方式。",
+      "title": "通知偏好设置"
+    },
+    "push_description": "在您的设备上接收推送通知。"
   },
   "notifications": "通知",
   "open": "打开",
@@ -571,7 +597,8 @@
     "current_password": {
       "label": "当前密码",
       "placeholder": "输入当前密码",
-      "required": "需要旧密码。"
+      "required": "需要旧密码。",
+      "incorrect": "当前密码错误。"
     },
     "google_warning": "已使用 Google 登录。您无法更改您的电子邮件地址或密码。",
     "instructions": "检查与您的帐户关联的电子邮件地址，并在必要时更改您的密码。",
@@ -580,7 +607,28 @@
     },
     "password_updated": "密码已成功更新。",
     "title": "帐户管理",
-    "update_password": "更新密码"
+    "update_password": "更新密码",
+    "email_auth": {
+      "description": "管理您的电子邮件地址和与您的帐户关联的登录方式。",
+      "title": "电子邮件和身份验证"
+    },
+    "password_section": {
+      "description": "请更改密码以加强账户安全。",
+      "hint": "请使用至少 8 个字符，包括字母、数字和符号。",
+      "same_password_error": "新密码必须与旧密码不同。",
+      "title": "密码"
+    },
+    "providers": {
+      "connect": "连接",
+      "connected": "已连接",
+      "connecting": "连接...",
+      "connection_error": "连接提供商时出错",
+      "description": "管理与您的帐户关联的登录方式。",
+      "help_text": "关联多个账号，方便登录。",
+      "not_connected": "未连接",
+      "section_title": "身份验证提供商",
+      "title": "连接方式"
+    }
   },
   "send_invitation": "发送邀请",
   "send_sms": "通过短信发送",
@@ -593,7 +641,9 @@
     "preferences_desc": "个性化您在 MediTime 上的体验。",
     "security": "安全",
     "theme": "主题",
-    "theme_toggle": "点击更改主题"
+    "theme_toggle": "点击更改主题",
+    "theme_description": "选择浅色模式或深色模式。",
+    "theme_help": "该主题适用于整个应用程序。"
   },
   "share": "分享",
   "share_calendar": "共享日历",

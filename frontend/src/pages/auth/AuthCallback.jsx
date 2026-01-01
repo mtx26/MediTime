@@ -67,8 +67,7 @@ const AuthCallback = () => {
       }
 
       const user = session.user;
-      // On attend que le user soit rechargé pour être sûr d'avoir les infos à jour
-      await reloadUser(session);
+      reloadUser(session);
 
       log.info(t('auth_callback.success'), {
         origin: 'CALLBACK_SUCCESS',

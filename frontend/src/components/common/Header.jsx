@@ -242,85 +242,91 @@ function Navbar({ sharedProps }) {
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-4">
-              <NavigationMenu>
-                <NavigationMenuList className="flex flex-row items-center gap-1">
-                  <NavigationMenuItem>
-                    <NavigationMenuLink asChild>
-                      <Link to={`/${lng}/calendars`} className="flex flex-row items-center gap-2 px-3 py-2 rounded-md hover:bg-accent whitespace-nowrap">
-                        <Calendar className="h-4 w-4 shrink-0" />
-                        <span>{t('calendars')}</span>
-                      </Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuLink asChild>
-                      <Link to={`/${lng}/shared-calendars`} className="flex flex-row items-center gap-2 px-3 py-2 rounded-md hover:bg-accent whitespace-nowrap">
-                        <Share2 className="h-4 w-4 shrink-0" />
-                        <span>{t('shared')}</span>
-                      </Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                  {userInfo?.role === 'admin' && (
+
+              {/* Navigation Menu */}
+              { userInfo &&
+                <NavigationMenu>
+                  <NavigationMenuList className="flex flex-row items-center gap-1">
                     <NavigationMenuItem>
                       <NavigationMenuLink asChild>
-                        <Link to={`/${lng}/admin`} className="flex flex-row items-center gap-2 px-3 py-2 rounded-md hover:bg-accent whitespace-nowrap">
-                          <Shield className="h-4 w-4 shrink-0" />
-                          <span>{t('admin')}</span>
+                        <Link to={`/${lng}/calendars`} className="flex flex-row items-center gap-2 px-3 py-2 rounded-md hover:bg-accent whitespace-nowrap">
+                          <Calendar className="h-4 w-4 shrink-0" />
+                          <span>{t('calendars')}</span>
                         </Link>
                       </NavigationMenuLink>
                     </NavigationMenuItem>
-                  )}
-                </NavigationMenuList>
-              </NavigationMenu>
+                    <NavigationMenuItem>
+                      <NavigationMenuLink asChild>
+                        <Link to={`/${lng}/shared-calendars`} className="flex flex-row items-center gap-2 px-3 py-2 rounded-md hover:bg-accent whitespace-nowrap">
+                          <Share2 className="h-4 w-4 shrink-0" />
+                          <span>{t('shared')}</span>
+                        </Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                    {userInfo?.role === 'admin' && (
+                      <NavigationMenuItem>
+                        <NavigationMenuLink asChild>
+                          <Link to={`/${lng}/admin`} className="flex flex-row items-center gap-2 px-3 py-2 rounded-md hover:bg-accent whitespace-nowrap">
+                            <Shield className="h-4 w-4 shrink-0" />
+                            <span>{t('admin')}</span>
+                          </Link>
+                        </NavigationMenuLink>
+                      </NavigationMenuItem>
+                    )}
+                  </NavigationMenuList>
+                </NavigationMenu>
+              }
 
               <ThemeToggle />
               <LanguageSelector />
 
               {/* Notifications Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
-                    <Bell className="h-5 w-5" />
-                    {unreadCount > 0 && (
-                      <Badge 
-                        variant="destructive" 
-                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                      >
-                        {unreadCount}
-                      </Badge>
+              {userInfo &&
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="relative">
+                      <Bell className="h-5 w-5" />
+                      {unreadCount > 0 && (
+                        <Badge 
+                          variant="destructive" 
+                          className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                        >
+                          {unreadCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-125">
+                    {notificationsData === null ? (
+                      <DropdownMenuItem disabled>
+                        {t('loading_notifications')}
+                      </DropdownMenuItem>
+                    ) : notificationsData.filter((n) => !n.read).length === 0 ? (
+                      <DropdownMenuItem disabled>
+                        {t('no_notifications')}
+                      </DropdownMenuItem>
+                    ) : (
+                      notificationsData
+                        .filter((n) => !n.read)
+                        .slice(0, 5)
+                        .map((notif) => (
+                          <NotificationLine
+                            key={notif.notification_id}
+                            notif={notif}
+                            onRead={readNotification}
+                            navigate={navigate}
+                          />
+                        ))
                     )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-125">
-                  {notificationsData === null ? (
-                    <DropdownMenuItem disabled>
-                      {t('loading_notifications')}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to={`/${lng}/notifications`} className="w-full flex items-center justify-center gap-2">
+                        <Bell className="h-4 w-4" /> {t('open_notifications')}
+                      </Link>
                     </DropdownMenuItem>
-                  ) : notificationsData.filter((n) => !n.read).length === 0 ? (
-                    <DropdownMenuItem disabled>
-                      {t('no_notifications')}
-                    </DropdownMenuItem>
-                  ) : (
-                    notificationsData
-                      .filter((n) => !n.read)
-                      .slice(0, 5)
-                      .map((notif) => (
-                        <NotificationLine
-                          key={notif.notification_id}
-                          notif={notif}
-                          onRead={readNotification}
-                          navigate={navigate}
-                        />
-                      ))
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to={`/${lng}/notifications`} className="w-full flex items-center justify-center gap-2">
-                      <Bell className="h-4 w-4" /> {t('open_notifications')}
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              }
 
               {/* User Dropdown */}
               <DropdownMenu>
@@ -339,6 +345,7 @@ function Navbar({ sharedProps }) {
                       <>
                         <User className="h-5 w-5" />
                         <span>{t('account.label')}</span>
+                        <ChevronDown className="h-4 w-4" />
                       </>
                     )}
                   </Button>

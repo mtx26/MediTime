@@ -18,13 +18,29 @@
     },
     "display_name": {
       "label": "Seudo",
-      "placeholder": "Introduce tu nombre de usuario"
+      "placeholder": "Introduce tu nombre de usuario",
+      "hint": "Este nombre será visible para otros usuarios."
     },
     "image_size_error": "El tamaño de la imagen no debe exceder los 5 MB",
     "instructions": "Puede cambiar su información personal aquí.",
     "label": "Cuenta",
     "profile_alt": "Perfil",
-    "save_changes": "Guardar cambios"
+    "save_changes": "Guardar cambios",
+    "change_photo": "Modificador",
+    "profile_photo": {
+      "title": "Foto de perfil",
+      "description": "Personaliza tu foto de perfil. Haz clic en la imagen para cambiarla.",
+      "hint": "Formatos aceptados: JPG, PNG, GIF",
+      "size_limit": "Tamaño máximo: 5 MB"
+    },
+    "personal_info": {
+      "title": "Información personal",
+      "description": "Edite la información de su perfil que es visible para otros usuarios."
+    },
+    "photo_updated": "La foto de perfil se actualizó correctamente",
+    "photo_error": "Error al actualizar la foto",
+    "profile_updated": "Perfil actualizado exitosamente",
+    "profile_error": "Error al actualizar el perfil"
   },
   "accounts": "Cuentas",
   "actions": "Comportamiento",
@@ -275,7 +291,11 @@
     "sw_error": "Error de registro del Service Worker",
     "sw_registered": "Trabajador de servicio registrado",
     "token_registered": "[FCM] Token registrado en el backend",
-    "token_send_error": "[FCM] Error al enviar el token"
+    "token_send_error": "[FCM] Error al enviar el token",
+    "status_disabled": "Notificaciones deshabilitadas",
+    "status_disabled_desc": "Haga clic en el botón para habilitar las notificaciones push en este dispositivo.",
+    "status_enabled": "Notificaciones habilitadas",
+    "status_enabled_desc": "Recibirás notificaciones push en este dispositivo."
   },
   "features": {
     "desc1": "Programa tus vacunas, recibe recordatorios y ten tranquilidad.",
@@ -427,7 +447,13 @@
   "notification": {
     "email_toggle": "Habilitar notificaciones por correo electrónico",
     "instructions": "Habilite o deshabilite el correo electrónico o las notificaciones push según sus preferencias.",
-    "push_toggle": "Habilitar notificaciones push web"
+    "push_toggle": "Habilitar notificaciones push web",
+    "email_description": "Reciba recordatorios y alertas por correo electrónico.",
+    "preferences": {
+      "description": "Elija cómo desea recibir sus recordatorios de medicamentos.",
+      "title": "Preferencias de notificación"
+    },
+    "push_description": "Recibe notificaciones push en tus dispositivos."
   },
   "notifications": "Notificaciones",
   "open": "Abierto",
@@ -571,7 +597,8 @@
     "current_password": {
       "label": "Contraseña actual",
       "placeholder": "Introduzca la contraseña actual",
-      "required": "Se requiere contraseña antigua."
+      "required": "Se requiere contraseña antigua.",
+      "incorrect": "Contraseña actual incorrecta."
     },
     "google_warning": "Has iniciado sesión con Google. No puedes cambiar tu correo electrónico ni tu contraseña.",
     "instructions": "Verifique la dirección de correo electrónico asociada a su cuenta y cambie su contraseña si es necesario.",
@@ -580,7 +607,28 @@
     },
     "password_updated": "Contraseña actualizada exitosamente.",
     "title": "Gestión de cuentas",
-    "update_password": "Actualizar contraseña"
+    "update_password": "Actualizar contraseña",
+    "email_auth": {
+      "description": "Administre su dirección de correo electrónico y los métodos de inicio de sesión asociados a su cuenta.",
+      "title": "Correo electrónico y autenticación"
+    },
+    "password_section": {
+      "description": "Cambie su contraseña para fortalecer la seguridad de su cuenta.",
+      "hint": "Utilice al menos 8 caracteres con letras, números y símbolos.",
+      "same_password_error": "La nueva contraseña debe ser diferente de la anterior.",
+      "title": "Contraseña"
+    },
+    "providers": {
+      "connect": "Conectar",
+      "connected": "Conectado",
+      "connecting": "Conexión...",
+      "connection_error": "Error al conectar con el proveedor",
+      "description": "Administra los métodos de inicio de sesión asociados a tu cuenta.",
+      "help_text": "Vincula varias cuentas para iniciar sesión fácilmente.",
+      "not_connected": "No conectado",
+      "section_title": "Proveedores de autenticación",
+      "title": "Métodos de conexión"
+    }
   },
   "send_invitation": "Enviar una invitación",
   "send_sms": "Enviar por SMS",
@@ -593,7 +641,9 @@
     "preferences_desc": "Personalice su experiencia en MediTime.",
     "security": "Seguridad",
     "theme": "Tema",
-    "theme_toggle": "Haga clic para cambiar el tema"
+    "theme_toggle": "Haga clic para cambiar el tema",
+    "theme_description": "Elija entre el modo claro y el modo oscuro.",
+    "theme_help": "El tema se aplica a toda la aplicación."
   },
   "share": "Compartir",
   "share_calendar": "Comparte el calendario",

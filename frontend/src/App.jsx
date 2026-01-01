@@ -25,6 +25,13 @@ const fileToBase64 = (file) =>
     reader.readAsDataURL(file);
   });
 
+const isPillbox = (pathParts) =>
+  pathParts.length === 3 &&
+  ['calendar', 'shared-user-calendar', 'shared-token-calendar'].includes(
+    pathParts[0]
+  ) &&
+  pathParts[2] === 'pillbox';
+
 function App() {
   const { t, i18n } = useTranslation();
   const { lng } = useParams();
@@ -35,6 +42,10 @@ function App() {
   const [calendarsData, setCalendarsData] = useState(null);
   const [notificationsData, setNotificationsData] = useState(null);
   const [sharedCalendarsData, setSharedCalendarsData] = useState(null);
+
+  const pathAfterLang = location.pathname.split('/').slice(2).join('/');
+  const pathParts = pathAfterLang.split('/').filter(Boolean);
+  const isPillboxPage = isPillbox(pathParts);
 
   const { userInfo } = useContext(UserContext);
   const uid = userInfo?.uid ?? null;
@@ -1068,9 +1079,6 @@ function App() {
     description: t('home_meta.description'),
     path
   });
-
-  // Vérifier si on est sur une page pillbox
-  const isPillboxPage = location.pathname.includes('/pillbox');
 
   return (
     <div className="flex flex-col min-h-screen">

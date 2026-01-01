@@ -18,13 +18,29 @@
     },
     "display_name": {
       "label": "Pseudo",
-      "placeholder": "Inserisci il tuo nome utente"
+      "placeholder": "Inserisci il tuo nome utente",
+      "hint": "Questo nome sarà visibile agli altri utenti."
     },
     "image_size_error": "La dimensione dell'immagine non deve superare i 5 MB",
     "instructions": "Puoi modificare i tuoi dati personali qui.",
     "label": "Account",
     "profile_alt": "Profilo",
-    "save_changes": "Salva le modifiche"
+    "save_changes": "Salva le modifiche",
+    "change_photo": "Modificatore",
+    "profile_photo": {
+      "title": "Immagine del profilo",
+      "description": "Personalizza la tua immagine del profilo. Clicca sull'immagine per modificarla.",
+      "hint": "Formati accettati: JPG, PNG, GIF",
+      "size_limit": "Dimensione massima: 5 MB"
+    },
+    "personal_info": {
+      "title": "Informazioni personali",
+      "description": "Modifica le informazioni del tuo profilo visibili agli altri utenti."
+    },
+    "photo_updated": "Immagine del profilo aggiornata con successo",
+    "photo_error": "Errore durante l'aggiornamento della foto",
+    "profile_updated": "Profilo aggiornato con successo",
+    "profile_error": "Errore durante l'aggiornamento del profilo"
   },
   "accounts": "Conti",
   "actions": "Azioni",
@@ -275,7 +291,11 @@
     "sw_error": "Errore di registrazione del Service Worker",
     "sw_registered": "Lavoratore dei servizi registrato",
     "token_registered": "[FCM] Token registrato sul lato backend",
-    "token_send_error": "[FCM] Errore durante l'invio del token"
+    "token_send_error": "[FCM] Errore durante l'invio del token",
+    "status_disabled": "Notifiche disabilitate",
+    "status_disabled_desc": "Fare clic sul pulsante per abilitare le notifiche push su questo dispositivo.",
+    "status_enabled": "Notifiche abilitate",
+    "status_enabled_desc": "Ricevi notifiche push su questo dispositivo."
   },
   "features": {
     "desc1": "Pianifica i tuoi scatti, ricevi promemoria e vivi in tutta tranquillità.",
@@ -427,7 +447,13 @@
   "notification": {
     "email_toggle": "Abilita le notifiche e-mail",
     "instructions": "Abilita o disabilita le notifiche e-mail o push in base alle tue preferenze.",
-    "push_toggle": "Abilita le notifiche push web"
+    "push_toggle": "Abilita le notifiche push web",
+    "email_description": "Ricevi promemoria e avvisi via e-mail.",
+    "preferences": {
+      "description": "Scegli come desideri ricevere i promemoria per i tuoi farmaci.",
+      "title": "Preferenze di notifica"
+    },
+    "push_description": "Ricevi notifiche push sui tuoi dispositivi."
   },
   "notifications": "Notifiche",
   "open": "Aprire",
@@ -571,7 +597,8 @@
     "current_password": {
       "label": "Password attuale",
       "placeholder": "Inserisci la password corrente",
-      "required": "È richiesta la vecchia password."
+      "required": "È richiesta la vecchia password.",
+      "incorrect": "Password corrente errata."
     },
     "google_warning": "Accedi con Google. Non puoi cambiare email o password.",
     "instructions": "Controlla l'indirizzo email associato al tuo account e, se necessario, modifica la password.",
@@ -580,7 +607,28 @@
     },
     "password_updated": "Password aggiornata con successo.",
     "title": "Gestione dell'account",
-    "update_password": "Aggiorna password"
+    "update_password": "Aggiorna password",
+    "email_auth": {
+      "description": "Gestisci il tuo indirizzo email e i metodi di accesso associati al tuo account.",
+      "title": "E-mail e autenticazione"
+    },
+    "password_section": {
+      "description": "Cambia la tua password per rafforzare la sicurezza del tuo account.",
+      "hint": "Utilizzare almeno 8 caratteri con lettere, numeri e simboli.",
+      "same_password_error": "La nuova password deve essere diversa da quella vecchia.",
+      "title": "Password"
+    },
+    "providers": {
+      "connect": "Collegare",
+      "connected": "Collegato",
+      "connecting": "Connessione...",
+      "connection_error": "Errore durante la connessione al provider",
+      "description": "Gestisci i metodi di accesso associati al tuo account.",
+      "help_text": "Collega più account per un accesso semplice.",
+      "not_connected": "Non connesso",
+      "section_title": "Fornitori di autenticazione",
+      "title": "Metodi di connessione"
+    }
   },
   "send_invitation": "Invia un invito",
   "send_sms": "Invia tramite SMS",
@@ -593,7 +641,9 @@
     "preferences_desc": "Personalizza la tua esperienza su MediTime.",
     "security": "Sicurezza",
     "theme": "Tema",
-    "theme_toggle": "Clicca per cambiare il tema"
+    "theme_toggle": "Clicca per cambiare il tema",
+    "theme_description": "Scegli tra la modalità chiara e la modalità scura.",
+    "theme_help": "Il tema si applica all'intera applicazione."
   },
   "share": "Condividere",
   "share_calendar": "Condividi il calendario",

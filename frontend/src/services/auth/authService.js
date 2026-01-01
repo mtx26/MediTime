@@ -8,10 +8,9 @@ import { getGlobalReloadUser } from '../../contexts/UserContext';
 const API_URL = import.meta.env.VITE_API_URL;
 
 function buildCallbackUrl(redirect) {
-  const lang = window.location.pathname.split('/')[1] || '';
   return (
     window.location.origin +
-    `/${lang}/auth/callback` +
+    `/auth/callback` +
     (redirect ? `?redirect=${encodeURIComponent(redirect)}` : '')
   );
 }
@@ -57,7 +56,6 @@ export const GoogleHandleLogin = async (redirect) => {
           prompt: 'select_account',
           access_type: 'offline',
         },
-        flowType: 'redirect',
       },
     });
   } catch (err) {
@@ -81,7 +79,6 @@ export const GithubHandleLogin = async (redirect) => {
           prompt: 'select_account',
           access_type: 'offline',
         },
-        flowType: 'redirect',
       },
     });
   } catch (err) {
@@ -105,7 +102,6 @@ export const TwitterHandleLogin = async (redirect) => {
           prompt: 'select_account',
           access_type: 'offline',
         },
-        flowType: 'redirect',
       },
     });
   } catch (err) {
@@ -129,7 +125,6 @@ export const FacebookHandleLogin = async (redirect) => {
           prompt: 'select_account',
           access_type: 'offline',
         },
-        flowType: 'redirect',
       },
     });
   } catch (err) {
@@ -153,7 +148,6 @@ export const DiscordHandleLogin = async (redirect) => {
           prompt: 'select_account',
           access_type: 'offline',
         },
-        flowType: 'redirect',
       },
     });
   } catch (err) {
@@ -178,7 +172,6 @@ export const MicrosoftHandleLogin = async (redirect) => {
           prompt: 'select_account',
           access_type: 'offline',
         },
-        flowType: 'redirect',
       },
     });
   } catch (err) {
@@ -272,11 +265,7 @@ export const resetPassword = async (email) => {
  */
 export const handleLogout = async () => {
   try {
-    await supabase.auth.signOut({
-      options: {
-        redirectTo: buildCallbackUrl(),
-      },
-    });
+    await supabase.auth.signOut();
   } catch (error) {
     log.error('Erreur de déconnexion :', error.message, {
       origin: 'HANDLE_LOGOUT',
@@ -293,7 +282,7 @@ export const updateUserPassword = async (newPassword) => {
     await supabase.auth.updateUser({
       password: newPassword,
       options: {
-        redirectTo: buildCallbackUrl(),
+        emailRedirectTo: buildCallbackUrl(),
       },
     });
   } catch (error) {
@@ -363,9 +352,7 @@ export const updateUserEmail = async (newEmail) => {
  */
 export const reauthenticateUser = async () => {
   try {
-    await supabase.auth.reauthenticate({
-      redirectTo: buildCallbackUrl(),
-    });
+    await supabase.auth.reauthenticate();
   } catch (error) {
     log.error('Erreur lors de la réauthentification', error.message, {
       origin: 'REAUTHENTICATE_USER',

@@ -18,13 +18,29 @@
     },
     "display_name": {
       "label": "擬似",
-      "placeholder": "ユーザー名を入力してください"
+      "placeholder": "ユーザー名を入力してください",
+      "hint": "この名前は他のユーザーに表示されます。"
     },
     "image_size_error": "画像サイズは5MBを超えてはいけません",
     "instructions": "ここで個人情報を変更できます。",
     "label": "アカウント",
     "profile_alt": "プロフィール",
-    "save_changes": "変更を保存"
+    "save_changes": "変更を保存",
+    "change_photo": "修飾子",
+    "profile_photo": {
+      "title": "プロフィール写真",
+      "description": "プロフィール写真をカスタマイズしましょう。画像をクリックして変更してください。",
+      "hint": "受け入れ可能な形式: JPG、PNG、GIF",
+      "size_limit": "最大サイズ: 5 MB"
+    },
+    "personal_info": {
+      "title": "個人情報",
+      "description": "他のユーザーに表示されるプロフィール情報を編集します。"
+    },
+    "photo_updated": "プロフィール写真が正常に更新されました",
+    "photo_error": "写真の更新中にエラーが発生しました",
+    "profile_updated": "プロフィールが正常に更新されました",
+    "profile_error": "プロフィールの更新中にエラーが発生しました"
   },
   "accounts": "アカウント",
   "actions": "アクション",
@@ -275,7 +291,11 @@
     "sw_error": "サービスワーカー登録エラー",
     "sw_registered": "登録済みサービスワーカー",
     "token_registered": "[FCM] バックエンド側で登録されたトークン",
-    "token_send_error": "[FCM] トークンの送信エラー"
+    "token_send_error": "[FCM] トークンの送信エラー",
+    "status_disabled": "通知が無効になっています",
+    "status_disabled_desc": "このデバイスでプッシュ通知を有効にするには、ボタンをクリックします。",
+    "status_enabled": "通知が有効",
+    "status_enabled_desc": "このデバイスでプッシュ通知を受信します。"
   },
   "features": {
     "desc1": "撮影をスケジュールし、リマインダーを受け取って、安心して撮影しましょう。",
@@ -427,7 +447,13 @@
   "notification": {
     "email_toggle": "メール通知を有効にする",
     "instructions": "好みに応じて電子メールまたはプッシュ通知を有効または無効にします。",
-    "push_toggle": "ウェブプッシュ通知を有効にする"
+    "push_toggle": "ウェブプッシュ通知を有効にする",
+    "email_description": "リマインダーやアラートを電子メールで受信します。",
+    "preferences": {
+      "description": "服薬リマインダーの受信方法を選択してください。",
+      "title": "通知設定"
+    },
+    "push_description": "デバイスでプッシュ通知を受信します。"
   },
   "notifications": "通知",
   "open": "開ける",
@@ -571,7 +597,8 @@
     "current_password": {
       "label": "現在のパスワード",
       "placeholder": "現在のパスワードを入力してください",
-      "required": "古いパスワードが必要です。"
+      "required": "古いパスワードが必要です。",
+      "incorrect": "現在のパスワードが正しくありません。"
     },
     "google_warning": "Googleでログインしています。メールアドレスやパスワードは変更できません。",
     "instructions": "アカウントに関連付けられているメールアドレスを確認し、必要に応じてパスワードを変更してください。",
@@ -580,7 +607,28 @@
     },
     "password_updated": "パスワードが正常に更新されました。",
     "title": "アカウント管理",
-    "update_password": "パスワードを更新する"
+    "update_password": "パスワードを更新する",
+    "email_auth": {
+      "description": "アカウントに関連付けられた電子メール アドレスとログイン方法を管理します。",
+      "title": "電子メールと認証"
+    },
+    "password_section": {
+      "description": "アカウントのセキュリティを強化するためにパスワードを変更してください。",
+      "hint": "文字、数字、記号を含む 8 文字以上を使用してください。",
+      "same_password_error": "新しいパスワードは古いパスワードとは異なる必要があります。",
+      "title": "パスワード"
+    },
+    "providers": {
+      "connect": "接続する",
+      "connected": "接続",
+      "connecting": "接続...",
+      "connection_error": "プロバイダーへの接続エラー",
+      "description": "アカウントに関連付けられたログイン方法を管理します。",
+      "help_text": "複数のアカウントをリンクして簡単にログインできます。",
+      "not_connected": "接続されていません",
+      "section_title": "認証プロバイダー",
+      "title": "接続方法"
+    }
   },
   "send_invitation": "招待状を送る",
   "send_sms": "SMSで送信",
@@ -593,7 +641,9 @@
     "preferences_desc": "MediTime での体験をカスタマイズします。",
     "security": "安全",
     "theme": "テーマ",
-    "theme_toggle": "テーマを変更するにはクリックしてください"
+    "theme_toggle": "テーマを変更するにはクリックしてください",
+    "theme_description": "ライトモードとダークモードを選択します。",
+    "theme_help": "テーマはアプリケーション全体に適用されます。"
   },
   "share": "共有",
   "share_calendar": "カレンダーを共有する",

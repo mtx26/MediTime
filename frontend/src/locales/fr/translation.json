@@ -17,15 +17,31 @@
       "title": "Recadrer la photo",
       "use": "Utiliser cette image"
     },
-    "display_name": {
-      "label": "Pseudo",
-      "placeholder": "Entrez votre pseudo"
-    },
     "image_size_error": "La taille de l'image ne doit pas dépasser 5MB",
     "instructions": "Vous pouvez modifier vos informations personnelles ici.",
     "label": "Compte",
     "profile_alt": "Profil",
-    "save_changes": "Enregistrer les modifications"
+    "save_changes": "Enregistrer les modifications",
+    "change_photo": "Modifier",
+    "profile_photo": {
+      "title": "Photo de profil",
+      "description": "Personnalisez votre photo de profil. Cliquez sur l'image pour la modifier.",
+      "hint": "Formats acceptés: JPG, PNG, GIF",
+      "size_limit": "Taille maximale: 5 MB"
+    },
+    "personal_info": {
+      "title": "Informations personnelles",
+      "description": "Modifiez vos informations de profil visibles par les autres utilisateurs."
+    },
+    "display_name": {
+      "label": "Pseudo",
+      "placeholder": "Entrez votre pseudo",
+      "hint": "Ce nom sera visible par les autres utilisateurs."
+    },
+    "photo_updated": "Photo de profil mise à jour avec succès",
+    "photo_error": "Erreur lors de la mise à jour de la photo",
+    "profile_updated": "Profil mis à jour avec succès",
+    "profile_error": "Erreur lors de la mise à jour du profil"
   },
   "accounts": "Comptes",
   "actions": "Actions",
@@ -280,6 +296,10 @@
     "enable_btn": "Activer les notifications",
     "enabled_msg": "Notifications activées !",
     "reload": "Recharger",
+    "status_disabled": "Notifications désactivées",
+    "status_disabled_desc": "Cliquez sur le bouton pour activer les notifications push sur cet appareil.",
+    "status_enabled": "Notifications activées",
+    "status_enabled_desc": "Vous recevez des notifications push sur cet appareil.",
     "sw_error": "Erreur d’enregistrement du Service Worker",
     "sw_registered": "Service Worker enregistré",
     "token_registered": "Token enregistré côté backend",
@@ -432,9 +452,15 @@
     "share_removed_by_you": "<0></0> a retiré le calendrier <1>{{name}}</1>"
   },
   "notification": {
-    "email_toggle": "Activer les notifications par e-mail",
+    "email_description": "Recevez des rappels et alertes par email.",
+    "email_toggle": "Notifications par e-mail",
     "instructions": "Activez ou désactivez les notifications par e-mail ou push selon vos préférences.",
-    "push_toggle": "Activer les notifications par web push"
+    "preferences": {
+      "description": "Choisissez comment vous souhaitez recevoir vos rappels de médicaments.",
+      "title": "Préférences de notification"
+    },
+    "push_description": "Recevez des notifications push sur vos appareils.",
+    "push_toggle": "Notifications push"
   },
   "notifications": "Notifications",
   "open": "Ouvrir",
@@ -580,16 +606,38 @@
   "security": {
     "current_email": "Email actuel :",
     "current_password": {
+      "incorrect": "Mot de passe actuel incorrect.",
       "label": "Mot de passe actuel",
       "placeholder": "Entrez le mot de passe actuel",
       "required": "Ancien mot de passe requis."
+    },
+    "email_auth": {
+      "description": "Gérez votre adresse email et les méthodes de connexion associées à votre compte.",
+      "title": "Email et authentification"
     },
     "google_warning": "Connecté avec Google. Vous ne pouvez pas modifier votre email ou mot de passe.",
     "instructions": "Consultez l'adresse e-mail associée à votre compte et changez votre mot de passe si nécessaire.",
     "new_password": {
       "placeholder": "Entrez le nouveau mot de passe"
     },
+    "password_section": {
+      "description": "Modifiez votre mot de passe pour renforcer la sécurité de votre compte.",
+      "hint": "Utilisez au moins 8 caractères avec des lettres, chiffres et symboles.",
+      "same_password_error": "Le nouveau mot de passe doit être différent de l'ancien.",
+      "title": "Mot de passe"
+    },
     "password_updated": "Mot de passe mis à jour avec succès.",
+    "providers": {
+      "connect": "Connecter",
+      "connected": "Connecté",
+      "connecting": "Connexion...",
+      "connection_error": "Erreur lors de la connexion au fournisseur",
+      "description": "Gérez les méthodes de connexion associées à votre compte.",
+      "help_text": "Liez plusieurs comptes pour vous connecter facilement.",
+      "not_connected": "Non connecté",
+      "section_title": "Fournisseurs d'authentification",
+      "title": "Méthodes de connexion"
+    },
     "title": "Gestion de compte",
     "update_password": "Mettre à jour le mot de passe"
   },
@@ -604,7 +652,9 @@
     "preferences_desc": "Personnalisez votre expérience sur MediTime.",
     "security": "Sécurité",
     "theme": "Thème",
-    "theme_toggle": "Cliquez pour changer le thème"
+    "theme_toggle": "Cliquez pour changer le thème",
+    "theme_description": "Choisissez entre le mode clair et le mode sombre.",
+    "theme_help": "Le thème s'applique à l'ensemble de l'application."
   },
   "theme": {
     "dark": "Mode sombre",
