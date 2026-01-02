@@ -27,6 +27,7 @@ backend/__pycache__
 tests
 .env
 .env.prod
+.env.dev
 serviceAccountKey.json
 .venv/
 *.log
