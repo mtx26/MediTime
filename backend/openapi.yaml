@@ -102,6 +102,43 @@ components:
         Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
         ```
 
+  responses:
+    Forbidden:
+      description: Accès non autorisé
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: "Accès interdit"
+            code: "FORBIDDEN"
+            i18n_key: "api.common.forbidden"
+            status_code: 403
+
+    ServerError:
+      description: Erreur serveur
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: "Erreur interne"
+            code: "INTERNAL_ERROR"
+            i18n_key: "api.common.internal_error"
+            status_code: 500
+
+    NotFound:
+      description: Ressource non trouvée
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: "Ressource introuvable"
+            code: "NOT_FOUND"
+            i18n_key: "api.common.not_found"
+            status_code: 404
+
   schemas:
     Error:
       type: object
@@ -125,6 +162,12 @@ components:
         status_code:
           type: integer
           example: 500
+      example:
+        message: "Erreur lors de la récupération des données"
+        code: "CALENDAR_FETCH_ERROR"
+        i18n_key: "api.calendar.fetch_error"
+        error: "string"
+        status_code: 500
 
     Success:
       type: object
@@ -191,7 +234,8 @@ components:
           description: Au moins une boîte en stock faible
         stock_decrement_method:
           type: string
-          enum: [auto, manual]
+          enum: [weekly_pillbox, daily_midnight]
+          description: Mode de décrémentation du stock (pilulier hebdomadaire ou décrément quotidien)
         created_at:
           type: string
           format: date-time
@@ -247,21 +291,23 @@ components:
           type: integer
         box_id:
           type: integer
-        time:
-          type: string
-          format: time
-          example: "08:00"
-        days:
-          type: array
-          items:
-            type: integer
-          example: [1, 2, 3, 4, 5]
-        quantity:
+        tablet_count:
           type: number
           example: 1
-        max_date:
+        interval_days:
+          type: integer
+          example: 1
+        start_date:
           type: string
           format: date
+          nullable: true
+        time_of_day:
+          type: string
+          enum: [morning, noon, evening]
+          example: "morning"
+        max_date:
+          type: string
+          format: date-time
           nullable: true
 
     PillboxUse:
@@ -463,6 +509,8 @@ paths:
                   status:
                     type: string
                     example: ok
+              example:
+                status: ok
     head:
       tags: [Status]
       summary: Health check (HEAD)
@@ -492,18 +540,22 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/User'
+              example:
+                message: "Profil synchronisé"
+                code: "USER_SYNC_SUCCESS"
+                data:
+                  id: "6b5f9d84-1d3b-4c3e-b6c3-1b2d4f6a9c01"
+                  display_name: "Jean Dupont"
+                  email: "jean@example.com"
+                  photo_url: "https://cdn.meditime-app.com/avatars/jean.png"
+                  email_enabled: true
+                  push_enabled: true
+                  created_at: "2024-10-01T12:00:00Z"
+                  updated_at: "2025-01-01T09:30:00Z"
         '404':
-          description: Utilisateur non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /user/update:
     put:
@@ -541,6 +593,16 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/User'
+              example:
+                message: "Profil mis à jour"
+                code: "USER_UPDATED"
+                data:
+                  id: "6b5f9d84-1d3b-4c3e-b6c3-1b2d4f6a9c01"
+                  display_name: "Jean D."
+                  email: "jean@example.com"
+                  photo_url: "https://cdn.meditime-app.com/avatars/jean.png"
+                  email_enabled: true
+                  push_enabled: false
         '400':
           description: Données invalides
           content:
@@ -548,11 +610,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /user/photo:
     post:
@@ -586,6 +644,11 @@ paths:
                           photo_url:
                             type: string
                             format: uri
+              example:
+                message: "Photo mise à jour"
+                code: "USER_PHOTO_UPDATED"
+                data:
+                  photo_url: "https://cdn.meditime-app.com/avatars/jean.png"
         '400':
           description: Fichier manquant
           content:
@@ -593,11 +656,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   # ═══════════════════════════════════════════════════════════════════════════
   # CALENDARS
@@ -624,6 +683,23 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/Calendar'
+              example:
+                message: "Calendriers récupérés"
+                code: "CALENDARS_LIST_SUCCESS"
+                data:
+                  calendars:
+                    - id: 1
+                      name: "Traitement matin"
+                      owner_uid: "6b5f9d84-1d3b-4c3e-b6c3-1b2d4f6a9c01"
+                      boxes_count: 2
+                      ifLowStock: false
+                      stock_decrement_method: "weekly_pillbox"
+                    - id: 2
+                      name: "Post-op"
+                      owner_uid: "6b5f9d84-1d3b-4c3e-b6c3-1b2d4f6a9c01"
+                      boxes_count: 1
+                      ifLowStock: true
+                      stock_decrement_method: "daily_midnight"
         '500':
           description: Erreur serveur
           content:
@@ -663,6 +739,12 @@ paths:
                             type: integer
                           calendarName:
                             type: string
+              example:
+                message: "Calendrier créé"
+                code: "CALENDAR_CREATED"
+                data:
+                  calendarId: 3
+                  calendarName: "Nouveau calendrier"
         '400':
           description: Nom manquant
           content:
@@ -704,6 +786,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Calendrier renommé"
+                code: "CALENDAR_RENAMED"
         '400':
           description: Nom invalide ou identique
           content:
@@ -711,11 +796,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Calendrier non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -740,24 +821,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Calendrier supprimé"
+                code: "CALENDAR_DELETED"
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Calendrier non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /calendars/{calendar_id}/schedule:
     get:
@@ -789,18 +861,26 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/Schedule'
+              example:
+                message: "Planning généré"
+                code: "SCHEDULE_OK"
+                data:
+                  calendar_name: "Traitement matin"
+                  if_low_stock: false
+                  schedule:
+                    "2025-01-05":
+                      - time: "08:00"
+                        box_id: 12
+                        medicine: "Doliprane"
+                        quantity: 1
+                  table:
+                    headers: ["Heure", "Médicament", "Quantité"]
+                    rows:
+                      - ["08:00", "Doliprane", "1 comprimé"]
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /calendars/{calendar_id}/pdf:
     get:
@@ -821,6 +901,7 @@ paths:
               schema:
                 type: string
                 format: binary
+              example: "PDF binary"
         '400':
           description: ID manquant
           content:
@@ -860,13 +941,14 @@ paths:
                         properties:
                           method:
                             type: string
-                            enum: [auto, manual]
+                            enum: [weekly_pillbox, daily_midnight]
+              example:
+                message: "Méthode récupérée"
+                code: "STOCK_METHOD_OK"
+                data:
+                  method: "weekly_pillbox"
         '404':
-          description: Calendrier non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -894,7 +976,7 @@ paths:
               properties:
                 method:
                   type: string
-                  enum: [auto, manual]
+                  enum: [weekly_pillbox, daily_midnight]
       responses:
         '200':
           description: Méthode mise à jour
@@ -902,6 +984,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Méthode mise à jour"
+                code: "STOCK_METHOD_UPDATED"
         '400':
           description: Méthode manquante
           content:
@@ -941,18 +1026,15 @@ paths:
                         properties:
                           notifications-enabled:
                             type: boolean
+              example:
+                message: "Statut de notification"
+                code: "CALENDAR_NOTIF_STATUS"
+                data:
+                  notifications-enabled: true
         '404':
-          description: Calendrier non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
     patch:
       tags: [Calendars]
@@ -966,17 +1048,12 @@ paths:
             type: integer
       responses:
         '200':
-          description: Notifications basculées
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Success'
+          $ref: '#/components/responses/NotFound'
+              example:
+                message: "Notifications mises à jour"
+                code: "CALENDAR_NOTIF_TOGGLED"
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
   # ═══════════════════════════════════════════════════════════════════════════
   # BOXES (Boîtes de médicaments)
   # ═══════════════════════════════════════════════════════════════════════════
@@ -1008,18 +1085,38 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/MedicineBox'
+              example:
+                message: "Boîtes récupérées"
+                code: "BOXES_LIST_SUCCESS"
+                data:
+                  boxes:
+                    - id: 12
+                      calendar_id: 1
+                      name: "Doliprane 1000mg"
+                      dose: "1 comprimé"
+                      box_capacity: 30
+                      stock_quantity: 15
+                      stock_alert_threshold: 5
+                      conditions:
+                        - id: 99
+                          box_id: 12
+                          tablet_count: 1
+                          interval_days: 1
+                          start_date: "2025-01-05"
+                          time_of_day: "morning"
+                          max_date: null
+                    - id: 13
+                      calendar_id: 1
+                      name: "Ibuprofène"
+                      dose: "400mg"
+                      box_capacity: 20
+                      stock_quantity: 6
+                      stock_alert_threshold: 4
+                      conditions: []
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
     post:
       tags: [Boxes]
@@ -1056,6 +1153,22 @@ paths:
                       type: array
                       items:
                         type: object
+                        properties:
+                          tablet_count:
+                            type: number
+                          interval_days:
+                            type: integer
+                          start_date:
+                            type: string
+                            format: date
+                            nullable: true
+                          time_of_day:
+                            type: string
+                            enum: [morning, noon, evening]
+                          max_date:
+                            type: string
+                            format: date-time
+                            nullable: true
       responses:
         '200':
           description: Boîte créée
@@ -1071,6 +1184,11 @@ paths:
                         properties:
                           box_id:
                             type: integer
+              example:
+                message: "Boîte créée"
+                code: "BOX_CREATED"
+                data:
+                  box_id: 14
         '400':
           description: Données manquantes
           content:
@@ -1078,17 +1196,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /calendars/{calendar_id}/boxes/{box_id}:
     put:
@@ -1123,6 +1233,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Boîte mise à jour"
+                code: "BOX_UPDATED"
         '400':
           description: Données manquantes
           content:
@@ -1130,17 +1243,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
     delete:
       tags: [Boxes]
@@ -1164,18 +1269,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Boîte supprimée"
+                code: "BOX_DELETED"
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /calendars/{calendar_id}/boxes/{box_id}/restock:
     post:
@@ -1208,18 +1308,16 @@ paths:
                         properties:
                           box_id:
                             type: integer
+              example:
+                message: "Stock mis à jour"
+                code: "BOX_RESTOCKED"
+                data:
+                  box_id: 12
+                  new_quantity: 30
         '404':
-          description: Boîte non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   # ═══════════════════════════════════════════════════════════════════════════
   # PILLBOX (Suivi des prises)
@@ -1256,6 +1354,11 @@ paths:
                         properties:
                           if_pillbox_used:
                             type: boolean
+              example:
+                message: "Statut du pilulier"
+                code: "PILLBOX_STATUS"
+                data:
+                  if_pillbox_used: false
 
     post:
       tags: [Pillbox]
@@ -1284,6 +1387,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Prises validées"
+                code: "PILLBOX_MARKED"
         '400':
           description: Déjà utilisé ou mode non supporté
           content:
@@ -1291,11 +1397,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Aucun médicament à prendre
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -1331,6 +1433,16 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/PillboxUse'
+              example:
+                message: "Historique des prises"
+                code: "PILLBOX_USES"
+                data:
+                  pillbox_uses:
+                    - id: 501
+                      calendar_id: 1
+                      user_id: "6b5f9d84-1d3b-4c3e-b6c3-1b2d4f6a9c01"
+                      used_at: "2025-01-04T08:05:00Z"
+                      period_start: "2025-01-04"
         '500':
           description: Erreur serveur
           content:
@@ -1361,12 +1473,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Prise annulée"
+                code: "PILLBOX_USE_CANCELLED"
         '404':
-          description: Utilisation non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -1399,6 +1510,21 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/SharedCalendar'
+              example:
+                message: "Calendriers partagés"
+                code: "SHARED_LIST"
+                data:
+                  calendars:
+                    - id: 10
+                      access: "edit"
+                      name: "Traitement maman"
+                      owner_uid: "d3c0e6b5-1f2d-4a7b-91a4-123456789abc"
+                      owner_name: "Marie"
+                      owner_email: "marie@example.com"
+                      owner_photo_url: "https://cdn.meditime-app.com/avatars/marie.png"
+                      notifications_enabled: true
+                      boxes_count: 3
+                      ifLowStock: false
         '500':
           description: Erreur serveur
           content:
@@ -1418,6 +1544,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Groupes récupérés"
+                code: "SHARED_GROUPED"
+                data:
+                  summary:
+                    total: 2
+                    editable: 1
         '500':
           description: Erreur serveur
           content:
@@ -1443,18 +1576,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Calendrier quitté"
+                code: "SHARED_LEFT"
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /shared/users/calendars/{calendar_id}/schedule:
     get:
@@ -1485,18 +1613,22 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/Schedule'
+              example:
+                message: "Planning partagé"
+                code: "SHARED_SCHEDULE"
+                data:
+                  calendar_name: "Traitement maman"
+                  if_low_stock: true
+                  schedule:
+                    "2025-01-05":
+                      - time: "08:00"
+                        box_id: 22
+                        medicine: "Vitamine D"
+                        quantity: 1
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /shared/users/calendars/{calendar_id}/notifications:
     get:
@@ -1524,12 +1656,13 @@ paths:
                         properties:
                           notifications-enabled:
                             type: boolean
+              example:
+                message: "Notifications partagées"
+                code: "SHARED_NOTIF_STATUS"
+                data:
+                  notifications-enabled: false
         '404':
-          description: Non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -1554,6 +1687,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Notifications mises à jour"
+                code: "SHARED_NOTIF_TOGGLED"
         '500':
           description: Erreur serveur
           content:
@@ -1587,7 +1723,12 @@ paths:
                         properties:
                           method:
                             type: string
-                            enum: [auto, manual]
+                            enum: [weekly_pillbox, daily_midnight]
+              example:
+                message: "Méthode récupérée"
+                code: "SHARED_STOCK_METHOD"
+                data:
+                  method: "daily_midnight"
         '500':
           description: Erreur serveur
           content:
@@ -1623,18 +1764,23 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/MedicineBox'
+              example:
+                message: "Boîtes partagées"
+                code: "SHARED_BOXES"
+                data:
+                  boxes:
+                    - id: 22
+                      calendar_id: 10
+                      name: "Vitamine D"
+                      dose: "1 goutte"
+                      box_capacity: 100
+                      stock_quantity: 40
+                      stock_alert_threshold: 10
+                      conditions: []
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
     post:
       tags: [Shared Calendars]
@@ -1671,6 +1817,11 @@ paths:
                         properties:
                           box_id:
                             type: integer
+              example:
+                message: "Boîte créée"
+                code: "SHARED_BOX_CREATED"
+                data:
+                  box_id: 23
         '400':
           description: Données manquantes
           content:
@@ -1678,17 +1829,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /shared/users/calendars/{calendar_id}/boxes/{box_id}:
     put:
@@ -1723,6 +1866,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Boîte mise à jour"
+                code: "SHARED_BOX_UPDATED"
         '400':
           description: Données manquantes
           content:
@@ -1730,17 +1876,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
     delete:
       tags: [Shared Calendars]
@@ -1764,18 +1902,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Boîte supprimée"
+                code: "SHARED_BOX_DELETED"
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /shared/users/calendars/{calendar_id}/boxes/{box_id}/restock:
     post:
@@ -1800,12 +1933,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Stock mis à jour"
+                code: "SHARED_BOX_RESTOCKED"
         '404':
-          description: Boîte non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -1845,6 +1977,11 @@ paths:
                         properties:
                           if_pillbox_used:
                             type: boolean
+              example:
+                message: "Statut du pilulier partagé"
+                code: "SHARED_PILLBOX_STATUS"
+                data:
+                  if_pillbox_used: true
 
     post:
       tags: [Shared Calendars]
@@ -1873,6 +2010,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Prises validées"
+                code: "SHARED_PILLBOX_MARKED"
         '400':
           description: Déjà utilisé
           content:
@@ -1914,6 +2054,16 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/PillboxUse'
+              example:
+                message: "Historique partagé"
+                code: "SHARED_PILLBOX_USES"
+                data:
+                  pillbox_uses:
+                    - id: 777
+                      calendar_id: 10
+                      user_id: "d3c0e6b5-1f2d-4a7b-91a4-123456789abc"
+                      used_at: "2025-01-04T18:00:00Z"
+                      period_start: "2025-01-04"
         '500':
           description: Erreur serveur
           content:
@@ -1944,12 +2094,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Prise annulée"
+                code: "SHARED_PILLBOX_USE_CANCELLED"
         '404':
-          description: Non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -1983,18 +2132,19 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/ICSToken'
+              example:
+                message: "Token ICS créé"
+                code: "ICS_CREATED"
+                data:
+                  id: 31
+                  token: "sharedics123"
+                  calendar_id: 10
+                  user_id: "d3c0e6b5-1f2d-4a7b-91a4-123456789abc"
+                  ics_url: "https://api.meditime-app.com/api/calendar/sharedics123.ics"
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
     get:
       tags: [ICS]
@@ -2023,18 +2173,20 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/ICSToken'
+              example:
+                message: "Tokens ICS"
+                code: "ICS_LIST"
+                data:
+                  tokens:
+                    - id: 31
+                      token: "sharedics123"
+                      calendar_id: 10
+                      user_id: "d3c0e6b5-1f2d-4a7b-91a4-123456789abc"
+                      ics_url: "https://api.meditime-app.com/api/calendar/sharedics123.ics"
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /shared/users/calendars/{calendar_id}/ics/{token_id}:
     delete:
@@ -2059,24 +2211,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Token supprimé"
+                code: "ICS_DELETED"
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Token non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   # ═══════════════════════════════════════════════════════════════════════════
   # NOTIFICATIONS
@@ -2103,6 +2246,27 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/Notification'
+              example:
+                message: "Notifications"
+                code: "NOTIFICATIONS_LIST"
+                data:
+                  notifications:
+                    - notification_id: 91
+                      notification_type: "low_stock"
+                      read: false
+                      timestamp: "2025-01-04T07:00:00Z"
+                      calendar_id: 1
+                      calendar_name: "Traitement matin"
+                      medication_name: "Ibuprofène"
+                      medication_qty: 2
+                    - notification_id: 92
+                      notification_type: "calendar_invitation"
+                      read: true
+                      timestamp: "2025-01-03T14:00:00Z"
+                      calendar_id: 10
+                      calendar_name: "Traitement maman"
+                      sender_name: "Marie"
+                      sender_email: "marie@example.com"
         '500':
           description: Erreur serveur
           content:
@@ -2128,12 +2292,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Notification lue"
+                code: "NOTIFICATION_READ"
         '404':
-          description: Notification non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -2164,6 +2327,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Token FCM enregistré"
+                code: "FCM_REGISTERED"
         '400':
           description: Token manquant
           content:
@@ -2202,6 +2368,21 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/Token'
+              example:
+                message: "Tokens listés"
+                code: "TOKENS_LIST"
+                data:
+                  tokens:
+                    - id: 5
+                      token: "abc123"
+                      calendar_id: 1
+                      owner_uid: "6b5f9d84-1d3b-4c3e-b6c3-1b2d4f6a9c01"
+                      expires_at: "2025-02-01T00:00:00Z"
+                    - id: 6
+                      token: "xyz789"
+                      calendar_id: 2
+                      owner_uid: "6b5f9d84-1d3b-4c3e-b6c3-1b2d4f6a9c01"
+                      expires_at: null
         '500':
           description: Erreur serveur
           content:
@@ -2238,6 +2419,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Token créé"
+                code: "TOKEN_CREATED"
         '400':
           description: Token déjà existant
           content:
@@ -2245,17 +2429,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /tokens/{token}:
     get:
@@ -2286,12 +2462,14 @@ paths:
                             type: integer
                           owner_uid:
                             type: string
+              example:
+                message: "Token valide"
+                code: "TOKEN_METADATA"
+                data:
+                  calendar_id: 1
+                  owner_uid: "6b5f9d84-1d3b-4c3e-b6c3-1b2d4f6a9c01"
         '404':
-          description: Token non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -2316,6 +2494,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Token supprimé"
+                code: "TOKEN_DELETED"
         '500':
           description: Erreur serveur
           content:
@@ -2352,6 +2533,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Expiration mise à jour"
+                code: "TOKEN_EXPIRATION_UPDATED"
         '500':
           description: Erreur serveur
           content:
@@ -2389,6 +2573,18 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/Schedule'
+              example:
+                message: "Planning public"
+                code: "TOKEN_SCHEDULE"
+                data:
+                  calendar_name: "Traitement public"
+                  if_low_stock: false
+                  schedule:
+                    "2025-01-05":
+                      - time: "09:00"
+                        box_id: 40
+                        medicine: "Vitamine C"
+                        quantity: 1
         '500':
           description: Erreur serveur
           content:
@@ -2425,6 +2621,14 @@ paths:
                             type: array
                             items:
                               type: object
+              example:
+                message: "Médicaments publics"
+                code: "TOKEN_MEDICINES"
+                data:
+                  medicines:
+                    - name: "Vitamine C"
+                      dose: "1 comprimé"
+                      schedule: ["09:00"]
         '403':
           description: Token invalide ou expiré
           content:
@@ -2470,6 +2674,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Invitation envoyée"
+                code: "INVITATION_SENT"
         '400':
           description: Invitation à soi-même ou déjà invité
           content:
@@ -2509,12 +2716,19 @@ paths:
                         properties:
                           invitation:
                             $ref: '#/components/schemas/Invitation'
+              example:
+                message: "Invitation trouvée"
+                code: "INVITATION_LOGIN"
+                data:
+                  invitation:
+                    token: "invite-login-123"
+                    calendar_id: 1
+                    calendar_name: "Traitement matin"
+                    owner_email: "owner@example.com"
+                    owner_display_name: "Jean"
+                    invited_email: "invitee@example.com"
         '404':
-          description: Invitation non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -2539,6 +2753,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Invitation annulée"
+                code: "INVITATION_LOGIN_DELETED"
         '500':
           description: Erreur serveur
           content:
@@ -2572,6 +2789,11 @@ paths:
                         properties:
                           calendar_id:
                             type: integer
+              example:
+                message: "Invitation acceptée"
+                code: "INVITATION_LOGIN_ACCEPTED"
+                data:
+                  calendar_id: 1
         '500':
           description: Erreur serveur
           content:
@@ -2597,6 +2819,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Invitation rejetée"
+                code: "INVITATION_LOGIN_REJECTED"
         '500':
           description: Erreur serveur
           content:
@@ -2630,12 +2855,19 @@ paths:
                         properties:
                           invitation:
                             $ref: '#/components/schemas/Invitation'
+              example:
+                message: "Invitation trouvée"
+                code: "INVITATION_REGISTRATION"
+                data:
+                  invitation:
+                    token: "invite-reg-456"
+                    calendar_id: 10
+                    calendar_name: "Traitement maman"
+                    owner_email: "marie@example.com"
+                    owner_display_name: "Marie"
+                    invited_email: "newuser@example.com"
         '404':
-          description: Invitation non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -2660,6 +2892,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Invitation annulée"
+                code: "INVITATION_REGISTRATION_DELETED"
         '500':
           description: Erreur serveur
           content:
@@ -2693,12 +2928,13 @@ paths:
                         properties:
                           calendar_id:
                             type: integer
+              example:
+                message: "Invitation acceptée"
+                code: "INVITATION_REGISTRATION_ACCEPTED"
+                data:
+                  calendar_id: 10
         '404':
-          description: Invitation non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -2724,18 +2960,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Invitation rejetée"
+                code: "INVITATION_REGISTRATION_REJECTED"
         '404':
-          description: Invitation non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
 
   # ═══════════════════════════════════════════════════════════════════════════
   # ICS (Calendriers personnels)
@@ -2753,32 +2984,25 @@ paths:
             type: integer
       responses:
         '200':
-          description: Token ICS créé
-          content:
-            application/json:
-              schema:
-                allOf:
+          $ref: '#/components/responses/NotFound'
                   - $ref: '#/components/schemas/Success'
                   - type: object
                     properties:
                       data:
                         $ref: '#/components/schemas/ICSToken'
+              example:
+                message: "Token ICS créé"
+                code: "ICS_CREATED"
+                data:
+                  id: 41
+                  token: "ics123"
+                  calendar_id: 1
+                  user_id: "6b5f9d84-1d3b-4c3e-b6c3-1b2d4f6a9c01"
+                  ics_url: "https://api.meditime-app.com/api/calendar/ics123.ics"
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-    get:
-      tags: [ICS]
-      summary: Lister les tokens ICS d'un calendrier
+          $ref: '#/components/responses/NotFound'
       operationId: listICSTokens
       parameters:
         - name: calendar_id
@@ -2788,11 +3012,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Tokens listés
-          content:
-            application/json:
-              schema:
-                allOf:
+          $ref: '#/components/responses/NotFound'
                   - $ref: '#/components/schemas/Success'
                   - type: object
                     properties:
@@ -2803,18 +3023,20 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/ICSToken'
+              example:
+                message: "Tokens ICS"
+                code: "ICS_LIST"
+                data:
+                  tokens:
+                    - id: 41
+                      token: "ics123"
+                      calendar_id: 1
+                      user_id: "6b5f9d84-1d3b-4c3e-b6c3-1b2d4f6a9c01"
+                      ics_url: "https://api.meditime-app.com/api/calendar/ics123.ics"
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /calendars/{calendar_id}/ics/{token_id}:
     delete:
@@ -2839,24 +3061,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
+              example:
+                message: "Token supprimé"
+                code: "ICS_DELETED"
         '403':
-          description: Accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Token non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
-          description: Erreur serveur
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
 
   /calendar/{token}.ics:
     get:
@@ -2877,12 +3090,9 @@ paths:
             text/calendar:
               schema:
                 type: string
+              example: "BEGIN:VCALENDAR...END:VCALENDAR"
         '404':
-          description: Token invalide
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -2927,6 +3137,15 @@ paths:
                             type: array
                             items:
                               type: object
+              example:
+                message: "Analyse terminée"
+                code: "DOCUMENT_ANALYZED"
+                data:
+                  medicines:
+                    - name: "Amoxicilline"
+                      dose: "500mg"
+                      frequency: "2/j"
+                      duration_days: 7
         '400':
           description: Image manquante
           content:
@@ -2975,6 +3194,11 @@ paths:
                         properties:
                           calendar_id:
                             type: integer
+              example:
+                message: "Analyse sauvegardée"
+                code: "DOCUMENT_SAVED"
+                data:
+                  calendar_id: 42
         '400':
           description: Données manquantes
           content:
@@ -3011,6 +3235,7 @@ paths:
               schema:
                 type: string
                 format: binary
+              example: "PDF binary"
         '400':
           description: Box ID manquant
           content:
@@ -3018,11 +3243,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: URL PDF non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
         '500':
           description: Erreur serveur
           content:
@@ -3070,3 +3291,5 @@ paths:
                   status:
                     type: string
                     example: ok
+              example:
+                status: "ok"
