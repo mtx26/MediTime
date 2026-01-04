@@ -174,7 +174,7 @@ def handle_delete_user_shared_calendar(calendar_id):
                         i18n_key="api.shared_calendar.invalid_id"
                     )
 
-                owner_uid = result.get("owner_uid")
+                owner_uid = result.get("owner_uid") if result else None
                 link = urljoin(Config.FRONTEND_URL or "", "/calendars")
 
                 notify_and_record(

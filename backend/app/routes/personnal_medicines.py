@@ -200,7 +200,7 @@ def handle_use_pillbox(calendar_id):
         if add_pillbox_uses(calendar_id, g.uid, start_date):
             result = use_pillbox(calendar_id, start_date)
 
-            if result == False:
+            if result is False:
                 return warning_response(
                     message="no medication to use",
                     code="NO_MEDICATION_TO_USE",

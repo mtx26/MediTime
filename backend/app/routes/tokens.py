@@ -60,7 +60,7 @@ def handle_create_token(calendar_id):
                 token = cursor.fetchone()
                 if token:
                     return warning_response(
-                        message="token already shared", 
+                        message="token already exists for this calendar", 
                         code="TOKEN_ALREADY_SHARED",
                         i18n_key="api.tokens.already_shared", 
                         status_code=400, 
@@ -75,6 +75,7 @@ def handle_create_token(calendar_id):
                     """,
                     (calendar_id, expires_at, owner_uid)
                 )
+                conn.commit()
 
                 return success_response(
                     message="token created", 
@@ -118,6 +119,7 @@ def handle_update_token_expiration(token):
                     "UPDATE shared_tokens SET expires_at = %s WHERE id = %s AND deleted_at IS NULL",
                     (expires_at, token)
                 )
+                conn.commit()
 
                 return success_response(
                     message="token expiration update", 
@@ -206,7 +208,7 @@ def handle_get_token_metadata(token):
                         log_extra={"token": token}
                     )
 
-                owner_uid = token_data.get("owner_uid")
+                owner_uid = token_data.get("owner_uid") if token_data else None
 
                 return success_response(
                     message="retrieved token metadata",
@@ -245,6 +247,7 @@ def handle_delete_token(token):
                     "UPDATE shared_tokens SET deleted_at = COALESCE(deleted_at, NOW()) WHERE id = %s",
                     (token,)
                 )
+                conn.commit()
 
                 return success_response(
                     message="token removed", 

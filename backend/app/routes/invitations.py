@@ -426,6 +426,14 @@ def handle_accept_login_invitation(token: str):
                     (token, uid),
                 )
                 row = cursor.fetchone()
+                if not row:
+                    return error_response(
+                        message="Invitation not found or already accepted",
+                        code="INVITATION_NOT_FOUND",
+                        i18n_key="api.invitations.not_found",
+                        status_code=404,
+                        log_extra={"token": token},
+                    )
                 id = row.get("id")
                 conn.commit()
 
@@ -665,6 +673,8 @@ def _process_accept_registration(cursor, token: str, uid: str) -> tuple[str | No
         (uid, calendar_id),
     )
     row = cursor.fetchone()
+    if not row:
+        return None, None, None
     id = row.get("id")
     return calendar_id, owner_uid, id
 

@@ -217,7 +217,7 @@ def handle_read_notification(notification_id):
         return error_response(
             message="Error marking notification as read", 
             code="NOTIFICATION_READ_ERROR",
-            i18n_key="api.notifications.not_found", 
+            i18n_key="api.notifications.marked_read_error", 
             status_code=500,
             error=str(e)
         )
