@@ -1,0 +1,3072 @@
+openapi: 3.0.3
+info:
+  title: MediTime API
+  description: |
+    API REST complète pour **MediTime**, application de gestion de médicaments et suivi des traitements médicaux.
+
+    ## 🔐 Authentification
+    L'API utilise **Supabase Auth** avec tokens JWT Bearer.  
+    La plupart des endpoints nécessitent le header `Authorization: Bearer <token>`.
+
+    ### Obtenir un token
+    1. Authentifiez-vous via Supabase Auth (email/password, Google, etc.)
+    2. Récupérez le token JWT depuis la session Supabase
+    3. Ajoutez-le au header : `Authorization: Bearer <votre_token>`
+
+    ## 🏗 Architecture
+    | Composant | Technologie |
+    |-----------|-------------|
+    | Frontend | React 19 (Vite) + Bootstrap 5 + Supabase Client |
+    | Backend | Flask (Python) + PostgreSQL + Raw SQL (psycopg2) |
+    | Base de données | PostgreSQL avec Row Level Security (RLS) |
+    | Infrastructure | Docker + CapRover + Render |
+
+    ## 🚀 Guide de démarrage
+    1. `GET /api/status` — Vérifier la connexion
+    2. `GET /api/user/sync` — Synchroniser votre profil
+    3. `GET /api/calendars` — Lister vos calendriers
+    4. `POST /api/calendars` — Créer un calendrier
+
+    ## 📦 Codes de réponse
+    | Code | Signification |
+    |------|---------------|
+    | 200 | Succès |
+    | 400 | Requête invalide (données manquantes) |
+    | 401 | Non authentifié |
+    | 403 | Accès refusé |
+    | 404 | Ressource non trouvée |
+    | 500 | Erreur serveur |
+
+  version: 2.0.0
+  contact:
+    name: MediTime Support
+    url: https://meditime-app.com
+    email: support@meditime-app.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  x-logo:
+    url: https://meditime-app.com/icons/icon-512x512.png
+    altText: MediTime Logo
+
+servers:
+  - url: http://localhost:5000/api
+    description: 🖥️ Serveur local (développement)
+  - url: https://dev.api.meditime-app.com/api
+    description: 🧪 Serveur de développement
+  - url: https://api.meditime-app.com/api
+    description: 🚀 Serveur de production
+
+tags:
+  - name: Status
+    description: Health checks et vérification du statut de l'API
+  - name: User
+    description: Gestion du profil utilisateur, synchronisation et préférences
+  - name: Calendars
+    description: Gestion des calendriers personnels de médicaments
+  - name: Boxes
+    description: Gestion des boîtes de médicaments (stock, alertes, conditions)
+  - name: Pillbox
+    description: Suivi des prises de médicaments (pilulier)
+  - name: Shared Calendars
+    description: Calendriers partagés entre utilisateurs
+  - name: Invitations
+    description: Invitations et partages de calendriers
+  - name: Tokens
+    description: Tokens de partage public (accès sans authentification)
+  - name: Notifications
+    description: Alertes de stock, invitations, rappels
+  - name: ICS
+    description: Export calendrier ICS (Google Calendar, Outlook)
+  - name: Documents
+    description: Analyse IA de documents médicaux (Vertex AI / Gemini)
+  - name: PDF
+    description: Proxy pour notices PDF des médicaments
+  - name: Logs
+    description: Collecte des logs frontend
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Token JWT Supabase Auth.
+        
+        **Format du header :**
+        ```
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+        ```
+
+  schemas:
+    Error:
+      type: object
+      required: [message, code]
+      properties:
+        message:
+          type: string
+          description: Message d'erreur lisible
+          example: "Erreur lors de la récupération des données"
+        code:
+          type: string
+          description: Code d'erreur machine
+          example: "CALENDAR_FETCH_ERROR"
+        i18n_key:
+          type: string
+          description: Clé de traduction i18n
+          example: "api.calendar.fetch_error"
+        error:
+          type: string
+          description: Détails techniques (dev uniquement)
+        status_code:
+          type: integer
+          example: 500
+
+    Success:
+      type: object
+      required: [message, code]
+      properties:
+        message:
+          type: string
+          example: "Opération réussie"
+        code:
+          type: string
+          example: "OPERATION_SUCCESS"
+        i18n_key:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: UID Supabase
+        display_name:
+          type: string
+          example: "Jean Dupont"
+        email:
+          type: string
+          format: email
+          example: "jean@example.com"
+        photo_url:
+          type: string
+          format: uri
+        email_enabled:
+          type: boolean
+          description: Notifications email activées
+        push_enabled:
+          type: boolean
+          description: Notifications push activées
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Calendar:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Mon traitement"
+        owner_uid:
+          type: string
+          format: uuid
+        boxes_count:
+          type: integer
+          description: Nombre de boîtes
+        ifLowStock:
+          type: boolean
+          description: Au moins une boîte en stock faible
+        stock_decrement_method:
+          type: string
+          enum: [auto, manual]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    MedicineBox:
+      type: object
+      properties:
+        id:
+          type: integer
+        calendar_id:
+          type: integer
+        name:
+          type: string
+          example: "Doliprane 1000mg"
+        dose:
+          type: string
+          example: "1 comprimé"
+        box_capacity:
+          type: integer
+          example: 30
+        stock_quantity:
+          type: integer
+          example: 15
+        stock_alert_threshold:
+          type: integer
+          example: 5
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/MedicineCondition'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    MedicineCondition:
+      type: object
+      properties:
+        id:
+          type: integer
+        box_id:
+          type: integer
+        time:
+          type: string
+          format: time
+          example: "08:00"
+        days:
+          type: array
+          items:
+            type: integer
+          example: [1, 2, 3, 4, 5]
+        quantity:
+          type: number
+          example: 1
+        max_date:
+          type: string
+          format: date
+          nullable: true
+
+    PillboxUse:
+      type: object
+      properties:
+        id:
+          type: integer
+        calendar_id:
+          type: integer
+        user_id:
+          type: string
+          format: uuid
+        used_at:
+          type: string
+          format: date-time
+        period_start:
+          type: string
+          format: date
+
+    Notification:
+      type: object
+      properties:
+        notification_id:
+          type: integer
+        notification_type:
+          type: string
+          enum:
+            - low_stock
+            - calendar_invitation
+            - calendar_invitation_accepted
+            - calendar_invitation_rejected
+            - calendar_shared_deleted_by_receiver
+            - calendar_shared_deleted_by_owner
+        read:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+        calendar_id:
+          type: integer
+          nullable: true
+        calendar_name:
+          type: string
+          nullable: true
+        sender_name:
+          type: string
+          nullable: true
+        sender_email:
+          type: string
+          nullable: true
+        sender_photo_url:
+          type: string
+          nullable: true
+        medication_name:
+          type: string
+          nullable: true
+        medication_qty:
+          type: integer
+          nullable: true
+        accepted:
+          type: boolean
+          nullable: true
+        token:
+          type: string
+          nullable: true
+        link:
+          type: string
+          nullable: true
+
+    SharedCalendar:
+      type: object
+      properties:
+        id:
+          type: integer
+        access:
+          type: string
+          enum: [view, edit]
+        name:
+          type: string
+        owner_uid:
+          type: string
+          format: uuid
+        owner_name:
+          type: string
+        owner_email:
+          type: string
+        owner_photo_url:
+          type: string
+        notifications_enabled:
+          type: boolean
+        boxes_count:
+          type: integer
+        ifLowStock:
+          type: boolean
+
+    Token:
+      type: object
+      properties:
+        id:
+          type: integer
+        token:
+          type: string
+        calendar_id:
+          type: integer
+        owner_uid:
+          type: string
+          format: uuid
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    ICSToken:
+      type: object
+      properties:
+        id:
+          type: integer
+        token:
+          type: string
+        calendar_id:
+          type: integer
+        user_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        ics_url:
+          type: string
+          format: uri
+          example: "https://api.meditime-app.com/api/calendar/abc123.ics"
+
+    Invitation:
+      type: object
+      properties:
+        token:
+          type: string
+        calendar_id:
+          type: integer
+        calendar_name:
+          type: string
+        owner_email:
+          type: string
+        owner_display_name:
+          type: string
+        owner_photo_url:
+          type: string
+        invited_email:
+          type: string
+        accepted_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    Schedule:
+      type: object
+      properties:
+        schedule:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: object
+        table:
+          type: object
+        calendar_name:
+          type: string
+        if_low_stock:
+          type: boolean
+
+paths:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # STATUS
+  # ═══════════════════════════════════════════════════════════════════════════
+  /status:
+    get:
+      tags: [Status]
+      summary: Vérifier le statut de l'API
+      operationId: getStatus
+      security: []
+      responses:
+        '200':
+          description: API opérationnelle
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+    head:
+      tags: [Status]
+      summary: Health check (HEAD)
+      operationId: headStatus
+      security: []
+      responses:
+        '200':
+          description: API opérationnelle
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # USER
+  # ═══════════════════════════════════════════════════════════════════════════
+  /user/sync:
+    get:
+      tags: [User]
+      summary: Récupérer le profil utilisateur
+      operationId: getUserInfo
+      responses:
+        '200':
+          description: Profil récupéré
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '404':
+          description: Utilisateur non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/update:
+    put:
+      tags: [User]
+      summary: Mettre à jour le profil
+      operationId: updateUserInfo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                photo_url:
+                  type: string
+                  format: uri
+                email_enabled:
+                  type: boolean
+                push_enabled:
+                  type: boolean
+      responses:
+        '200':
+          description: Profil mis à jour
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/photo:
+    post:
+      tags: [User]
+      summary: Uploader une photo de profil
+      operationId: uploadUserPhoto
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [photo]
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Photo uploadée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          photo_url:
+                            type: string
+                            format: uri
+        '400':
+          description: Fichier manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CALENDARS
+  # ═══════════════════════════════════════════════════════════════════════════
+  /calendars:
+    get:
+      tags: [Calendars]
+      summary: Lister mes calendriers
+      operationId: getCalendars
+      responses:
+        '200':
+          description: Calendriers récupérés
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          calendars:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Calendar'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags: [Calendars]
+      summary: Créer un calendrier
+      operationId: createCalendar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [calendarName]
+              properties:
+                calendarName:
+                  type: string
+                  example: "Mon traitement"
+      responses:
+        '200':
+          description: Calendrier créé
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          calendarId:
+                            type: integer
+                          calendarName:
+                            type: string
+        '400':
+          description: Nom manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /calendars/{calendar_id}:
+    put:
+      tags: [Calendars]
+      summary: Renommer un calendrier
+      operationId: renameCalendar
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [newCalendarName]
+              properties:
+                newCalendarName:
+                  type: string
+      responses:
+        '200':
+          description: Calendrier renommé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '400':
+          description: Nom invalide ou identique
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Calendrier non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags: [Calendars]
+      summary: Supprimer un calendrier
+      operationId: deleteCalendar
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Calendrier supprimé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Calendrier non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /calendars/{calendar_id}/schedule:
+    get:
+      tags: [Calendars]
+      summary: Générer le planning d'un calendrier
+      operationId: getCalendarSchedule
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          required: false
+          description: Date de début (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Planning généré
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Schedule'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /calendars/{calendar_id}/pdf:
+    get:
+      tags: [Calendars]
+      summary: Télécharger le calendrier en PDF
+      operationId: downloadCalendarPDF
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: PDF généré
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: ID manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /calendars/{calendar_id}/stock-decrement-method:
+    get:
+      tags: [Calendars]
+      summary: Récupérer la méthode de décompte du stock
+      operationId: getStockDecrementMethod
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Méthode récupérée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          method:
+                            type: string
+                            enum: [auto, manual]
+        '404':
+          description: Calendrier non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      tags: [Calendars]
+      summary: Modifier la méthode de décompte du stock
+      operationId: updateStockDecrementMethod
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method]
+              properties:
+                method:
+                  type: string
+                  enum: [auto, manual]
+      responses:
+        '200':
+          description: Méthode mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '400':
+          description: Méthode manquante
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /calendars/{calendar_id}/notifications:
+    get:
+      tags: [Calendars]
+      summary: Récupérer le statut des notifications du calendrier
+      operationId: getCalendarNotificationsStatus
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Statut récupéré
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          notifications-enabled:
+                            type: boolean
+        '404':
+          description: Calendrier non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      tags: [Calendars]
+      summary: Basculer les notifications du calendrier
+      operationId: toggleCalendarNotifications
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notifications basculées
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  # ═══════════════════════════════════════════════════════════════════════════
+  # BOXES (Boîtes de médicaments)
+  # ═══════════════════════════════════════════════════════════════════════════
+  /calendars/{calendar_id}/boxes:
+    get:
+      tags: [Boxes]
+      summary: Lister les boîtes d'un calendrier
+      operationId: getBoxes
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Boîtes récupérées
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          boxes:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/MedicineBox'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags: [Boxes]
+      summary: Créer une boîte de médicament
+      operationId: createBox
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [box]
+              properties:
+                box:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    dose:
+                      type: string
+                    box_capacity:
+                      type: integer
+                    stock_quantity:
+                      type: integer
+                    stock_alert_threshold:
+                      type: integer
+                    conditions:
+                      type: array
+                      items:
+                        type: object
+      responses:
+        '200':
+          description: Boîte créée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          box_id:
+                            type: integer
+        '400':
+          description: Données manquantes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /calendars/{calendar_id}/boxes/{box_id}:
+    put:
+      tags: [Boxes]
+      summary: Modifier une boîte
+      operationId: updateBox
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: box_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [box]
+              properties:
+                box:
+                  type: object
+      responses:
+        '200':
+          description: Boîte modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '400':
+          description: Données manquantes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags: [Boxes]
+      summary: Supprimer une boîte
+      operationId: deleteBox
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: box_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Boîte supprimée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /calendars/{calendar_id}/boxes/{box_id}/restock:
+    post:
+      tags: [Boxes]
+      summary: Réapprovisionner une boîte
+      operationId: restockBox
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: box_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Boîte réapprovisionnée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          box_id:
+                            type: integer
+        '404':
+          description: Boîte non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # PILLBOX (Suivi des prises)
+  # ═══════════════════════════════════════════════════════════════════════════
+  /calendars/{calendar_id}/pillbox/used:
+    get:
+      tags: [Pillbox]
+      summary: Vérifier si le pilulier a été utilisé
+      operationId: getPillboxUsed
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Statut récupéré
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          if_pillbox_used:
+                            type: boolean
+
+    post:
+      tags: [Pillbox]
+      summary: Marquer le pilulier comme utilisé
+      operationId: usePillbox
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startDate:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: Pilulier utilisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '400':
+          description: Déjà utilisé ou mode non supporté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Aucun médicament à prendre
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /calendars/{calendar_id}/pillbox/uses:
+    get:
+      tags: [Pillbox]
+      summary: Lister les utilisations du pilulier
+      operationId: getPillboxUses
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Utilisations récupérées
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          pillbox_uses:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/PillboxUse'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /calendars/{calendar_id}/pillbox/uses/{use_id}:
+    delete:
+      tags: [Pillbox]
+      summary: Annuler une utilisation du pilulier
+      operationId: cancelPillboxUse
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: use_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Utilisation annulée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '404':
+          description: Utilisation non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # SHARED CALENDARS
+  # ═══════════════════════════════════════════════════════════════════════════
+  /shared/users/calendars:
+    get:
+      tags: [Shared Calendars]
+      summary: Lister les calendriers partagés avec moi
+      operationId: getSharedCalendars
+      responses:
+        '200':
+          description: Calendriers partagés récupérés
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          calendars:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/SharedCalendar'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shared/grouped:
+    get:
+      tags: [Shared Calendars]
+      summary: Vue groupée des calendriers partagés
+      operationId: getSharedGrouped
+      responses:
+        '200':
+          description: Vue groupée récupérée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shared/users/calendars/{calendar_id}:
+    delete:
+      tags: [Shared Calendars]
+      summary: Quitter un calendrier partagé
+      operationId: leaveSharedCalendar
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Calendrier quitté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shared/users/calendars/{calendar_id}/schedule:
+    get:
+      tags: [Shared Calendars]
+      summary: Planning d'un calendrier partagé
+      operationId: getSharedCalendarSchedule
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Planning récupéré
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Schedule'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shared/users/calendars/{calendar_id}/notifications:
+    get:
+      tags: [Shared Calendars]
+      summary: Statut notifications calendrier partagé
+      operationId: getSharedCalendarNotifications
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Statut récupéré
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          notifications-enabled:
+                            type: boolean
+        '404':
+          description: Non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      tags: [Shared Calendars]
+      summary: Basculer notifications calendrier partagé
+      operationId: toggleSharedCalendarNotifications
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notifications basculées
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shared/users/calendars/{calendar_id}/stock-decrement-method:
+    get:
+      tags: [Shared Calendars]
+      summary: Méthode décompte stock (partagé)
+      operationId: getSharedStockDecrementMethod
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Méthode récupérée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          method:
+                            type: string
+                            enum: [auto, manual]
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shared/users/calendars/{calendar_id}/boxes:
+    get:
+      tags: [Shared Calendars]
+      summary: Boîtes d'un calendrier partagé
+      operationId: getSharedBoxes
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Boîtes récupérées
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          boxes:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/MedicineBox'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags: [Shared Calendars]
+      summary: Créer une boîte (calendrier partagé)
+      operationId: createSharedBox
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [box]
+              properties:
+                box:
+                  type: object
+      responses:
+        '200':
+          description: Boîte créée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          box_id:
+                            type: integer
+        '400':
+          description: Données manquantes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shared/users/calendars/{calendar_id}/boxes/{box_id}:
+    put:
+      tags: [Shared Calendars]
+      summary: Modifier une boîte (partagé)
+      operationId: updateSharedBox
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: box_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [box]
+              properties:
+                box:
+                  type: object
+      responses:
+        '200':
+          description: Boîte modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '400':
+          description: Données manquantes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags: [Shared Calendars]
+      summary: Supprimer une boîte (partagé)
+      operationId: deleteSharedBox
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: box_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Boîte supprimée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shared/users/calendars/{calendar_id}/boxes/{box_id}/restock:
+    post:
+      tags: [Shared Calendars]
+      summary: Réapprovisionner (partagé)
+      operationId: restockSharedBox
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: box_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Boîte réapprovisionnée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '404':
+          description: Boîte non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shared/users/calendars/{calendar_id}/pillbox/used:
+    get:
+      tags: [Shared Calendars]
+      summary: Pilulier utilisé ? (partagé)
+      operationId: getSharedPillboxUsed
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Statut récupéré
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          if_pillbox_used:
+                            type: boolean
+
+    post:
+      tags: [Shared Calendars]
+      summary: Utiliser pilulier (partagé)
+      operationId: useSharedPillbox
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startDate:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: Pilulier utilisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '400':
+          description: Déjà utilisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shared/users/calendars/{calendar_id}/pillbox/uses:
+    get:
+      tags: [Shared Calendars]
+      summary: Utilisations pilulier (partagé)
+      operationId: getSharedPillboxUses
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Utilisations récupérées
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          pillbox_uses:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/PillboxUse'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shared/users/calendars/{calendar_id}/pillbox/uses/{use_id}:
+    delete:
+      tags: [Shared Calendars]
+      summary: Annuler utilisation (partagé)
+      operationId: cancelSharedPillboxUse
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: use_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Utilisation annulée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '404':
+          description: Non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # ICS (Calendriers partagés)
+  # ═══════════════════════════════════════════════════════════════════════════
+  /shared/users/calendars/{calendar_id}/ics:
+    post:
+      tags: [ICS]
+      summary: Créer token ICS (partagé)
+      operationId: createSharedICSToken
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Token ICS créé
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ICSToken'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags: [ICS]
+      summary: Lister tokens ICS (partagé)
+      operationId: listSharedICSTokens
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tokens listés
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          tokens:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ICSToken'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shared/users/calendars/{calendar_id}/ics/{token_id}:
+    delete:
+      tags: [ICS]
+      summary: Supprimer token ICS (partagé)
+      operationId: deleteSharedICSToken
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: token_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Token supprimé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Token non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # NOTIFICATIONS
+  # ═══════════════════════════════════════════════════════════════════════════
+  /notifications:
+    get:
+      tags: [Notifications]
+      summary: Lister mes notifications
+      operationId: getNotifications
+      responses:
+        '200':
+          description: Notifications récupérées
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          notifications:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Notification'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /notifications/{notification_id}:
+    patch:
+      tags: [Notifications]
+      summary: Marquer une notification comme lue
+      operationId: markNotificationRead
+      parameters:
+        - name: notification_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification marquée comme lue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '404':
+          description: Notification non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /notifications/register-token:
+    post:
+      tags: [Notifications]
+      summary: Enregistrer un token FCM
+      operationId: registerFCMToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  description: Token FCM du device
+      responses:
+        '200':
+          description: Token enregistré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '400':
+          description: Token manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # TOKENS (Partage public)
+  # ═══════════════════════════════════════════════════════════════════════════
+  /tokens:
+    get:
+      tags: [Tokens]
+      summary: Lister mes tokens de partage
+      operationId: getTokens
+      responses:
+        '200':
+          description: Tokens récupérés
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          tokens:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Token'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tokens/{calendar_id}:
+    post:
+      tags: [Tokens]
+      summary: Créer un token de partage
+      operationId: createToken
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expiresAt:
+                  type: string
+                  format: date-time
+                  nullable: true
+      responses:
+        '200':
+          description: Token créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '400':
+          description: Token déjà existant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tokens/{token}:
+    get:
+      tags: [Tokens]
+      summary: Métadonnées d'un token public
+      operationId: getTokenMetadata
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Métadonnées récupérées
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          calendar_id:
+                            type: integer
+                          owner_uid:
+                            type: string
+        '404':
+          description: Token non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags: [Tokens]
+      summary: Supprimer un token
+      operationId: deleteToken
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Token supprimé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tokens/expiration/{token}:
+    patch:
+      tags: [Tokens]
+      summary: Modifier l'expiration d'un token
+      operationId: updateTokenExpiration
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expiresAt:
+                  type: string
+                  format: date
+                  nullable: true
+      responses:
+        '200':
+          description: Expiration mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tokens/{token}/schedule:
+    get:
+      tags: [Tokens]
+      summary: Planning via token public
+      operationId: getTokenSchedule
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Planning généré
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Schedule'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tokens/{token}/medicines:
+    get:
+      tags: [Tokens]
+      summary: Médicaments via token public
+      operationId: getTokenMedicines
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Médicaments récupérés
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          medicines:
+                            type: array
+                            items:
+                              type: object
+        '403':
+          description: Token invalide ou expiré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # INVITATIONS
+  # ═══════════════════════════════════════════════════════════════════════════
+  /invitations/{calendar_id}:
+    post:
+      tags: [Invitations]
+      summary: Envoyer une invitation
+      operationId: sendInvitation
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Invitation envoyée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '400':
+          description: Invitation à soi-même ou déjà invité
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /invitations/login/{token}:
+    get:
+      tags: [Invitations]
+      summary: Récupérer une invitation (utilisateur existant)
+      operationId: getLoginInvitation
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation récupérée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          invitation:
+                            $ref: '#/components/schemas/Invitation'
+        '404':
+          description: Invitation non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags: [Invitations]
+      summary: Annuler une invitation (propriétaire)
+      operationId: deleteLoginInvitation
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation supprimée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /invitations/login/accept/{token}:
+    post:
+      tags: [Invitations]
+      summary: Accepter une invitation (login)
+      operationId: acceptLoginInvitation
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation acceptée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          calendar_id:
+                            type: integer
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /invitations/login/reject/{token}:
+    post:
+      tags: [Invitations]
+      summary: Rejeter une invitation (login)
+      operationId: rejectLoginInvitation
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation rejetée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /invitations/registration/{token}:
+    get:
+      tags: [Invitations]
+      summary: Récupérer une invitation (nouvel utilisateur)
+      operationId: getRegistrationInvitation
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation récupérée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          invitation:
+                            $ref: '#/components/schemas/Invitation'
+        '404':
+          description: Invitation non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags: [Invitations]
+      summary: Annuler une invitation (registration)
+      operationId: deleteRegistrationInvitation
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation supprimée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /invitations/registration/accept/{token}:
+    post:
+      tags: [Invitations]
+      summary: Accepter une invitation (registration)
+      operationId: acceptRegistrationInvitation
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation acceptée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          calendar_id:
+                            type: integer
+        '404':
+          description: Invitation non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /invitations/registration/reject/{token}:
+    post:
+      tags: [Invitations]
+      summary: Rejeter une invitation (registration)
+      operationId: rejectRegistrationInvitation
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation rejetée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '404':
+          description: Invitation non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # ICS (Calendriers personnels)
+  # ═══════════════════════════════════════════════════════════════════════════
+  /calendars/{calendar_id}/ics:
+    post:
+      tags: [ICS]
+      summary: Créer un token ICS
+      operationId: createICSToken
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Token ICS créé
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ICSToken'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags: [ICS]
+      summary: Lister les tokens ICS d'un calendrier
+      operationId: listICSTokens
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tokens listés
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          tokens:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ICSToken'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /calendars/{calendar_id}/ics/{token_id}:
+    delete:
+      tags: [ICS]
+      summary: Supprimer un token ICS
+      operationId: deleteICSToken
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: token_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Token supprimé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '403':
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Token non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /calendar/{token}.ics:
+    get:
+      tags: [ICS]
+      summary: Télécharger le fichier ICS
+      operationId: downloadICSFile
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Fichier ICS
+          content:
+            text/calendar:
+              schema:
+                type: string
+        '404':
+          description: Token invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # DOCUMENTS (Analyse IA)
+  # ═══════════════════════════════════════════════════════════════════════════
+  /documents/analyze:
+    post:
+      tags: [Documents]
+      summary: Analyser un document médical (IA)
+      operationId: analyzeDocument
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [image]
+              properties:
+                image:
+                  type: string
+                  format: byte
+                  description: Image encodée en base64
+      responses:
+        '200':
+          description: Document analysé
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          medicines:
+                            type: array
+                            items:
+                              type: object
+        '400':
+          description: Image manquante
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /documents/analyze/save:
+    post:
+      tags: [Documents]
+      summary: Sauvegarder le résultat d'analyse
+      operationId: saveAnalysisResult
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [boxes]
+              properties:
+                calendarName:
+                  type: string
+                  default: "Calendrier (analyse)"
+                boxes:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Résultat sauvegardé
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          calendar_id:
+                            type: integer
+        '400':
+          description: Données manquantes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # PDF (Notices)
+  # ═══════════════════════════════════════════════════════════════════════════
+  /proxy/pdf/{box_id}:
+    get:
+      tags: [PDF]
+      summary: Télécharger la notice PDF
+      operationId: proxyPDF
+      security: []
+      parameters:
+        - name: box_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: PDF téléchargé
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Box ID manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: URL PDF non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # LOGS
+  # ═══════════════════════════════════════════════════════════════════════════
+  /log:
+    post:
+      tags: [Logs]
+      summary: Envoyer des logs frontend
+      operationId: logFrontend
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+                type:
+                  type: string
+                  enum: [info, warning, error, debug]
+                  default: info
+                context:
+                  type: object
+                error:
+                  type: string
+                stack:
+                  type: string
+      responses:
+        '200':
+          description: Log enregistré
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok

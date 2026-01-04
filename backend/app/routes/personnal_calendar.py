@@ -389,7 +389,7 @@ def get_personnal_stock_decrement_method(calendar_id):
         )
 
     
-@api.route("/calendars/<calendar_id>/stock-decrement-method", methods=["POST"])
+@api.route("/calendars/<calendar_id>/stock-decrement-method", methods=["PATCH"])
 @measure_time()
 @require_auth
 @verify_calendar
@@ -469,7 +469,7 @@ def fetch_personal_notifications_enabled(calendar_id):
             log_extra={"calendar_id": calendar_id}
         )
     
-@api.route("/calendars/<calendar_id>/notifications", methods=["PUT"])
+@api.route("/calendars/<calendar_id>/notifications", methods=["PATCH"])
 @measure_time()
 @require_auth
 @verify_calendar

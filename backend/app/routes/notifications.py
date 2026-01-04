@@ -177,7 +177,7 @@ def handle_notifications():
         )
 
 # Route pour marquer une notification comme lue
-@api.route("/notifications/<notification_id>", methods=["POST"])
+@api.route("/notifications/<notification_id>", methods=["PATCH"])
 @measure_time()
 @require_auth
 @with_query_origin(default_origin="NOTIFICATION_READ")

@@ -349,7 +349,7 @@ def handle_shared_user_notifications(calendar_id):
             log_extra={"calendar_id": calendar_id}
         )
 
-@api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["PUT"])
+@api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["PATCH"])
 @measure_time()
 @require_auth
 @verify_calendar_share

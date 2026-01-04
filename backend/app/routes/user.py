@@ -39,7 +39,7 @@ def get_user_info():
         )
     
 
-@api.route("/user/update", methods=["POST"])
+@api.route("/user/update", methods=["PUT"])
 @measure_time()
 @require_auth
 @with_query_origin(default_origin="USER_UPDATE")

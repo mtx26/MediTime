@@ -61,7 +61,7 @@ export const UserProvider = ({ children }) => {
         console.log('[UserContext] Utilisateur non trouvé, création en cours...');
         // Utilisateur non trouvé => première connexion
         const creationRes = await fetch(`${API_URL}/api/user/update`, {
-          method: 'POST',
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${session.access_token}`,

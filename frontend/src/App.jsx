@@ -278,7 +278,7 @@ function App() {
   const updatePersonalStockDecrementMethod = useCallback(async (calendarId, method) => {
     return await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/stock-decrement-method`,
-      method: 'POST',
+      method: 'PATCH',
       body: { method },
       origin: 'PERSONNAL_STOCK_DECREMENT_METHOD_UPDATE',
       uid,
@@ -316,7 +316,7 @@ function App() {
   const updatePersonalNotificationsEnabled = useCallback(async (calendarId) => {
     return await performApiCall({
       url: `${API_URL}/api/calendars/${calendarId}/notifications`,
-      method: 'PUT',
+      method: 'PATCH',
       origin: 'PERSONAL_NOTIFICATIONS_ENABLED_UPDATE',
       uid,
       analyticsEvent: 'update_personal_notifications_enabled',
@@ -463,7 +463,7 @@ function App() {
   const updateTokenExpiration = useCallback(async (token, expiresAt) => {
     return await performApiCall({
       url: `${API_URL}/api/tokens/expiration/${token}`,
-      method: 'POST',
+      method: 'PATCH',
       body: { expiresAt },
       origin: 'TOKEN_EXPIRATION_UPDATE',
       uid,
@@ -603,7 +603,7 @@ function App() {
   const readNotification = useCallback(async (notificationId) => {
     return await performApiCall({
       url: `${API_URL}/api/notifications/${notificationId}`,
-      method: 'POST',
+      method: 'PATCH',
       origin: 'NOTIFICATION_READ',
       uid,
       analyticsEvent: 'read_notification',
@@ -838,7 +838,7 @@ function App() {
   const updateSharedUserNotificationsEnabled = useCallback(async (calendarId) => {
     return await performApiCall({
       url: `${API_URL}/api/shared/users/calendars/${calendarId}/notifications`,
-      method: 'PUT',
+      method: 'PATCH',
       origin: 'SHARED_USER_NOTIFICATIONS_ENABLED_UPDATE',
       uid,
       analyticsEvent: 'update_shared_user_notifications_enabled',

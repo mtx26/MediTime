@@ -95,7 +95,7 @@ def handle_create_token(calendar_id):
 
 
 # Route pour mettre à jour l'expiration d'un token
-@api.route("/tokens/expiration/<token>", methods=["POST"])
+@api.route("/tokens/expiration/<token>", methods=["PATCH"])
 @measure_time()
 @require_auth
 @verify_token_owner

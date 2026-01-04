@@ -27,7 +27,7 @@ export async function updateUserInfo({ display_name, email, photo_url, email_ena
 
   const response = await performApiCall({
     url: `${API_URL}/api/user/update`,
-    method: 'POST',
+    method: 'PUT',
     body,
     origin: 'USER_UPDATE',
     uid,

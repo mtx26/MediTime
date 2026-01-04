@@ -17,6 +17,7 @@ from .user import *
 from .pdf import *
 from .gemini import *
 from .ics import *
+from .docs import *
 
 
 def register_routes(app):

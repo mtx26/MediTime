@@ -78,7 +78,7 @@ function getDemoSchedule() {
 
 function handleStockDecrementMethod(method) {
   if (method === 'GET') return { success: true, method: 'weekly_pillbox' };
-  if (method === 'POST') return { success: true, message: 'Demo method updated' };
+  if (method === 'PATCH') return { success: true, message: 'Demo method updated' };
   return null;
 }
 
@@ -104,7 +104,7 @@ function handleBoxes(url, method) {
 
 function handleNotifications(method) {
   if (method === 'GET') return { success: true, enabled: true };
-  if (method === 'PUT') return { success: true, message: 'Demo notifications updated' };
+  if (method === 'PATCH') return { success: true, message: 'Demo notifications updated' };
   return null;
 }
 
