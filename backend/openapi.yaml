@@ -1048,12 +1048,16 @@ paths:
             type: integer
       responses:
         '200':
-          $ref: '#/components/responses/NotFound'
+          description: Notifications mises à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
               example:
                 message: "Notifications mises à jour"
                 code: "CALENDAR_NOTIF_TOGGLED"
         '500':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/ServerError'
   # ═══════════════════════════════════════════════════════════════════════════
   # BOXES (Boîtes de médicaments)
   # ═══════════════════════════════════════════════════════════════════════════
@@ -2984,7 +2988,11 @@ paths:
             type: integer
       responses:
         '200':
-          $ref: '#/components/responses/NotFound'
+          description: Token ICS créé
+          content:
+            application/json:
+              schema:
+                allOf:
                   - $ref: '#/components/schemas/Success'
                   - type: object
                     properties:
@@ -3002,7 +3010,11 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
         '500':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/ServerError'
+
+    get:
+      tags: [ICS]
+      summary: Lister tokens ICS
       operationId: listICSTokens
       parameters:
         - name: calendar_id
@@ -3012,7 +3024,11 @@ paths:
             type: integer
       responses:
         '200':
-          $ref: '#/components/responses/NotFound'
+          description: Tokens listés
+          content:
+            application/json:
+              schema:
+                allOf:
                   - $ref: '#/components/schemas/Success'
                   - type: object
                     properties:
