@@ -1096,11 +1096,7 @@ function App() {
     : location.pathname;
 
   // Hook SEO unifié
-  useSEO({
-    title: t('home_meta.title'),
-    description: t('home_meta.description'),
-    path
-  });
+  useSEO({ path });
 
   return (
     <div className="flex flex-col min-h-screen">

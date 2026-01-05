@@ -7,17 +7,12 @@ import { SEO_CONFIG, upsertMetaTag, getSchemaOrg } from '../config/seo.js';
  * Hook unifié pour gérer toutes les métadonnées SEO, Schema.org et PWA
  * Centralise toute la logique SEO de l'application
  */
-export const useSEO = ({ 
-  title, 
-  description, 
-  path = '/', 
-  customMeta = {} 
-}) => {
+export default function useSEO({ path = '/' }) {
   const { t, i18n } = useTranslation();
   const lng = i18n.language;
   
-  const finalTitle = title || t('app.pageTitle');
-  const finalDescription = description || t('app.description');
+  const finalTitle = t('home_meta.title')
+  const finalDescription = t('home_meta.description');
   const finalUrl = `${SEO_CONFIG.BASE_URL}/${lng}${path}`;
 
   useEffect(() => {
@@ -92,15 +87,6 @@ export const useSEO = ({
     upsertMetaTag('meta', 'property', 'article:author', { content: SEO_CONFIG.AUTHOR.name });
     upsertMetaTag('meta', 'property', 'article:publisher', { content: SEO_CONFIG.BASE_URL });
 
-    // 8. Meta personnalisées
-    Object.entries(customMeta).forEach(([key, value]) => {
-      if (key.startsWith('og:')) {
-        upsertMetaTag('meta', 'property', key, { content: value });
-      } else {
-        upsertMetaTag('meta', 'name', key, { content: value });
-      }
-    });
-
     // 9. PWA Manifest
     const manifestUrl = enabledLanguageCodes.includes(lng) 
       ? `/manifests/manifest-${lng}.json`
@@ -110,7 +96,7 @@ export const useSEO = ({
     // 10. Schema.org JSON-LD
     updateSchemaOrg();
 
-  }, [finalTitle, finalDescription, path, lng, t, customMeta]);
+  }, [finalTitle, finalDescription, path, lng, t]);
 
   const updateSchemaOrg = () => {
     // Supprime l'ancien script
@@ -136,5 +122,3 @@ export const useSEO = ({
     url: finalUrl
   };
 };
-
-export default useSEO;
