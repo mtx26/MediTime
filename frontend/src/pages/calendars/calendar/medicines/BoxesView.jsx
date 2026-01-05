@@ -196,6 +196,7 @@ const InputDropdown = ({
           ref={inputRef}
           type="text"
           size="sm"
+          required
           value={inputValue}
           onChange={(e) => {
             setInputValue(e.target.value);
@@ -213,8 +214,9 @@ const InputDropdown = ({
         <Input
           type="number"
           size="sm"
-          value={dose}
-          onChange={(e) => onChangeDose(parseInt(e.target.value))}
+          required
+          value={dose || ''}
+          onChange={(e) => onChangeDose(e.target.value === '' ? 0 : parseInt(e.target.value) || 0)}
           onClick={() => setTimeout(() => setShowDropdown(true), 300)}
           onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
           aria-label={t('boxes.dose')}
@@ -1058,11 +1060,11 @@ function BoxCard({
               <Input
                 type="number"
                 size="sm"
-                value={editingBox.box_capacity}
+                value={editingBox.box_capacity ?? ''}
                 onChange={(e) =>
                   setEditingBox((p) => ({
                     ...p,
-                    box_capacity: parseFloat(e.target.value),
+                    box_capacity: e.target.value === '' ? null : parseFloat(e.target.value) || null,
                   }))
                 }
                 aria-label={t('boxes.capacity')}
@@ -1077,11 +1079,11 @@ function BoxCard({
               <Input
                 type="number"
                 size="sm"
-                value={editingBox.stock_alert_threshold}
+                value={editingBox.stock_alert_threshold ?? ''}
                 onChange={(e) =>
                   setEditingBox((p) => ({
                     ...p,
-                    stock_alert_threshold: parseFloat(e.target.value),
+                    stock_alert_threshold: e.target.value === '' ? null : parseFloat(e.target.value) || null,
                   }))
                 }
                 aria-label={t('boxes.alert_threshold')}
@@ -1100,11 +1102,11 @@ function BoxCard({
               <Input
                 type="number"
                 size="sm"
-                value={editingBox.stock_quantity}
+                value={editingBox.stock_quantity ?? ''}
                 onChange={(e) =>
                   setEditingBox((p) => ({
                     ...p,
-                    stock_quantity: parseFloat(e.target.value),
+                    stock_quantity: e.target.value === '' ? null : parseFloat(e.target.value) || null,
                   }))
                 }
                 aria-label={t('boxes.remaining_qty')}
