@@ -324,7 +324,6 @@ function Navbar({ sharedProps }) {
                             key={notif.notification_id}
                             notif={notif}
                             onRead={readNotification}
-                            navigate={navigate}
                           />
                         ))
                     )}

@@ -68,7 +68,6 @@ function NotificationsPage({ notifications }) {
               key={notif.notification_id}
               notif={notif}
               onRead={notifications.readNotification}
-              navigate={navigate}
             />
           ))}
         </div>

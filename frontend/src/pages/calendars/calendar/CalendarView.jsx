@@ -23,6 +23,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Pill, Grid3X3, CalendarDays, Share2, Download, AlertTriangle, Calendar, Clock, Settings, Trash2, ChevronRight, Pin } from 'lucide-react';
 import '@/styles/fullcalendar-custom.css';
+import { getLocale } from '@/config/languages';
 
 
 function CalendarPage({
@@ -644,7 +645,7 @@ function CalendarPage({
                     center: '',
                     right: '',
                   }}
-                  locale={t('locale')}
+                  locale={getLocale(lng)}
                   firstDay={1}
                   dateClick={handleDateClick}
                   height="auto"

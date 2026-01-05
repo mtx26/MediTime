@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Languages, Check } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { LANGUAGES } from '../../config/languages';
+import { LANGUAGES, findLanguage } from '../../config/languages';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function LanguageSelector() {
@@ -13,7 +13,7 @@ function LanguageSelector() {
   const [selected, setSelected] = useState('FR');
 
   useEffect(() => {
-    const currentLang = LANGUAGES.find(lang => lang.code === i18n.language);
+    const currentLang = findLanguage(i18n.language);
     setSelected(currentLang?.flag || 'FR');
   }, [i18n.language]);
 
@@ -21,10 +21,10 @@ function LanguageSelector() {
     const lang = LANGUAGES.find(lang => lang.flag === flagCode);
     if (lang) {
       const segments = location.pathname.split('/');
-      segments[1] = lang.code;
+      segments[1] = lang.locale;
       const newPath = segments.join('/') || '/';
       navigate(`${newPath}${location.search}${location.hash}`);
-      i18n.changeLanguage(lang.code);
+      i18n.changeLanguage(lang.locale);
       setSelected(lang.flag);
     }
   };

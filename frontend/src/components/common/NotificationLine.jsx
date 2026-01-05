@@ -8,14 +8,13 @@ import { useTranslation, Trans } from 'react-i18next';
 
 export default function NotificationLine({
   notif,
-  onRead,
-  navigate,
+  onRead
 }) {
   const { t } = useTranslation();
   const { lng } = useParams();
 
   const isUnread = !notif.read;
-  const timestamp = new Date(notif.timestamp).toLocaleString(t('locale'), {
+  const timestamp = new Date(notif.timestamp).toLocaleString(lng, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
