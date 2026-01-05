@@ -80,15 +80,15 @@ export const generateI18nManifests = async () => {
   }
   
   // Génère le manifest par défaut (anglais)
-  const enTranslations = loadTranslations('en');
+  const enTranslations = loadTranslations('en-US');
   const defaultManifest = {
     name: enTranslations?.app?.name || "MediTime",
     short_name: enTranslations?.app?.shortName || "MediTime",
     description: enTranslations?.app?.description || "Medical treatment application",
-    start_url: '/en/home',
-    lang: 'en',
+    start_url: '/en-US/home',
+    lang: 'en-US',
     ...SEO_CONFIG.PWA,
-    shortcuts: enTranslations ? getShortcuts('en', enTranslations) : []
+    shortcuts: enTranslations ? getShortcuts('en-US', enTranslations) : []
   };
   
   fs.writeFileSync(
@@ -107,7 +107,7 @@ export const generateI18nManifests = async () => {
 /**
  * Fonction utilitaire pour obtenir l'URL du manifest selon la langue
  */
-export const getManifestUrl = (language = 'en') => {
+export const getManifestUrl = (language = 'en-US') => {
   if (enabledLanguageCodes.includes(language)) {
     return `/manifests/manifest-${language}.json`;
   }

@@ -1,9 +1,9 @@
 {
   "name": "MediTime",
   "short_name": "MediTime",
-  "description": "Planifica tus tratamientos y comparte tus calendarios médicos con facilidad.",
-  "start_url": "/es/home",
-  "lang": "es",
+  "description": "安排您的治疗并轻松分享您的医疗日历。",
+  "start_url": "/zh-CN/home",
+  "lang": "zh-CN",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -66,10 +66,10 @@
   "dir": "ltr",
   "shortcuts": [
     {
-      "name": "Añadir un medicamento",
-      "short_name": "Agregar",
-      "description": "Añadir rápidamente un nuevo medicamento",
-      "url": "/es/add-calendar",
+      "name": "添加药物",
+      "short_name": "添加",
+      "description": "快速添加一种新药",
+      "url": "/zh-CN/add-calendar",
       "icons": [
         {
           "src": "/icons/icon-192.png",
@@ -78,10 +78,10 @@
       ]
     },
     {
-      "name": "Calendario",
-      "short_name": "Calendario",
-      "description": "Consulte su horario de medicación",
-      "url": "/es/calendars",
+      "name": "日历",
+      "short_name": "日历",
+      "description": "请查看您的用药时间表",
+      "url": "/zh-CN/calendars",
       "icons": [
         {
           "src": "/icons/icon-192.png",

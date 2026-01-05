@@ -5,7 +5,7 @@
     <description>Latest updates and news from MediTime, your smart medication tracker</description>
     <link>https://meditime-app.com</link>
     <atom:link href="https://meditime-app.com/feed.xml" rel="self" type="application/rss+xml" />
-    <language>en</language>
+    <language>en-US</language>
     <lastBuildDate>Mon, 23 Dec 2025 00:00:00 +0000</lastBuildDate>
     <pubDate>Mon, 23 Dec 2025 00:00:00 +0000</pubDate>
     <ttl>1800</ttl>
@@ -19,8 +19,8 @@
     
     <item>
       <title>MediTime 0.1.0 Released - Your Smart Medication Companion</title>
-      <link>https://meditime-app.com/en/home</link>
-      <guid isPermaLink="true">https://meditime-app.com/en/home</guid>
+      <link>https://meditime-app.com/en-US/home</link>
+      <guid isPermaLink="true">https://meditime-app.com/en-US/home</guid>
       <pubDate>Mon, 23 Dec 2025 00:00:00 +0000</pubDate>
       <description><![CDATA[
         <p>We're excited to announce the launch of MediTime, your smart medication management companion!</p>

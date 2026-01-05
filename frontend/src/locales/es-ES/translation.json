@@ -2,9 +2,9 @@
   "Actions": "Comportamiento",
   "Fri": "Viernes",
   "Mon": "Lunes",
-  "Sat": "SÁBADO",
+  "Sat": "Sábado",
   "Sun": "Domingo",
-  "Thu": "JUEVES",
+  "Thu": "Jueves",
   "Tue": "Martes",
   "Wed": "Miércoles",
   "about": "Acerca de",
@@ -72,7 +72,7 @@
       "pillbox_already_used": "El pastillero ya fue utilizado durante este periodo.",
       "refill_error": "Error durante la reposición de la caja de medicamentos",
       "refilled": "caja de medicinas rellenada",
-      "retrieved": "cajas de medicamentos recuperadas",
+      "retrieved": "cajas de medicinas recuperadas",
       "status_fetch_error": "Error al recuperar el estado de uso de Pillbox",
       "status_retrieved": "Estado de uso del pastillero recuperado",
       "unsupported_counting_mode": "Método de conteo no compatible",
@@ -225,14 +225,14 @@
   },
   "app": {
     "access": "Acceder a la aplicación",
-    "description": "Planifica tus tratamientos y comparte tus calendarios médicos con facilidad.",
+    "description": "Programe sus tratamientos y comparta sus calendarios médicos con facilidad.",
     "login": "Acceso",
     "name": "MediTime",
-    "pageTitle": "MediTime - Gestor de Tratamientos Médicos",
+    "pageTitle": "MediTime - Gestor de tratamientos médicos",
     "register": "Crear una cuenta",
     "shortN": "MediTime",
     "shortName": "MediTime",
-    "subtitle": "Administre, rastree y comparta sus tratamientos médicos fácilmente.",
+    "subtitle": "Gestione, realice un seguimiento y comparta sus tratamientos médicos fácilmente.",
     "title": "MediTime"
   },
   "auth": {
@@ -286,7 +286,7 @@
       "end_date": "Fecha de finalización",
       "expired": "Condición expirada",
       "expired_tooltip": "Una de tus condiciones para aprovechar esta oferta ha expirado. Ya no está activa.",
-      "expired_tooltip_one": "Esta condición de aceptación [de la oferta] ha pasado su fecha límite y ya no está activa.",
+      "expired_tooltip_one": "Esta condición de aceptación [de la oferta] ha pasado su fecha de vencimiento y ya no está activa.",
       "for_days": "Por... días",
       "inactive": "fármaco inactivo",
       "inactive_tooltip": "Todas sus instrucciones para tomar este medicamento han caducado. El medicamento está completamente inactivo.",
@@ -328,8 +328,8 @@
     "stock": {
       "alerts": {
         "line": "{{name}} ({{dose}} mg) — {{count}} unidad en stock",
-        "line_negative": "{{nombre}} ({{dosis}} mg) — {{cantidad}} unidades (agotado)",
-        "line_plural": "{{nombre}} ({{dosis}} mg) — {{cantidad}} unidades en stock",
+        "line_negative": "{{name}} ({{dose}} mg) — {{count}} unidades (agotado)",
+        "line_plural": "{{name}} ({{dose}} mg) — {{count}} unidades en stock",
         "title": "Alertas de stock:"
       },
       "badge": {
@@ -348,7 +348,7 @@
     "tablet": "comprimido",
     "tablets": "tabletas",
     "title": "Cajas de medicamentos",
-    "until": "Hasta el",
+    "until": "Hasta",
     "view_notice": "Vea las instrucciones"
   },
   "calendar": {
@@ -401,7 +401,7 @@
     "weekly_view": "Calendario por semana"
   },
   "calendar_completed": "¡Calendario completado exitosamente!",
-  "calendar_completed_this_week": "¡Pastillas llenas para esta semana!",
+  "calendar_completed_this_week": "¡El pastillero está lleno para esta semana!",
   "calendar_completion_error": "Error al completar el calendario.",
   "calendar_deleted": "Calendario eliminado exitosamente.",
   "calendar_settings": {
@@ -454,7 +454,7 @@
     "title": "Vista diaria"
   },
   "delete": "BORRAR",
-  "delete_access": "Eliminar el acceso",
+  "delete_access": "Eliminar acceso",
   "delete_access_confirm": "¿Quitar el acceso?",
   "delete_access_description": "Este usuario ya no podrá ver ni modificar este calendario. Esta acción es irreversible.",
   "delete_access_title": "¿Eliminar el acceso de este usuario?",
@@ -494,12 +494,12 @@
     "desc3": "Sus datos están protegidos con tecnologías confiables como Supabase y Firebase.",
     "title1": "Calendario inteligente",
     "title2": "Intercambio colaborativo",
-    "title3": "Seguridad garantizada"
+    "title3": "Seguridad asegurada"
   },
   "home": "Bienvenido",
   "home_meta": {
-    "description": "Administre y comparta fácilmente su toma de medicamentos.",
-    "title": "MediTime - Planificador de tratamientos"
+    "description": "Planifique y comparta sus horarios de medicación fácilmente.",
+    "title": "MediTime - Planificador de horarios de medicamentos"
   },
   "ics": {
     "add_token": "Crear un enlace ICS",
@@ -517,7 +517,7 @@
     "loading_ics_tokens": "Cargando enlaces ICS...",
     "no_tokens": "No se creó ningún enlace ICS.",
     "title": "Listas de enlaces de ICS",
-    "token_label": "Derecho de retención"
+    "token_label": "Enlace"
   },
   "image_upload": {
     "analysis_error": "Error al analizar la imagen.",
@@ -579,7 +579,7 @@
   "medicines": {
     "back_to_calendar": "Volver al calendario",
     "label": "Drogas",
-    "list_empty": "Aún no se han agregado medicamentos para este cronograma.",
+    "list_empty": "Aún no se han agregado medicamentos a este cronograma.",
     "list_title": "Lista de medicamentos"
   },
   "mg": "mg",
@@ -600,13 +600,13 @@
     "about": "Acerca de",
     "calendar": "Calendario",
     "dashboard": "Panel",
-    "forgot-password": "Contraseña olvidada",
-    "help": "Ayudante",
-    "home": "Bienvenido",
+    "forgot-password": "Has olvidado tu contraseña",
+    "help": "Ayuda",
+    "home": "Hogar",
     "login": "Acceso",
-    "medicines": "Drogas",
+    "medicines": "Medicamentos",
     "profile": "Perfil",
-    "register": "Registro",
+    "register": "Inscribirse",
     "reset-password": "Restablecer contraseña",
     "settings": "Ajustes"
   },
@@ -659,7 +659,7 @@
     "title": "Fortín"
   },
   "pillbox_completion_description": "El stock de medicamentos para esta semana se reducirá según su horario. Esta medida es irreversible.",
-  "pillbox_error_message": "Se ha producido un error al validar el pastillero. Inténtelo de nuevo.",
+  "pillbox_error_message": "Se produjo un error al validar el pastillero. Inténtalo de nuevo.",
   "pillbox_restored": "Pastillero restaurado con éxito",
   "pillbox_stock_decreased_successfully": "Las existencias de pastillero se redujeron con éxito",
   "pillbox_uses": "Historia del pastillero",
@@ -694,7 +694,7 @@
     },
     "section3": {
       "no_ads": "Ningún dato se vende, comparte o utiliza con fines publicitarios.",
-      "reminders": "Envía recordatorios o alertas si el usuario ha habilitado las notificaciones.",
+      "reminders": "Enviar recordatorios o alertas si el usuario ha habilitado las notificaciones.",
       "sharing": "Permitir compartir de forma segura con otros usuarios.",
       "stability": "Mejorar la estabilidad y seguridad de la aplicación.",
       "sync": "Ver y sincronizar los horarios de tratamiento.",
@@ -748,7 +748,7 @@
     "cannot_change": "No se puede cambiar la contraseña: sesión no válida.",
     "instructions": "Ingrese una nueva contraseña para su cuenta MediTime.",
     "invalid_link": "Enlace de restablecimiento no válido o caducado.",
-    "invalid_session": "Sesión no válida. Solicita un enlace de nuevo.",
+    "invalid_session": "Sesión inválida. Solicite un enlace nuevamente.",
     "new_password_label": "Nueva contraseña",
     "save_password": "Guardar contraseña",
     "saving": "Registro...",
@@ -795,7 +795,7 @@
     "current_password": {
       "incorrect": "Contraseña actual incorrecta.",
       "label": "Contraseña actual",
-      "placeholder": "Introduzca la contraseña actual",
+      "placeholder": "Ingrese la contraseña actual",
       "required": "Se requiere contraseña antigua."
     },
     "email_auth": {
@@ -906,15 +906,15 @@
     "invalid_phone_number": "Número de teléfono inválido",
     "invalid_provider": "Proveedor no válido",
     "invalid_refresh_token": "Token de actualización no válido",
-    "invalid_token": "Token no válido",
+    "invalid_token": "Token inválido",
     "invite_not_found": "Invitación no encontrada",
     "manual_linking_disabled": "Enlace manual deshabilitado",
     "mfa_challenge_expired": "El desafío MFA ha expirado",
     "mfa_factor_name_conflict": "Nombre del factor MFA conflictivo",
-    "mfa_factor_not_found": "No se encontró el factor MFA",
+    "mfa_factor_not_found": "Factor MFA no encontrado",
     "mfa_ip_address_mismatch": "Dirección IP diferente para MFA",
     "mfa_phone_enroll_not_enabled": "Registro MFA por teléfono deshabilitado",
-    "mfa_phone_verify_not_enabled": "Verificación de MFA del teléfono deshabilitada",
+    "mfa_phone_verify_not_enabled": "Verificación MFA del teléfono deshabilitada",
     "mfa_totp_enroll_not_enabled": "Registro TOTP del MFA deshabilitado",
     "mfa_totp_verify_not_enabled": "Verificación TOTP MFA deshabilitada",
     "mfa_verification_failed": "La verificación de MFA falló",
@@ -927,7 +927,7 @@
     "no_authorization": "Autorización faltante",
     "not_admin": "Se requiere acceso de administrador",
     "oauth_callback_error": "Error de OAuth",
-    "oauth_provider_not_supported": "Proveedor de OAuth no compatible",
+    "oauth_provider_not_supported": "Proveedor OAuth no compatible",
     "otp_disabled": "OTP deshabilitado",
     "otp_expired": "OTP expirado",
     "over_email_send_rate_limit": "Demasiados correos electrónicos enviados",
@@ -941,7 +941,7 @@
     "provider_disabled": "Proveedor deshabilitado",
     "provider_email_needs_verification": "Correo electrónico del proveedor a verificar",
     "reauthentication_needed": "Se requiere nueva autenticación",
-    "reauthentication_not_valid": "Re-autenticación no válida",
+    "reauthentication_not_valid": "Reautenticación no válida",
     "reauthentication_required": "Se requiere nueva autenticación",
     "refresh_token_already_used": "Token de actualización ya utilizado",
     "refresh_token_not_found": "No se encontró el token de actualización",
@@ -951,7 +951,7 @@
     "saml_assertion_no_user_id": "No hay ID de usuario en la afirmación SAML",
     "saml_entity_id_mismatch": "ID de entidad SAML diferente",
     "saml_idp_already_exists": "IdP SAML existente",
-    "saml_idp_not_found": "No se encontró el IdP de SAML",
+    "saml_idp_not_found": "No se encontró el IdP SAML",
     "saml_metadata_fetch_failed": "Error en la recuperación de metadatos SAML",
     "saml_provider_disabled": "Proveedor SAML deshabilitado",
     "saml_relay_state_expired": "Estado de retransmisión SAML expirado",
@@ -959,7 +959,7 @@
     "session_expired": "Sesión expirada",
     "session_not_found": "Sesión no encontrada",
     "signup_disabled": "Registros deshabilitados",
-    "single_identity_not_deletable": "Identidad única e ineliminable",
+    "single_identity_not_deletable": "Identidad única e indeleble",
     "sms_send_failed": "Error en el envío de SMS",
     "sso_domain_already_exists": "Dominio SSO existente",
     "sso_provider_not_found": "Proveedor de SSO no encontrado",
@@ -979,12 +979,12 @@
     "label": "Condiciones de uso",
     "last_update": "Última actualización: 9 de junio de 2025",
     "section1": {
-      "p1": "El objeto de estas condiciones es definir los términos de utilización de la aplicación MediTime, desarrollada personalmente por Matis Gillet (alias mtx_26), sin ánimo de lucro.",
+      "p1": "El objeto de estas condiciones es definir los términos de uso de la aplicación MediTime, desarrollada personalmente por Matis Gillet (alias mtx_26), sin ánimo de lucro.",
       "p2": "Al utilizar la aplicación, usted acepta incondicionalmente estas condiciones.",
       "title": "1. Propósito"
     },
     "section2": {
-      "disclaimer": "La Aplicación se proporciona “tal cual”, sin garantía de disponibilidad continua o precisión médica.",
+      "disclaimer": "La Aplicación se proporciona “tal cual”, sin garantía de disponibilidad continua ni precisión médica.",
       "intro": "MediTime permite a sus usuarios:",
       "list": {
         "item1": "Crear y gestionar horarios de medicación;",
@@ -1013,7 +1013,7 @@
         "item3": "Por pérdida o divulgación de datos debido a un uso no seguro."
       },
       "p1": "La aplicación no pretende sustituir el consejo médico. El usuario es el único responsable del uso de la información mostrada.",
-      "p2": "En ningún caso MediTime o su desarrollador podrán ser considerados responsables:",
+      "p2": "Bajo ninguna circunstancia MediTime o su desarrollador podrán ser considerados responsables:",
       "title": "5. Responsabilidades"
     },
     "section6": {
@@ -1122,11 +1122,11 @@
     "instructions": "Envíe un nuevo enlace de verificación a su dirección de correo electrónico.",
     "no_user": "No hay usuarios conectados",
     "resend_link": "Reenviar enlace de verificación",
-    "title": "Verificación de la dirección de correo electrónico"
+    "title": "Verificación de dirección de correo electrónico"
   },
   "week": "Semana",
   "why": {
-    "desc": "Porque la atención médica no admite improvisaciones. MediTime te ofrece una solución clara, intuitiva y segura para el seguimiento diario de tus tratamientos y los de tus seres queridos.",
+    "desc": "Porque la atención médica no deja lugar a la improvisación. MediTime le ofrece una solución clara, intuitiva y segura para el seguimiento diario de sus tratamientos y los de sus seres queridos.",
     "title": "¿Por qué elegir MediTime?"
   },
   "yes": "Sí",

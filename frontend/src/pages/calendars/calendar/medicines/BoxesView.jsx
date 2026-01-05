@@ -271,7 +271,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   // CALENDAR DETECTION
   // =========================================================================
   
-  const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+  const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(-[A-Z]{2})?(?=\/|$)/, '') || '/';
   let calendarType = 'personal';
   let calendarId = params.calendarId;
   let basePath = 'calendar';

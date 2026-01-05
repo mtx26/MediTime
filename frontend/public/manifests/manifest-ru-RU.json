@@ -1,9 +1,9 @@
 {
   "name": "MediTime",
   "short_name": "MediTime",
-  "description": "Agende seus tratamentos e compartilhe seus calendários médicos com facilidade.",
-  "start_url": "/pt/home",
-  "lang": "pt",
+  "description": "Планируйте свои процедуры и легко делитесь своими медицинскими календарями.",
+  "start_url": "/ru-RU/home",
+  "lang": "ru-RU",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -66,10 +66,10 @@
   "dir": "ltr",
   "shortcuts": [
     {
-      "name": "Adicionar um medicamento",
-      "short_name": "Adicionar",
-      "description": "Adicione rapidamente um novo medicamento",
-      "url": "/pt/add-calendar",
+      "name": "Добавить лекарство",
+      "short_name": "Добавлять",
+      "description": "Быстро добавить новый препарат",
+      "url": "/ru-RU/add-calendar",
       "icons": [
         {
           "src": "/icons/icon-192.png",
@@ -78,10 +78,10 @@
       ]
     },
     {
-      "name": "Calendário",
-      "short_name": "Calendário",
-      "description": "Consulte sua tabela de medicamentos.",
-      "url": "/pt/calendars",
+      "name": "Календарь",
+      "short_name": "Календарь",
+      "description": "Ознакомьтесь с графиком приема лекарств.",
+      "url": "/ru-RU/calendars",
       "icons": [
         {
           "src": "/icons/icon-192.png",

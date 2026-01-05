@@ -53,7 +53,7 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
     let basePath = 'calendar';
   
     const pathWithoutLang =
-      location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+      location.pathname.replace(/^\/[a-z]{2}(-[A-Z]{2})?(?=\/|$)/, '') || '/';
   
     if (pathWithoutLang.startsWith('/shared-user-calendar')) {
       calendarType = 'sharedUser';

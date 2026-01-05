@@ -2,8 +2,8 @@
   "name": "MediTime",
   "short_name": "MediTime",
   "description": "Planen Sie Ihre Behandlungen und teilen Sie Ihre medizinischen Kalender mit Leichtigkeit.",
-  "start_url": "/de/home",
-  "lang": "de",
+  "start_url": "/de-DE/home",
+  "lang": "de-DE",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -69,7 +69,7 @@
       "name": "Füge ein Medikament hinzu",
       "short_name": "Hinzufügen",
       "description": "Fügen Sie schnell ein neues Medikament hinzu.",
-      "url": "/de/add-calendar",
+      "url": "/de-DE/add-calendar",
       "icons": [
         {
           "src": "/icons/icon-192.png",
@@ -81,7 +81,7 @@
       "name": "Kalender",
       "short_name": "Kalender",
       "description": "Siehe Ihren Medikamentenplan",
-      "url": "/de/calendars",
+      "url": "/de-DE/calendars",
       "icons": [
         {
           "src": "/icons/icon-192.png",

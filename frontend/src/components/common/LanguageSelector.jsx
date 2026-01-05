@@ -10,26 +10,26 @@ function LanguageSelector() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [selected, setSelected] = useState('FR');
+  const [selected, setSelected] = useState('en-US');
 
   useEffect(() => {
     const currentLang = findLanguage(i18n.language);
-    setSelected(currentLang?.flag || 'FR');
+    setSelected(currentLang?.locale || 'en-US');
   }, [i18n.language]);
 
-  const onSelect = (flagCode) => {
-    const lang = LANGUAGES.find(lang => lang.flag === flagCode);
+  const onSelect = (locale) => {
+    const lang = LANGUAGES.find(lang => lang.locale === locale);
     if (lang) {
       const segments = location.pathname.split('/');
       segments[1] = lang.locale;
       const newPath = segments.join('/') || '/';
       navigate(`${newPath}${location.search}${location.hash}`);
       i18n.changeLanguage(lang.locale);
-      setSelected(lang.flag);
+      setSelected(lang.locale);
     }
   };
 
-  const currentLang = LANGUAGES.find(lang => lang.flag === selected);
+  const currentLang = LANGUAGES.find(lang => lang.locale === selected);
   const CurrentFlag = currentLang?.FlagComponent;
 
   return (
@@ -46,13 +46,13 @@ function LanguageSelector() {
           const FlagComponent = lang.FlagComponent;
           return (
             <DropdownMenuItem
-              key={lang.flag}
-              onClick={() => onSelect(lang.flag)}
+              key={lang.locale}
+              onClick={() => onSelect(lang.locale)}
               className="gap-2 cursor-pointer"
             >
               {FlagComponent && <FlagComponent className="w-5 h-4" />}
               <span className="flex-1">{lang.label}</span>
-              {selected === lang.flag && <Check className="w-4 h-4" />}
+              {selected === lang.locale && <Check className="w-4 h-4" />}
             </DropdownMenuItem>
           );
         })}

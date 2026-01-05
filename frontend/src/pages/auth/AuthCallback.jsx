@@ -91,7 +91,7 @@ const AuthCallback = () => {
 
     if (redirect) {
       if (redirect.startsWith('/')) {
-        const cleaned = redirect.replace(/^\/[a-z]{2}(?=\/|$)/, '');
+        const cleaned = redirect.replace(/^\/[a-z]{2}(-[A-Z]{2})?(?=\/|$)/, '');
         showLoading(false);
         navigate(`/${lng}${cleaned}`, { replace: true });
       } else {

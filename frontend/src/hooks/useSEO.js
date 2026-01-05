@@ -35,9 +35,9 @@ export default function useSEO({ path = '/' }) {
     upsertMetaTag('link', 'rel', 'canonical', { href: finalUrl });
     
     LANGUAGES.forEach((lang) => {
-      upsertMetaTag('link', 'hreflang', lang.code, {
+      upsertMetaTag('link', 'hreflang', lang.locale, {
         rel: 'alternate',
-        href: `${SEO_CONFIG.BASE_URL}/${lang.code}${path}`,
+        href: `${SEO_CONFIG.BASE_URL}/${lang.locale}${path}`,
       });
     });
     
@@ -48,8 +48,8 @@ export default function useSEO({ path = '/' }) {
 
     // 4. Open Graph
     upsertMetaTag('meta', 'property', 'og:locale', { content: lng });
-    LANGUAGES.filter((lang) => lang.code !== lng).forEach((lang) => {
-      upsertMetaTag('meta', 'property', 'og:locale:alternate', { content: lang.code });
+    LANGUAGES.filter((lang) => lang.locale !== lng).forEach((lang) => {
+      upsertMetaTag('meta', 'property', 'og:locale:alternate', { content: lang.locale });
     });
     
     upsertMetaTag('meta', 'property', 'og:site_name', { content: t('app.name') });

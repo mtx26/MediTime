@@ -2,8 +2,8 @@
   "name": "MediTime",
   "short_name": "MediTime",
   "description": "治療をスケジュールし、医療カレンダーを簡単に共有できます。",
-  "start_url": "/ja/home",
-  "lang": "ja",
+  "start_url": "/ja-JP/home",
+  "lang": "ja-JP",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -69,7 +69,7 @@
       "name": "薬を追加する",
       "short_name": "追加",
       "description": "新しい薬をすぐに追加する",
-      "url": "/ja/add-calendar",
+      "url": "/ja-JP/add-calendar",
       "icons": [
         {
           "src": "/icons/icon-192.png",
@@ -81,7 +81,7 @@
       "name": "カレンダー",
       "short_name": "カレンダー",
       "description": "服薬スケジュールを確認する",
-      "url": "/ja/calendars",
+      "url": "/ja-JP/calendars",
       "icons": [
         {
           "src": "/icons/icon-192.png",

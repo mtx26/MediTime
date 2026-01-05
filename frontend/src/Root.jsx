@@ -15,9 +15,10 @@ function LanguageRoutes() {
   const { i18n } = useTranslation();
   const rawLang = i18n.language || DEFAULT_LANG;
   const normalizedLang = rawLang.split('-')[0];
-  const defaultLang = enabledLanguageCodes.includes(normalizedLang)
-    ? normalizedLang
-    : DEFAULT_LANG;
+  // Trouve la locale complète correspondant au code court
+  const defaultLang = enabledLanguageCodes.find(
+    locale => locale === rawLang || locale.startsWith(normalizedLang)
+  ) || DEFAULT_LANG;
   const pathParts = location.pathname.split('/');
   const currentLang = pathParts[1];
 

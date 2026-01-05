@@ -1,9 +1,9 @@
 {
   "name": "MediTime",
   "short_name": "MediTime",
-  "description": "Schedule your treatments and share your medical calendars with ease.",
-  "start_url": "/en/home",
-  "lang": "en",
+  "description": "Pianifica i tuoi trattamenti e condividi i tuoi calendari medici con facilità.",
+  "start_url": "/it-IT/home",
+  "lang": "it-IT",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -66,10 +66,10 @@
   "dir": "ltr",
   "shortcuts": [
     {
-      "name": "Add a drug",
-      "short_name": "Add",
-      "description": "Quickly add a new drug",
-      "url": "/en/add-calendar",
+      "name": "Aggiungi un farmaco",
+      "short_name": "Aggiungere",
+      "description": "Aggiungere rapidamente un nuovo farmaco",
+      "url": "/it-IT/add-calendar",
       "icons": [
         {
           "src": "/icons/icon-192.png",
@@ -78,10 +78,10 @@
       ]
     },
     {
-      "name": "Calendar",
-      "short_name": "Calendar",
-      "description": "See your medication schedule",
-      "url": "/en/calendars",
+      "name": "Calendario",
+      "short_name": "Calendario",
+      "description": "Consulta il tuo programma di assunzione dei farmaci",
+      "url": "/it-IT/calendars",
       "icons": [
         {
           "src": "/icons/icon-192.png",
