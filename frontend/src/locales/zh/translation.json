@@ -459,7 +459,9 @@
       "description": "选择您希望接收用药提醒的方式。",
       "title": "通知偏好设置"
     },
-    "push_description": "在您的设备上接收推送通知。"
+    "push_description": "在您的设备上接收推送通知。",
+    "label": "通知",
+    "mark_all_read": "全部标记为已读"
   },
   "notifications": "通知",
   "open": "打开",

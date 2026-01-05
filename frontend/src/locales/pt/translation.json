@@ -459,7 +459,9 @@
       "description": "Escolha como você gostaria de receber seus lembretes de medicação.",
       "title": "Preferências de notificação"
     },
-    "push_description": "Receba notificações push em seus dispositivos."
+    "push_description": "Receba notificações push em seus dispositivos.",
+    "label": "Notificações",
+    "mark_all_read": "Marcar tudo como lido"
   },
   "notifications": "Notificações",
   "open": "Abrir",

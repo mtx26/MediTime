@@ -459,7 +459,9 @@
       "description": "Elija cómo desea recibir sus recordatorios de medicamentos.",
       "title": "Preferencias de notificación"
     },
-    "push_description": "Recibe notificaciones push en tus dispositivos."
+    "push_description": "Recibe notificaciones push en tus dispositivos.",
+    "label": "Notificaciones",
+    "mark_all_read": "Marcar todo como leído"
   },
   "notifications": "Notificaciones",
   "open": "Abierto",

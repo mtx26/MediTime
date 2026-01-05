@@ -473,9 +473,10 @@
       "title": "Préférences de notification"
     },
     "push_description": "Recevez des notifications push sur vos appareils.",
-    "push_toggle": "Notifications push"
+    "push_toggle": "Notifications push",
+    "label": "Notifications",
+    "mark_all_read": "Tout marquer comme lu"
   },
-  "notifications": "Notifications",
   "open": "Ouvrir",
   "open_notifications": "Ouvrir les notifications",
   "owner": "Propriétaire",

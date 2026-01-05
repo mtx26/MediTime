@@ -26,10 +26,23 @@ function NotificationsPage({ notifications }) {
     <div className="container mx-auto">
       <div className="flex justify-between items-center mb-3">
         <h4 className="font-bold text-xl flex items-center gap-2">
-          <Bell className="h-5 w-5" /> {t('notifications')}
+          <Bell className="h-5 w-5" /> {t('notification.label')}
         </h4>
         <ActionSheet
           actions={[
+            {
+              label: (
+                <>
+                  <Bell className="h-4 w-4 mr-2" /> {t('notification.mark_all_read')}
+                </>
+              ),
+              onClick: () => {
+                if (notifications.notificationsData && notifications.notificationsData.length > 0 && notifications.notificationsData.some(n => !n.read)) {
+                  notifications.readAllNotifications();
+                }
+              },
+              title: t('notification.mark_all_read')
+            },
             {
               label: (
                 <>

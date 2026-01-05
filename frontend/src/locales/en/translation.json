@@ -459,7 +459,9 @@
       "description": "Choose how you would like to receive your medication reminders.",
       "title": "Notification preferences"
     },
-    "push_description": "Receive push notifications on your devices."
+    "push_description": "Receive push notifications on your devices.",
+    "label": "Notifications",
+    "mark_all_read": "Mark all as read"
   },
   "notifications": "Notifications",
   "open": "Open",

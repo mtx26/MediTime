@@ -612,6 +612,18 @@ function App() {
     });
   }, [showAlert]);
   
+  // Fonction pour marqué tout les notif lue
+  const readAllNotifications = useCallback(async () => {
+    return await performApiCall({
+      url: `${API_URL}/api/notifications/mark-all-read`,
+      method: 'PATCH',
+      origin: 'NOTIFICATIONS_MARK_ALL_READ',
+      uid,
+      analyticsEvent: 'read_all_notifications',
+      analyticsData: { uid },
+      showAlert,
+    });
+  }, [showAlert]);
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -996,6 +1008,7 @@ function App() {
       readNotification,
       notificationsData,
       setNotificationsData,
+      readAllNotifications,
     },
     fcm: {
       sendTokenToBackend,

@@ -459,7 +459,9 @@
       "description": "Wählen Sie aus, wie Sie Ihre Medikamentenerinnerungen erhalten möchten.",
       "title": "Benachrichtigungseinstellungen"
     },
-    "push_description": "Empfangen Sie Push-Benachrichtigungen auf Ihren Geräten."
+    "push_description": "Empfangen Sie Push-Benachrichtigungen auf Ihren Geräten.",
+    "label": "Benachrichtigungen",
+    "mark_all_read": "Alle als gelesen markieren"
   },
   "notifications": "Benachrichtigungen",
   "open": "Offen",

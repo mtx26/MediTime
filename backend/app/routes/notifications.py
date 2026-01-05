@@ -198,7 +198,7 @@ def handle_read_notification(notification_id):
                 if not notif:
                     return warning_response(
                         message="notification not found", 
-                        code="NOTIFICATION_READ_ERROR",
+                        code="NOTIFICATION_NOT_FOUND",
                         i18n_key="api.notifications.not_found", 
                         status_code=404, 
                         log_extra={"notification_id": notification_id}
@@ -218,6 +218,50 @@ def handle_read_notification(notification_id):
             message="Error marking notification as read", 
             code="NOTIFICATION_READ_ERROR",
             i18n_key="api.notifications.marked_read_error", 
+            status_code=500,
+            error=str(e)
+        )
+        
+# Route pour marquer toutes les notifications comme lues
+@api.route("/notifications/mark-all-read", methods=["PATCH"])
+@measure_time()
+@require_auth
+@with_query_origin(default_origin="NOTIFICATIONS_MARK_ALL_READ")
+def mark_all_notifications_read():
+    try:
+        uid = g.uid if hasattr(g, "uid") else None
+
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE notifications
+                    SET read = TRUE
+                    WHERE user_id = %s AND read = FALSE
+                    RETURNING id    
+                """, (uid,))
+                notifs = cursor.fetchall()
+
+                if not notifs:
+                    return warning_response(
+                        message="no unread notifications found", 
+                        code="NO_UNREAD_NOTIFICATIONS",
+                        i18n_key="api.notifications.no_unread_notifications", 
+                        status_code=404
+                    )
+
+            conn.commit()
+
+        return success_response(
+            message="all notifications marked as read", 
+            code="ALL_NOTIFICATIONS_MARKED_READ",
+            i18n_key="api.notifications.all_marked_read"
+        )
+
+    except Exception as e:
+        return error_response(
+            message="error marking all notifications as read", 
+            code="NOTIFICATIONS_MARK_ALL_READ_ERROR",
+            i18n_key="api.notifications.mark_all_read_error", 
             status_code=500,
             error=str(e)
         )

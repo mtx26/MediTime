@@ -459,7 +459,9 @@
       "description": "Scegli come desideri ricevere i promemoria per i tuoi farmaci.",
       "title": "Preferenze di notifica"
     },
-    "push_description": "Ricevi notifiche push sui tuoi dispositivi."
+    "push_description": "Ricevi notifiche push sui tuoi dispositivi.",
+    "label": "Notifiche",
+    "mark_all_read": "Segna tutto come letto"
   },
   "notifications": "Notifiche",
   "open": "Aprire",

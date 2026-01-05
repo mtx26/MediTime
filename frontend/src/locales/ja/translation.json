@@ -459,7 +459,9 @@
       "description": "服薬リマインダーの受信方法を選択してください。",
       "title": "通知設定"
     },
-    "push_description": "デバイスでプッシュ通知を受信します。"
+    "push_description": "デバイスでプッシュ通知を受信します。",
+    "label": "通知",
+    "mark_all_read": "すべてを既読にする"
   },
   "notifications": "通知",
   "open": "開ける",
