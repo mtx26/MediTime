@@ -23,7 +23,7 @@ function NotificationsPage({ notifications }) {
   }
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto max-w-2xl">
       <div className="flex justify-between items-center mb-3">
         <h4 className="font-bold text-xl flex items-center gap-2">
           <Bell className="h-5 w-5" /> {t('notification.label')}
