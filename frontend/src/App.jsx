@@ -922,11 +922,18 @@ function App() {
       }
     }
 
+    // Récupérer les informations de l'appareil
+    const deviceName = navigator.userAgent
+    console.log('FCM Token obtenu :', token, 'Device Name :', deviceName);
+
     // N'envoyer la requête que si le token est bien défini
     return await performApiCall({
-      url: `${API_URL}/api/notifications/register-token`,
+      url: `${API_URL}/api/notifications/fcm-token`,
       method: 'POST',
-      body: { token },
+      body: { 
+        token,
+        deviceName,
+      },
       origin: 'FCM_TOKEN_SEND',
       uid,
       analyticsEvent: 'FCM_TOKEN_SEND',

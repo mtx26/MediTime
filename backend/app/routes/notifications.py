@@ -268,13 +268,14 @@ def mark_all_notifications_read():
 
 
 # Route pour enregistrer un token FCM
-@api.route("/notifications/register-token", methods=["POST"])
+@api.route("/notifications/fcm-token", methods=["POST"])
 @measure_time()
 @require_auth
 @with_query_origin(default_origin="FCM_TOKEN_SEND")
 def register_token():
     data = request.json
     token = data.get("token")
+    device_name = data.get("deviceName")
     uid = g.uid
 
     if not token or not uid:
@@ -289,10 +290,10 @@ def register_token():
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
-                    INSERT INTO fcm_tokens (uid, token)
-                    VALUES (%s, %s)
+                    INSERT INTO fcm_tokens (uid, token, device_name)
+                    VALUES (%s, %s, %s)
                     ON CONFLICT (token) DO NOTHING;
-                """, (uid, token))
+                """, (uid, token, device_name))
                 conn.commit()
 
         return success_response(

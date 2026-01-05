@@ -2308,7 +2308,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /notifications/register-token:
+  /notifications/fcm-token:
     post:
       tags: [Notifications]
       summary: Enregistrer un token FCM
