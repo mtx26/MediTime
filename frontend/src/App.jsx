@@ -924,6 +924,8 @@ function App() {
 
     // Récupérer les informations de l'appareil
     const deviceName = navigator.userAgent
+    // recupere juste le Mozilla/5.0 (<system-information>) part
+    .match(/Mozilla\/5\.0 \(([^)]+)\)/)?.[1] || 'Unknown Device';
     console.log('FCM Token obtenu :', token, 'Device Name :', deviceName);
 
     // N'envoyer la requête que si le token est bien défini

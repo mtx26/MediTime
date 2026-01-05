@@ -1,8 +1,7 @@
-import React, { use, useContext, useState } from 'react';
-import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
+import React, { use, useContext, useState, useEffect } from 'react';
+import { UserContext } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import { updateUserInfo } from '../../services/auth/authService';
-import { getToken } from '../../services/supabase/tokenUtils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -23,7 +22,7 @@ export default function Notification({ fcm }) {
     <div className="max-w-4xl mx-auto space-y-8">
       {/* En-tête */}
       <div className="space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">{t('notifications')}</h2>
+        <h2 className="text-3xl font-bold tracking-tight">{t('notification.label')}</h2>
         <p className="text-muted-foreground">{t('notification.instructions')}</p>
       </div>
 
@@ -129,9 +128,9 @@ export default function Notification({ fcm }) {
                 className="flex items-center whitespace-nowrap"
                 onClick={async () => {
                   setIsRegistering(true);
-                  await fcm.sendTokenToBackend()
+                  const rep = await fcm.sendTokenToBackend()
                   setIsRegistering(false);
-                  setNotificationsEnabled(window.Notification.permission === 'granted');
+                  setNotificationsEnabled(rep.success ? true : false);
                 }}
                 disabled={isRegistering}
               >
