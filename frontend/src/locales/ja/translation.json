@@ -173,7 +173,9 @@
     "condition_none_tooltip": "受講条件は設定されていません。定期的にリマインダーを受け取るには、こちらをクリックして条件を追加してください。",
     "no_medicines_selected": "薬が選択されていません",
     "loading_medicine_boxes": "薬箱を積んでいます…",
-    "loading_stock_alerts": "株価アラートを読み込んでいます..."
+    "loading_stock_alerts": "株価アラートを読み込んでいます...",
+    "delete_title": "薬箱を削除しますか？",
+    "delete_description": "この操作は元に戻せません。ボックスと関連するすべての利用規約は完全に削除されます。"
   },
   "calendar": {
     "add": "カレンダーを追加する",

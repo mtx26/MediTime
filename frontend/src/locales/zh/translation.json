@@ -173,7 +173,9 @@
     "condition_none_tooltip": "服用这些药物没有具体条件。点击此处添加条件，即可定期收到提醒。",
     "no_medicines_selected": "未选择任何药物",
     "loading_medicine_boxes": "正在装载药品箱……",
-    "loading_stock_alerts": "正在加载股票提醒……"
+    "loading_stock_alerts": "正在加载股票提醒……",
+    "delete_title": "把药盒拿走？",
+    "delete_description": "此操作不可逆。该框及其所有相关条款和条件将被永久删除。"
   },
   "calendar": {
     "add": "添加日历",

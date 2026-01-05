@@ -173,7 +173,9 @@
     "condition_none_tooltip": "No conditions have been defined for taking these. Click here to add one in order to receive regular reminders.",
     "no_medicines_selected": "No medication selected",
     "loading_medicine_boxes": "Loading the medicine boxes...",
-    "loading_stock_alerts": "Loading stock alerts..."
+    "loading_stock_alerts": "Loading stock alerts...",
+    "delete_title": "Remove the medicine box?",
+    "delete_description": "This action is irreversible. The box and all associated terms and conditions will be permanently deleted."
   },
   "calendar": {
     "add": "Add a calendar",

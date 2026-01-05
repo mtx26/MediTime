@@ -173,7 +173,9 @@
     "condition_none_tooltip": "No se han definido condiciones para realizarlas. Haga clic aquí para añadir una y recibir recordatorios periódicos.",
     "no_medicines_selected": "No se seleccionó ningún medicamento",
     "loading_medicine_boxes": "Cargando las cajas de medicamentos...",
-    "loading_stock_alerts": "Cargando alertas de stock..."
+    "loading_stock_alerts": "Cargando alertas de stock...",
+    "delete_title": "¿Quitar la caja de medicamentos?",
+    "delete_description": "Esta acción es irreversible. El cuadro y todos los términos y condiciones asociados se eliminarán permanentemente."
   },
   "calendar": {
     "add": "Agregar un calendario",

@@ -130,6 +130,8 @@
     "day": "jour",
     "days": "jours",
     "delete": "Supprimer",
+    "delete_title": "Supprimer la boîte de médicament ?",
+    "delete_description": "Cette action est irréversible. La boîte et toutes les conditions de prise associées seront définitivement supprimées.",
     "dose": "Dose",
     "each": "chaque",
     "edit": "Modifier",
@@ -172,7 +174,9 @@
     "title": "Boîtes de médicaments",
     "condition_none_tooltip": "Aucune condition de prise définie. Cliquez ici pour en ajouter une afin de recevoir des rappels réguliers.",
     "view_notice": "Voir la notice",
-    "no_medicines_selected": "Aucun médicament sélectionné"
+    "no_medicines_selected": "Aucun médicament sélectionné",
+    "loading_medicine_boxes": "Chargement des boîtes de médicaments...",
+    "loading_stock_alerts": "Chargement des alertes de stock..."
   },
   "calendar": {
     "add": "Ajouter un calendrier",
@@ -220,7 +224,8 @@
     "today": "Aujourd'hui",
     "week": "Semaine",
     "weekly_help": "Cliquez sur un jour du calendrier pour voir les médicaments associés dans une fenêtre.",
-    "weekly_view": "Calendrier par semaine"
+    "weekly_view": "Calendrier par semaine",
+    "loading_daily_view": "Chargement du calendrier journalier..."
   },
   "calendar_completed": "Calendrier complété avec succès !",
   "calendar_completed_this_week": "Pilulier complété pour cette semaine !",
@@ -228,6 +233,8 @@
   "calendar_deleted": "Calendrier supprimé avec succès.",
   "calendar_settings": {
     "label": "Paramètres du calendrier",
+    "loading_stock_settings": "Chargement des paramètres de stock...",
+    "loading_notification_settings": "Chargement des paramètres de notification...",
     "notifications": {
       "disabled": "Notifications désactivées",
       "enabled": "Notifications activées",
@@ -337,7 +344,8 @@
     "info_title": "À propos des liens ICS",
     "no_tokens": "Aucun lien ICS créé.",
     "title": "Listes de liens ICS",
-    "token_label": "Lien"
+    "token_label": "Lien",
+    "loading_ics_tokens": "Chargement des liens ICS..."
   },
   "image_upload": {
     "analysis_error": "Erreur lors de l'analyse de l'image.",
@@ -357,7 +365,8 @@
   "invalid_or_expired_link": "Ce lien de calendrier partagé est invalide ou a expiré.",
   "invitation": {
     "invalid_or_expired": "Invitation invalide ou expirée",
-    "title": "Invitation"
+    "title": "Invitation",
+    "loading": "Chargement de l'invitation..."
   },
   "link": "Lien",
   "link_already_exists": "Un lien existe déjà pour ce calendrier.",

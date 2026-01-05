@@ -173,7 +173,9 @@
     "condition_none_tooltip": "Non sono state definite condizioni per prenderli. Clicca qui per aggiungerne uno e ricevere promemoria regolari.",
     "no_medicines_selected": "Nessun farmaco selezionato",
     "loading_medicine_boxes": "Caricamento delle scatole dei medicinali...",
-    "loading_stock_alerts": "Caricamento avvisi sulle azioni..."
+    "loading_stock_alerts": "Caricamento avvisi sulle azioni...",
+    "delete_title": "Rimuovere la scatola dei medicinali?",
+    "delete_description": "Questa azione è irreversibile. La casella e tutti i termini e le condizioni associati verranno eliminati definitivamente."
   },
   "calendar": {
     "add": "Aggiungi un calendario",

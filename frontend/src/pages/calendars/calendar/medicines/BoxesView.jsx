@@ -780,6 +780,8 @@ function BoxCard({
   onUpdateScan,
   t,
 }) {
+  const { showConfirm } = useAlert();
+  
   const isEditing = editingBoxId === box.id && editingBox && editingBox.name !== undefined;
   
   const timeOfDayMap = {
@@ -896,6 +898,18 @@ function BoxCard({
     setExpandedBoxes((p) => ({ ...p, [box.id]: !p[box.id] }));
   };
 
+  const deleteBox = async (calendarId, boxId) => {
+    showConfirm(
+      'confirm-danger',
+      t('boxes.delete_title'),
+      t('boxes.delete_description'),
+      async () => {
+        await calendarSource.deleteBox(calendarId, boxId);
+      }
+    );
+  };
+
+
   const addCondition = () => {
     const id = uuidv4();
     setEditingBox((p) => ({
@@ -974,7 +988,7 @@ function BoxCard({
           {t('boxes.delete')}
         </>
       ),
-      onClick: async () => await calendarSource.deleteBox(calendarId, box.id),
+      onClick: () => deleteBox(calendarId, box.id),
       title: t('boxes.delete'),
       danger: true,
     },

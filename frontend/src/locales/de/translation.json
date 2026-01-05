@@ -173,7 +173,9 @@
     "condition_none_tooltip": "Für die Einnahme dieser Produkte sind keine Bedingungen festgelegt. Klicken Sie hier, um eine Bedingung hinzuzufügen und regelmäßig Erinnerungen zu erhalten.",
     "no_medicines_selected": "Keine Medikamente ausgewählt",
     "loading_medicine_boxes": "Die Medikamentenboxen werden geladen...",
-    "loading_stock_alerts": "Aktienbenachrichtigungen werden geladen..."
+    "loading_stock_alerts": "Aktienbenachrichtigungen werden geladen...",
+    "delete_title": "Den Medikamentenkasten entfernen?",
+    "delete_description": "Diese Maßnahme ist unumkehrbar. Das Feld und alle zugehörigen Geschäftsbedingungen werden dauerhaft gelöscht."
   },
   "calendar": {
     "add": "Einen Kalender hinzufügen",

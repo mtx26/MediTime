@@ -173,7 +173,9 @@
     "condition_none_tooltip": "Não foram definidas condições para a realização destes exercícios. Clique aqui para adicionar um e receber lembretes regulares.",
     "no_medicines_selected": "Nenhum medicamento selecionado",
     "loading_medicine_boxes": "Carregando as caixas de medicamentos...",
-    "loading_stock_alerts": "Carregando alertas de estoque..."
+    "loading_stock_alerts": "Carregando alertas de estoque...",
+    "delete_title": "Remover a caixa de medicamentos?",
+    "delete_description": "Esta ação é irreversível. A caixa e todos os termos e condições associados serão excluídos permanentemente."
   },
   "calendar": {
     "add": "Adicionar um calendário",
