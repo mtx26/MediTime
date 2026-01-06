@@ -1130,5 +1130,6 @@
     "title": "MediTimeを選ぶ理由"
   },
   "yes": "はい",
-  "you_have_no_pillbox_use_history": "ピルオーガナイザーの使用履歴がありません。"
+  "you_have_no_pillbox_use_history": "ピルオーガナイザーの使用履歴がありません。",
+  "creator": "クリエイター"
 }

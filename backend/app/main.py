@@ -27,4 +27,4 @@ if __name__ == "__main__":
             "origin": "FLASK_START",
             "port": port
         })
-        app.run(host="0.0.0.0", port=port)
+        app.run(host="0.0.0.0", port=port, debug=True)

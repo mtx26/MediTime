@@ -4,6 +4,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import { useAlert } from '@/contexts/AlertContext';
 import { useLoading } from '@/components/ui/loading';
 import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
+import HoveredUserProfile from '@/components/common/HoveredUserProfile';
 import PropTypes from 'prop-types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -126,13 +127,13 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       {tokens.map((token) => (
         <Card key={token.id} className="mb-3 shadow-sm">
           <CardContent>
-            <h5 className="mb-3 flex justify-between items-center">
-              <div className="flex items-center gap-2">
+            <div className="mb-3">
+              <h5 className="flex items-center gap-2">
                 <Link2 className="h-4 w-4" />
                 {t('ics.token_label')}
-              </div>
-            </h5>
-            <div className="flex">
+              </h5>
+            </div>
+            <div className="flex mb-3">
               <Input
                 type="text"
                 className="flex-1 rounded-r-none border-2 border-green-500 focus-visible:ring-green-500"
@@ -174,6 +175,21 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
+            </div>
+            <div className="flex items-center gap-1 text-sm">
+              <span className="text-muted-foreground">{t('creator')}:</span>
+              <HoveredUserProfile
+                user={{
+                  photo_url: token.owner_photo_url,
+                  display_name: token.owner_display_name,
+                  email: token.owner_email,
+                }}
+                trigger={
+                  <span className="text-muted-foreground">
+                    {token.owner_display_name}
+                  </span>
+                }
+              />
             </div>
           </CardContent>
         </Card>

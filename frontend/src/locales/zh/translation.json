@@ -1130,5 +1130,6 @@
     "title": "为什么选择 MediTime？"
   },
   "yes": "是的",
-  "you_have_no_pillbox_use_history": "您的药盒没有使用记录。"
+  "you_have_no_pillbox_use_history": "您的药盒没有使用记录。",
+  "creator": "创作者"
 }

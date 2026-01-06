@@ -1130,5 +1130,6 @@
     "title": "Why choose MediTime?"
   },
   "yes": "Yes",
-  "you_have_no_pillbox_use_history": "You have no usage history for the pill organizer."
+  "you_have_no_pillbox_use_history": "You have no usage history for the pill organizer.",
+  "creator": "Creator"
 }

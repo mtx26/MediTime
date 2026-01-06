@@ -61,6 +61,12 @@ def get_connection(uid: str = None, skip_rls: bool = False):
                     cursor.execute("SET ROLE authenticated")
         
         yield conn
+        # Commit automatique si tout s'est bien passé
+        conn.commit()
+    except Exception as e:
+        # Rollback en cas d'erreur
+        conn.rollback()
+        raise e
     finally:
         # IMPORTANT: Rendre la connexion au pool après utilisation
         connection_pool.putconn(conn)

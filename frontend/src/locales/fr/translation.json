@@ -271,6 +271,7 @@
   "copy_link_error": "Erreur lors de la copie du lien.",
   "create_share_link": "Créer un lien de partage",
   "created_at": "Créé le",
+  "creator": "Créateur",
   "critical_stock": "Rupture de stock",
   "cta": {
     "button": "Je crée mon compte",

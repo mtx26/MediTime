@@ -30,13 +30,4 @@ def create_app():
     # Importation des médicaments AFMPS dans la base de données
     # import_afmps_to_bis("C:/Users/mtx_2/Documents/Code/Medic/MediTime/backend/app/scripts/A.csv")
 
-    @app.after_request
-    def add_cache_headers(response):
-        path = request.path
-        if any(ext in path for ext in [".js", ".css", ".png", ".webp", ".avif", ".ico"]) and "v=" in request.query_string.decode():
-            response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
-        elif path.endswith('.html'):
-            response.headers['Cache-Control'] = 'no-store'
-        return response
-
     return app

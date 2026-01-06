@@ -24,25 +24,34 @@ def create_ics_token(calendar_id: str, owner_uid: str) -> dict:
             return cursor.fetchone()
 
 def get_ics_tokens(calendar_id: str, owner_uid: str) -> list:
-    """Récupère tous les tokens ICS actifs pour un calendrier.
+    """Récupère tous les tokens ICS actifs pour un calendrier avec les infos du propriétaire.
     
     Paramètres:
     - calendar_id (str): L'ID du calendrier.
     - owner_uid (str): L'UID du propriétaire du calendrier.
 
     Retour:
-    - list: Une liste de dictionnaires contenant les informations des tokens actifs.
+    - list: Une liste de dictionnaires contenant les informations des tokens actifs avec les infos du propriétaire.
     """
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
-                SELECT id, token, created_at, last_accessed_at, last_user_agent
-                FROM ics_tokens
-                WHERE calendar_id = %s
-                    AND owner_uid = %s
-                    AND deleted_at IS NULL
-                ORDER BY created_at DESC
-            """, (calendar_id, owner_uid))
+                SELECT 
+                    it.id, 
+                    it.token, 
+                    it.created_at, 
+                    it.last_accessed_at, 
+                    it.last_user_agent, 
+                    it.owner_uid,
+                    u.display_name as owner_display_name,
+                    u.photo_url as owner_photo_url,
+                    u.email as owner_email
+                FROM ics_tokens it
+                LEFT JOIN users u ON it.owner_uid = u.id
+                WHERE it.calendar_id = %s
+                    AND it.deleted_at IS NULL
+                ORDER BY it.created_at DESC
+            """, (calendar_id,))
             return cursor.fetchall()
 
 def delete_ics_token(token_id: str, owner_uid: str) -> bool:

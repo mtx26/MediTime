@@ -1130,5 +1130,6 @@
     "title": "¿Por qué elegir MediTime?"
   },
   "yes": "Sí",
-  "you_have_no_pillbox_use_history": "No tienes historial de uso del pastillero."
+  "you_have_no_pillbox_use_history": "No tienes historial de uso del pastillero.",
+  "creator": "Creador"
 }
