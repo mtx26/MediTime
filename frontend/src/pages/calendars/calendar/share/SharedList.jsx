@@ -91,13 +91,14 @@ function SharedList({
       'confirm-danger',
       t("delete_link_title"),
       t("delete_link_description"),
-      () => handleDeleteToken(tokenId)
+      async () => {
+        const rep = await tokenCalendars.deleteToken(tokenId);
+        if (rep.success) {
+          setSelectedModifyToken(null);
+          setGroupedSharedFunction();
+        }
+      }
     );
-  };
-
-  const handleDeleteToken = async (tokenId) => {
-    await tokenCalendars.deleteToken(tokenId);
-    setSelectedModifyToken(null);
   };
 
   const deleteLoginInvitationConfirmAction = (token) => {
@@ -105,12 +106,13 @@ function SharedList({
       'confirm-danger',
       t("delete_access_title"),
       t("delete_access_description"),
-      () => handleDeleteLoginInvitation(token)
+      async () => {
+        const rep = await sharedUserCalendars.deleteLoginInvitation(token);
+        if (rep.success) {
+          setGroupedSharedFunction();
+        }
+      }
     );
-  };
-
-  const handleDeleteLoginInvitation = async (token) => {
-    await sharedUserCalendars.deleteLoginInvitation(token);
   };
 
   const deleteRegistrationInvitationConfirmAction = (token) => {
@@ -118,20 +120,17 @@ function SharedList({
       'confirm-danger',
       t("delete_invitation_title"),
       t("delete_invitation_description"),
-      () => handledeleteRegistrationInvitation(token)
+      async () => {
+        const rep = await sharedUserCalendars.deleteRegistrationInvitation(token);
+        if (rep.success) {
+          setGroupedSharedFunction();
+        }
+      }
     );
-  };
-
-  const handledeleteRegistrationInvitation = async (token) => {
-    const rep = await sharedUserCalendars.deleteRegistrationInvitation(token);
-    if (rep.success) {
-      setGroupedSharedFunction();
-    }
   };
 
   const handleSendInvitation = async (calendarId) => {
     const email = emailsToInvite[calendarId];
-
     const rep = await sharedUserCalendars.sendInvitation(email, calendarId);
     if (rep.success) {
       setGroupedSharedFunction();
@@ -140,11 +139,14 @@ function SharedList({
   };
 
   const handleCreateToken = async (calendarId) => {
-    await tokenCalendars.createToken(
+    const rep = await tokenCalendars.createToken(
       calendarId,
       expiresAt[calendarId],
       permissions[calendarId],
     );
+    if (rep.success) {
+      setGroupedSharedFunction();
+    }
   };
 
   // 🔄 Fonction pour mettre à jour les info de partage
@@ -505,7 +507,7 @@ function TokenList({
       ))
     ) : (
       <Card className="shadow">
-        <CardContent className="p-4 space-y-3">
+        <CardContent>
           <h5 className="flex items-center gap-2">
             <Link2 className="h-4 w-4" />
             {t("public_links")} :

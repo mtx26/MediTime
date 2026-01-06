@@ -27,10 +27,7 @@ export default function Preferences() {
           <CardDescription>{t('settings.language_note')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-3 p-4 border rounded-lg bg-accent/20">
-            <div className="p-2 bg-background rounded-lg border">
-              <Languages className="h-4 w-4 text-primary" />
-            </div>
+          <div className="flex items-center gap-3">
             <div className="flex-1">
               <LanguageSelector />
             </div>
@@ -48,11 +45,8 @@ export default function Preferences() {
           <CardDescription>{t('settings.theme_description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between p-4 border rounded-lg bg-accent/20">
+          <div className="flex items-center justify-between gap-1">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-background rounded-lg border">
-                <Palette className="h-4 w-4 text-primary" />
-              </div>
               <div>
                 <Label className="font-medium text-sm cursor-pointer">
                   {t('settings.theme_toggle')}

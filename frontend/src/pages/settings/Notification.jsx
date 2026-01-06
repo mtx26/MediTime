@@ -37,11 +37,8 @@ export default function Notification({ fcm }) {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Email notifications */}
-          <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+          <div className="flex items-center justify-between gap-1">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-background rounded-lg border">
-                <Mail className="h-4 w-4 text-blue-600" />
-              </div>
               <div>
                 <Label htmlFor="emailNotificationToggle" className="cursor-pointer font-medium text-sm">
                   {t('notification.email_toggle')}
@@ -64,11 +61,8 @@ export default function Notification({ fcm }) {
           </div>
 
           {/* Push notifications */}
-          <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+          <div className="flex items-center justify-between gap-1">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-background rounded-lg border">
-                <Smartphone className="h-4 w-4 text-green-600" />
-              </div>
               <div>
                 <Label htmlFor="pushNotificationToggle" className="cursor-pointer font-medium text-sm">
                   {t('notification.push_toggle')}
@@ -102,11 +96,8 @@ export default function Notification({ fcm }) {
             <CardDescription>{t('fcm.device_registration_desc')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 border rounded-lg bg-accent/20">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3">
-                <div className="p-2 bg-background rounded-lg border">
-                  <Bell className="h-4 w-4 text-primary" />
-                </div>
                 <div>
                   <div className="font-medium text-sm mb-1">
                     {notificationsEnabled 

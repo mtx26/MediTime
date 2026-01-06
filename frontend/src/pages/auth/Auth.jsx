@@ -162,20 +162,48 @@ function Auth() {
               {activeTab === 'register' && (
                 <div className="space-y-2">
                   <Label htmlFor="name">{t('auth.name')}</Label>
-                  <Input id="name" type="text" required value={name} autoComplete={activeTab === 'login' ? 'name' : 'new-name'} onChange={(e) => setName(e.target.value)} aria-label={t('auth.name')} />
+                  <Input 
+                    id="name" 
+                    type="text" 
+                    required 
+                    value={name} 
+                    autoComplete={activeTab === 'login' ? 'name' : 'new-name'} 
+                    onChange={(e) => setName(e.target.value)} 
+                    aria-label={t('auth.name')}
+                  />
                 </div>
               )}
 
               <div className="space-y-2">
                 <Label htmlFor="email">{t('auth.email')}</Label>
-                <Input id="email" type="email" required value={email} autoComplete={activeTab === 'login' ? 'email' : 'new-email'} onChange={(e) => setEmail(e.target.value)} aria-label={t('auth.email')} />
+                <Input 
+                  id="email"
+                  type="email"
+                  required value={email}
+                  autoComplete={activeTab === 'login' ? 'email' : 'new-email'}
+                  onChange={(e) => setEmail(e.target.value)} 
+                  aria-label={t('auth.email')}
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password">{t('auth.password')}</Label>
                 <div className="relative">
-                  <Input id="password" type={passwordVisible ? 'text' : 'password'} required value={password} autoComplete={activeTab === 'login' ? 'current-password' : 'new-password'} onChange={(e) => setPassword(e.target.value)} aria-label={t('auth.password')} />
-                  <button type="button" className="absolute top-2.5 right-3 text-muted-foreground" aria-label={passwordVisible ? t('auth.hide_password') : t('auth.show_password')} onClick={() => setPasswordVisible(!passwordVisible)}>
+                  <Input 
+                    id="password" 
+                    type={passwordVisible ? 'text' : 'password'} 
+                    required 
+                    value={password} 
+                    autoComplete={activeTab === 'login' ? 'current-password' : 'new-password'} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    aria-label={t('auth.password')}
+                  />
+                  <button 
+                    type="button" 
+                    className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" 
+                    aria-label={passwordVisible ? t('auth.hide_password') : t('auth.show_password')} 
+                    onClick={() => setPasswordVisible(!passwordVisible)}
+                  >
                     {passwordVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>

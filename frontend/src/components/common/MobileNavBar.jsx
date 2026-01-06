@@ -62,6 +62,7 @@ function MobileNavBar() {
             return (
               <Link
                 to={path}
+                className={active ? 'bg-secondary rounded-xl' : ''}
                 aria-current={active ? 'page' : undefined}
                 aria-label={t('calendars')}
               >
@@ -79,6 +80,7 @@ function MobileNavBar() {
             return (
               <Link
                 to={path}
+                className={active ? 'bg-secondary rounded-xl' : ''}
                 aria-current={active ? 'page' : undefined}
                 aria-label={t('shared')}
               >
@@ -96,11 +98,12 @@ function MobileNavBar() {
             return (
               <Link
                 to={path}
+                className={active ? 'bg-secondary rounded-xl' : ''}
                 aria-current={active ? 'page' : undefined}
-                aria-label={t('notifications')}
+                aria-label={t('notification.label')}
               >
                 <Bell className={`${iconBase} ${active ? 'text-primary' : ''}`} style={iconStyle} />
-                <span className="sr-only">{t('notifications')}</span>
+                <span className="sr-only">{t('notification.label')}</span>
               </Link>
             );
           })()}
@@ -113,6 +116,7 @@ function MobileNavBar() {
             return (
               <Link
                 to={path}
+                className={active ? 'bg-secondary rounded-xl' : ''}
                 aria-current={active ? 'page' : undefined}
                 aria-label={t('settings.label')}
               >

@@ -162,9 +162,9 @@ export default function Account() {
               <CardDescription>{t('account.profile_photo.description')}</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col sm:flex-row items-center gap-6 p-4 border rounded-lg bg-accent/20">
+              <div className="flex flex-col sm:flex-row items-center gap-6 rounded-lg">
                 <button
-                  className="relative rounded-full overflow-hidden border-4 border-background shadow-lg hover:shadow-xl transition-shadow"
+                  className="relative rounded-full overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
                   style={{ width: '120px', height: '120px', cursor: 'pointer' }}
                   type="button"
                   onClick={() => {
@@ -219,9 +219,6 @@ export default function Account() {
                   {t('account.display_name.label')}
                 </Label>
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-background rounded-lg border">
-                    <User className="h-4 w-4 text-primary" />
-                  </div>
                   <Input
                     type="text"
                     id="displayName"
@@ -231,9 +228,6 @@ export default function Account() {
                     className="flex-1"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {t('account.display_name.hint')}
-                </p>
               </div>
 
               {isModified && (
