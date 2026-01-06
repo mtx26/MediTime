@@ -414,7 +414,8 @@ CREATE TABLE public.fcm_tokens (
     uid uuid NOT NULL,
     token text NOT NULL,
     created_at timestamp with time zone DEFAULT now(),
-    updated_at timestamp with time zone DEFAULT now()
+    updated_at timestamp with time zone DEFAULT now(),
+    device_name text
 );
 
 
