@@ -76,6 +76,25 @@ def delete_ics_token(token_id: str, owner_uid: str) -> bool:
             """, (token_id, owner_uid))
             return cursor.fetchone() is not None
 
+def record_event(var, med, stock, at_date):
+    var.append({
+        "date": at_date,
+        "name": med["name"],
+        "stock": stock,
+        "threshold": med["stock_alert_threshold"],
+        "dose": med["dose"],
+        "capacity": med["box_capacity"],
+        "box_id": med["id"]
+    })
+        
+def check_initial_stock(med, stock, events, events_temp, day):
+    if stock < 0:
+        record_event(events, med, stock, date.today())
+        stock += med['box_capacity']
+    elif stock <= med['stock_alert_threshold']:
+        record_event(events_temp, med, stock, day)
+        stock += med['box_capacity']
+
 def create_calendar_ics(token: str, user_agent: str) -> bytes:
     """Crée un calendrier ICS pour un token donné.
     
@@ -119,6 +138,7 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
             
             # 2. Récupérer les médicaments avec leurs conditions groupées
             # Le RLS va filtrer via app.current_ics_token injecté précédemment (la session persiste dans la transaction)
+            # get pillbox_uses for calendar_id create table public.pillbox_uses
             cursor.execute("""
                 SELECT 
                     mb.id, 
@@ -134,9 +154,15 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                             'max_date', to_char(mbc.max_date, 'YYYY-MM-DD'),
                             'tablet_count', mbc.tablet_count
                         ) ORDER BY mbc.start_date
-                    ) as conditions
+                    ) as conditions,
+                    json_agg(
+                        json_build_object(
+                            'prepared_at', to_char(pbu.prepared_at, 'YYYY-MM-DD')
+                        ) ORDER BY pbu.prepared_at DESC
+                    ) as pillbox_uses
                 FROM medicine_boxes mb
                 JOIN medicine_box_conditions mbc ON mb.id = mbc.box_id
+                JOIN pillbox_uses pbu ON pbu.calendar_id = mb.calendar_id
                 WHERE mb.calendar_id = %s
                     AND mb.deleted_at IS NULL
                     AND mbc.deleted_at IS NULL
@@ -145,36 +171,26 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
             
             medicines = cursor.fetchall()
             events = []
-
-            def record_event(var, med, stock, at_date):
-                var.append({
-                    "date": at_date,
-                    "name": med["name"],
-                    "stock": stock,
-                    "threshold": med["stock_alert_threshold"],
-                    "dose": med["dose"],
-                    "capacity": med["box_capacity"]
-                })
             
             for med in medicines:
-                events_temp = []
-                today = date.today()
-                sunday = today + timedelta(days=(6 - today.weekday()))
-                is_active = False
+                events_temp = [] # événements temporaires pour ce médicament, à valider à la fin de la boucle
+                first_day = date.today() # jour de départ pour la simulation, par défaut aujourd'hui
+                max_day_used = date.today() # date du check de stock initial, par défaut aujourd'hui
+                is_active = False # indique si le médicament est actif
+                stock = med['stock_quantity'] # stock initial du médicament
                 
-                stock = med['stock_quantity']
-                if today <= sunday and stock_mode == 'weekly_pillbox':
-                    if stock < 0:
-                        record_event(events, med, stock, today)
-                        stock += med['box_capacity']
-                    elif stock <= med['stock_alert_threshold']:
-                        record_event(events_temp, med, stock, today)
-                        stock += med['box_capacity']
-                    today = sunday + timedelta(days=1)
+                if stock_mode == 'weekly_pillbox':
+                    # Si on est en mode hebdomadaire, max_day_used est le dimanche de la semaine de la dernière préparation et first_day le lundi suivant
+                    day_used = max(datetime.strptime(p['prepared_at'], '%Y-%m-%d').date() for p in med['pillbox_uses'])
+                    max_day_used = day_used + timedelta(days=6 - day_used.weekday())  # dimanche de la semaine de la dernière préparation
+                    first_day = max_day_used + timedelta(days=1)
                     
-                    
+                # check du stock init 
+                check_initial_stock(med, stock, events, events_temp, max_day_used)
+                
+                # Simulation jour par jour pour les 365 prochains jours
                 for day in range(0, 365):
-                    check_date = today + timedelta(days=day)
+                    check_date = first_day + timedelta(days=day)
                     
                     for cond in med['conditions']:
                         # Conversion des dates string en objets date
@@ -185,6 +201,7 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                             'tablet_count': cond['tablet_count']
                         }
                         
+                        # Vérifier si le médicament est dû à la date de check
                         if is_medication_due(cond_parsed, check_date):
                             is_active = True
                             stock -= cond['tablet_count']
@@ -203,9 +220,9 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                 if is_active:
                     events.extend(events_temp)
 
-    return _generate_ics_content(events, calendar_name).encode('utf-8')
+    return _generate_ics_content(events, calendar_name, calendar_id).encode('utf-8')
 
-def _generate_ics_content(events: list, calendar_name: str = "MediTime Stocks") -> str:
+def _generate_ics_content(events: list, calendar_name: str = "MediTime Stocks", calendar_id: int = 0) -> str:
     """Génère le contenu textuel au format iCalendar (ICS).
     
     Paramètres:
@@ -221,7 +238,9 @@ def _generate_ics_content(events: list, calendar_name: str = "MediTime Stocks") 
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH",
         f"X-WR-CALNAME:{calendar_name} - Stocks",
-        "X-WR-TIMEZONE:UTC"
+        "X-WR-TIMEZONE:UTC",
+        "X-PUBLISHED-TTL:PT6H",
+        "REFRESH-INTERVAL;VALUE=DURATION:PT6H"
     ]
     
     # Date de génération du fichier
@@ -230,9 +249,12 @@ def _generate_ics_content(events: list, calendar_name: str = "MediTime Stocks") 
     for event in events:
         # Format date YYYYMMDD pour les événements "toute la journée"
         dt_start = event['date'].strftime("%Y%m%d")
+        
         # DTEND est exclusif, donc on ajoute 1 jour pour couvrir la journée entière
         dt_end = (event['date'] + timedelta(days=1)).strftime("%Y%m%d")
-        uid = str(uuid.uuid4())
+        
+        # UID = {box_id}-{YYYYMMDD}@meditime
+        uid = f"{event['box_id']}-{event['date'].strftime('%Y%m%d')}@meditime"
         
         summary = f"💊 {event['name']}"
         if event.get('dose'):
@@ -248,10 +270,12 @@ def _generate_ics_content(events: list, calendar_name: str = "MediTime Stocks") 
             f"DTEND;VALUE=DATE:{dt_end}",
             f"SUMMARY:{summary}",
             f"DESCRIPTION:{description}",
+            f"URL:https://meditime.app/calendar/{calendar_id}/boxes",
             "STATUS:CONFIRMED",
-            "TRANSP:TRANSPARENT", # Indique que cet événement ne bloque pas le temps (disponible)
+            "TRANSP:TRANSPARENT",
             "END:VEVENT"
         ])
         
     lines.append("END:VCALENDAR")
-    return "\r\n".join(lines)
+    # Joindre avec CRLF et ajouter CRLF final
+    return "\r\n".join(lines) + "\r\n"

@@ -114,7 +114,7 @@ def error_response(
     - tuple: Tuple contenant la réponse JSON et le code HTTP.
     """
     uid, origin = _defaults(uid, origin)
-    payload = {"error": message, "code": code}
+    payload = {"error": message, "code": code, "details": str(error) if error is not None else None}
     if i18n_key:
         payload["i18n_key"] = i18n_key
 

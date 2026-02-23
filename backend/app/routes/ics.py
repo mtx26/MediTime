@@ -183,12 +183,13 @@ def get_calendar_ics(token):
                 'Cache-Control': 'no-cache, no-store, must-revalidate'
             }
         )
-    except ValueError:
+    except ValueError as ve:
         return error_response(
             message="Calendar not found or token invalid",
             code="ICS_NOT_FOUND",
             i18n_key="api.ics.calendar_not_found",
-            status_code=404
+            status_code=404,
+            error=str(ve)
         )
     except Exception as e:
         return error_response(
