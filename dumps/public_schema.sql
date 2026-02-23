@@ -1067,25 +1067,6 @@ CREATE POLICY "Owners can manage their ics tokens" ON public.ics_tokens TO authe
 
 
 --
--- Name: ics_tokens Shared users can view ics tokens; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY "Shared users can view ics tokens" ON public.ics_tokens TO authenticated USING (
-  EXISTS (
-    SELECT 1 FROM public.shared_calendars
-    WHERE shared_calendars.calendar_id = ics_tokens.calendar_id
-      AND shared_calendars.receiver_uid = auth.uid()
-  )
-) WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM public.shared_calendars
-    WHERE shared_calendars.calendar_id = ics_tokens.calendar_id
-      AND shared_calendars.receiver_uid = auth.uid()
-  )
-);
-
-
---
 -- Name: calendars Public access via ics token; Type: POLICY; Schema: public; Owner: -
 --
 
