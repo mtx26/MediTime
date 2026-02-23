@@ -26,8 +26,8 @@ node_modules
 backend/__pycache__
 tests
 .env
-.env.prod
 .env.dev
+.env.prod
 serviceAccountKey.json
 .venv/
 *.log
