@@ -2,6 +2,9 @@ from datetime import datetime, timedelta, date
 import uuid
 from app.db.connection import get_connection
 from app.services.calendar.core import is_medication_due
+from app.config import Config
+
+FRONTEND_URL = Config.FRONTEND_URL
 
 def create_ics_token(calendar_id: str, owner_uid: str) -> dict:
     """
@@ -270,7 +273,7 @@ def _generate_ics_content(events: list, calendar_name: str = "MediTime Stocks", 
             f"DTEND;VALUE=DATE:{dt_end}",
             f"SUMMARY:{summary}",
             f"DESCRIPTION:{description}",
-            f"URL:https://meditime.app/calendar/{calendar_id}/boxes",
+            f"URL:{FRONTEND_URL}/calendar/{calendar_id}/boxes",
             "STATUS:CONFIRMED",
             "TRANSP:TRANSPARENT",
             "END:VEVENT"
