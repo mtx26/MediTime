@@ -175,7 +175,7 @@ def create_box(calendar_id: str, box: dict) -> str:
             
             conn.commit()
 
-    return box_id
+    return str(box_id) if box_id else ""
   
   
 def delete_box(box_id: str, calendar_id: str):

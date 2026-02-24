@@ -49,7 +49,7 @@ def init_vertex_ai():
         scopes = ["https://www.googleapis.com/auth/cloud-platform"]
         credentials_obj, project_id = get_google_credentials(scopes)
 
-        if not credentials_obj or not project_id:
+        if not isinstance(credentials_obj, service_account.Credentials) or not project_id:
             raise RuntimeError("Échec de récupération des identifiants Google")
 
         location = Config.GOOGLE_CLOUD_LOCATION
@@ -78,7 +78,7 @@ def init_vertex_ai():
         raise RuntimeError("Initialisation Vertex AI échouée")
 
 
-def get_google_credentials(scopes: list = None) -> tuple[service_account.Credentials | dict | None, str | None]:
+def get_google_credentials(scopes: list | None = None) -> tuple[service_account.Credentials | dict | None, str | None]:
     """Récupère les informations d'identification Google à partir des variables d'environnement.
 
     Paramètres:

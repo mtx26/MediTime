@@ -1,6 +1,7 @@
 from flask import request
 from . import api
 from app.utils.logging import frontend_logger
+from app.utils.logging import log_backend
 
 @api.route("/log", methods=["POST"])
 def log_handler() -> dict:
@@ -8,6 +9,8 @@ def log_handler() -> dict:
     Extrait le message, le type de log et le contexte, puis utilise le logger approprié.
     """
     data = request.json
+    if data is None:
+        return {"status": "error", "message": "Invalid JSON payload"}
     msg = data.get("message", "")
     level = data.get("type", "info").lower()
     context = data.get("context", {}) or {}

@@ -27,7 +27,7 @@ def _get_pool():
     return _connection_pool
 
 @contextmanager
-def get_connection(uid: str = None, skip_rls: bool = False):
+def get_connection(uid: str | None = None, skip_rls: bool = False):
     """Context manager pour gérer une connexion à la base de données Supabase PostgreSQL depuis le pool.
 
     Paramètres:

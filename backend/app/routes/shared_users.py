@@ -81,7 +81,7 @@ def handle_shared_calendars():
         calendars_list = [
             dict(row)
             for row in rows
-            if verify_calendar_share(row["id"], uid)
+            if verify_calendar_share(row["id"])
         ]
 
         return success_response(
@@ -175,6 +175,14 @@ def handle_delete_user_shared_calendar(calendar_id):
                     )
 
                 owner_uid = result.get("owner_uid") if result else None
+                if not owner_uid:
+                    return error_response(
+                        message=ERROR_CALENDAR_NOT_FOUND,
+                        code="SHARED_CALENDAR_DELETE_ERROR",
+                        status_code=404,
+                        log_extra={"calendar_id": calendar_id},
+                        i18n_key="api.shared_calendar.invalid_id"
+                    )
                 link = urljoin(Config.FRONTEND_URL or "", "/calendars")
 
                 notify_and_record(

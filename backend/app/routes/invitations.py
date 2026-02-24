@@ -7,7 +7,7 @@ from app.utils.responses import success_response, error_response, warning_respon
 from app.utils.decorators import require_auth, measure_time, with_query_origin
 
 
-def _get_user_by_email(cursor, email: str) -> dict | None:
+def _get_user_by_email(cursor, email: str | None) -> dict | None:
     """Récupère un utilisateur par son email.
 
     Paramètres:
@@ -18,11 +18,13 @@ def _get_user_by_email(cursor, email: str) -> dict | None:
     - dict ou None: Dictionnaire contenant les informations de l'utilisateur si trouvé, sinon None.
     """
     # Utilisation de la fonction RPC sécurisée pour contourner RLS
+    if not email:
+        return None
     cursor.execute("SELECT * FROM get_user_by_email(%s)", (email,))
     return cursor.fetchone()
 
 
-def _insert_registration_invitation(cursor, calendar_id: str, email: str) -> str | None:
+def _insert_registration_invitation(cursor, calendar_id: str, email: str | None) -> str | None:
     """Insère une invitation d'enregistrement dans la base de données.
 
     Paramètres:
@@ -33,6 +35,8 @@ def _insert_registration_invitation(cursor, calendar_id: str, email: str) -> str
     Retour:
     - str: Token de l'invitation créée.
     """
+    if not email:
+        return None
 
     cursor.execute(
         """
@@ -118,7 +122,7 @@ def _delete_invitation_returning_calendar_owner(cursor, token: str) -> tuple[str
     return (row.get("calendar_id"), row.get("owner_uid"))
 
 
-def _delete_invite_notification(cursor, receiver_uid: str, calendar_id: str, owner_uid: str):
+def _delete_invite_notification(cursor, receiver_uid: str | None, calendar_id: str | None, owner_uid: str | None):
     """Supprime la notification d'invitation de calendrier pour un utilisateur.
 
     Paramètres:
@@ -139,7 +143,7 @@ def _delete_invite_notification(cursor, receiver_uid: str, calendar_id: str, own
     )
 
 
-def _handle_registration_invite(cursor, calendar_id : str, receiver_email: str, owner_uid: str):
+def _handle_registration_invite(cursor, calendar_id : str, receiver_email: str | None, owner_uid: str | None):
     """
     Gère l'invitation pour un utilisateur non enregistré.
     
@@ -151,6 +155,14 @@ def _handle_registration_invite(cursor, calendar_id : str, receiver_email: str, 
     """
     token = _insert_registration_invitation(cursor, calendar_id, receiver_email)
     link = f"/accept-invite?token={token}&type=registration"
+    if not token or not owner_uid or not receiver_email:
+        return error_response(
+            message="Error creating invitation",
+            code="INVITATION_CREATE_ERROR",
+            i18n_key="api.invitations.create_error",
+            status_code=500,
+            log_extra={"calendar_id": calendar_id},
+        )
 
     email_address_direct(
         to_email=receiver_email,
@@ -169,7 +181,7 @@ def _handle_registration_invite(cursor, calendar_id : str, receiver_email: str, 
         log_extra={"calendar_id": calendar_id},
     )
 
-def _handle_existing_user_invite(cursor, calendar_id: str, receiver_uid: str, owner_uid: str):
+def _handle_existing_user_invite(cursor, calendar_id: str, receiver_uid: str | None, owner_uid: str | None):
     """
     Gère l'invitation pour un utilisateur existant.
 
@@ -179,6 +191,15 @@ def _handle_existing_user_invite(cursor, calendar_id: str, receiver_uid: str, ow
     - receiver_uid: ID de l'utilisateur à inviter.
     - owner_uid: ID de l'utilisateur qui envoie l'invitation.
     """
+    if not receiver_uid or not owner_uid:
+        return error_response(
+            message="Error creating invitation",
+            code="INVITATION_CREATE_ERROR",
+            i18n_key="api.invitations.create_error",
+            status_code=500,
+            log_extra={"calendar_id": calendar_id},
+        )
+        
     # Invitation à soi-même
     if owner_uid == receiver_uid:
         return warning_response(
@@ -250,10 +271,10 @@ def handle_send_invitation(calendar_id: str):
     Payload:
     - str: email - Adresse email de l'utilisateur à inviter.
     """
-    owner_uid = g.uid if hasattr(g, "uid") else None  # défini avant try pour except éventuel
+    owner_uid: str | None = g.uid if hasattr(g, "uid") else None  # défini avant try pour except éventuel
     try:
         payload = request.get_json(force=True)
-        receiver_email = payload.get("email")
+        receiver_email: str | None = payload.get("email")
 
         # Utilisation de get_connection() standard (RLS actif)
         # La recherche d'utilisateur se fait via RPC sécurisé dans _get_user_by_email
@@ -364,6 +385,15 @@ def delete_login_invitation(token: str):
                 # Supprimer la notif d'invitation côté receveur
                 _delete_invite_notification(cursor, receiver_uid, calendar_id, owner_uid)
                 conn.commit()
+        
+        if not receiver_uid or not calendar_id or not owner_uid:
+            return error_response(
+                message="Error deleting invitation",
+                code="INVITATION_DELETE_ERROR",
+                i18n_key="api.invitations.delete_error",
+                status_code=500,
+                log_extra={"calendar_id": calendar_id},
+            )
 
         # Notifier le receveur que le partage a été retiré
         link = "/calendars"
@@ -407,21 +437,30 @@ def handle_accept_login_invitation(token: str):
     - str: token - Token de l'invitation à accepter.
 
     """
-    uid = g.uid if hasattr(g, "uid") else None
-    calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
-    owner_uid = g.owner_uid if hasattr(g, "owner_uid") else None
     try:
+        uid = g.uid if hasattr(g, "uid") else None
+        calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
+        owner_uid = g.owner_uid if hasattr(g, "owner_uid") else None
+        
+        if not uid or not calendar_id or not owner_uid:
+            return error_response(
+                message="Error accepting invitation",
+                code="INVITATION_ACCEPT_ERROR",
+                i18n_key="api.invitations.accept_error",
+                status_code=500,
+                log_extra={"token": token},
+            )
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
                     """
-                                        UPDATE shared_calendars
-                                        SET accepted_at = NOW()
-                                        WHERE token = %s
-                                            AND receiver_uid = %s
-                                            AND accepted_at IS NULL
-                                            AND deleted_at IS NULL
-                                        RETURNING id
+                        UPDATE shared_calendars
+                        SET accepted_at = NOW()
+                        WHERE token = %s
+                            AND receiver_uid = %s
+                            AND accepted_at IS NULL
+                            AND deleted_at IS NULL
+                        RETURNING id
                     """,
                     (token, uid),
                 )
@@ -482,10 +521,20 @@ def handle_reject_login_invitation(token: str):
     - str: token - Token de l'invitation à rejeter.
 
     """
-    uid = g.uid if hasattr(g, "uid") else None
-    calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
-    owner_uid = g.owner_uid if hasattr(g, "owner_uid") else None
     try:
+        uid = g.uid if hasattr(g, "uid") else None
+        calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
+        owner_uid = g.owner_uid if hasattr(g, "owner_uid") else None
+
+        if not uid or not calendar_id or not owner_uid:
+            return error_response(
+                message="Error rejecting invitation",
+                code="INVITATION_REJECT_ERROR",
+                i18n_key="api.invitations.reject_error",
+                status_code=500,
+                log_extra={"token": token},
+            )
+            
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
@@ -604,10 +653,19 @@ def delete_registration_invitation(token: str):
     - str: token - Token de l'invitation à supprimer.
 
     """
-    uid = g.uid if hasattr(g, "uid") else None
-    calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
-    invited_email = g.invited_email if hasattr(g, "invited_email") else None
     try:
+        uid = g.uid if hasattr(g, "uid") else None
+        calendar_id = g.calendar_id if hasattr(g, "calendar_id") else None
+        invited_email = g.invited_email if hasattr(g, "invited_email") else None
+        
+        if not uid or not calendar_id or not invited_email:
+            return error_response(
+                message="Error deleting invitation",
+                code="INVITATION_DELETE_ERROR",
+                i18n_key="api.invitations.delete_error",
+                status_code=500,
+                log_extra={"token": token},
+            )
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
@@ -689,13 +747,22 @@ def accept_registration_invitation(token: str):
     - str: token - Token de l'invitation à accepter.
 
     """
-    uid = g.uid if hasattr(g, "uid") else None
     try:
+        uid = g.uid if hasattr(g, "uid") else None
+        
+        if not uid:
+            return error_response(
+                message="Error accepting invitation",
+                code="INVITATION_ACCEPT_ERROR",
+                i18n_key="api.invitations.accept_error",
+                status_code=500,
+                log_extra={"token": token},
+            )
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 calendar_id, owner_uid, shared_calendar_id = _process_accept_registration(cursor, token, uid)
                 conn.commit()
-                if not calendar_id:
+                if not calendar_id or not owner_uid or not shared_calendar_id:
                     return error_response(
                         message="invitation not found",
                         code="INVITATION_NOT_FOUND",
@@ -745,8 +812,16 @@ def reject_registration_invitation(token: str):
     - str: token - Token de l'invitation à rejeter.
 
     """
-    uid = g.uid if hasattr(g, "uid") else None
     try:
+        uid = g.uid if hasattr(g, "uid") else None
+        if not uid:
+            return error_response(
+                message="Error rejecting invitation",
+                code="INVITATION_REJECT_ERROR",
+                i18n_key="api.invitations.reject_error",
+                status_code=500,
+                log_extra={"token": token},
+            )
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 calendar_id, owner_uid = _delete_invitation_returning_calendar_owner(cursor, token)

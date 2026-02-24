@@ -29,14 +29,14 @@ def load_image_from_bytes(file_bytes: bytes) -> bytes:
         raise ValueError("Unsupported or corrupted image format") from e
 
 
-def analyze_medical_document(base64_image: str) -> dict:
+def analyze_medical_document(base64_image: str) -> dict | None:
     """Analyse un document médical scanné via Gemini et extrait les informations des médicaments.
 
     Paramètres:
     - base64_image (str): Image encodée en base64 du document médical scanné.
 
     Retour:
-    - dict: Dictionnaire contenant les informations extraites des médicaments.
+    - dict | None: Dictionnaire contenant les informations extraites des médicaments, ou None en cas d'erreur.
     """
     try:
         MODEL_ID = "gemini-2.0-flash-lite"

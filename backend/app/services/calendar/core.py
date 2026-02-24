@@ -2,12 +2,12 @@ from datetime import timedelta, date, datetime
 from app.utils.logging import log_backend as logger
 from app.db.connection import get_connection
 
-def normalize_date(input_date: str) -> date | None:
+def normalize_date(input_date: str | None) -> date | None:
     """
     Normalise une date au format date.
 
     Paramètres:
-    - input_date (str): La date en format 'DD-MM-YYYY'.
+    - input_date (str | None): La date en format 'DD-MM-YYYY' ou None.
 
     Retour:
     - date | None: La date normalisée ou None si le format est invalide.
@@ -26,7 +26,7 @@ def normalize_date(input_date: str) -> date | None:
         })
     
     return None
-def generate_calendar_schedule(calendar_id: str, start_date: date) -> tuple[list, list, str | None]:
+def generate_calendar_schedule(calendar_id: str, start_date: date) -> tuple[list[dict], dict, str | None]:
     """
     Génère le planning et le tableau de prise de médicaments pour un calendrier donné à partir d'une date de début.
     
@@ -35,7 +35,7 @@ def generate_calendar_schedule(calendar_id: str, start_date: date) -> tuple[list
     - start_date (date): La date de début pour générer le planning.
 
     Retour:
-    - tuple: Un tuple contenant la liste du planning, la liste du tableau de prise, et le nom du calendrier (ou None si non trouvé).
+    - tuple: Un tuple contenant la liste du planning, le dictionnaire du tableau de prise, et le nom du calendrier (ou None si non trouvé).
     """
     try:
         with get_connection() as conn:
@@ -66,7 +66,7 @@ def generate_calendar_schedule(calendar_id: str, start_date: date) -> tuple[list
                 rows = cursor.fetchall()
                 if not rows:
                     # calendrier inexistant ou aucun médoc -> même retour qu’avant
-                    return [], [], None
+                    return [], {}, None
 
                 calendar_name = rows[0].get("calendar_name")
                 # on retire simplement la clé de chaque ligne pour garder EXACTEMENT cond.* + name + dose
@@ -84,7 +84,7 @@ def generate_calendar_schedule(calendar_id: str, start_date: date) -> tuple[list
             "error": str(e),
             "calendar_id": calendar_id
         })
-        return [], [], None
+        return [], {}, None
 
 
 def is_medication_due(med: dict, current_date: date) -> bool:
@@ -99,14 +99,12 @@ def is_medication_due(med: dict, current_date: date) -> bool:
     - bool: True si le médicament doit être pris à la date donnée, False sinon.
     """
     try:
-        start_date = med.get("start_date", None)
-        start_date = normalize_date(start_date)
+        start_date: date | None = normalize_date(med.get("start_date", None))
 
         # Fin de validité optionnelle: max_date est soit une date, soit absent/None
-        max_date = med.get("max_date", None)
+        max_date: date | None = normalize_date(med.get("max_date", None))
+        
         if max_date:
-            max_date = normalize_date(max_date)
-            
             if current_date > max_date:
                 return False
         if not start_date:
@@ -150,31 +148,22 @@ def generate_schedule(start_date: date, medications: list[dict]) -> list[dict]:
                 name = med.get('name')
                 tablet_count = med.get('tablet_count')
                 dose = med.get('dose', None)
+                time_of_day = med.get("time_of_day", "morning")
 
-                if med["time_of_day"] == "morning":
-                    pils_data = {
-                        "title" : name,
-                        "start" : current_date.strftime("%Y-%m-%dT08:00:00"),
-                        "color" : "#f87171", # rouge clair
-                        "tablet_count" : tablet_count,
-                        "dose" : dose
-                    }
-                elif med["time_of_day"] == "noon":
-                    pils_data = {
-                        "title" : name,
-                        "start" : current_date.strftime("%Y-%m-%dT12:00:00"),
-                        "color" : "#34d399", # vert clair
-                        "tablet_count" : tablet_count,
-                        "dose" : dose
-                    }
-                elif med["time_of_day"] == "evening":
-                    pils_data = {
-                        "title" : name,
-                        "start" : current_date.strftime("%Y-%m-%dT18:00:00"),
-                        "color" : "#60a5fa", # bleu clair
-                        "tablet_count" : tablet_count,
-                        "dose" : dose
-                    }
+                time_map = {
+                    "morning": {"time": "08:00:00", "color": "#f87171"},
+                    "noon": {"time": "12:00:00", "color": "#34d399"},
+                    "evening": {"time": "18:00:00", "color": "#60a5fa"}
+                }
+                
+                time_config = time_map.get(time_of_day, time_map["morning"])
+                pils_data = {
+                    "title": name,
+                    "start": current_date.strftime(f"%Y-%m-%dT{time_config['time']}"),
+                    "color": time_config["color"],
+                    "tablet_count": tablet_count,
+                    "dose": dose
+                }
                 schedule.append(pils_data)
                 
     # trier les événements par date et par alphabet
@@ -226,7 +215,7 @@ def generate_table(start_date: date, medications: list[dict]) -> dict:
         moment = med.get("time_of_day")
         if moment not in table_by_moment:
             continue
-        merge_or_append_by_moment(table_by_moment[moment], med.get("name"), med_table.get(moment, {}), med.get("dose", None))
+        merge_or_append_by_moment(table_by_moment[moment], med.get("name", "unknown"), med_table.get(moment, {}), med.get("dose", None))
 
     for moment in table_by_moment:
         table_by_moment[moment].sort(key=lambda x: x["title"].lower())

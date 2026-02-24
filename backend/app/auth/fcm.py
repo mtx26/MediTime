@@ -20,7 +20,7 @@ def get_fcm_access_token() -> tuple[str | None, str | None]:
              Si une erreur se produit, retourne (None, None).
     """
     credentials_obj, project_id = get_google_credentials(SCOPES)
-    if credentials_obj is None:
+    if credentials_obj is None or isinstance(credentials_obj, dict):
         return None, None
 
     try:

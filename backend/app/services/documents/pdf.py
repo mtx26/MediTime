@@ -76,7 +76,7 @@ def _format_condition_text(cond: dict, dose_str: str) -> str:
     tablet_count = cond.get("tablet_count")
     interval_days = cond.get("interval_days")
     moment_key = cond.get("time_of_day")
-    moment_txt = moment_map.get(moment_key, moment_key or "moment")
+    moment_txt = moment_map.get(moment_key, moment_key) if moment_key else "moment"
     start_txt = _fmt_date(cond.get("start_date"))
 
     parts = [f"- {tablet_count if tablet_count is not None else '?'} comprimé(s)"]

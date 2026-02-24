@@ -6,9 +6,6 @@ from app.utils.logging import log_backend
 from app.auth.fcm import get_fcm_access_token
 from app.db.connection import get_connection
 
-
-frontend_url = Config.FRONTEND_URL
-
 def delete_fcm_token(token: str):
     """Supprime un token FCM de la base de données.
 
@@ -33,7 +30,7 @@ def _create_fcm_payload(token: str, title: str, body: str, context: dict) -> dic
     Retour:
     - dict: Le payload de la notification FCM.
     """
-    icon_url = urljoin(frontend_url, "/icons/icon-192.png")
+    icon_url = urljoin(str(Config.FRONTEND_URL), "/icons/icon-192.png")
 
     return {
         "message": {

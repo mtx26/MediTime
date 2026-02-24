@@ -14,6 +14,7 @@ from app.utils.decorators import require_auth, measure_time, with_query_origin
 def get_user_info():
     uid = g.uid if hasattr(g, "uid") else None
     try:
+        
         user = fetch_user(uid)
         if not user:
             return error_response(

@@ -94,7 +94,7 @@ def error_response(
     status_code: int = 500,
     uid: str | None = None,
     origin: str | None = None,
-    error: Exception | None = None,
+    error: Exception | str | None = None,
     log_extra: dict | None = None,
     i18n_key: str | None = None
 ) -> tuple:

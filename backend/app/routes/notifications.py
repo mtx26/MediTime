@@ -274,6 +274,15 @@ def mark_all_notifications_read():
 @with_query_origin(default_origin="FCM_TOKEN_SEND")
 def register_token():
     data = request.json
+    
+    if not data:
+        return error_response(
+            message="missing data", 
+            code="MISSING_DATA",
+            i18n_key="api.notifications.missing_data",
+            status_code=400,
+        )
+    
     token = data.get("token")
     device_name = data.get("deviceName")
     uid = g.uid

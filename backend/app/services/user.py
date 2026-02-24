@@ -2,7 +2,7 @@ from app.db.connection import get_connection
 from app.utils.upload import upload_logo
 from psycopg2 import sql
 
-def fetch_user(uid: str) -> dict:
+def fetch_user(uid: str | None) -> dict:
     """Fetch user from the database by user ID.
 
     Paramètres:
@@ -11,6 +11,8 @@ def fetch_user(uid: str) -> dict:
     Retour:
     - dict: Dictionnaire représentant l'utilisateur ou vide si non trouvé.
     """
+    if uid is None:
+        return {}
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("SELECT * FROM users WHERE id = %s", (uid,))
@@ -36,7 +38,7 @@ def fetch_public_user_info(uid: str) -> dict:
 
 
 def update_existing_user(
-    uid: str,
+    uid: str | None,
     user_db: dict,
     display_name: str | None,
     email: str | None,
@@ -47,7 +49,7 @@ def update_existing_user(
     """Met à jour les informations de l'utilisateur existant dans la base de données.
 
     Paramètres:
-    - uid (str): ID de l'utilisateur.
+    - uid (str | None): ID de l'utilisateur.
     - user_db (dict): Dictionnaire représentant l'utilisateur actuel.
     - display_name (str | None): Nouveau nom d'affichage.
     - email (str | None): Nouvelle adresse e-mail.
@@ -93,11 +95,11 @@ def update_existing_user(
 
             return user_db
 
-def insert_new_user(uid: str, display_name: str, email: str, photo_url: str | None, email_enabled: bool = True, push_enabled: bool = True) -> dict:
+def insert_new_user(uid: str | None, display_name: str, email: str, photo_url: str | None, email_enabled: bool = True, push_enabled: bool = True) -> dict:
     """Insère un nouvel utilisateur dans la base de données.
 
     Paramètres:
-    - uid (str): ID de l'utilisateur.
+    - uid (str | None): ID de l'utilisateur.
     - display_name (str): Nom d'affichage.
     - email (str): Adresse e-mail.
     - photo_url (str | None): URL de la photo.

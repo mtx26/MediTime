@@ -31,6 +31,10 @@ def init_vertex_ai():
         if not credentials_obj:
             raise RuntimeError("Impossible de récupérer les credentials Vertex AI")
 
+        # Ensure credentials_obj is a Credentials instance, not a dict
+        if isinstance(credentials_obj, dict):
+            raise RuntimeError("Expected Credentials object, got dictionary from get_google_credentials")
+
         aiplatform.init(
             project=project_id,
             location="europe-west1",

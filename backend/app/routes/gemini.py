@@ -16,7 +16,8 @@ def handle_analyze_medical_document():
     - str: Image encodée en base64 du document médical à analyser.
     """
     try:
-        base64_image = request.json.get("image")
+        payload = request.get_json(force=True) or {}
+        base64_image = payload.get("image", "")
 
         if not base64_image:
             return warning_response(
