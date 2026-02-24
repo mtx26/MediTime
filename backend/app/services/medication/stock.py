@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, date
 from app.services.calendar import is_medication_due
 from app.db.connection import get_connection
 from app.services.notifications import notify_and_record
@@ -6,7 +6,7 @@ from app.utils.logging import log_backend
 from app.config import Config
 from collections import defaultdict
 
-def process_box_decrement(cursor, id_box: str, qty: int, start_date: str, days: int = 7):
+def process_box_decrement(cursor, id_box: str, qty: int, start_date: date, days: int = 7):
     """
     Calcule et applique la diminution du stock pour une boîte donnée
     sur un ou plusieurs jours (par défaut 7).
@@ -46,7 +46,7 @@ def process_box_decrement(cursor, id_box: str, qty: int, start_date: str, days: 
             (new_qty, id_box)
         )
 
-def process_box_increment(cursor, id_box: str, qty: int, start_date: str, days: int = 7):
+def process_box_increment(cursor, id_box: str, qty: int, start_date: date, days: int = 7):
     """
     Calcule et applique l'augmentation du stock pour une boîte donnée
     sur un ou plusieurs jours (par défaut 7).
@@ -87,7 +87,7 @@ def process_box_increment(cursor, id_box: str, qty: int, start_date: str, days: 
             (new_qty, id_box)
         )
 
-def check_low_stock_and_notify_for_calendar(calendar_id: int):
+def check_low_stock_and_notify_for_calendar(calendar_id: str) -> None:
     """
     Vérifie les stocks faibles pour un calendrier spécifique et envoie des notifications.
     
