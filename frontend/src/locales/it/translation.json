@@ -315,9 +315,11 @@
     "intake_conditions": "Condizioni di assunzione",
     "loading_medicine_boxes": "Caricamento delle scatole dei medicinali...",
     "loading_stock_alerts": "Caricamento avvisi sulle azioni...",
+    "missing_pillbox": "Portapillole mancante",
     "name": "Nome",
     "new_box": "Nuova scatola",
     "no_medicines_selected": "Nessun farmaco selezionato",
+    "pill_box": "fortino",
     "qr_code_help_text": "Il codice DataMatrix si trova sulla confezione del farmaco, vicino al codice a barre. È un piccolo quadrato bianco e nero.",
     "remaining_qty": "Quantità rimanente",
     "restock": "Riassortimento",
@@ -443,6 +445,7 @@
   "copy_link_error": "Errore durante la copia del collegamento.",
   "create_share_link": "Crea un collegamento di condivisione",
   "created_at": "Creato il",
+  "creator": "Creatore",
   "critical_stock": "Rottura di stock",
   "cta": {
     "button": "creo il mio account",
@@ -1131,5 +1134,6 @@
   },
   "yes": "SÌ",
   "you_have_no_pillbox_use_history": "Non hai alcuna cronologia di utilizzo per l'organizzatore di pillole.",
-  "creator": "Creatore"
+  "confirm_calendar_refill": "Verificare che il portapillole sia pieno",
+  "pillbox_refill_description": "Il portapillole si riempirà con eventuali farmaci mancanti (scorte negative) per questa settimana. Questa azione è irreversibile."
 }

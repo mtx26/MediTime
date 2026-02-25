@@ -24,6 +24,7 @@ export const getCalendarSourceMap = (
     getTokensIcs: personalCalendars.getTokensIcs,
     createTokenIcs: personalCalendars.createTokenIcs,
     deleteTokenIcs: personalCalendars.deleteTokenIcs,
+    fetchScheduleNegativeStock: personalCalendars.fetchPersonalScheduleNegativeStock ,
     },
   sharedUser: {
     fetchSchedule: sharedUserCalendars.fetchSharedUserCalendarSchedule,
@@ -45,6 +46,7 @@ export const getCalendarSourceMap = (
     getTokensIcs: sharedUserCalendars.getSharedTokensIcs,
     createTokenIcs: sharedUserCalendars.createSharedTokenIcs,
     deleteTokenIcs: sharedUserCalendars.deleteSharedTokenIcs,
+    fetchScheduleNegativeStock: sharedUserCalendars.fetchSharedUserScheduleNegativeStock,
   },
   token: {
     fetchSchedule: tokenCalendars.fetchTokenCalendarSchedule,
@@ -67,5 +69,6 @@ export const getCalendarSourceMap = (
     getTokensIcs: null,
     createTokenIcs: null,
     deleteTokenIcs: null,
+    fetchScheduleNegativeStock: null,
   },
 });

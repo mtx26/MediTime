@@ -315,9 +315,11 @@
     "intake_conditions": "受講条件",
     "loading_medicine_boxes": "薬箱を積んでいます…",
     "loading_stock_alerts": "株価アラートを読み込んでいます...",
+    "missing_pillbox": "紛失したトーチカ",
     "name": "名前",
     "new_box": "新しい箱",
     "no_medicines_selected": "薬が選択されていません",
+    "pill_box": "トーチカ",
     "qr_code_help_text": "DataMatrixコードは、医薬品のパッケージのバーコードの近くにあります。小さな白黒の四角形です。",
     "remaining_qty": "残り数量",
     "restock": "再入荷",
@@ -443,6 +445,7 @@
   "copy_link_error": "リンクのコピー中にエラーが発生しました。",
   "create_share_link": "共有リンクを作成する",
   "created_at": "作成日",
+  "creator": "クリエイター",
   "critical_stock": "破裂した株式",
   "cta": {
     "button": "アカウントを作成します",
@@ -1131,5 +1134,6 @@
   },
   "yes": "はい",
   "you_have_no_pillbox_use_history": "ピルオーガナイザーの使用履歴がありません。",
-  "creator": "クリエイター"
+  "confirm_calendar_refill": "ピルボックスがいっぱいであることを確認する",
+  "pillbox_refill_description": "ピルケースは、今週不足している薬（マイナス在庫）を補充します。この操作は元に戻せません。"
 }

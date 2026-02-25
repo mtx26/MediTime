@@ -97,6 +97,7 @@ def check_initial_stock(med, stock, events, events_temp, day):
     elif stock <= med['stock_alert_threshold']:
         record_event(events_temp, med, stock, day)
         stock += med['box_capacity']
+    
     return stock
 
 def create_calendar_ics(token: str, user_agent: str) -> bytes:
@@ -127,7 +128,6 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                 WHERE ics_tokens.token = %s 
                     AND ics_tokens.deleted_at IS NULL
                     AND ics_tokens.calendar_id = calendars.id
-                    AND calendar_settings.calendar_id = calendars.id
                 RETURNING ics_tokens.calendar_id, calendars.name, calendar_settings.stock_decrement_method
             """, (token, user_agent, token))
             
@@ -158,30 +158,24 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                             'start_date', to_char(mbc.start_date, 'YYYY-MM-DD'),
                             'max_date', to_char(mbc.max_date, 'YYYY-MM-DD'),
                             'tablet_count', mbc.tablet_count
-                        )
-                        ORDER BY mbc.start_date
-                    ) AS conditions,
-                    COALESCE(pbu_agg.pillbox_uses, '[]'::json) AS pillbox_uses
+                        ) ORDER BY mbc.start_date
+                    ) as conditions,
+                    (
+                        SELECT json_agg(json_build_object('prepared_at', to_char(pbu2.prepared_at, 'YYYY-MM-DD')))
+                        FROM (
+                            SELECT pbu2.prepared_at
+                            FROM pillbox_uses pbu2
+                            WHERE pbu2.calendar_id = mb.calendar_id
+                            ORDER BY pbu2.prepared_at DESC
+                            LIMIT 1
+                        ) pbu2
+                    ) as pillbox_uses
                 FROM medicine_boxes mb
                 JOIN medicine_box_conditions mbc ON mb.id = mbc.box_id
-                LEFT JOIN (
-                    SELECT 
-                        calendar_id,
-                        json_agg(
-                            json_build_object(
-                                'prepared_at', to_char(prepared_at, 'YYYY-MM-DD')
-                            )
-                            ORDER BY prepared_at DESC
-                        ) AS pillbox_uses
-                    FROM pillbox_uses
-                    GROUP BY calendar_id
-                ) pbu_agg ON pbu_agg.calendar_id = mb.calendar_id
                 WHERE mb.calendar_id = %s
-                  AND mb.deleted_at IS NULL
-                  AND mbc.deleted_at IS NULL
-                GROUP BY 
-                    mb.id, mb.name, mb.stock_quantity, mb.stock_alert_threshold, mb.box_capacity, mb.dose,
-                    pbu_agg.pillbox_uses;
+                    AND mb.deleted_at IS NULL
+                    AND mbc.deleted_at IS NULL
+                GROUP BY mb.id, mb.name, mb.stock_quantity, mb.stock_alert_threshold, mb.box_capacity, mb.dose
             """, (calendar_id,))
             
             medicines = cursor.fetchall()
@@ -194,7 +188,7 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                 is_active = False # indique si le médicament est actif
                 stock = med['stock_quantity'] # stock initial du médicament
                 
-                if stock_mode == 'weekly_pillbox' and med['pillbox_uses']:
+                if stock_mode == 'weekly_pillbox':
                     # Si on est en mode hebdomadaire, max_day_used est le dimanche de la semaine de la dernière préparation et first_day le lundi suivant
                     day_used = max(datetime.strptime(p['prepared_at'], '%Y-%m-%d').date() for p in med['pillbox_uses'])
                     max_day_used = day_used + timedelta(days=6 - day_used.weekday())  # dimanche de la semaine de la dernière préparation

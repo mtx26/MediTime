@@ -315,9 +315,11 @@
     "intake_conditions": "服用条件",
     "loading_medicine_boxes": "正在装载药品箱……",
     "loading_stock_alerts": "正在加载股票提醒……",
+    "missing_pillbox": "药盒不见了",
     "name": "姓名",
     "new_box": "新盒子",
     "no_medicines_selected": "未选择任何药物",
+    "pill_box": "药盒",
     "qr_code_help_text": "DataMatrix 码位于药品包装上，靠近条形码。它是一个黑白相间的小方块。",
     "remaining_qty": "剩余数量",
     "restock": "补货",
@@ -443,6 +445,7 @@
   "copy_link_error": "复制链接时出错。",
   "create_share_link": "创建共享链接",
   "created_at": "创建于",
+  "creator": "创作者",
   "critical_stock": "股票破裂",
   "cta": {
     "button": "我创建了我的帐户",
@@ -1131,5 +1134,6 @@
   },
   "yes": "是的",
   "you_have_no_pillbox_use_history": "您的药盒没有使用记录。",
-  "creator": "创作者"
+  "confirm_calendar_refill": "确认药盒已满。",
+  "pillbox_refill_description": "药盒将自动补充本周缺失的药物（库存不足）。此操作不可逆。"
 }

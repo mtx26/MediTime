@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import { useRealtimeBoxesSwitcher } from '@/hooks/realtime/useRealtimeBoxesSwitcher';
@@ -9,7 +9,7 @@ import IconButton from '@/components/common/UtilityComponents';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle, Package } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
 
 function StockAlertsPage({
@@ -19,6 +19,7 @@ function StockAlertsPage({
 }) {
   const params = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { lng } = params;
 
@@ -229,15 +230,31 @@ function StockAlertsPage({
                         {med.stock_quantity}
                       </strong>
                     </div>
-                    <div>
-                      <IconButton
-                        className="w-full border-green-500 text-green-600 hover:bg-green-50"
-                        icon={PlusCircle}
-                        text={t('boxes.restock')}
-                        onClick={() => restockBox(calendarId, med.id)}
-                        disabled={med.box_capacity === 0}
-                        helpDisabled={t('boxes.restock_disabled_tooltip')}
-                      />
+                    <div className='flex-1 flex flex-col gap-2'>
+                      <div className="flex-1">
+                        <IconButton
+                          className="w-full border-green-500 text-green-600 hover:bg-green-50"
+                          icon={PlusCircle}
+                          text={t('boxes.restock')}
+                          onClick={() => calendarSource.restockBox(calendarId, med.id)}
+                          disabled={med.box_capacity === 0}
+                          helpDisabled={t('boxes.restock_disabled_tooltip')}
+                        />
+                      </div>
+                      {/* Bouton pour faire le pillulier d'un medoc negatif */}
+                      {med.stock_quantity < 0 && (
+                        <div className='flex-1'>
+                          <IconButton
+                            className="w-full border-blue-500 text-blue-600 hover:bg-blue-50"
+                            icon={Package}
+                            text={t('boxes.missing_pillbox')}
+                            onClick={() => {
+                              const medsIdParam = encodeURIComponent(JSON.stringify([med.id]));
+                              navigate(`/${lng}/${basePath}/${calendarId}/pillbox?medsId=${medsIdParam}`);
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                   <Badge

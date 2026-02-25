@@ -315,9 +315,11 @@
     "intake_conditions": "Conditions of taking",
     "loading_medicine_boxes": "Loading the medicine boxes...",
     "loading_stock_alerts": "Loading stock alerts...",
+    "missing_pillbox": "Missing pillbox",
     "name": "Name",
     "new_box": "New box",
     "no_medicines_selected": "No medication selected",
+    "pill_box": "pillbox",
     "qr_code_help_text": "The DataMatrix code is located on the medication packaging, near the barcode. It is a small black and white square.",
     "remaining_qty": "Remaining quantity",
     "restock": "Restocking",
@@ -443,6 +445,7 @@
   "copy_link_error": "Error copying link.",
   "create_share_link": "Create a sharing link",
   "created_at": "Created on",
+  "creator": "Creator",
   "critical_stock": "Rupture de stock",
   "cta": {
     "button": "I create my account",
@@ -1131,5 +1134,6 @@
   },
   "yes": "Yes",
   "you_have_no_pillbox_use_history": "You have no usage history for the pill organizer.",
-  "creator": "Creator"
+  "confirm_calendar_refill": "Confirm that the pillbox is full",
+  "pillbox_refill_description": "The pill organizer will refill with any missing medication (negative stock) for this week. This action is irreversible."
 }

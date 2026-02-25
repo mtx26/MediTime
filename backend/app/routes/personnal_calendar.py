@@ -1,8 +1,9 @@
 from flask import request, g, Response
 from . import api
 from datetime import datetime, timezone
+import json
 from app.db.connection import get_connection
-from app.services.calendar import generate_calendar_schedule, update_stock_decrement_method
+from app.services.calendar import generate_calendar_schedule, update_stock_decrement_method, generate_table_negative_stock
 from app.services.documents import generate_medicine_conditions_pdf
 from app.services.medication import check_if_stock_is_low
 from app.utils.responses import success_response, error_response, warning_response
@@ -497,6 +498,51 @@ def update_personal_notifications_enabled(calendar_id):
             code="PERSONAL_NOTIFICATIONS_ENABLED_UPDATE_ERROR",
             i18n_key="api.calendar.notifications_update_error", 
             status_code=500, 
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
+        
+@api.route("/calendars/<calendar_id>/schedule/negative-stock", methods=["GET"])
+@measure_time()
+@require_auth
+@verify_calendar
+@with_query_origin(default_origin="PERSONAL_NEGATIVE_STOCK_TABLE_FETCH")
+def get_personal_negative_stock_table(calendar_id):
+    try:
+        meds_id_str = request.args.get("medsId")
+        if not meds_id_str:
+            return warning_response(
+                message="missing medsId",
+                code="PERSONAL_NEGATIVE_STOCK_TABLE_FETCH_ERROR",
+                i18n_key="api.calendar.negative_stock_table_fetch_error",
+                status_code=400,
+                log_extra={"calendar_id": calendar_id}
+            )
+        
+        meds_id = json.loads(meds_id_str)
+        if not meds_id:
+            return warning_response(
+                message="medsId is empty",
+                code="PERSONAL_NEGATIVE_STOCK_TABLE_FETCH_ERROR",
+                i18n_key="api.calendar.negative_stock_table_fetch_error",
+                status_code=400,
+                log_extra={"calendar_id": calendar_id}
+            )
+        
+        table, calendar_name = generate_table_negative_stock(calendar_id, meds_id)
+        return success_response(
+            message="negative stock table retrieved",
+            code="PERSONAL_NEGATIVE_STOCK_TABLE_FETCH_SUCCESS",
+            i18n_key="api.calendar.negative_stock_table_retrieved",
+            data={"table": table, "calendar_name": calendar_name},
+            log_extra={"calendar_id": calendar_id}
+        )
+    except Exception as e:
+        return error_response(
+            message="Error retrieving negative stock table",
+            code="PERSONAL_NEGATIVE_STOCK_TABLE_FETCH_ERROR",
+            i18n_key="api.calendar.negative_stock_table_fetch_error",
+            status_code=500,
             error=str(e),
             log_extra={"calendar_id": calendar_id}
         )

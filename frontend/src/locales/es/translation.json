@@ -315,9 +315,11 @@
     "intake_conditions": "Condiciones de toma",
     "loading_medicine_boxes": "Cargando las cajas de medicamentos...",
     "loading_stock_alerts": "Cargando alertas de stock...",
+    "missing_pillbox": "Pastillero desaparecido",
     "name": "Nombre",
     "new_box": "Nueva caja",
     "no_medicines_selected": "No se seleccionó ningún medicamento",
+    "pill_box": "fortín",
     "qr_code_help_text": "El código DataMatrix se encuentra en el envase del medicamento, cerca del código de barras. Es un pequeño cuadrado blanco y negro.",
     "remaining_qty": "Cantidad restante",
     "restock": "Reposición de existencias",
@@ -443,6 +445,7 @@
   "copy_link_error": "Error al copiar el enlace.",
   "create_share_link": "Crear un enlace para compartir",
   "created_at": "Creado el",
+  "creator": "Creador",
   "critical_stock": "Ruptura de existencias",
   "cta": {
     "button": "Creo mi cuenta",
@@ -1131,5 +1134,6 @@
   },
   "yes": "Sí",
   "you_have_no_pillbox_use_history": "No tienes historial de uso del pastillero.",
-  "creator": "Creador"
+  "confirm_calendar_refill": "Confirme que el pastillero esté lleno",
+  "pillbox_refill_description": "El pastillero se reabastecerá con cualquier medicamento faltante (stock negativo) para esta semana. Esta acción es irreversible."
 }
