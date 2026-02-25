@@ -45,8 +45,7 @@ import {
   Settings,
   FileText,
   Pencil,
-  ScanLine,
-  Icon
+  ScanLine
 } from 'lucide-react';
 import NotFound from '../../../general/NotFound';
 

@@ -128,7 +128,6 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                 WHERE ics_tokens.token = %s 
                     AND ics_tokens.deleted_at IS NULL
                     AND ics_tokens.calendar_id = calendars.id
-                    AND calendar_settings.calendar_id = calendars.id
                 RETURNING ics_tokens.calendar_id, calendars.name, calendar_settings.stock_decrement_method
             """, (token, user_agent, token))
             
