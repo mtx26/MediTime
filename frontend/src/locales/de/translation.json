@@ -315,9 +315,11 @@
     "intake_conditions": "Einnahmebedingungen",
     "loading_medicine_boxes": "Die Medikamentenboxen werden geladen...",
     "loading_stock_alerts": "Aktienbenachrichtigungen werden geladen...",
+    "missing_pillbox": "Fehlende Pillendose",
     "name": "Name",
     "new_box": "Neue Box",
     "no_medicines_selected": "Keine Medikamente ausgewählt",
+    "pill_box": "Bunker",
     "qr_code_help_text": "Der DataMatrix-Code befindet sich auf der Medikamentenverpackung in der Nähe des Barcodes. Es handelt sich um ein kleines schwarz-weißes Quadrat.",
     "remaining_qty": "Restmenge",
     "restock": "Auffüllen",
@@ -443,6 +445,7 @@
   "copy_link_error": "Fehler beim Kopieren des Links.",
   "create_share_link": "Erstellen eines Freigabelinks",
   "created_at": "Erstellt am",
+  "creator": "Schöpfer",
   "critical_stock": "Aktienbruch",
   "cta": {
     "button": "Ich erstelle mein Konto",
@@ -1131,5 +1134,6 @@
   },
   "yes": "Ja",
   "you_have_no_pillbox_use_history": "Für den Pillenorganizer liegen keine Nutzungsdaten vor.",
-  "creator": "Schöpfer"
+  "confirm_calendar_refill": "Vergewissern Sie sich, dass der Pillenbehälter voll ist.",
+  "pillbox_refill_description": "Der Tablettenorganizer wird automatisch mit den fehlenden Medikamenten (negativer Bestand) für diese Woche aufgefüllt. Dieser Vorgang ist unumkehrbar."
 }

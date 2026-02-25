@@ -315,9 +315,11 @@
     "intake_conditions": "Condições de tomada",
     "loading_medicine_boxes": "Carregando as caixas de medicamentos...",
     "loading_stock_alerts": "Carregando alertas de estoque...",
+    "missing_pillbox": "Caixa de comprimidos desaparecida",
     "name": "Nome",
     "new_box": "Nova caixa",
     "no_medicines_selected": "Nenhum medicamento selecionado",
+    "pill_box": "caixa de comprimidos",
     "qr_code_help_text": "O código DataMatrix está localizado na embalagem do medicamento, próximo ao código de barras. É um pequeno quadrado preto e branco.",
     "remaining_qty": "Quantidade restante",
     "restock": "Reabastecimento",
@@ -443,6 +445,7 @@
   "copy_link_error": "Erro ao copiar link.",
   "create_share_link": "Criar um link de compartilhamento",
   "created_at": "Criado em",
+  "creator": "Criador",
   "critical_stock": "Ruptura de estoque",
   "cta": {
     "button": "Eu crio minha conta",
@@ -1131,5 +1134,6 @@
   },
   "yes": "Sim",
   "you_have_no_pillbox_use_history": "Você não possui histórico de uso para o organizador de comprimidos.",
-  "creator": "Criador"
+  "confirm_calendar_refill": "Confirme se o porta-comprimidos está cheio.",
+  "pillbox_refill_description": "O organizador de comprimidos será reabastecido com qualquer medicamento em falta (estoque negativo) desta semana. Esta ação é irreversível."
 }

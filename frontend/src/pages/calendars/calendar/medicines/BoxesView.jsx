@@ -45,7 +45,8 @@ import {
   Settings,
   FileText,
   Pencil,
-  ScanLine
+  ScanLine,
+  Icon
 } from 'lucide-react';
 import NotFound from '../../../general/NotFound';
 
@@ -694,6 +695,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                       setCurrentEditingBoxId(box.id);
                       setShowQRModal(true);
                     }}
+                    basePath={basePath}
                     t={t}
                   />
                 </form>
@@ -715,6 +717,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
                     setCurrentEditingBoxId(box.id);
                     setShowQRModal(true);
                   }}
+                  basePath={basePath}
                   t={t}
                 />
               )}
@@ -780,9 +783,12 @@ function BoxCard({
   calendarSource,
   onEdit,
   onUpdateScan,
+  basePath,
   t,
 }) {
   const { showConfirm } = useAlert();
+  const { lng } = useParams();
+  const navigate = useNavigate();
   
   const isEditing = editingBoxId === box.id && editingBox && editingBox.name !== undefined;
   
@@ -1095,7 +1101,7 @@ function BoxCard({
         </div>
 
         {/* Stock Quantity and Restock Button */}
-        <div className="flex gap-4 mb-3 items-end">
+        <div className="flex gap-4 mb-3">
           <div className="flex-1">
             <Label className="text-muted-foreground text-xs">{t('boxes.remaining_qty')}</Label>
             {isEditing ? (
@@ -1116,15 +1122,31 @@ function BoxCard({
             )}
           </div>
           {!isEditing && (
-            <div className="flex-1">
-              <IconButton
-                className="w-full border-green-500 text-green-600 hover:bg-green-50"
-                icon={PlusCircle}
-                text={t('boxes.restock')}
-                onClick={() => calendarSource.restockBox(calendarId, box.id)}
-                disabled={box.box_capacity === 0}
-                helpDisabled={t('boxes.restock_disabled_tooltip')}
-              />
+            <div className='flex-1 flex flex-col gap-2'>
+              <div className="flex-1">
+                <IconButton
+                  className="w-full border-green-500 text-green-600 hover:bg-green-50"
+                  icon={PlusCircle}
+                  text={t('boxes.restock')}
+                  onClick={() => calendarSource.restockBox(calendarId, box.id)}
+                  disabled={box.box_capacity === 0}
+                  helpDisabled={t('boxes.restock_disabled_tooltip')}
+                />
+              </div>
+              {/* Bouton pour faire le pillulier d'un medoc negatif */}
+              {box.stock_quantity < 0 && (
+                <div className='flex-1'>
+                  <IconButton
+                    className="w-full border-blue-500 text-blue-600 hover:bg-blue-50"
+                    icon={Package}
+                    text={t('boxes.missing_pillbox')}
+                    onClick={() => {
+                      const medsIdParam = encodeURIComponent(JSON.stringify([box.id]));
+                      navigate(`/${lng}/${basePath}/${calendarId}/pillbox?medsId=${medsIdParam}`);
+                    }}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1454,6 +1476,7 @@ BoxCard.propTypes = {
   calendarSource: PropTypes.object.isRequired,
   onEdit: PropTypes.func.isRequired,
   onUpdateScan: PropTypes.func.isRequired,
+  basePath: PropTypes.string.isRequired,
   t: PropTypes.func.isRequired,
 };
 

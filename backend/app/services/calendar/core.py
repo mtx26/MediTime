@@ -7,7 +7,7 @@ def normalize_date(input_date: str) -> date | None:
     Normalise une date au format date.
 
     Paramètres:
-    - input_date (str): La date en format 'DD-MM-YYYY'.
+    - input_date (str): La date en format 'YYYY-MM-DD'.
 
     Retour:
     - date | None: La date normalisée ou None si le format est invalide.
@@ -17,6 +17,8 @@ def normalize_date(input_date: str) -> date | None:
             return input_date.date()
         if isinstance(input_date, date):
             return input_date
+        if isinstance(input_date, str):
+            return datetime.strptime(input_date, "%Y-%m-%d").date()
         return None
     except Exception as e:
         logger.error(f"Erreur lors de la normalisation de la date: {e}", {
@@ -101,7 +103,6 @@ def is_medication_due(med: dict, current_date: date) -> bool:
     try:
         start_date = med.get("start_date", None)
         start_date = normalize_date(start_date)
-
         # Fin de validité optionnelle: max_date est soit une date, soit absent/None
         max_date = med.get("max_date", None)
         if max_date:
@@ -258,40 +259,6 @@ def build_medication_table(med: dict, monday: date, total_day: int) -> dict:
             if moment not in table:
                 table[moment] = {}
             table[moment][day] = med["tablet_count"]
-
-    return table
-
-def build_medication_table_negative_stock(med: dict, sunday: date, total_day: int) -> dict:
-    """
-    Construit le tableau de prise pour un médicament donné sur une semaine en indiquant les jours où le stock est négatif jusqua ce que le stock soit >= 0.
-    On part du dimanche et on recule jusqu'au lundi max
-
-    Args:
-        med (dict): Dictionnaire contenant les informations du médicament.
-        sunday (date): La date du dimanche de la semaine.
-        total_day (int): Nombre total de jours dans la semaine.
-
-    Returns:
-        dict: Tableau de prise pour le médicament avec indication des jours à stock négatif.
-    """
-    
-    table = {}
-    i = 0
-    stock_quantity = med.get("stock_quantity", 0)
-    
-    while stock_quantity < 0 and i < total_day:
-        current_date = sunday - timedelta(days=i)
-        if is_medication_due(med, current_date):
-            day = current_date.strftime("%a")
-            moment = med["time_of_day"]
-            if moment not in table:
-                table[moment] = {}
-            table[moment][day] = med["tablet_count"]
-            
-            stock_quantity += med.get("tablet_count", 0)
-            
-        i += 1
-        
     return table
 
 
@@ -556,12 +523,85 @@ def fetch_medication_by_id(medication_id: str) -> dict:
                 LIMIT 1
             """, (medication_id,))
             return cursor.fetchone() or {}
+        
+def build_medication_table_negative_stock(med: dict, sunday: date, total_day: int) -> dict:
+    """
+    Construit le tableau de prise pour un médicament donné sur une semaine en indiquant les jours où le stock est négatif jusqua ce que le stock soit >= 0.
+    On part du dimanche et on recule jusqu'au lundi max
+
+    Args:
+        med (dict): Dictionnaire contenant les informations du médicament.
+        sunday (date): La date du dimanche de la semaine.
+        total_day (int): Nombre total de jours dans la semaine.
+
+    Returns:
+        dict: Tableau de prise pour le médicament avec indication des jours à stock négatif.
+    """
+    
+    table = {}
+    i = 0
+    stock_quantity = med.get("stock_quantity", 0)
+    conditions = med.get("conditions", [])
+
+    # On remonte depuis dimanche jusqu'à lundi (ou jusqu'à ce que le stock soit positif)
+    while stock_quantity < 0 and i < total_day:
+        current_date = sunday - timedelta(days=i)
+        for cond in conditions:
+            # On vérifie si la condition s'applique ce jour-là
+            if is_medication_due(cond, current_date):
+                moment = cond["time_of_day"]
+                day = current_date.strftime("%a")
+                if moment not in table:
+                    table[moment] = {}
+                table[moment][day] = table[moment].get(day, 0) + cond["tablet_count"]
+                stock_quantity += cond["tablet_count"]
+        i += 1
+    return table
+        
+def fetch_medication_with_conditions(medication_id: str) -> dict:
+    """
+    Récupère les informations d'un médicament et toutes ses conditions à partir de son ID.
+
+    Paramètres:
+    - medication_id (str): L'ID du médicament.
+
+    Retour:
+    - dict: Dictionnaire contenant les infos du médicament et une liste de conditions.
+    """
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    box.id,
+                    box.name,
+                    box.dose,
+                    box.stock_quantity,
+                    json_agg(
+                        jsonb_build_object(
+                            'condition_id', cond.id,
+                            'time_of_day', cond.time_of_day,
+                            'interval_days', cond.interval_days,
+                            'start_date', cond.start_date,
+                            'max_date', cond.max_date,
+                            'tablet_count', cond.tablet_count
+                        )
+                    ) AS conditions
+                FROM medicine_boxes box
+                JOIN medicine_box_conditions cond ON cond.box_id = box.id
+                WHERE box.id = %s
+                    AND box.deleted_at IS NULL
+                    AND cond.deleted_at IS NULL
+                GROUP BY box.id, box.name, box.dose, box.stock_quantity
+                LIMIT 1
+            """, (medication_id,))
+            return cursor.fetchone() or {}
 
 
-def generate_table_negative_stock(start_day: date, calendar_id: str, meds_id: list[str]) -> dict:
+def generate_table_negative_stock(calendar_id: str, meds_id: list[str]) -> dict:
     """
     Génère le tableau des prises de médicaments en indiquant les jours où le stock est négatif jusqu'à ce que le stock soit >= 0.
     On part du dimanche et on remonte jusqu'au lundi.
+    Recuperer les start_date grace a la dernier competion du calendrier, comme ca on est aligner sur la dernier semain ou ca a ete negatif
 
     Paramètres:
     - start_day (date): La date de base pour générer le tableau (généralement un lundi).
@@ -572,8 +612,23 @@ def generate_table_negative_stock(start_day: date, calendar_id: str, meds_id: li
     - dict: Dictionnaire contenant les tableaux de prise de médicaments par moment de la journée avec indication des jours à stock négatif.
     """
     try:
+        # Récupérer la date de la dernière complétion du calendrier
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT prepared_at
+                    FROM pillbox_uses
+                    WHERE calendar_id = %s
+                    ORDER BY prepared_at DESC
+                    LIMIT 1
+                """, (calendar_id,))
+                row = cursor.fetchone()
+                start_day = row.get("prepared_at", datetime.now()).date() if row else datetime.now().date()
+        
         sunday = start_day - timedelta(days=start_day.weekday()) + timedelta(days=6) # Trouver le dimanche de la semaine
         total_day = 7
+        
+        calendar_name = fetch_calendar(calendar_id).get("name", "unknown")
         
         table_by_moment = {
             "morning": [],
@@ -582,7 +637,7 @@ def generate_table_negative_stock(start_day: date, calendar_id: str, meds_id: li
         }
 
         for med_id in meds_id:
-            med = fetch_medication_by_id(med_id)
+            med = fetch_medication_with_conditions(med_id)
             if not med or med.get("stock_quantity", 0) >= 0:
                 continue
 
@@ -591,22 +646,21 @@ def generate_table_negative_stock(start_day: date, calendar_id: str, meds_id: li
             if not med_table:
                 continue
 
-            moment = med.get("time_of_day")
-            if moment not in table_by_moment:
-                continue
-            
-            merge_or_append_by_moment(
-                table_by_moment[moment], 
-                med.get("name"), 
-                med_table.get(moment, {}), 
-                med.get("dose", None)
-            )
+            for moment in med_table:
+                if moment not in table_by_moment:
+                    continue
+                merge_or_append_by_moment(
+                    table_by_moment[moment],
+                    med.get("name"),
+                    med_table.get(moment, {}),
+                    med.get("dose", None)
+                )
 
         # Trier par nom
         for moment in table_by_moment:
             table_by_moment[moment].sort(key=lambda x: x["title"].lower())
         
-        return table_by_moment
+        return table_by_moment, calendar_name
         
     except Exception as e:
         logger.error("Erreur lors de la génération du tableau de stock négatif", {
@@ -615,4 +669,4 @@ def generate_table_negative_stock(start_day: date, calendar_id: str, meds_id: li
             "calendar_id": calendar_id,
             "meds_id": meds_id
         })
-        return {"morning": [], "noon": [], "evening": []}
+        return {"morning": [], "noon": [], "evening": []}, "unknown"

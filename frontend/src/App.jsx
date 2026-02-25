@@ -325,6 +325,20 @@ function App() {
     });
   }, [showAlert]);
 
+  // Génère le tableau des prises de médicaments en indiquant les jours où le stock est négatif jusqu'à ce que le stock soit >= 0.
+  // On part du dimanche et on remonte jusqu'au lundi.
+  const fetchPersonalScheduleNegativeStock = useCallback(async (calendarId, medsId) => {
+    const medsIdParam = encodeURIComponent(JSON.stringify(medsId));
+    return await performApiCall({
+      url: `${API_URL}/api/calendars/${calendarId}/schedule/negative-stock?medsId=${medsIdParam}`,
+      method: 'GET',
+      origin: 'PERSONAL_SCHEDULE_NEGATIVE_STOCK',
+      uid,
+      analyticsEvent: 'fetch_personal_schedule_negative_stock',
+      analyticsData: { calendarId, uid, medsId },
+      showAlert,
+    });
+  }, [showAlert]);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -872,6 +886,18 @@ function App() {
     });
   }, [showAlert]);
 
+  const fetchSharedUserScheduleNegativeStock = useCallback(async (calendarId, medsId) => {
+    const medsIdParam = encodeURIComponent(JSON.stringify(medsId));
+    return await performApiCall({
+      url: `${API_URL}/api/shared/users/calendars/${calendarId}/schedule/negative-stock?medsId=${medsIdParam}`,
+      method: 'GET',
+      origin: 'SHARED_USER_SCHEDULE_NEGATIVE_STOCK',
+      uid,
+      analyticsEvent: 'fetch_shared_user_schedule_negative_stock',
+      analyticsData: { calendarId, uid, medsId },
+    });
+  }, [showAlert]);
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const analyzeImage = useCallback(async (file) => {
@@ -971,6 +997,7 @@ function App() {
       getTokensIcs,
       createTokenIcs,
       deleteTokenIcs,
+      fetchPersonalScheduleNegativeStock,
     },
 
     sharedUserCalendars: {
@@ -1002,6 +1029,7 @@ function App() {
       getSharedTokensIcs,
       createSharedTokenIcs,
       deleteSharedTokenIcs,
+      fetchSharedUserScheduleNegativeStock,
     },
 
     tokenCalendars: {
