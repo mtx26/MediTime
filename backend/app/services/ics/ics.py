@@ -173,11 +173,9 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                 FROM medicine_boxes mb
                 JOIN medicine_box_conditions mbc ON mb.id = mbc.box_id
                 WHERE mb.calendar_id = %s
-                  AND mb.deleted_at IS NULL
-                  AND mbc.deleted_at IS NULL
-                GROUP BY 
-                    mb.id, mb.name, mb.stock_quantity, mb.stock_alert_threshold, mb.box_capacity, mb.dose,
-                    pbu_agg.pillbox_uses;
+                    AND mb.deleted_at IS NULL
+                    AND mbc.deleted_at IS NULL
+                GROUP BY mb.id, mb.name, mb.stock_quantity, mb.stock_alert_threshold, mb.box_capacity, mb.dose
             """, (calendar_id,))
             
             medicines = cursor.fetchall()
@@ -190,7 +188,7 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                 is_active = False # indique si le médicament est actif
                 stock = med['stock_quantity'] # stock initial du médicament
                 
-                if stock_mode == 'weekly_pillbox' and med['pillbox_uses']:
+                if stock_mode == 'weekly_pillbox':
                     # Si on est en mode hebdomadaire, max_day_used est le dimanche de la semaine de la dernière préparation et first_day le lundi suivant
                     day_used = max(datetime.strptime(p['prepared_at'], '%Y-%m-%d').date() for p in med['pillbox_uses'])
                     max_day_used = day_used + timedelta(days=6 - day_used.weekday())  # dimanche de la semaine de la dernière préparation
