@@ -97,6 +97,8 @@ def check_initial_stock(med, stock, events, events_temp, day):
     elif stock <= med['stock_alert_threshold']:
         record_event(events_temp, med, stock, day)
         stock += med['box_capacity']
+    
+    return stock
 
 def create_calendar_ics(token: str, user_agent: str) -> bytes:
     """Crée un calendrier ICS pour un token donné.
@@ -158,14 +160,18 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                             'tablet_count', mbc.tablet_count
                         ) ORDER BY mbc.start_date
                     ) as conditions,
-                    json_agg(
-                        json_build_object(
-                            'prepared_at', to_char(pbu.prepared_at, 'YYYY-MM-DD')
-                        ) ORDER BY pbu.prepared_at DESC
+                    (
+                        SELECT json_agg(json_build_object('prepared_at', to_char(pbu2.prepared_at, 'YYYY-MM-DD')))
+                        FROM (
+                            SELECT pbu2.prepared_at
+                            FROM pillbox_uses pbu2
+                            WHERE pbu2.calendar_id = mb.calendar_id
+                            ORDER BY pbu2.prepared_at DESC
+                            LIMIT 1
+                        ) pbu2
                     ) as pillbox_uses
                 FROM medicine_boxes mb
                 JOIN medicine_box_conditions mbc ON mb.id = mbc.box_id
-                JOIN pillbox_uses pbu ON pbu.calendar_id = mb.calendar_id
                 WHERE mb.calendar_id = %s
                     AND mb.deleted_at IS NULL
                     AND mbc.deleted_at IS NULL
@@ -189,7 +195,7 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                     first_day = max_day_used + timedelta(days=1)
                     
                 # check du stock init 
-                check_initial_stock(med, stock, events, events_temp, max_day_used)
+                stock = check_initial_stock(med, stock, events, events_temp, max_day_used)
                 
                 # Simulation jour par jour pour les 365 prochains jours
                 for day in range(0, 365):
