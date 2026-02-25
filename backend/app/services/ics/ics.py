@@ -97,6 +97,7 @@ def check_initial_stock(med, stock, events, events_temp, day):
     elif stock <= med['stock_alert_threshold']:
         record_event(events_temp, med, stock, day)
         stock += med['box_capacity']
+    return stock
 
 def create_calendar_ics(token: str, user_agent: str) -> bytes:
     """Crée un calendrier ICS pour un token donné.
@@ -126,6 +127,7 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                 WHERE ics_tokens.token = %s 
                     AND ics_tokens.deleted_at IS NULL
                     AND ics_tokens.calendar_id = calendars.id
+                    AND calendar_settings.calendar_id = calendars.id
                 RETURNING ics_tokens.calendar_id, calendars.name, calendar_settings.stock_decrement_method
             """, (token, user_agent, token))
             
@@ -192,14 +194,14 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                 is_active = False # indique si le médicament est actif
                 stock = med['stock_quantity'] # stock initial du médicament
                 
-                if stock_mode == 'weekly_pillbox':
+                if stock_mode == 'weekly_pillbox' and med['pillbox_uses']:
                     # Si on est en mode hebdomadaire, max_day_used est le dimanche de la semaine de la dernière préparation et first_day le lundi suivant
                     day_used = max(datetime.strptime(p['prepared_at'], '%Y-%m-%d').date() for p in med['pillbox_uses'])
                     max_day_used = day_used + timedelta(days=6 - day_used.weekday())  # dimanche de la semaine de la dernière préparation
                     first_day = max_day_used + timedelta(days=1)
                     
                 # check du stock init 
-                check_initial_stock(med, stock, events, events_temp, max_day_used)
+                stock = check_initial_stock(med, stock, events, events_temp, max_day_used)
                 
                 # Simulation jour par jour pour les 365 prochains jours
                 for day in range(0, 365):
