@@ -156,20 +156,30 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
                             'start_date', to_char(mbc.start_date, 'YYYY-MM-DD'),
                             'max_date', to_char(mbc.max_date, 'YYYY-MM-DD'),
                             'tablet_count', mbc.tablet_count
-                        ) ORDER BY mbc.start_date
-                    ) as conditions,
-                    json_agg(
-                        json_build_object(
-                            'prepared_at', to_char(pbu.prepared_at, 'YYYY-MM-DD')
-                        ) ORDER BY pbu.prepared_at DESC
-                    ) as pillbox_uses
+                        )
+                        ORDER BY mbc.start_date
+                    ) AS conditions,
+                    COALESCE(pbu_agg.pillbox_uses, '[]'::json) AS pillbox_uses
                 FROM medicine_boxes mb
                 JOIN medicine_box_conditions mbc ON mb.id = mbc.box_id
-                JOIN pillbox_uses pbu ON pbu.calendar_id = mb.calendar_id
+                LEFT JOIN (
+                    SELECT 
+                        calendar_id,
+                        json_agg(
+                            json_build_object(
+                                'prepared_at', to_char(prepared_at, 'YYYY-MM-DD')
+                            )
+                            ORDER BY prepared_at DESC
+                        ) AS pillbox_uses
+                    FROM pillbox_uses
+                    GROUP BY calendar_id
+                ) pbu_agg ON pbu_agg.calendar_id = mb.calendar_id
                 WHERE mb.calendar_id = %s
-                    AND mb.deleted_at IS NULL
-                    AND mbc.deleted_at IS NULL
-                GROUP BY mb.id, mb.name, mb.stock_quantity, mb.stock_alert_threshold, mb.box_capacity, mb.dose
+                  AND mb.deleted_at IS NULL
+                  AND mbc.deleted_at IS NULL
+                GROUP BY 
+                    mb.id, mb.name, mb.stock_quantity, mb.stock_alert_threshold, mb.box_capacity, mb.dose,
+                    pbu_agg.pillbox_uses;
             """, (calendar_id,))
             
             medicines = cursor.fetchall()
