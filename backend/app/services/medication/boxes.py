@@ -225,7 +225,8 @@ GET_MEDICINES_QUERY = """
               'tablet_count', c.tablet_count,
               'time_of_day',  c.time_of_day,
               'interval_days', c.interval_days,
-              'start_date',    c.start_date
+              'start_date',    c.start_date,
+              'max_date',      c.max_date
             )
             ORDER BY c.start_date NULLS LAST
           ) FILTER (WHERE c.id IS NOT NULL),

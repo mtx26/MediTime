@@ -315,6 +315,9 @@ def handle_calendar_schedule(calendar_id):
 def download_pdf_calendar(calendar_id):
     try:
         # TODO: Sécuriser cette route
+        #get ?includeInactive
+
+        include_inactive = request.args.get("includeInactive", "false").lower() == "true"
 
         if not calendar_id:
             return error_response(
@@ -325,7 +328,7 @@ def download_pdf_calendar(calendar_id):
             )
 
         # Génère le PDF en mémoire
-        pdf_buffer = generate_medicine_conditions_pdf(calendar_id)
+        pdf_buffer = generate_medicine_conditions_pdf(calendar_id, include_inactive)
 
         # Log facultatif
         log_backend.info("PDF généré avec succès", {
@@ -335,7 +338,7 @@ def download_pdf_calendar(calendar_id):
         })
 
         return Response(
-            pdf_buffer.getvalue(),
+            pdf_buffer,
             mimetype="application/pdf",
             headers={
                 "Content-Disposition": f"inline; filename=calendrier_{calendar_id[:8]}.pdf",

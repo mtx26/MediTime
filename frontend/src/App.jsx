@@ -930,8 +930,8 @@ function App() {
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  const downloadPersonalCalendarPdf = useCallback(async (calendarId) => {
-    const url = `${API_URL}/api/calendars/${calendarId}/pdf`;
+  const downloadPersonalCalendarPdf = useCallback(async (calendarId, includeInactive) => {
+    const url = `${API_URL}/api/calendars/${calendarId}/pdf?includeInactive=${includeInactive}`;
     window.open(url, '_blank');
   }, []);
 

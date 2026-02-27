@@ -351,7 +351,10 @@
     "tablets": "таблетки",
     "title": "Аптечки",
     "until": "До",
-    "view_notice": "См. инструкцию"
+    "view_notice": "См. инструкцию",
+    "export_pdf_description": "Скачайте календарь в формате PDF, чтобы распечатать или поделиться им.",
+    "export_pdf_title": "Экспорт в PDF",
+    "include_inactive_medicines": "Включать неактивные лекарственные средства"
   },
   "calendar": {
     "add": "Добавить календарь",

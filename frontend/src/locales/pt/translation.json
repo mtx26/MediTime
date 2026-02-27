@@ -351,7 +351,10 @@
     "tablets": "comprimidos",
     "title": "Caixas de remédios",
     "until": "Até",
-    "view_notice": "Veja as instruções"
+    "view_notice": "Veja as instruções",
+    "export_pdf_description": "Baixe seu calendário em formato PDF para imprimir ou compartilhar.",
+    "export_pdf_title": "Exportar para PDF",
+    "include_inactive_medicines": "Incluir medicamentos inativos"
   },
   "calendar": {
     "add": "Adicionar um calendário",

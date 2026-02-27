@@ -351,7 +351,10 @@
     "tablets": "平板电脑",
     "title": "药箱",
     "until": "直到",
-    "view_notice": "查看说明"
+    "view_notice": "查看说明",
+    "export_pdf_description": "下载PDF格式的日历，以便打印或分享。",
+    "export_pdf_title": "导出为 PDF",
+    "include_inactive_medicines": "包括非活性药物"
   },
   "calendar": {
     "add": "添加日历",

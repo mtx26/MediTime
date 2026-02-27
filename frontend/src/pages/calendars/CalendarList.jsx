@@ -10,6 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { Calendar, Users, Pencil, Share, Pill, Download, AlertTriangle, Settings, Trash2, Plus, X, AlertCircle } from 'lucide-react';
 
 
@@ -24,6 +27,24 @@ function SelectCalendar({
   // 📅 Gestion des calendriers
   const [renameValues, setRenameValues] = useState({}); // État pour les valeurs de renommage de calendrier
   const [renameMode, setRenameMode] = useState(null); // État pour le mode de renommage
+
+  // 📄 Export PDF
+  const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
+  const [pdfCalendarId, setPdfCalendarId] = useState(null);
+  const [includeInactive, setIncludeInactive] = useState(false);
+
+  const openPdfDialog = (calendarId) => {
+    setPdfCalendarId(calendarId);
+    setIncludeInactive(false);
+    setPdfDialogOpen(true);
+  };
+
+  const handleDownloadPdf = () => {
+    if (pdfCalendarId) {
+      personalCalendars.downloadPersonalCalendarPdf(pdfCalendarId, includeInactive);
+    }
+    setPdfDialogOpen(false);
+  };
 
   const renameConfirmAction = async (calendarId) => {
     const rep = await personalCalendars.renameCalendar(
@@ -156,7 +177,7 @@ function SelectCalendar({
                             {t('boxes.export_pdf')}
                           </div>
                         ),
-                        onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
+                        onClick: () => openPdfDialog(calendarData.id),
                         title: t('boxes.export_pdf'),
                       },
                       {
@@ -334,7 +355,7 @@ function SelectCalendar({
                               {t('boxes.export_pdf')}
                             </div>
                           ),
-                          onClick: () => personalCalendars.downloadPersonalCalendarPdf(calendarData.id),
+                          onClick: () => openPdfDialog(calendarData.id),
                           title: t('boxes.export_pdf'),
                         },
                         {
@@ -394,6 +415,35 @@ function SelectCalendar({
           </Alert>
         )}
       </div>
+
+      {/* Dialog export PDF */}
+      <Dialog open={pdfDialogOpen} onOpenChange={setPdfDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('boxes.export_pdf_title')}</DialogTitle>
+            <DialogDescription>{t('boxes.export_pdf_description')}</DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center gap-2 py-4">
+            <Checkbox
+              id="includeInactive"
+              checked={includeInactive}
+              onCheckedChange={setIncludeInactive}
+            />
+            <Label htmlFor="includeInactive" className="cursor-pointer">
+              {t('boxes.include_inactive_medicines')}
+            </Label>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPdfDialogOpen(false)}>
+              {t('cancel')}
+            </Button>
+            <Button onClick={handleDownloadPdf}>
+              <Download className="h-4 w-4 mr-2" />
+              {t('boxes.export_pdf')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
