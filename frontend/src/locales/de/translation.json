@@ -351,7 +351,10 @@
     "tablets": "Tabletten",
     "title": "Medikamentenboxen",
     "until": "Bis zum",
-    "view_notice": "Siehe die Anweisungen"
+    "view_notice": "Siehe die Anweisungen",
+    "export_pdf_description": "Laden Sie Ihren Kalender im PDF-Format herunter, um ihn auszudrucken oder weiterzugeben.",
+    "export_pdf_title": "Als PDF exportieren",
+    "include_inactive_medicines": "Inaktive Arzneimittel einschließen"
   },
   "calendar": {
     "add": "Einen Kalender hinzufügen",

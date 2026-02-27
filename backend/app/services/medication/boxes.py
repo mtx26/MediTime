@@ -179,7 +179,7 @@ def create_box(calendar_id: str, box: dict) -> str:
   
   
 def delete_box(box_id: str, calendar_id: str):
-    """Supprime une boîte de médicaments et ses conditions associées.
+    """Supprime une boîte de médicaments.
 
     Paramètres:
     - box_id (str): L'ID de la boîte à supprimer.
@@ -192,20 +192,9 @@ def delete_box(box_id: str, calendar_id: str):
           UPDATE medicine_boxes
           SET deleted_at = COALESCE(deleted_at, NOW())
           WHERE id = %s AND calendar_id = %s AND deleted_at IS NULL
-          RETURNING id
           """,
           (box_id, calendar_id)
         )
-        updated = cursor.fetchone()
-        if updated:
-          cursor.execute(
-            """
-            UPDATE medicine_box_conditions
-            SET deleted_at = COALESCE(deleted_at, NOW())
-            WHERE box_id = %s AND deleted_at IS NULL
-            """,
-            (box_id,)
-          )
         conn.commit()
 
 
@@ -236,7 +225,8 @@ GET_MEDICINES_QUERY = """
               'tablet_count', c.tablet_count,
               'time_of_day',  c.time_of_day,
               'interval_days', c.interval_days,
-              'start_date',    c.start_date
+              'start_date',    c.start_date,
+              'max_date',      c.max_date
             )
             ORDER BY c.start_date NULLS LAST
           ) FILTER (WHERE c.id IS NOT NULL),

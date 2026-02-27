@@ -351,7 +351,10 @@
     "tablets": "錠剤",
     "title": "薬箱",
     "until": "まで",
-    "view_notice": "説明書をご覧ください"
+    "view_notice": "説明書をご覧ください",
+    "export_pdf_description": "カレンダーを PDF 形式でダウンロードして、印刷したり共有したりできます。",
+    "export_pdf_title": "PDFにエクスポート",
+    "include_inactive_medicines": "不活性薬剤を含める"
   },
   "calendar": {
     "add": "カレンダーを追加する",

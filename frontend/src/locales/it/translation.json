@@ -351,7 +351,10 @@
     "tablets": "compresse",
     "title": "Scatole di medicinali",
     "until": "Fino al",
-    "view_notice": "Vedi le istruzioni"
+    "view_notice": "Vedi le istruzioni",
+    "export_pdf_description": "Scarica il tuo calendario in formato PDF per stamparlo o condividerlo.",
+    "export_pdf_title": "Esporta in PDF",
+    "include_inactive_medicines": "Includere farmaci inattivi"
   },
   "calendar": {
     "add": "Aggiungi un calendario",
