@@ -17,6 +17,9 @@ from reportlab.platypus import (
 from reportlab.lib import colors
 from reportlab.lib.units import mm
 import os
+import tempfile
+import requests
+from app.config.config import Config
 
 moment_map = {
     "morning": "matin",
@@ -370,8 +373,19 @@ def pdf_template(medicines_list: list, user_name: str = "MediTime", calendar_nam
         styles["SmallMuted"]
     ))
 
-    # Affiche le logo dans le header/footer sur chaque page
-    logo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../frontend/public/icons/logo.png"))
+    # Télécharge le logo depuis l'URL du frontend
+    logo_url = f"{Config.FRONTEND_URL}/icons/logo.png"
+    logo_path = None
+    try:
+        resp = requests.get(logo_url, timeout=5)
+        if resp.status_code == 200:
+            tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+            tmp.write(resp.content)
+            tmp.close()
+            logo_path = tmp.name
+    except Exception:
+        logo_path = None
+
     generated_str = f"Généré le {today_str} par {user_name}"
 
     def header_footer_with_logo(canvas, doc):
@@ -388,7 +402,7 @@ def pdf_template(medicines_list: list, user_name: str = "MediTime", calendar_nam
         canvas.line(left, top + 10, right, top + 10)
 
         # Logo à gauche dans le header
-        if os.path.exists(logo_path):
+        if logo_path and os.path.exists(logo_path):
             try:
                 img = Image(logo_path)
                 max_h = 10 * mm * 1.5
@@ -427,5 +441,12 @@ def pdf_template(medicines_list: list, user_name: str = "MediTime", calendar_nam
         onFirstPage=header_footer_with_logo,
         onLaterPages=header_footer_with_logo,
     )
+
+    # Nettoyage du fichier temporaire du logo
+    if logo_path:
+        try:
+            os.unlink(logo_path)
+        except OSError:
+            pass
 
     return buffer.getvalue() if hasattr(buffer, "getvalue") else (buffer if isinstance(buffer, bytes) else bytes(buffer))
