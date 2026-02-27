@@ -39,29 +39,7 @@ PALETTE = {
     "inactive_bg": colors.HexColor("#FEF2F2")# rouge très clair
 }
 
-def _try_register_fonts():
-    """
-    Tente d'enregistrer une police plus 'pro' si disponible (optionnel).
-    Ne casse pas si les fichiers n'existent pas.
-    """
-    try:
-        base_dir = os.path.dirname(__file__)
-        fonts_dir = os.path.join(base_dir, "fonts")
-        # Tu peux mettre ces fichiers (optionnel) :
-        # - Inter-Regular.ttf
-        # - Inter-SemiBold.ttf
-        reg = os.path.join(fonts_dir, "Inter-Regular.ttf")
-        semibold = os.path.join(fonts_dir, "Inter-SemiBold.ttf")
-        if os.path.exists(reg) and os.path.exists(semibold):
-            pdfmetrics.registerFont(TTFont("Inter", reg))
-            pdfmetrics.registerFont(TTFont("Inter-SemiBold", semibold))
-            return ("Inter", "Inter-SemiBold")
-    except Exception:
-        pass
-    # Fallback sûr
-    return ("Helvetica", "Helvetica-Bold")
-
-FONT_REGULAR, FONT_BOLD = _try_register_fonts()
+FONT_REGULAR, FONT_BOLD = "Helvetica", "Helvetica-Bold"
 
 def _parse_date(val: str | date | datetime | None) -> date | None:
     """Parse une chaîne de caractères en date.
