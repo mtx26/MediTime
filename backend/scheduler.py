@@ -10,6 +10,7 @@ Utilisation:
 
 Tâches configurées:
     - Diminution quotidienne des stocks à minuit (00:00)
+    - Vérification et envoi de notifications pour tous les utilisateurs toutes les 30 minutes
 """
 
 import signal
@@ -25,7 +26,7 @@ from app.core.db_init import verify_db_connection
 from app.utils.logging import log_backend
 
 # Import des tâches cron
-from app.cron.tasks.stock import decrease_stock
+from app.cron.tasks import decrease_stock, send_notifications_for_all_users
 
 
 def shutdown_handler(signum, frame):
@@ -87,6 +88,17 @@ def main():
         max_instances=1,  # Empêche les exécutions multiples
         replace_existing=True
     )
+    
+    # vérification et envoi de notifications pour tous les utilisateurs toute les 30 minutes
+    scheduler.add_job(
+        send_notifications_for_all_users,
+        CronTrigger(minute='*/30'),
+        id='stock_notification',
+        name='Notifications de stock faible',
+        max_instances=1,
+        replace_existing=True
+    )
+    send_notifications_for_all_users()
     
     log_backend.info("⏰ Tâches planifiées configurées", {
         "origin": "SCHEDULER",

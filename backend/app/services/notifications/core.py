@@ -27,7 +27,7 @@ from html import escape                        # Sécurisation HTML
 
 # ========= Constantes =========
 ORIGIN = "NOTIFICATIONS"  # Origine pour le logging
-DEFAULT_CHANNELS: Tuple[str, ...] = ("email", "web", "push")  # Canaux par défaut (web = historique, email, )
+DEFAULT_CHANNELS: List[str] = ["email", "web", "push"]  # Canaux par défaut (web = historique, email, )
 DEFAULT_USER_NAME = "un utilisateur"  # Nom par défaut si utilisateur inconnu
 VIEW_CALENDAR_LABEL = "Voir le calendrier"  # Libellé CTA générique
 
@@ -498,11 +498,11 @@ def notify_and_record(user_id: str, body_or_list: Dict | List[Dict], notificatio
     - channels (List[str] | None): Canaux par lesquels envoyer les notifications. Par défaut DEFAULT_CHANNELS.
     """
     if channels is None:
-        channels = list(DEFAULT_CHANNELS)
+        channels = DEFAULT_CHANNELS.copy()
     try:
         items = body_or_list if isinstance(body_or_list, list) else [body_or_list]
         enriched_items = [enrich_notification(n) for n in items]
-        send_grouped_notifications(user_id, enriched_items, notification_type, list(channels))
+        send_grouped_notifications(user_id, enriched_items, notification_type, channels)
     except Exception as e:
         log_backend.error(
             "Erreur notify_and_record",

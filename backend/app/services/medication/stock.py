@@ -87,7 +87,7 @@ def process_box_increment(cursor, id_box: str, qty: int, start_date: date, days:
             (new_qty, id_box)
         )
 
-def check_low_stock_and_notify_for_calendar(calendar_id: str) -> None:
+def check_low_stock_and_notify_for_calendar(calendar_id: str, channels: list[str] = None) -> None:
     """
     Vérifie les stocks faibles pour un calendrier spécifique et envoie des notifications.
     
@@ -130,14 +130,16 @@ def check_low_stock_and_notify_for_calendar(calendar_id: str) -> None:
                             SELECT 1 FROM medicine_box_conditions mbc
                             WHERE mbc.box_id = m.id
                                 AND mbc.deleted_at IS NULL
-                                AND (
-                                    mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE
-                                )
+                                AND (mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE)
+                                AND (mbc.start_date IS NULL OR mbc.start_date <= CURRENT_DATE)
                             )
                     """,
                     (calendar_id,)
                 )
                 results = cursor.fetchall()
+                
+                if not results:
+                    return
 
                 # Récupération des utilisateurs partagés
                 cursor.execute(
@@ -153,9 +155,6 @@ def check_low_stock_and_notify_for_calendar(calendar_id: str) -> None:
                     (calendar_id,)
                 )
                 shared_uids = {row["receiver_uid"] for row in cursor.fetchall()}
-
-        if not results:
-            return
 
         grouped: dict[str, list[dict]] = defaultdict(list)
         for result in results:
@@ -186,7 +185,8 @@ def check_low_stock_and_notify_for_calendar(calendar_id: str) -> None:
                 notify_and_record(
                     user_id=uid, 
                     body_or_list=notifs, 
-                    notification_type="low_stock"
+                    notification_type="low_stock",
+                    channels=channels if channels is not None else None
                 )
                 log_backend.info(
                     "Notifications de stock faible envoyées pour le calendrier",
@@ -244,9 +244,8 @@ def check_if_stock_is_low(calendar_id: int) -> bool:
                         SELECT 1 FROM medicine_box_conditions mbc
                         WHERE mbc.box_id = m.id
                             AND mbc.deleted_at IS NULL
-                            AND (
-                                mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE
-                            )
+                            AND (mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE)
+                            AND (mbc.start_date IS NULL OR mbc.start_date <= CURRENT_DATE)
                     )
                 """,
                 (calendar_id,)

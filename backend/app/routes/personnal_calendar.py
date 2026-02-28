@@ -45,6 +45,7 @@ def handle_calendars():
                         ON mbc.box_id = mb.id
                         AND mbc.deleted_at IS NULL
                         AND (mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE)
+                        AND (mbc.start_date IS NULL OR mbc.start_date <= CURRENT_DATE)
                     WHERE c.owner_uid = %s AND c.deleted_at IS NULL
                     GROUP BY c.id, cs.stock_decrement_method
                 """, (uid,))
