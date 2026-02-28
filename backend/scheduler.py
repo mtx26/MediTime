@@ -98,7 +98,6 @@ def main():
         max_instances=1,
         replace_existing=True
     )
-    send_notifications_for_all_users()
     
     log_backend.info("⏰ Tâches planifiées configurées", {
         "origin": "SCHEDULER",
