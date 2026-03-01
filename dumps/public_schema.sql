@@ -531,13 +531,20 @@ CREATE TABLE public.notifications (
     content jsonb,
     read boolean DEFAULT false NOT NULL,
     "timestamp" timestamp with time zone DEFAULT now(),
-    sender_uid uuid NOT NULL,
+    sender_uid uuid,
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now(),
     shared_calendar_id uuid,
     calendar_id uuid,
     medication_id uuid
 );
+
+
+--
+-- Name: COLUMN notifications.sender_uid; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.notifications.sender_uid IS 'ID de l''expéditeur (nullable pour les notifications système ou si l''expéditeur est supprimé)';
 
 
 --
