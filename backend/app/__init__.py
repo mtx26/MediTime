@@ -10,6 +10,7 @@ from app.core.db_init import verify_db_connection
 # from app.scripts import import_afmps_to_bis
 # from app.vertex import test_analyze_medical_document
 from flask_cors import CORS
+from app.utils.logging import log_backend
 
 def create_app():
     app = Flask(__name__)
@@ -26,6 +27,9 @@ def create_app():
     
     # 🔧 Enregistrement des routes
     register_routes(app)
+    
+    # Note: Le scheduler indépendant (scheduler.py) gère les tâches cron
+    # Il s'exécute en parallèle via launch.bat
 
     # Importation des médicaments AFMPS dans la base de données
     # import_afmps_to_bis("C:/Users/mtx_2/Documents/Code/Medic/MediTime/backend/app/scripts/A.csv")
