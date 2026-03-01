@@ -93,6 +93,7 @@ def check_low_stock_and_notify_for_calendar(calendar_id: str, channels: list[str
     
     Paramètres:
     - calendar_id: ID du calendrier à vérifier.
+    - channels: liste optionnelle de canaux de notification à utiliser (ex: ["email", "push", "web"]). Si None, utilise les canaux par défaut.
     """
     log_backend.info(
         "Vérification des stocks faibles", {

@@ -61,7 +61,7 @@ def use_pillbox(calendar_id: str, start_date: date) -> bool | None:
                 conn.commit()
 
         # Notifications faibles ensuite, comme avant
-        check_low_stock_and_notify_for_calendar(calendar_id)
+        check_low_stock_and_notify_for_calendar(calendar_id, ["email", "web"])
         return True
 
     except Exception:

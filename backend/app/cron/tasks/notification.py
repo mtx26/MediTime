@@ -76,7 +76,7 @@ def send_notification(user_id):
         # Envoyer les notifications pour chaque calendrier
         for calendar in calendars:
             calendar_id = calendar["id"]
-            check_low_stock_and_notify_for_calendar(calendar_id)
+            check_low_stock_and_notify_for_calendar(calendar_id, ["push"])
         
         return len(calendars)
             
