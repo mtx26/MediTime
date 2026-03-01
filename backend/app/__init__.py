@@ -10,7 +10,6 @@ from app.core.db_init import verify_db_connection
 # from app.scripts import import_afmps_to_bis
 # from app.vertex import test_analyze_medical_document
 from flask_cors import CORS
-from app.utils.logging import log_backend
 
 def create_app():
     app = Flask(__name__)
