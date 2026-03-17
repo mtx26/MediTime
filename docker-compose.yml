@@ -25,10 +25,7 @@ x-backend-env: &backend-env
 
 services:
   backend-api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: meditime-backend-api
+    image: ${BACKEND_IMAGE}
     working_dir: /app/backend
     environment: *backend-env
     ports:
@@ -36,14 +33,15 @@ services:
     command: >
       gunicorn -w 9 --threads 2 -b 0.0.0.0:5000 --timeout 120
       --access-logfile - --error-logfile - app.main:app
-    restart: unless-stopped
+    deploy:
+      restart_policy:
+        condition: any
 
   backend-scheduler:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: meditime-backend-scheduler
+    image: ${BACKEND_IMAGE}
     working_dir: /app/backend
     environment: *backend-env
     command: python scheduler.py
-    restart: unless-stopped
+    deploy:
+      restart_policy:
+        condition: any
