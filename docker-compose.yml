@@ -1,11 +1,36 @@
+x-backend-env: &backend-env
+  PORT: ${PORT:-5000}
+  SUPABASE_DB_HOST: ${SUPABASE_DB_HOST}
+  SUPABASE_DB_NAME: ${SUPABASE_DB_NAME}
+  SUPABASE_DB_USER: ${SUPABASE_DB_USER}
+  SUPABASE_DB_PASSWORD: ${SUPABASE_DB_PASSWORD}
+  SUPABASE_DB_PORT: ${SUPABASE_DB_PORT:-6543}
+  SUPABASE_URL: ${SUPABASE_URL}
+  SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+  GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:-/app/backend/serviceAccountKey.json}
+  GOOGLE_CLOUD_LOCATION: ${GOOGLE_CLOUD_LOCATION:-us-central1}
+  CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+  CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+  CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+  SYSTEM_UID: ${SYSTEM_UID}
+  FRONTEND_URL: ${FRONTEND_URL}
+  SMTP_HOST: ${SMTP_HOST}
+  SMTP_PORT: ${SMTP_PORT}
+  NOTIFICATION_EMAIL_ADDRESS: ${NOTIFICATION_EMAIL_ADDRESS}
+  NOTIFICATION_EMAIL_PASSWORD: ${NOTIFICATION_EMAIL_PASSWORD}
+  TWILIO_API_KEY_SID: ${TWILIO_API_KEY_SID}
+  TWILIO_API_KEY_SECRET: ${TWILIO_API_KEY_SECRET}
+  TWILIO_MESSAGING_SERVICE_SID: ${TWILIO_MESSAGING_SERVICE_SID}
+  RAILWAY_ENVIRONMENT: ${RAILWAY_ENVIRONMENT:-false}
+
 services:
   backend-api:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: meditime-backend-api
-    env_file:
-      - .env
+    working_dir: /app/backend
+    environment: *backend-env
     ports:
       - "5000:5000"
     command: >
@@ -18,7 +43,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: meditime-backend-scheduler
-    env_file:
-      - .env
+    working_dir: /app/backend
+    environment: *backend-env
     command: python scheduler.py
     restart: unless-stopped
