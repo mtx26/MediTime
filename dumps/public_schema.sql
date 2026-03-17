@@ -4,7 +4,7 @@
 
 
 -- Dumped from database version 15.8
--- Dumped by pg_dump version 16.12 (Ubuntu 16.12-1.pgdg24.04+1)
+-- Dumped by pg_dump version 16.13 (Ubuntu 16.13-1.pgdg24.04+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -531,13 +531,20 @@ CREATE TABLE public.notifications (
     content jsonb,
     read boolean DEFAULT false NOT NULL,
     "timestamp" timestamp with time zone DEFAULT now(),
-    sender_uid uuid NOT NULL,
+    sender_uid uuid,
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now(),
     shared_calendar_id uuid,
     calendar_id uuid,
     medication_id uuid
 );
+
+
+--
+-- Name: COLUMN notifications.sender_uid; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.notifications.sender_uid IS 'ID de l''expéditeur (nullable pour les notifications système ou si l''expéditeur est supprimé)';
 
 
 --

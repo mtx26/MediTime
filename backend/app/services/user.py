@@ -15,6 +15,11 @@ def fetch_user(uid: str) -> dict:
         with conn.cursor() as cursor:
             cursor.execute("SELECT * FROM users WHERE id = %s", (uid,))
             user = cursor.fetchone() or {}
+            
+            # Convert time object to string for JSON serialization
+            if user and 'notification_time' in user and user['notification_time']:
+                user['notification_time'] = user['notification_time'].strftime('%H:%M:%S')
+            
             return user
 
 def fetch_public_user_info(uid: str) -> dict:
@@ -89,6 +94,11 @@ def update_existing_user(
                 )
                 updated_user = cursor.fetchone()
                 conn.commit()
+                
+                # Convert time object to string for JSON serialization
+                if 'notification_time' in updated_user and updated_user['notification_time']:
+                    updated_user['notification_time'] = updated_user['notification_time'].strftime('%H:%M:%S')
+                
                 return updated_user
 
             return user_db

@@ -59,6 +59,7 @@ def handle_shared_calendars():
                                     WHERE mbc.box_id = mb.id
                                         AND mbc.deleted_at IS NULL
                                         AND (mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE)
+                                        AND (mbc.start_date IS NULL OR mbc.start_date <= CURRENT_DATE)
                                 )
                         ) AS "ifLowStock"
                     FROM shared_calendars sc
