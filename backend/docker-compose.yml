@@ -1,0 +1,24 @@
+services:
+  backend-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: meditime-backend-api
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    command: >
+      gunicorn -w 9 --threads 2 -b 0.0.0.0:5000 --timeout 120
+      --access-logfile - --error-logfile - app.main:app
+    restart: unless-stopped
+
+  backend-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: meditime-backend-scheduler
+    env_file:
+      - .env
+    command: python scheduler.py
+    restart: unless-stopped
