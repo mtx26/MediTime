@@ -25,7 +25,7 @@ x-backend-env: &backend-env
 
 services:
   backend-api:
-    image: ${BACKEND_IMAGE}
+    image: ${BACKEND_IMAGE:-ghcr.io/mtx26/meditime-backend:latest}
     working_dir: /app/backend
     environment: *backend-env
     ports:
@@ -38,7 +38,7 @@ services:
         condition: any
 
   backend-scheduler:
-    image: ${BACKEND_IMAGE}
+    image: ${BACKEND_IMAGE:-ghcr.io/mtx26/meditime-backend:latest}
     working_dir: /app/backend
     environment: *backend-env
     command: python scheduler.py
