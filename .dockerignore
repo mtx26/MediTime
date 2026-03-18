@@ -1,0 +1,24 @@
+# Git and editor
+.git
+.gitignore
+.vscode
+
+# Python cache and virtual environments
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+backend/.venv
+
+# Node modules (frontend not needed for backend image)
+frontend/node_modules
+
+# Logs and local artifacts
+logs
+backend/logs
+*.log
+
+# Secrets (never bake into image)
+backend/serviceAccountKey.json
+.env
+.env.*

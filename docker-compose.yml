@@ -7,7 +7,7 @@ x-backend-env: &backend-env
   SUPABASE_DB_PORT: ${SUPABASE_DB_PORT:-6543}
   SUPABASE_URL: ${SUPABASE_URL}
   SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
-  GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:-/app/backend/serviceAccountKey.json}
+  GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}
   GOOGLE_CLOUD_LOCATION: ${GOOGLE_CLOUD_LOCATION:-us-central1}
   CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
   CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
@@ -25,6 +25,9 @@ x-backend-env: &backend-env
 
 services:
   backend-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: ${BACKEND_IMAGE:-ghcr.io/mtx26/meditime-backend:latest}
     working_dir: /app/backend
     environment: *backend-env
@@ -38,6 +41,9 @@ services:
         condition: any
 
   backend-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: ${BACKEND_IMAGE:-ghcr.io/mtx26/meditime-backend:latest}
     working_dir: /app/backend
     environment: *backend-env

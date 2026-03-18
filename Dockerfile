@@ -1,7 +1,8 @@
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PORT=5000
 
 WORKDIR /app
 
@@ -18,3 +19,5 @@ COPY backend /app/backend
 WORKDIR /app/backend
 
 EXPOSE 5000
+
+CMD ["sh", "-c", "gunicorn -w ${GUNICORN_WORKERS:-4} --threads ${GUNICORN_THREADS:-2} -b 0.0.0.0:${PORT:-5000} --timeout ${GUNICORN_TIMEOUT:-120} --access-logfile - --error-logfile - app.main:app"]
