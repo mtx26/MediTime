@@ -32,7 +32,7 @@ services:
     working_dir: /app/backend
     environment: *backend-env
     ports:
-      - "5000:5000"
+      - "${HOST_PORT:-5000}:5000"
     command: >
       gunicorn -w 9 --threads 2 -b 0.0.0.0:5000 --timeout 120
       --access-logfile - --error-logfile - app.main:app
