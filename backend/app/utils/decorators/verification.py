@@ -395,6 +395,7 @@ def verify_login_invitation_owner(token: str = None, uid: str = None) -> dict | 
     """
     if callable(token):
         f = token
+        
 
         @wraps(f)
         def wrapper(*args, **kwargs):
