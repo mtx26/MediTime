@@ -105,7 +105,9 @@
       "stock_method_fetch_error": "Fehler beim Abrufen der Bestandsreduzierungsmethode",
       "stock_method_retrieved": "Methode zur Bestandsreduzierung wiederverwertet",
       "stock_method_update_error": "Fehler bei der Aktualisierung der Bestandsreduzierungsmethode",
-      "stock_method_updated": "aktualisierte Bestandsreduzierungsmethode"
+      "stock_method_updated": "aktualisierte Bestandsreduzierungsmethode",
+      "negative_stock_table_fetch_error": "fehlende Medikamenten-ID",
+      "negative_stock_table_retrieved": "Negative-Bestandstabelle abgerufen"
     },
     "ics": {
       "calendar_not_found": "Kalender nicht gefunden oder Token ungültig",
@@ -122,7 +124,8 @@
       "shared_link_deleted": "Link zum gemeinsamen Kalender entfernt",
       "shared_link_not_found": "Link nicht gefunden oder nicht autorisiert",
       "shared_links_fetch_error": "Fehler beim Abrufen der freigegebenen Kalenderlinks",
-      "shared_links_list": "Liste der freigegebenen Kalenderlinks"
+      "shared_links_list": "Liste der freigegebenen Kalenderlinks",
+      "generation_error": "api.ics.generation_error"
     },
     "invitations": {
       "accept_error": "Fehler beim Annehmen der Einladung",
@@ -152,7 +155,11 @@
       "not_found": "Fehler beim Markieren der Benachrichtigung als gelesen",
       "retrieved": "Benachrichtigungen abgerufen",
       "token_save_error": "Fehler bei der Token-Registrierung",
-      "token_saved": "Token registriert"
+      "token_saved": "Token registriert",
+      "all_marked_read": "Alle Benachrichtigungen als gelesen markiert",
+      "mark_all_read_error": "Fehler beim Markieren aller Benachrichtigungen als gelesen",
+      "marked_read_error": "Fehler beim Markieren der Benachrichtigung als gelesen",
+      "no_unread_notifications": "Keine ungelesenen Benachrichtigungen gefunden"
     },
     "pdf": {
       "download_error": "Fehler beim Herunterladen der PDF-Datei",
@@ -195,7 +202,9 @@
       "notifications_fetch_error": "Fehler beim Aktualisieren von Benachrichtigungen",
       "notifications_retrieved": "Aktualisierte Benachrichtigungen",
       "stock_method_fetch_error": "Fehler beim Abrufen der Bestandsreduzierungsmethode",
-      "stock_method_retrieved": "Methode zur Bestandsreduzierung wiederverwertet"
+      "stock_method_retrieved": "Methode zur Bestandsreduzierung wiederverwertet",
+      "negative_stock_table_fetch_error": "fehlende Medikamenten-ID",
+      "negative_stock_table_retrieved": "Negative-Bestandstabelle abgerufen"
     },
     "tokens": {
       "already_shared": "Token bereits geteilt",
@@ -220,7 +229,10 @@
       "not_found": "Benutzer nicht gefunden",
       "photo_error": "Fehler beim Aktualisieren des Benutzerfotos",
       "photo_success": "Benutzerfoto aktualisiert",
-      "updated": "aktualisierte Benutzerdaten"
+      "updated": "aktualisierte Benutzerdaten",
+      "notification_time_error": "Fehler beim Abrufen oder Aktualisieren der Benachrichtigungszeit",
+      "notification_time_retrieved": "Benachrichtigungszeit abgerufen",
+      "notification_time_updated": "Aktualisierung der Benachrichtigungszeit"
     }
   },
   "app": {
@@ -403,7 +415,8 @@
     "today": "Heute",
     "week": "Woche",
     "weekly_help": "Klicken Sie auf einen Tag im Kalender, um die zugehörigen Medikamente in einem Fenster anzuzeigen.",
-    "weekly_view": "Kalender nach Woche"
+    "weekly_view": "Kalender nach Woche",
+    "modal_description": "Modalbeschreibung"
   },
   "calendar_completed": "Kalender erfolgreich abgeschlossen!",
   "calendar_completed_this_week": "Pillendose für diese Woche voll!",
@@ -847,7 +860,11 @@
     "theme": "Thema",
     "theme_description": "Wählen Sie zwischen hellem und dunklem Modus.",
     "theme_help": "Das Thema gilt für die gesamte Anwendung.",
-    "theme_toggle": "Klicken Sie hier, um das Design zu ändern."
+    "theme_toggle": "Klicken Sie hier, um das Design zu ändern.",
+    "notification_time": "Benachrichtigungszeit",
+    "notification_time_desc": "Legen Sie die Standardzeit für den Empfang Ihrer Erinnerungen fest.",
+    "notification_time_label": "Tägliche Zeit",
+    "notification_time_note": "Diese Zeit wird für Erinnerungen an die Medikamenteneinnahme genutzt."
   },
   "share": "Aktie",
   "share_calendar": "Den Kalender freigeben",
@@ -1138,5 +1155,7 @@
   "yes": "Ja",
   "you_have_no_pillbox_use_history": "Für den Pillenorganizer liegen keine Nutzungsdaten vor.",
   "confirm_calendar_refill": "Vergewissern Sie sich, dass der Pillenbehälter voll ist.",
-  "pillbox_refill_description": "Der Tablettenorganizer wird automatisch mit den fehlenden Medikamenten (negativer Bestand) für diese Woche aufgefüllt. Dieser Vorgang ist unumkehrbar."
+  "pillbox_refill_description": "Der Tablettenorganizer wird automatisch mit den fehlenden Medikamenten (negativer Bestand) für diese Woche aufgefüllt. Dieser Vorgang ist unumkehrbar.",
+  "error": "Fehler",
+  "notifications": "Benachrichtigungen"
 }

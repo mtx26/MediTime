@@ -40,7 +40,7 @@ export default function WeeklyEventContent({
   return (
     <div className="flex flex-col h-full">
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 bg-background pb-2">
+      <div className="sticky top-0 z-10 pb-2">
         <ArrowControls
           onLeft={isFirstDay ? getPastWeek : onPrev}
           onRight={isLastDay ? getNextWeek : onNext}

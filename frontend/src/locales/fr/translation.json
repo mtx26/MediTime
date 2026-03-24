@@ -105,7 +105,9 @@
       "stock_method_fetch_error": "erreur lors de la récupération de la méthode de diminution de stock",
       "stock_method_retrieved": "méthode de diminution de stock récupérée",
       "stock_method_update_error": "erreur lors de la mise à jour de la méthode de diminution de stock",
-      "stock_method_updated": "methode de diminution de stock mise à jour"
+      "stock_method_updated": "methode de diminution de stock mise à jour",
+      "negative_stock_table_fetch_error": "missing medsId",
+      "negative_stock_table_retrieved": "negative stock table retrieved"
     },
     "ics": {
       "calendar_not_found": "Calendrier introuvable ou token invalide",
@@ -122,7 +124,8 @@
       "shared_link_deleted": "Lien calendrier partagé supprimé",
       "shared_link_not_found": "Lien introuvable ou non autorisé",
       "shared_links_fetch_error": "Erreur lors de la récupération des liens calendrier partagé",
-      "shared_links_list": "Liste des liens calendrier partagé"
+      "shared_links_list": "Liste des liens calendrier partagé",
+      "generation_error": "api.ics.generation_error"
     },
     "invitations": {
       "accept_error": "erreur lors de l'acceptation de l'invitation",
@@ -152,7 +155,11 @@
       "not_found": "erreur lors de la marque de la notification comme lue",
       "retrieved": "notifications récupérées",
       "token_save_error": "erreur lors de l'enregistrement du token",
-      "token_saved": "token enregistré"
+      "token_saved": "token enregistré",
+      "all_marked_read": "all notifications marked as read",
+      "mark_all_read_error": "error marking all notifications as read",
+      "marked_read_error": "Error marking notification as read",
+      "no_unread_notifications": "no unread notifications found"
     },
     "pdf": {
       "download_error": "Erreur lors du téléchargement du PDF",
@@ -195,7 +202,9 @@
       "notifications_fetch_error": "Erreur lors de la mise à jour des notifications",
       "notifications_retrieved": "Notifications mises à jour",
       "stock_method_fetch_error": "erreur lors de la récupération de la méthode de diminution de stock",
-      "stock_method_retrieved": "méthode de diminution de stock récupérée"
+      "stock_method_retrieved": "méthode de diminution de stock récupérée",
+      "negative_stock_table_fetch_error": "missing medsId",
+      "negative_stock_table_retrieved": "negative stock table retrieved"
     },
     "tokens": {
       "already_shared": "token déjà partagé",
@@ -217,6 +226,9 @@
       "fetch_error": "erreur lors de la récupération des données utilisateur",
       "info_retrieved": "informations utilisateur récupérées",
       "no_data": "erreur lors de la mise à jour",
+      "notification_time_error": "erreur lors de la récupération ou de la mise à jour de l'heure de notification",
+      "notification_time_retrieved": "heure de notification récupérée",
+      "notification_time_updated": "heure de notification mise à jour",
       "not_found": "utilisateur introuvable",
       "photo_error": "erreur lors de la mise à jour de la photo de l'utilisateur",
       "photo_success": "photo de l'utilisateur mise à jour",
@@ -403,7 +415,8 @@
     "today": "Aujourd'hui",
     "week": "Semaine",
     "weekly_help": "Cliquez sur un jour du calendrier pour voir les médicaments associés dans une fenêtre.",
-    "weekly_view": "Calendrier par semaine"
+    "weekly_view": "Calendrier par semaine",
+    "modal_description": "modal description"
   },
   "calendar_completed": "Calendrier complété avec succès !",
   "calendar_completed_this_week": "Pilulier complété pour cette semaine !",
@@ -843,6 +856,10 @@
     "label": "Paramètres",
     "language": "Langue de l'application",
     "language_note": "La langue sélectionnée s’appliquera à toute l’interface.",
+    "notification_time": "Heure de notification",
+    "notification_time_desc": "Définissez l'heure par défaut pour recevoir vos rappels.",
+    "notification_time_label": "Heure quotidienne",
+    "notification_time_note": "Cette heure sera utilisée pour les notifications de prise de médicaments.",
     "preferences": "Préférences",
     "preferences_desc": "Personnalisez votre expérience sur MediTime.",
     "security": "Sécurité",
@@ -1138,5 +1155,7 @@
     "title": "Pourquoi choisir MediTime ?"
   },
   "yes": "Oui",
-  "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier."
+  "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier.",
+  "error": "error",
+  "notifications": "notifications"
 }
