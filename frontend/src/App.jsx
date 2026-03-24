@@ -65,7 +65,7 @@ function App() {
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  // focntion de recup tu notif time d'un utilisateur
+  // fonction pour récupérer le temps de notification d'un utilisateur
   const fetchNotificationTime = useCallback(async () => {
     return await performApiCall({
       url: `${API_URL}/api/user/notification-time`,
