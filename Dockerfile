@@ -11,12 +11,20 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential gcc \
     && rm -rf /var/lib/apt/lists/*
 
+# Run the app as a dedicated non-root user.
+RUN groupadd --system app \
+    && useradd --system --gid app --create-home app
+
 COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
 COPY backend /app/backend
 
+RUN chown -R app:app /app
+
 WORKDIR /app/backend
+
+USER app
 
 EXPOSE 5000
 
