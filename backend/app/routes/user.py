@@ -1,10 +1,27 @@
 from flask import request, g
+from datetime import datetime
 from . import api
 from app.db.connection import get_connection
 from app.services.user import fetch_user, update_existing_user, insert_new_user
 from app.utils.responses import success_response, error_response
 from app.utils.upload import upload_logo
 from app.utils.decorators import require_auth, measure_time, with_query_origin
+
+
+def _normalize_notification_time(raw_value):
+    """Convert time strings to HH:MM:SS (accepts HH:MM or HH:MM:SS)."""
+    if not isinstance(raw_value, str) or not raw_value.strip():
+        raise ValueError("notification_time must be a non-empty time string")
+
+    value = raw_value.strip()
+
+    for time_format in ("%H:%M", "%H:%M:%S"):
+        try:
+            return datetime.strptime(value, time_format).strftime("%H:%M:%S")
+        except ValueError:
+            continue
+
+    raise ValueError("Invalid notification_time format, expected HH:MM or HH:MM:SS")
 
 
 @api.route("/user/sync", methods=["GET"])
@@ -122,6 +139,104 @@ def handle_user_photo():
             message="Error updating user photo",
             code="USER_PHOTO_ERROR",
             i18n_key="api.user.photo_error",
+            status_code=500,
+            error=str(e),
+        )
+
+
+@api.route("/user/notification-time", methods=["GET"])
+@measure_time()
+@require_auth
+def get_notification_time():
+    try:
+        uid = g.uid if hasattr(g, "uid") else None
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "SELECT notification_time FROM users WHERE id = %s",
+                    (uid,)
+                )
+                row = cursor.fetchone()
+                if not row:
+                    return error_response(
+                        message="User not found",
+                        code="USER_NOT_FOUND",
+                        i18n_key="api.user.not_found",
+                        status_code=404,
+                    )
+                notification_time = row["notification_time"]
+                if notification_time is not None:
+                    notification_time = notification_time.strftime("%H:%M:%S")
+
+        return success_response(
+            message="Notification time retrieved",
+            code="USER_NOTIFICATION_TIME_SUCCESS",
+            i18n_key="api.user.notification_time_retrieved",
+            data={"notification_time": notification_time}
+        )
+    except Exception as e:
+        return error_response(
+            message="Error retrieving notification time",
+            code="USER_NOTIFICATION_TIME_ERROR",
+            i18n_key="api.user.notification_time_error",
+            status_code=500,
+            error=str(e),
+        )
+
+
+@api.route("/user/notification-time", methods=["PUT"])
+@measure_time()
+@require_auth
+def update_notification_time():
+    try:
+        uid = g.uid if hasattr(g, "uid") else None
+        payload = request.get_json(force=True)
+        if not payload:
+            return error_response(
+                message="No notification time provided",
+                code="USER_NOTIFICATION_TIME_ERROR",
+                i18n_key="api.user.notification_time_error",
+                status_code=400,
+            )
+
+        raw_notification_time = payload.get("notification_time", payload.get("notificationTime"))
+        if raw_notification_time is None:
+            return error_response(
+                message="No notification time provided",
+                code="USER_NOTIFICATION_TIME_ERROR",
+                i18n_key="api.user.notification_time_error",
+                status_code=400,
+            )
+
+        try:
+            notification_time = _normalize_notification_time(raw_notification_time)
+        except ValueError as e:
+            return error_response(
+                message=f"Invalid notification time format: {str(e)}",
+                code="USER_NOTIFICATION_TIME_INVALID_FORMAT",
+                i18n_key="api.user.notification_time_error",
+                status_code=400,
+            )
+        
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE users SET notification_time = %s WHERE id = %s",
+                    (notification_time, uid)
+                )
+                conn.commit()
+
+        return success_response(
+            message="Notification time updated",
+            code="USER_NOTIFICATION_TIME_SUCCESS",
+            i18n_key="api.user.notification_time_updated",
+            data={"notification_time": notification_time}
+        )
+    except Exception as e:
+        return error_response(
+            message="Error updating notification time",
+            code="USER_NOTIFICATION_TIME_ERROR",
+            i18n_key="api.user.notification_time_error",
             status_code=500,
             error=str(e),
         )

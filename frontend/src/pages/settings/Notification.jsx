@@ -1,4 +1,4 @@
-import React, { use, useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { UserContext } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import { updateUserInfo } from '../../services/auth/authService';
@@ -6,17 +6,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Bell, RefreshCw, Mail, Smartphone } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Bell, RefreshCw, Smartphone, Settings } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function Notification({ fcm }) {
+export default function Notification({ fcm, user }) {
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
   const uid = userInfo?.uid ?? null;
   const [notificationsEnabled, setNotificationsEnabled] = useState(window?.Notification?.permission === 'granted');
   const notificationNotSupported = !('Notification' in window) || window.Notification.permission === 'denied';
   const [isRegistering, setIsRegistering] = useState(false);
+  const [notificationTime, setNotificationTime] = useState(null);
+
+  // fetch notification time on component mount
+  useEffect(() => {
+    const fetchNotificationTime = async () => {
+      const rep = await user.fetchNotificationTime();
+      if (rep.success) {
+        setNotificationTime(rep.notification_time);
+      }
+    };
+
+    fetchNotificationTime();
+  }, [user.fetchNotificationTime, notificationTime]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -80,6 +94,39 @@ export default function Notification({ fcm }) {
                   push_enabled: !userInfo?.pushEnabled
                 })
               }}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Section notification time */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Settings className="h-5 w-5 text-primary" />
+            <CardTitle>{t('settings.notification_time')}</CardTitle>
+          </div>
+          <CardDescription>{t('settings.notification_time_desc')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <Label htmlFor="notificationTime" className="font-medium text-sm">
+                {t('settings.notification_time_label')}
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {t('settings.notification_time_note')}
+              </p>
+            </div>
+            <Input
+              id="notificationTime"
+              type="time"
+              value={notificationTime ? notificationTime.slice(0, 5) : ''}
+              onChange={async (e) => {
+                await user.updateNotificationTime(e.target.value);
+                setNotificationTime(e.target.value);
+              }}
+              className="w-24"
             />
           </div>
         </CardContent>

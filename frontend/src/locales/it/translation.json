@@ -105,7 +105,9 @@
       "stock_method_fetch_error": "errore durante il recupero del metodo di riduzione delle scorte",
       "stock_method_retrieved": "metodo di riduzione delle scorte recuperato",
       "stock_method_update_error": "Errore durante l'aggiornamento del metodo di riduzione delle scorte",
-      "stock_method_updated": "metodo di riduzione delle scorte aggiornato"
+      "stock_method_updated": "metodo di riduzione delle scorte aggiornato",
+      "negative_stock_table_fetch_error": "ID del farmaco mancante",
+      "negative_stock_table_retrieved": "tabella di stock negativo recuperata"
     },
     "ics": {
       "calendar_not_found": "Calendario non trovato o token non valido",
@@ -122,7 +124,8 @@
       "shared_link_deleted": "Rimosso il collegamento al calendario condiviso",
       "shared_link_not_found": "Collegamento non trovato o non autorizzato",
       "shared_links_fetch_error": "Errore durante il recupero dei link del calendario condiviso",
-      "shared_links_list": "Elenco dei link del calendario condiviso"
+      "shared_links_list": "Elenco dei link del calendario condiviso",
+      "generation_error": "api.ics.generation_error"
     },
     "invitations": {
       "accept_error": "errore durante l'accettazione dell'invito",
@@ -152,7 +155,11 @@
       "not_found": "Errore durante la marcatura della notifica come letta",
       "retrieved": "notifiche recuperate",
       "token_save_error": "errore durante la registrazione del token",
-      "token_saved": "token registrato"
+      "token_saved": "token registrato",
+      "all_marked_read": "tutte le notifiche contrassegnate come lette",
+      "mark_all_read_error": "errore nel contrassegnare tutte le notifiche come lette",
+      "marked_read_error": "Errore nel contrassegnare la notifica come letta",
+      "no_unread_notifications": "Nessuna notifica non letta trovata"
     },
     "pdf": {
       "download_error": "Errore durante il download del PDF",
@@ -195,7 +202,9 @@
       "notifications_fetch_error": "Errore durante l'aggiornamento delle notifiche",
       "notifications_retrieved": "Notifiche aggiornate",
       "stock_method_fetch_error": "errore durante il recupero del metodo di riduzione delle scorte",
-      "stock_method_retrieved": "metodo di riduzione delle scorte recuperato"
+      "stock_method_retrieved": "metodo di riduzione delle scorte recuperato",
+      "negative_stock_table_fetch_error": "ID del farmaco mancante",
+      "negative_stock_table_retrieved": "tabella di stock negativo recuperata"
     },
     "tokens": {
       "already_shared": "token già condiviso",
@@ -220,7 +229,10 @@
       "not_found": "utente non trovato",
       "photo_error": "Errore durante l'aggiornamento della foto dell'utente",
       "photo_success": "foto utente aggiornata",
-      "updated": "dati utente aggiornati"
+      "updated": "dati utente aggiornati",
+      "notification_time_error": "Errore durante il recupero o l'aggiornamento dell'orario di notifica.",
+      "notification_time_retrieved": "tempo di notifica recuperato",
+      "notification_time_updated": "aggiornamento orario notifica"
     }
   },
   "app": {
@@ -403,7 +415,8 @@
     "today": "Oggi",
     "week": "Settimana",
     "weekly_help": "Cliccando su un giorno nel calendario si possono visualizzare in una finestra i farmaci associati.",
-    "weekly_view": "Calendario per settimana"
+    "weekly_view": "Calendario per settimana",
+    "modal_description": "descrizione modale"
   },
   "calendar_completed": "Calendario completato con successo!",
   "calendar_completed_this_week": "Questa settimana il bunker è pieno!",
@@ -847,7 +860,11 @@
     "theme": "Tema",
     "theme_description": "Scegli tra la modalità chiara e la modalità scura.",
     "theme_help": "Il tema si applica all'intera applicazione.",
-    "theme_toggle": "Clicca per cambiare il tema"
+    "theme_toggle": "Clicca per cambiare il tema",
+    "notification_time": "Orario di notifica",
+    "notification_time_desc": "Imposta l'orario predefinito per la ricezione dei promemoria.",
+    "notification_time_label": "Orario giornaliero",
+    "notification_time_note": "Questo tempo verrà utilizzato per i promemoria relativi all'assunzione dei farmaci."
   },
   "share": "Condividere",
   "share_calendar": "Condividi il calendario",
@@ -1138,5 +1155,7 @@
   "yes": "SÌ",
   "you_have_no_pillbox_use_history": "Non hai alcuna cronologia di utilizzo per l'organizzatore di pillole.",
   "confirm_calendar_refill": "Verificare che il portapillole sia pieno",
-  "pillbox_refill_description": "Il portapillole si riempirà con eventuali farmaci mancanti (scorte negative) per questa settimana. Questa azione è irreversibile."
+  "pillbox_refill_description": "Il portapillole si riempirà con eventuali farmaci mancanti (scorte negative) per questa settimana. Questa azione è irreversibile.",
+  "error": "errore",
+  "notifications": "notifiche"
 }

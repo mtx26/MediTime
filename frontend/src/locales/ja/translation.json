@@ -105,7 +105,9 @@
       "stock_method_fetch_error": "在庫削減方法の取得中にエラーが発生しました",
       "stock_method_retrieved": "在庫削減方法が回復した",
       "stock_method_update_error": "在庫削減方法の更新中にエラーが発生しました",
-      "stock_method_updated": "更新された在庫削減方法"
+      "stock_method_updated": "更新された在庫削減方法",
+      "negative_stock_table_fetch_error": "不足しているmedsId",
+      "negative_stock_table_retrieved": "マイナスの株価表を取得しました"
     },
     "ics": {
       "calendar_not_found": "カレンダーが見つからないかトークンが無効です",
@@ -122,7 +124,8 @@
       "shared_link_deleted": "共有カレンダーのリンクが削除されました",
       "shared_link_not_found": "リンクが見つからないか、許可されていません",
       "shared_links_fetch_error": "共有カレンダーのリンクの取得中にエラーが発生しました",
-      "shared_links_list": "共有カレンダーのリンクのリスト"
+      "shared_links_list": "共有カレンダーのリンクのリスト",
+      "generation_error": "api.ics.generation_error"
     },
     "invitations": {
       "accept_error": "招待を承諾する際のエラー",
@@ -152,7 +155,11 @@
       "not_found": "通知を既読にする際にエラーが発生しました",
       "retrieved": "通知を取得しました",
       "token_save_error": "トークン登録中にエラーが発生しました",
-      "token_saved": "トークンが登録されました"
+      "token_saved": "トークンが登録されました",
+      "all_marked_read": "すべての通知が既読としてマークされています",
+      "mark_all_read_error": "すべての通知を既読としてマークするとエラーが発生します",
+      "marked_read_error": "通知を既読としてマークする際にエラーが発生しました",
+      "no_unread_notifications": "未読の通知は見つかりませんでした"
     },
     "pdf": {
       "download_error": "PDFのダウンロード中にエラーが発生しました",
@@ -195,7 +202,9 @@
       "notifications_fetch_error": "通知の更新中にエラーが発生しました",
       "notifications_retrieved": "通知を更新しました",
       "stock_method_fetch_error": "在庫削減方法の取得中にエラーが発生しました",
-      "stock_method_retrieved": "在庫削減方法が回復した"
+      "stock_method_retrieved": "在庫削減方法が回復した",
+      "negative_stock_table_fetch_error": "不足しているmedsId",
+      "negative_stock_table_retrieved": "マイナスの株価表を取得しました"
     },
     "tokens": {
       "already_shared": "トークンはすでに共有されています",
@@ -220,7 +229,10 @@
       "not_found": "ユーザーが見つかりません",
       "photo_error": "ユーザー写真の更新中にエラーが発生しました",
       "photo_success": "ユーザーの写真が更新されました",
-      "updated": "更新されたユーザーデータ"
+      "updated": "更新されたユーザーデータ",
+      "notification_time_error": "通知時間の取得または更新中にエラーが発生しました",
+      "notification_time_retrieved": "通知時刻を取得しました",
+      "notification_time_updated": "通知時間の更新"
     }
   },
   "app": {
@@ -403,7 +415,8 @@
     "today": "今日",
     "week": "週",
     "weekly_help": "カレンダーの日付をクリックすると、関連する薬がウィンドウに表示されます。",
-    "weekly_view": "週ごとのカレンダー"
+    "weekly_view": "週ごとのカレンダー",
+    "modal_description": "モーダルの説明"
   },
   "calendar_completed": "カレンダーが無事完成しました！",
   "calendar_completed_this_week": "今週はピルボックスがいっぱいです！",
@@ -847,7 +860,11 @@
     "theme": "テーマ",
     "theme_description": "ライトモードとダークモードを選択します。",
     "theme_help": "テーマはアプリケーション全体に適用されます。",
-    "theme_toggle": "テーマを変更するにはクリックしてください"
+    "theme_toggle": "テーマを変更するにはクリックしてください",
+    "notification_time": "通知時間",
+    "notification_time_desc": "リマインダーを受信するデフォルトの時刻を設定します。",
+    "notification_time_label": "毎日",
+    "notification_time_note": "この時間は服薬のリマインダーに使用されます。"
   },
   "share": "共有",
   "share_calendar": "カレンダーを共有する",
@@ -1138,5 +1155,7 @@
   "yes": "はい",
   "you_have_no_pillbox_use_history": "ピルオーガナイザーの使用履歴がありません。",
   "confirm_calendar_refill": "ピルボックスがいっぱいであることを確認する",
-  "pillbox_refill_description": "ピルケースは、今週不足している薬（マイナス在庫）を補充します。この操作は元に戻せません。"
+  "pillbox_refill_description": "ピルケースは、今週不足している薬（マイナス在庫）を補充します。この操作は元に戻せません。",
+  "error": "エラー",
+  "notifications": "通知"
 }

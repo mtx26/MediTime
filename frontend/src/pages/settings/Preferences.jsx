@@ -4,7 +4,7 @@ import LanguageSelector from '../../components/common/LanguageSelector';
 import ThemeToggle from '../../components/common/ThemeToggle';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Settings, Languages, Palette } from 'lucide-react';
+import { Languages, Palette } from 'lucide-react';
 
 export default function Preferences() {
   const { t } = useTranslation();

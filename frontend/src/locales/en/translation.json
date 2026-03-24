@@ -105,7 +105,9 @@
       "stock_method_fetch_error": "error during retrieval of the stock reduction method",
       "stock_method_retrieved": "inventory reduction method recovered",
       "stock_method_update_error": "Error during the update of the stock reduction method",
-      "stock_method_updated": "updated inventory reduction method"
+      "stock_method_updated": "updated inventory reduction method",
+      "negative_stock_table_fetch_error": "missing medsId",
+      "negative_stock_table_retrieved": "negative stock table retrieved"
     },
     "ics": {
       "calendar_not_found": "Calendar not found or token invalid",
@@ -122,7 +124,8 @@
       "shared_link_deleted": "Shared calendar link removed",
       "shared_link_not_found": "Link not found or unauthorized",
       "shared_links_fetch_error": "Error retrieving shared calendar links",
-      "shared_links_list": "List of shared calendar links"
+      "shared_links_list": "List of shared calendar links",
+      "generation_error": "api.ics.generation_error"
     },
     "invitations": {
       "accept_error": "error when accepting the invitation",
@@ -152,7 +155,11 @@
       "not_found": "Error marking notification as read",
       "retrieved": "notifications retrieved",
       "token_save_error": "error during token registration",
-      "token_saved": "token registered"
+      "token_saved": "token registered",
+      "all_marked_read": "all notifications marked as read",
+      "mark_all_read_error": "error marking all notifications as read",
+      "marked_read_error": "Error marking notification as read",
+      "no_unread_notifications": "no unread notifications found"
     },
     "pdf": {
       "download_error": "Error downloading PDF",
@@ -195,7 +202,9 @@
       "notifications_fetch_error": "Error updating notifications",
       "notifications_retrieved": "Updated notifications",
       "stock_method_fetch_error": "error during retrieval of the stock reduction method",
-      "stock_method_retrieved": "inventory reduction method recovered"
+      "stock_method_retrieved": "inventory reduction method recovered",
+      "negative_stock_table_fetch_error": "missing medsId",
+      "negative_stock_table_retrieved": "negative stock table retrieved"
     },
     "tokens": {
       "already_shared": "token already shared",
@@ -220,7 +229,10 @@
       "not_found": "user not found",
       "photo_error": "Error updating user photo",
       "photo_success": "user photo updated",
-      "updated": "updated user data"
+      "updated": "updated user data",
+      "notification_time_error": "Error retrieving or updating notification time",
+      "notification_time_retrieved": "notification time retrieved",
+      "notification_time_updated": "notification time update"
     }
   },
   "app": {
@@ -403,7 +415,8 @@
     "today": "Today",
     "week": "Week",
     "weekly_help": "Click on a day in the calendar to see the associated medications in a window.",
-    "weekly_view": "Calendar by week"
+    "weekly_view": "Calendar by week",
+    "modal_description": "modal description"
   },
   "calendar_completed": "Calendar successfully completed!",
   "calendar_completed_this_week": "Pillbox full for this week!",
@@ -847,7 +860,11 @@
     "theme": "Theme",
     "theme_description": "Choose between light mode and dark mode.",
     "theme_help": "The theme applies to the entire application.",
-    "theme_toggle": "Click to change the theme"
+    "theme_toggle": "Click to change the theme",
+    "notification_time": "Notification time",
+    "notification_time_desc": "Set the default time to receive your reminders.",
+    "notification_time_label": "Daily time",
+    "notification_time_note": "This time will be used for medication reminders."
   },
   "share": "Share",
   "share_calendar": "Share the calendar",
@@ -1138,5 +1155,7 @@
   "yes": "Yes",
   "you_have_no_pillbox_use_history": "You have no usage history for the pill organizer.",
   "confirm_calendar_refill": "Confirm that the pillbox is full",
-  "pillbox_refill_description": "The pill organizer will refill with any missing medication (negative stock) for this week. This action is irreversible."
+  "pillbox_refill_description": "The pill organizer will refill with any missing medication (negative stock) for this week. This action is irreversible.",
+  "error": "error",
+  "notifications": "notifications"
 }

@@ -105,7 +105,9 @@
       "stock_method_fetch_error": "库存减少方法检索过程中出现错误",
       "stock_method_retrieved": "库存减少法回收",
       "stock_method_update_error": "库存减少方法更新过程中出错",
-      "stock_method_updated": "更新后的库存减少方法"
+      "stock_method_updated": "更新后的库存减少方法",
+      "negative_stock_table_fetch_error": "缺少 medsId",
+      "negative_stock_table_retrieved": "已检索到负库存表"
     },
     "ics": {
       "calendar_not_found": "未找到日历或令牌无效",
@@ -122,7 +124,8 @@
       "shared_link_deleted": "已移除共享日历链接",
       "shared_link_not_found": "链接未找到或未经授权",
       "shared_links_fetch_error": "获取共享日历链接时出错",
-      "shared_links_list": "共享日历链接列表"
+      "shared_links_list": "共享日历链接列表",
+      "generation_error": "api.ics.generation_error"
     },
     "invitations": {
       "accept_error": "接受邀请时出错",
@@ -152,7 +155,11 @@
       "not_found": "错误：将通知标记为已读",
       "retrieved": "已检索通知",
       "token_save_error": "令牌注册过程中出错",
-      "token_saved": "已注册令牌"
+      "token_saved": "已注册令牌",
+      "all_marked_read": "所有标记为已读的通知",
+      "mark_all_read_error": "错误：所有通知均被标记为已读",
+      "marked_read_error": "错误：将通知标记为已读",
+      "no_unread_notifications": "未找到未读通知"
     },
     "pdf": {
       "download_error": "下载PDF文件时出错",
@@ -195,7 +202,9 @@
       "notifications_fetch_error": "更新通知时出错",
       "notifications_retrieved": "更新通知",
       "stock_method_fetch_error": "库存减少方法检索过程中出现错误",
-      "stock_method_retrieved": "库存减少法回收"
+      "stock_method_retrieved": "库存减少法回收",
+      "negative_stock_table_fetch_error": "缺少 medsId",
+      "negative_stock_table_retrieved": "已检索到负库存表"
     },
     "tokens": {
       "already_shared": "令牌已共享",
@@ -220,7 +229,10 @@
       "not_found": "用户未找到",
       "photo_error": "用户照片更新错误",
       "photo_success": "用户照片已更新",
-      "updated": "用户数据已更新"
+      "updated": "用户数据已更新",
+      "notification_time_error": "获取或更新通知时间时出错",
+      "notification_time_retrieved": "获取通知时间",
+      "notification_time_updated": "通知时间更新"
     }
   },
   "app": {
@@ -403,7 +415,8 @@
     "today": "今天",
     "week": "星期",
     "weekly_help": "单击日历中的某一天即可在窗口中查看相关药物。",
-    "weekly_view": "按周日历"
+    "weekly_view": "按周日历",
+    "modal_description": "模态描述"
   },
   "calendar_completed": "行事历成功完成！",
   "calendar_completed_this_week": "这周药盒已满！",
@@ -847,7 +860,11 @@
     "theme": "主题",
     "theme_description": "选择浅色模式或深色模式。",
     "theme_help": "该主题适用于整个应用程序。",
-    "theme_toggle": "点击更改主题"
+    "theme_toggle": "点击更改主题",
+    "notification_time": "通知时间",
+    "notification_time_desc": "设置接收提醒的默认时间。",
+    "notification_time_label": "每日时间",
+    "notification_time_note": "这段时间将用于提醒服药。"
   },
   "share": "分享",
   "share_calendar": "共享日历",
@@ -1138,5 +1155,7 @@
   "yes": "是的",
   "you_have_no_pillbox_use_history": "您的药盒没有使用记录。",
   "confirm_calendar_refill": "确认药盒已满。",
-  "pillbox_refill_description": "药盒将自动补充本周缺失的药物（库存不足）。此操作不可逆。"
+  "pillbox_refill_description": "药盒将自动补充本周缺失的药物（库存不足）。此操作不可逆。",
+  "error": "错误",
+  "notifications": "通知"
 }

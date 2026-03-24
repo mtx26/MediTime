@@ -63,6 +63,38 @@ function App() {
     setIsInitialLoading(isLoading);
   }, [loadingStates]);
 
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // fonction pour récupérer le temps de notification d'un utilisateur
+  const fetchNotificationTime = useCallback(async () => {
+    return await performApiCall({
+      url: `${API_URL}/api/user/notification-time`,
+      method: 'GET',
+      origin: 'NOTIFICATION_TIME_FETCH',
+      uid,
+      analyticsEvent: 'fetch_notification_time',
+      analyticsData: { uid },
+      showAlert,
+    });
+  }, [showAlert]);
+
+  // fonction de mise à jour du notif time d'un utilisateur
+  const updateNotificationTime = useCallback(async (notificationTime) => {
+    return await performApiCall({
+      url: `${API_URL}/api/user/notification-time`,
+      method: 'PUT',
+      body: { notification_time: notificationTime },
+      origin: 'NOTIFICATION_TIME_UPDATE',
+      uid,
+      analyticsEvent: 'update_notification_time',
+      analyticsData: { uid, notificationTime },
+      showAlert,
+    });
+  }, [showAlert]);
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
   // Fonction pour ajouter un calendrier
   const addCalendar = useCallback(async (calendarName) => {
     return await performApiCall({
@@ -1040,7 +1072,6 @@ function App() {
       tokensList,
       setTokensList,
     },
-
     notifications: {
       readNotification,
       notificationsData,
@@ -1052,6 +1083,10 @@ function App() {
     },
     loadingStates: {
       isInitialLoading,
+    },
+    user: {
+      fetchNotificationTime,
+      updateNotificationTime,
     },
   };
 
