@@ -5,7 +5,7 @@ import Stock from './CalendarStock';
 import Notifications from './CalendarNotifications.jsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pill, Bell, Settings } from 'lucide-react';
-import { cn } from '@meditime/utils';
+import { cn } from '@/lib/utils';
 import NotFound from '@/pages/general/NotFound';
 // import Sharing from './calendar-settings/Sharing';
 

@@ -39,7 +39,7 @@ import {
   X,
   ChevronDown,
 } from 'lucide-react';
-import { cn } from '@meditime/utils';
+import { cn } from '@/lib/utils';
 
 function buildLocationList(pathWithSlash) {
   return {
