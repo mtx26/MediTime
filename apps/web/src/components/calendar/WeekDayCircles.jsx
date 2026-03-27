@@ -1,4 +1,4 @@
-import { getMondayDate } from '../../utils/calendar/dateUtils';
+import { getMondayDate } from '@meditime/utils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';

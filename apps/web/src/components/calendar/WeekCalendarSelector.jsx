@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar } from '@/components/ui/calendar';
-import { getMondayDate } from '../../utils/calendar/dateUtils';
+import { getMondayDate } from '@meditime/utils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { getDateLocale } from '@meditime/config';

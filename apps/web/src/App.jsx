@@ -6,7 +6,6 @@ import Footer from './components/common/Footer';
 import MobileNavBar from './components/common/MobileNavBar';
 import AppRoutes from './routes/AppRouter';
 import { UserContext } from './contexts/UserContext';
-import { toISO } from './utils/calendar/dateUtils';
 import RealtimeManager from './components/realtime/RealtimeManager';
 import { performApiCall } from '@meditime/utils';
 import {
@@ -81,7 +80,6 @@ function App() {
       uid,
       showAlert,
       performApiCall,
-      toISO,
     });
   }, [uid, showAlert]);
 
@@ -91,7 +89,6 @@ function App() {
       uid,
       showAlert,
       performApiCall,
-      toISO,
     });
   }, [uid, showAlert]);
 
@@ -101,7 +98,6 @@ function App() {
       uid,
       showAlert,
       performApiCall,
-      toISO,
     });
   }, [uid, showAlert]);
 

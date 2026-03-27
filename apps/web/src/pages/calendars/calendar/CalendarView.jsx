@@ -7,7 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '@/contexts/UserContext';
 import { useLoading } from '@/components/ui/loading';
-import { toISO } from '@/utils/calendar/dateUtils';
+import { toISO } from '@meditime/utils';
 import { getCalendarSourceMap } from '@meditime/utils';
 import { useAlert } from '@/contexts/AlertContext';
 import isEqual from 'lodash/isEqual';

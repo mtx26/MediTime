@@ -1,4 +1,6 @@
-export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performApiCall, toISO }) {
+import { toISO } from '../../date/dateUtils';
+
+export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performApiCall }) {
   return {
     sendInvitation: async (email, calendarId) => {
       return performApiCall({

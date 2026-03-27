@@ -1,4 +1,6 @@
-export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiCall, toISO }) {
+import { toISO } from '../../date/dateUtils';
+
+export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiCall }) {
   return {
     addCalendar: async (calendarName) => {
       return performApiCall({

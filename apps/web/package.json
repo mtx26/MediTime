@@ -37,7 +37,6 @@
     "@tailwindcss/vite": "^4.1.18",
     "@types/node": "^25.0.3",
     "@vercel/speed-insights": "^1.2.0",
-    "bootstrap": "^5.3.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "country-flag-icons": "^1.6.4",

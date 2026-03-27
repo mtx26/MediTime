@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { useAlert } from "@/contexts/AlertContext";
 import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from "@/components/common/HoveredUserProfile";
-import { toISO } from "@/utils/calendar/dateUtils";
+import { toISO } from '@meditime/utils';
 import { useTranslation } from "react-i18next";
 import ActionSheet from '@/components/common/ActionSheet';
 import { useSearchParams, useNavigate, useParams, Link } from "react-router-dom";

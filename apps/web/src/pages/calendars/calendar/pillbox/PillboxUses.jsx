@@ -4,7 +4,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from '@/components/common/HoveredUserProfile';
-import { getMondayDate } from '@/utils/calendar/dateUtils';
+import { getMondayDate } from '@meditime/utils';
 import { getCalendarSourceMap } from '@meditime/utils';
 import { UserContext } from '@/contexts/UserContext';
 import { useAlert } from '@/contexts/AlertContext';

@@ -3,7 +3,7 @@ import PropTypes from "prop-types"
 import { useTranslation } from "react-i18next"
 import ArrowControls from "./ArrowControls"
 import WeekDayCircles from "./WeekDayCircles"
-import { getMondayDate, toISO } from "../../utils/calendar/dateUtils"
+import { getMondayDate, toISO } from '@meditime/utils'
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"

@@ -5,7 +5,7 @@ import { UserContext } from '../../contexts/UserContext';
 import { getCalendarSourceMap } from '@meditime/utils';
 import isEqual from 'lodash/isEqual';
 import { useTranslation } from 'react-i18next';
-import { getMondayDate, toISO } from '../../utils/calendar/dateUtils';
+import { getMondayDate, toISO } from '@meditime/utils';
 import { useAlert } from '../../contexts/AlertContext';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
