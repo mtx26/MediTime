@@ -16,4 +16,4 @@ google-cloud-aiplatform==1.106.0
 pillow-heif==1.1.1
 pillow==11.3.0
 zxing-cpp==2.3.0
-pandas==2.2.3
+pandas==2.3.3
