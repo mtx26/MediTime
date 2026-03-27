@@ -1,4 +1,6 @@
-export function createUserApi({ apiUrl, uid, showAlert, performApiCall }) {
+import type { ApiFactoryOptions } from '@meditime/types';
+
+export function createUserApi({ apiUrl, uid, showAlert, performApiCall }: ApiFactoryOptions) {
   return {
     fetchNotificationTime: async () => {
       return performApiCall({
@@ -12,7 +14,7 @@ export function createUserApi({ apiUrl, uid, showAlert, performApiCall }) {
       });
     },
 
-    updateNotificationTime: async (notificationTime) => {
+    updateNotificationTime: async (notificationTime: string) => {
       return performApiCall({
         url: `${apiUrl}/api/user/notification-time`,
         method: 'PUT',

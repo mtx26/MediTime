@@ -1,6 +1,8 @@
-export function createNotificationsApi({ apiUrl, uid, showAlert, performApiCall }) {
+import type { ApiFactoryOptions } from '@meditime/types';
+
+export function createNotificationsApi({ apiUrl, uid, showAlert, performApiCall }: ApiFactoryOptions) {
   return {
-    readNotification: async (notificationId) => {
+    readNotification: async (notificationId: string) => {
       return performApiCall({
         url: `${apiUrl}/api/notifications/${notificationId}`,
         method: 'PATCH',

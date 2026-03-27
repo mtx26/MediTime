@@ -1,6 +1,12 @@
-export function createDocumentsApi({ apiUrl, uid, showAlert, performApiCall, fileToBase64 }) {
+import type { ApiFactoryOptions } from '@meditime/types';
+
+interface DocumentsApiFactoryOptions extends ApiFactoryOptions {
+  fileToBase64: (file: File) => Promise<string>;
+}
+
+export function createDocumentsApi({ apiUrl, uid, showAlert, performApiCall, fileToBase64 }: DocumentsApiFactoryOptions) {
   return {
-    analyzeImage: async (file) => {
+    analyzeImage: async (file: File) => {
       const base64 = await fileToBase64(file);
 
       return performApiCall({
@@ -15,7 +21,7 @@ export function createDocumentsApi({ apiUrl, uid, showAlert, performApiCall, fil
       });
     },
 
-    saveAnalysisResult: async (calendarName, boxes) => {
+    saveAnalysisResult: async (calendarName: string, boxes: unknown[]) => {
       return performApiCall({
         url: `${apiUrl}/api/documents/analyze/save`,
         method: 'POST',

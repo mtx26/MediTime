@@ -1,4 +1,12 @@
-const OAUTH_PROVIDER_OPTIONS = {
+interface OAuthProviderOptions {
+  scopes?: string;
+  queryParams?: {
+    prompt: string;
+    access_type: string;
+  };
+}
+
+const OAUTH_PROVIDER_OPTIONS: Record<string, OAuthProviderOptions> = {
   google: {
     queryParams: {
       prompt: 'select_account',
@@ -38,7 +46,11 @@ const OAUTH_PROVIDER_OPTIONS = {
   },
 };
 
-export function buildAuthCallbackUrl(origin, redirect, callbackPath = '/auth/callback') {
+export function buildAuthCallbackUrl(
+  origin: string,
+  redirect: string | null | undefined,
+  callbackPath = '/auth/callback'
+): string {
   return (
     origin +
     callbackPath +
@@ -52,7 +64,19 @@ export function buildUserUpdatePayload({
   photo_url,
   email_enabled,
   push_enabled,
-}) {
+}: {
+  display_name?: string | null;
+  email?: string | null;
+  photo_url?: string | null;
+  email_enabled?: boolean | null;
+  push_enabled?: boolean | null;
+}): {
+  display_name: string | null;
+  email: string | null;
+  photo_url: string | null;
+  email_enabled: boolean | null;
+  push_enabled: boolean | null;
+} {
   return {
     display_name: display_name ?? null,
     email: email ?? null,
@@ -62,7 +86,7 @@ export function buildUserUpdatePayload({
   };
 }
 
-export function getOAuthSignInOptions(provider, redirectTo) {
+export function getOAuthSignInOptions(provider: string, redirectTo: string): { redirectTo: string } & OAuthProviderOptions {
   const providerOptions = OAUTH_PROVIDER_OPTIONS[provider] || {};
   return {
     redirectTo,
