@@ -8,11 +8,13 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
+    "allowJs": true,
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "types": ["vite/client"],
 
     /* Linting */
     "strict": true,

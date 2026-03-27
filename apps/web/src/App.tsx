@@ -1,5 +1,13 @@
-// App.js
-import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
+import {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  useMemo,
+  type Dispatch,
+  type SetStateAction,
+  type ReactElement,
+} from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import Navbar from './components/common/Header';
 import Footer from './components/common/Footer';
@@ -7,8 +15,8 @@ import MobileNavBar from './components/common/MobileNavBar';
 import AppRoutes from './routes/AppRouter';
 import { UserContext } from './contexts/UserContext';
 import RealtimeManager from './components/realtime/RealtimeManager';
-import { performApiCall } from '@meditime/utils';
 import {
+  performApiCall,
   createDocumentsApi,
   createNotificationsApi,
   createPersonalCalendarsApi,
@@ -21,129 +29,107 @@ import useSEO from './hooks/useSEO';
 import OnboardingTour from './components/onboarding/OnboardingTour';
 import { requestPermissionAndGetToken } from './services/firebase/firebase';
 import { useAlert } from './contexts/AlertContext';
+import type { AppSharedProps, LoadingStates } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const fileToBase64 = (file) =>
+type UnknownRecord = Record<string, unknown>;
+
+const fileToBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onload = () => {
+      const value = typeof reader.result === 'string' ? reader.result : '';
+      resolve(value.split(',')[1] || '');
+    };
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
 
-const isPillbox = (pathParts) =>
+const isPillbox = (pathParts: string[]): boolean =>
   pathParts.length === 3 &&
-  ['calendar', 'shared-user-calendar', 'shared-token-calendar'].includes(
-    pathParts[0]
-  ) &&
+  ['calendar', 'shared-user-calendar', 'shared-token-calendar'].includes(pathParts[0] || '') &&
   pathParts[2] === 'pillbox';
 
-function App() {
+export default function App(): ReactElement {
   const { t, i18n } = useTranslation();
   const { lng } = useParams();
   const location = useLocation();
   const { showAlert } = useAlert();
-  
-  const [tokensList, setTokensList] = useState([]);
-  const [calendarsData, setCalendarsData] = useState(null);
-  const [notificationsData, setNotificationsData] = useState(null);
-  const [sharedCalendarsData, setSharedCalendarsData] = useState(null);
+
+  const [tokensList, setTokensList] = useState<unknown[]>([]);
+  const [calendarsData, setCalendarsData] = useState<unknown>(null);
+  const [notificationsData, setNotificationsData] = useState<unknown>(null);
+  const [sharedCalendarsData, setSharedCalendarsData] = useState<unknown>(null);
 
   const pathAfterLang = location.pathname.split('/').slice(2).join('/');
   const pathParts = pathAfterLang.split('/').filter(Boolean);
   const isPillboxPage = isPillbox(pathParts);
 
-  const { userInfo } = useContext(UserContext);
+  const userContext = useContext(UserContext) as unknown as { userInfo?: { uid?: string } | null } | null;
+  const userInfo = userContext?.userInfo;
   const uid = userInfo?.uid ?? null;
 
-  const [loadingStates, setLoadingStates] = useState({
+  const apiFactoryOptions = useMemo(() => {
+    return {
+      apiUrl: API_URL,
+      uid,
+      showAlert,
+      performApiCall,
+    };
+  }, [uid, showAlert]);
+
+  const [loadingStates, setLoadingStates] = useState<LoadingStates>({
     calendars: true,
     sharedCalendars: true,
     tokens: true,
     notifications: true,
+    isInitialLoading: true,
   });
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
-    const isLoading = Object.values(loadingStates).some((v) => v);
+    const isLoading = Object.entries(loadingStates)
+      .filter(([key]) => key !== 'isInitialLoading')
+      .some(([, v]) => v);
     setIsInitialLoading(isLoading);
   }, [loadingStates]);
 
-  const userApi = useMemo(() => {
-    return createUserApi({ apiUrl: API_URL, uid, showAlert, performApiCall });
-  }, [uid, showAlert]);
-
-  const personalCalendarsApi = useMemo(() => {
-    return createPersonalCalendarsApi({
-      apiUrl: API_URL,
-      uid,
-      showAlert,
-      performApiCall,
-    });
-  }, [uid, showAlert]);
-
-  const sharedUserCalendarsApi = useMemo(() => {
-    return createSharedUserCalendarsApi({
-      apiUrl: API_URL,
-      uid,
-      showAlert,
-      performApiCall,
-    });
-  }, [uid, showAlert]);
-
-  const tokenCalendarsApi = useMemo(() => {
-    return createTokenCalendarsApi({
-      apiUrl: API_URL,
-      uid,
-      showAlert,
-      performApiCall,
-    });
-  }, [uid, showAlert]);
-
-  const notificationsApi = useMemo(() => {
-    return createNotificationsApi({ apiUrl: API_URL, uid, showAlert, performApiCall });
-  }, [uid, showAlert]);
+  const userApi = useMemo(() => createUserApi(apiFactoryOptions), [apiFactoryOptions]);
+  const personalCalendarsApi = useMemo(() => createPersonalCalendarsApi(apiFactoryOptions), [apiFactoryOptions]);
+  const sharedUserCalendarsApi = useMemo(() => createSharedUserCalendarsApi(apiFactoryOptions), [apiFactoryOptions]);
+  const tokenCalendarsApi = useMemo(() => createTokenCalendarsApi(apiFactoryOptions), [apiFactoryOptions]);
+  const notificationsApi = useMemo(() => createNotificationsApi(apiFactoryOptions), [apiFactoryOptions]);
 
   const documentsApi = useMemo(() => {
     return createDocumentsApi({
-      apiUrl: API_URL,
-      uid,
-      showAlert,
-      performApiCall,
+      ...apiFactoryOptions,
       fileToBase64,
     });
-  }, [uid, showAlert]);
+  }, [apiFactoryOptions]);
 
-  const downloadPersonalCalendarPdf = useCallback(async (calendarId, includeInactive) => {
+  const downloadPersonalCalendarPdf = useCallback(async (calendarId: string, includeInactive: boolean) => {
     const url = personalCalendarsApi.getPersonalCalendarPdfUrl(calendarId, includeInactive);
     window.open(url, '_blank');
   }, [personalCalendarsApi]);
 
-  // 🔐 Demande de permission et envoi du token
-  const sendTokenToBackend = useCallback(async (maxRetries = 4) => {
-    if (!uid) return;
+  const sendTokenToBackend = useCallback(async (maxRetries = 4): Promise<unknown> => {
+    if (!uid) return null;
     const token = await requestPermissionAndGetToken(uid);
     if (!token) {
       if (maxRetries > 0) {
-        return await sendTokenToBackend(maxRetries - 1);
-      } else {
-        // Ne pas envoyer de requête si le token est toujours absent
-        return;
+        return sendTokenToBackend(maxRetries - 1);
       }
+      return null;
     }
 
-    // Récupérer les informations de l'appareil
-    const deviceName = navigator.userAgent
-    // recupere juste le Mozilla/5.0 (<system-information>) part
-    .match(/Mozilla\/5\.0 \(([^)]+)\)/)?.[1] || 'Unknown Device';
-    console.log('FCM Token obtenu :', token, 'Device Name :', deviceName);
+    const deviceName =
+      navigator.userAgent.match(/Mozilla\/5\.0 \(([^)]+)\)/)?.[1] || 'Unknown Device';
 
-    // N'envoyer la requête que si le token est bien défini
-    return await performApiCall({
+    return performApiCall({
       url: `${API_URL}/api/notifications/fcm-token`,
       method: 'POST',
-      body: { 
+      body: {
         token,
         deviceName,
       },
@@ -153,10 +139,9 @@ function App() {
       analyticsData: { uid, token },
       showAlert,
     });
-  }, [showAlert]);
-  
+  }, [uid, showAlert]);
 
-  const sharedProps = {
+  const sharedProps: AppSharedProps = {
     personalCalendars: {
       ...personalCalendarsApi,
       ...documentsApi,
@@ -164,13 +149,11 @@ function App() {
       setCalendarsData,
       downloadPersonalCalendarPdf,
     },
-
     sharedUserCalendars: {
       ...sharedUserCalendarsApi,
       sharedCalendarsData,
       setSharedCalendarsData,
     },
-
     tokenCalendars: {
       ...tokenCalendarsApi,
       tokensList,
@@ -185,6 +168,7 @@ function App() {
       sendTokenToBackend,
     },
     loadingStates: {
+      ...loadingStates,
       isInitialLoading,
     },
     user: {
@@ -192,17 +176,10 @@ function App() {
     },
   };
 
-  const resetAppData = () => {
-    // CALENDARS
+  const resetAppData = (): void => {
     setCalendarsData(null);
-
-    // TOKENS
     setTokensList([]);
-
-    // NOTIFICATIONS
     setNotificationsData(null);
-
-    // SHARED CALENDARS
     setSharedCalendarsData(null);
   };
 
@@ -230,7 +207,7 @@ function App() {
             registration,
           });
         })
-        .catch((err) => {
+        .catch((err: unknown) => {
           console.error(t('fcm.sw_error'), {
             origin: 'FCM_SW_REGISTER',
             code: 'FCM_SW_REGISTER_ERROR',
@@ -238,45 +215,49 @@ function App() {
           });
         });
     }
-  }, [userInfo?.uid]);
+  }, [userInfo?.uid, t]);
 
   useEffect(() => {
-    const fcmNotificationsEnabled = window?.Notification?.permission === 'granted' || false;
+    const fcmNotificationsEnabled = window.Notification?.permission === 'granted' || false;
     if (fcmNotificationsEnabled) {
-      setTimeout(() => {
-        sendTokenToBackend();
+      const timer = setTimeout(() => {
+        void sendTokenToBackend();
       }, 1000);
+      return () => clearTimeout(timer);
     }
-  }, [window?.Notification?.permission, sendTokenToBackend]);
+    return undefined;
+  }, [sendTokenToBackend]);
 
   useEffect(() => {
     if (lng && i18n.language !== lng) {
-      i18n.changeLanguage(lng);
+      void i18n.changeLanguage(lng);
     }
-    document.documentElement.setAttribute('lang', lng);
+    if (lng) {
+      document.documentElement.setAttribute('lang', lng);
+    }
   }, [lng, i18n]);
 
   const path = location.pathname.startsWith(`/${lng}`)
-    ? location.pathname.slice(lng.length + 1) || '/home'
+    ? location.pathname.slice((lng?.length || 0) + 1) || '/home'
     : location.pathname;
+  const isAuthRoute = location.pathname === `/${lng}/login` || location.pathname === `/${lng}/register`;
 
-  // Hook SEO unifié
   useSEO({ path });
 
   return (
     <div className="flex flex-col min-h-screen">
       <OnboardingTour isAppLoading={isInitialLoading} />
-      <Navbar sharedProps={sharedProps}/>
+      <Navbar sharedProps={sharedProps} />
       <main className="flex flex-col min-h-0 grow">
         {userInfo && (
           <RealtimeManager
-            setCalendarsData={setCalendarsData}
-            setSharedCalendarsData={setSharedCalendarsData}
-            setNotificationsData={setNotificationsData}
-            setTokensList={setTokensList}
-            setLoadingStates={setLoadingStates}
-            calendarsData={calendarsData}
-            sharedCalendarsData={sharedCalendarsData}
+            setCalendarsData={setCalendarsData as Dispatch<SetStateAction<unknown>>}
+            setSharedCalendarsData={setSharedCalendarsData as Dispatch<SetStateAction<unknown>>}
+            setNotificationsData={setNotificationsData as Dispatch<SetStateAction<unknown>>}
+            setTokensList={setTokensList as Dispatch<SetStateAction<unknown[]>>}
+            setLoadingStates={setLoadingStates as Dispatch<SetStateAction<LoadingStates>>}
+            calendarsData={calendarsData as UnknownRecord[] | null}
+            sharedCalendarsData={sharedCalendarsData as UnknownRecord[] | null}
           />
         )}
 
@@ -285,13 +266,11 @@ function App() {
         </div>
       </main>
       <Footer />
-      {location.pathname !== `/${lng}/login` && location.pathname !== `/${lng}/register` && !isPillboxPage &&
-        <div className='mt-24 lg:mt-0'>
-          <MobileNavBar/>
+      {!isAuthRoute && !isPillboxPage && (
+        <div className="mt-24 lg:mt-0">
+          <MobileNavBar />
         </div>
-      }
+      )}
     </div>
   );
 }
-
-export default App;

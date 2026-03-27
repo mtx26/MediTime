@@ -1,20 +1,20 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
+import type { ComponentType, ReactNode } from 'react';
 import './index.css';
 import Root from './Root';
 import { UserProvider } from './contexts/UserContext';
 import { AlertProvider } from './contexts/AlertContext';
-import { LoadingProvider } from '@/components/ui/loading';
+import { LoadingProvider as LoadingProviderRaw } from '@/components/ui/loading';
 import { Toaster } from '@/components/ui/sonner';
 import './i18n';
-import { SpeedInsights } from "@vercel/speed-insights/react"
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { initLogger } from '@meditime/utils';
 import { DEFAULT_THEME } from '@meditime/constants';
 
-// Initialize logger with API URL
+const LoadingProvider = LoadingProviderRaw as unknown as ComponentType<{ children: ReactNode }>;
+
 initLogger(import.meta.env.VITE_API_URL, import.meta.env.DEV);
 
-// Initialiser le thème depuis localStorage ou préférence système
 const savedTheme = localStorage.getItem('theme') || DEFAULT_THEME;
 if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
   document.documentElement.classList.add('dark');
@@ -22,7 +22,6 @@ if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-s
   document.documentElement.classList.remove('dark');
 }
 
-// Initialize Google Analytics
 const gaId = import.meta.env.VITE_FIREBASE_MEASUREMENT_ID;
 if (gaId) {
   const script = document.createElement('script');
@@ -31,12 +30,20 @@ if (gaId) {
   document.head.appendChild(script);
 
   window.dataLayer = window.dataLayer || [];
-  function gtag(){window.dataLayer.push(arguments);}
+  function gtag(...args: unknown[]) {
+    window.dataLayer.push(args);
+  }
+
   gtag('js', new Date());
   gtag('config', gaId);
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Root element #root not found');
+}
+
+const root = ReactDOM.createRoot(rootElement);
 root.render(
   <AlertProvider>
     <UserProvider>
@@ -48,5 +55,5 @@ root.render(
       </LoadingProvider>
     </UserProvider>
     <Toaster position="bottom-right" closeButton />
-  </AlertProvider>,
+  </AlertProvider>
 );

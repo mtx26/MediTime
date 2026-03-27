@@ -215,6 +215,7 @@ export async function performApiCall({
       const [{ analyticsPromise }, { logEvent }] = await Promise.all([
         // @ts-ignore imported from app workspace at runtime
         import('../../../../apps/web/src/services/firebase/firebase.js'),
+        // @ts-ignore resolved at runtime
         import('firebase/analytics'),
       ]);
       analyticsPromise.then((analytics: unknown) => {

@@ -1,5 +1,5 @@
 import { LANGUAGES, DEFAULT_LANG } from '@meditime/constants';
-import type { Language } from '@meditime/constants';
+import type { Language } from '@meditime/types';
 
 export { LANGUAGES, DEFAULT_LANG };
 

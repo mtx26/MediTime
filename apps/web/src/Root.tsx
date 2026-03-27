@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -6,11 +5,12 @@ import {
   Navigate,
   useLocation,
 } from 'react-router-dom';
+import type { ReactElement } from 'react';
 import App from './App';
 import { useTranslation } from 'react-i18next';
 import { enabledLanguageCodes, DEFAULT_LANG } from '@meditime/config';
 
-function LanguageRoutes() {
+function LanguageRoutes(): ReactElement {
   const location = useLocation();
   const { i18n } = useTranslation();
   const rawLang = i18n.language || DEFAULT_LANG;
@@ -19,7 +19,7 @@ function LanguageRoutes() {
     ? normalizedLang
     : DEFAULT_LANG;
   const pathParts = location.pathname.split('/');
-  const currentLang = pathParts[1];
+  const currentLang = pathParts[1] || '';
 
   if (!enabledLanguageCodes.includes(currentLang)) {
     const path = location.pathname + location.search + location.hash;
@@ -33,11 +33,10 @@ function LanguageRoutes() {
   );
 }
 
-export default function Root() {
+export default function Root(): ReactElement {
   return (
     <BrowserRouter>
       <LanguageRoutes />
     </BrowserRouter>
   );
 }
-
