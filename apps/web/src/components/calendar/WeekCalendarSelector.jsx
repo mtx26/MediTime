@@ -3,7 +3,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { getMondayDate } from '../../utils/calendar/dateUtils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
-import { getDateLocale } from '../../config/languages';
+import { getDateLocale } from '@meditime/config';
 
 export default function WeekCalendarSelector({ onWeekSelect, selectedDate }) {
   const today = new Date();

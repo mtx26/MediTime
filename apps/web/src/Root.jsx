@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import App from './App';
 import { useTranslation } from 'react-i18next';
-import { enabledLanguageCodes, DEFAULT_LANG } from './config/languages';
+import { enabledLanguageCodes, DEFAULT_LANG } from '@meditime/config';
 
 function LanguageRoutes() {
   const location = useLocation();

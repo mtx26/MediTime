@@ -1,19 +1,14 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { enabledLanguageCodes, DEFAULT_LANG } from './config/languages.js';
-
-const translationFiles = import.meta.glob('./locales/*/translation.json', { eager: true });
+import { enabledLanguageCodes, DEFAULT_LANG } from '@meditime/config';
+import { translationResources } from '@meditime/i18n';
 
 const resources = {};
 
-for (const path in translationFiles) {
-  const match = path.match(/\.\/locales\/(.*?)\/translation\.json$/);
-  if (match) {
-    const lang = match[1];
-    if (enabledLanguageCodes.includes(lang)) {
-      resources[lang] = { translation: translationFiles[path].default };
-    }
+for (const lang of enabledLanguageCodes) {
+  if (translationResources[lang]) {
+    resources[lang] = translationResources[lang];
   }
 }
 

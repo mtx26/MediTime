@@ -1,14 +1,34 @@
 import fs from 'fs';
 import path from 'path';
-import { SEO_CONFIG, getShortcuts } from '../config/seo.js';
-import { enabledLanguageCodes } from '../config/languages.js';
+import { SEO_CONFIG, getShortcuts } from '@meditime/config';
+import { enabledLanguageCodes } from '@meditime/config';
+
+const resolveTranslationPath = (langCode) => {
+  const packagePath = path.join(
+    process.cwd(),
+    '..',
+    '..',
+    'packages',
+    'i18n',
+    'src',
+    'locales',
+    langCode,
+    'translation.json'
+  );
+
+  if (fs.existsSync(packagePath)) {
+    return packagePath;
+  }
+
+  return path.join(process.cwd(), 'src', 'locales', langCode, 'translation.json');
+};
 
 /**
  * Lit les traductions d'un fichier de langue
  */
 const loadTranslations = (langCode) => {
   try {
-    const translationPath = path.join(process.cwd(), 'src', 'locales', langCode, 'translation.json');
+    const translationPath = resolveTranslationPath(langCode);
     const translationContent = fs.readFileSync(translationPath, 'utf8');
     return JSON.parse(translationContent);
   } catch (error) {

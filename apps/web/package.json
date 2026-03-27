@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
+    "@meditime/config": "*",
     "@fullcalendar/bootstrap5": "^6.1.17",
     "@fullcalendar/core": "^6.1.19",
     "@fullcalendar/daygrid": "^6.1.17",
@@ -66,7 +67,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run build:i18n && vite build",
-    "build:i18n": "node scripts/generate-i18n-manifests.js",
+    "build:i18n": "node ../../scripts/generate-i18n-manifests.js",
     "i18n:sync": "node ../../scripts/i18n/run.js",
     "preview": "vite preview"
   },

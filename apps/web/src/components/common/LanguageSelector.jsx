@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Languages, Check } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { LANGUAGES } from '../../config/languages';
+import { LANGUAGES } from '@meditime/config';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function LanguageSelector() {
