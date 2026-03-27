@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES, DEFAULT_LANG, enabledLanguageCodes } from '@meditime/config';
-import { SEO_CONFIG, upsertMetaTag, getSchemaOrg } from '@meditime/config';
+import { SEO_CONFIG, upsertMetaTag, getSchemaOrg } from '@/config/seo';
 
 /**
  * Hook unifié pour gérer toutes les métadonnées SEO, Schema.org et PWA

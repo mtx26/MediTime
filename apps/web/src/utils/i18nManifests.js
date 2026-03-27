@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { SEO_CONFIG, getShortcuts } from '@meditime/config';
+import { SEO_CONFIG, getShortcuts } from '../config/seo.js';
 import { enabledLanguageCodes } from '@meditime/config';
 
 /**

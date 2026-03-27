@@ -1,8 +1,8 @@
 /**
- * Configuration centralisée SEO et métadonnées pour MediTime
+ * Configuration centralisee SEO et metadonnees pour MediTime (Web only)
  */
 
-import { enabledLanguageCodes } from './languages.js';
+import { enabledLanguageCodes } from '@meditime/config';
 
 // Constantes de l'application
 const APP_VERSION = '0.1.0';
@@ -25,8 +25,8 @@ export const SEO_CONFIG = {
   BASE_URL: getBaseUrl(),
   APP_VERSION,
   AUTHOR,
-  
-  // Métadonnées par défaut
+
+  // Metadonnees par defaut
   META: {
     siteName: 'MediTime',
     twitterSite: '@MediTime',
@@ -34,7 +34,7 @@ export const SEO_CONFIG = {
     ogImage: '/icons/og-image.png',
     twitterCard: 'summary_large_image'
   },
-  
+
   // Configuration PWA de base
   PWA: {
     scope: '/',
@@ -61,23 +61,21 @@ export const SEO_CONFIG = {
 };
 
 /**
- * Génère les shortcuts PWA selon la langue
+ * Genere les shortcuts PWA selon la langue
  * @param {string} langCode - Code de langue
  * @param {Function|Object} t - Fonction de traduction i18next ou objet de traductions brutes
  */
 export const getShortcuts = (langCode, t) => {
-  // Si t est une fonction (i18next), l'utiliser directement
-  // Sinon, créer une fonction helper pour accéder aux traductions
-  const translate = typeof t === 'function' 
-    ? t 
+  const translate = typeof t === 'function'
+    ? t
     : (key) => {
-        const keys = key.split('.');
-        let value = t;
-        for (const k of keys) {
-          value = value?.[k];
-        }
-        return value || key;
-      };
+      const keys = key.split('.');
+      let value = t;
+      for (const k of keys) {
+        value = value?.[k];
+      }
+      return value || key;
+    };
 
   return [
     {
@@ -98,94 +96,94 @@ export const getShortcuts = (langCode, t) => {
 };
 
 /**
- * Génère le Schema.org complet optimisé
+ * Genere le Schema.org complet optimise
  */
 export const getSchemaOrg = (lng, t) => ({
-  "@context": "https://schema.org",
-  "@graph": [
+  '@context': 'https://schema.org',
+  '@graph': [
     {
-      "@type": "WebApplication",
-      "@id": `${SEO_CONFIG.BASE_URL}/#webapp`,
-      "name": t('app.name'),
-      "alternateName": `${t('app.name')} - ${t('app.subtitle')}`,
-      "url": SEO_CONFIG.BASE_URL,
-      "applicationCategory": "HealthApplication",
-      "applicationSubCategory": "Medical",
-      "operatingSystem": "All",
-      "description": t('app.description'),
-      "screenshot": `${SEO_CONFIG.BASE_URL}/icons/icon-512.png`,
-      "inLanguage": enabledLanguageCodes,
-      "browserRequirements": "Requires JavaScript. Requires HTML5.",
-      "softwareVersion": SEO_CONFIG.APP_VERSION,
-      "datePublished": CURRENT_DATE,
-      "dateModified": CURRENT_DATE,
-      "installUrl": `${SEO_CONFIG.BASE_URL}/${lng}/register`,
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD",
-        "availability": "https://schema.org/InStock"
+      '@type': 'WebApplication',
+      '@id': `${SEO_CONFIG.BASE_URL}/#webapp`,
+      name: t('app.name'),
+      alternateName: `${t('app.name')} - ${t('app.subtitle')}`,
+      url: SEO_CONFIG.BASE_URL,
+      applicationCategory: 'HealthApplication',
+      applicationSubCategory: 'Medical',
+      operatingSystem: 'All',
+      description: t('app.description'),
+      screenshot: `${SEO_CONFIG.BASE_URL}/icons/icon-512.png`,
+      inLanguage: enabledLanguageCodes,
+      browserRequirements: 'Requires JavaScript. Requires HTML5.',
+      softwareVersion: SEO_CONFIG.APP_VERSION,
+      datePublished: CURRENT_DATE,
+      dateModified: CURRENT_DATE,
+      installUrl: `${SEO_CONFIG.BASE_URL}/${lng}/register`,
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock'
       },
-      "creator": {
-        "@type": "Person",
-        "@id": `${SEO_CONFIG.BASE_URL}/#creator`,
-        "name": SEO_CONFIG.AUTHOR.name,
-        "url": SEO_CONFIG.AUTHOR.github
+      creator: {
+        '@type': 'Person',
+        '@id': `${SEO_CONFIG.BASE_URL}/#creator`,
+        name: SEO_CONFIG.AUTHOR.name,
+        url: SEO_CONFIG.AUTHOR.github
       },
-      "publisher": {
-        "@id": `${SEO_CONFIG.BASE_URL}/#organization`
+      publisher: {
+        '@id': `${SEO_CONFIG.BASE_URL}/#organization`
       }
     },
     {
-      "@type": "Organization",
-      "@id": `${SEO_CONFIG.BASE_URL}/#organization`,
-      "name": t('app.name'),
-      "url": SEO_CONFIG.BASE_URL,
-      "logo": {
-        "@type": "ImageObject",
-        "url": `${SEO_CONFIG.BASE_URL}/icons/icon-192.png`,
-        "width": 192,
-        "height": 192
+      '@type': 'Organization',
+      '@id': `${SEO_CONFIG.BASE_URL}/#organization`,
+      name: t('app.name'),
+      url: SEO_CONFIG.BASE_URL,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${SEO_CONFIG.BASE_URL}/icons/icon-192.png`,
+        width: 192,
+        height: 192
       },
-      "founder": {
-        "@type": "Person",
-        "name": SEO_CONFIG.AUTHOR.name
+      founder: {
+        '@type': 'Person',
+        name: SEO_CONFIG.AUTHOR.name
       },
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "email": SEO_CONFIG.AUTHOR.email,
-        "contactType": "technical support",
-        "availableLanguage": enabledLanguageCodes
+      contactPoint: {
+        '@type': 'ContactPoint',
+        email: SEO_CONFIG.AUTHOR.email,
+        contactType: 'technical support',
+        availableLanguage: enabledLanguageCodes
       }
     },
     {
-      "@type": "WebSite",
-      "@id": `${SEO_CONFIG.BASE_URL}/#website`,
-      "url": SEO_CONFIG.BASE_URL,
-      "name": t('app.name'),
-      "description": t('app.description'),
-      "publisher": {
-        "@id": `${SEO_CONFIG.BASE_URL}/#organization`
+      '@type': 'WebSite',
+      '@id': `${SEO_CONFIG.BASE_URL}/#website`,
+      url: SEO_CONFIG.BASE_URL,
+      name: t('app.name'),
+      description: t('app.description'),
+      publisher: {
+        '@id': `${SEO_CONFIG.BASE_URL}/#organization`
       },
-      "inLanguage": enabledLanguageCodes
+      inLanguage: enabledLanguageCodes
     },
     {
-      "@type": "MobileApplication",
-      "@id": `${SEO_CONFIG.BASE_URL}/#mobileapp`,
-      "name": t('app.name'),
-      "operatingSystem": "Android, iOS, Windows, macOS, Linux",
-      "applicationCategory": "HealthApplication",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
+      '@type': 'MobileApplication',
+      '@id': `${SEO_CONFIG.BASE_URL}/#mobileapp`,
+      name: t('app.name'),
+      operatingSystem: 'Android, iOS, Windows, macOS, Linux',
+      applicationCategory: 'HealthApplication',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD'
       }
     }
   ]
 });
 
 /**
- * Utilitaire pour créer ou mettre à jour des balises meta/link
+ * Utilitaire pour creer ou mettre a jour des balises meta/link
  */
 export const upsertMetaTag = (tagName, keyAttr, key, attrs) => {
   const selector = `${tagName}[${keyAttr}="${key}"]`;
