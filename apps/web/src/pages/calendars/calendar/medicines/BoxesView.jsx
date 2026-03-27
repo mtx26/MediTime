@@ -3,7 +3,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useRealtimeBoxesSwitcher } from '@/hooks/realtime/useRealtimeBoxesSwitcher';
 import { useAlert } from '@/contexts/AlertContext';
 import { useLoading } from '@/components/ui/loading';
-import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
+import { getCalendarSourceMap } from '@meditime/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { fetchSuggestions } from '@/utils/api/fetchSuggestions';
 import ActionSheet from '@/components/common/ActionSheet';

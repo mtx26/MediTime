@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
+import { getCalendarSourceMap } from '@meditime/utils';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';

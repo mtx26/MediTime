@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useLocation } from 'react-router-dom';
 import { useAlert } from '@/contexts/AlertContext';
 import { useLoading } from '@/components/ui/loading';
-import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
+import { getCalendarSourceMap } from '@meditime/utils';
 import HoveredUserProfile from '@/components/common/HoveredUserProfile';
 import PropTypes from 'prop-types';
 import { Card, CardContent } from '@/components/ui/card';

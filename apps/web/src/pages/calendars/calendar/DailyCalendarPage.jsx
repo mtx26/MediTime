@@ -4,7 +4,7 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
 import { toISO, toDate } from '@/utils/calendar/dateUtils';
-import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
+import { getCalendarSourceMap } from '@meditime/utils';
 import { UserContext } from '@/contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import isEqual from 'lodash/isEqual';

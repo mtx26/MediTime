@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from '@/components/common/HoveredUserProfile';
 import { getMondayDate } from '@/utils/calendar/dateUtils';
-import { getCalendarSourceMap } from '@/utils/calendar/calendarSourceMap';
+import { getCalendarSourceMap } from '@meditime/utils';
 import { UserContext } from '@/contexts/UserContext';
 import { useAlert } from '@/contexts/AlertContext';
 import { Button } from '@/components/ui/button';

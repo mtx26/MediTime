@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useState } from 'react';
 import { useNavigate, useParams,  useSearchParams} from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
 import { UserContext } from '../../contexts/UserContext';
-import { getCalendarSourceMap } from '../../utils/calendar/calendarSourceMap';
+import { getCalendarSourceMap } from '@meditime/utils';
 import isEqual from 'lodash/isEqual';
 import { useTranslation } from 'react-i18next';
 import { getMondayDate, toISO } from '../../utils/calendar/dateUtils';
