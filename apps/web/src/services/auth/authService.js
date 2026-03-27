@@ -1,29 +1,42 @@
-import { useContext } from 'react';
 import { supabase } from '../supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import { performApiCall } from '@meditime/utils';
+import {
+  buildAuthCallbackUrl,
+  buildUserUpdatePayload,
+  getOAuthSignInOptions,
+} from '@meditime/utils';
 import { getGlobalReloadUser } from '../../contexts/UserContext';
 
 // URL de l'API
 const API_URL = import.meta.env.VITE_API_URL;
 
 function buildCallbackUrl(redirect) {
-  return (
-    window.location.origin +
-    `/auth/callback` +
-    (redirect ? `?redirect=${encodeURIComponent(redirect)}` : '')
-  );
+  return buildAuthCallbackUrl(window.location.origin, redirect);
+}
+
+async function handleOAuthLogin({ provider, redirect, origin, providerLabel }) {
+  try {
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: getOAuthSignInOptions(provider, buildCallbackUrl(redirect)),
+    });
+  } catch (err) {
+    log.error(err.message || `Erreur lors de la connexion avec ${providerLabel}`, err, {
+      origin,
+      uid: null,
+    });
+  }
 }
 
 export async function updateUserInfo({ display_name, email, photo_url, email_enabled, push_enabled, uid }) {
-  
-  const body = {
-    display_name: display_name ?? null,
-    email: email ?? null,
-    photo_url: photo_url ?? null,
-    email_enabled: email_enabled ?? null,
-    push_enabled: push_enabled ?? null,
-  };
+  const body = buildUserUpdatePayload({
+    display_name,
+    email,
+    photo_url,
+    email_enabled,
+    push_enabled,
+  });
 
   const response = await performApiCall({
     url: `${API_URL}/api/user/update`,
@@ -47,139 +60,72 @@ export async function updateUserInfo({ display_name, email, photo_url, email_ena
  * Connexion avec Google
  */
 export const GoogleHandleLogin = async (redirect) => {
-  try {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: buildCallbackUrl(redirect),
-        queryParams: {
-          prompt: 'select_account',
-          access_type: 'offline',
-        },
-      },
-    });
-  } catch (err) {
-    log.error(err.message || 'Erreur lors de la connexion avec Google', err, {
-      origin: 'GOOGLE_HANDLE_LOGIN',
-      uid: null,
-    });
-  }
+  return handleOAuthLogin({
+    provider: 'google',
+    redirect,
+    origin: 'GOOGLE_HANDLE_LOGIN',
+    providerLabel: 'Google',
+  });
 };
 
 /**
  * Connexion avec Github
  */
 export const GithubHandleLogin = async (redirect) => {
-  try {
-    await supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: buildCallbackUrl(redirect),
-        queryParams: {
-          prompt: 'select_account',
-          access_type: 'offline',
-        },
-      },
-    });
-  } catch (err) {
-    log.error(err.message || 'Erreur lors de la connexion avec Github', err, {
-      origin: 'GITHUB_HANDLE_LOGIN',
-      uid: null,
-    });
-  }
+  return handleOAuthLogin({
+    provider: 'github',
+    redirect,
+    origin: 'GITHUB_HANDLE_LOGIN',
+    providerLabel: 'Github',
+  });
 };
 
 /**
  * Connexion avec Twitter
  */
 export const TwitterHandleLogin = async (redirect) => {
-  try {
-    await supabase.auth.signInWithOAuth({
-      provider: 'twitter',
-      options: {
-        redirectTo: buildCallbackUrl(redirect),
-        queryParams: {
-          prompt: 'select_account',
-          access_type: 'offline',
-        },
-      },
-    });
-  } catch (err) {
-    log.error(err.message || 'Erreur lors de la connexion avec Twitter', err, {
-      origin: 'TWITTER_HANDLE_LOGIN',
-      uid: null,
-    });
-  }
+  return handleOAuthLogin({
+    provider: 'twitter',
+    redirect,
+    origin: 'TWITTER_HANDLE_LOGIN',
+    providerLabel: 'Twitter',
+  });
 };
 
 /**
  * Connexion avec Facebook
  */
 export const FacebookHandleLogin = async (redirect) => {
-  try {
-    await supabase.auth.signInWithOAuth({
-      provider: 'facebook',
-      options: {
-        redirectTo: buildCallbackUrl(redirect),
-        queryParams: {
-          prompt: 'select_account',
-          access_type: 'offline',
-        },
-      },
-    });
-  } catch (err) {
-    log.error(err.message || 'Erreur lors de la connexion avec Facebook', err, {
-      origin: 'FACEBOOK_HANDLE_LOGIN',
-      uid: null,
-    });
-  }
+  return handleOAuthLogin({
+    provider: 'facebook',
+    redirect,
+    origin: 'FACEBOOK_HANDLE_LOGIN',
+    providerLabel: 'Facebook',
+  });
 };
 
 /**
  * Connexion avec Discord
  */
 export const DiscordHandleLogin = async (redirect) => {
-  try {
-    await supabase.auth.signInWithOAuth({
-      provider: 'discord',
-      options: {
-        redirectTo: buildCallbackUrl(redirect),
-        queryParams: {
-          prompt: 'select_account',
-          access_type: 'offline',
-        },
-      },
-    });
-  } catch (err) {
-    log.error(err.message || 'Erreur lors de la connexion avec Discord', err, {
-      origin: 'DISCORD_HANDLE_LOGIN',
-      uid: null,
-    });
-  }
+  return handleOAuthLogin({
+    provider: 'discord',
+    redirect,
+    origin: 'DISCORD_HANDLE_LOGIN',
+    providerLabel: 'Discord',
+  });
 };
 
 /**
  * Connexion avec Microsoft
  */
 export const MicrosoftHandleLogin = async (redirect) => {
-  try {
-    await supabase.auth.signInWithOAuth({
-      provider: 'azure',
-      options: {
-        redirectTo: buildCallbackUrl(redirect),
-        scopes: 'email profile openid',
-        queryParams: {
-          prompt: 'select_account',
-          access_type: 'offline',
-        },
-      },
-    });
-  } catch (err) {
-    log.error(err.message || 'Erreur lors de la connexion avec Microsoft', err, {
-      origin: 'MICROSOFT_HANDLE_LOGIN',
-      uid: null,
-    });
-  }
+  return handleOAuthLogin({
+    provider: 'azure',
+    redirect,
+    origin: 'MICROSOFT_HANDLE_LOGIN',
+    providerLabel: 'Microsoft',
+  });
 };
 
   /**
