@@ -1,16 +1,24 @@
-import { useContext, useCallback } from 'react';
+import { useContext, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { UserContext } from '../../contexts/UserContext';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '@meditime/utils';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
+import type { LoadingStates, NotificationItem, NotificationsResponse, UserContextValue } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+type SetNotificationsData = Dispatch<SetStateAction<NotificationItem[]>>;
+type SetLoadingStates = Dispatch<SetStateAction<LoadingStates>>;
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback;
+}
+
 const fetchNotifications = async (
-  uid,
-  setNotificationsData,
-  setLoadingStates
-) => {
+  uid: string,
+  setNotificationsData: SetNotificationsData,
+  setLoadingStates: SetLoadingStates
+): Promise<void> => {
   try {
     const {
       data: { session },
@@ -23,38 +31,39 @@ const fetchNotifications = async (
       },
     });
 
-    const data = await res.json();
+    const data = (await res.json()) as NotificationsResponse;
     if (!res.ok) throw new Error(data.error);
 
     const sortedNotifications = data.notifications.sort(
-      (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+      (a: NotificationItem, b: NotificationItem) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     );
     setNotificationsData(sortedNotifications);
-    setLoadingStates((prev) => ({ ...prev, notifications: false }));
+    setLoadingStates((prev: LoadingStates) => ({ ...prev, notifications: false }));
 
     const [{ analyticsPromise }, { logEvent }] = await Promise.all([
       import('../../services/firebase/firebase'),
       import('firebase/analytics'),
     ]);
-    analyticsPromise.then((analytics) => {
+    analyticsPromise.then((analytics: unknown) => {
       if (analytics) {
-        logEvent(analytics, 'fetch_notifications', {
+        (logEvent as (instance: unknown, name: string, params?: Record<string, unknown>) => void)(analytics, 'fetch_notifications', {
           uid,
           count: data.notifications?.length,
         });
       }
     });
 
-    log.info(data.message, {
+    log.info(data.message || 'Notifications synchronisees', {
       origin: 'REALTIME_NOTIFICATIONS_FETCH',
       uid,
       code: 'REALTIME_NOTIFICATIONS_FETCH_SUCCESS',
       count: data.notifications?.length,
     });
-  } catch (err) {
+  } catch (err: unknown) {
     setNotificationsData([]);
-    setLoadingStates((prev) => ({ ...prev, notifications: false }));
-    log.error(err.message || 'Échec de récupération des notifications', err, {
+    setLoadingStates((prev: LoadingStates) => ({ ...prev, notifications: false }));
+    log.error(getErrorMessage(err, 'Échec de récupération des notifications'), err, {
       origin: 'REALTIME_NOTIFICATIONS_FETCH',
       uid,
       code: 'REALTIME_NOTIFICATIONS_FETCH_ERROR',
@@ -63,15 +72,16 @@ const fetchNotifications = async (
 };
 
 export const useRealtimeNotifications = (
-  setNotificationsData,
-  setLoadingStates
-) => {
-  const { userInfo } = useContext(UserContext);
+  setNotificationsData: SetNotificationsData,
+  setLoadingStates: SetLoadingStates
+): void => {
+  const userContext = useContext(UserContext) as UserContextValue | null;
+  const userInfo = userContext?.userInfo;
   const uid = userInfo?.uid;
 
   const fetchData = useCallback(() => {
     if (!uid) return;
-    setLoadingStates((prev) => ({ ...prev, notifications: true }));
+    setLoadingStates((prev: LoadingStates) => ({ ...prev, notifications: true }));
     fetchNotifications(uid, setNotificationsData, setLoadingStates);
   }, [uid, setNotificationsData, setLoadingStates]);
 

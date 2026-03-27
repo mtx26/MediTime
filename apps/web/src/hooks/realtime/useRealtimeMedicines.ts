@@ -1,20 +1,28 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { log } from '@meditime/utils';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
+import type { MedicineItem, MedicinesResponse } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+type SetMedicinesData = Dispatch<SetStateAction<MedicineItem[]>>;
+type SetLoadingMedicines = Dispatch<SetStateAction<boolean>>;
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback;
+}
+
 const fetchTokenMedicines = async (
-  token,
-  setMedicinesData,
-  setLoadingMedicines
-) => {
+  token: string,
+  setMedicinesData: SetMedicinesData,
+  setLoadingMedicines: SetLoadingMedicines
+): Promise<void> => {
   try {
     const res = await fetch(`${API_URL}/api/tokens/${token}/medicines`);
-    const data = await res.json();
+    const data = (await res.json()) as MedicinesResponse;
     if (!res.ok) throw new Error(data.error);
 
-    const sorted = data.medicines.sort((a, b) => a.name.localeCompare(b.name));
+    const sorted = data.medicines.sort((a: MedicineItem, b: MedicineItem) => a.name.localeCompare(b.name));
     setMedicinesData(sorted);
     setLoadingMedicines(true);
 
@@ -22,23 +30,23 @@ const fetchTokenMedicines = async (
       import('../../services/firebase/firebase'),
       import('firebase/analytics'),
     ]);
-    analyticsPromise.then((analytics) => {
+    analyticsPromise.then((analytics: unknown) => {
       if (analytics) {
-        logEvent(analytics, 'fetch_token_calendar_medicines', {
+        (logEvent as (instance: unknown, name: string, params?: Record<string, unknown>) => void)(analytics, 'fetch_token_calendar_medicines', {
           count: data.medicines.length,
         });
       }
     });
 
-    log.info(data.message, {
+    log.info(data.message || 'Medicaments synchronises', {
       origin: 'REALTIME_TOKEN_MEDICINES',
       code: 'REALTIME_TOKEN_MEDICINES_SUCCESS',
       token,
       count: data.medicines.length,
     });
-  } catch (err) {
+  } catch (err: unknown) {
     setLoadingMedicines(false);
-    log.error(err.message, err, {
+    log.error(getErrorMessage(err, 'Erreur de récupération des médicaments'), err, {
       origin: 'REALTIME_TOKEN_MEDICINES',
       token,
       code: 'REALTIME_TOKEN_MEDICINES_ERROR',
@@ -47,11 +55,11 @@ const fetchTokenMedicines = async (
 };
 
 export const useRealtimeTokenMedicines = (
-  token,
-  setMedicinesData,
-  setLoadingMedicines
-) => {
-  const [calendarId, setCalendarId] = useState(null);
+  token: string | null,
+  setMedicinesData: SetMedicinesData,
+  setLoadingMedicines: SetLoadingMedicines
+): void => {
+  const [calendarId, setCalendarId] = useState<string | number | null>(null);
 
   useEffect(() => {
     if (!token) return;
@@ -59,7 +67,7 @@ export const useRealtimeTokenMedicines = (
     const initListener = async () => {
       try {
         const res = await fetch(`${API_URL}/api/tokens/${token}`);
-        const data = await res.json();
+        const data = (await res.json()) as MedicinesResponse;
         if (!res.ok) throw new Error(data.error);
 
         if (!data.calendar_id) {
@@ -67,9 +75,9 @@ export const useRealtimeTokenMedicines = (
         }
 
         setCalendarId(data.calendar_id);
-      } catch (err) {
+      } catch (err: unknown) {
         setLoadingMedicines(false);
-        log.error(err.message, err, {
+        log.error(getErrorMessage(err, 'Erreur de récupération du token'), err, {
           origin: 'TOKEN_METADATA_LOAD',
           code: 'TOKEN_METADATA_LOAD_ERROR',
           token,

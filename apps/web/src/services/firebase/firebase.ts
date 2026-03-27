@@ -16,10 +16,9 @@ const firebaseConfig = {
 // 🚀 Initialisation
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-let onMessageFn;
 
 // 🔔 Récupérer le token de notifications
-export const requestPermissionAndGetToken = async (uid) => {
+export const requestPermissionAndGetToken = async (uid: string): Promise<string | null> => {
   try {
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') throw new Error('Permission refusée');
@@ -35,7 +34,7 @@ export const requestPermissionAndGetToken = async (uid) => {
       origin: 'FCM_TOKEN_RECEIVED',
     });
     return token;
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Erreur permission ou token fcm', {
       uid: uid,
       origin: 'FCM_TOKEN_ERROR',

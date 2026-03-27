@@ -1,10 +1,28 @@
-import { useEffect, useContext, useCallback } from 'react';
+import { useEffect, useContext, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { UserContext } from '../../contexts/UserContext';
 import { log } from '@meditime/utils';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
+import type { BoxItem, BoxesResponse, SourceType, UserContextValue } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+type SetBoxes = Dispatch<SetStateAction<BoxItem[]>>;
+type SetLoadingBoxes = Dispatch<SetStateAction<boolean | undefined>>;
+type SetRep = Dispatch<SetStateAction<Response | null>>;
+
+type FetchBoxesParams = {
+  uid: string;
+  calendarId: string;
+  setBoxes: SetBoxes;
+  setLoadingBoxes: SetLoadingBoxes;
+  sourceType: SourceType;
+  setRep: SetRep;
+};
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback;
+}
 
 const fetchBoxes = async ({
   uid,
@@ -13,7 +31,7 @@ const fetchBoxes = async ({
   setLoadingBoxes,
   sourceType,
   setRep
-}) => {
+}: FetchBoxesParams): Promise<void> => {
   try {
     const {
       data: { session },
@@ -31,10 +49,10 @@ const fetchBoxes = async ({
       },
     });
     setRep(res);
-    const data = await res.json();
+    const data = (await res.json()) as BoxesResponse;
     if (!res.ok) throw new Error(data.error);
 
-    const sorted = data.boxes.sort((a, b) => a.name.localeCompare(b.name));
+    const sorted = data.boxes.sort((a: BoxItem, b: BoxItem) => a.name.localeCompare(b.name));
     setBoxes(sorted);
     setLoadingBoxes(true);
 
@@ -52,9 +70,9 @@ const fetchBoxes = async ({
       import('../../services/firebase/firebase'),
       import('firebase/analytics'),
     ]);
-    analyticsPromise.then((analytics) => {
+    analyticsPromise.then((analytics: unknown) => {
       if (analytics) {
-        logEvent(analytics, eventName, {
+        (logEvent as (instance: unknown, name: string, params?: Record<string, unknown>) => void)(analytics, eventName, {
           uid,
           count: data.boxes.length,
           calendarId,
@@ -62,20 +80,20 @@ const fetchBoxes = async ({
       }
     });
 
-    log.info(data.message, {
+    log.info(data.message || 'Boites synchronisees', {
       origin: logOrigin,
       uid,
       count: data.boxes.length,
       calendarId,
     });
-  } catch (err) {
+  } catch (err: unknown) {
     const errorOrigin =
       sourceType === 'personal'
         ? 'PERSONAL_CALENDAR_MEDICINE_BOXES_FETCH_ERROR'
         : 'SHARED_CALENDAR_MEDICINE_BOXES_FETCH_ERROR';
 
     log.error(
-      err.message || 'Erreur de récupération des boîtes de médicaments',
+      getErrorMessage(err, 'Erreur de récupération des boîtes de médicaments'),
       err,
       {
         origin: errorOrigin,
@@ -86,13 +104,14 @@ const fetchBoxes = async ({
 };
 
 const useRealtimeBoxes = (
-  sourceType,
-  calendarId,
-  setBoxes,
-  setLoadingBoxes,
-  setRep
-) => {
-  const { userInfo } = useContext(UserContext);
+  sourceType: SourceType,
+  calendarId: string | null,
+  setBoxes: SetBoxes,
+  setLoadingBoxes: SetLoadingBoxes,
+  setRep: SetRep
+): void => {
+  const userContext = useContext(UserContext) as UserContextValue | null;
+  const userInfo = userContext?.userInfo;
 
   useEffect(() => {
     if (!userInfo || !calendarId) {
@@ -133,19 +152,19 @@ const useRealtimeBoxes = (
 };
 
 export const useRealtimePersonalBoxes = (
-  calendarId,
-  setBoxes,
-  setLoadingBoxes,
-  setRep
-) => {
+  calendarId: string | null,
+  setBoxes: SetBoxes,
+  setLoadingBoxes: SetLoadingBoxes,
+  setRep: SetRep
+): void => {
   useRealtimeBoxes('personal', calendarId, setBoxes, setLoadingBoxes, setRep);
 };
 
 export const useRealtimeSharedBoxes = (
-  calendarId,
-  setBoxes,
-  setLoadingBoxes,
-  setRep
-) => {
+  calendarId: string | null,
+  setBoxes: SetBoxes,
+  setLoadingBoxes: SetLoadingBoxes,
+  setRep: SetRep
+): void => {
   useRealtimeBoxes('shared', calendarId, setBoxes, setLoadingBoxes, setRep);
 };

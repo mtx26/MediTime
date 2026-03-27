@@ -1,29 +1,14 @@
 /* -------------------------------------------------------------------------- */
-/* API Utility Types                                                          */
+/* API Call Types                                                             */
 /* -------------------------------------------------------------------------- */
+
+import type { ApiResult } from './result';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export type AlertLevel = 'success' | 'danger' | 'warning' | 'info';
 
 export type ShowAlert = (level: AlertLevel, message: string) => void;
-
-export interface ApiError extends Error {
-  code?: string | null;
-  status?: number | null;
-  i18nKey?: string;
-}
-
-export interface ApiFailure {
-  success: false;
-  error: string;
-  code: string | null;
-  status: number | null;
-}
-
-export type ApiSuccess = { success: true } & Record<string, unknown>;
-
-export type ApiResult = ApiSuccess | ApiFailure;
 
 export interface PerformApiCallOptions {
   url: string;

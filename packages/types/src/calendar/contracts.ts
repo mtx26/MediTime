@@ -1,9 +1,9 @@
 /* -------------------------------------------------------------------------- */
-/* Calendar API Domain Types                                                  */
+/* Calendar Contracts Types                                                   */
 /* -------------------------------------------------------------------------- */
 
-import type { ApiResponse } from './api-base';
-import type { Calendar } from './domain';
+import type { ApiResponse } from '../api';
+import type { Calendar } from '../domain';
 
 export type CalendarId = Calendar['id'];
 export type BoxId = string;

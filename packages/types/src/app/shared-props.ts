@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- */
-/* Web App Shared Props Types                                                 */
+/* App Shared Props Types                                                     */
 /* -------------------------------------------------------------------------- */
 
 export interface LoadingStates {
@@ -15,18 +15,4 @@ export interface AppSharedProps {
   notifications: Record<string, unknown>;
   fcm: Record<string, unknown>;
   user: Record<string, unknown>;
-}
-
-export interface UserInfo {
-  displayName: string | null;
-  email: string | null;
-  photoUrl: string | null;
-  emailEnabled: boolean;
-  pushEnabled: boolean;
-  uid: string;
-}
-
-export interface UserContextValue {
-  userInfo: UserInfo | null;
-  recoveryEvent: boolean;
 }
