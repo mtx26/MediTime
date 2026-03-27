@@ -11,16 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { Pencil, Trash2, Plus, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
-
-const DEFAULT_CONDITION = {
-  time_of_day: '',
-  interval_days: '',
-  start_date: '',
-  tablet_count: '',
-  max_date_mode: '',
-  max_date: null,
-  max_date_days: null,
-};
+import { DEFAULT_CONDITION } from '@meditime/constants';
 
 export default function MedicineReview({ personalCalendars }) {
   const location = useLocation();

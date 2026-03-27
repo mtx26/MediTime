@@ -9,12 +9,13 @@ import { Toaster } from '@/components/ui/sonner';
 import './i18n';
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import { initLogger } from '@meditime/utils';
+import { DEFAULT_THEME } from '@meditime/constants';
 
 // Initialize logger with API URL
 initLogger(import.meta.env.VITE_API_URL, import.meta.env.DEV);
 
 // Initialiser le thème depuis localStorage ou préférence système
-const savedTheme = localStorage.getItem('theme');
+const savedTheme = localStorage.getItem('theme') || DEFAULT_THEME;
 if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
   document.documentElement.classList.add('dark');
 } else {

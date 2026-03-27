@@ -11,14 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, AlertTriangle, RefreshCw, ArrowLeft, ArrowRight } from 'lucide-react';
 import { LoadingProvider } from '@/components/ui/loading';
-
-const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const pill_count = {
-  0.25: '0.25',
-  0.5: '0.50',
-  0.75: '0.75',
-  1: '1.00',
-};
+import { DAYS, PILL_COUNT } from '@meditime/constants';
 
 function PillboxContent({
   type,
@@ -214,7 +207,7 @@ function PillboxContent({
                     <h4 className="mb-0 text-lg font-bold">{orderedMeds[selectedMedIndex].title}</h4>
                   </div>
                   <div className="grid grid-cols-7 gap-3 items-stretch text-center">
-                    {days.map((day, idx) => (
+                    {DAYS.map((day, idx) => (
                       <div key={day} className="flex flex-col">
                         <div className="flex flex-col h-full">
                           <h6 className="mb-1 text-sm font-semibold">{t(day)}</h6>
@@ -230,7 +223,7 @@ function PillboxContent({
                             {orderedMeds[selectedMedIndex].cells[day] !== undefined && (
                               <div className="w-full aspect-square">
                                 <img
-                                  src={`/icons/pills/${pill_count[orderedMeds[selectedMedIndex].cells[day]]}_pills.svg`}
+                                  src={`/icons/pills/${PILL_COUNT[orderedMeds[selectedMedIndex].cells[day]]}_pills.svg`}
                                   alt="Pills"
                                   className="w-full h-full object-contain"
                                 />
