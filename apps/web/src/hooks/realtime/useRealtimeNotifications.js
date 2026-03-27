@@ -1,7 +1,7 @@
 import { useContext, useCallback } from 'react';
 import { UserContext } from '../../contexts/UserContext';
 import { supabase } from '../../services/supabase/supabaseClient';
-import { log } from '../../utils/logger';
+import { log } from '@meditime/utils';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 
 const API_URL = import.meta.env.VITE_API_URL;

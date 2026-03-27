@@ -3,7 +3,7 @@ import { supabase } from '../../services/supabase/supabaseClient';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
 import { useAlert } from '../../contexts/AlertContext';
-import { log } from '../../utils/logger';
+import { log } from '@meditime/utils';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Mail } from 'lucide-react';

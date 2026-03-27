@@ -3,9 +3,9 @@ import { useEffect, useContext, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { getGlobalReloadUser, UserContext } from '../../contexts/UserContext';
-import { log } from '../../utils/logger';
+import { log } from '@meditime/utils';
 import { useTranslation } from 'react-i18next';
-import { getValidRedirect } from '../../utils/redirect';
+import { getValidRedirect } from '@meditime/utils';
 import { useLoading } from '@/components/ui/loading';
 
 const AuthCallback = () => {

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
-import { log } from '../../utils/logger';
+import { log } from '@meditime/utils';
 
 /**
  * Standardized supabase realtime subscription hook.

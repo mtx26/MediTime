@@ -2,7 +2,7 @@ import { getMondayDate } from '@meditime/utils';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@meditime/utils';
 
 export default function WeekDayCircles({ selectedDate, onSelectDate }) {
   const { i18n } = useTranslation();

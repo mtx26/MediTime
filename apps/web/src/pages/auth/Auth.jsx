@@ -11,10 +11,10 @@ import {
   MicrosoftHandleLogin
 } from '../../services/auth/authService';
 import { useAlert } from '../../contexts/AlertContext';
-import { log } from '../../utils/logger';
+import { log } from '@meditime/utils';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../contexts/UserContext';
-import { getValidRedirect } from '../../utils/redirect';
+export { getValidRedirect } from '@meditime/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

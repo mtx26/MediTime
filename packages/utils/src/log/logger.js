@@ -1,8 +1,12 @@
-const isDev = import.meta.env.DEV;
 const forceLog = true; // ← reste utile en local
-const API_URL = import.meta.env.VITE_API_URL;
+let isDev = false;
+let API_URL = null;
 
-if (!API_URL) console.error('API_URL is not defined');
+export const initLogger = (apiUrl, isDevMode = false) => {
+  API_URL = apiUrl;
+  isDev = isDevMode;
+  if (!API_URL) console.warn('Logger: API_URL not provided');
+};
 
 const fetchLog = (msg, error, context, type) => {
   const structuredMessage = {

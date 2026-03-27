@@ -1,6 +1,6 @@
 import { useContext, useCallback } from 'react';
 import { UserContext } from '../../contexts/UserContext';
-import { log } from '../../utils/logger';
+import { log } from '@meditime/utils';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 

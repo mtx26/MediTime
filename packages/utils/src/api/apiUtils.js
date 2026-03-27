@@ -1,6 +1,6 @@
 // apiUtils.js
 import { getToken } from '../../../../apps/web/src/services/supabase/tokenUtils.js';
-import { log } from '../../../../apps/web/src/utils/logger.js';
+import { log } from '@meditime/utils';
 import i18n from '../../../../apps/web/src/i18n.js';
 
 /**

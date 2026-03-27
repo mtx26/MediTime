@@ -1,6 +1,5 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { log } from '../../utils/logger';
 import { getMessaging, getToken } from 'firebase/messaging';
 
 // 🔐 Configuration Firebase

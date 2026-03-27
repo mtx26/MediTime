@@ -8,6 +8,10 @@ import { LoadingProvider } from '@/components/ui/loading';
 import { Toaster } from '@/components/ui/sonner';
 import './i18n';
 import { SpeedInsights } from "@vercel/speed-insights/react"
+import { initLogger } from '@meditime/utils';
+
+// Initialize logger with API URL
+initLogger(import.meta.env.VITE_API_URL, import.meta.env.DEV);
 
 // Initialiser le thème depuis localStorage ou préférence système
 const savedTheme = localStorage.getItem('theme');

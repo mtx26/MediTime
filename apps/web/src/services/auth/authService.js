@@ -1,5 +1,5 @@
 import { supabase } from '../supabase/supabaseClient';
-import { log } from '../../utils/logger';
+import { log } from '@meditime/utils';
 import { performApiCall } from '@meditime/utils';
 import {
   buildAuthCallbackUrl,
