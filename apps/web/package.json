@@ -5,6 +5,9 @@
   "private": true,
   "dependencies": {
     "@meditime/config": "*",
+    "@meditime/i18n": "*",
+    "@meditime/utils": "*",
+    "@meditime/types": "*",
     "@fullcalendar/bootstrap5": "^6.1.17",
     "@fullcalendar/core": "^6.1.19",
     "@fullcalendar/daygrid": "^6.1.17",

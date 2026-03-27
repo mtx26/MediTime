@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { supabase } from '../supabase/supabaseClient';
 import { log } from '../../utils/logger';
-import { performApiCall } from '../../services/api/apiUtils';
+import { performApiCall } from '@meditime/utils';
 import { getGlobalReloadUser } from '../../contexts/UserContext';
 
 // URL de l'API

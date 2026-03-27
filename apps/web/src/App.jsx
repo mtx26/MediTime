@@ -8,7 +8,7 @@ import AppRoutes from './routes/AppRouter';
 import { UserContext } from './contexts/UserContext';
 import { toISO } from './utils/calendar/dateUtils';
 import RealtimeManager from './components/realtime/RealtimeManager';
-import { performApiCall } from './services/api/apiUtils';
+import { performApiCall } from '@meditime/utils';
 import { useTranslation } from 'react-i18next';
 import useSEO from './hooks/useSEO';
 import OnboardingTour from './components/onboarding/OnboardingTour';

@@ -1,7 +1,7 @@
 // apiUtils.js
-import { getToken } from '../supabase/tokenUtils.js';
-import { log } from '../../utils/logger';
-import i18n from '../../i18n';
+import { getToken } from '../../../../apps/web/src/services/supabase/tokenUtils.js';
+import { log } from '../../../../apps/web/src/utils/logger.js';
+import i18n from '../../../../apps/web/src/i18n.js';
 
 /**
  * Traduit automatiquement un message backend si une clé i18n est présente
@@ -176,7 +176,7 @@ export async function performApiCall({
     // Analytics optionnels
     if (analyticsEvent) {
       const [{ analyticsPromise }, { logEvent }] = await Promise.all([
-        import('../firebase/firebase'),
+        import('../../../../apps/web/src/services/firebase/firebase.js'),
         import('firebase/analytics'),
       ]);
       analyticsPromise.then((analytics) => {
