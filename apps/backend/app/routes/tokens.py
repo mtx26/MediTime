@@ -163,7 +163,11 @@ def handle_generate_token_schedule(token):
             i18n_key="api.tokens.calendar_generated", 
             uid="unknown", 
             origin="TOKEN_GENERATE_SCHEDULE", 
-            data={"schedule": schedule, "table": table, "calendar_name": calendar_name},
+            data={
+                "schedule": schedule,
+                "table": table,
+                "calendarName": calendar_name,
+            },
             log_extra={"token": token}
         )
     except Exception as e:

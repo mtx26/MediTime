@@ -1,8 +1,17 @@
 import { toISO } from '../../date/dateUtils';
+import type {
+  ApiResult,
+  ApiFactoryOptions,
+  BoxId,
+  CalendarBoxInput,
+  CalendarId,
+  InvitationToken,
+  TokenId,
+} from '@meditime/types';
 
-export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performApiCall }) {
+export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performApiCall }: ApiFactoryOptions) {
   return {
-    sendInvitation: async (email, calendarId) => {
+    sendInvitation: async (email: string, calendarId: CalendarId) => {
       return performApiCall({
         url: `${apiUrl}/api/invitations/${calendarId}`,
         method: 'POST',
@@ -15,7 +24,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    getLoginInvitation: async (token) => {
+    getLoginInvitation: async (token: InvitationToken) => {
       return performApiCall({
         url: `${apiUrl}/api/invitations/login/${token}`,
         method: 'GET',
@@ -27,7 +36,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    deleteLoginInvitation: async (token) => {
+    deleteLoginInvitation: async (token: InvitationToken) => {
       return performApiCall({
         url: `${apiUrl}/api/invitations/login/${token}`,
         method: 'DELETE',
@@ -39,7 +48,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    acceptLoginInvitation: async (token) => {
+    acceptLoginInvitation: async (token: InvitationToken) => {
       return performApiCall({
         url: `${apiUrl}/api/invitations/login/accept/${token}`,
         method: 'POST',
@@ -51,7 +60,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    rejectLoginInvitation: async (token) => {
+    rejectLoginInvitation: async (token: InvitationToken) => {
       return performApiCall({
         url: `${apiUrl}/api/invitations/login/reject/${token}`,
         method: 'POST',
@@ -63,7 +72,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    getRegistrationInvitation: async (token) => {
+    getRegistrationInvitation: async (token: InvitationToken) => {
       return performApiCall({
         url: `${apiUrl}/api/invitations/registration/${token}`,
         method: 'GET',
@@ -75,7 +84,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    deleteRegistrationInvitation: async (token) => {
+    deleteRegistrationInvitation: async (token: InvitationToken) => {
       return performApiCall({
         url: `${apiUrl}/api/invitations/registration/${token}`,
         method: 'DELETE',
@@ -87,7 +96,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    acceptRegistrationInvitation: async (token) => {
+    acceptRegistrationInvitation: async (token: InvitationToken) => {
       return performApiCall({
         url: `${apiUrl}/api/invitations/registration/accept/${token}`,
         method: 'POST',
@@ -99,7 +108,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    rejectRegistrationInvitation: async (token) => {
+    rejectRegistrationInvitation: async (token: InvitationToken) => {
       return performApiCall({
         url: `${apiUrl}/api/invitations/registration/reject/${token}`,
         method: 'POST',
@@ -111,7 +120,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    deleteSharedCalendar: async (calendarId) => {
+    deleteSharedCalendar: async (calendarId: CalendarId) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}`,
         method: 'DELETE',
@@ -135,10 +144,13 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    fetchSharedUserCalendarSchedule: async (calendarId, startDate = null) => {
+    fetchSharedUserCalendarSchedule: async (
+      calendarId: CalendarId,
+      startDate: string | null = null
+    ): Promise<ApiResult> => {
       const start = startDate || toISO(new Date());
 
-      const response = await performApiCall({
+      return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/schedule?startDate=${start}`,
         method: 'GET',
         origin: 'SHARED_CALENDAR_FETCH_SCHEDULE',
@@ -147,24 +159,9 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
         analyticsData: { calendarId, uid, startDate: start },
         showAlert,
       });
-
-      if (response.success) {
-        return {
-          ...response,
-          calendarName: response.calendar_name,
-          ifLowStock: response.if_low_stock ?? false,
-        };
-      }
-
-      return {
-        ...response,
-        schedule: [],
-        calendarName: '',
-        table: {},
-      };
     },
 
-    updateSharedUserBox: async (calendarId, boxId, box) => {
+    updateSharedUserBox: async (calendarId: CalendarId, boxId: BoxId, box: Record<string, unknown>) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/boxes/${boxId}`,
         method: 'PUT',
@@ -178,14 +175,14 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
     },
 
     createSharedUserBox: async (
-      calendarId,
-      name,
-      boxCapacity,
-      stockAlertThreshold,
-      stockQuantity,
-      dose,
-      conditions,
-      codeFmd
+      calendarId: CalendarId,
+      name: string,
+      boxCapacity: number,
+      stockAlertThreshold: number,
+      stockQuantity: number,
+      dose: number | string | null,
+      conditions: unknown[],
+      codeFmd: string | null = null
     ) => {
       const result = await performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/boxes`,
@@ -199,7 +196,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
             stock_quantity: stockQuantity,
             code_fmd: codeFmd,
             conditions,
-          },
+          } as CalendarBoxInput,
         },
         origin: 'BOX_CREATE',
         uid,
@@ -218,7 +215,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       return result;
     },
 
-    deleteSharedUserBox: async (calendarId, boxId) => {
+    deleteSharedUserBox: async (calendarId: CalendarId, boxId: BoxId) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/boxes/${boxId}`,
         method: 'DELETE',
@@ -230,7 +227,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    fetchIfSharedUserPillboxUsed: async (calendarId, startDate = null) => {
+    fetchIfSharedUserPillboxUsed: async (calendarId: CalendarId, startDate: string | null = null) => {
       const start = startDate || toISO(new Date());
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/pillbox/used?startDate=${start}`,
@@ -243,7 +240,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    useMedicinesForSharedUserPillbox: async (calendarId, startDate = null) => {
+    useMedicinesForSharedUserPillbox: async (calendarId: CalendarId, startDate: string | null = null) => {
       const start = startDate || toISO(new Date());
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/pillbox/used`,
@@ -257,7 +254,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    cancelUseSharedUserPillbox: async (calendarId, useId) => {
+    cancelUseSharedUserPillbox: async (calendarId: CalendarId, useId: string) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/pillbox/uses/${useId}`,
         method: 'DELETE',
@@ -269,7 +266,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    fetchSharedUserPillboxUses: async (calendarId) => {
+    fetchSharedUserPillboxUses: async (calendarId: CalendarId) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/pillbox/uses`,
         method: 'GET',
@@ -281,7 +278,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    sharedUserRestockBox: async (calendarId, boxId) => {
+    sharedUserRestockBox: async (calendarId: CalendarId, boxId: BoxId) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/boxes/${boxId}/restock`,
         method: 'POST',
@@ -293,7 +290,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    fetchSharedUserNotificationsEnabled: async (calendarId) => {
+    fetchSharedUserNotificationsEnabled: async (calendarId: CalendarId) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/notifications`,
         method: 'GET',
@@ -305,7 +302,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    updateSharedUserNotificationsEnabled: async (calendarId) => {
+    updateSharedUserNotificationsEnabled: async (calendarId: CalendarId) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/notifications`,
         method: 'PATCH',
@@ -317,7 +314,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    fetchSharedUserStockDecrementMethod: async (calendarId) => {
+    fetchSharedUserStockDecrementMethod: async (calendarId: CalendarId) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/stock-decrement-method`,
         method: 'GET',
@@ -329,7 +326,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    fetchSharedUserScheduleNegativeStock: async (calendarId, medsId) => {
+    fetchSharedUserScheduleNegativeStock: async (calendarId: CalendarId, medsId: unknown[]) => {
       const medsIdParam = encodeURIComponent(JSON.stringify(medsId));
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/schedule/negative-stock?medsId=${medsIdParam}`,
@@ -341,7 +338,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    getSharedTokensIcs: async (calendarId) => {
+    getSharedTokensIcs: async (calendarId: CalendarId) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/ics`,
         method: 'GET',
@@ -353,7 +350,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    createSharedTokenIcs: async (calendarId) => {
+    createSharedTokenIcs: async (calendarId: CalendarId) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/ics`,
         method: 'POST',
@@ -365,7 +362,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    deleteSharedTokenIcs: async (calendarId, tokenId) => {
+    deleteSharedTokenIcs: async (calendarId: CalendarId, tokenId: TokenId) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/ics/${tokenId}`,
         method: 'DELETE',

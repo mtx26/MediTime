@@ -1,9 +1,19 @@
 
+interface CalendarSourceMapInput extends Record<string, unknown> {}
+
+type CalendarSourceGroup = Record<string, unknown>;
+
+interface CalendarSourceMap {
+  personal: CalendarSourceGroup;
+  sharedUser: CalendarSourceGroup;
+  token: CalendarSourceGroup;
+}
+
 export const getCalendarSourceMap = (
-  personalCalendars,
-  sharedUserCalendars,
-  tokenCalendars
-) => ({
+  personalCalendars: CalendarSourceMapInput,
+  sharedUserCalendars: CalendarSourceMapInput,
+  tokenCalendars: CalendarSourceMapInput
+): CalendarSourceMap => ({
   personal: {
     fetchSchedule: personalCalendars.fetchPersonalCalendarSchedule,
     calendarsData: personalCalendars.calendarsData,

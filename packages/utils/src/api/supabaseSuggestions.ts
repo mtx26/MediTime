@@ -1,8 +1,35 @@
-function isValidDoseFilter(dose) {
+interface SuggestionsUrlParams {
+  supabaseUrl: string;
+  name: string;
+  dose?: string | number | null;
+  limit?: number;
+}
+
+interface MedicamentsByCodeUrlParams {
+  supabaseUrl: string;
+  codeFmd: string;
+}
+
+interface SupabaseRequestBase {
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+}
+
+interface FetchSuggestionsParams extends SupabaseRequestBase {
+  name: string;
+  dose?: string | number | null;
+  limit?: number;
+}
+
+interface FetchMedicamentsParams extends SupabaseRequestBase {
+  codeFmd: string;
+}
+
+function isValidDoseFilter(dose: string | number | null | undefined): dose is string | number {
   return dose !== null && dose !== 0 && dose !== undefined && dose !== '';
 }
 
-export function buildSuggestionsUrl({ supabaseUrl, name, dose, limit = 40 }) {
+export function buildSuggestionsUrl({ supabaseUrl, name, dose, limit = 40 }: SuggestionsUrlParams): string {
   let url = `${supabaseUrl}/rest/v1/medicaments_afmps?select=name,dose,conditionnement,forme_pharmaceutique,code_fmd`;
   url += `&name=ilike.*${encodeURIComponent(name)}*`;
 
@@ -21,7 +48,7 @@ export async function fetchSuggestionsFromSupabase({
   name,
   dose = null,
   limit = 40,
-}) {
+}: FetchSuggestionsParams): Promise<unknown[]> {
   if (!name || name.length < 2) return [];
 
   const url = buildSuggestionsUrl({ supabaseUrl, name, dose, limit });
@@ -35,7 +62,7 @@ export async function fetchSuggestionsFromSupabase({
   return res.json();
 }
 
-export function buildMedicamentsByCodeUrl({ supabaseUrl, codeFmd }) {
+export function buildMedicamentsByCodeUrl({ supabaseUrl, codeFmd }: MedicamentsByCodeUrlParams): string {
   let url = `${supabaseUrl}/rest/v1/medicaments_afmps?select=name,dose,conditionnement`;
   url += `&code_fmd=ilike.*${encodeURIComponent(codeFmd)}*`;
   return url;
@@ -45,7 +72,7 @@ export async function fetchMedicamentsFromSupabase({
   supabaseUrl,
   supabaseAnonKey,
   codeFmd,
-}) {
+}: FetchMedicamentsParams): Promise<unknown[]> {
   if (!codeFmd) return [];
 
   const url = buildMedicamentsByCodeUrl({ supabaseUrl, codeFmd });

@@ -1,5 +1,6 @@
 import { fr, enUS, es, de, it, ja, zhCN, ptBR, ru } from 'date-fns/locale';
 import type { Locale as DateLocale } from 'date-fns';
+import type { Language } from '@meditime/types';
 import * as Flags from 'country-flag-icons/react/3x2';
 
 // ============================================================================
@@ -39,16 +40,7 @@ export const DEFAULT_THEME = 'light';
 // Language Constants
 // ============================================================================
 
-export interface Language {
-  flag: string;
-  code: string;
-  locale: string;
-  label: string;
-  dateLocale: DateLocale;
-  FlagComponent: typeof Flags.FR;
-}
-
-export const LANGUAGES: Language[] = [
+export const LANGUAGES: Language<DateLocale, typeof Flags.FR>[] = [
   { flag: 'FR', code: 'fr', locale: 'fr-FR', label: 'Français', dateLocale: fr, FlagComponent: Flags.FR },
   { flag: 'US', code: 'en', locale: 'en-US', label: 'English', dateLocale: enUS, FlagComponent: Flags.US },
   { flag: 'ES', code: 'es', locale: 'es-ES', label: 'Español', dateLocale: es, FlagComponent: Flags.ES },

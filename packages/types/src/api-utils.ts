@@ -21,15 +21,15 @@ export interface ApiFailure {
   status: number | null;
 }
 
-export type ApiSuccess<T extends object = Record<string, unknown>> = { success: true } & T;
+export type ApiSuccess = { success: true } & Record<string, unknown>;
 
-export type ApiResult<T extends object = Record<string, unknown>> = ApiSuccess<T> | ApiFailure;
+export type ApiResult = ApiSuccess | ApiFailure;
 
-export interface PerformApiCallOptions<TBody = unknown> {
+export interface PerformApiCallOptions {
   url: string;
   method?: HttpMethod;
   headers?: HeadersInit | null;
-  body?: TBody | null;
+  body?: unknown | null;
   origin: string;
   uid?: string | null;
   analyticsEvent?: string | null;
@@ -37,9 +37,7 @@ export interface PerformApiCallOptions<TBody = unknown> {
   showAlert?: ShowAlert | null;
 }
 
-export type PerformApiCall = <T extends object = Record<string, unknown>, TBody = unknown>(
-  options: PerformApiCallOptions<TBody>
-) => Promise<ApiResult<T>>;
+export type PerformApiCall = (options: PerformApiCallOptions) => Promise<ApiResult>;
 
 export interface ApiFactoryOptions {
   apiUrl: string;

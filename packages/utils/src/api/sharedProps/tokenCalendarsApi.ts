@@ -1,11 +1,15 @@
 import { toISO } from '../../date/dateUtils';
+import type { ApiFactoryOptions, ApiResult, CalendarId } from '@meditime/types';
 
-export function createTokenCalendarsApi({ apiUrl, uid, showAlert, performApiCall }) {
+export function createTokenCalendarsApi({ apiUrl, uid, showAlert, performApiCall }: ApiFactoryOptions) {
   return {
-    fetchTokenCalendarSchedule: async (token, startDate = null) => {
+    fetchTokenCalendarSchedule: async (
+      token: string,
+      startDate: string | null = null
+    ): Promise<ApiResult> => {
       const start = startDate || toISO(new Date());
 
-      const result = await performApiCall({
+      return performApiCall({
         url: `${apiUrl}/api/tokens/${token}/schedule?startDate=${start}`,
         method: 'GET',
         origin: 'TOKEN_FETCH_SCHEDULE',
@@ -13,19 +17,9 @@ export function createTokenCalendarsApi({ apiUrl, uid, showAlert, performApiCall
         analyticsData: { token, startTime: start },
         showAlert,
       });
-
-      return {
-        success: result.success,
-        message: result.message,
-        code: result.code,
-        schedule: result.schedule ?? [],
-        calendarName: result.calendar_name ?? '',
-        table: result.table ?? {},
-        error: result.error,
-      };
     },
 
-    createToken: async (calendarId, expiresAt, permissions) => {
+    createToken: async (calendarId: CalendarId, expiresAt: string | null, permissions: unknown) => {
       return performApiCall({
         url: `${apiUrl}/api/tokens/${calendarId}`,
         method: 'POST',
@@ -37,7 +31,7 @@ export function createTokenCalendarsApi({ apiUrl, uid, showAlert, performApiCall
       });
     },
 
-    deleteToken: async (token) => {
+    deleteToken: async (token: string) => {
       return performApiCall({
         url: `${apiUrl}/api/tokens/${token}`,
         method: 'DELETE',
@@ -49,7 +43,7 @@ export function createTokenCalendarsApi({ apiUrl, uid, showAlert, performApiCall
       });
     },
 
-    updateTokenExpiration: async (token, expiresAt) => {
+    updateTokenExpiration: async (token: string, expiresAt: string | null) => {
       return performApiCall({
         url: `${apiUrl}/api/tokens/expiration/${token}`,
         method: 'PATCH',

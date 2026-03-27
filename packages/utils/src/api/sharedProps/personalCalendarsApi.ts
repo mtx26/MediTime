@@ -1,8 +1,20 @@
 import { toISO } from '../../date/dateUtils';
+import type {
+  ApiFactoryOptions,
+  ApiResult,
+  BoxId,
+  CalendarBoxInput,
+  CalendarId,
+  TokenId,
+} from '@meditime/types';
 
-export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiCall }) {
+type PersonalBoxResult = ApiResult & {
+  boxId?: unknown;
+};
+
+export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiCall }: ApiFactoryOptions) {
   return {
-    addCalendar: async (calendarName) => {
+    addCalendar: async (calendarName: string): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars`,
         method: 'POST',
@@ -15,7 +27,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    deleteCalendar: async (calendarId) => {
+    deleteCalendar: async (calendarId: CalendarId): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}`,
         method: 'DELETE',
@@ -27,7 +39,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    renameCalendar: async (calendarId, newCalendarName) => {
+    renameCalendar: async (calendarId: CalendarId, newCalendarName: string): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}`,
         method: 'PUT',
@@ -40,10 +52,13 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    fetchPersonalCalendarSchedule: async (calendarId, startDate = null) => {
+    fetchPersonalCalendarSchedule: async (
+      calendarId: CalendarId,
+      startDate: string | null = null
+    ): Promise<ApiResult> => {
       const start = startDate || toISO(new Date());
 
-      const result = await performApiCall({
+      return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/schedule?startDate=${start}`,
         method: 'GET',
         origin: 'CALENDAR_FETCH_SCHEDULE',
@@ -51,24 +66,13 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
         analyticsEvent: 'fetch_personal_calendar_schedule',
         analyticsData: { calendarId, uid, startDate: start },
       });
-
-      if (result.success) {
-        return {
-          ...result,
-          calendarName: result.calendar_name,
-          ifLowStock: result.if_low_stock,
-        };
-      }
-
-      return {
-        ...result,
-        schedule: [],
-        calendarName: '',
-        table: {},
-      };
     },
 
-    updatePersonalBox: async (calendarId, boxId, box) => {
+    updatePersonalBox: async (
+      calendarId: CalendarId,
+      boxId: BoxId,
+      box: Record<string, unknown>
+    ): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/boxes/${boxId}`,
         method: 'PUT',
@@ -82,15 +86,15 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
     },
 
     createPersonalBox: async (
-      calendarId,
-      name,
-      boxCapacity,
-      stockAlertThreshold,
-      stockQuantity,
-      dose,
-      conditions,
-      codeFmd
-    ) => {
+      calendarId: CalendarId,
+      name: string,
+      boxCapacity: number,
+      stockAlertThreshold: number,
+      stockQuantity: number,
+      dose: number | string | null,
+      conditions: unknown[],
+      codeFmd: string | null = null
+    ): Promise<PersonalBoxResult> => {
       const result = await performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/boxes`,
         method: 'POST',
@@ -103,7 +107,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
             stock_quantity: stockQuantity,
             code_fmd: codeFmd,
             conditions,
-          },
+          } as CalendarBoxInput,
         },
         origin: 'BOX_CREATE',
         uid,
@@ -119,10 +123,10 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
         };
       }
 
-      return result;
+      return result as PersonalBoxResult;
     },
 
-    deletePersonalBox: async (calendarId, boxId) => {
+    deletePersonalBox: async (calendarId: CalendarId, boxId: BoxId): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/boxes/${boxId}`,
         method: 'DELETE',
@@ -134,7 +138,10 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    fetchIfPersonalPillboxUsed: async (calendarId, startDate = null) => {
+    fetchIfPersonalPillboxUsed: async (
+      calendarId: CalendarId,
+      startDate: string | null = null
+    ): Promise<ApiResult> => {
       const start = startDate || toISO(new Date());
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/pillbox/used?startDate=${start}`,
@@ -147,7 +154,10 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    useMedicinesForPersonalPillbox: async (calendarId, startDate = null) => {
+    useMedicinesForPersonalPillbox: async (
+      calendarId: CalendarId,
+      startDate: string | null = null
+    ): Promise<ApiResult> => {
       const start = startDate || toISO(new Date());
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/pillbox/used`,
@@ -161,7 +171,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    cancelUsePersonalPillbox: async (calendarId, useId) => {
+    cancelUsePersonalPillbox: async (calendarId: CalendarId, useId: string): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/pillbox/uses/${useId}`,
         method: 'DELETE',
@@ -173,7 +183,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    fetchPersonalPillboxUses: async (calendarId) => {
+    fetchPersonalPillboxUses: async (calendarId: CalendarId): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/pillbox/uses`,
         method: 'GET',
@@ -185,7 +195,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    fetchPersonalStockDecrementMethod: async (calendarId) => {
+    fetchPersonalStockDecrementMethod: async (calendarId: CalendarId): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/stock-decrement-method`,
         method: 'GET',
@@ -197,7 +207,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    updatePersonalStockDecrementMethod: async (calendarId, method) => {
+    updatePersonalStockDecrementMethod: async (calendarId: CalendarId, method: string): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/stock-decrement-method`,
         method: 'PATCH',
@@ -210,7 +220,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    personalRestockBox: async (calendarId, boxId) => {
+    personalRestockBox: async (calendarId: CalendarId, boxId: BoxId): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/boxes/${boxId}/restock`,
         method: 'POST',
@@ -222,7 +232,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    fetchPersonalNotificationsEnabled: async (calendarId) => {
+    fetchPersonalNotificationsEnabled: async (calendarId: CalendarId): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/notifications`,
         method: 'GET',
@@ -234,7 +244,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    updatePersonalNotificationsEnabled: async (calendarId) => {
+    updatePersonalNotificationsEnabled: async (calendarId: CalendarId): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/notifications`,
         method: 'PATCH',
@@ -246,7 +256,10 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    fetchPersonalScheduleNegativeStock: async (calendarId, medsId) => {
+    fetchPersonalScheduleNegativeStock: async (
+      calendarId: CalendarId,
+      medsId: unknown[]
+    ): Promise<ApiResult> => {
       const medsIdParam = encodeURIComponent(JSON.stringify(medsId));
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/schedule/negative-stock?medsId=${medsIdParam}`,
@@ -259,7 +272,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    getTokensIcs: async (calendarId) => {
+    getTokensIcs: async (calendarId: CalendarId): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/ics`,
         method: 'GET',
@@ -271,7 +284,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    createTokenIcs: async (calendarId) => {
+    createTokenIcs: async (calendarId: CalendarId): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/ics`,
         method: 'POST',
@@ -283,7 +296,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    deleteTokenIcs: async (calendarId, tokenId) => {
+    deleteTokenIcs: async (calendarId: CalendarId, tokenId: TokenId): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/ics/${tokenId}`,
         method: 'DELETE',
@@ -295,7 +308,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    getPersonalCalendarPdfUrl: (calendarId, includeInactive) => {
+    getPersonalCalendarPdfUrl: (calendarId: CalendarId, includeInactive: boolean): string => {
       return `${apiUrl}/api/calendars/${calendarId}/pdf?includeInactive=${includeInactive}`;
     },
   };

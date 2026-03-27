@@ -126,7 +126,12 @@ def handle_user_shared_calendar_schedule(calendar_id):
         return success_response(
             message=SUCCESS_SHARED_CALENDARS_LOAD, 
             code="SHARED_CALENDARS_LOAD_SUCCESS", 
-            data={"schedule": schedule, "table": table, "calendar_name": calendar_name, "if_low_stock": if_low_stock},
+            data={
+                "schedule": schedule,
+                "table": table,
+                "calendarName": calendar_name,
+                "ifLowStock": if_low_stock,
+            },
             log_extra={"calendar_id": calendar_id},
             i18n_key="api.shared_calendar.calendars_retrieved"
         )

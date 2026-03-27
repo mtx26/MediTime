@@ -296,7 +296,12 @@ def handle_calendar_schedule(calendar_id):
             message="calendar generated", 
             code="CALENDAR_GENERATE_SUCCESS",
             i18n_key="api.calendar.calendar_generated",
-            data={"schedule": schedule, "table": table, "calendar_name": calendar_name, "if_low_stock": if_low_stock},
+            data={
+                "schedule": schedule,
+                "table": table,
+                "calendarName": calendar_name,
+                "ifLowStock": if_low_stock,
+            },
             log_extra={"calendar_id": calendar_id}
         )
 
