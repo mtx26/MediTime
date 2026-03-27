@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '../../utils/logger';
 import Cropper from 'react-easy-crop';
-import getCroppedImg from '../../utils/files/cropImage';
+import { getCroppedImg } from '@meditime/utils';
 import { updateUserInfo } from '../../services/auth/authService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

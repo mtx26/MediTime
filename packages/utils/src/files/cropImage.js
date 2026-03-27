@@ -30,4 +30,4 @@ async function getCroppedImg(imageSrc, pixelCrop) {
   return canvas.toDataURL('image/jpeg');
 }
 
-export default getCroppedImg;
+export { getCroppedImg };
