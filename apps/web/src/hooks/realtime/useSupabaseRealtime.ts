@@ -28,7 +28,9 @@ export const useSupabaseRealtime = ({ enabled, fetchData, channels, deps = [] }:
           subscribe: () => SubscribedChannel;
         };
       })
-        .on('postgres_changes', { event, schema, table, filter }, fetchData)
+        .on('postgres_changes', { event, schema, table, filter }, () => {
+          void fetchData();
+        })
         .subscribe();
 
       return channel;
@@ -46,5 +48,5 @@ export const useSupabaseRealtime = ({ enabled, fetchData, channels, deps = [] }:
       });
       channelRef.current = [];
     };
-  }, [enabled, fetchData, channels, ...deps]);
+  }, [enabled, ...deps]);
 };

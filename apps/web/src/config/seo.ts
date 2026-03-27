@@ -3,6 +3,7 @@
  */
 
 import { enabledLanguageCodes } from '@meditime/config';
+import type { PwaShortcut, SchemaOrgDocument, SeoConfig, TranslatorInput } from '@meditime/types';
 
 // Constantes de l'application
 const APP_VERSION = '0.1.0';
@@ -14,14 +15,14 @@ const AUTHOR = {
 };
 
 // Fonction pour obtenir l'URL de base
-const getBaseUrl = () => {
+const getBaseUrl = (): string => {
   if (typeof window !== 'undefined') {
     return import.meta.env?.VITE_VITE_URL || 'https://meditime-app.com';
   }
   return process.env.VITE_VITE_URL || 'https://meditime-app.com';
 };
 
-export const SEO_CONFIG = {
+export const SEO_CONFIG: SeoConfig = {
   BASE_URL: getBaseUrl(),
   APP_VERSION,
   AUTHOR,
@@ -65,17 +66,24 @@ export const SEO_CONFIG = {
  * @param {string} langCode - Code de langue
  * @param {Function|Object} t - Fonction de traduction i18next ou objet de traductions brutes
  */
-export const getShortcuts = (langCode, t) => {
-  const translate = typeof t === 'function'
-    ? t
-    : (key) => {
-      const keys = key.split('.');
-      let value = t;
-      for (const k of keys) {
-        value = value?.[k];
-      }
-      return value || key;
-    };
+function resolveTranslation(t: TranslatorInput, key: string): string {
+  if (typeof t === 'function') {
+    return t(key);
+  }
+
+  const keys = key.split('.');
+  let value: unknown = t;
+  for (const k of keys) {
+    if (!value || typeof value !== 'object') {
+      return key;
+    }
+    value = (value as Record<string, unknown>)[k];
+  }
+  return typeof value === 'string' ? value : key;
+}
+
+export const getShortcuts = (langCode: string, t: TranslatorInput): PwaShortcut[] => {
+  const translate = (key: string) => resolveTranslation(t, key);
 
   return [
     {
@@ -98,7 +106,7 @@ export const getShortcuts = (langCode, t) => {
 /**
  * Genere le Schema.org complet optimise
  */
-export const getSchemaOrg = (lng, t) => ({
+export const getSchemaOrg = (lng: string, t: (key: string) => string): SchemaOrgDocument => ({
   '@context': 'https://schema.org',
   '@graph': [
     {
@@ -185,9 +193,14 @@ export const getSchemaOrg = (lng, t) => ({
 /**
  * Utilitaire pour creer ou mettre a jour des balises meta/link
  */
-export const upsertMetaTag = (tagName, keyAttr, key, attrs) => {
+export const upsertMetaTag = (
+  tagName: 'meta' | 'link',
+  keyAttr: string,
+  key: string,
+  attrs: Record<string, string>
+): HTMLElement => {
   const selector = `${tagName}[${keyAttr}="${key}"]`;
-  let tag = document.head.querySelector(selector);
+  let tag = document.head.querySelector(selector) as HTMLElement | null;
   if (!tag) {
     tag = document.createElement(tagName);
     tag.setAttribute(keyAttr, key);

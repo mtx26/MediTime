@@ -4,11 +4,15 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import { enabledLanguageCodes, DEFAULT_LANG } from '@meditime/config';
 import { translationResources } from '@meditime/i18n';
 
-const resources = {};
+type TranslationResources = typeof translationResources;
+type TranslationLang = keyof TranslationResources;
+
+const resources: Record<string, TranslationResources[TranslationLang]> = {};
 
 for (const lang of enabledLanguageCodes) {
-  if (translationResources[lang]) {
-    resources[lang] = translationResources[lang];
+  if (lang in translationResources) {
+    const key = lang as TranslationLang;
+    resources[key] = translationResources[key];
   }
 }
 

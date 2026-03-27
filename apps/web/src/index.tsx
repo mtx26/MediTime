@@ -13,7 +13,11 @@ import { DEFAULT_THEME } from '@meditime/constants';
 
 const LoadingProvider = LoadingProviderRaw as unknown as ComponentType<{ children: ReactNode }>;
 
-initLogger(import.meta.env.VITE_API_URL, import.meta.env.DEV);
+initLogger(
+  import.meta.env.VITE_API_URL,
+  import.meta.env.DEV,
+  import.meta.env.VITE_ENABLE_REMOTE_LOGGING === 'true'
+);
 
 const savedTheme = localStorage.getItem('theme') || DEFAULT_THEME;
 if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {

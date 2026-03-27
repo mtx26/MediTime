@@ -2,7 +2,11 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-const Input = React.forwardRef(({
+type InputProps = React.ComponentProps<"input"> & {
+  size?: "default" | "sm"
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(({ 
   className,
   type,
   size = "default",

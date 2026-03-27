@@ -1,10 +1,18 @@
-const forceLog = true; // ← reste utile en local
+const forceLog = false;
+
 let isDev = false;
 let API_URL: string | null = null;
+let enableRemoteLogging = false;
 
-export const initLogger = (apiUrl: string | null, isDevMode = false): void => {
+export const initLogger = (
+  apiUrl: string | null,
+  isDevMode = false,
+  remoteLoggingEnabled = false
+): void => {
   API_URL = apiUrl;
   isDev = isDevMode;
+  enableRemoteLogging = remoteLoggingEnabled;
+
   if (!API_URL) console.warn('Logger: API_URL not provided');
 };
 
@@ -27,15 +35,16 @@ const fetchLog = (
     type,
   };
 
-  if ((forceLog || !isDev) && API_URL) {
-    fetch(`${API_URL}/api/log`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(structuredMessage),
-    }).catch((err) => {
-      if (isDev) console.warn("Échec de l'envoi du log au backend :", err);
-    });
-  }
+  if (!API_URL) return;
+  if (!(forceLog || enableRemoteLogging)) return;
+
+  fetch(`${API_URL}/api/log`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(structuredMessage),
+  }).catch((err) => {
+    if (isDev) console.warn("Échec de l'envoi du log au backend :", err);
+  });
 };
 
 export const log = {
