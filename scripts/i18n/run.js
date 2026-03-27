@@ -1,5 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 import dotenv from 'dotenv';
 import { v2 as Translate } from '@google-cloud/translate';
 import { collectBackendKeys, collectFrontendKeys } from './collect-keys.js';
@@ -18,13 +19,33 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config();
-
-const workspaceFrontendDir = path.join(__dirname, '..', '..');
-const workspaceBackendAppDir = path.join(__dirname, '..', '..', '..', 'backend', 'app');
+const workspaceRootDir = path.join(__dirname, '..', '..');
+const workspaceFrontendDir = path.join(workspaceRootDir, 'apps', 'web');
+const workspaceBackendDir = path.join(workspaceRootDir, 'apps', 'backend');
+const workspaceBackendAppDir = path.join(workspaceRootDir, 'apps', 'backend', 'app');
 const frontendSrcDir = path.join(workspaceFrontendDir, 'src');
 const localesRootDir = path.join(frontendSrcDir, 'locales');
 const frPath = localeFilePath(localesRootDir, 'fr');
+
+function loadMonorepoEnv() {
+  const envFiles = [
+    path.join(workspaceRootDir, '.env'),
+    path.join(workspaceBackendDir, '.env'),
+    path.join(workspaceFrontendDir, '.env'),
+  ];
+
+  const loaded = [];
+  for (const envFile of envFiles) {
+    if (!fs.existsSync(envFile)) {
+      continue;
+    }
+
+    dotenv.config({ path: envFile, override: true });
+    loaded.push(envFile);
+  }
+
+  return loaded;
+}
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
@@ -58,8 +79,14 @@ function chooseFrValue(key, refs) {
 }
 
 async function main() {
+  const loadedEnvFiles = loadMonorepoEnv();
   console.log('i18n sync started');
   console.log(`mode: ${dryRun ? 'dry-run' : 'write'}`);
+  console.log(
+    loadedEnvFiles.length > 0
+      ? `env loaded: ${loadedEnvFiles.join(', ')}`
+      : 'env loaded: none (.env not found)',
+  );
 
   const backendKeys = collectBackendKeys(workspaceBackendAppDir);
   const frontendKeys = collectFrontendKeys(frontendSrcDir);
