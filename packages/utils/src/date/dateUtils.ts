@@ -1,3 +1,5 @@
+import type { DateLike } from '@meditime/types';
+
 // dateUtils.js
 
 // 🔁 Formatte une date JS en YYYY-MM-DD
@@ -30,4 +32,24 @@ export function getMondayDate(dateInput: string | number | Date | null | undefin
   monday.setDate(date.getDate() - diff);
   monday.setHours(0, 0, 0, 0);
   return monday;
+}
+
+// Normalise une date à minuit (00:00:00.000) pour comparaisons fiables
+export function normalizeToStartOfDay(dateInput: DateLike): Date {
+  const date = new Date(dateInput);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+// Construit les 7 jours de la semaine (lundi -> dimanche) d'une date donnée
+export function getWeekDates(dateInput: DateLike): Date[] {
+  const monday = getMondayDate(dateInput);
+  if (!monday) return [];
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const day = new Date(monday);
+    day.setDate(day.getDate() + index);
+    day.setHours(0, 0, 0, 0);
+    return day;
+  });
 }

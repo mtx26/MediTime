@@ -1,30 +1,19 @@
-import { getMondayDate } from '@meditime/utils';
-import PropTypes from 'prop-types';
+import { getWeekDates, normalizeToStartOfDay } from '@meditime/utils';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
+import type { WeekDayCirclesProps } from '@meditime/types';
 
-export default function WeekDayCircles({ selectedDate, onSelectDate }) {
+export default function WeekDayCircles({ selectedDate, onSelectDate }: WeekDayCirclesProps) {
   const { i18n } = useTranslation();
-  // normalise les dates à minuit pour comparaisons simples
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  
-  // Normaliser selectedDate pour la comparaison
-  const normalizedSelectedDate = new Date(selectedDate);
-  normalizedSelectedDate.setHours(0,0,0,0);
-  
-  const mondayDate = getMondayDate(selectedDate);
-  const weekDates = [...Array(7)].map((_, i) => {
-    const d = new Date(mondayDate);
-    d.setDate(d.getDate() + i);
-    d.setHours(0,0,0,0);
-    return d;
-  });
+  const today = normalizeToStartOfDay(new Date());
+  const normalizedSelectedDate = normalizeToStartOfDay(selectedDate);
+  const weekDates = getWeekDates(selectedDate);
 
   return (
     <div className="flex w-full overflow-hidden gap-1 p-1 justify-between items-center">
-      {weekDates.map((day, index) => {
+      {weekDates.map((day) => {
         const isSelected = day.getTime() === normalizedSelectedDate.getTime();
         const isToday = day.getTime() === today.getTime();
 
@@ -36,7 +25,7 @@ export default function WeekDayCircles({ selectedDate, onSelectDate }) {
 
         return (
           <Button
-            key={index}
+            key={day.toISOString()}
             type="button"
             variant={isToday || isSelected ? "default" : "outline"}
             size="sm"
@@ -47,8 +36,9 @@ export default function WeekDayCircles({ selectedDate, onSelectDate }) {
             )}
             aria-label={ariaLabel}
             onClick={() => onSelectDate(day)}
-            onKeyDown={(e) => {
+            onKeyDown={(e: ReactKeyboardEvent<HTMLButtonElement>) => {
               if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
                 onSelectDate(day);
               }
             }}
@@ -68,8 +58,3 @@ export default function WeekDayCircles({ selectedDate, onSelectDate }) {
     </div>
   );
 }
-
-WeekDayCircles.propTypes = {
-  selectedDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
-  onSelectDate: PropTypes.func.isRequired,
-};
