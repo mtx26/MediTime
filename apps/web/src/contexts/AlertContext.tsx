@@ -1,10 +1,13 @@
 import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import Toast from '../components/common/Toast';
+import type { ConfirmDialogType, ToastType } from '@meditime/types';
+
+type AlertType = ToastType | ConfirmDialogType | '';
 
 interface AlertContextValue {
-  showAlert: (type: string, message: string) => void;
-  showConfirm: (type: string, title: string, message: string, onConfirm: () => void) => void;
+  showAlert: (type: ToastType, message: string) => void;
+  showConfirm: (type: ConfirmDialogType, title: string, message: string, onConfirm: () => void) => void;
   closeAlert: () => void;
 }
 
@@ -15,18 +18,18 @@ interface AlertProviderProps {
 }
 
 export function AlertProvider({ children }: AlertProviderProps) {
-  const [alertType, setAlertType] = useState('');
+  const [alertType, setAlertType] = useState<AlertType>('');
   const [alertMessage, setAlertMessage] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
   const [onConfirmAction, setOnConfirmAction] = useState<(() => void) | null>(null);
 
-  const showAlert = useCallback((type: string, message: string) => {
+  const showAlert = useCallback((type: ToastType, message: string) => {
     setAlertType(type);
     setAlertMessage(message);
     setOnConfirmAction(null);
   }, []);
 
-  const showConfirm = useCallback((type: string, title: string, message: string, onConfirm: () => void) => {
+  const showConfirm = useCallback((type: ConfirmDialogType, title: string, message: string, onConfirm: () => void) => {
     setAlertType(type);
     setAlertTitle(title);
     setAlertMessage(message);
@@ -40,7 +43,7 @@ export function AlertProvider({ children }: AlertProviderProps) {
     setOnConfirmAction(null);
   }, []);
 
-  const isConfirm = alertType.startsWith('confirm');
+  const isConfirm = alertType === 'confirm-safe' || alertType === 'confirm-danger';
 
   const value = useMemo<AlertContextValue>(
     () => ({ showAlert, showConfirm, closeAlert }),
@@ -64,7 +67,7 @@ export function AlertProvider({ children }: AlertProviderProps) {
         />
       )}
       {alertMessage && !isConfirm && (
-        <Toast type={alertType} message={alertMessage} onClose={closeAlert} duration={4000} />
+        <Toast type={alertType as ToastType} message={alertMessage} onClose={closeAlert} duration={4000} />
       )}
     </AlertContext.Provider>
   );

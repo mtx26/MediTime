@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { handleLogout } from '../../services/auth/authService';
 import HoveredUserProfile from './HoveredUserProfile';
@@ -7,7 +7,7 @@ import NotificationLine from './NotificationLine';
 import LanguageSelector from './LanguageSelector';
 import ThemeToggle from './ThemeToggle';
 import { useTranslation } from 'react-i18next';
-import PropTypes from 'prop-types';
+import type { AppNotification, AppSharedProps, CalendarHeaderInfo } from '@meditime/types';
 import {
   buildLocationList,
   buildReturnToCalendarList,
@@ -45,15 +45,15 @@ import {
   ChevronDown,
 } from 'lucide-react';
 
-function Navbar({ sharedProps }) {
-  const { userInfo } = useContext(UserContext);
-  const navigate = useNavigate();
+function Navbar({ sharedProps }: { sharedProps: AppSharedProps }) {
+  const userContext = useContext(UserContext);
+  const userInfo = userContext?.userInfo;
   const location = useLocation();
-  const { lng } = useParams();
+  const { lng = 'en' } = useParams();
   const { t } = useTranslation();
-  const [calendarInfo, setCalendarInfo] = useState(null);
-  const [basePath, setBasePath] = useState(null);
-  const [tokenId, setTokenId] = useState(null);
+  const [calendarInfo, setCalendarInfo] = useState<CalendarHeaderInfo | null>(null);
+  const [basePath, setBasePath] = useState<'calendar' | 'shared-user-calendar' | 'shared-token-calendar' | null>(null);
+  const [tokenId, setTokenId] = useState<string | null>(null);
   
   const pathAfterLang = location.pathname.split('/').slice(2).join('/');
   const pathWithSlash = '/' + pathAfterLang;
@@ -64,24 +64,22 @@ function Navbar({ sharedProps }) {
   const locationAvailableForReturnToCalendar = buildReturnToCalendar(pathParts);
   const isPillboxPage = isPillboxPath(pathParts);
 
+  const personalCalendarsData = sharedProps.personalCalendars.calendarsData as CalendarHeaderInfo[] | undefined;
+  const sharedCalendarsData = sharedProps.sharedUserCalendars.sharedCalendarsData as CalendarHeaderInfo[] | undefined;
+  const notificationsData = (sharedProps.notifications.notificationsData as AppNotification[] | null | undefined) ?? null;
+  const readNotification = sharedProps.notifications.readNotification as (notificationId: string | number) => void;
+  const readAllNotifications = sharedProps.notifications.readAllNotifications as () => void;
+
   useEffect(() => {
-    if (locationList.calendar && sharedProps.personalCalendars.calendarsData) {
+    if (locationList.calendar && personalCalendarsData) {
       setBasePath('calendar');
-      setCalendarInfo(
-        sharedProps.personalCalendars.calendarsData.find(
-          (calendar) => calendar.id === pathParts[1]
-        )
-      );
+      setCalendarInfo(personalCalendarsData.find((calendar) => calendar.id === pathParts[1]) ?? null);
     } else if (
       locationList.sharedUserCalendar &&
-      sharedProps.sharedUserCalendars.sharedCalendarsData
+      sharedCalendarsData
     ) {
       setBasePath('shared-user-calendar');
-      setCalendarInfo(
-        sharedProps.sharedUserCalendars.sharedCalendarsData.find(
-          (calendar) => calendar.id === pathParts[1]
-        )
-      );
+      setCalendarInfo(sharedCalendarsData.find((calendar) => calendar.id === pathParts[1]) ?? null);
     } else if (locationList.tokenCalendar) {
       setBasePath('shared-token-calendar');
       setTokenId(pathParts[1]);
@@ -92,11 +90,13 @@ function Navbar({ sharedProps }) {
     }
   }, [
     location.pathname,
-    sharedProps.personalCalendars.calendarsData,
-    sharedProps.sharedUserCalendars.sharedCalendarsData,
+    personalCalendarsData,
+    sharedCalendarsData,
+    pathParts,
+    locationList.calendar,
+    locationList.sharedUserCalendar,
+    locationList.tokenCalendar,
   ]);
-
-  const { notificationsData, readNotification } = sharedProps.notifications;
   const unreadCount = notificationsData?.filter((n) => !n.read).length || 0;
 
   return (
@@ -156,11 +156,11 @@ function Navbar({ sharedProps }) {
                     {t('shared_by')}{' '}
                     <HoveredUserProfile
                       user={{
-                        email: calendarInfo.owner_email,
-                        display_name: calendarInfo.owner_name,
-                        photo_url: calendarInfo.owner_photo_url,
+                        email: calendarInfo?.owner_email,
+                        display_name: calendarInfo?.owner_name || t('unknown_user'),
+                        photo_url: calendarInfo?.owner_photo_url || '',
                       }}
-                      trigger={<span>{calendarInfo.owner_name}</span>}
+                      trigger={<span>{calendarInfo?.owner_name || t('unknown_user')}</span>}
                     />
                   </Badge>
                 )}
@@ -188,11 +188,11 @@ function Navbar({ sharedProps }) {
                   <Badge variant="secondary" className="text-xs">
                     <HoveredUserProfile
                       user={{
-                        email: calendarInfo.owner_email,
-                        display_name: calendarInfo.owner_name,
-                        photo_url: calendarInfo.owner_photo_url,
+                        email: calendarInfo?.owner_email,
+                        display_name: calendarInfo?.owner_name || t('unknown_user'),
+                        photo_url: calendarInfo?.owner_photo_url || '',
                       }}
-                      trigger={<span>{calendarInfo.owner_name}</span>}
+                      trigger={<span>{calendarInfo?.owner_name || t('unknown_user')}</span>}
                     />
                   </Badge>
                 )}
@@ -250,8 +250,8 @@ function Navbar({ sharedProps }) {
               {userInfo &&
                 <DropdownMenu
                   onOpenChange={(open) => {
-                    if (open && sharedProps.notifications.notificationsData && sharedProps.notifications.notificationsData.length > 0 && sharedProps.notifications.notificationsData.some(n => !n.read)) {
-                      sharedProps.notifications.readAllNotifications();
+                    if (open && notificationsData && notificationsData.length > 0 && notificationsData.some((n) => !n.read)) {
+                      readAllNotifications();
                     }
                   }}
                 >
@@ -285,7 +285,7 @@ function Navbar({ sharedProps }) {
                       notificationsData
                         .filter((n) => !n.read)
                         .slice(0, 5)
-                        .map((notif) => (
+                        .map((notif: AppNotification) => (
                           <NotificationLine
                             key={notif.notification_id}
                             notif={notif}
@@ -310,7 +310,7 @@ function Navbar({ sharedProps }) {
                     {userInfo ? (
                       <>
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={userInfo.photoUrl} alt={userInfo.displayName} referrerPolicy="no-referrer" />
+                          <AvatarImage src={userInfo.photoUrl || undefined} alt={userInfo.displayName || t('user')} referrerPolicy="no-referrer" />
                           <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
                         </Avatar>
                         <span className="text-sm">{userInfo.displayName || t('user')}</span>
@@ -378,9 +378,5 @@ function Navbar({ sharedProps }) {
     </>
   );
 }
-
-Navbar.propTypes = {
-  sharedProps: PropTypes.object.isRequired,
-};
 
 export default Navbar;

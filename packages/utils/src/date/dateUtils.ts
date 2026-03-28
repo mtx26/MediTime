@@ -53,3 +53,18 @@ export function getWeekDates(dateInput: DateLike): Date[] {
     return day;
   });
 }
+
+// Formatte une date/heure avec locale en utilisant Intl
+export function formatDateTime(
+  dateInput: DateLike,
+  locale?: string,
+  options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }
+): string {
+  return new Date(dateInput).toLocaleString(locale, options);
+}

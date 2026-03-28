@@ -1,14 +1,16 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { Info } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent, PopoverArrow } from '@/components/ui/popover';
 import useIsTouchDevice from '../../hooks/device/useIsTouchDevice';
-import PropTypes from 'prop-types';
+import type { HoveredUserProfileProps as SharedHoveredUserProfileProps } from '@meditime/types';
+
+type HoveredUserProfileProps = SharedHoveredUserProfileProps<ReactNode>;
 
 export default function HoveredUserProfile({
   user,
   trigger,
-  containerRef = null,
-}) {
+}: HoveredUserProfileProps) {
   const [open, setOpen] = useState(false);
 
   const isTouchDevice = useIsTouchDevice();
@@ -85,13 +87,3 @@ export default function HoveredUserProfile({
     </Popover>
   );
 }
-
-HoveredUserProfile.propTypes = {
-  user: PropTypes.shape({
-    photo_url: PropTypes.string.isRequired,
-    display_name: PropTypes.string.isRequired,
-    email: PropTypes.string,
-  }).isRequired,
-  trigger: PropTypes.node.isRequired,
-  containerRef: PropTypes.object,
-};

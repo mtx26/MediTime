@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { ConfirmDialogProps } from '@meditime/types';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 
-function ConfirmDialog({ type = 'confirm-danger', title, message, onClose, onConfirm }) {
+function ConfirmDialog({ type = 'confirm-danger', title, message, onClose, onConfirm }: ConfirmDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
@@ -35,7 +35,14 @@ function ConfirmDialog({ type = 'confirm-danger', title, message, onClose, onCon
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={handleClose}>
+    <AlertDialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          handleClose();
+        }
+      }}
+    >
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
@@ -60,11 +67,5 @@ function ConfirmDialog({ type = 'confirm-danger', title, message, onClose, onCon
     </AlertDialog>
   );
 }
-
-ConfirmDialog.propTypes = {
-  type: PropTypes.oneOf(['confirm-safe', 'confirm-danger']),  title: PropTypes.string,  message: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onConfirm: PropTypes.func,
-};
 
 export default ConfirmDialog;

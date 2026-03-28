@@ -1,35 +1,32 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../contexts/UserContext';
+import { computeMobileBottomOffset } from '@meditime/utils';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Calendar, Share2, Bell, User } from 'lucide-react';
 
 function MobileNavBar() {
-  const { lng } = useParams();
+  const { lng = 'en' } = useParams();
   const location = useLocation();
   const { t } = useTranslation();
-  const { userInfo } = useContext(UserContext);
+  const userContext = useContext(UserContext);
+  const userInfo = userContext?.userInfo;
   const [bottomOffset, setBottomOffset] = useState(0);
 
   useEffect(() => {
     const computeOffset = () => {
       const vv = window.visualViewport;
-      if (!vv) {
-        // Espacement constant pour un rendu intentionnel
-        setBottomOffset(10);
-        return;
-      }
       const layoutH = window.innerHeight;
-      const visualBottom = vv.height + vv.offsetTop;
-      // N'applique un offset que lorsque le clavier virtuel est probablement ouvert,
-      // pour éviter un "gap" sous la barre lors des variations de la barre d'URL.
-      const keyboardLikely = vv.height < layoutH - 80; // marge heuristique ~80px
-      const offset = keyboardLikely ? Math.max(layoutH - visualBottom, 0) : 0;
-      // Ajoute un léger espacement constant
-      setBottomOffset(offset + 10);
+      setBottomOffset(
+        computeMobileBottomOffset(
+          layoutH,
+          vv?.height,
+          vv?.offsetTop
+        )
+      );
     };
     computeOffset();
     const vv = window.visualViewport;
@@ -43,10 +40,10 @@ function MobileNavBar() {
     };
   }, []);
 
-  const isActive = (path) => location.pathname.startsWith(path);
+  const isActive = (path: string): boolean => location.pathname.startsWith(path);
   const itemBase = 'inline-flex flex-col items-center justify-center h-full px-7 hover:bg-accent/50 group';
   const iconBase = 'mb-1 shrink-0 text-muted-foreground group-hover:text-primary !size-[36px]';
-  const iconStyle = { width: 36, height: 36, flexShrink: 0 };
+  const iconStyle: CSSProperties = { width: 36, height: 36, flexShrink: 0 };
 
   const nav = (
     <nav
@@ -122,7 +119,7 @@ function MobileNavBar() {
               >
                 {userInfo ? (
                   <Avatar className="w-10 h-10 mb-1">
-                    <AvatarImage src={userInfo.photoUrl} alt={userInfo.displayName} referrerPolicy="no-referrer" />
+                    <AvatarImage src={userInfo.photoUrl || undefined} alt={userInfo.displayName || t('user')} referrerPolicy="no-referrer" />
                     <AvatarFallback>
                       <User/>
                     </AvatarFallback>

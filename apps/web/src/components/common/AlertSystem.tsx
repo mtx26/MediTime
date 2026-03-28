@@ -1,7 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import ConfirmDialog from './ConfirmDialog';
 import Toast from './Toast';
+import type { AlertSystemProps, ConfirmDialogType, ToastType } from '@meditime/types';
 
 function AlertSystem({
   type = 'info',
@@ -10,15 +9,15 @@ function AlertSystem({
   onClose,
   onConfirm = null,
   duration = 2000,
-}) {
-  const isConfirm = type.startsWith('confirm');
+}: AlertSystemProps) {
+  const isConfirm = type === 'confirm-safe' || type === 'confirm-danger';
 
   if (!message) return null;
 
   if (isConfirm) {
     return (
       <ConfirmDialog
-        type={type}
+        type={type as ConfirmDialogType}
         title={title}
         message={message}
         onClose={onClose}
@@ -29,28 +28,12 @@ function AlertSystem({
 
   return (
     <Toast
-      type={type}
+      type={type as ToastType}
       message={message}
       onClose={onClose}
       duration={duration}
     />
   );
 }
-
-AlertSystem.propTypes = {
-  type: PropTypes.oneOf([
-    'info',
-    'success',
-    'warning',
-    'danger',
-    'confirm-safe',
-    'confirm-danger',
-  ]),
-  title: PropTypes.string,
-  message: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onConfirm: PropTypes.func,
-  duration: PropTypes.number,
-};
 
 export default AlertSystem;

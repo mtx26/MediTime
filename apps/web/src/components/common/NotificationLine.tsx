@@ -1,33 +1,29 @@
-import React from 'react';
+import type { ReactNode } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { UserPlus, CheckCircle, XCircle, Trash2, AlertTriangle, ArrowRightCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import HoveredUserProfile from './HoveredUserProfile';
 import { useTranslation, Trans } from 'react-i18next';
+import { formatDateTime } from '@meditime/utils';
+import type { NotificationLineProps } from '@meditime/types';
 
 export default function NotificationLine({
   notif,
   onRead
-}) {
+}: NotificationLineProps) {
   const { t } = useTranslation();
   const { lng } = useParams();
 
   const isUnread = !notif.read;
-  const timestamp = new Date(notif.timestamp).toLocaleString(lng, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const timestamp = formatDateTime(notif.timestamp, lng);
 
   const user = notif.sender_name ? (
     <HoveredUserProfile
       user={{
-        photo_url: notif.sender_photo_url,
+        photo_url: notif.sender_photo_url || '',
         display_name: notif.sender_name,
-        email: notif.sender_email,
+        email: notif.sender_email || null,
       }}
       trigger={<strong>{notif.sender_name}</strong>}
     />
@@ -35,10 +31,10 @@ export default function NotificationLine({
     <strong>{t('unknown_user')}</strong>
   );
 
-  let icon = null;
-  let message = null;
-  let link = null;
-  let actions = null;
+  let icon: ReactNode = null;
+  let message: ReactNode = null;
+  let link: string | null = null;
+  let actions: ReactNode = null;
 
   switch (notif.notification_type) {
     case 'calendar_invitation':
@@ -177,7 +173,7 @@ export default function NotificationLine({
             to={link}
             onClick={(e) => {
               e.stopPropagation();
-              isUnread && onRead(notif.notification_id);
+              if (isUnread) onRead(notif.notification_id);
             }}
             style={{ cursor: isUnread || link ? 'pointer' : 'default' }}
             className="no-underline block text-foreground"
@@ -193,14 +189,14 @@ export default function NotificationLine({
         ) : (
           <div
             onClick={() => {
-              isUnread && onRead(notif.notification_id);
+              if (isUnread) onRead(notif.notification_id);
             }}
             style={{ cursor: isUnread || link ? 'pointer' : 'default' }}
             className="no-underline block text-foreground"
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                isUnread && onRead(notif.notification_id);
+                if (isUnread) onRead(notif.notification_id);
               }
             }}
           >

@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import type { ToastProps } from '@meditime/types';
 
-function Toast({ type = 'info', message, onClose, duration = 4000 }) {
+function Toast({ type = 'info', message, onClose, duration = 4000 }: ToastProps) {
   const { t } = useTranslation();
   const lastMessageRef = useRef('');
 
@@ -38,12 +38,5 @@ function Toast({ type = 'info', message, onClose, duration = 4000 }) {
 
   return null;
 }
-
-Toast.propTypes = {
-  type: PropTypes.oneOf(['info', 'success', 'warning', 'danger']),
-  message: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
-  duration: PropTypes.number,
-};
 
 export default Toast;

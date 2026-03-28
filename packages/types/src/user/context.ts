@@ -9,6 +9,7 @@ export interface UserInfo {
   emailEnabled: boolean;
   pushEnabled: boolean;
   uid: string;
+  role?: string | null;
 }
 
 export interface UserContextValue {
