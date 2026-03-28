@@ -1,9 +1,8 @@
-import React from "react"
-import PropTypes from "prop-types"
 import { useTranslation } from "react-i18next"
 import ArrowControls from "./ArrowControls"
 import WeekDayCircles from "./WeekDayCircles"
-import { getMondayDate, toISO } from '@meditime/utils'
+import { getWeekDates, normalizeToStartOfDay, toISO } from '@meditime/utils'
+import type { WeeklyEventContentProps } from '@meditime/types'
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -11,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 
 export default function WeeklyEventContent({
-  ifModal,
+  ifModal: _ifModal,
   selectedDate,
   eventsForDay,
   onSelectDate,
@@ -19,18 +18,12 @@ export default function WeeklyEventContent({
   onPrev,
   getPastWeek,
   getNextWeek,
-}) {
+}: WeeklyEventContentProps) {
   const { t, i18n } = useTranslation()
 
-  const selDate =
-    selectedDate instanceof Date ? selectedDate : new Date(selectedDate)
+  const selDate = selectedDate ? normalizeToStartOfDay(selectedDate) : normalizeToStartOfDay(new Date())
 
-  const weekDates = [...Array(7)].map((_, i) => {
-    const d = new Date(getMondayDate(selDate))
-    d.setDate(d.getDate() + i)
-    d.setHours(0, 0, 0, 0)
-    return d
-  })
+  const weekDates = getWeekDates(selDate)
 
   const selIso = toISO(selDate)
   const weekIsos = weekDates.map(toISO)
@@ -91,14 +84,14 @@ export default function WeeklyEventContent({
       <ScrollArea className="flex-1 pr-3 overflow-auto">
         {eventsForDay.length > 0 ? (
           <div className="grid gap-2 px-1 over">
-            {eventsForDay.map((event, index) => {
+            {eventsForDay.map((event) => {
               const time = new Date(event.start).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })
 
               return (
-                <Card key={index} className="rounded-lg p-2.5">
+                <Card key={`${event.start}-${event.title}`} className="rounded-lg p-2.5">
                   <div className="flex items-start">
                     <div className="w-16 shrink-0 mr-3">
                       <div
@@ -141,20 +134,4 @@ export default function WeeklyEventContent({
       </ScrollArea>
     </div>
   )
-}
-
-WeeklyEventContent.propTypes = {
-  ifModal: PropTypes.bool.isRequired,
-  selectedDate: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.instanceOf(Date),
-    PropTypes.number,
-    PropTypes.oneOf([undefined, null]),
-  ]).isRequired,
-  eventsForDay: PropTypes.array.isRequired,
-  onSelectDate: PropTypes.func.isRequired,
-  onNext: PropTypes.func.isRequired,
-  onPrev: PropTypes.func.isRequired,
-  getPastWeek: PropTypes.func.isRequired,
-  getNextWeek: PropTypes.func.isRequired,
 }

@@ -16,7 +16,7 @@ import WeekCalendarSelector from '@/components/calendar/WeekCalendarSelector';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
 import PillboxDisplay from '@/components/calendar/PillboxDisplay';
 import ActionSheet from '@/components/common/ActionSheet';
-import NotFound from '@/pages/general/NotFound.jsx';
+import NotFound from '@/pages/general/NotFound';
 import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';

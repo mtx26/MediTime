@@ -4,10 +4,16 @@ import { UserContext } from '../../contexts/UserContext';
 import { handleLogout } from '../../services/auth/authService';
 import HoveredUserProfile from './HoveredUserProfile';
 import NotificationLine from './NotificationLine';
-import LanguageSelector from './LanguageSelector.jsx';
+import LanguageSelector from './LanguageSelector';
 import ThemeToggle from './ThemeToggle';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
+import {
+  buildLocationList,
+  buildReturnToCalendarList,
+  buildReturnToCalendar,
+  isPillboxPath,
+} from '@meditime/utils';
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -26,7 +32,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   ArrowLeft,
-  Pill,
   Calendar,
   Share2,
   Bell,
@@ -39,45 +44,6 @@ import {
   X,
   ChevronDown,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-
-function buildLocationList(pathWithSlash) {
-  return {
-    calendar: pathWithSlash.startsWith('/calendar/'),
-    sharedUserCalendar: pathWithSlash.startsWith('/shared-user-calendar/'),
-    tokenCalendar: pathWithSlash.startsWith('/shared-token-calendar/'),
-  };
-}
-
-function buildReturnToCalendarList(pathParts) {
-  return {
-    calendar: pathParts.length === 2 && pathParts[0] === 'calendar',
-    sharedUserCalendar:
-      pathParts.length === 2 && pathParts[0] === 'shared-user-calendar',
-    addCalendar: pathParts.length === 1 && pathParts[0] === 'add-calendar',
-  };
-}
-
-function buildReturnToCalendar(pathParts) {
-  const isDetailPage =
-    pathParts.length === 3 &&
-    ['medicines', 'boxes', 'pillbox', 'settings', 'stock-alerts', 'daily', 'pillbox-uses', 'ics-tokens'].includes(
-      pathParts[2]
-    );
-  return {
-    calendar: pathParts[0] === 'calendar' && isDetailPage,
-    sharedUserCalendar:
-      pathParts[0] === 'shared-user-calendar' && isDetailPage,
-    tokenCalendar: pathParts.length === 3 && pathParts[0] === 'shared-token-calendar',
-  };
-}
-
-const isPillbox = (pathParts) =>
-  pathParts.length === 3 &&
-  ['calendar', 'shared-user-calendar', 'shared-token-calendar'].includes(
-    pathParts[0]
-  ) &&
-  pathParts[2] === 'pillbox';
 
 function Navbar({ sharedProps }) {
   const { userInfo } = useContext(UserContext);
@@ -96,7 +62,7 @@ function Navbar({ sharedProps }) {
   const locationAvailableForReturnToCalendarList = buildReturnToCalendarList(pathParts);
   const shouldShowReturnToCalendarList = Object.values(locationAvailableForReturnToCalendarList).some(Boolean);
   const locationAvailableForReturnToCalendar = buildReturnToCalendar(pathParts);
-  const isPillboxPage = isPillbox(pathParts);
+  const isPillboxPage = isPillboxPath(pathParts);
 
   useEffect(() => {
     if (locationList.calendar && sharedProps.personalCalendars.calendarsData) {

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
+import type { ReactNode } from 'react';
+import type { ActionSheetProps as SharedActionSheetProps } from '@meditime/types';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +12,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { MoreVertical } from 'lucide-react';
 
-function ActionSheet({ actions, buttonSize, dataTour }) {
+type ActionSheetProps = SharedActionSheetProps<ReactNode>;
+
+function ActionSheet({ actions, buttonSize, dataTour }: ActionSheetProps) {
   const { t } = useTranslation();
 
   return (
@@ -73,20 +76,5 @@ function ActionSheet({ actions, buttonSize, dataTour }) {
     </DropdownMenu>
   );
 }
-
-ActionSheet.propTypes = {
-  buttonSize: PropTypes.string,
-  dataTour: PropTypes.string,
-  actions: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.node,
-      title: PropTypes.string,
-      onClick: PropTypes.func,
-      linkTo: PropTypes.string,
-      danger: PropTypes.bool,
-      separator: PropTypes.bool,
-    })
-  ).isRequired,
-};
 
 export default ActionSheet;

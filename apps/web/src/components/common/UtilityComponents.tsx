@@ -1,9 +1,12 @@
-import React from 'react';
+import type { ComponentType } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import PropTypes from 'prop-types';
+import type { IconButtonProps as SharedIconButtonProps } from '@meditime/types';
 
-export default function IconButton({ className, icon: Icon, text, onClick, title, disabled, helpDisabled }) {
+type IconComponent = ComponentType<{ className?: string }>;
+type IconButtonProps = SharedIconButtonProps<IconComponent>;
+
+export default function IconButton({ className, icon: Icon, text, onClick, title, disabled, helpDisabled }: IconButtonProps) {
   const content = (
     <Button
       type="button"
@@ -33,13 +36,3 @@ export default function IconButton({ className, icon: Icon, text, onClick, title
     content
   );
 }
-
-IconButton.propTypes = {
-  className: PropTypes.string,
-  icon: PropTypes.elementType,
-  text: PropTypes.string.isRequired,
-  onClick: PropTypes.func,
-  title: PropTypes.string,
-  disabled: PropTypes.bool,
-  helpDisabled: PropTypes.string,
-};
