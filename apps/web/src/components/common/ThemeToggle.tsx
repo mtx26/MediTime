@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sun, Moon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import type { ThemeToggleProps } from '@meditime/types';
 
-export default function ThemeToggle({ className = '' }) {
+export default function ThemeToggle({ className = '' }: ThemeToggleProps) {
   const { t } = useTranslation();
   const [theme, setTheme] = useState(() => {
     // Récupérer le thème sauvegardé ou détecter la préférence système

@@ -1,23 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Languages, Check } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { LANGUAGES } from '@meditime/config';
 import { useNavigate, useLocation } from 'react-router-dom';
+import type { Language } from '@meditime/types';
+
+type LanguageFlagCode = Language['flag'];
 
 function LanguageSelector() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [selected, setSelected] = useState('FR');
+  const [selected, setSelected] = useState<LanguageFlagCode>('FR');
 
   useEffect(() => {
     const currentLang = LANGUAGES.find(lang => lang.code === i18n.language);
     setSelected(currentLang?.flag || 'FR');
   }, [i18n.language]);
 
-  const onSelect = (flagCode) => {
+  const onSelect = (flagCode: LanguageFlagCode) => {
     const lang = LANGUAGES.find(lang => lang.flag === flagCode);
     if (lang) {
       const segments = location.pathname.split('/');

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
@@ -12,15 +12,14 @@ import {
   Share2, 
   Bell, 
   Mail, 
-  Github, 
-  Pill 
+  Github
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 function Footer() {
   const location = useLocation();
   const { lng } = useParams();
-  const { userInfo } = useContext(UserContext);
+  const userContext = useContext(UserContext);
+  const userInfo = userContext?.userInfo;
   const { t } = useTranslation();
 
   const hiddenFooterRoutes = [

@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import PropTypes from 'prop-types';
+import type { TooltipsProps as SharedTooltipsProps } from '@meditime/types';
 
-export default function Tooltips({ children, content, side = 'bottom', className = '', propagation = true }) {
+type TooltipsProps = Omit<SharedTooltipsProps, 'children' | 'content'> & {
+  children: ReactNode;
+  content?: ReactNode;
+};
+
+export default function Tooltips({ children, content, side = 'bottom', className = '', propagation = true }: TooltipsProps) {
   const [open, setOpen] = useState(false);
   const isTouchDevice = 'ontouchstart' in globalThis || navigator.maxTouchPoints > 0;
 
-  if (!content) return children;
+  if (!content) return <>{children}</>;
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -57,10 +62,3 @@ export default function Tooltips({ children, content, side = 'bottom', className
     </TooltipProvider>
   );
 }
-
-Tooltips.propTypes = {
-  children: PropTypes.node.isRequired,
-  content: PropTypes.node,
-  side: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
-  className: PropTypes.string,
-};

@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import PropTypes from 'prop-types';
+import type { ArrowControlsProps } from '@meditime/types';
 
-export default function ArrowControls({ onLeft, onRight }) {
+export default function ArrowControls({ onLeft, onRight }: ArrowControlsProps) {
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowLeft') {
         onLeft();
       } else if (event.key === 'ArrowRight') {
@@ -17,8 +17,3 @@ export default function ArrowControls({ onLeft, onRight }) {
 
   return null;
 }
-
-ArrowControls.propTypes = {
-  onLeft: PropTypes.func.isRequired,
-  onRight: PropTypes.func.isRequired,
-};
