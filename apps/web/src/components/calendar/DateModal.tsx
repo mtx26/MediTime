@@ -1,20 +1,17 @@
-import { forwardRef, useImperativeHandle, useState } from "react"
-import PropTypes from "prop-types"
-import { useTranslation } from "react-i18next"
-import WeeklyEventContent from "./WeeklyEventContent"
+import { forwardRef, useImperativeHandle, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { DateModalProps, DateModalRef } from '@meditime/types';
+import WeeklyEventContent from './WeeklyEventContent';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "lucide-react"
+} from '@/components/ui/dialog';
+import { Calendar } from 'lucide-react';
 
-const DateModal = forwardRef(({
+const DateModal = forwardRef<DateModalRef, DateModalProps>(({ 
   selectedDate,
   eventsForDay,
   onNext,
@@ -23,13 +20,14 @@ const DateModal = forwardRef(({
   getPastWeek,
   getNextWeek,
 }, ref) => {
-  const { t } = useTranslation()
-  const [open, setOpen] = useState(false)
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const modalDate = selectedDate ? new Date(selectedDate) : new Date();
 
   useImperativeHandle(ref, () => ({
     open: () => setOpen(true),
     close: () => setOpen(false),
-  }))
+  }));
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -38,15 +36,15 @@ const DateModal = forwardRef(({
         <DialogHeader className="shrink-0">
           <DialogTitle>
             <Calendar className="inline-block h-4 w-4 mr-2" />
-            {new Date(selectedDate).toLocaleDateString(t("locale"), {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
+            {modalDate.toLocaleDateString(t('locale'), {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
             })}
           </DialogTitle>
           <DialogDescription className="sr-only">
-            {t("calendar.modal_description")}
+            {t('calendar.modal_description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -65,22 +63,9 @@ const DateModal = forwardRef(({
         </div>
       </DialogContent>
     </Dialog>
-  )
-})
+  );
+});
 
-export default DateModal
+DateModal.displayName = 'DateModal';
 
-DateModal.propTypes = {
-  selectedDate: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.instanceOf(Date),
-    PropTypes.number,
-    PropTypes.oneOf([undefined, null]),
-  ]).isRequired,
-  eventsForDay: PropTypes.array.isRequired,
-  onNext: PropTypes.func.isRequired,
-  onPrev: PropTypes.func.isRequired,
-  onSelectDate: PropTypes.func.isRequired,
-  getPastWeek: PropTypes.func.isRequired,
-  getNextWeek: PropTypes.func.isRequired,
-}
+export default DateModal;

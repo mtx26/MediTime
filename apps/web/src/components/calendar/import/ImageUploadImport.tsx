@@ -1,57 +1,22 @@
-import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle, useCallback } from 'react';
+import type { ChangeEvent, DragEvent, KeyboardEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAlert } from '../../../contexts/AlertContext';
-import { Button } from "@/components/ui/button";
+import type { ImageUploadImportProps, ImageUploadImportRef } from '@meditime/types';
+import { isValidImageFile, isValidImagePreviewUrl } from '@meditime/utils';
+import { Button } from '@/components/ui/button';
 import { CloudUpload, CheckCircle, X } from 'lucide-react';
 
-const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onStateChange }, ref) => {
+const ImageUploadImport = forwardRef<ImageUploadImportRef, ImageUploadImportProps>(({ calendarName, personalCalendars, onStateChange }, ref) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { lng } = useParams();
-  const [file, setFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  const { lng } = useParams<{ lng: string }>();
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const { showAlert } = useAlert();
-  const fileInputRef = useRef(null);
-
-  // Fonction pour valider une URL de prévisualisation d'image
-  const isValidImagePreviewUrl = (url) => {
-    if (!url) return false;
-    // Vérifier strictement que l'URL est un blob URL créé par createObjectURL
-    // et provient de l'origine actuelle
-    if (!url.startsWith('blob:') || !url.includes(window.location.origin)) {
-      return false;
-    }
-    
-    // Vérifier que l'URL ne contient pas de caractères suspects
-    try {
-      const urlObj = new URL(url);
-      return urlObj.protocol === 'blob:';
-    } catch {
-      return false;
-    }
-  };
-
-  // Fonction pour valider strictement le type de fichier
-  const isValidImageFile = (file) => {
-    if (!file) return false;
-    
-    // Liste blanche des types MIME acceptés
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-    
-    // Vérifier le type MIME
-    if (!allowedTypes.includes(file.type.toLowerCase())) {
-      return false;
-    }
-    
-    // Vérifier l'extension du fichier
-    const fileName = file.name.toLowerCase();
-    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
-    const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
-    
-    return hasValidExtension;
-  };
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (file) {
@@ -75,12 +40,12 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
     if (onStateChange) {
       onStateChange({
         hasFile: !!file,
-        isProcessing: isProcessing
+        isProcessing,
       });
     }
   }, [file, isProcessing, onStateChange]);
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile && isValidImageFile(droppedFile)) {
@@ -90,8 +55,8 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
     }
   };
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.currentTarget.files?.[0];
     if (selectedFile && isValidImageFile(selectedFile)) {
       setFile(selectedFile);
     } else {
@@ -99,18 +64,11 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
     }
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
 
-  // Expose the import function to parent
-  useImperativeHandle(ref, () => ({
-    handleImport: () => handleImport(new Event('submit'))
-  }));
-
-  const handleImport = async (e) => {
-    e.preventDefault();
-    
+  const handleImport = useCallback(async () => {
     if (!file) {
       showAlert('warning', t('image_upload.select_file_error'));
       return;
@@ -123,13 +81,14 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
 
     setIsProcessing(true);
     const analysisResult = await personalCalendars.analyzeImage(file);
+    const locale = lng ?? 'en';
     
     if (analysisResult.success) {
       if (analysisResult.medicines && analysisResult.medicines.length > 0) {
-        navigate(`/${lng}/add-calendar/review`, {
+        navigate(`/${locale}/add-calendar/review`, {
           state: { 
             importedMedicines: analysisResult.medicines,
-            calendarName: calendarName 
+            calendarName,
           },
         });
       } else {
@@ -137,7 +96,12 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
       }
     }
     setIsProcessing(false);
-  };
+  }, [calendarName, file, lng, navigate, personalCalendars, showAlert, t]);
+
+  // Expose the import function to parent
+  useImperativeHandle(ref, () => ({
+    handleImport,
+  }), [handleImport]);
 
   const removeFile = () => {
     setFile(null);
@@ -166,7 +130,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                   onClick={() => fileInputRef.current?.click()}
-                  onKeyDown={(e) => {
+                  onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
                       fileInputRef.current?.click();
@@ -174,7 +138,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
                   }}
                   tabIndex={0}
                   role="button"
-                  aria-label={t('image_upload.click_to_select_file')}
+                  aria-label={String(t('image_upload.click_to_select_file'))}
                 >
                   <input
                     type="file"
@@ -184,11 +148,11 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
                     className="hidden"
                   />
                   
-                  {previewUrl && isValidImagePreviewUrl(previewUrl) ? (
+                  {previewUrl && isValidImagePreviewUrl(previewUrl, window.location.origin) ? (
                     <div className="relative inline-block">
                       <img
                         src={previewUrl}
-                        alt={t('image_upload.preview_alt')}
+                        alt={String(t('image_upload.preview_alt'))}
                         className="w-auto h-auto max-h-50 max-w-full object-cover rounded-lg border border-border shadow-sm mb-3"
                         referrerPolicy="no-referrer"
                         crossOrigin="anonymous"
@@ -208,7 +172,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
                           e.stopPropagation(); // Empêcher le clic sur la zone de drop
                           removeFile();
                         }}
-                        title={t('image_upload.remove_image')}
+                        title={String(t('image_upload.remove_image'))}
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -238,5 +202,7 @@ const ImageUploadImport = forwardRef(({ calendarName, personalCalendars, onState
     </div>
   );
 });
+
+ImageUploadImport.displayName = 'ImageUploadImport';
 
 export default ImageUploadImport;

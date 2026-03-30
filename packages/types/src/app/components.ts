@@ -1,3 +1,5 @@
+import type { ApiResult } from '../api';
+
 /* -------------------------------------------------------------------------- */
 /* App Component Props Types                                                   */
 /* -------------------------------------------------------------------------- */
@@ -12,6 +14,10 @@ export interface ThemeToggleProps {
 }
 
 export type DateLike = string | number | Date;
+
+export interface ForcedLandscapeWrapperProps<TNode = unknown> {
+  children: TNode;
+}
 
 export interface WeekDayCirclesProps {
   selectedDate: Exclude<DateLike, number>;
@@ -42,6 +48,36 @@ export interface WeeklyEventContentProps {
   onPrev: () => void;
   getPastWeek: () => void;
   getNextWeek: () => void;
+}
+
+export type DateModalProps = Omit<WeeklyEventContentProps, 'ifModal'>;
+
+export interface DateModalRef {
+  open: () => void;
+  close: () => void;
+}
+
+export interface ImageUploadImportState {
+  hasFile: boolean;
+  isProcessing: boolean;
+}
+
+export type AnalyzeImageResult = ApiResult & {
+  medicines?: unknown[];
+};
+
+export interface ImageUploadImportPersonalCalendars {
+  analyzeImage: (file: File) => Promise<AnalyzeImageResult>;
+}
+
+export interface ImageUploadImportProps {
+  calendarName: string;
+  personalCalendars: ImageUploadImportPersonalCalendars;
+  onStateChange?: (state: ImageUploadImportState) => void;
+}
+
+export interface ImageUploadImportRef {
+  handleImport: () => void;
 }
 
 export interface ActionSheetAction<TLabel = unknown> {
