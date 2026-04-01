@@ -1,4 +1,4 @@
-import type { ApiResult } from '../../../contracts/api';
+import type { ApiResult } from '../../../contracts';
 
 export interface ImageUploadImportState {
   hasFile: boolean;
@@ -80,4 +80,52 @@ export interface AddCalendarPagePersonalCalendars
 
 export interface AddCalendarPageProps {
   personalCalendars: AddCalendarPagePersonalCalendars | Record<string, unknown>;
+}
+
+export interface MedicineReviewConditionInput {
+  time_of_day?: string;
+  interval_days?: number | string;
+  start_date?: string | null;
+  tablet_count?: number | string;
+  max_date_mode?: string;
+  max_date?: string | null;
+  max_date_days?: number | string | null;
+  [key: string]: unknown;
+}
+
+export interface MedicineReviewMedicineInput {
+  name: string;
+  dose: number | string | null;
+  stock_quantity?: number | string;
+  stock_max?: number | string;
+  stock_alert_threshold?: number | string;
+  conditions: MedicineReviewConditionInput[];
+  [key: string]: unknown;
+}
+
+export interface MedicineReviewLocationState {
+  importedMedicines?: MedicineReviewMedicineInput[];
+  calendarName?: string;
+}
+
+export interface MedicineReviewSuggestion {
+  name: string;
+  dose: string;
+  conditionnement: number | string;
+  forme_pharmaceutique?: string;
+}
+
+export type SaveAnalysisResult = ApiResult & {
+  calendar_id?: string | number;
+};
+
+export interface MedicineReviewPersonalCalendars {
+  saveAnalysisResult: (
+    calendarName: string,
+    medicines: MedicineReviewMedicineInput[]
+  ) => Promise<SaveAnalysisResult>;
+}
+
+export interface MedicineReviewProps {
+  personalCalendars: MedicineReviewPersonalCalendars | Record<string, unknown>;
 }

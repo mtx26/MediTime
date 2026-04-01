@@ -1,5 +1,5 @@
 import { fetchSuggestions } from '@/utils/api/fetchSuggestions';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ArrowControls from '@/components/calendar/ArrowControls';
@@ -11,42 +11,74 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { Pencil, Trash2, Plus, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
-import { DEFAULT_CONDITION } from '@meditime/constants';
+import {
+  DEFAULT_CONDITION,
+  MEDICINE_REVIEW_CONDITION_FIELDS,
+  MEDICINE_REVIEW_MAIN_FIELDS,
+  MEDICINE_REVIEW_TIME_OF_DAY_HOURS,
+} from '@meditime/constants';
+import type {
+  MedicineReviewConditionInput,
+  MedicineReviewLocationState,
+  MedicineReviewMedicineInput,
+  MedicineReviewPersonalCalendars,
+  MedicineReviewProps,
+  MedicineReviewSuggestion,
+} from '@meditime/types';
 
-export default function MedicineReview({ personalCalendars }) {
+const toInt = (value: string | number): number => Number.parseInt(String(value), 10);
+
+const isMedicineSuggestion = (value: unknown): value is MedicineReviewSuggestion => {
+  if (!value || typeof value !== 'object') return false;
+  const item = value as Record<string, unknown>;
+  return typeof item.name === 'string' && typeof item.dose === 'string' && 'conditionnement' in item;
+};
+
+export default function MedicineReview({ personalCalendars }: MedicineReviewProps) {
   const location = useLocation();
-  const params = useParams();
+  const params = useParams<{ lng: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const medicineBoxes = location.state?.importedMedicines ?? [];
-  const calendarName = location.state?.calendarName;
+  const state = (location.state ?? {}) as MedicineReviewLocationState;
+  const medicineBoxes = Array.isArray(state.importedMedicines) ? state.importedMedicines : [];
+  const calendarName = state.calendarName ?? '';
   const lng = params.lng;
   const { showAlert, showConfirm } = useAlert();
+  const calendarsApi = personalCalendars as MedicineReviewPersonalCalendars;
 
-  const [medicines, setMedicines] = useState(medicineBoxes);
+  const [medicines, setMedicines] = useState<MedicineReviewMedicineInput[]>(medicineBoxes);
 
   const [index, setIndex] = useState(0);
-  const current = medicines[index];
-  const [suggestions, setSuggestions] = useState([]);
+  const current = medicines[index] ?? null;
+  const [suggestions, setSuggestions] = useState<MedicineReviewSuggestion[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [openDropdownKey, setOpenDropdownKey] = useState(null);
+  const [openDropdownKey, setOpenDropdownKey] = useState<string | null>(null);
 
-  const CONDITION_FIELDS = ['time_of_day', 'interval_days', 'tablet_count', 'start_date', 'max_date_mode', 'max_date', 'max_date_days'];
-  const MAIN_FIELDS = ['name', 'dose', 'stock_quantity', 'stock_max', 'stock_alert_threshold'];
+  useEffect(() => {
+    if (!calendarName || medicines.length === 0) {
+      navigate(`/${lng ?? 'en'}/add-calendar`, { replace: true });
+    }
+  }, [calendarName, lng, medicines.length, navigate]);
 
-  const handleChange = (field, value) => {
-    if (!MAIN_FIELDS.includes(field)) return;
+  const handleChange = (field: string, value: string | number | null) => {
+    if (!current || !MEDICINE_REVIEW_MAIN_FIELDS.includes(field as (typeof MEDICINE_REVIEW_MAIN_FIELDS)[number])) {
+      return;
+    }
     const updated = [...medicines];
-    updated[index][field] = value;
+    (updated[index] as Record<string, unknown>)[field] = value ?? '';
     setMedicines(updated);
   };
 
-  const handleConditionChange = (i, field, value) => {
-    if (!CONDITION_FIELDS.includes(field)) return;
+  const handleConditionChange = (i: number, field: string, value: string | number | null) => {
+    if (!current || !MEDICINE_REVIEW_CONDITION_FIELDS.includes(field as (typeof MEDICINE_REVIEW_CONDITION_FIELDS)[number])) {
+      return;
+    }
     const updated = [...medicines];
+    const currentCondition = (updated[index].conditions[i] ?? {}) as MedicineReviewConditionInput;
+    updated[index].conditions[i] = currentCondition;
     
     // Gestion spéciale pour interval_days
-    if (field === 'interval_days' && parseInt(value) <= 1) {
+    if (field === 'interval_days' && toInt(value ?? 0) <= 1) {
       updated[index].conditions[i]['start_date'] = null;
     }
     
@@ -61,32 +93,33 @@ export default function MedicineReview({ personalCalendars }) {
       const cond = updated[index].conditions[i];
       const now = new Date();
       const target = new Date(now);
-      const hourByTime = { morning: 8, noon: 12, evening: 18 };
-      const targetHour = hourByTime[cond.time_of_day] ?? 8;
+      const targetHour = MEDICINE_REVIEW_TIME_OF_DAY_HOURS[String(cond.time_of_day) as keyof typeof MEDICINE_REVIEW_TIME_OF_DAY_HOURS] ?? 8;
       target.setHours(targetHour, 0, 0, 0);
       const includeToday = now < target;
       const endDate = new Date(now);
-      endDate.setDate(endDate.getDate() + (includeToday ? parseInt(value) - 1 : parseInt(value)));
+      endDate.setDate(endDate.getDate() + (includeToday ? toInt(value) - 1 : toInt(value)));
       endDate.setHours(23, 59, 59, 999);
       updated[index].conditions[i]['max_date'] = endDate.toISOString();
-      updated[index].conditions[i]['max_date_days'] = parseInt(value);
+      updated[index].conditions[i]['max_date_days'] = toInt(value);
     } else if (field === 'max_date' && value) {
-      const selectedDate = new Date(value);
+      const selectedDate = new Date(String(value));
       selectedDate.setHours(23, 59, 59, 999);
       updated[index].conditions[i]['max_date'] = selectedDate.toISOString();
     }
     
-    updated[index].conditions[i][field] = value;
+    (updated[index].conditions[i] as Record<string, unknown>)[field] = value ?? '';
     setMedicines(updated);
   };
 
   const addCondition = () => {
+    if (!current) return;
     const updated = [...medicines];
     updated[index].conditions.push({ ...DEFAULT_CONDITION });
     setMedicines(updated);
   };
 
-  const deleteCondition = (condIndex) => {
+  const deleteCondition = (condIndex: number) => {
+    if (!current) return;
     const updated = [...medicines];
     updated[index].conditions.splice(condIndex, 1);
     setMedicines(updated);
@@ -96,7 +129,7 @@ export default function MedicineReview({ personalCalendars }) {
     showConfirm(
       'confirm-danger',
       t('medicine_review.confirm_delete_title'),
-      t('medicine_review.confirm_delete_message', { name: current.name }),
+      t('medicine_review.confirm_delete_message', { name: current?.name || '' }),
       () => {
         const updated = [...medicines];
         updated.splice(index, 1);
@@ -126,19 +159,19 @@ export default function MedicineReview({ personalCalendars }) {
 
   const handleSave = async () => {
     showConfirm(
-      'confirm',
+      'confirm-safe',
       t('medicine_review.confirm_save_title'),
       t('medicine_review.confirm_save_message'),
       async () => {
-        const rep = await personalCalendars.saveAnalysisResult(calendarName, medicines);
-        if (rep.success) {
+        const rep = await calendarsApi.saveAnalysisResult(calendarName, medicines);
+        if (rep.success && rep.calendar_id) {
           navigate(`/${lng}/calendar/${rep.calendar_id}`);
         }
       }
     );
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (index < medicines.length - 1) {
       goNext();
@@ -152,6 +185,7 @@ export default function MedicineReview({ personalCalendars }) {
   }, [index]);
 
   useEffect(() => {
+    if (!current) return;
     const updated = [...medicines];
     const med = updated[index];
 
@@ -162,21 +196,25 @@ export default function MedicineReview({ personalCalendars }) {
     if (!Array.isArray(med.conditions)) med.conditions = [];
 
     setMedicines(updated);
-  }, [index]);
+  }, [current, index, medicines]);
 
   useEffect(() => {
-    if (!current.name || current.name.length < 2) {
+    if (!current?.name || current.name.length < 2) {
       setSuggestions([]);
       return;
     }
 
     const timeout = setTimeout(async () => {
       const results = await fetchSuggestions(current.name, current.dose || '');
-      setSuggestions(results || []);
+      setSuggestions((results || []).filter(isMedicineSuggestion));
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [current.name, current.dose]);
+  }, [current?.dose, current?.name]);
+
+  if (!current) {
+    return null;
+  }
 
   return (
     <div className="text-center">
@@ -289,13 +327,13 @@ export default function MedicineReview({ personalCalendars }) {
                 type: 'number',
                 min: '0',
                 required: false,
-              }].map(({ label, field, type, min }) => (
+              }].map(({ label, field, type, min }: { label: string; field: string; type: string; min?: string }) => (
                 <div key={field} className="text-start">
                   <Label htmlFor={field}>{label} :</Label>
                   <Input
                     id={field}
                     type={type}
-                    value={current[field] || ''}
+                    value={String((current as Record<string, unknown>)[field] ?? '')}
                     onChange={(e) => handleChange(field, e.target.value)}
                     title={label}
                     aria-label={label}
@@ -310,7 +348,7 @@ export default function MedicineReview({ personalCalendars }) {
               <strong>{t('boxes.intake_conditions')} :</strong>
             </div>
 
-            {current.conditions.map((cond, i) => (
+            {current.conditions.map((cond: MedicineReviewConditionInput, i: number) => (
               <div key={i} className="mb-3 border rounded p-3 text-start bg-muted/30">
                 {[{
                   label: t('boxes.condition.tablet_count'),
@@ -339,8 +377,8 @@ export default function MedicineReview({ personalCalendars }) {
                   label: t('boxes.condition.start_date'),
                   field: 'start_date',
                   type: 'date',
-                  show: parseInt(cond.interval_days) > 1,
-                  required: parseInt(cond.interval_days) > 1,
+                  show: toInt(cond.interval_days ?? 0) > 1,
+                  required: toInt(cond.interval_days ?? 0) > 1,
                 }, {
                   label: t('boxes.condition.max_date_mode'),
                   field: 'max_date_mode',
@@ -361,19 +399,19 @@ export default function MedicineReview({ personalCalendars }) {
                   step: '1',
                   show: cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
                   required: cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
-                }].filter(item => item.show !== false).map(({ label, field, type, step, min, options, required }) => (
+                }].filter(item => item.show !== false).map(({ label, field, type, step, min, options, required }: any) => (
                   <div key={field} className="mb-2">
                     <Label htmlFor={field}>{label} :</Label>
                     {type === 'select' ? (
                       <Select
-                        value={cond[field] || ''}
+                        value={String((cond as Record<string, unknown>)[field] ?? '')}
                         onValueChange={(val) => handleConditionChange(i, field, (field === 'max_date_mode' && val === 'none') ? '' : val)}
                       >
                         <SelectTrigger id={field} size="sm" className="w-full mt-1">
                           <SelectValue placeholder={field === 'time_of_day' ? t('medicine_review.select_option') : (options?.[0]?.label || '')} />
                         </SelectTrigger>
                         <SelectContent>
-                          {options?.map(opt => (
+                          {options?.map((opt: any) => (
                             <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                           ))}
                         </SelectContent>
@@ -388,7 +426,11 @@ export default function MedicineReview({ personalCalendars }) {
                           onClick={() => setOpenDropdownKey(`${i}:${field}:${cond[field] || ''}:${Date.now()}`)}
                           aria-label={label}
                         >
-                          {(cond[field] && (field !== 'max_date' ? cond[field] : cond[field].split('T')[0])) || t('medicine_review.select_option')}
+                          {(typeof (cond as Record<string, unknown>)[field] === 'string'
+                            ? (field !== 'max_date'
+                              ? String((cond as Record<string, unknown>)[field])
+                              : String((cond as Record<string, unknown>)[field]).split('T')[0])
+                            : t('medicine_review.select_option'))}
                         </Button>
                         {/* Inline popover calendar */}
                         <div className="relative">
@@ -397,7 +439,7 @@ export default function MedicineReview({ personalCalendars }) {
                             <div className="absolute z-20 mt-2 border rounded-md bg-popover p-2 shadow">
                               <Calendar
                                 mode="single"
-                                selected={cond[field] ? new Date(cond[field]) : undefined}
+                                selected={typeof (cond as Record<string, unknown>)[field] === 'string' ? new Date(String((cond as Record<string, unknown>)[field])) : undefined}
                                 onSelect={(date) => {
                                   if (!date) return;
                                   if (field === 'max_date') {
@@ -421,14 +463,17 @@ export default function MedicineReview({ personalCalendars }) {
                       <Input
                         id={field}
                         type={type}
-                        value={field === 'max_date' && cond[field] ? cond[field].split('T')[0] : (cond[field] || '')}
+                        value={
+                          field === 'max_date' && typeof (cond as Record<string, unknown>)[field] === 'string'
+                            ? String((cond as Record<string, unknown>)[field]).split('T')[0]
+                            : String((cond as Record<string, unknown>)[field] ?? '')
+                        }
                         onChange={(e) => handleConditionChange(i, field, e.target.value)}
                         step={step}
                         min={min}
                         title={label}
                         aria-label={label}
                         required={required}
-                        size="sm"
                         className="mt-1"
                       />
                     )}

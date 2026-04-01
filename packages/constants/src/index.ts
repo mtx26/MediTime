@@ -76,3 +76,31 @@ export const DATAMATRIX_PREVIEW_MAX_HEIGHT_PX = 160;
 
 export const ALLOWED_IMAGE_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'] as const;
 export const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif'] as const;
+
+// ============================================================================
+// Medicine Review Constants
+// ============================================================================
+
+export const MEDICINE_REVIEW_CONDITION_FIELDS = [
+  'time_of_day',
+  'interval_days',
+  'tablet_count',
+  'start_date',
+  'max_date_mode',
+  'max_date',
+  'max_date_days',
+] as const;
+
+export const MEDICINE_REVIEW_MAIN_FIELDS = [
+  'name',
+  'dose',
+  'stock_quantity',
+  'stock_max',
+  'stock_alert_threshold',
+] as const;
+
+export const MEDICINE_REVIEW_TIME_OF_DAY_HOURS = {
+  morning: 8,
+  noon: 12,
+  evening: 18,
+} as const;
