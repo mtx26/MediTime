@@ -12,6 +12,7 @@
     "@fullcalendar/react": "^6.1.17",
     "@google-cloud/translate": "^9.3.0",
     "@hookform/resolvers": "^5.2.2",
+    "@meditime/constants": "*",
     "@meditime/config": "*",
     "@meditime/i18n": "*",
     "@meditime/types": "*",

@@ -1,7 +1,8 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { enabledLanguageCodes, DEFAULT_LANG } from '@meditime/config';
+import { enabledLanguageCodes } from '@meditime/config';
+import { DEFAULT_LANG } from '@meditime/constants';
 import { translationResources } from '@meditime/i18n';
 
 type TranslationResources = typeof translationResources;

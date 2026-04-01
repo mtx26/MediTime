@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@meditime/constants": "*",
     "@meditime/types": "*"
   },
   "exports": {

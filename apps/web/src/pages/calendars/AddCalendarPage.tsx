@@ -1,8 +1,21 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import QRScanImport from '@/components/calendar/import/QRScanImport';
 import ImageUploadImport from '@/components/calendar/import/ImageUploadImport';
+import type {
+  AddCalendarPagePersonalCalendars,
+  AddCalendarPageProps,
+  ImageUploadImportRef,
+  ImageUploadImportState,
+  QRCodeScannerHandle,
+  QRScanImportState,
+} from '@meditime/types';
+import {
+  ADD_CALENDAR_IMPORT_TYPES,
+  DATAMATRIX_PREVIEW_MAX_HEIGHT_PX,
+  type AddCalendarImportType,
+} from '@meditime/constants';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -17,37 +30,39 @@ import {
 } from '@/components/ui/select';
 import { CalendarPlus, Plus, QrCode, Upload, AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 
-function AddCalendarPage({ personalCalendars }) {
+function AddCalendarPage({ personalCalendars }: AddCalendarPageProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { lng } = useParams();
+  const { lng } = useParams<{ lng: string }>();
+  const locale = lng ?? 'en';
+  const calendarsApi = personalCalendars as AddCalendarPagePersonalCalendars;
 
   const [newCalendarName, setNewCalendarName] = useState('');
-  const [importType, setImportType] = useState('manual');
+  const [importType, setImportType] = useState<AddCalendarImportType>(ADD_CALENDAR_IMPORT_TYPES.MANUAL);
   
   // Refs pour les composants d'import
-  const imageImportRef = useRef(null);
-  const qrScanRef = useRef(null);
+  const imageImportRef = useRef<ImageUploadImportRef | null>(null);
+  const qrScanRef = useRef<QRCodeScannerHandle | null>(null);
   
   // State pour l'état du composant d'import d'image
-  const [imageImportState, setImageImportState] = useState({
+  const [imageImportState, setImageImportState] = useState<ImageUploadImportState>({
     hasFile: false,
-    isProcessing: false
+    isProcessing: false,
   });
 
-  const [qrScanState, setQrScanState] = useState({
-    hasMedicine: false
+  const [qrScanState, setQrScanState] = useState<QRScanImportState>({
+    hasMedicine: false,
   });
 
   const handleSubmit = async () => {
-    if (importType === 'manual') {
-      const rep = await personalCalendars.addCalendar(newCalendarName);
-      if (rep.success) {
-        navigate(`/${lng}/calendar/${rep.calendarId}/boxes`);
+    if (importType === ADD_CALENDAR_IMPORT_TYPES.MANUAL) {
+      const rep = await calendarsApi.addCalendar(newCalendarName);
+      if (rep.success && rep.calendarId) {
+        navigate(`/${locale}/calendar/${rep.calendarId}/boxes`);
       }
-    } else if (importType === 'qr' && qrScanRef.current) {
+    } else if (importType === ADD_CALENDAR_IMPORT_TYPES.QR && qrScanRef.current) {
       qrScanRef.current.handleAddAll();
-    } else if (importType === 'file' && imageImportRef.current) {
+    } else if (importType === ADD_CALENDAR_IMPORT_TYPES.FILE && imageImportRef.current) {
       imageImportRef.current.handleImport();
     }
   };
@@ -91,21 +106,21 @@ function AddCalendarPage({ personalCalendars }) {
                 <Label htmlFor="importType">
                   {t('calendar.import_type')} <span className="text-destructive">*</span>
                 </Label>
-                <Select value={importType} onValueChange={setImportType}>
+                <Select value={importType} onValueChange={(value) => setImportType(value as AddCalendarImportType)}>
                   <SelectTrigger id="importType" className="mt-2 w-full" data-tour="import-type-select">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="manual">{t('calendar.import_type_manual')}</SelectItem>
-                    <SelectItem value="qr">{t('calendar.scan_qr_option')}</SelectItem>
-                    <SelectItem value="file">{t('calendar.import_type_file')}</SelectItem>
+                    <SelectItem value={ADD_CALENDAR_IMPORT_TYPES.MANUAL}>{t('calendar.import_type_manual')}</SelectItem>
+                    <SelectItem value={ADD_CALENDAR_IMPORT_TYPES.QR}>{t('calendar.scan_qr_option')}</SelectItem>
+                    <SelectItem value={ADD_CALENDAR_IMPORT_TYPES.FILE}>{t('calendar.import_type_file')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             {/* Mode manuel */}
-            {importType === 'manual' && (
+            {importType === ADD_CALENDAR_IMPORT_TYPES.MANUAL && (
               <div>
                 <div className="mb-6">
                   <Button
@@ -132,13 +147,13 @@ function AddCalendarPage({ personalCalendars }) {
             )}
 
             {/* Composants d'import pour QR et fichier */}
-            {importType === 'qr' && (
+            {importType === ADD_CALENDAR_IMPORT_TYPES.QR && (
               <>
                 <QRScanImport
                   ref={qrScanRef}
                   calendarName={newCalendarName}
-                  personalCalendars={personalCalendars}
-                  onStateChange={setQrScanState}
+                  personalCalendars={calendarsApi}
+                  onStateChange={(state) => setQrScanState(state)}
                 />
                 
                 {/* Bouton pour créer le calendrier avec les médicaments scannés */}
@@ -167,7 +182,7 @@ function AddCalendarPage({ personalCalendars }) {
                         src="/icons/datamatrix.webp" 
                         alt="Data Matrix QR Code" 
                         className="mx-auto"
-                        style={{ maxHeight: '160px' }}
+                        style={{ maxHeight: `${DATAMATRIX_PREVIEW_MAX_HEIGHT_PX}px` }}
                       />
                     </div>
                   </div>
@@ -175,13 +190,13 @@ function AddCalendarPage({ personalCalendars }) {
               </>
             )}
 
-            {importType === 'file' && (
+            {importType === ADD_CALENDAR_IMPORT_TYPES.FILE && (
               <>
                 <ImageUploadImport
                   ref={imageImportRef}
                   calendarName={newCalendarName}
-                  personalCalendars={personalCalendars}
-                  onStateChange={setImageImportState}
+                  personalCalendars={calendarsApi}
+                  onStateChange={(state) => setImageImportState(state)}
                 />
                 
                 {/* Bouton d'import pour les fichiers */}

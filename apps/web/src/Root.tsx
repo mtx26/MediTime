@@ -8,7 +8,8 @@ import {
 import type { ReactElement } from 'react';
 import App from './App';
 import { useTranslation } from 'react-i18next';
-import { enabledLanguageCodes, DEFAULT_LANG } from '@meditime/config';
+import { enabledLanguageCodes } from '@meditime/config';
+import { DEFAULT_LANG } from '@meditime/constants';
 
 function LanguageRoutes(): ReactElement {
   const location = useLocation();

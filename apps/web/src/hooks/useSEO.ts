@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LANGUAGES, DEFAULT_LANG, enabledLanguageCodes } from '@meditime/config';
+import { enabledLanguageCodes } from '@meditime/config';
+import { LANGUAGES, DEFAULT_LANG } from '@meditime/constants';
 import { SEO_CONFIG, upsertMetaTag, getSchemaOrg } from '@/config/seo';
 
 /**

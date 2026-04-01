@@ -53,3 +53,26 @@ export const LANGUAGES: Language<DateLocale, typeof Flags.FR>[] = [
 ];
 
 export const DEFAULT_LANG: string = 'en';
+
+// ============================================================================
+// Calendar Import Constants
+// ============================================================================
+
+export const ADD_CALENDAR_IMPORT_TYPES = {
+  MANUAL: 'manual',
+  QR: 'qr',
+  FILE: 'file',
+} as const;
+
+export type AddCalendarImportType =
+  (typeof ADD_CALENDAR_IMPORT_TYPES)[keyof typeof ADD_CALENDAR_IMPORT_TYPES];
+
+export const QR_PARTIAL_IMPORT_REDIRECT_DELAY_MS = 3000;
+export const DATAMATRIX_PREVIEW_MAX_HEIGHT_PX = 160;
+
+// ============================================================================
+// Image Validation Constants
+// ============================================================================
+
+export const ALLOWED_IMAGE_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'] as const;
+export const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif'] as const;

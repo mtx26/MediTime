@@ -1,21 +1,35 @@
-import React, { useState, forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
+import { useState, forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
+import type { ForwardRefExoticComponent, RefAttributes } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
+import type {
+  QRCodeScannerHandle,
+  QRCodeScannerProps,
+  QRScanImportProps,
+  QRScanImportResult,
+  QRScannedMedicine,
+} from '@meditime/types';
+import { QR_PARTIAL_IMPORT_REDIRECT_DELAY_MS } from '@meditime/constants';
 import QRCodeScanner from '../../scanner/QRCodeScanner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { QrCode } from 'lucide-react';
 
-const QRScanImport = forwardRef(({ calendarName, personalCalendars, onStateChange }, ref) => {
+const TypedQRCodeScanner = QRCodeScanner as unknown as ForwardRefExoticComponent<
+  QRCodeScannerProps & RefAttributes<QRCodeScannerHandle>
+>;
+
+const QRScanImport = forwardRef<QRCodeScannerHandle, QRScanImportProps>(({ calendarName, personalCalendars, onStateChange }, ref) => {
   const { t } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
   const navigate = useNavigate();
-  const { lng } = useParams();
-  const scannerRef = useRef();
+  const { lng } = useParams<{ lng: string }>();
+  const scannerRef = useRef<QRCodeScannerHandle | null>(null);
+  const locale = lng ?? 'en';
 
   // Exposer la référence du scanner au composant parent
-  useImperativeHandle(ref, () => scannerRef.current);
+  useImperativeHandle(ref, () => scannerRef.current ?? { handleAddAll: async () => {} }, []);
 
-  const handleCreateCalendar = async (medicines) => {
+  const handleCreateCalendar = async (medicines: QRScannedMedicine[]): Promise<QRScanImportResult> => {
 
     setIsCreating(true);
 
@@ -23,7 +37,7 @@ const QRScanImport = forwardRef(({ calendarName, personalCalendars, onStateChang
       // Créer le calendrier
       const calendarResult = await personalCalendars.addCalendar(calendarName);
       
-      if (!calendarResult.success) {
+      if (!calendarResult.success || !calendarResult.calendarId) {
         return { success: false };
       }
 
@@ -58,13 +72,13 @@ const QRScanImport = forwardRef(({ calendarName, personalCalendars, onStateChang
 
       if (errorCount === 0) {
         // Succès total - naviguer vers le calendrier créé
-        navigate(`/${lng}/calendar/${calendarId}/boxes`);
+        navigate(`/${locale}/calendar/${calendarId}/boxes`);
         return { success: true, successCount, errorCount };
       } else {
         // Succès partiel ou échec
         setTimeout(() => {
-          navigate(`/${lng}/calendar/${calendarId}/boxes`);
-        }, 3000);
+          navigate(`/${locale}/calendar/${calendarId}/boxes`);
+        }, QR_PARTIAL_IMPORT_REDIRECT_DELAY_MS);
         return { success: true, successCount, errorCount };
       }
 
@@ -79,7 +93,7 @@ const QRScanImport = forwardRef(({ calendarName, personalCalendars, onStateChang
   const { showLoading } = useLoading();
 
   useEffect(() => {
-    showLoading(isCreating, t('calendar.creating_calendar'));
+    showLoading(isCreating, String(t('calendar.creating_calendar')));
   }, [isCreating, showLoading, t]);
 
   if (isCreating) {
@@ -95,7 +109,7 @@ const QRScanImport = forwardRef(({ calendarName, personalCalendars, onStateChang
 						<QrCode className="h-5 w-5" />
 						{t('scanner.title')}
 					</h5>         
-					<QRCodeScanner
+          <TypedQRCodeScanner
 						ref={scannerRef}
 						modal={false}
 						onAddAll={handleCreateCalendar}
@@ -107,5 +121,7 @@ const QRScanImport = forwardRef(({ calendarName, personalCalendars, onStateChang
     </div>
   );
 });
+
+QRScanImport.displayName = 'QRScanImport';
 
 export default QRScanImport;
