@@ -1,27 +1,32 @@
-// src/pages/AcceptInvitePage.jsx
-import React, { useEffect, useState } from 'react';
+// src/pages/AcceptInvitePage.tsx
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from '@/components/common/HoveredUserProfile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Mail, Calendar, AlertCircle, Check, X } from 'lucide-react';
+import { Mail, Calendar, Check, X } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
+import type {
+  AcceptInvitePageProps,
+  AcceptInviteSharedUserCalendars,
+  SharedInvitation,
+} from '@meditime/types';
 
-function AcceptInvitePage({sharedUserCalendars}) {
+function AcceptInvitePage({ sharedUserCalendars }: AcceptInvitePageProps) {
   const { t } = useTranslation();
 
-  const [token, setToken] = useState(undefined);
-  const [type, setType] = useState(undefined);
+  const [token, setToken] = useState('');
+  const [type, setType] = useState('');
   const [loading, setLoading] = useState(true);
-  const [invitation, setInvitation] = useState(null);
+  const [invitation, setInvitation] = useState<SharedInvitation | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const calendarsApi = sharedUserCalendars as AcceptInviteSharedUserCalendars;
 
   const navigate = useNavigate();
-  const { lng } = useParams();
+  const { lng } = useParams<{ lng: string }>();
   const [searchParams] = useSearchParams();
 
     useEffect(() => {
@@ -32,63 +37,70 @@ function AcceptInvitePage({sharedUserCalendars}) {
   useEffect(() => {
     if (token === '' || type === '') {
       setNotFound(true);
+      setLoading(false);
       return;
     }
-    getInvitation();
-  }, [token, type, setLoading]);
+    void getInvitation();
+  }, [token, type]);
 
   const getInvitation = async () => {
     if (type === 'login') {
-      const rep = await sharedUserCalendars.getLoginInvitation(token);
+      const rep = await calendarsApi.getLoginInvitation(token);
       if (rep.success) {
-        setInvitation(rep.invitation);
+        setInvitation(rep.invitation ?? null);
       }
     } else if (type === 'registration') {
-      const rep = await sharedUserCalendars.getRegistrationInvitation(token);
+      const rep = await calendarsApi.getRegistrationInvitation(token);
       if (rep.success) {
-        setInvitation(rep.invitation);
+        setInvitation(rep.invitation ?? null);
       } else if (rep.status === 404) {
         setNotFound(true);
       }
     }
     setLoading(false);
-  }
+  };
 
   const handleAccept = async () => {
     setLoading(true);
-    let calendarId = null;
+    let calendarId: string | number | null = null;
+    const locale = lng ?? 'en';
 
     if (type === 'login') {
-      const rep = await sharedUserCalendars.acceptLoginInvitation(token);
+      const rep = await calendarsApi.acceptLoginInvitation(token);
       if (rep.success) {
-        calendarId = rep.calendar_id;
-        navigate(`/${lng}/shared-user-calendar/${calendarId}`);
+        calendarId = rep.calendar_id ?? null;
+        if (calendarId) {
+          navigate(`/${locale}/shared-user-calendar/${calendarId}`);
+        }
       }
     } else if (type === 'registration') {
-      const rep = await sharedUserCalendars.acceptRegistrationInvitation(token);
+      const rep = await calendarsApi.acceptRegistrationInvitation(token);
       if (rep.success) {
-        calendarId = rep.calendar_id;
-        navigate(`/${lng}/shared-user-calendar/${calendarId}`);
+        calendarId = rep.calendar_id ?? null;
+        if (calendarId) {
+          navigate(`/${locale}/shared-user-calendar/${calendarId}`);
+        }
       }
     }
     setLoading(false);
-  }
+  };
 
   const handleReject = async () => {
     setLoading(true);
+    const locale = lng ?? 'en';
     if (type === 'login') {
-      const rep = await sharedUserCalendars.rejectLoginInvitation(token);
+      const rep = await calendarsApi.rejectLoginInvitation(token);
       if (rep.success) {
-        navigate(`/${lng}/calendars`);
+        navigate(`/${locale}/calendars`);
       }
     } else if (type === 'registration') {
-      const rep = await sharedUserCalendars.rejectRegistrationInvitation(token);
+      const rep = await calendarsApi.rejectRegistrationInvitation(token);
       if (rep.success) {
-        navigate(`/${lng}/calendars`);
+        navigate(`/${locale}/calendars`);
       }
     }
     setLoading(false);
-  }
+  };
 
   const { showLoading } = useLoading();
 

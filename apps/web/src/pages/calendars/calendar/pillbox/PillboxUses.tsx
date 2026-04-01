@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
-import PropTypes from 'prop-types';
+import { useEffect, useState, useContext } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
@@ -11,30 +10,36 @@ import { useAlert } from '@/contexts/AlertContext';
 import { Button } from '@/components/ui/button';
 import { History, RotateCcw } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
+import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
+import type {
+  PillboxSource,
+  PillboxUseItem,
+  PillboxUsesPageProps,
+} from '@meditime/types';
 
-const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }) => {
+const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }: PillboxUsesPageProps) => {
   const { t } = useTranslation();
   const location = useLocation();
-  const params = useParams();
+  const params = useParams<{ lng?: string; calendarId?: string; sharedToken?: string }>();
   const { lng } = params;
 
   const { userInfo } = useContext(UserContext);
   const { showConfirm } = useAlert();
 
-  const [pillboxUsesData, setPillboxUsesData] = useState([]);
+  const [pillboxUsesData, setPillboxUsesData] = useState<PillboxUseItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  let calendarType = 'personal';
+  let calendarType: 'personal' | 'sharedUser' | 'token' = 'personal';
   let calendarId = params.calendarId;
 
   const pathWithoutLang =
     location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
 
-  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
+  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
-  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
+  } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
     calendarType = 'token';
     calendarId = params.sharedToken;
   }
@@ -43,16 +48,17 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
     personalCalendars,
     sharedUserCalendars,
     tokenCalendars
-  )[calendarType];
+  )[calendarType] as unknown as PillboxSource;
 
-  const formatWeek = (dateString) => {
+  const formatWeek = (dateString: string) => {
     const date = new Date(dateString);
     const monday = getMondayDate(date);
     const sunday = new Date(monday);
     sunday.setDate(monday.getDate() + 6);
     
-    const options = { day: 'numeric', month: 'short' };
-    return `${monday.toLocaleDateString(lng, options)} - ${sunday.toLocaleDateString(lng, options)}`;
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+    const locale = lng ?? 'en';
+    return `${monday.toLocaleDateString(locale, options)} - ${sunday.toLocaleDateString(locale, options)}`;
   };
 
   const fetchData = async () => {
@@ -60,9 +66,9 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
     if (calendarType === 'personal' || calendarType === 'sharedUser') {
       if (!userInfo) return setLoading(true);
     }
-    const rep = await calendarSource.fetchPillboxUses(calendarId); 
+    const rep = await calendarSource.fetchPillboxUses(calendarId);
     if (rep.success) {
-      setPillboxUsesData(rep.pillbox_uses);
+      setPillboxUsesData(rep.pillbox_uses ?? []);
       setLoading(false);
     } else {
       console.error('Error fetching pillbox uses:', rep.status);
@@ -73,7 +79,7 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
     }
   };
 
-  const cancelUse = (useId) => {
+  const cancelUse = (useId: string | number) => {
     if (!calendarId) return;
     
     showConfirm(
@@ -84,20 +90,20 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
         const res = await calendarSource.cancelUse(calendarId, useId);
         if (res.success) {
           setLoading(true);
-          fetchData();
+          void fetchData();
         }
       }
     );
   };
 
   useEffect(() => {
-    fetchData();
+    void fetchData();
   }, [calendarId, calendarType, userInfo]);
 
   const { showLoading } = useLoading();
 
   useEffect(() => {
-    showLoading(loading === true && calendarId, t('loading_pillbox_uses'));
+    showLoading(Boolean(loading === true && calendarId), t('loading_pillbox_uses'));
   }, [loading, calendarId, showLoading, t, notFound]);
 
   if (loading === true && calendarId) {
@@ -132,7 +138,7 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
               </tr>
             </thead>
             <tbody className="divide-y">
-              {pillboxUsesData.sort((a, b) => new Date(b.prepared_at) - new Date(a.prepared_at)).map((use) => (
+              {pillboxUsesData.sort((a, b) => new Date(b.prepared_at).getTime() - new Date(a.prepared_at).getTime()).map((use) => (
                 <tr key={use.id} className="hover:bg-muted/50 transition">
                   <td className="px-4 py-3">{formatWeek(use.prepared_at)}</td>
                   <td className="px-4 py-3">
@@ -160,12 +166,6 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars })
       )}
     </div>
   );
-};
-
-PillboxUses.propTypes = {
-  personalCalendars: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
-  sharedUserCalendars: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
-  tokenCalendars: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
 };
 
 export default PillboxUses;

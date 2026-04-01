@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
@@ -7,24 +7,29 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell } from 'lucide-react';
+import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
+import type {
+  CalendarNotificationsProps,
+  CalendarNotificationsSource,
+} from '@meditime/types';
 
 
-const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars, setNotFound }) => {
+const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars, setNotFound }: CalendarNotificationsProps) => {
   const { t } = useTranslation();
   const [enabled, setEnabled] = useState(true);
-  const [loading, setLoading] = useState(undefined);
-  const params = useParams();
+  const [loading, setLoading] = useState<boolean | undefined>(undefined);
+  const params = useParams<{ calendarId?: string; sharedToken?: string }>();
   const location = useLocation();
 
-  let calendarType = 'personal';
+  let calendarType: 'personal' | 'sharedUser' | 'token' = 'personal';
   let calendarId = params.calendarId;
 
   const pathWithoutLang =
     location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
 
-  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
+  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
     calendarType = 'sharedUser';
-  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
+  } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
     calendarType = 'token';
     calendarId = params.sharedToken;
   }
@@ -33,13 +38,13 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars,
     personalCalendars,
     sharedUserCalendars,
     tokenCalendars
-  )[calendarType];
+  )[calendarType] as unknown as CalendarNotificationsSource;
 
   useEffect(() => {
     const fetchNotificationSetting = async () => {
       const rep = await calendarSource.fetchNotificationsEnabled(calendarId);
       if (rep.success) {
-        setEnabled(rep["notifications-enabled"]);
+        setEnabled(rep["notifications-enabled"] ?? false);
         setLoading(false);
       } else {
         // Si l'API retourne un 404, le calendrier n'existe pas
@@ -51,7 +56,7 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars,
     };
 
     fetchNotificationSetting();
-  }, [calendarId, calendarSource.fetchNotificationsEnabled, enabled]);
+  }, [calendarId, calendarSource, enabled, setNotFound]);
 
   const toggleNotifications = async () => {
     // TODO: alert 
@@ -65,7 +70,7 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars,
   const { showLoading } = useLoading();
 
   useEffect(() => {
-    showLoading(loading === undefined && calendarId, t('calendar_settings.loading_notification_settings'));
+    showLoading(Boolean(loading === undefined && calendarId), t('calendar_settings.loading_notification_settings'));
   }, [loading, calendarId, showLoading, t]);
 
   return (

@@ -1,33 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Box, Package } from 'lucide-react';
+import { Package } from 'lucide-react';
+import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
+import type { CalendarStockProps } from '@meditime/types';
 
 
-const Stock = ({ personalCalendars, setNotFound }) => {
+const Stock = ({ personalCalendars, setNotFound }: CalendarStockProps) => {
   const { t } = useTranslation();
   const [selectedMethod, setSelectedMethod] = useState('');
-  const params = useParams();
+  const params = useParams<{ calendarId?: string; sharedToken?: string }>();
   const location = useLocation();
-  const [loading, setLoading] = useState(undefined);
+  const [loading, setLoading] = useState<boolean | undefined>(undefined);
 
-  let calendarType = 'personal';
   let calendarId = params.calendarId;
-  let basePath = 'calendar';
 
   const pathWithoutLang =
     location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
 
-  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
-    calendarType = 'sharedUser';
+  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
     calendarId = params.calendarId;
-    basePath = 'shared-user-calendar';
   }
 
-  const modifyStockDecrementMethod = async (method) => {
+  const modifyStockDecrementMethod = async (method: string) => {
     const rep = await personalCalendars.updatePersonalStockDecrementMethod(calendarId, method);
     if (rep.success) {
       setSelectedMethod(method);
@@ -38,23 +36,23 @@ const Stock = ({ personalCalendars, setNotFound }) => {
     const initialize = async () => {
       const rep = await personalCalendars.fetchPersonalStockDecrementMethod(calendarId);
       if (rep.success) {
-        setSelectedMethod(rep.method);
+        setSelectedMethod(rep.method ?? '');
         setLoading(false);
       } else {
         if (rep.status === 404) {
           setNotFound(true);
         }
-        setLoading(true);
+        setLoading(false);
       }
-    }
-    initialize();
+    };
+    void initialize();
 
-  }, [calendarId, personalCalendars.fetchPersonalStockDecrementMethod, selectedMethod]);
+  }, [calendarId, personalCalendars, selectedMethod, setNotFound]);
 
   const { showLoading } = useLoading();
 
   useEffect(() => {
-    showLoading(loading === undefined && calendarId, t('calendar_settings.loading_stock_settings'));
+    showLoading(Boolean(loading === undefined && calendarId), t('calendar_settings.loading_stock_settings'));
   }, [loading, calendarId, showLoading, t]);
 
   return (

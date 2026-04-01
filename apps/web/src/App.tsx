@@ -13,6 +13,7 @@ import Navbar from './components/common/Header';
 import Footer from './components/common/Footer';
 import MobileNavBar from './components/common/MobileNavBar';
 import AppRoutes from './routes/AppRouter';
+import { TooltipProvider } from './components/ui/tooltip';
 import { UserContext } from './contexts/UserContext';
 import RealtimeManager from './components/realtime/RealtimeManager';
 import {
@@ -245,32 +246,34 @@ export default function App(): ReactElement {
   useSEO({ path });
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <OnboardingTour isAppLoading={isInitialLoading} />
-      <Navbar sharedProps={sharedProps} />
-      <main className="flex flex-col min-h-0 grow">
-        {userInfo && (
-          <RealtimeManager
-            setCalendarsData={setCalendarsData as Dispatch<SetStateAction<unknown>>}
-            setSharedCalendarsData={setSharedCalendarsData as Dispatch<SetStateAction<unknown>>}
-            setNotificationsData={setNotificationsData as Dispatch<SetStateAction<unknown>>}
-            setTokensList={setTokensList as Dispatch<SetStateAction<unknown[]>>}
-            setLoadingStates={setLoadingStates as Dispatch<SetStateAction<LoadingStates>>}
-            calendarsData={calendarsData as UnknownRecord[] | null}
-            sharedCalendarsData={sharedCalendarsData as UnknownRecord[] | null}
-          />
-        )}
+    <TooltipProvider>
+      <div className="flex flex-col min-h-screen">
+        <OnboardingTour isAppLoading={isInitialLoading} />
+        <Navbar sharedProps={sharedProps} />
+        <main className="flex flex-col min-h-0 grow">
+          {userInfo && (
+            <RealtimeManager
+              setCalendarsData={setCalendarsData as Dispatch<SetStateAction<unknown>>}
+              setSharedCalendarsData={setSharedCalendarsData as Dispatch<SetStateAction<unknown>>}
+              setNotificationsData={setNotificationsData as Dispatch<SetStateAction<unknown>>}
+              setTokensList={setTokensList as Dispatch<SetStateAction<unknown[]>>}
+              setLoadingStates={setLoadingStates as Dispatch<SetStateAction<LoadingStates>>}
+              calendarsData={calendarsData as UnknownRecord[] | null}
+              sharedCalendarsData={sharedCalendarsData as UnknownRecord[] | null}
+            />
+          )}
 
-        <div className="container mx-auto px-4 my-4">
-          <AppRoutes sharedProps={sharedProps} />
-        </div>
-      </main>
-      <Footer />
-      {!isAuthRoute && !isPillboxPage && (
-        <div className="mt-24 lg:mt-0">
-          <MobileNavBar />
-        </div>
-      )}
-    </div>
+          <div className="container mx-auto px-4 my-4">
+            <AppRoutes sharedProps={sharedProps} />
+          </div>
+        </main>
+        <Footer />
+        {!isAuthRoute && !isPillboxPage && (
+          <div className="mt-24 lg:mt-0">
+            <MobileNavBar />
+          </div>
+        )}
+      </div>
+    </TooltipProvider>
   );
 }

@@ -104,3 +104,12 @@ export const MEDICINE_REVIEW_TIME_OF_DAY_HOURS = {
   noon: 12,
   evening: 18,
 } as const;
+
+// ============================================================================
+// Calendar Route Constants
+// ============================================================================
+
+export const CALENDAR_ROUTE_PREFIXES = {
+  SHARED_USER: '/shared-user-calendar',
+  SHARED_TOKEN: '/shared-token-calendar',
+} as const;

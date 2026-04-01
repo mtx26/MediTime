@@ -1,42 +1,43 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useLocation } from 'react-router-dom';
 import { useAlert } from '@/contexts/AlertContext';
 import { useLoading } from '@/components/ui/loading';
 import { getCalendarSourceMap } from '@meditime/utils';
 import HoveredUserProfile from '@/components/common/HoveredUserProfile';
-import PropTypes from 'prop-types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Link2, InfoIcon, Trash2, Clipboard, ExternalLink, PlusCircle } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
+import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
+import type { IcsListPageProps, IcsSource, IcsTokenEntry } from '@meditime/types';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 
-function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
+function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }: IcsListPageProps) {
   const { t } = useTranslation();
   const location = useLocation();
-  const params = useParams();
+  const params = useParams<{ calendarId?: string; sharedToken?: string }>();
 
-  const [tokens, setTokens] = useState([]);
+  const [tokens, setTokens] = useState<IcsTokenEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const { showAlert, showConfirm } = useAlert();
   const { showLoading } = useLoading();
   const [notFound, setNotFound] = useState(false);
 
-  let calendarType = 'personal';
+  let calendarType: 'personal' | 'sharedUser' | 'token' = 'personal';
   let calendarId = params.calendarId;
 
   const pathWithoutLang =
     location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
 
-  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
+  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
-  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
+  } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
     calendarType = 'token';
     calendarId = params.sharedToken;
   }
@@ -45,18 +46,18 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     personalCalendars,
     sharedUserCalendars,
     tokenCalendars
-  )[calendarType];
+  )[calendarType] as unknown as IcsSource;
 
   const fetchTokens = useCallback(async () => {
     setLoading(true);
     const result = await calendarSource.getTokensIcs(calendarId);
     if (result.success) {
-      setTokens(result.data.tokens || []);
+      setTokens(result.data?.tokens || []);
     } else if (result.status === 404) {
       setNotFound(true);
     }
     setLoading(false);
-  }, [calendarId, calendarSource.getTokensIcs, t]);
+  }, [calendarId, calendarSource]);
 
   useEffect(() => {
     fetchTokens();
@@ -69,23 +70,25 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     }
   };
 
-  const handleDeleteToken = async (tokenId) => {
+  const handleDeleteToken = async (tokenId: string | number) => {
     const result = await calendarSource.deleteTokenIcs(calendarId, tokenId);
     if (result.success) {
       fetchTokens();
     }
   };
 
-  const openDeleteActionSheet = (token) => {
+  const openDeleteActionSheet = (token: IcsTokenEntry) => {
     showConfirm(
       'confirm-danger',
       t('ics.delete_title'),
       t('ics.delete_description'),
-      () => {handleDeleteToken(token.id);}
+      () => {
+        void handleDeleteToken(token.id);
+      }
     );
   };
 
-  const copyToClipboard = (text) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
       showAlert('success', t('link_copied'));
     }).catch(() => {
@@ -93,7 +96,7 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     });
   };
 
-  const getWebcalUrl = (token) => {
+  const getWebcalUrl = (token: string) => {
     const url = `${VITE_API_URL}/api/calendar/${token}.ics`;
     return url.replace(/^https?:\/\//, 'webcal://');
   };
@@ -211,8 +214,3 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
 
 export default IcsList;
 
-IcsList.propTypes = {
-  personalCalendars: PropTypes.object.isRequired,
-  sharedUserCalendars: PropTypes.object.isRequired,
-  tokenCalendars: PropTypes.object.isRequired,
-};

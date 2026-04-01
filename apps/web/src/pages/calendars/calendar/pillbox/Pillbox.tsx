@@ -1,13 +1,15 @@
-// pages/PillboxPage.jsx
-import React, { useState } from 'react';
+// pages/PillboxPage.tsx
+import { useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import ForcedLandscapeWrapper from '@/components/common/ForcedLandscapeWrapper';
 import PillboxDisplay from '@/components/calendar/PillboxDisplay';
 import NotFound from '@/pages/general/NotFound';
+import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
+import type { PillboxPageProps } from '@meditime/types';
 
-function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
+function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars }: PillboxPageProps) {
   const location = useLocation();
-  const params = useParams();
+  const params = useParams<{ calendarId?: string; sharedToken?: string }>();
 
   const [notFound, setNotFound] = useState(false);
 
@@ -18,11 +20,11 @@ function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars })
   const pathWithoutLang =
     location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
 
-  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
+  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
     basePath = 'shared-user-calendar';
-  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
+  } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
     calendarType = 'token';
     calendarId = params.sharedToken;
     basePath = 'shared-token-calendar';
