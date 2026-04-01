@@ -5,6 +5,7 @@ Initialisation Vertex AI partagée entre l'API et le scheduler.
 
 from google.cloud import aiplatform
 from app.auth.google_services import get_google_credentials
+from app.config.config import Config
 from app.utils.logging import log_backend
 
 # Instance globale Vertex AI
@@ -33,7 +34,7 @@ def init_vertex_ai():
 
         aiplatform.init(
             project=project_id,
-            location="europe-west1",
+            location=Config.GOOGLE_CLOUD_LOCATION,
             credentials=credentials_obj
         )
         
@@ -42,7 +43,8 @@ def init_vertex_ai():
         log_backend.info("Vertex AI initialisé avec succès", {
             "origin": "VERTEX_INIT",
             "code": "VERTEX_INIT_SUCCESS",
-            "project_id": project_id
+            "project_id": project_id,
+            "location": Config.GOOGLE_CLOUD_LOCATION,
         })
         
     except Exception as e:

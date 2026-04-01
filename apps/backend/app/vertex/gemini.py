@@ -4,6 +4,7 @@ import io
 from PIL import Image as PILImage
 import pillow_heif
 from vertexai.preview.generative_models import GenerativeModel, Image as VertexImage
+from app.config.config import Config
 from app.utils.logging import log_backend
 
 # Enregistre le support HEIF (.heic)
@@ -39,8 +40,7 @@ def analyze_medical_document(base64_image: str) -> dict:
     - dict: Dictionnaire contenant les informations extraites des médicaments.
     """
     try:
-        MODEL_ID = "gemini-2.0-flash-lite"
-        model = GenerativeModel(MODEL_ID)
+        model = GenerativeModel(Config.GEMINI_MODEL_ID)
 
         prompt = """
 You are a medical assistant. You receive a scanned medical prescription. Your goal is to extract all the prescribed medications and their treatment instructions into a clean JSON structure.
