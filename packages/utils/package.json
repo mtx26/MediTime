@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "@meditime/constants": "*",
+    "firebase": "^12.4.0",
     "@meditime/types": "*"
   },
   "exports": {
