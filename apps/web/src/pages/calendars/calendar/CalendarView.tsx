@@ -56,7 +56,6 @@ function CalendarPage({
   const [eventsForDay, setEventsForDay] = useState<WeeklyEventItem[]>([]); // Événements filtrés pour un jour spécifique
   const [calendarEvents, setCalendarEvents] = useState<WeeklyEventItem[]>([]); // Événements du calendrier
   const [calendarTable, setCalendarTable] = useState<CalendarTable>({}); // Événements du calendrier
-  const [calendarName, setCalendarName] = useState(''); // Nom du calendrier
   const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
   const { showConfirm } = useAlert();
 
@@ -68,7 +67,7 @@ function CalendarPage({
   const dateModalRef = useRef<DateModalRef | null>(null);
   const [loading, setLoading] = useState(true); // État de chargement du calendrier
   const [notFound, setNotFound] = useState(false);
-  const initialNextDate = new Date(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0));
+  const initialNextDate = useMemo(() => new Date(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0)), []);
 
   let calendarType: CalendarPageSourceType = 'personal';
   let calendarId = params.calendarId;
@@ -147,20 +146,10 @@ function CalendarPage({
       const rep = await calendarSource.fetchSchedule(calendarId, toISO(selectedDate));
       if (rep.success) {
         const nextSchedule = (rep.schedule || []) as WeeklyEventItem[];
-        if (JSON.stringify(nextSchedule) !== JSON.stringify(calendarEvents)) {
-          setCalendarEvents(nextSchedule);
-        }
+        setCalendarEvents(prev => JSON.stringify(nextSchedule) !== JSON.stringify(prev) ? nextSchedule : prev);
         const nextTable = (rep.table || {}) as CalendarTable;
-        if (JSON.stringify(nextTable) !== JSON.stringify(calendarTable)) {
-          setCalendarTable(nextTable);
-        }
-        if ((rep.calendarName || '') !== calendarName) {
-          setCalendarName(rep.calendarName || '');
-        }
-        if (rep.ifLowStock !== undefined && rep.ifLowStock !== isLowStock) {
-          setIsLowStock(rep.ifLowStock);
-          // TODO: Hook pour alerte stock faible en temps réel
-        }
+        setCalendarTable(prev => JSON.stringify(nextTable) !== JSON.stringify(prev) ? nextTable : prev);
+        setIsLowStock(prev => rep.ifLowStock !== undefined && rep.ifLowStock !== prev ? rep.ifLowStock : prev);
       } else {;
         // Si l'API retourne un 404, le calendrier n'existe pas
         if (rep.status === 404) {
@@ -171,7 +160,8 @@ function CalendarPage({
     };
 
     void load();
-  }, [calendarId, calendarEvents, calendarName, calendarSource, calendarTable, isLowStock, userInfo, selectedDate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calendarId, calendarType, userInfo, selectedDate]);
 
   // Gérer l'affichage du spinner global
   useEffect(() => {
@@ -202,7 +192,8 @@ function CalendarPage({
       setLoadingStockMethod(false);
     };
     void fetchMethod();
-  }, [calendarId, calendarSource, calendarType, initialNextDate, userInfo]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calendarId, calendarType, userInfo]);
 
   // Fonction pour supprimer le calendrier avec confirmation
   const handleDeleteCalendar = () => {
