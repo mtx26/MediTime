@@ -1,6 +1,4 @@
-/* -------------------------------------------------------------------------- */
-/* Realtime Models                                                            */
-/* -------------------------------------------------------------------------- */
+// ─── Realtime Config ─────────────────────────────────────────────────
 
 export type SourceType = 'personal' | 'shared';
 
@@ -13,6 +11,19 @@ export interface RealtimeChannelConfig {
   table: string;
   filter?: string;
 }
+
+export interface RealtimeOptions {
+  enabled: boolean;
+  fetchData: () => void | Promise<void>;
+  channels: RealtimeChannelConfig[];
+  deps?: ReadonlyArray<unknown>;
+}
+
+export interface SubscribedChannel {
+  unsubscribe: () => void;
+}
+
+// ─── Realtime Items ──────────────────────────────────────────────────
 
 export interface BoxItem {
   name: string;
@@ -34,6 +45,10 @@ export interface NotificationItem {
   timestamp: string;
   [key: string]: unknown;
 }
+
+export type TokenItem = Record<string, unknown>;
+
+// ─── Realtime Responses ──────────────────────────────────────────────
 
 export interface BoxesResponse {
   boxes: BoxItem[];
@@ -60,29 +75,8 @@ export interface NotificationsResponse {
   error?: string;
 }
 
-/* -------------------------------------------------------------------------- */
-/* Token Types                                                                */
-/* -------------------------------------------------------------------------- */
-
-export type TokenItem = Record<string, unknown>;
-
 export interface TokensResponse {
   tokens: TokenItem[];
   message?: string;
   error?: string;
-}
-
-/* -------------------------------------------------------------------------- */
-/* Realtime Hook Types                                                        */
-/* -------------------------------------------------------------------------- */
-
-export interface RealtimeOptions {
-  enabled: boolean;
-  fetchData: () => void | Promise<void>;
-  channels: RealtimeChannelConfig[];
-  deps?: ReadonlyArray<unknown>;
-}
-
-export interface SubscribedChannel {
-  unsubscribe: () => void;
 }

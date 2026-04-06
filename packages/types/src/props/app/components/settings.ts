@@ -1,8 +1,6 @@
 import type { ApiResult } from '../../../contracts';
 
-/* ------------------------------------------------------------------ */
-/* FCM / User notification settings                                   */
-/* ------------------------------------------------------------------ */
+// ─── FCM / Notification Settings ────────────────────────────────────────────
 
 export interface FcmSettingsProps {
   sendTokenToBackend: () => Promise<ApiResult & { success: boolean }>;
@@ -18,9 +16,7 @@ export interface NotificationSettingsProps {
   user: UserSettingsProps;
 }
 
-/* ------------------------------------------------------------------ */
-/* Security provider                                                  */
-/* ------------------------------------------------------------------ */
+// ─── Security Provider ───────────────────────────────────────────────────────
 
 export interface SecurityProviderItem<TIcon = unknown> {
   id: string;

@@ -2,10 +2,9 @@ import type { ApiResult } from '../../../contracts';
 import type { UserProfile, CalendarListItem } from '../../../models/common';
 import type { MedicineItem } from '../../../models/realtime';
 
-/* ------------------------------------------------------------------ */
-/* Base                                                               */
-/* ------------------------------------------------------------------ */
+// ─── Base ────────────────────────────────────────────────────────────
 
+/** Props communes à toutes les pages calendrier (personal / shared / token). */
 export interface CalendarDataSourceProps {
   personalCalendars: Record<string, unknown>;
   sharedUserCalendars: Record<string, unknown>;
@@ -14,9 +13,7 @@ export interface CalendarDataSourceProps {
 
 export type CalendarPageSourceType = 'personal' | 'sharedUser' | 'token';
 
-/* ------------------------------------------------------------------ */
-/* API Result subtypes                                                */
-/* ------------------------------------------------------------------ */
+// ─── API Results ─────────────────────────────────────────────────────
 
 export type CalendarScheduleResult = ApiResult & {
   schedule?: unknown[];
@@ -43,14 +40,62 @@ export type PillboxUsesResult = ApiResult & {
 
 export type IcsTokensResult = ApiResult & {
   status?: number;
-  data?: {
-    tokens?: IcsTokenEntry[];
-  };
+  data?: { tokens?: IcsTokenEntry[] };
 };
 
-/* ------------------------------------------------------------------ */
-/* Sources de données calendrier                                      */
-/* ------------------------------------------------------------------ */
+// ─── Data Items ──────────────────────────────────────────────────────
+
+export interface CalendarBoxAlertItem {
+  id: string;
+  name: string;
+  dose?: number | null;
+  stock_quantity: number;
+  stock_alert_threshold: number;
+  box_capacity: number;
+  conditions?: Array<{ max_date?: string | null }>;
+  [key: string]: unknown;
+}
+
+export interface PillboxUseItem {
+  id: string;
+  prepared_at: string;
+  prepared_by: UserProfile;
+}
+
+export interface IcsTokenEntry {
+  id: string;
+  token: string;
+  owner_photo_url: string;
+  owner_display_name: string;
+  owner_email?: string;
+}
+
+export interface MedicineDisplayItem extends MedicineItem {
+  dose?: number | null;
+  time_of_day?: string[];
+  tablet_count?: number;
+  interval_days?: number;
+  start_date?: string;
+}
+
+export type GroupedMedicines = Record<string, MedicineItem[]>;
+
+export type CalendarTable = Record<string, unknown[]>;
+
+// ─── Pillbox table ───────────────────────────────────────────────────
+
+export interface PillboxTableMed {
+  title: string;
+  cells: Record<string, number>;
+}
+
+export interface PillboxOrderedMed extends PillboxTableMed {
+  moment: string;
+}
+
+export type PillboxTable = Record<string, PillboxTableMed[]>;
+
+// ─── Data Sources (méthodes d'accès API par type de calendrier) ─────
 
 export interface CalendarScheduleSource {
   fetchSchedule: (calendarId?: string, date?: string) => Promise<CalendarScheduleResult>;
@@ -72,41 +117,6 @@ export interface CalendarStockAlertsSource {
   restockBox: (calendarId: string | undefined, boxId: string) => Promise<ApiResult>;
 }
 
-/* ------------------------------------------------------------------ */
-/* Items                                                              */
-/* ------------------------------------------------------------------ */
-
-export interface CalendarBoxAlertItem {
-  id: string;
-  name: string;
-  dose?: number | null;
-  stock_quantity: number;
-  stock_alert_threshold: number;
-  box_capacity: number;
-  conditions?: Array<{
-    max_date?: string | null;
-  }>;
-  [key: string]: unknown;
-}
-
-export interface PillboxUseItem {
-  id: string;
-  prepared_at: string;
-  prepared_by: UserProfile;
-}
-
-export interface IcsTokenEntry {
-  id: string;
-  token: string;
-  owner_photo_url: string;
-  owner_display_name: string;
-  owner_email?: string;
-}
-
-/* ------------------------------------------------------------------ */
-/* Sources pilulier & ICS                                             */
-/* ------------------------------------------------------------------ */
-
 export interface PillboxSource {
   fetchPillboxUses: (calendarId: string) => Promise<PillboxUsesResult>;
   cancelUse: (calendarId: string, useId: string) => Promise<ApiResult>;
@@ -118,20 +128,28 @@ export interface IcsSource {
   deleteTokenIcs: (calendarId: string | undefined, tokenId: string) => Promise<ApiResult>;
 }
 
-/* ------------------------------------------------------------------ */
-/* Props utilitaires                                                  */
-/* ------------------------------------------------------------------ */
+export type CalendarViewSource = CalendarScheduleSource & {
+  fetchStockDecrementMethod: (calendarId?: string) => Promise<StockMethodResult>;
+  downloadCalendarPdf: (calendarId?: string) => void;
+};
+
+export interface PillboxCalendarSource {
+  fetchSchedule: (calendarId: string, date: string) => Promise<CalendarScheduleResult>;
+  fetchScheduleNegativeStock: (calendarId: string, medsId: string[]) => Promise<CalendarScheduleResult>;
+  fetchIfPillboxUsed: (calendarId: string, date: string) => Promise<ApiResult & { if_pillbox_used?: boolean }>;
+  decreaseStock: (calendarId: string, date: string) => Promise<ApiResult>;
+  restockBox: (calendarId: string, boxId: string) => Promise<ApiResult>;
+}
+
+// ─── Utility Props ───────────────────────────────────────────────────
 
 export interface CalendarNotFoundProps {
   setNotFound: (value: boolean) => void;
 }
 
-/* ------------------------------------------------------------------ */
-/* Page Props                                                         */
-/* ------------------------------------------------------------------ */
+// ─── Page Props ──────────────────────────────────────────────────────
 
 export interface PillboxPageProps extends CalendarDataSourceProps {}
-export interface CalendarNotificationsProps extends CalendarDataSourceProps, CalendarNotFoundProps {}
 export interface PillboxUsesPageProps extends CalendarDataSourceProps {}
 export interface IcsListPageProps extends CalendarDataSourceProps {}
 export interface CalendarSettingsPageProps extends CalendarDataSourceProps {}
@@ -140,9 +158,21 @@ export interface StockAlertsPageProps extends CalendarDataSourceProps {}
 export interface SharedListPageProps extends CalendarDataSourceProps {}
 export interface BoxesViewPageProps extends CalendarDataSourceProps {}
 
+export interface CalendarNotificationsProps extends CalendarDataSourceProps, CalendarNotFoundProps {}
+
 export interface CalendarStockProps extends CalendarNotFoundProps {
   personalCalendars: CalendarStockPersonalCalendars;
 }
+
+export interface PillboxContentProps extends CalendarDataSourceProps, CalendarNotFoundProps {
+  type: string;
+  selectedDate: Date | string | null;
+  calendarType: CalendarPageSourceType;
+  calendarId: string | undefined;
+  basePath: string;
+}
+
+// ─── Calendar List Props ─────────────────────────────────────────────
 
 export interface CalendarListPersonalCalendars {
   calendarsData: CalendarListItem[] | null;
@@ -159,60 +189,4 @@ export interface CalendarListSharedUserCalendars {
 export interface CalendarListPageProps {
   personalCalendars: CalendarListPersonalCalendars;
   sharedUserCalendars: CalendarListSharedUserCalendars;
-}
-
-/* ------------------------------------------------------------------ */
-/* CalendarView                                                       */
-/* ------------------------------------------------------------------ */
-
-export type CalendarTable = Record<string, unknown[]>;
-
-export type CalendarViewSource = CalendarScheduleSource & {
-  fetchStockDecrementMethod: (calendarId?: string) => Promise<StockMethodResult>;
-  downloadCalendarPdf: (calendarId?: string) => void;
-};
-
-/* ------------------------------------------------------------------ */
-/* MedicinesList                                                      */
-/* ------------------------------------------------------------------ */
-
-export type GroupedMedicines = Record<string, MedicineItem[]>;
-
-export interface MedicineDisplayItem extends MedicineItem {
-  dose?: number | null;
-  time_of_day?: string[];
-  tablet_count?: number;
-  interval_days?: number;
-  start_date?: string;
-}
-
-/* ------------------------------------------------------------------ */
-/* PillboxDisplay                                                     */
-/* ------------------------------------------------------------------ */
-
-export interface PillboxTableMed {
-  title: string;
-  cells: Record<string, number>;
-}
-
-export interface PillboxOrderedMed extends PillboxTableMed {
-  moment: string;
-}
-
-export type PillboxTable = Record<string, PillboxTableMed[]>;
-
-export interface PillboxCalendarSource {
-  fetchSchedule: (calendarId: string, date: string) => Promise<CalendarScheduleResult>;
-  fetchScheduleNegativeStock: (calendarId: string, medsId: string[]) => Promise<CalendarScheduleResult>;
-  fetchIfPillboxUsed: (calendarId: string, date: string) => Promise<ApiResult & { if_pillbox_used?: boolean }>;
-  decreaseStock: (calendarId: string, date: string) => Promise<ApiResult>;
-  restockBox: (calendarId: string, boxId: string) => Promise<ApiResult>;
-}
-
-export interface PillboxContentProps extends CalendarDataSourceProps, CalendarNotFoundProps {
-  type: string;
-  selectedDate: Date | string | null;
-  calendarType: CalendarPageSourceType;
-  calendarId: string | undefined;
-  basePath: string;
 }

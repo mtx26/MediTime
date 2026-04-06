@@ -1,9 +1,7 @@
 import type { CalendarBoxAlertItem } from './calendar-pages';
 import type { MedicineReviewConditionInput } from './imports';
 
-/* -------------------------------------------------------------------------- */
-/* BoxesView Types                                                            */
-/* -------------------------------------------------------------------------- */
+// ─── BoxesView Types ─────────────────────────────────────────────────────────
 
 export type BoxesViewBoxItem = CalendarBoxAlertItem & {
   code_fmd?: string | null;

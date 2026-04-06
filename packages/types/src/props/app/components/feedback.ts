@@ -44,9 +44,7 @@ export interface ToastProps {
   duration?: number;
 }
 
-/* ------------------------------------------------------------------ */
-/* Alert Context                                                      */
-/* ------------------------------------------------------------------ */
+// ─── Alert Context ───────────────────────────────────────────────────────────
 
 export interface AlertContextValue {
   showAlert: (type: ToastType, message: string) => void;

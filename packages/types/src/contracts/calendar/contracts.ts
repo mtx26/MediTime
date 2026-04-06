@@ -1,6 +1,4 @@
-/* -------------------------------------------------------------------------- */
-/* Calendar Contracts Types                                                   */
-/* -------------------------------------------------------------------------- */
+// ─── Calendar Contract Types ─────────────────────────────────────────────────
 
 import type { ApiResponse } from '../api/index';
 import type { Calendar } from '../../models/index';

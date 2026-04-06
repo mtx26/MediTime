@@ -1,15 +1,11 @@
-/* -------------------------------------------------------------------------- */
-/* Common Models — types de base réutilisés dans toute l'application          */
-/* -------------------------------------------------------------------------- */
+// ─── Common Models ───────────────────────────────────────────────────
 
-/** Profil utilisateur minimal (photo, nom, email). */
 export interface UserProfile {
   photo_url: string;
   display_name: string;
   email?: string | null;
 }
 
-/** Info minimale d'un calendrier. */
 export interface CalendarInfo {
   id: string;
   name: string;
@@ -18,7 +14,6 @@ export interface CalendarInfo {
   owner_photo_url?: string;
 }
 
-/** Calendrier enrichi pour affichage en liste. */
 export interface CalendarListItem extends CalendarInfo {
   boxes_count?: number;
   ifLowStock?: boolean;

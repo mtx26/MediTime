@@ -1,7 +1,4 @@
-/* ------------------------------------------------------------------ */
-/* ActionDefinition – platform-agnostic action descriptors            */
-/* Reusable across React Web and React Native                         */
-/* ------------------------------------------------------------------ */
+// ─── Action Definitions ─────────────────────────────────────────────────────
 
 /** A concrete action entry (navigation or handler) */
 export interface ActionDefinition {
@@ -36,9 +33,7 @@ export function isActionSeparator(item: ActionItem): item is ActionSeparator {
   return 'separator' in item && (item as ActionSeparator).separator === true;
 }
 
-/* ------------------------------------------------------------------ */
-/* Builder parameter types                                            */
-/* ------------------------------------------------------------------ */
+// ─── Builder Parameter Types ─────────────────────────────────────────────────
 
 /** Route context shared by all calendar action builders */
 export interface CalendarActionContext {
