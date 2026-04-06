@@ -1,6 +1,5 @@
-import React, { useEffect, useContext, useState, useCallback } from "react";
+import { useEffect, useContext, useState, useCallback } from "react";
 import { UserContext } from "@/contexts/UserContext";
-import PropTypes from "prop-types";
 import { useAlert } from "@/contexts/AlertContext";
 import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from "@/components/common/HoveredUserProfile";
@@ -14,21 +13,23 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Users, Link2, Eye, Pill, Trash2, Plus, Clipboard, Mail, User } from 'lucide-react';
+import type { AnyRecord, SharedListPageProps } from '@meditime/types';
 
-const VITE_URL = import.meta.env.VITE_VITE_URL;
+const VITE_URL = import.meta.env.VITE_VITE_URL ?? '';
 
 function SharedList({
   tokenCalendars,
   personalCalendars,
   sharedUserCalendars,
-}) {
+}: SharedListPageProps) {
   // 🔐 Contexte d'authentification
-  const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
+  const userContext = useContext(UserContext) as { userInfo?: unknown } | null;
+  const userInfo = userContext?.userInfo; // Contexte de l'utilisateur connecté
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const calendarFromURL = searchParams.get('calendar');
   const navigate = useNavigate(); // Hook pour la navigation
-  const { lng } = useParams();
+  const { lng } = useParams<{ lng?: string }>();
 
   // ⚠️ Alertes et confirmations
   const { showAlert, showConfirm } = useAlert();
@@ -36,21 +37,20 @@ function SharedList({
 
   // 🔄 Chargement et données partagées groupées
   const [loadingGroupedShared, setLoadingGroupedShared] = useState(true); // État de chargement des partages groupés
-  const [groupedShared, setGroupedShared] = useState({}); // Données groupées des partages
+  const [groupedShared, setGroupedShared] = useState<AnyRecord>({}); // Données groupées des partages
 
   // 🔗 Données liées aux partages
-  const [expiresAt, setExpiresAt] = useState({}); // Dates d'expiration des liens partagés
-  const [permissions, setPermissions] = useState({}); // Permissions associées aux partages
-  const [expirationType, setExpirationType] = useState({});
-  const [emailsToInvite, setEmailsToInvite] = useState({}); // E-mails à inviter au partage
-  const [selectedModifyToken, setSelectedModifyToken] = useState(null); // Token sélectionné pour modification
-  const [selectedCalendarId, setSelectedCalendarId] = useState(null);
+  const [expiresAt, setExpiresAt] = useState<AnyRecord>({}); // Dates d'expiration des liens partagés
+  const [permissions, setPermissions] = useState<AnyRecord>({}); // Permissions associées aux partages
+  const [emailsToInvite, setEmailsToInvite] = useState<AnyRecord>({}); // E-mails à inviter au partage
+  const [selectedModifyToken, setSelectedModifyToken] = useState<string | null>(null); // Token sélectionné pour modification
+  const [selectedCalendarId, setSelectedCalendarId] = useState<string | null>(null);
 
   // 📅 Date du jour
   const today = toISO(new Date()); // Date du jour au format 'YYYY-MM-DD'
 
   // 📄 Copie du lien
-  const handleCopyLink = async (token) => {
+  const handleCopyLink = async (token: AnyRecord) => {
     try {
       await navigator.clipboard.writeText(
         `${VITE_URL}/${lng}/shared-token-calendar/${token.id}`,
@@ -62,8 +62,8 @@ function SharedList({
   };
 
   // 📅 Mise à jour de la date d'expiration
-  const handleUpdateTokenExpiration = async (tokenId, date) => {
-    await tokenCalendars.updateTokenExpiration(tokenId, date);
+  const handleUpdateTokenExpiration = async (tokenId: string, date: string | null) => {
+    await (tokenCalendars as AnyRecord).updateTokenExpiration(tokenId, date);
   };
 
   const promptDeleteCalendar = ({
@@ -72,7 +72,7 @@ function SharedList({
     personalCalendars,
     t,
     lng,
-  }) => {
+  }: AnyRecord) => {
     showConfirm(
       'confirm-danger',
       t("calendar.delete_title'"),
@@ -86,13 +86,13 @@ function SharedList({
     );
   };
 
-  const deleteTokenConfirmAction = (tokenId) => {
+  const deleteTokenConfirmAction = (tokenId: string) => {
     showConfirm(
       'confirm-danger',
       t("delete_link_title"),
       t("delete_link_description"),
       async () => {
-        const rep = await tokenCalendars.deleteToken(tokenId);
+        const rep = await (tokenCalendars as AnyRecord).deleteToken(tokenId);
         if (rep.success) {
           setSelectedModifyToken(null);
           setGroupedSharedFunction();
@@ -101,13 +101,13 @@ function SharedList({
     );
   };
 
-  const deleteLoginInvitationConfirmAction = (token) => {
+  const deleteLoginInvitationConfirmAction = (token: string) => {
     showConfirm(
       'confirm-danger',
       t("delete_access_title"),
       t("delete_access_description"),
       async () => {
-        const rep = await sharedUserCalendars.deleteLoginInvitation(token);
+        const rep = await (sharedUserCalendars as AnyRecord).deleteLoginInvitation(token);
         if (rep.success) {
           setGroupedSharedFunction();
         }
@@ -115,13 +115,13 @@ function SharedList({
     );
   };
 
-  const deleteRegistrationInvitationConfirmAction = (token) => {
+  const deleteRegistrationInvitationConfirmAction = (token: string) => {
     showConfirm(
       'confirm-danger',
       t("delete_invitation_title"),
       t("delete_invitation_description"),
       async () => {
-        const rep = await sharedUserCalendars.deleteRegistrationInvitation(token);
+        const rep = await (sharedUserCalendars as AnyRecord).deleteRegistrationInvitation(token);
         if (rep.success) {
           setGroupedSharedFunction();
         }
@@ -129,17 +129,17 @@ function SharedList({
     );
   };
 
-  const handleSendInvitation = async (calendarId) => {
+  const handleSendInvitation = async (calendarId: string) => {
     const email = emailsToInvite[calendarId];
-    const rep = await sharedUserCalendars.sendInvitation(email, calendarId);
+    const rep = await (sharedUserCalendars as AnyRecord).sendInvitation(email, calendarId);
     if (rep.success) {
       setGroupedSharedFunction();
       setEmailsToInvite((prev) => ({ ...prev, [calendarId]: "" }));
     }
   };
 
-  const handleCreateToken = async (calendarId) => {
-    const rep = await tokenCalendars.createToken(
+  const handleCreateToken = async (calendarId: string) => {
+    const rep = await (tokenCalendars as AnyRecord).createToken(
       calendarId,
       expiresAt[calendarId],
       permissions[calendarId],
@@ -171,7 +171,7 @@ function SharedList({
     // --- MOCK DEMO END ---
 
     setLoadingGroupedShared(true);
-    const rep = await sharedUserCalendars.fetchGroupedSharedCalendars();
+    const rep = await (sharedUserCalendars as AnyRecord).fetchGroupedSharedCalendars();
 
     if (rep.success) {
       setGroupedShared(rep.grouped);
@@ -197,10 +197,9 @@ function SharedList({
   // 🔄 Initialisation des permissions et des dates d'expiration
   useEffect(() => {
     if (userInfo && personalCalendars.calendarsData) {
-      for (const calendar of personalCalendars.calendarsData) {
+      for (const calendar of ((personalCalendars as AnyRecord).calendarsData || [])) {
         setPermissions((prev) => ({ ...prev, [calendar.id]: "read" }));
         setExpiresAt((prev) => ({ ...prev, [calendar.id]: null }));
-        setExpirationType((prev) => ({ ...prev, [calendar.id]: "never" }));
       }
     }
   }, [userInfo, personalCalendars.calendarsData]);
@@ -213,16 +212,16 @@ function SharedList({
     }
     // --- MOCK DEMO END ---
 
-    const existsInList = personalCalendars.calendarsData?.some(c => c.id === calendarFromURL);
+    const existsInList = (personalCalendars as AnyRecord).calendarsData?.some((c: AnyRecord) => String(c.id) === String(calendarFromURL));
 
     if (calendarFromURL && existsInList) {
       setSelectedCalendarId(calendarFromURL);
-    } else if (personalCalendars.calendarsData?.length > 0) {
-      const first = personalCalendars.calendarsData[0].id;
+    } else if ((personalCalendars as AnyRecord).calendarsData?.length > 0) {
+      const first = String((personalCalendars as AnyRecord).calendarsData[0].id);
       setSelectedCalendarId(first);
       setSearchParams({ calendar: first });
     }
-  }, [personalCalendars.calendarsData, calendarFromURL]);
+  }, [personalCalendars, calendarFromURL, setSearchParams]);
 
   // Gérer l'affichage du spinner global
   useEffect(() => {
@@ -235,8 +234,8 @@ function SharedList({
   }
 
   if (
-    personalCalendars.calendarsData &&
-    personalCalendars.calendarsData?.length === 0 &&
+    (personalCalendars as AnyRecord).calendarsData &&
+    (personalCalendars as AnyRecord).calendarsData?.length === 0 &&
     calendarFromURL !== 'demo'
   ) {
     return (
@@ -264,7 +263,7 @@ function SharedList({
             </Button>
           )}
           {/* --- MOCK DEMO END --- */}
-          {(personalCalendars?.calendarsData || []).map((calendar) => (
+          {(((personalCalendars as AnyRecord)?.calendarsData || []) as AnyRecord[]).map((calendar) => (
             <Button
               key={calendar.id}
               asChild
@@ -290,7 +289,7 @@ function SharedList({
             <CalendarCard
               key={calendarId}
               calendarId={calendarId}
-              data={data}
+              data={data as AnyRecord}
               handleCopyLink={handleCopyLink}
               handleUpdateTokenExpiration={handleUpdateTokenExpiration}
               deleteTokenConfirmAction={deleteTokenConfirmAction}
@@ -322,7 +321,7 @@ const calendarActions = ({
   promptDeleteCalendar,
   t,
   lng,
-}) => {
+}: AnyRecord) => {
   return [
     {
       label: (
@@ -367,13 +366,13 @@ function CalendarCard({
   calendarId, data,
   handleCopyLink, handleUpdateTokenExpiration,
   deleteTokenConfirmAction, handleCreateToken, today,
-  VITE_URL, selectedModifyToken, setSelectedModifyToken, tokenCalendars,
+  VITE_URL,
   handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction,
   emailsToInvite, setEmailsToInvite, navigate, personalCalendars, promptDeleteCalendar,
-}) {
+}: AnyRecord) {
   const { t } = useTranslation();
   const { lng } = useParams();
-  const tokenProps = { handleCopyLink, handleUpdateTokenExpiration, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId, selectedModifyToken, setSelectedModifyToken, tokenCalendars };
+  const tokenProps = { handleCopyLink, handleUpdateTokenExpiration, deleteTokenConfirmAction, handleCreateToken, today, VITE_URL, data, calendarId };
   const userProps = { handleSendInvitation, deleteLoginInvitationConfirmAction, deleteRegistrationInvitationConfirmAction, data, calendarId, emailsToInvite, setEmailsToInvite };
   return (
     <div className="space-y-4">
@@ -408,15 +407,12 @@ function TokenList({
   VITE_URL,
   data,
   calendarId,
-  selectedModifyToken,
-  setSelectedModifyToken,
-  tokenCalendars,
-}) {
+}: AnyRecord) {
   const { t } = useTranslation();
   const { lng } = useParams();
   return (
     data.tokens.length !== 0 ? (
-      (data.tokens || []).map((token) => (
+      (data.tokens || []).map((token: AnyRecord) => (
         <Card key={token.id} className="shadow">
           <CardContent>
             <h5 className="flex justify-between items-center">
@@ -536,7 +532,7 @@ function UserList({
   calendarId,
   emailsToInvite,
   setEmailsToInvite,
-}) {
+}: AnyRecord) {
   const { t } = useTranslation();
   return (
     <Card className="shadow">
@@ -546,7 +542,7 @@ function UserList({
           {t("shared_users")}:
         </h5>
         {/* Liste des utilisateurs partagés */}
-        {(data.users || []).map((user) => (
+        {(data.users || []).map((user: AnyRecord) => (
           <div className="border rounded-lg p-2 mt-2" key={user.token} data-tour="share-users-list">
             {/* Desktop: tout sur une ligne */}
             <div className="hidden sm:flex items-center gap-2">
@@ -626,7 +622,7 @@ function UserList({
           </div>
         ))}
         {/* Liste des utilisateurs invités */}
-        {(data.invitation || []).map((invitation) => {
+        {(data.invitation || []).map((invitation: AnyRecord) => {
 
           const displayName = invitation.invited_email || t("unknown_user");
 
@@ -727,7 +723,7 @@ function UserList({
               placeholder={t("recipient_email")}
               aria-label={t("recipient_email")}
               onChange={(e) =>
-                setEmailsToInvite((prev) => ({
+                setEmailsToInvite((prev: AnyRecord) => ({
                   ...prev,
                   [calendarId]: e.target.value,
                 }))
@@ -749,101 +745,5 @@ function UserList({
     </Card>
   );
 }
-
-SharedList.propTypes = {
-  tokenCalendars: PropTypes.shape({
-    updateTokenExpiration: PropTypes.func.isRequired,
-    deleteToken: PropTypes.func.isRequired,
-    createToken: PropTypes.func.isRequired,
-    tokensList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  }).isRequired,
-  personalCalendars: PropTypes.shape({
-    calendarsData: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string,
-      }),
-    ),
-    deleteCalendar: PropTypes.func,
-  }).isRequired,
-  sharedUserCalendars: PropTypes.shape({
-    deleteLoginInvitation: PropTypes.func.isRequired,
-    sendInvitation: PropTypes.func.isRequired,
-    deleteRegistrationInvitation: PropTypes.func.isRequired,
-    fetchGroupedSharedCalendars: PropTypes.func.isRequired,
-  }).isRequired,
-};
-
-CalendarCard.propTypes = {
-  calendarId: PropTypes.string.isRequired,
-  data: PropTypes.shape({
-    tokens: PropTypes.array,
-    users: PropTypes.array,
-    calendar_name: PropTypes.string,
-  }).isRequired,
-  handleCopyLink: PropTypes.func.isRequired,
-  handleUpdateTokenExpiration: PropTypes.func.isRequired,
-  deleteTokenConfirmAction: PropTypes.func.isRequired,
-  handleCreateToken: PropTypes.func.isRequired,
-  today: PropTypes.string.isRequired,
-  VITE_URL: PropTypes.string.isRequired,
-  selectedModifyToken: PropTypes.string,
-  setSelectedModifyToken: PropTypes.func.isRequired,
-  tokenCalendars: PropTypes.object.isRequired,
-  handleSendInvitation: PropTypes.func.isRequired,
-  deleteLoginInvitationConfirmAction: PropTypes.func.isRequired,
-  deleteRegistrationInvitationConfirmAction: PropTypes.func.isRequired,
-  emailsToInvite: PropTypes.object.isRequired,
-  setEmailsToInvite: PropTypes.func.isRequired,
-  navigate: PropTypes.func.isRequired,
-  personalCalendars: PropTypes.object.isRequired,
-  promptDeleteCalendar: PropTypes.func.isRequired,
-};
-
-TokenList.propTypes = {
-  handleCopyLink: PropTypes.func.isRequired,
-  handleUpdateTokenExpiration: PropTypes.func.isRequired,
-  deleteTokenConfirmAction: PropTypes.func.isRequired,
-  handleCreateToken: PropTypes.func.isRequired,
-  today: PropTypes.string.isRequired,
-  VITE_URL: PropTypes.string.isRequired,
-  data: PropTypes.shape({
-    tokens: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string,
-        revoked: PropTypes.bool,
-        expires_at: PropTypes.string,
-      }),
-    ),
-    calendar_name: PropTypes.string,
-  }).isRequired,
-  calendarId: PropTypes.string.isRequired,
-  selectedModifyToken: PropTypes.string,
-  setSelectedModifyToken: PropTypes.func.isRequired,
-  tokenCalendars: PropTypes.shape({
-    tokensList: PropTypes.array,
-  }).isRequired,
-};
-
-UserList.propTypes = {
-  handleSendInvitation: PropTypes.func.isRequired,
-  deleteLoginInvitationConfirmAction: PropTypes.func.isRequired,
-  deleteRegistrationInvitationConfirmAction: PropTypes.func.isRequired,
-  data: PropTypes.shape({
-    users: PropTypes.arrayOf(
-      PropTypes.shape({
-        receiver_uid: PropTypes.string,
-        receiver_photo_url: PropTypes.string,
-        receiver_name: PropTypes.string,
-        receiver_email: PropTypes.string,
-        accepted: PropTypes.bool,
-      }),
-    ),
-    calendar_name: PropTypes.string,
-  }).isRequired,
-  calendarId: PropTypes.string.isRequired,
-  emailsToInvite: PropTypes.object.isRequired,
-  setEmailsToInvite: PropTypes.func.isRequired,
-};
 
 export default SharedList;

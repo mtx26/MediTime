@@ -28,22 +28,23 @@ export interface QRScannedMedicine {
   box_capacity: number;
   stock_alert_threshold: number;
   stock_quantity: number;
-  dose: number | string | null;
+  dose: number | null;
+  code_fmd?: string | null;
 }
 
 export type AddCalendarResult = ApiResult & {
-  calendarId?: string | number;
+  calendarId?: string;
 };
 
 export interface QRScanImportPersonalCalendars {
   addCalendar: (calendarName: string) => Promise<AddCalendarResult>;
   createPersonalBox: (
-    calendarId: string | number,
+    calendarId: string,
     name: string,
     boxCapacity: number,
     stockAlertThreshold: number,
     stockQuantity: number,
-    dose: number | string | null
+    dose: number | null
   ) => Promise<ApiResult>;
 }
 
@@ -111,12 +112,13 @@ export interface MedicineReviewLocationState {
 export interface MedicineReviewSuggestion {
   name: string;
   dose: string;
-  conditionnement: number | string;
+  conditionnement: string;
   forme_pharmaceutique?: string;
+  code_fmd?: string | null;
 }
 
 export type SaveAnalysisResult = ApiResult & {
-  calendar_id?: string | number;
+  calendar_id?: string;
 };
 
 export interface MedicineReviewPersonalCalendars {

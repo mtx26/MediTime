@@ -1,18 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { log } from '@meditime/utils';
-import type { RealtimeChannelConfig } from '@meditime/types';
-
-type RealtimeOptions = {
-  enabled: boolean;
-  fetchData: () => void | Promise<void>;
-  channels: RealtimeChannelConfig[];
-  deps?: ReadonlyArray<unknown>;
-};
-
-type SubscribedChannel = {
-  unsubscribe: () => void;
-};
+import type { RealtimeChannelConfig, RealtimeOptions, SubscribedChannel } from '@meditime/types';
 
 export const useSupabaseRealtime = ({ enabled, fetchData, channels, deps = [] }: RealtimeOptions): void => {
   const channelRef = useRef<SubscribedChannel[]>([]);

@@ -115,7 +115,7 @@ function StockAlertsPage({
       })
   );
 
-  const restockBox = (currentCalendarId: string | undefined, boxId: string | number) => {
+  const restockBox = (currentCalendarId: string | undefined, boxId: string) => {
     void calendarSource.restockBox(currentCalendarId, boxId);
   };
 

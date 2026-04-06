@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from '@/components/common/HoveredUserProfile';
 import ActionSheet from '@/components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 import { useAlert } from '@/contexts/AlertContext';
-import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -14,26 +13,28 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Calendar, Users, Pencil, Share, Pill, Download, AlertTriangle, Settings, Trash2, Plus, X, AlertCircle } from 'lucide-react';
+import type { CheckedState } from '@radix-ui/react-checkbox';
+import type { CalendarListItem, CalendarListPageProps } from '@meditime/types';
 
 
 function SelectCalendar({
   personalCalendars,
   sharedUserCalendars
-}) {
+}: CalendarListPageProps) {
   const { lng } = useParams();
   const { t } = useTranslation();
   const { showConfirm } = useAlert();
 
   // 📅 Gestion des calendriers
-  const [renameValues, setRenameValues] = useState({}); // État pour les valeurs de renommage de calendrier
-  const [renameMode, setRenameMode] = useState(null); // État pour le mode de renommage
+  const [renameValues, setRenameValues] = useState<Record<string, string>>({}); // État pour les valeurs de renommage de calendrier
+  const [renameMode, setRenameMode] = useState<string | null>(null); // État pour le mode de renommage
 
   // 📄 Export PDF
   const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
-  const [pdfCalendarId, setPdfCalendarId] = useState(null);
+  const [pdfCalendarId, setPdfCalendarId] = useState<string | null>(null);
   const [includeInactive, setIncludeInactive] = useState(false);
 
-  const openPdfDialog = (calendarId) => {
+  const openPdfDialog = (calendarId: string) => {
     setPdfCalendarId(calendarId);
     setIncludeInactive(false);
     setPdfDialogOpen(true);
@@ -46,18 +47,18 @@ function SelectCalendar({
     setPdfDialogOpen(false);
   };
 
-  const renameConfirmAction = async (calendarId) => {
+  const renameConfirmAction = async (calendarId: string) => {
     const rep = await personalCalendars.renameCalendar(
       calendarId,
-      renameValues[calendarId]
+      renameValues[String(calendarId)]
     );
     if (rep.success) {
-      setRenameValues((prev) => ({ ...prev, [calendarId]: '' }));
+      setRenameValues((prev) => ({ ...prev, [String(calendarId)]: '' }));
     }
   };
 
   // 🔄 Renommage d'un calendrier
-  const handleRenameClick = (calendarId) => {
+  const handleRenameClick = (calendarId: string) => {
     showConfirm(
       'confirm-safe',
       t('calendar.rename_title'),
@@ -66,11 +67,11 @@ function SelectCalendar({
     );
   };
 
-  const deleteConfirmAction = async (calendarId) => {
+  const deleteConfirmAction = async (calendarId: string) => {
     await personalCalendars.deleteCalendar(calendarId);
   };
 
-  const handleDeleteCalendarClick = (calendarId) => {
+  const handleDeleteCalendarClick = (calendarId: string) => {
     showConfirm(
       'confirm-danger',
       t('calendar.delete_title'),
@@ -79,11 +80,11 @@ function SelectCalendar({
     );
   };
 
-  const deleteSharedCalendarConfirmAction = async (calendarId) => {
+  const deleteSharedCalendarConfirmAction = async (calendarId: string) => {
     await sharedUserCalendars.deleteSharedCalendar(calendarId);
   };
 
-  const handleDeleteSharedCalendarClick = (calendarId) => {
+  const handleDeleteSharedCalendarClick = (calendarId: string) => {
     showConfirm(
       'confirm-danger',
       t('calendar.delete_shared_title'),
@@ -114,8 +115,8 @@ function SelectCalendar({
         {/* Liste des calendriers */}
         <div className="border rounded-lg overflow-hidden shadow">
           {(Array.isArray(personalCalendars.calendarsData) && personalCalendars.calendarsData.length > 0) && (
-            personalCalendars.calendarsData.map((calendarData, index) => (
-              <div key={index} className="border-b last:border-b-0 p-3 hover:bg-accent/50 transition">
+            personalCalendars.calendarsData.map((calendarData: CalendarListItem) => (
+              <div key={calendarData.id} className="border-b last:border-b-0 p-3 hover:bg-accent/50 transition">
                 <div className="flex flex-wrap justify-between items-center gap-3">
                   {/* Partie gauche : Nom + nombre */}
                   <div className="grow">
@@ -242,11 +243,11 @@ function SelectCalendar({
                         type="text"
                         placeholder={t('calendar.new_name')}
                         required
-                        value={renameValues[calendarData.id] || ''} // Valeur du champ de renommage
+                        value={renameValues[String(calendarData.id)] || ''} // Valeur du champ de renommage
                         onChange={(e) =>
                           setRenameValues({
                             ...renameValues,
-                            [calendarData.id]: e.target.value,
+                            [String(calendarData.id)]: e.target.value,
                           })
                         } // Mise à jour de l'état
                         className="flex-1"
@@ -300,8 +301,8 @@ function SelectCalendar({
         sharedUserCalendars.sharedCalendarsData.length > 0 ? (
           <div className="border rounded-lg overflow-hidden shadow">
             {sharedUserCalendars.sharedCalendarsData.map(
-              (calendarData, index) => (
-                <div key={index} className="border-b last:border-b-0 p-3 hover:bg-accent/50 transition">
+              (calendarData: CalendarListItem) => (
+                <div key={calendarData.id} className="border-b last:border-b-0 p-3 hover:bg-accent/50 transition">
 
                   <div className="flex flex-wrap justify-between items-center gap-3">
                     <div className="grow">
@@ -316,8 +317,8 @@ function SelectCalendar({
                         <HoveredUserProfile
                           user={{
                             email: calendarData.owner_email,
-                            display_name: calendarData.owner_name,
-                            photo_url: calendarData.owner_photo_url,
+                            display_name: calendarData.owner_name || '',
+                            photo_url: calendarData.owner_photo_url || '',
                           }}
                           trigger={
                             <span
@@ -427,7 +428,7 @@ function SelectCalendar({
             <Checkbox
               id="includeInactive"
               checked={includeInactive}
-              onCheckedChange={setIncludeInactive}
+              onCheckedChange={(checked: CheckedState) => setIncludeInactive(checked === true)}
             />
             <Label htmlFor="includeInactive" className="cursor-pointer">
               {t('boxes.include_inactive_medicines')}
@@ -447,14 +448,5 @@ function SelectCalendar({
     </div>
   );
 }
-
-SelectCalendar.propTypes = {
-  personalCalendars: PropTypes.shape({
-    calendarsData: PropTypes.array,
-  }).isRequired,
-  sharedUserCalendars: PropTypes.shape({
-    sharedUserCalendarsData: PropTypes.array,
-  }).isRequired,
-};
 
 export default SelectCalendar;

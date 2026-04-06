@@ -12,7 +12,7 @@ export type InvitationToken = string;
 
 export interface CalendarBoxInput {
   name: string;
-  dose: number | string | null;
+  dose: number | null;
   box_capacity: number;
   stock_alert_threshold: number;
   stock_quantity: number;

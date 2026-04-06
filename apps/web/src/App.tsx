@@ -30,11 +30,9 @@ import useSEO from './hooks/useSEO';
 import OnboardingTour from './components/onboarding/OnboardingTour';
 import { requestPermissionAndGetToken } from './services/firebase/firebase';
 import { useAlert } from './contexts/AlertContext';
-import type { AppSharedProps, LoadingStates } from '@meditime/types';
+import type { AppSharedProps, LoadingStates, UnknownRecord } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-type UnknownRecord = Record<string, unknown>;
 
 const fileToBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {

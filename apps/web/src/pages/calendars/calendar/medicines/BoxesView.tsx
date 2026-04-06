@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import type { FormEvent } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useRealtimeBoxesSwitcher } from '@/hooks/realtime/useRealtimeBoxesSwitcher';
 import { useAlert } from '@/contexts/AlertContext';
@@ -10,8 +11,17 @@ import ActionSheet from '@/components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
 import QRCodeScanner from '@/components/scanner/QRCodeScanner';
 import Tooltips from '@/components/common/Tooltips';
-import PropTypes from 'prop-types';
 import IconButton from '@/components/common/UtilityComponents';
+import type {
+  AnyRecord,
+  BoxesViewPageProps,
+  BoxesViewBoxItem,
+  MedicineReviewSuggestion,
+  QRScannedMedicine,
+  StatusBadgeProps as SharedStatusBadgeProps,
+  ActionCardProps as SharedActionCardProps,
+  InputDropdownProps,
+} from '@meditime/types';
 
 // Composants shadcn/ui
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,6 +33,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@/lib/utils';
 
 // Icônes Lucide
+import type { LucideIcon } from 'lucide-react';
 import { 
   Package, 
   Plus, 
@@ -53,7 +64,12 @@ import NotFound from '../../../general/NotFound';
 // UTILITY COMPONENTS
 // ============================================================================
 
-const StatusBadge = ({ variant, icon: Icon, text, tooltip }) => {
+type StatusBadgeProps = SharedStatusBadgeProps<LucideIcon>;
+type ActionCardProps = SharedActionCardProps<LucideIcon>;
+
+const QRCodeScannerAny = QRCodeScanner as any;
+
+const StatusBadge = ({ variant, icon: Icon, text, tooltip }: StatusBadgeProps) => {
   const variantMap = {
     warning: 'bg-amber-500 text-white hover:bg-amber-600',
     danger: 'bg-destructive text-white',
@@ -78,14 +94,7 @@ const StatusBadge = ({ variant, icon: Icon, text, tooltip }) => {
   );
 };
 
-StatusBadge.propTypes = {
-  variant: PropTypes.string.isRequired,
-  icon: PropTypes.elementType,
-  text: PropTypes.string.isRequired,
-  tooltip: PropTypes.string,
-};
-
-const ActionCard = ({ variant, icon: Icon, text, onClick, hasTooltip, tooltip, dataTour }) => {
+const ActionCard = ({ variant, icon: Icon, text, onClick, hasTooltip, tooltip, dataTour }: ActionCardProps) => {
   const variantStyles = {
     success: 'border-green-500',
     primary: 'border-primary',
@@ -122,16 +131,6 @@ const ActionCard = ({ variant, icon: Icon, text, onClick, hasTooltip, tooltip, d
   );
 };
 
-ActionCard.propTypes = {
-  variant: PropTypes.string.isRequired,
-  icon: PropTypes.elementType.isRequired,
-  text: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
-  hasTooltip: PropTypes.bool,
-  tooltip: PropTypes.string,
-  dataTour: PropTypes.string,
-};
-
 const InputDropdown = ({
   name,
   dose,
@@ -141,12 +140,12 @@ const InputDropdown = ({
   onChangeStockQuantity,
   onChangeCodeFmd,
   fetchSuggestions,
-}) => {
+}: InputDropdownProps) => {
   const { t } = useTranslation();
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState<MedicineReviewSuggestion[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [inputValue, setInputValue] = useState(name);
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setInputValue(name);
@@ -157,14 +156,15 @@ const InputDropdown = ({
     inputRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  const handleSelect = (item) => {
-    const onlyNumbers = parseInt(item.dose.replace(/\D/g, ''));
+  const handleSelect = (item: MedicineReviewSuggestion) => {
+    const onlyNumbers = parseInt(String(item.dose || '').replace(/\D/g, ''), 10) || 0;
     const itemName = item.name;
     setInputValue(itemName);
     onChangeName(itemName);
     onChangeDose(onlyNumbers);
-    onChangeBoxCapacity(item.conditionnement);
-    onChangeStockQuantity(item.conditionnement);
+    const parsedCapacity = Number(item.conditionnement) || 0;
+    onChangeBoxCapacity(parsedCapacity);
+    onChangeStockQuantity(parsedCapacity);
     if (item.code_fmd) {
       onChangeCodeFmd(item.code_fmd);
     }
@@ -181,7 +181,7 @@ const InputDropdown = ({
 
     const fetchData = async () => {
       const results = await fetchSuggestions(name, dose);
-      setSuggestions(results);
+      setSuggestions((results || []) as MedicineReviewSuggestion[]);
     };
 
     const timeout = setTimeout(fetchData, 300);
@@ -195,7 +195,6 @@ const InputDropdown = ({
         <Input
           ref={inputRef}
           type="text"
-          size="sm"
           required
           value={inputValue}
           onChange={(e) => {
@@ -213,10 +212,9 @@ const InputDropdown = ({
         <Label className="text-muted-foreground text-xs">{t('boxes.dose')}</Label>
         <Input
           type="number"
-          size="sm"
           required
           value={dose || ''}
-          onChange={(e) => onChangeDose(e.target.value === '' ? 0 : parseInt(e.target.value) || 0)}
+          onChange={(e) => onChangeDose(e.target.value === '' ? 0 : parseInt(e.target.value, 10) || 0)}
           onClick={() => setTimeout(() => setShowDropdown(true), 300)}
           onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
           aria-label={t('boxes.dose')}
@@ -244,9 +242,9 @@ const InputDropdown = ({
 // MAIN COMPONENT: BoxesView
 // ============================================================================
 
-function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
+function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: BoxesViewPageProps) {
   const location = useLocation();
-  const params = useParams();
+  const params = useParams<{ lng?: string; calendarId?: string; sharedToken?: string }>();
   const navigate = useNavigate();
   const lng = params.lng;
   const { t } = useTranslation();
@@ -255,16 +253,16 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   // STATE
   // =========================================================================
   
-  const [boxes, setBoxes] = useState([]);
-  const [loadingBoxes, setLoadingBoxes] = useState(undefined);
+  const [boxes, setBoxes] = useState<BoxesViewBoxItem[]>([]);
+  const [loadingBoxes, setLoadingBoxes] = useState<boolean | undefined>(undefined);
   const { showConfirm } = useAlert();
   const [showQRModal, setShowQRModal] = useState(false);
   const [singleScan, setSingleScan] = useState(false);
-  const [currentEditingBoxId, setCurrentEditingBoxId] = useState(null);
-  const [expandedBoxes, setExpandedBoxes] = useState({});
-  const [editingBoxId, setEditingBoxId] = useState(null);
-  const [editingBox, setEditingBox] = useState(null);
-  const [rep, setRep] = useState(null);
+  const [currentEditingBoxId, setCurrentEditingBoxId] = useState<string | null>(null);
+  const [expandedBoxes, setExpandedBoxes] = useState<Record<string, boolean>>({});
+  const [editingBoxId, setEditingBoxId] = useState<string | null>(null);
+  const [editingBox, setEditingBox] = useState<AnyRecord | null>(null);
+  const [rep, setRep] = useState<AnyRecord | null>(null);
   const [notFound, setNotFound] = useState(false);
 
   // =========================================================================
@@ -272,8 +270,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   // =========================================================================
   
   const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-  let calendarType = 'personal';
-  let calendarId = params.calendarId;
+  let calendarType: 'personal' | 'sharedUser' | 'token' = 'personal';
+  let calendarId: string | undefined = params.calendarId;
   let basePath = 'calendar';
 
   if (pathWithoutLang.startsWith('/shared-user-calendar')) {
@@ -285,11 +283,11 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     basePath = 'shared-token-calendar';
   }
 
-  const calendarSource = getCalendarSourceMap(
+  const calendarSource = (getCalendarSourceMap(
     personalCalendars, 
     sharedUserCalendars, 
     tokenCalendars
-  )[calendarType];
+  )[calendarType] || {}) as AnyRecord;
   
   const isDemo = calendarId === 'demo';
 
@@ -298,9 +296,9 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   // =========================================================================
   
   useRealtimeBoxesSwitcher(
-    isDemo ? null : calendarType, 
-    calendarId, 
-    setBoxes, 
+    isDemo ? '' : calendarType,
+    calendarId ?? null,
+    setBoxes as any,
     setLoadingBoxes,
     setRep
   );
@@ -318,7 +316,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         {
           id: 'demo-1',
           name: 'Doliprane 1000mg',
-          dose: '1000 mg',
+          dose: 1000,
           box_capacity: 8,
           stock_quantity: 5,
           stock_alert_threshold: 2,
@@ -327,7 +325,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         {
           id: 'demo-2',
           name: 'Amoxicilline',
-          dose: '500 mg',
+          dose: 500,
           box_capacity: 12,
           stock_quantity: 1,
           stock_alert_threshold: 3,
@@ -336,7 +334,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
         {
           id: 'demo-3',
           name: 'Vitamin C',
-          dose: '500 mg',
+          dose: 500,
           box_capacity: 30,
           stock_quantity: 25,
           stock_alert_threshold: 5,
@@ -352,7 +350,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   // =========================================================================
 
   // Fonction pour créer une box temporaire en mode édition
-  const createTemporaryBox = (medicineData = {}) => {
+  const createTemporaryBox = (medicineData: Partial<BoxesViewBoxItem> = {}) => {
     const tempId = `temp-${Date.now()}`;
     const newBox = {
       id: tempId,
@@ -366,11 +364,11 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     };
     
     // Ajouter la box au state local
-    setBoxes((prev) => [...prev, newBox]);
+    setBoxes((prev) => [...prev, newBox as BoxesViewBoxItem]);
     
     // Mettre en mode édition
     initEditing(newBox);
-    setExpandedBoxes((p) => ({
+    setExpandedBoxes((p: AnyRecord) => ({
       ...p,
       [tempId]: true,
     }));
@@ -385,7 +383,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       t('calendar.delete_title'),
       t('calendar.delete_description'),
       async () => {
-        const r = await personalCalendars.deleteCalendar(calendarId);
+        const r = await (personalCalendars as AnyRecord).deleteCalendar(calendarId);
         if (r.success) {
           navigate(`/${lng}/calendars`);
         }
@@ -400,7 +398,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       t('delete_calendar_title'),
       t('delete_calendar_description'),
       async () => {
-        const r = await sharedUserCalendars.deleteSharedCalendar(calendarId);
+        const r = await (sharedUserCalendars as AnyRecord).deleteSharedCalendar(calendarId);
         if (r.success) {
           navigate(`/${lng}/calendars`);
         }
@@ -408,7 +406,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     );
   };
 
-  const initEditing = (box) => {
+  const initEditing = (box: BoxesViewBoxItem) => {
     setEditingBoxId(box.id);
     setEditingBox({
       name: box.name,
@@ -417,8 +415,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       stock_alert_threshold: box.stock_alert_threshold,
       stock_quantity: box.stock_quantity,
       code_fmd: box.code_fmd || null,
-      conditions: box.conditions.reduce(
-        (acc, c) => ({
+      conditions: (box.conditions || []).reduce(
+        (acc: AnyRecord, c: AnyRecord) => ({
           ...acc,
           [c.id]: {
             ...c,
@@ -439,43 +437,44 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   
   const cancelEditing = () => {
     // Si c'est une box temporaire, la supprimer
-    if (editingBoxId && editingBoxId.startsWith('temp-')) {
+    if (editingBoxId && String(editingBoxId).startsWith('temp-')) {
       setBoxes(prev => prev.filter(b => b.id !== editingBoxId));
     }
     resetEditing();
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const conditions = Object.values(editingBox.conditions || {}).filter(
-      c => c !== undefined
+    const currentEditing = editingBox || {};
+    const conditions = Object.values(currentEditing.conditions || {}).filter(
+      (c) => c !== undefined
     );
     
     // Si c'est une nouvelle box temporaire (ID commence par "temp-")
-    if (editingBoxId.startsWith('temp-')) {
+    if (String(editingBoxId || '').startsWith('temp-')) {
       await calendarSource.createBox(
         calendarId,
-        editingBox.name,
-        editingBox.box_capacity,
-        editingBox.stock_alert_threshold,
-        editingBox.stock_quantity,
-        editingBox.dose,
+        currentEditing.name,
+        currentEditing.box_capacity,
+        currentEditing.stock_alert_threshold,
+        currentEditing.stock_quantity,
+        currentEditing.dose,
         conditions,
-        editingBox.code_fmd
+        currentEditing.code_fmd
       );
     } else {
       // Mise à jour d'une box existante
       await calendarSource.updateBox(
         calendarId, 
         editingBoxId, 
-        { ...editingBox, conditions }
+        { ...currentEditing, conditions }
       );
     }
     
     resetEditing();
   };
 
-  const processMedicineCreation = async (med) => {
+  const processMedicineCreation = async (med: QRScannedMedicine) => {
     const res = await calendarSource.createBox(
       calendarId,
       med.name,
@@ -489,13 +488,13 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     return res.success;
   };
 
-  const addScannedMedicines = async (medicines) => {    
+  const addScannedMedicines = async (medicines: QRScannedMedicine[]) => {
     // Fermer la modal
     setShowQRModal(false);
     
     // Si un seul médicament, créer une box temporaire en mode édition
     if (medicines.length === 1) {
-      createTemporaryBox(medicines[0]);
+      createTemporaryBox(medicines[0] as unknown as Partial<BoxesViewBoxItem>);
       return { success: true, successCount: 1, errorCount: 0 };
     }
     
@@ -513,9 +512,9 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     return { success: error === 0, successCount: success, errorCount: error };
   };
 
-  const updateScannedMedicine = async (medicines) => {    
+  const updateScannedMedicine = async (medicines: QRScannedMedicine[]) => {
     const med = medicines[0];
-    const currentBox = boxes.find(b => b.id === currentEditingBoxId);
+    const currentBox = boxes.find((b) => b.id === currentEditingBoxId);
     
     const res = await calendarSource.updateBox(
       calendarId,
@@ -543,7 +542,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
   };
 
   const getCommonActions = () => {
-    const actions = [
+    const actions: AnyRecord[] = [
       {
         label: (
           <>
@@ -751,7 +750,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       </div>
 
       {/* QR Code Scanner Modal */}
-      <QRCodeScanner
+      <QRCodeScannerAny
         modal={true}
         show={showQRModal}
         singleScan={singleScan}
@@ -784,20 +783,20 @@ function BoxCard({
   onUpdateScan,
   basePath,
   t,
-}) {
+}: AnyRecord) {
   const { showConfirm } = useAlert();
-  const { lng } = useParams();
+  const { lng } = useParams<{ lng?: string }>();
   const navigate = useNavigate();
   
   const isEditing = editingBoxId === box.id && editingBox && editingBox.name !== undefined;
   
-  const timeOfDayMap = {
+  const timeOfDayMap: AnyRecord = {
     morning: t('morning'),
     noon: t('noon'),
     evening: t('evening'),
   };
   
-  const conditionFields = [
+  const conditionFields: AnyRecord[] = [
     {
       label: t('boxes.condition.tablet_count'),
       field: 'tablet_count',
@@ -825,7 +824,7 @@ function BoxCard({
       min: '0',
       step: '1',
       format: 'int',
-      onChange: (cond, value, updateFn) => {
+      onChange: (_cond: AnyRecord, value: number, updateFn: (field: string, v: any) => void) => {
         if (value <= 1) {
           updateFn('start_date', null);
         }
@@ -836,8 +835,8 @@ function BoxCard({
       label: t('boxes.condition.start_date'),
       field: 'start_date',
       type: 'date',
-      ifComplete: (cond) => cond.interval_days > 1,
-      required: (cond) => cond.interval_days > 1,
+      ifComplete: (cond: AnyRecord) => cond.interval_days > 1,
+      required: (cond: AnyRecord) => cond.interval_days > 1,
     },
     {
       label: t('boxes.condition.max_date_mode'),
@@ -848,22 +847,22 @@ function BoxCard({
         { value: 'until_date', label: t('boxes.condition.until_date') },
         { value: 'for_days', label: t('boxes.condition.for_days') },
       ],
-      onChange: (cond, value, updateFn) => {
+      onChange: (_cond: AnyRecord, _value: string, updateFn: (field: string, v: any) => void) => {
         updateFn('max_date', null);
         updateFn('max_date_days', null);
       },
       required: false,
     },
     {
-      label: (cond) => cond.max_date_mode === 'until_date' 
+      label: (cond: AnyRecord) => cond.max_date_mode === 'until_date' 
         ? t('boxes.condition.end_date') 
         : t('boxes.condition.duration_days'),
-      field: (cond) => cond.max_date_mode === 'until_date' ? 'max_date' : 'max_date_days',
-      type: (cond) => cond.max_date_mode === 'until_date' ? 'date' : 'number',
+      field: (cond: AnyRecord) => cond.max_date_mode === 'until_date' ? 'max_date' : 'max_date_days',
+      type: (cond: AnyRecord) => cond.max_date_mode === 'until_date' ? 'date' : 'number',
       min: '1',
       step: '1',
-      format: (cond) => cond.max_date_mode === 'until_date' ? '' : 'int',
-      onChange: (cond, value, updateFn) => {
+      format: (cond: AnyRecord) => cond.max_date_mode === 'until_date' ? '' : 'int',
+      onChange: (cond: AnyRecord, value: any, updateFn: (field: string, v: any) => void) => {
         if (!value || value === '') {
           updateFn('max_date', null);
           if (cond.max_date_mode === 'for_days') updateFn('max_date_days', null);
@@ -873,7 +872,7 @@ function BoxCard({
         if (cond.max_date_mode === 'for_days') {
           const now = new Date();
           const target = new Date(now);
-          const hourByTime = { morning: 8, noon: 12, evening: 18 };
+          const hourByTime: AnyRecord = { morning: 8, noon: 12, evening: 18 };
           const targetHour = hourByTime[cond.time_of_day] ?? 8;
           target.setHours(targetHour, 0, 0, 0);
           const includeToday = now < target;
@@ -888,8 +887,8 @@ function BoxCard({
           updateFn('max_date', selectedDate.toISOString());
         }
       },
-      ifComplete: (cond) => cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
-      required: (cond) => cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
+      ifComplete: (cond: AnyRecord) => cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
+      required: (cond: AnyRecord) => cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
     },
   ];
 
@@ -902,10 +901,10 @@ function BoxCard({
   };
 
   const toggleExpand = () => {
-    setExpandedBoxes((p) => ({ ...p, [box.id]: !p[box.id] }));
+    setExpandedBoxes((p: AnyRecord) => ({ ...p, [box.id]: !p[box.id] }));
   };
 
-  const deleteBox = async (calendarId, boxId) => {
+  const deleteBox = async (calendarId: string, boxId: string) => {
     showConfirm(
       'confirm-danger',
       t('boxes.delete_title'),
@@ -919,7 +918,7 @@ function BoxCard({
 
   const addCondition = () => {
     const id = uuidv4();
-    setEditingBox((p) => ({
+    setEditingBox((p: AnyRecord) => ({
       ...p,
       conditions: {
         ...p.conditions,
@@ -937,15 +936,15 @@ function BoxCard({
     }));
   };
 
-  const deleteCondition = (id) => {
-    setEditingBox((p) => ({
+  const deleteCondition = (id: string) => {
+    setEditingBox((p: AnyRecord) => ({
       ...p,
       conditions: { ...p.conditions, [id]: undefined },
     }));
   };
 
-  const updateCondition = (id, field, val) => {
-    setEditingBox((p) => ({
+  const updateCondition = (id: string, field: string, val: any) => {
+    setEditingBox((p: AnyRecord) => ({
       ...p,
       conditions: {
         ...p.conditions,
@@ -1002,7 +1001,7 @@ function BoxCard({
   ];
 
   const getBorderClass = () => {
-    const allExpired = box.conditions?.every((c) => {
+    const allExpired = box.conditions?.every((c: AnyRecord) => {
       if (!c?.max_date) return false;
       return new Date() > new Date(c.max_date);
     });
@@ -1035,19 +1034,19 @@ function BoxCard({
             name={editingBox.name}
             dose={editingBox.dose}
             onChangeName={(value) =>
-              setEditingBox((p) => ({ ...p, name: value }))
+              setEditingBox((p: AnyRecord) => ({ ...p, name: value }))
             }
             onChangeDose={(value) =>
-              setEditingBox((p) => ({ ...p, dose: value }))
+              setEditingBox((p: AnyRecord) => ({ ...p, dose: value }))
             }
             onChangeBoxCapacity={(value) =>
-              setEditingBox((p) => ({ ...p, box_capacity: value }))
+              setEditingBox((p: AnyRecord) => ({ ...p, box_capacity: value }))
             }
             onChangeStockQuantity={(value) =>
-              setEditingBox((p) => ({ ...p, stock_quantity: value }))
+              setEditingBox((p: AnyRecord) => ({ ...p, stock_quantity: value }))
             }
             onChangeCodeFmd={(value) =>
-              setEditingBox((p) => ({ ...p, code_fmd: value }))
+              setEditingBox((p: AnyRecord) => ({ ...p, code_fmd: value }))
             }
             fetchSuggestions={fetchSuggestions}
           />
@@ -1064,10 +1063,9 @@ function BoxCard({
             {isEditing ? (
               <Input
                 type="number"
-                size="sm"
                 value={editingBox.box_capacity ?? ''}
                 onChange={(e) =>
-                  setEditingBox((p) => ({
+                  setEditingBox((p: AnyRecord) => ({
                     ...p,
                     box_capacity: e.target.value === '' ? null : parseFloat(e.target.value) || null,
                   }))
@@ -1083,10 +1081,9 @@ function BoxCard({
             {isEditing ? (
               <Input
                 type="number"
-                size="sm"
                 value={editingBox.stock_alert_threshold ?? ''}
                 onChange={(e) =>
-                  setEditingBox((p) => ({
+                  setEditingBox((p: AnyRecord) => ({
                     ...p,
                     stock_alert_threshold: e.target.value === '' ? null : parseFloat(e.target.value) || null,
                   }))
@@ -1106,10 +1103,9 @@ function BoxCard({
             {isEditing ? (
               <Input
                 type="number"
-                size="sm"
                 value={editingBox.stock_quantity ?? ''}
                 onChange={(e) =>
-                  setEditingBox((p) => ({
+                  setEditingBox((p: AnyRecord) => ({
                     ...p,
                     stock_quantity: e.target.value === '' ? null : parseFloat(e.target.value) || null,
                   }))
@@ -1153,11 +1149,11 @@ function BoxCard({
         {/* Stock Badges */}
         {!isEditing && (
           <div className="flex flex-wrap gap-2 mb-3">
-            {box.conditions.filter((c) => c !== undefined).length === 0 && (
+            {box.conditions.filter((c: AnyRecord) => c !== undefined).length === 0 && (
               <button
                 className="p-0 border-0 bg-transparent"
                 onClick={() => {
-                  setExpandedBoxes((p) => ({ ...p, [box.id]: true }));
+                  setExpandedBoxes((p: AnyRecord) => ({ ...p, [box.id]: true }));
                   onEdit(box);
                 }}
                 aria-label={t('boxes.condition.add')}
@@ -1171,7 +1167,7 @@ function BoxCard({
               </button>
             )}
             
-            {box.conditions?.every((c) => {
+            {box.conditions?.every((c: AnyRecord) => {
               if (!c?.max_date) return false;
               return new Date() > new Date(c.max_date);
             }) ? (
@@ -1182,13 +1178,13 @@ function BoxCard({
                 tooltip={t('boxes.condition.inactive_tooltip')}
               />
             ) : (
-              box.conditions?.some((c) => {
+              box.conditions?.some((c: AnyRecord) => {
                 if (!c?.max_date) return false;
                 return new Date() > new Date(c.max_date);
               }) ? (
                 <button
                   className="p-0 border-0 bg-transparent"
-                  onClick={() => setExpandedBoxes((p) => ({ ...p, [box.id]: true }))}
+                  onClick={() => setExpandedBoxes((p: AnyRecord) => ({ ...p, [box.id]: true }))}
                   aria-label={t('boxes.condition.add')}
                 >
                   <StatusBadge
@@ -1271,8 +1267,8 @@ function BoxCard({
               {isEditing ? (
                 <>
                   {Object.values(editingBox.conditions || {})
-                    .filter((c) => c !== undefined)
-                    .map((cond) => (
+                    .filter((c: any) => c !== undefined)
+                    .map((cond: any) => (
                       <div
                         key={cond.id}
                         className="p-3 border rounded-md bg-muted/50 space-y-3"
@@ -1298,16 +1294,16 @@ function BoxCard({
                                     onValueChange={(value) => {
                                       updateCondition(cond.id, resolvedField, value);
                                       if (onChange) {
-                                        onChange(cond, value, (f, v) => updateCondition(cond.id, f, v));
+                                        onChange(cond, value, (f: string, v: any) => updateCondition(cond.id, f, v));
                                       }
                                     }}
                                     required={resolvedRequired}
                                   >
-                                    <SelectTrigger size="sm" className="w-full">
+                                    <SelectTrigger className="w-full">
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      {options.map((o) => (
+                                      {options.map((o: AnyRecord) => (
                                         <SelectItem key={o.value} value={o.value}>
                                           {o.label}
                                         </SelectItem>
@@ -1317,7 +1313,6 @@ function BoxCard({
                                 ) : (
                                   <Input
                                     type={resolvedType}
-                                    size="sm"
                                     value={
                                       (resolvedField === 'start_date' || (resolvedField === 'max_date' && resolvedType === 'date')) && cond[resolvedField]
                                         ? new Date(cond[resolvedField]).toISOString().split('T')[0]
@@ -1326,7 +1321,7 @@ function BoxCard({
                                     min={min}
                                     step={step}
                                     onChange={(e) => {
-                                      let value = e.target.value;
+                                      let value: any = e.target.value;
                                       if (resolvedFormat === 'int') {
                                         value = parseInt(value);
                                       } else if (resolvedFormat === 'float') {
@@ -1334,7 +1329,7 @@ function BoxCard({
                                       }
                                       updateCondition(cond.id, resolvedField, value);
                                       if (onChange) {
-                                        onChange(cond, value, (f, v) => updateCondition(cond.id, f, v));
+                                        onChange(cond, value, (f: string, v: any) => updateCondition(cond.id, f, v));
                                       }
                                     }}
                                     aria-label={resolvedLabel}
@@ -1348,7 +1343,6 @@ function BoxCard({
                         <Button
                           type="button"
                           variant="destructive"
-                          size="sm"
                           onClick={() => deleteCondition(cond.id)}
                         >
                           <Trash2 className="h-4 w-4 mr-1" />
@@ -1360,7 +1354,6 @@ function BoxCard({
                   <Button
                     type="button"
                     variant="outline"
-                    size="sm"
                     className="w-full"
                     onClick={addCondition}
                   >
@@ -1368,10 +1361,10 @@ function BoxCard({
                     {t('boxes.condition.add')}
                   </Button>
                 </>
-              ) : box.conditions.filter((c) => c !== undefined).length > 0 ? (
+              ) : box.conditions.filter((c: AnyRecord) => c !== undefined).length > 0 ? (
                 box.conditions
-                  .filter((c) => c !== undefined)
-                  .map((cond) => (
+                  .filter((c: AnyRecord) => c !== undefined)
+                  .map((cond: AnyRecord) => (
                     <div
                       key={cond.id}
                       className="p-3 border rounded-md bg-muted/50"
@@ -1425,7 +1418,6 @@ function BoxCard({
               <Button
                 type="submit"
                 variant="default"
-                size="sm"
                 className="flex-1 bg-green-600 hover:bg-green-700"
               >
                 <Save className="h-4 w-4 mr-1" />
@@ -1434,7 +1426,6 @@ function BoxCard({
               <Button
                 type="button"
                 variant="secondary"
-                size="sm"
                 className="flex-1"
                 onClick={onCancel}
               >
@@ -1449,43 +1440,7 @@ function BoxCard({
   );
 }
 
-BoxCard.propTypes = {
-  box: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-    dose: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    box_capacity: PropTypes.number,
-    stock_quantity: PropTypes.number,
-    stock_alert_threshold: PropTypes.number,
-    conditions: PropTypes.arrayOf(PropTypes.shape({
-      tablet_count: PropTypes.number,
-      time_of_day: PropTypes.string,
-      interval_days: PropTypes.number,
-      start_date: PropTypes.string,
-      max_date: PropTypes.string,
-    })),
-  }).isRequired,
-  editingBoxId: PropTypes.string,
-  editingBox: PropTypes.object,
-  setEditingBox: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  expandedBoxes: PropTypes.object.isRequired,
-  setExpandedBoxes: PropTypes.func.isRequired,
-  calendarId: PropTypes.string.isRequired,
-  calendarSource: PropTypes.object.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onUpdateScan: PropTypes.func.isRequired,
-  basePath: PropTypes.string.isRequired,
-  t: PropTypes.func.isRequired,
-};
-
-BoxesView.propTypes = {
-  personalCalendars: PropTypes.object,
-  sharedUserCalendars: PropTypes.shape({
-    deleteSharedCalendar: PropTypes.func,
-  }),
-  tokenCalendars: PropTypes.object,
-};
-
 export default BoxesView;
+
+
 

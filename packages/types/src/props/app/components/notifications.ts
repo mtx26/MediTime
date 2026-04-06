@@ -1,11 +1,7 @@
-export interface HoveredUserProfileUser {
-  photo_url: string;
-  display_name: string;
-  email?: string | null;
-}
+import type { UserProfile, CalendarInfo } from '../../../models/common';
 
 export interface HoveredUserProfileProps<TTrigger = unknown> {
-  user: HoveredUserProfileUser;
+  user: UserProfile;
   trigger: TTrigger;
 }
 
@@ -18,7 +14,7 @@ export type AppNotificationType =
   | 'low_stock';
 
 export interface AppNotification {
-  notification_id: string | number;
+  notification_id: string;
   notification_type: AppNotificationType;
   read: boolean;
   timestamp: string;
@@ -26,38 +22,30 @@ export interface AppNotification {
   sender_photo_url?: string | null;
   sender_email?: string | null;
   calendar_name?: string | null;
-  calendar_id?: string | number | null;
+  calendar_id?: string | null;
   accepted?: boolean;
   token?: string | null;
   medication_name?: string | null;
-  medication_qty?: number | string | null;
+  medication_qty?: number | null;
 }
 
 export interface NotificationLineProps {
   notif: AppNotification;
-  onRead: (notificationId: string | number) => void;
-}
-
-export interface CalendarHeaderInfo {
-  id: string;
-  name: string;
-  owner_email?: string;
-  owner_name?: string;
-  owner_photo_url?: string;
+  onRead: (notificationId: string) => void;
 }
 
 export interface HeaderNotificationsState {
   notificationsData: AppNotification[] | null;
-  readNotification: (notificationId: string | number) => void;
+  readNotification: (notificationId: string) => void;
   readAllNotifications: () => void;
 }
 
 export interface HeaderSharedProps {
   personalCalendars: {
-    calendarsData?: CalendarHeaderInfo[];
+    calendarsData?: CalendarInfo[];
   };
   sharedUserCalendars: {
-    sharedCalendarsData?: CalendarHeaderInfo[];
+    sharedCalendarsData?: CalendarInfo[];
   };
   notifications: HeaderNotificationsState;
 }

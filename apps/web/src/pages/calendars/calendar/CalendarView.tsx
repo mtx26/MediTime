@@ -1,5 +1,5 @@
 // CalendarPage.jsx
-import React, { useEffect, useContext, useRef, useState, useMemo } from 'react';
+import { useEffect, useContext, useRef, useState, useMemo } from 'react';
 import { useNavigate, useParams, useLocation, Link } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -10,70 +10,78 @@ import { useLoading } from '@/components/ui/loading';
 import { toISO } from '@meditime/utils';
 import { getCalendarSourceMap } from '@meditime/utils';
 import { useAlert } from '@/contexts/AlertContext';
-import isEqual from 'lodash/isEqual';
 import DateModal from '@/components/calendar/DateModal';
 import WeekCalendarSelector from '@/components/calendar/WeekCalendarSelector';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
 import PillboxDisplay from '@/components/calendar/PillboxDisplay';
 import ActionSheet from '@/components/common/ActionSheet';
 import NotFound from '@/pages/general/NotFound';
-import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Pill, Grid3X3, CalendarDays, Share2, Download, AlertTriangle, Calendar, Clock, Settings, Trash2, ChevronRight, Pin } from 'lucide-react';
 import '@/styles/fullcalendar-custom.css';
 import { getLocale } from '@meditime/config';
+import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
+import type {
+  CalendarPageSourceType,
+  CalendarTable,
+  CalendarViewSource,
+  DateModalRef,
+  WeeklyEventItem,
+  DailyCalendarPageProps as CalendarViewProps,
+} from '@meditime/types';
 
 
 function CalendarPage({
   personalCalendars,
   sharedUserCalendars,
   tokenCalendars,
-}) {
+}: CalendarViewProps) {
   // 📍 Paramètres d'URL et navigation
   const navigate = useNavigate(); // Hook de navigation
   const location = useLocation();
-  const params = useParams();
+  const params = useParams<{ lng?: string; calendarId?: string; sharedToken?: string }>();
   const { lng } = params;
   const { t } = useTranslation();
 
   // 🔐 Contexte d'authentification
-  const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
+  const userContext = useContext(UserContext);
+  const userInfo = userContext?.userInfo; // Contexte de l'utilisateur connecté
   const { showLoading } = useLoading(); // Gestion du spinner global
 
-  const calendarRef = useRef(null);
+  const calendarRef = useRef<any>(null);
   // garder selectedDate comme objet Date pour manipulations faciles
-  const [selectedDate, setSelectedDate] = useState(); // Date JS
-  const [eventsForDay, setEventsForDay] = useState([]); // Événements filtrés pour un jour spécifique
-  const [calendarEvents, setCalendarEvents] = useState([]); // Événements du calendrier
-  const [calendarTable, setCalendarTable] = useState([]); // Événements du calendrier
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Date JS
+  const [eventsForDay, setEventsForDay] = useState<WeeklyEventItem[]>([]); // Événements filtrés pour un jour spécifique
+  const [calendarEvents, setCalendarEvents] = useState<WeeklyEventItem[]>([]); // Événements du calendrier
+  const [calendarTable, setCalendarTable] = useState<CalendarTable>({}); // Événements du calendrier
   const [calendarName, setCalendarName] = useState(''); // Nom du calendrier
   const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
   const { showConfirm } = useAlert();
 
   // Méthode de décrémentation du stock (pour affichage différencié)
-  const [stockDecrementMethod, setStockDecrementMethod] = useState(false);
+  const [stockDecrementMethod, setStockDecrementMethod] = useState('');
   const [loadingStockMethod, setLoadingStockMethod] = useState(false);
 
   // 🔄 Références et chargement
-  const dateModalRef = useRef(null);
+  const dateModalRef = useRef<DateModalRef | null>(null);
   const [loading, setLoading] = useState(true); // État de chargement du calendrier
   const [notFound, setNotFound] = useState(false);
   const initialNextDate = new Date(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0));
 
-  let calendarType = 'personal';
+  let calendarType: CalendarPageSourceType = 'personal';
   let calendarId = params.calendarId;
   let basePath = 'calendar';
 
   const pathWithoutLang =
     location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
 
-  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
+  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
     basePath = 'shared-user-calendar';
-  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
+  } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
     calendarType = 'token';
     calendarId = params.sharedToken;
     basePath = 'shared-token-calendar';
@@ -83,10 +91,10 @@ function CalendarPage({
     personalCalendars,
     sharedUserCalendars,
     tokenCalendars
-  )[calendarType];
+  )[calendarType] as unknown as CalendarViewSource;
 
   // Fonction pour naviguer vers une date
-  const onSelectDate = (dateInput) => {
+  const onSelectDate = (dateInput: string | number | Date) => {
     // accepte Date ou ISO string
     const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
     setSelectedDate(d);
@@ -94,36 +102,38 @@ function CalendarPage({
   };
 
   // Fonction pour naviguer vers la semaine suivante ou precedente
-  const onWeekSelect = async (newSelectedDate) => {
+  const onWeekSelect = async (newSelectedDate: Date) => {
     onSelectDate(newSelectedDate);
     const isoDate = toISO(newSelectedDate);
     const rep = await calendarSource.fetchSchedule(calendarId, isoDate);
     if (rep.success) {
-      setCalendarEvents(rep.schedule);
-      setCalendarTable(rep.table);
+      setCalendarEvents((rep.schedule || []) as WeeklyEventItem[]);
+      setCalendarTable((rep.table || {}) as CalendarTable);
       calendarRef.current?.getApi().gotoDate(isoDate);
     }
   };
 
   // Fonction pour gérer le clic sur une date
-  const handleDateClick = (info) => {
+  const handleDateClick = (info: { dateStr: string }) => {
     const clickedDate = info.dateStr; // YYYY-MM-DD
     setSelectedDate(new Date(clickedDate));
     dateModalRef.current?.open();
   };
 
   // Fonction pour naviguer vers la date suivante ou precedente
-  const navigateDay = (direction) => {
+  const navigateDay = (direction: number) => {
+    if (!selectedDate) return;
     const current = new Date(selectedDate);
     current.setDate(current.getDate() + direction);
     setSelectedDate(current);
   };
 
-  const navigateWeek = (direction) => {
+  const navigateWeek = (direction: number) => {
+    if (!selectedDate) return;
     const current = new Date(selectedDate);
     current.setDate(current.getDate() + direction);
     const newSelectedDate = current;
-    onWeekSelect(newSelectedDate);
+    void onWeekSelect(newSelectedDate);
   };
 
   // Fonction pour charger le calendrier lorsque l'utilisateur est connecté ou que le calendrier est un token
@@ -136,14 +146,16 @@ function CalendarPage({
     const load = async () => {
       const rep = await calendarSource.fetchSchedule(calendarId, toISO(selectedDate));
       if (rep.success) {
-        if (!isEqual(rep.schedule, calendarEvents)) {
-          setCalendarEvents(rep.schedule);
+        const nextSchedule = (rep.schedule || []) as WeeklyEventItem[];
+        if (JSON.stringify(nextSchedule) !== JSON.stringify(calendarEvents)) {
+          setCalendarEvents(nextSchedule);
         }
-        if (!isEqual(rep.table, calendarTable)) {
-          setCalendarTable(rep.table);
+        const nextTable = (rep.table || {}) as CalendarTable;
+        if (JSON.stringify(nextTable) !== JSON.stringify(calendarTable)) {
+          setCalendarTable(nextTable);
         }
-        if (!isEqual(rep.calendarName, calendarName)) {
-          setCalendarName(rep.calendarName);
+        if ((rep.calendarName || '') !== calendarName) {
+          setCalendarName(rep.calendarName || '');
         }
         if (rep.ifLowStock !== undefined && rep.ifLowStock !== isLowStock) {
           setIsLowStock(rep.ifLowStock);
@@ -158,12 +170,12 @@ function CalendarPage({
       setLoading(false);
     };
 
-    load();
-  }, [calendarId, calendarSource.fetchSchedule, userInfo, selectedDate]);
+    void load();
+  }, [calendarId, calendarEvents, calendarName, calendarSource, calendarTable, isLowStock, userInfo, selectedDate]);
 
   // Gérer l'affichage du spinner global
   useEffect(() => {
-    showLoading(((loading === true || loadingStockMethod === true) && calendarId), t('loading_calendar'));
+    showLoading(Boolean((loading === true || loadingStockMethod === true) && calendarId), t('loading_calendar'));
   }, [loading, loadingStockMethod, calendarId, showLoading, t]);
 
   // Charger la méthode de décrémentation du stock (si disponible)
@@ -176,8 +188,9 @@ function CalendarPage({
       // On tente pour les calendriers personal et sharedUser en appelant l'API exposée
       const rep = await calendarSource.fetchStockDecrementMethod(calendarId);
       if (rep.success) {
-        setStockDecrementMethod(rep.method);
-        if (rep.method == 'weekly_pillbox') {
+        const method = rep.method || '';
+        setStockDecrementMethod(method);
+        if (method === 'weekly_pillbox') {
           setSelectedDate(new Date(initialNextDate));
         } else {
           setSelectedDate(new Date(new Date().setHours(0,0,0,0)));
@@ -188,8 +201,8 @@ function CalendarPage({
       }
       setLoadingStockMethod(false);
     };
-    fetchMethod();
-  }, [calendarId, calendarType, userInfo]);
+    void fetchMethod();
+  }, [calendarId, calendarSource, calendarType, initialNextDate, userInfo]);
 
   // Fonction pour supprimer le calendrier avec confirmation
   const handleDeleteCalendar = () => {
@@ -198,7 +211,7 @@ function CalendarPage({
       t('calendar.delete_title'),
       t('calendar.delete_description'),
       async () => {
-        const rep = await personalCalendars.deleteCalendar(calendarId);
+        const rep = await (personalCalendars as Record<string, unknown> & { deleteCalendar: (id?: string) => Promise<{ success: boolean }> }).deleteCalendar(calendarId);
         if (rep.success) {
           navigate(`/${lng}/calendars`);
         }
@@ -213,7 +226,7 @@ function CalendarPage({
       t('calendar.delete_shared_title'),
       t('calendar.delete_shared_description'),
       async () => {
-        const rep = await sharedUserCalendars.deleteSharedCalendar(calendarId);
+        const rep = await (sharedUserCalendars as Record<string, unknown> & { deleteSharedCalendar: (id?: string) => Promise<{ success: boolean }> }).deleteSharedCalendar(calendarId);
         if (rep.success) {
           navigate(`/${lng}/calendars`);
         }
@@ -290,7 +303,7 @@ function CalendarPage({
                             <Grid3X3 className="h-4 w-4 mr-2" /> {t('pillbox.title')}
                           </>
                         ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`,
+                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate || new Date())}`,
                         title: t('pillbox.title'),
                       },
                       {
@@ -388,7 +401,7 @@ function CalendarPage({
                             <Grid3X3 className="h-4 w-4 mr-2" /> {t('pillbox.title')}
                           </>
                         ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`,
+                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate || new Date())}`,
                         title: t('pillbox.title'),
                       },
                       {
@@ -509,7 +522,7 @@ function CalendarPage({
                       title={t('pillbox.fill')}
                       data-tour="calendar-grid-mobile-btn"
                     >
-                      <Link to={`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate)}`}>
+                      <Link to={`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate || new Date())}`}>
                         <Pill className="h-4 w-4" /> {t('pillbox.fill')}
                       </Link>
                     </Button>
@@ -645,7 +658,7 @@ function CalendarPage({
                     center: '',
                     right: '',
                   }}
-                  locale={getLocale(lng)}
+                  locale={getLocale(lng || 'en')}
                   firstDay={1}
                   dateClick={handleDateClick}
                   height="auto"
@@ -716,6 +729,11 @@ function CalendarWeekSelector({
   onWeekSelect,
   selectedDate,
   t
+}: {
+  calendarTable: CalendarTable;
+  onWeekSelect: (date: Date) => void;
+  selectedDate: Date | null;
+  t: (key: string) => string;
 }) {
   return (
     Object.keys(calendarTable).filter(
@@ -736,15 +754,5 @@ function CalendarWeekSelector({
     )
   )
 }
-
-CalendarPage.propTypes = {
-  personalCalendars: PropTypes.shape({
-    deletePersonalCalendar: PropTypes.func,
-  }),
-  sharedUserCalendars: PropTypes.shape({
-    deleteSharedCalendar: PropTypes.func,
-  }),
-  tokenCalendars: PropTypes.object,
-};
 
 export default CalendarPage;

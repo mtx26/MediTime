@@ -123,7 +123,7 @@ const fetchSharedCalendars = async (
 export const useRealtimeCalendars = (
   setCalendarsData: SetUnknown,
   setLoadingStates: SetLoadingStates,
-  calendarsData: Array<{ id: string | number }> = []
+  calendarsData: Array<{ id: string }> = []
 ): void => {
   const userContext = useContext(UserContext) as UserContextValue | null;
   const userInfo = userContext?.userInfo;
@@ -175,7 +175,7 @@ export const useRealtimeCalendars = (
 export const useRealtimeSharedCalendars = (
   setSharedCalendarsData: SetUnknown,
   setLoadingStates: SetLoadingStates,
-  sharedCalendarsData: Array<{ id: string | number }> = []
+  sharedCalendarsData: Array<{ id: string }> = []
 ): void => {
   const userContext = useContext(UserContext) as UserContextValue | null;
   const userInfo = userContext?.userInfo;

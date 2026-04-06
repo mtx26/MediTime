@@ -7,7 +7,7 @@ import NotificationLine from './NotificationLine';
 import LanguageSelector from './LanguageSelector';
 import ThemeToggle from './ThemeToggle';
 import { useTranslation } from 'react-i18next';
-import type { AppNotification, AppSharedProps, CalendarHeaderInfo } from '@meditime/types';
+import type { AppNotification, AppSharedProps, CalendarInfo } from '@meditime/types';
 import {
   buildLocationList,
   buildReturnToCalendarList,
@@ -51,7 +51,7 @@ function Navbar({ sharedProps }: { sharedProps: AppSharedProps }) {
   const location = useLocation();
   const { lng = 'en' } = useParams();
   const { t } = useTranslation();
-  const [calendarInfo, setCalendarInfo] = useState<CalendarHeaderInfo | null>(null);
+  const [calendarInfo, setCalendarInfo] = useState<CalendarInfo | null>(null);
   const [basePath, setBasePath] = useState<'calendar' | 'shared-user-calendar' | 'shared-token-calendar' | null>(null);
   const [tokenId, setTokenId] = useState<string | null>(null);
   
@@ -64,10 +64,10 @@ function Navbar({ sharedProps }: { sharedProps: AppSharedProps }) {
   const locationAvailableForReturnToCalendar = buildReturnToCalendar(pathParts);
   const isPillboxPage = isPillboxPath(pathParts);
 
-  const personalCalendarsData = sharedProps.personalCalendars.calendarsData as CalendarHeaderInfo[] | undefined;
-  const sharedCalendarsData = sharedProps.sharedUserCalendars.sharedCalendarsData as CalendarHeaderInfo[] | undefined;
+  const personalCalendarsData = sharedProps.personalCalendars.calendarsData as CalendarInfo[] | undefined;
+  const sharedCalendarsData = sharedProps.sharedUserCalendars.sharedCalendarsData as CalendarInfo[] | undefined;
   const notificationsData = (sharedProps.notifications.notificationsData as AppNotification[] | null | undefined) ?? null;
-  const readNotification = sharedProps.notifications.readNotification as (notificationId: string | number) => void;
+  const readNotification = sharedProps.notifications.readNotification as (notificationId: string) => void;
   const readAllNotifications = sharedProps.notifications.readAllNotifications as () => void;
 
   useEffect(() => {

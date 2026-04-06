@@ -13,7 +13,7 @@ export type SharedInvitationResult = ApiResult & {
 };
 
 export type SharedInvitationActionResult = ApiResult & {
-  calendar_id?: string | number;
+  calendar_id?: string;
 };
 
 export interface AcceptInviteSharedUserCalendars {

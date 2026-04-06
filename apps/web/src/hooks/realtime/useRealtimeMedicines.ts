@@ -59,7 +59,7 @@ export const useRealtimeTokenMedicines = (
   setMedicinesData: SetMedicinesData,
   setLoadingMedicines: SetLoadingMedicines
 ): void => {
-  const [calendarId, setCalendarId] = useState<string | number | null>(null);
+  const [calendarId, setCalendarId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;

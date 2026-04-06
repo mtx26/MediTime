@@ -43,3 +43,17 @@ export interface ToastProps {
   onClose: () => void;
   duration?: number;
 }
+
+/* ------------------------------------------------------------------ */
+/* Alert Context                                                      */
+/* ------------------------------------------------------------------ */
+
+export interface AlertContextValue {
+  showAlert: (type: ToastType, message: string) => void;
+  showConfirm: (type: ConfirmDialogType, title: string, message: string, onConfirm: () => void) => void;
+  closeAlert: () => void;
+}
+
+export interface AlertProviderProps<TNode = unknown> {
+  children: TNode;
+}

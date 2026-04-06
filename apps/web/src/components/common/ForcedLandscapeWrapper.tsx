@@ -1,10 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import type { ForcedLandscapeWrapperProps } from '@meditime/types';
-
-interface ViewportDimensions {
-  width: number;
-  height: number;
-}
+import type { ForcedLandscapeWrapperProps, ViewportDimensions } from '@meditime/types';
 
 function getViewportDimensions(): ViewportDimensions {
   return {

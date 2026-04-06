@@ -62,7 +62,7 @@ function AcceptInvitePage({ sharedUserCalendars }: AcceptInvitePageProps) {
 
   const handleAccept = async () => {
     setLoading(true);
-    let calendarId: string | number | null = null;
+    let calendarId: string | null = null;
     const locale = lng ?? 'en';
 
     if (type === 'login') {

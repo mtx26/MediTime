@@ -3,16 +3,9 @@ import { UserContext } from '../../contexts/UserContext';
 import { log } from '@meditime/utils';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
-import type { LoadingStates, UserContextValue } from '@meditime/types';
+import type { LoadingStates, TokenItem, TokensResponse, UserContextValue } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-type TokenItem = Record<string, unknown>;
-type TokensResponse = {
-  tokens: TokenItem[];
-  message?: string;
-  error?: string;
-};
 
 function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;

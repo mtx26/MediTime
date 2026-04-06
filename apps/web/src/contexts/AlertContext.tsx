@@ -1,24 +1,12 @@
 import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import Toast from '../components/common/Toast';
-import type { ConfirmDialogType, ToastType } from '@meditime/types';
-
-type AlertType = ToastType | ConfirmDialogType | '';
-
-interface AlertContextValue {
-  showAlert: (type: ToastType, message: string) => void;
-  showConfirm: (type: ConfirmDialogType, title: string, message: string, onConfirm: () => void) => void;
-  closeAlert: () => void;
-}
+import type { AlertType, AlertContextValue, AlertProviderProps, ConfirmDialogType, ToastType } from '@meditime/types';
 
 const AlertContext = createContext<AlertContextValue | null>(null);
 
-interface AlertProviderProps {
-  children: ReactNode;
-}
-
-export function AlertProvider({ children }: AlertProviderProps) {
-  const [alertType, setAlertType] = useState<AlertType>('');
+export function AlertProvider({ children }: AlertProviderProps<ReactNode>) {
+  const [alertType, setAlertType] = useState<AlertType | ''>('');
   const [alertMessage, setAlertMessage] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
   const [onConfirmAction, setOnConfirmAction] = useState<(() => void) | null>(null);

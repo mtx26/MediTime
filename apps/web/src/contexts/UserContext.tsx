@@ -1,27 +1,12 @@
 import { createContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { supabase } from '../services/supabase/supabaseClient';
 import { log } from '@meditime/utils';
-import type { UserContextValue, UserInfo } from '@meditime/types';
+import type { UserContextValue, UserInfo, SessionLike, ReloadUserFn, UserProviderProps } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-type SessionLike = {
-  access_token: string;
-  user?: {
-    id: string;
-    email?: string | null;
-    user_metadata?: Record<string, unknown>;
-  } | null;
-} | null;
-
-type ReloadUserFn = (currentSession?: SessionLike) => Promise<void>;
-
 const UserContext = createContext<UserContextValue | null>(null);
 let globalReloadUser: ReloadUserFn = async () => {};
-
-interface UserProviderProps {
-  children: ReactNode;
-}
 
 function parseStoredUserInfo(): UserInfo | null {
   try {
@@ -33,7 +18,7 @@ function parseStoredUserInfo(): UserInfo | null {
   }
 }
 
-export function UserProvider({ children }: UserProviderProps) {
+export function UserProvider({ children }: UserProviderProps<ReactNode>) {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(() => parseStoredUserInfo());
   const [recoveryEvent, setRecoveryEvent] = useState(false);
   const tokenRef = useRef<string | null>(null);

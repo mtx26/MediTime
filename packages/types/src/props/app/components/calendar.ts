@@ -14,9 +14,9 @@ export interface WeeklyEventItem {
   start: string;
   title: string;
   color?: string;
-  dose?: number | string | null;
+  dose?: number | null;
   notes?: string | null;
-  tablet_count?: number | string | null;
+  tablet_count?: number | null;
   [key: string]: unknown;
 }
 

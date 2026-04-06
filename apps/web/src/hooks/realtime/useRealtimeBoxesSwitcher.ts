@@ -1,15 +1,13 @@
 // useRealtimeBoxesSwitcher.js
 import type { Dispatch, SetStateAction } from 'react';
-import type { BoxItem } from '@meditime/types';
+import type { BoxItem, CalendarPageSourceType } from '@meditime/types';
 import {
   useRealtimePersonalBoxes,
   useRealtimeSharedBoxes,
 } from './useRealtimeBoxes';
 
-type CalendarType = 'personal' | 'sharedUser' | string;
-
 export const useRealtimeBoxesSwitcher = (
-  calendarType: CalendarType,
+  calendarType: CalendarPageSourceType | '',
   calendarId: string | null,
   setBoxes: Dispatch<SetStateAction<BoxItem[]>>,
   setLoadingBoxes: Dispatch<SetStateAction<boolean | undefined>>,

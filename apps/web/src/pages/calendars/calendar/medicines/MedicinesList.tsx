@@ -6,17 +6,7 @@ import { useLoading } from '@/components/ui/loading';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
 import { Pill, AlertCircle } from 'lucide-react';
-import type { MedicineItem } from '@meditime/types';
-
-type GroupedMedicines = Record<string, MedicineItem[]>;
-
-interface MedicineDisplayItem extends MedicineItem {
-  dose?: number | string | null;
-  time_of_day?: string[];
-  tablet_count?: number;
-  interval_days?: number;
-  start_date?: string;
-}
+import type { MedicineItem, GroupedMedicines, MedicineDisplayItem } from '@meditime/types';
 
 function MedicinesList() {
   // 📍 Paramètres d’URL et navigation

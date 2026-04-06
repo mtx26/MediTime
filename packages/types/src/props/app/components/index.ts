@@ -5,3 +5,4 @@ export * from './share';
 export * from './calendar-pages';
 export * from './feedback';
 export * from './notifications';
+export * from './boxes';

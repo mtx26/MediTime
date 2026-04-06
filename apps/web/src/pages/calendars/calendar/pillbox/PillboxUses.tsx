@@ -79,7 +79,7 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }:
     }
   };
 
-  const cancelUse = (useId: string | number) => {
+  const cancelUse = (useId: string) => {
     if (!calendarId) return;
     
     showConfirm(

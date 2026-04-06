@@ -70,7 +70,7 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }: Ics
     }
   };
 
-  const handleDeleteToken = async (tokenId: string | number) => {
+  const handleDeleteToken = async (tokenId: string) => {
     const result = await calendarSource.deleteTokenIcs(calendarId, tokenId);
     if (result.success) {
       fetchTokens();

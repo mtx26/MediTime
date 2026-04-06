@@ -1,4 +1,10 @@
 import type { ApiResult } from '../../../contracts';
+import type { UserProfile, CalendarListItem } from '../../../models/common';
+import type { MedicineItem } from '../../../models/realtime';
+
+/* ------------------------------------------------------------------ */
+/* Base                                                               */
+/* ------------------------------------------------------------------ */
 
 export interface CalendarDataSourceProps {
   personalCalendars: Record<string, unknown>;
@@ -8,70 +14,47 @@ export interface CalendarDataSourceProps {
 
 export type CalendarPageSourceType = 'personal' | 'sharedUser' | 'token';
 
+/* ------------------------------------------------------------------ */
+/* API Result subtypes                                                */
+/* ------------------------------------------------------------------ */
+
 export type CalendarScheduleResult = ApiResult & {
   schedule?: unknown[];
   table?: Record<string, unknown>;
   ifLowStock?: boolean;
+  calendarName?: string;
   status?: number;
 };
+
+export type NotificationSettingResult = ApiResult & {
+  'notifications-enabled'?: boolean;
+  status?: number;
+};
+
+export type StockMethodResult = ApiResult & {
+  method?: string;
+  status?: number;
+};
+
+export type PillboxUsesResult = ApiResult & {
+  status?: number;
+  pillbox_uses?: PillboxUseItem[];
+};
+
+export type IcsTokensResult = ApiResult & {
+  status?: number;
+  data?: {
+    tokens?: IcsTokenEntry[];
+  };
+};
+
+/* ------------------------------------------------------------------ */
+/* Sources de données calendrier                                      */
+/* ------------------------------------------------------------------ */
 
 export interface CalendarScheduleSource {
   fetchSchedule: (calendarId?: string, date?: string) => Promise<CalendarScheduleResult>;
 }
-
-export type CalendarNotificationsEnabledResult = ApiResult & {
-  'notifications-enabled'?: boolean;
-  status?: number;
-};
-
-export interface CalendarNotificationsSource {
-  fetchNotificationsEnabled: (calendarId?: string) => Promise<CalendarNotificationsEnabledResult>;
-  updateNotificationsEnabled: (calendarId: string | undefined, enabled: boolean) => Promise<ApiResult>;
-}
-
-export type CalendarStockMethodResult = ApiResult & {
-  method?: string;
-  status?: number;
-};
-
-export interface CalendarStockPersonalCalendars {
-  updatePersonalStockDecrementMethod: (calendarId: string | undefined, method: string) => Promise<ApiResult>;
-  fetchPersonalStockDecrementMethod: (calendarId: string | undefined) => Promise<CalendarStockMethodResult>;
-}
-
-export interface CalendarStockAlertsSource {
-  fetchPillboxUses: (calendarId: string | undefined) => Promise<ApiResult>;
-  restockBox: (calendarId: string | undefined, boxId: string | number) => Promise<ApiResult>;
-}
-
-export interface CalendarBoxAlertItem {
-  id: string | number;
-  name: string;
-  dose?: string | number | null;
-  stock_quantity: number;
-  stock_alert_threshold: number;
-  box_capacity: number;
-  conditions?: Array<{
-    max_date?: string | null;
-  }>;
-  [key: string]: unknown;
-}
-
-export interface CalendarNotFoundProps {
-  setNotFound: (value: boolean) => void;
-}
-
-export interface PillboxPageProps extends CalendarDataSourceProps {}
-
-export type NotificationSettingResult = ApiResult & {
-  status?: number;
-  'notifications-enabled'?: boolean;
-};
-
-export type StockMethodResult = ApiResult & {
-  status?: number;
-  method?: string;
-};
 
 export interface CalendarNotificationsSource {
   fetchNotificationsEnabled: (calendarId?: string) => Promise<NotificationSettingResult>;
@@ -83,61 +66,121 @@ export interface CalendarStockPersonalCalendars {
   fetchPersonalStockDecrementMethod: (calendarId: string | undefined) => Promise<StockMethodResult>;
 }
 
-export interface CalendarNotificationsProps extends CalendarDataSourceProps, CalendarNotFoundProps {}
-
-export interface CalendarStockProps extends CalendarNotFoundProps {
-  personalCalendars: CalendarStockPersonalCalendars;
+export interface CalendarStockAlertsSource {
+  fetchPillboxUses: (calendarId: string | undefined) => Promise<ApiResult>;
+  restockBox: (calendarId: string | undefined, boxId: string) => Promise<ApiResult>;
 }
 
-export interface PillboxPreparedBy {
-  photo_url: string;
-  display_name: string;
-  email?: string;
+/* ------------------------------------------------------------------ */
+/* Items                                                              */
+/* ------------------------------------------------------------------ */
+
+export interface CalendarBoxAlertItem {
+  id: string;
+  name: string;
+  dose?: number | null;
+  stock_quantity: number;
+  stock_alert_threshold: number;
+  box_capacity: number;
+  conditions?: Array<{
+    max_date?: string | null;
+  }>;
+  [key: string]: unknown;
 }
 
 export interface PillboxUseItem {
-  id: string | number;
+  id: string;
   prepared_at: string;
-  prepared_by: PillboxPreparedBy;
+  prepared_by: UserProfile;
 }
-
-export type PillboxUsesResult = ApiResult & {
-  status?: number;
-  pillbox_uses?: PillboxUseItem[];
-};
-
-export interface PillboxSource {
-  fetchPillboxUses: (calendarId: string) => Promise<PillboxUsesResult>;
-  cancelUse: (calendarId: string, useId: string | number) => Promise<ApiResult>;
-}
-
-export interface PillboxUsesPageProps extends CalendarDataSourceProps {}
 
 export interface IcsTokenEntry {
-  id: string | number;
+  id: string;
   token: string;
   owner_photo_url: string;
   owner_display_name: string;
   owner_email?: string;
 }
 
-export type IcsTokensResult = ApiResult & {
-  status?: number;
-  data?: {
-    tokens?: IcsTokenEntry[];
-  };
-};
+/* ------------------------------------------------------------------ */
+/* Sources pilulier & ICS                                             */
+/* ------------------------------------------------------------------ */
+
+export interface PillboxSource {
+  fetchPillboxUses: (calendarId: string) => Promise<PillboxUsesResult>;
+  cancelUse: (calendarId: string, useId: string) => Promise<ApiResult>;
+}
 
 export interface IcsSource {
   getTokensIcs: (calendarId?: string) => Promise<IcsTokensResult>;
   createTokenIcs: (calendarId?: string) => Promise<ApiResult>;
-  deleteTokenIcs: (calendarId: string | undefined, tokenId: string | number) => Promise<ApiResult>;
+  deleteTokenIcs: (calendarId: string | undefined, tokenId: string) => Promise<ApiResult>;
 }
 
+/* ------------------------------------------------------------------ */
+/* Props utilitaires                                                  */
+/* ------------------------------------------------------------------ */
+
+export interface CalendarNotFoundProps {
+  setNotFound: (value: boolean) => void;
+}
+
+/* ------------------------------------------------------------------ */
+/* Page Props                                                         */
+/* ------------------------------------------------------------------ */
+
+export interface PillboxPageProps extends CalendarDataSourceProps {}
+export interface CalendarNotificationsProps extends CalendarDataSourceProps, CalendarNotFoundProps {}
+export interface PillboxUsesPageProps extends CalendarDataSourceProps {}
 export interface IcsListPageProps extends CalendarDataSourceProps {}
-
 export interface CalendarSettingsPageProps extends CalendarDataSourceProps {}
-
 export interface DailyCalendarPageProps extends CalendarDataSourceProps {}
-
 export interface StockAlertsPageProps extends CalendarDataSourceProps {}
+export interface SharedListPageProps extends CalendarDataSourceProps {}
+export interface BoxesViewPageProps extends CalendarDataSourceProps {}
+
+export interface CalendarStockProps extends CalendarNotFoundProps {
+  personalCalendars: CalendarStockPersonalCalendars;
+}
+
+export interface CalendarListPersonalCalendars {
+  calendarsData: CalendarListItem[] | null;
+  downloadPersonalCalendarPdf: (calendarId: string, includeInactive: boolean) => void;
+  renameCalendar: (calendarId: string, newName: string) => Promise<ApiResult>;
+  deleteCalendar: (calendarId: string) => Promise<ApiResult>;
+}
+
+export interface CalendarListSharedUserCalendars {
+  sharedCalendarsData: CalendarListItem[] | null;
+  deleteSharedCalendar: (calendarId: string) => Promise<ApiResult>;
+}
+
+export interface CalendarListPageProps {
+  personalCalendars: CalendarListPersonalCalendars;
+  sharedUserCalendars: CalendarListSharedUserCalendars;
+}
+
+/* ------------------------------------------------------------------ */
+/* CalendarView                                                       */
+/* ------------------------------------------------------------------ */
+
+export type CalendarTable = Record<string, unknown[]>;
+
+export type CalendarViewSource = CalendarScheduleSource & {
+  fetchStockDecrementMethod: (calendarId?: string) => Promise<StockMethodResult>;
+  downloadCalendarPdf: (calendarId?: string) => void;
+};
+
+/* ------------------------------------------------------------------ */
+/* MedicinesList                                                      */
+/* ------------------------------------------------------------------ */
+
+export type GroupedMedicines = Record<string, MedicineItem[]>;
+
+export interface MedicineDisplayItem extends MedicineItem {
+  dose?: number | null;
+  time_of_day?: string[];
+  tablet_count?: number;
+  interval_days?: number;
+  start_date?: string;
+}
