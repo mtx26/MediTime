@@ -1,5 +1,5 @@
 import type { CalendarBoxAlertItem } from './calendar-pages';
-import type { MedicineReviewConditionInput, MedicineReviewSuggestion } from '../../../models/medicine';
+import type { MedicineReviewConditionInput, MedicineReviewSuggestion } from '../models/medicine';
 
 // ─── BoxesView Types ─────────────────────────────────────────────────────────
 

@@ -1,9 +1,9 @@
 // ─── Calendar Contract Types ─────────────────────────────────────────────────
 
-import type { ApiResponse } from '../api/index';
-import type { Calendar } from '../../models/index';
-import type { MedicineReviewConditionInput } from '../../models/medicine';
-import type { CalendarTable, WeeklyEventItem } from '../../models/schedule';
+import type { ApiResponse } from './result';
+import type { Calendar } from '../models';
+import type { MedicineReviewConditionInput } from '../models/medicine';
+import type { CalendarTable, WeeklyEventItem } from '../models/schedule';
 
 export type CalendarId = Calendar['id'];
 export type BoxId = string;

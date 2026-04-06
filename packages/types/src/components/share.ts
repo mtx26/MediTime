@@ -1,4 +1,4 @@
-import type { ApiResult } from '../../../contracts';
+import type { ApiResult } from '../api';
 
 export interface SharedInvitation {
   calendar_name: string;

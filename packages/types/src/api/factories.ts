@@ -1,9 +1,9 @@
 // ─── API Factory Return Types ────────────────────────────────────────────────
 
 import type { ApiResult } from './result';
-import type { CalendarId, BoxId, TokenId, InvitationToken, CalendarBoxInput } from '../calendar/contracts';
-import type { MedicineReviewConditionInput, MedicineReviewMedicineInput } from '../../models/medicine';
-import type { SharedCalendarAccess, StockDecrementMethod } from '../../models/realtime';
+import type { CalendarId, BoxId, TokenId, InvitationToken, CalendarBoxInput } from './calendar';
+import type { MedicineReviewConditionInput, MedicineReviewMedicineInput } from '../models/medicine';
+import type { SharedCalendarAccess, StockDecrementMethod } from '../models/realtime';
 
 export type PersonalBoxResult = ApiResult & { boxId?: string };
 

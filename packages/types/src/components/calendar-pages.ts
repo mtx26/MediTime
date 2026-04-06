@@ -1,9 +1,9 @@
-import type { ApiResult } from '../../../contracts';
-import type { UserProfile, CalendarListItem } from '../../../models/common';
-import type { BoxItem, IcsTokenItem, MedicineItem, StockDecrementMethod } from '../../../models/realtime';
-import type { WeeklyEventItem, CalendarTable } from '../../../models/schedule';
-import type { PersonalCalendarsApi } from '../../../contracts/api/factories';
-import type { AppPersonalCalendars, AppSharedUserCalendars, AppTokenCalendars } from '../shared-props';
+import type { ApiResult } from '../api';
+import type { UserProfile, CalendarListItem } from '../models/common';
+import type { BoxItem, IcsTokenItem, MedicineItem, StockDecrementMethod } from '../models/realtime';
+import type { WeeklyEventItem, CalendarTable } from '../models/schedule';
+import type { PersonalCalendarsApi } from '../api/factories';
+import type { AppPersonalCalendars, AppSharedUserCalendars, AppTokenCalendars } from '../app';
 
 
 

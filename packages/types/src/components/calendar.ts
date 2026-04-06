@@ -1,4 +1,4 @@
-import type { DateLike, WeeklyEventItem } from '../../../models';
+import type { DateLike, WeeklyEventItem } from '../models';
 
 export interface WeekDayCirclesProps {
   selectedDate: Exclude<DateLike, number>;

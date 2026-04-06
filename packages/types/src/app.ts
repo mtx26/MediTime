@@ -1,8 +1,8 @@
 // ─── App Shared Props ────────────────────────────────────────────────────────
 
-import type { CalendarInfo } from '../../models/common';
-import type { NotificationItem, SharedTokenItem } from '../../models/realtime';
-import type { ApiResult } from '../../contracts/api/result';
+import type { CalendarInfo } from './models/common';
+import type { NotificationItem, SharedTokenItem } from './models/realtime';
+import type { ApiResult } from './api/result';
 import type {
   PersonalCalendarsApi,
   SharedUserCalendarsApi,
@@ -10,7 +10,7 @@ import type {
   NotificationsApi,
   UserApi,
   DocumentsApi,
-} from '../../contracts/api/factories';
+} from './api/factories';
 
 export interface LoadingStates {
   isInitialLoading: boolean;

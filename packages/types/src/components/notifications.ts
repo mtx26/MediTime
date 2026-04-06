@@ -1,5 +1,5 @@
-import type { UserProfile, CalendarInfo } from '../../../models/common';
-import type { NotificationItem } from '../../../models/realtime';
+import type { UserProfile, CalendarInfo } from '../models/common';
+import type { NotificationItem } from '../models/realtime';
 
 export interface HoveredUserProfileProps<TTrigger = unknown> {
   user: UserProfile;

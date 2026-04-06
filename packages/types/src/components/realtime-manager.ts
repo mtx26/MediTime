@@ -1,6 +1,6 @@
-import type { CalendarInfo } from '../../../models/common';
-import type { NotificationItem, SharedTokenItem } from '../../../models/realtime';
-import type { LoadingStates } from '../shared-props';
+import type { CalendarInfo } from '../models/common';
+import type { NotificationItem, SharedTokenItem } from '../models/realtime';
+import type { LoadingStates } from '../app';
 
 export interface RealtimeManagerProps {
   setCalendarsData: (data: CalendarInfo[] | null) => void;
