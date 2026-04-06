@@ -1,5 +1,5 @@
 
-import React, { useRef, useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
@@ -7,40 +7,46 @@ import { toISO, toDate } from '@meditime/utils';
 import { getCalendarSourceMap } from '@meditime/utils';
 import { UserContext } from '@/contexts/UserContext';
 import { useTranslation } from 'react-i18next';
-import isEqual from 'lodash/isEqual';
 import { Alert } from '@/components/ui/alert';
 import { AlertTriangle, ChevronRight } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
+import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
+import type {
+  CalendarPageSourceType,
+  CalendarScheduleSource,
+  DailyCalendarPageProps,
+  WeeklyEventItem,
+} from '@meditime/types';
 
 // Page d'affichage du mode "daily" (journalier)
 
-export default function DailyCalendarPage({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
+export default function DailyCalendarPage({ personalCalendars, sharedUserCalendars, tokenCalendars }: DailyCalendarPageProps) {
   const location = useLocation();
-  const params = useParams();
+  const params = useParams<{ lng?: string; calendarId?: string; sharedToken?: string }>();
   const { t } = useTranslation();
   const today = new Date().setHours(0,0,0,0);
 
   const selectedDateParam = new URLSearchParams(location.search).get('date') || today; // Date sélectionnée en paramètre ou aujourd'hui par défaut
 
   // 🔐 Contexte d'authentification
-  const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
+  const userContext = useContext(UserContext);
+  const userInfo = userContext?.userInfo; // Contexte de l'utilisateur connecté
 
-  const calendarRef = useRef(null);
   // garder selectedDate comme objet Date pour manipulations faciles
-  const [selectedDate, setSelectedDate] = useState(); // Date JS
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Date JS
 
   useEffect(() => {
   if (selectedDateParam) {
     const parsedDate = toDate(selectedDateParam);
     setSelectedDate(parsedDate);
   } else {
-    setSelectedDate(new Date().setHours(0,0,0,0));
+    setSelectedDate(new Date(today));
   }
 }, [selectedDateParam]);
 
-  const [eventsForDay, setEventsForDay] = useState([]); // Événements filtrés pour un jour spécifique
-  const [calendarEvents, setCalendarEvents] = useState([]); // Événements du calendrier
-  const [calendarTable, setCalendarTable] = useState([]); // Événements du calendrier
+  const [eventsForDay, setEventsForDay] = useState<WeeklyEventItem[]>([]); // Événements filtrés pour un jour spécifique
+  const [calendarEvents, setCalendarEvents] = useState<WeeklyEventItem[]>([]); // Événements du calendrier
+  const [calendarTable, setCalendarTable] = useState<Record<string, unknown>>({}); // Événements du calendrier
   const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
   // Méthode de décrémentation du stock (pour affichage différencié)
 
@@ -48,18 +54,18 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
   const [loading, setLoading] = useState(true); // État de chargement du calendrier
   const [notFound, setNotFound] = useState(false); // Erreur 404 si le calendrier n'existe pas
 
-	  let calendarType = 'personal';
+  let calendarType: CalendarPageSourceType = 'personal';
     let calendarId = params.calendarId;
     let basePath = 'calendar';
   
     const pathWithoutLang =
       location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
   
-    if (pathWithoutLang.startsWith('/shared-user-calendar')) {
+    if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
       calendarType = 'sharedUser';
       calendarId = params.calendarId;
       basePath = 'shared-user-calendar';
-    } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
+    } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
       calendarType = 'token';
       calendarId = params.sharedToken;
       basePath = 'shared-token-calendar';
@@ -69,10 +75,10 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
       personalCalendars,
       sharedUserCalendars,
       tokenCalendars
-    )[calendarType];
+    )[calendarType] as unknown as CalendarScheduleSource;
   
     // Fonction pour naviguer vers une date
-    const onSelectDate = (dateInput) => {
+    const onSelectDate = (dateInput: string | number | Date) => {
       // accepte Date ou ISO string
       const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
       setSelectedDate(d);
@@ -82,28 +88,30 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
     // Fonction pour naviguer vers la semaine suivante ou precedente
     // accepte un second argument optionnel `desiredSelectedDate` (ISO string)
     // pour préserver le jour sélectionné lors du changement de semaine.
-    const onWeekSelect = async (newSelectedDate) => {
+    const onWeekSelect = async (newSelectedDate: Date) => {
       onSelectDate(newSelectedDate);
       const isoDate = toISO(newSelectedDate);
       const rep = await calendarSource.fetchSchedule(calendarId, isoDate);
       if (rep.success) {
-        setCalendarEvents(rep.schedule);
-        setCalendarTable(rep.table);
+        setCalendarEvents((rep.schedule as WeeklyEventItem[]) || []);
+        setCalendarTable(rep.table || {});
       }
     };
   
     // Fonction pour naviguer vers la date suivante ou precedente
-    const navigateDay = (direction) => {
+    const navigateDay = (direction: number) => {
+      if (!selectedDate) return;
       const current = new Date(selectedDate);
       current.setDate(current.getDate() + direction);
       setSelectedDate(current);
     };
   
-    const navigateWeek = (direction) => {
+    const navigateWeek = (direction: number) => {
+      if (!selectedDate) return;
       const current = new Date(selectedDate);
       current.setDate(current.getDate() + direction);
       const newSelectedDate = current;
-      onWeekSelect(newSelectedDate);
+      void onWeekSelect(newSelectedDate);
     };
   
     // Fonction pour charger le calendrier lorsque l'utilisateur est connecté ou que le calendrier est un token
@@ -116,11 +124,13 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
       const load = async () => {
         const rep = await calendarSource.fetchSchedule(calendarId, selectedDate ? toISO(selectedDate) : undefined);
         if (rep.success) {
-          if (!isEqual(rep.schedule, calendarEvents)) {
-            setCalendarEvents(rep.schedule);
+          const nextSchedule = (rep.schedule as WeeklyEventItem[]) || [];
+          if (JSON.stringify(nextSchedule) !== JSON.stringify(calendarEvents)) {
+            setCalendarEvents(nextSchedule);
           }
-          if (!isEqual(rep.table, calendarTable)) {
-            setCalendarTable(rep.table);
+          const nextTable = rep.table || {};
+          if (JSON.stringify(nextTable) !== JSON.stringify(calendarTable)) {
+            setCalendarTable(nextTable);
           }
           if (rep.ifLowStock !== undefined && rep.ifLowStock !== isLowStock) {
             setIsLowStock(rep.ifLowStock);
@@ -136,8 +146,8 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
         }
       };
   
-      load();
-    }, [calendarId, calendarSource.fetchSchedule, userInfo, selectedDate]);
+      void load();
+    }, [calendarId, calendarEvents, calendarSource, calendarTable, isLowStock, userInfo, selectedDate]);
 
     useEffect(() => {
       if (!selectedDate || !calendarEvents.length) return;
@@ -159,7 +169,7 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
   const { showLoading } = useLoading();
 
   useEffect(() => {
-    showLoading(loading === true && calendarId, t('calendar.loading_daily_view'));
+    showLoading(Boolean(loading === true && calendarId), t('calendar.loading_daily_view'));
   }, [loading, calendarId, showLoading, t]);
 
   if (loading === true && calendarId) {

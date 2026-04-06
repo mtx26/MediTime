@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, type Dispatch, type SetStateAction } from 'react';
 import { getCalendarSourceMap } from '@meditime/utils';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -11,35 +11,42 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle, Package } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
+import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
+import type {
+  CalendarBoxAlertItem,
+  CalendarPageSourceType,
+  CalendarStockAlertsSource,
+  StockAlertsPageProps,
+} from '@meditime/types';
 
 function StockAlertsPage({
   personalCalendars,
   sharedUserCalendars,
   tokenCalendars,
-}) {
-  const params = useParams();
+}: StockAlertsPageProps) {
+  const params = useParams<{ lng?: string; calendarId?: string; sharedToken?: string }>();
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { lng } = params;
 
-  const [boxes, setBoxes] = useState([]);
-  const [loadingBoxes, setLoadingBoxes] = useState(true);
-  const [rep, setRep] = useState(null);
+  const [boxes, setBoxes] = useState<CalendarBoxAlertItem[]>([]);
+  const [loadingBoxes, setLoadingBoxes] = useState<boolean | undefined>(undefined);
+  const [rep, setRep] = useState<any>(null);
   const [notFound, setNotFound] = useState(false);
 
-  let calendarType = 'personal';
+  let calendarType: CalendarPageSourceType = 'personal';
   let calendarId = params.calendarId;
   let basePath = 'calendar';
 
   const pathWithoutLang =
     location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
 
-  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
+  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
     calendarType = 'sharedUser';
     calendarId = params.calendarId;
     basePath = 'shared-user-calendar';
-  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
+  } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
     calendarType = 'token';
     calendarId = params.sharedToken;
     basePath = 'shared-token-calendar';
@@ -49,7 +56,7 @@ function StockAlertsPage({
     personalCalendars,
     sharedUserCalendars,
     tokenCalendars
-  )[calendarType];
+  )[calendarType] as unknown as CalendarStockAlertsSource;
 
   // --- MOCK DEMO START ---
   useEffect(() => {
@@ -80,9 +87,9 @@ function StockAlertsPage({
   const isDemo = calendarId === 'demo';
   // Hook en temps réel
   useRealtimeBoxesSwitcher(
-    isDemo ? null : calendarType,
-    calendarId,
-    setBoxes,
+    isDemo ? 'token' : calendarType,
+    calendarId ?? null,
+    setBoxes as unknown as Dispatch<SetStateAction<{ name: string; [key: string]: unknown }[]>>,
     setLoadingBoxes,
     setRep
   );
@@ -108,8 +115,8 @@ function StockAlertsPage({
       })
   );
 
-  const restockBox = (calendarId, boxId) => {
-    calendarSource.restockBox(calendarId, boxId)
+  const restockBox = (currentCalendarId: string | undefined, boxId: string | number) => {
+    void calendarSource.restockBox(currentCalendarId, boxId);
   };
 
   const sendStockAlertsSMS = () => {
@@ -143,7 +150,7 @@ function StockAlertsPage({
 
   // Gérer l'affichage du spinner global
   useEffect(() => {
-    showLoading(loadingBoxes === undefined, t('boxes.loading_stock_alerts'));
+    showLoading(Boolean(loadingBoxes === undefined), t('boxes.loading_stock_alerts'));
   }, [loadingBoxes, showLoading, t]);
 
   if (loadingBoxes === undefined) {
@@ -236,7 +243,7 @@ function StockAlertsPage({
                           className="w-full border-green-500 text-green-600 hover:bg-green-50"
                           icon={PlusCircle}
                           text={t('boxes.restock')}
-                          onClick={() => calendarSource.restockBox(calendarId, med.id)}
+                          onClick={() => restockBox(calendarId, med.id)}
                           disabled={med.box_capacity === 0}
                           helpDisabled={t('boxes.restock_disabled_tooltip')}
                         />
@@ -258,7 +265,7 @@ function StockAlertsPage({
                     </div>
                   </div>
                   <Badge
-                    variant={med.stock_quantity <= 0 ? 'destructive' : ''}
+                    variant={med.stock_quantity <= 0 ? 'destructive' : undefined}
                     className={med.stock_quantity > 0 ? 'bg-amber-500 text-white hover:bg-amber-600' : ''}
                   >
                     {med.stock_quantity <= 0

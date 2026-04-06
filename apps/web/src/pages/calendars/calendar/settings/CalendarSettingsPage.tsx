@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Stock from './CalendarStock';
@@ -7,16 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pill, Bell, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import NotFound from '@/pages/general/NotFound';
+import type { CalendarSettingsPageProps } from '@meditime/types';
 // import Sharing from './calendar-settings/Sharing';
 
 function CalendarSettingsPage({
   personalCalendars,
   sharedUserCalendars,
-  tokenCalendars
-}) {
+  tokenCalendars,
+}: CalendarSettingsPageProps) {
   const { t } = useTranslation();
   const location = useLocation();
-  const params = useParams();
+  const params = useParams<{ lng?: string; calendarId?: string; sharedToken?: string }>();
   const { lng } = params;
 
   const [notFound, setNotFound] = useState(false);

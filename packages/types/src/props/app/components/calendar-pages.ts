@@ -6,6 +6,57 @@ export interface CalendarDataSourceProps {
   tokenCalendars: Record<string, unknown>;
 }
 
+export type CalendarPageSourceType = 'personal' | 'sharedUser' | 'token';
+
+export type CalendarScheduleResult = ApiResult & {
+  schedule?: unknown[];
+  table?: Record<string, unknown>;
+  ifLowStock?: boolean;
+  status?: number;
+};
+
+export interface CalendarScheduleSource {
+  fetchSchedule: (calendarId?: string, date?: string) => Promise<CalendarScheduleResult>;
+}
+
+export type CalendarNotificationsEnabledResult = ApiResult & {
+  'notifications-enabled'?: boolean;
+  status?: number;
+};
+
+export interface CalendarNotificationsSource {
+  fetchNotificationsEnabled: (calendarId?: string) => Promise<CalendarNotificationsEnabledResult>;
+  updateNotificationsEnabled: (calendarId: string | undefined, enabled: boolean) => Promise<ApiResult>;
+}
+
+export type CalendarStockMethodResult = ApiResult & {
+  method?: string;
+  status?: number;
+};
+
+export interface CalendarStockPersonalCalendars {
+  updatePersonalStockDecrementMethod: (calendarId: string | undefined, method: string) => Promise<ApiResult>;
+  fetchPersonalStockDecrementMethod: (calendarId: string | undefined) => Promise<CalendarStockMethodResult>;
+}
+
+export interface CalendarStockAlertsSource {
+  fetchPillboxUses: (calendarId: string | undefined) => Promise<ApiResult>;
+  restockBox: (calendarId: string | undefined, boxId: string | number) => Promise<ApiResult>;
+}
+
+export interface CalendarBoxAlertItem {
+  id: string | number;
+  name: string;
+  dose?: string | number | null;
+  stock_quantity: number;
+  stock_alert_threshold: number;
+  box_capacity: number;
+  conditions?: Array<{
+    max_date?: string | null;
+  }>;
+  [key: string]: unknown;
+}
+
 export interface CalendarNotFoundProps {
   setNotFound: (value: boolean) => void;
 }
@@ -84,3 +135,9 @@ export interface IcsSource {
 }
 
 export interface IcsListPageProps extends CalendarDataSourceProps {}
+
+export interface CalendarSettingsPageProps extends CalendarDataSourceProps {}
+
+export interface DailyCalendarPageProps extends CalendarDataSourceProps {}
+
+export interface StockAlertsPageProps extends CalendarDataSourceProps {}
