@@ -1,15 +1,12 @@
 import { useContext, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { UserContext } from '../../contexts/UserContext';
-import { log } from '@meditime/utils';
+import { log, getErrorMessage } from '@meditime/utils';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 import type { LoadingStates, TokenItem, TokensResponse, UserContextValue } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function getErrorMessage(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
-}
 
 export const useRealtimeTokens = (
   setTokensList: Dispatch<SetStateAction<TokenItem[]>>,

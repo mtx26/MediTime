@@ -1,6 +1,6 @@
 import { useContext, useCallback, useMemo, type Dispatch, type SetStateAction } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
-import { log } from '@meditime/utils';
+import { log, getErrorMessage } from '@meditime/utils';
 import { UserContext } from '../../contexts/UserContext';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 import type { CalendarItem, CalendarsResponse, LoadingStates, UserContextValue } from '@meditime/types';
@@ -10,9 +10,6 @@ const API_URL = import.meta.env.VITE_API_URL;
 type SetUnknown = Dispatch<SetStateAction<unknown>>;
 type SetLoadingStates = Dispatch<SetStateAction<LoadingStates>>;
 
-function getErrorMessage(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
-}
 
 const fetchCalendars = async (uid: string, setCalendarsData: SetUnknown, setLoadingStates: SetLoadingStates): Promise<void> => {
   try {

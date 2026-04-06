@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pill, Bell, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import NotFound from '@/pages/general/NotFound';
+import { detectCalendarType } from '@meditime/utils';
 import type { CalendarSettingsPageProps } from '@meditime/types';
 // import Sharing from './calendar-settings/Sharing';
 
@@ -28,22 +29,8 @@ function CalendarSettingsPage({
     tokenCalendars
   };
 
-  let calendarType = 'personal';
-  let calendarId = params.calendarId;
-  let basePath = 'calendar';
-
-  const pathWithoutLang =
-    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-
-  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
-    calendarType = 'sharedUser';
-    calendarId = params.calendarId;
-    basePath = 'shared-user-calendar';
-  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
-    calendarType = 'token';
-    calendarId = params.sharedToken;
-    basePath = 'shared-token-calendar';
-  }
+  const { calendarType, basePath } = detectCalendarType(location.pathname);
+  const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
 
   const getInitialTab = () => {
     const params = new URLSearchParams(location.search);

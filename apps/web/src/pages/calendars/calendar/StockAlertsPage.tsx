@@ -1,5 +1,5 @@
 import { useState, useEffect, type Dispatch, type SetStateAction } from 'react';
-import { getCalendarSourceMap, buildStockAlertActions } from '@meditime/utils';
+import { getCalendarSourceMap, buildStockAlertActions, detectCalendarType } from '@meditime/utils';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
@@ -12,7 +12,6 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, CheckCircle, PlusCircle, Package } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
-import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
 import type {
   CalendarBoxAlertItem,
   CalendarPageSourceType,
@@ -36,22 +35,8 @@ function StockAlertsPage({
   const [rep, setRep] = useState<any>(null);
   const [notFound, setNotFound] = useState(false);
 
-  let calendarType: CalendarPageSourceType = 'personal';
-  let calendarId = params.calendarId;
-  let basePath = 'calendar';
-
-  const pathWithoutLang =
-    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-
-  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
-    calendarType = 'sharedUser';
-    calendarId = params.calendarId;
-    basePath = 'shared-user-calendar';
-  } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
-    calendarType = 'token';
-    calendarId = params.sharedToken;
-    basePath = 'shared-token-calendar';
-  }
+  const { calendarType, basePath } = detectCalendarType(location.pathname);
+  const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
 
   const calendarSource = getCalendarSourceMap(
     personalCalendars,

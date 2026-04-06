@@ -2,12 +2,11 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
-import { getCalendarSourceMap } from '@meditime/utils';
+import { getCalendarSourceMap, detectCalendarType } from '@meditime/utils';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell } from 'lucide-react';
-import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
 import type {
   CalendarNotificationsProps,
   CalendarNotificationsSource,
@@ -21,18 +20,8 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars,
   const params = useParams<{ calendarId?: string; sharedToken?: string }>();
   const location = useLocation();
 
-  let calendarType: 'personal' | 'sharedUser' | 'token' = 'personal';
-  let calendarId = params.calendarId;
-
-  const pathWithoutLang =
-    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-
-  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
-    calendarType = 'sharedUser';
-  } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
-    calendarType = 'token';
-    calendarId = params.sharedToken;
-  }
+  const { calendarType } = detectCalendarType(location.pathname);
+  const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
 
   const calendarSource = getCalendarSourceMap(
     personalCalendars,

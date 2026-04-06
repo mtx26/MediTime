@@ -1,4 +1,5 @@
 import { useLocation } from 'react-router-dom';
+import { stripLangPrefix } from '@meditime/utils';
 import {
   useRealtimeCalendars,
   useRealtimeSharedCalendars,
@@ -33,8 +34,7 @@ export default function RealtimeManager({
   ];
 
   // strip possible language prefix (e.g. /fr) before matching routes
-  const pathWithoutLang =
-    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+  const pathWithoutLang = stripLangPrefix(location.pathname);
 
   const isRealtimeEnabled = enabledRoutes.some((route) =>
     pathWithoutLang.startsWith(route)

@@ -11,11 +11,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { Pencil, Trash2, Plus, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
+import { applyConditionFieldSideEffects, toInt } from '@meditime/utils';
 import {
   DEFAULT_CONDITION,
   MEDICINE_REVIEW_CONDITION_FIELDS,
   MEDICINE_REVIEW_MAIN_FIELDS,
-  MEDICINE_REVIEW_TIME_OF_DAY_HOURS,
 } from '@meditime/constants';
 import type {
   MedicineReviewConditionInput,
@@ -25,8 +25,6 @@ import type {
   MedicineReviewProps,
   MedicineReviewSuggestion,
 } from '@meditime/types';
-
-const toInt = (value: string | number): number => Number.parseInt(String(value), 10);
 
 const isMedicineSuggestion = (value: unknown): value is MedicineReviewSuggestion => {
   if (!value || typeof value !== 'object') return false;
@@ -75,39 +73,7 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
     }
     const updated = [...medicines];
     const currentCondition = (updated[index].conditions[i] ?? {}) as MedicineReviewConditionInput;
-    updated[index].conditions[i] = currentCondition;
-    
-    // Gestion spéciale pour interval_days
-    if (field === 'interval_days' && toInt(value ?? 0) <= 1) {
-      updated[index].conditions[i]['start_date'] = null;
-    }
-    
-    // Gestion spéciale pour max_date_mode
-    if (field === 'max_date_mode') {
-      updated[index].conditions[i]['max_date'] = null;
-      updated[index].conditions[i]['max_date_days'] = null;
-    }
-    
-    // Gestion spéciale pour max_date et max_date_days
-    if (field === 'max_date_days' && value) {
-      const cond = updated[index].conditions[i];
-      const now = new Date();
-      const target = new Date(now);
-      const targetHour = MEDICINE_REVIEW_TIME_OF_DAY_HOURS[String(cond.time_of_day) as keyof typeof MEDICINE_REVIEW_TIME_OF_DAY_HOURS] ?? 8;
-      target.setHours(targetHour, 0, 0, 0);
-      const includeToday = now < target;
-      const endDate = new Date(now);
-      endDate.setDate(endDate.getDate() + (includeToday ? toInt(value) - 1 : toInt(value)));
-      endDate.setHours(23, 59, 59, 999);
-      updated[index].conditions[i]['max_date'] = endDate.toISOString();
-      updated[index].conditions[i]['max_date_days'] = toInt(value);
-    } else if (field === 'max_date' && value) {
-      const selectedDate = new Date(String(value));
-      selectedDate.setHours(23, 59, 59, 999);
-      updated[index].conditions[i]['max_date'] = selectedDate.toISOString();
-    }
-    
-    (updated[index].conditions[i] as Record<string, unknown>)[field] = value ?? '';
+    updated[index].conditions[i] = applyConditionFieldSideEffects(currentCondition, field, value);
     setMedicines(updated);
   };
 

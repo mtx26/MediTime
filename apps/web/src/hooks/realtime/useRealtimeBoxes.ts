@@ -1,7 +1,7 @@
 import { useEffect, useContext, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { UserContext } from '../../contexts/UserContext';
-import { log } from '@meditime/utils';
+import { log, getErrorMessage } from '@meditime/utils';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 import type { BoxItem, BoxesResponse, SourceType, UserContextValue } from '@meditime/types';
 
@@ -20,9 +20,6 @@ type FetchBoxesParams = {
   setRep: SetRep;
 };
 
-function getErrorMessage(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
-}
 
 const fetchBoxes = async ({
   uid,

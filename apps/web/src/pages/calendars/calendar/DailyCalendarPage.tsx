@@ -4,13 +4,12 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
 import { toISO, toDate } from '@meditime/utils';
-import { getCalendarSourceMap } from '@meditime/utils';
+import { getCalendarSourceMap, detectCalendarType } from '@meditime/utils';
 import { UserContext } from '@/contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import { Alert } from '@/components/ui/alert';
 import { AlertTriangle, ChevronRight } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
-import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
 import type {
   CalendarPageSourceType,
   CalendarScheduleSource,
@@ -54,22 +53,8 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
   const [loading, setLoading] = useState(true); // État de chargement du calendrier
   const [notFound, setNotFound] = useState(false); // Erreur 404 si le calendrier n'existe pas
 
-  let calendarType: CalendarPageSourceType = 'personal';
-    let calendarId = params.calendarId;
-    let basePath = 'calendar';
-  
-    const pathWithoutLang =
-      location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-  
-    if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
-      calendarType = 'sharedUser';
-      calendarId = params.calendarId;
-      basePath = 'shared-user-calendar';
-    } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
-      calendarType = 'token';
-      calendarId = params.sharedToken;
-      basePath = 'shared-token-calendar';
-    }
+  const { calendarType, basePath } = detectCalendarType(location.pathname);
+    const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
   
     const calendarSource = getCalendarSourceMap(
       personalCalendars,

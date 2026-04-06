@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package } from 'lucide-react';
-import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
 import type { CalendarStockProps } from '@meditime/types';
 
 
@@ -13,17 +12,9 @@ const Stock = ({ personalCalendars, setNotFound }: CalendarStockProps) => {
   const { t } = useTranslation();
   const [selectedMethod, setSelectedMethod] = useState('');
   const params = useParams<{ calendarId?: string; sharedToken?: string }>();
-  const location = useLocation();
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
 
-  let calendarId = params.calendarId;
-
-  const pathWithoutLang =
-    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-
-  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
-    calendarId = params.calendarId;
-  }
+  const calendarId = params.calendarId;
 
   const modifyStockDecrementMethod = async (method: string) => {
     const rep = await personalCalendars.updatePersonalStockDecrementMethod(calendarId, method);

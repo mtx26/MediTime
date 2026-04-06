@@ -7,7 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '@/contexts/UserContext';
 import { useLoading } from '@/components/ui/loading';
-import { toISO, getCalendarSourceMap, buildPersonalCalendarActions, buildSharedCalendarActions } from '@meditime/utils';
+import { toISO, getCalendarSourceMap, buildPersonalCalendarActions, buildSharedCalendarActions, detectCalendarType } from '@meditime/utils';
 import { useAlert } from '@/contexts/AlertContext';
 import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import DateModal from '@/components/calendar/DateModal';
@@ -22,9 +22,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Pill, AlertTriangle, CalendarDays, ChevronRight, Pin } from 'lucide-react';
 import '@/styles/fullcalendar-custom.css';
 import { getLocale } from '@meditime/config';
-import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
 import type {
-  CalendarPageSourceType,
   CalendarTable,
   CalendarViewSource,
   DateModalRef,
@@ -69,22 +67,8 @@ function CalendarPage({
   const [notFound, setNotFound] = useState(false);
   const initialNextDate = useMemo(() => new Date(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0)), []);
 
-  let calendarType: CalendarPageSourceType = 'personal';
-  let calendarId = params.calendarId;
-  let basePath = 'calendar';
-
-  const pathWithoutLang =
-    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-
-  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
-    calendarType = 'sharedUser';
-    calendarId = params.calendarId;
-    basePath = 'shared-user-calendar';
-  } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
-    calendarType = 'token';
-    calendarId = params.sharedToken;
-    basePath = 'shared-token-calendar';
-  }
+  const { calendarType, basePath } = detectCalendarType(location.pathname);
+  const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
 
   const calendarSource = getCalendarSourceMap(
     personalCalendars,

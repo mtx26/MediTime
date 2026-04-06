@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useLocation } from 'react-router-dom';
 import { useAlert } from '@/contexts/AlertContext';
 import { useLoading } from '@/components/ui/loading';
-import { getCalendarSourceMap } from '@meditime/utils';
+import { getCalendarSourceMap, detectCalendarType } from '@meditime/utils';
 import HoveredUserProfile from '@/components/common/HoveredUserProfile';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -11,7 +11,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Link2, InfoIcon, Trash2, Clipboard, ExternalLink, PlusCircle } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
-import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
 import type { IcsListPageProps, IcsSource, IcsTokenEntry } from '@meditime/types';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
@@ -28,19 +27,8 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }: Ics
   const { showLoading } = useLoading();
   const [notFound, setNotFound] = useState(false);
 
-  let calendarType: 'personal' | 'sharedUser' | 'token' = 'personal';
-  let calendarId = params.calendarId;
-
-  const pathWithoutLang =
-    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-
-  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
-    calendarType = 'sharedUser';
-    calendarId = params.calendarId;
-  } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
-    calendarType = 'token';
-    calendarId = params.sharedToken;
-  }
+  const { calendarType } = detectCalendarType(location.pathname);
+  const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
 
   const calendarSource = getCalendarSourceMap(
     personalCalendars,

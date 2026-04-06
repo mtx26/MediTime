@@ -3,14 +3,13 @@ import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from '@/components/common/HoveredUserProfile';
-import { getMondayDate } from '@meditime/utils';
+import { getMondayDate, detectCalendarType } from '@meditime/utils';
 import { getCalendarSourceMap } from '@meditime/utils';
 import { UserContext } from '@/contexts/UserContext';
 import { useAlert } from '@/contexts/AlertContext';
 import { Button } from '@/components/ui/button';
 import { History, RotateCcw } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
-import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
 import type {
   PillboxSource,
   PillboxUseItem,
@@ -30,19 +29,8 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }:
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  let calendarType: 'personal' | 'sharedUser' | 'token' = 'personal';
-  let calendarId = params.calendarId;
-
-  const pathWithoutLang =
-    location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-
-  if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
-    calendarType = 'sharedUser';
-    calendarId = params.calendarId;
-  } else if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_TOKEN)) {
-    calendarType = 'token';
-    calendarId = params.sharedToken;
-  }
+  const { calendarType } = detectCalendarType(location.pathname);
+  const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
 
   const calendarSource = getCalendarSourceMap(
     personalCalendars,

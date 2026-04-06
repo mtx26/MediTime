@@ -20,8 +20,7 @@ def send_notifications_for_all_users():
                 cursor.execute("""
                     SELECT id
                     FROM users
-                    WHERE deleted_at IS NULL
-                    AND notification_time > %s 
+                    WHERE notification_time > %s 
                     AND notification_time <= %s
                 """, (start_time, end_time))
                 rows = cursor.fetchall()

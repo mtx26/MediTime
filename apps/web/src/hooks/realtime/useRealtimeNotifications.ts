@@ -1,7 +1,7 @@
 import { useContext, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { UserContext } from '../../contexts/UserContext';
 import { supabase } from '../../services/supabase/supabaseClient';
-import { log } from '@meditime/utils';
+import { log, getErrorMessage } from '@meditime/utils';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 import type { LoadingStates, NotificationItem, NotificationsResponse, UserContextValue } from '@meditime/types';
 
@@ -10,9 +10,6 @@ const API_URL = import.meta.env.VITE_API_URL;
 type SetNotificationsData = Dispatch<SetStateAction<NotificationItem[]>>;
 type SetLoadingStates = Dispatch<SetStateAction<LoadingStates>>;
 
-function getErrorMessage(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
-}
 
 const fetchNotifications = async (
   uid: string,

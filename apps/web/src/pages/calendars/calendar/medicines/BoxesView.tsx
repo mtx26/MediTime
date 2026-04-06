@@ -4,7 +4,7 @@ import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
 import { useRealtimeBoxesSwitcher } from '@/hooks/realtime/useRealtimeBoxesSwitcher';
 import { useAlert } from '@/contexts/AlertContext';
 import { useLoading } from '@/components/ui/loading';
-import { getCalendarSourceMap, buildPersonalCalendarActions, buildSharedCalendarActions, buildBoxActions } from '@meditime/utils';
+import { getCalendarSourceMap, buildPersonalCalendarActions, buildSharedCalendarActions, buildBoxActions, detectCalendarType } from '@meditime/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { fetchSuggestions } from '@/utils/api/fetchSuggestions';
 import ActionSheet from '@/components/common/ActionSheet';
@@ -264,19 +264,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
   // CALENDAR DETECTION
   // =========================================================================
   
-  const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
-  let calendarType: 'personal' | 'sharedUser' | 'token' = 'personal';
-  let calendarId: string | undefined = params.calendarId;
-  let basePath = 'calendar';
-
-  if (pathWithoutLang.startsWith('/shared-user-calendar')) {
-    calendarType = 'sharedUser';
-    basePath = 'shared-user-calendar';
-  } else if (pathWithoutLang.startsWith('/shared-token-calendar')) {
-    calendarType = 'token';
-    calendarId = params.sharedToken;
-    basePath = 'shared-token-calendar';
-  }
+  const { calendarType, basePath } = detectCalendarType(location.pathname);
+  const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
 
   const calendarSource = (getCalendarSourceMap(
     personalCalendars, 

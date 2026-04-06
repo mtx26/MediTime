@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { supabase } from '../services/supabase/supabaseClient';
-import { log } from '@meditime/utils';
+import { log, mapApiResponseToUserInfo, buildUserCreationPayload } from '@meditime/utils';
 import type { UserContextValue, UserInfo, SessionLike, ReloadUserFn, UserProviderProps } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -58,17 +58,7 @@ export function UserProvider({ children }: UserProviderProps<ReactNode>) {
 
       if (res.status === 404) {
         const metadata = user.user_metadata || {};
-        const bodyBackend = {
-          uid: user.id,
-          display_name:
-            (metadata.full_name as string | undefined) ??
-            (metadata.name as string | undefined) ??
-            null,
-          email: user.email || null,
-          photo_url: (metadata.avatar_url as string | undefined) ?? null,
-          email_enabled: true,
-          push_enabled: true,
-        };
+        const bodyBackend = buildUserCreationPayload(user.id, user.email, metadata);
 
         const creationRes = await fetch(`${API_URL}/api/user/update`, {
           method: 'PUT',
@@ -84,14 +74,7 @@ export function UserProvider({ children }: UserProviderProps<ReactNode>) {
           throw new Error((creationData.error as string | undefined) || 'Erreur création utilisateur');
         }
 
-        const info: UserInfo = {
-          displayName: (creationData.display_name as string | null | undefined) ?? null,
-          email: (creationData.email as string | null | undefined) ?? null,
-          photoUrl: (creationData.photo_url as string | null | undefined) ?? null,
-          emailEnabled: Boolean(creationData.email_enabled),
-          pushEnabled: Boolean(creationData.push_enabled),
-          uid: user.id,
-        };
+        const info: UserInfo = mapApiResponseToUserInfo(creationData, user.id);
 
         setUserInfo(info);
         localStorage.setItem('userInfo', JSON.stringify(info));
@@ -103,14 +86,7 @@ export function UserProvider({ children }: UserProviderProps<ReactNode>) {
         throw new Error((data.error as string | undefined) || 'Erreur chargement utilisateur');
       }
 
-      const info: UserInfo = {
-        displayName: (data.display_name as string | null | undefined) ?? null,
-        email: (data.email as string | null | undefined) ?? null,
-        photoUrl: (data.photo_url as string | null | undefined) ?? null,
-        emailEnabled: Boolean(data.email_enabled),
-        pushEnabled: Boolean(data.push_enabled),
-        uid: user.id,
-      };
+      const info: UserInfo = mapApiResponseToUserInfo(data, user.id);
 
       setUserInfo(info);
       localStorage.setItem('userInfo', JSON.stringify(info));

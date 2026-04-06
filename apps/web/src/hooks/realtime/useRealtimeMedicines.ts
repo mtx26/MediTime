@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, type Dispatch, type SetStateAction } from 'react';
-import { log } from '@meditime/utils';
+import { log, getErrorMessage } from '@meditime/utils';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 import type { MedicineItem, MedicinesResponse } from '@meditime/types';
 
@@ -8,9 +8,6 @@ const API_URL = import.meta.env.VITE_API_URL;
 type SetMedicinesData = Dispatch<SetStateAction<MedicineItem[]>>;
 type SetLoadingMedicines = Dispatch<SetStateAction<boolean>>;
 
-function getErrorMessage(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
-}
 
 const fetchTokenMedicines = async (
   token: string,
