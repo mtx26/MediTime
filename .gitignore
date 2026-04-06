@@ -41,3 +41,4 @@ apps/web/massReplace.js
 apps/web/src/test/
 
 dist/
+.vercel
