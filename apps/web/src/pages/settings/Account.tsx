@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../services/supabase/supabaseClient';
@@ -28,13 +28,13 @@ export default function Account() {
     userInfo?.photoUrl ||
       'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg'
   );
-  const [photoFile, setPhotoFile] = useState(null);
+  const [photoFile, setPhotoFile] = useState<Blob | null>(null);
   const [isModified, setIsModified] = useState(false);
   const [showCropModal, setShowCropModal] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [rawImage, setRawImage] = useState(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+  const [rawImage, setRawImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (displayName !== userInfo?.displayName) {
@@ -44,7 +44,7 @@ export default function Account() {
     }
   }, [displayName, userInfo?.displayName]);
 
-  const uploadPhoto = async (file) => {
+  const uploadPhoto = async (file: Blob) => {
     try {
       const {
         data: { session },
@@ -92,7 +92,7 @@ export default function Account() {
     await uploadPhoto(blob);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (displayName !== userInfo?.displayName) {
       try {

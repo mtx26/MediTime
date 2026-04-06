@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { UserContext } from '../../contexts/UserContext';
 import { useTranslation } from 'react-i18next';
 import { updateUserInfo } from '../../services/auth/authService';
@@ -8,17 +8,18 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Bell, RefreshCw, Smartphone, Settings } from 'lucide-react';
+import type { NotificationSettingsProps } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function Notification({ fcm, user }) {
+export default function Notification({ fcm, user }: NotificationSettingsProps) {
   const { t } = useTranslation();
   const { userInfo } = useContext(UserContext);
   const uid = userInfo?.uid ?? null;
   const [notificationsEnabled, setNotificationsEnabled] = useState(window?.Notification?.permission === 'granted');
   const notificationNotSupported = !('Notification' in window) || window.Notification.permission === 'denied';
   const [isRegistering, setIsRegistering] = useState(false);
-  const [notificationTime, setNotificationTime] = useState(null);
+  const [notificationTime, setNotificationTime] = useState<string | null>(null);
 
   // fetch notification time on component mount
   useEffect(() => {

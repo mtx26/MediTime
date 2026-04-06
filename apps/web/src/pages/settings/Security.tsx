@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { 
   updateUserPassword,
   GoogleHandleLogin,
@@ -20,6 +20,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, Info, CheckCircle2, XCircle, Mail } from 'lucide-react';
 import { FaGoogle, FaGithub, FaTwitter, FaFacebook, FaDiscord, FaMicrosoft } from 'react-icons/fa';
+import type { SecurityProviderItem } from '@meditime/types';
+import type { IconType } from 'react-icons';
 
 export default function Security() {
   const { t, i18n } = useTranslation();
@@ -34,14 +36,14 @@ export default function Security() {
   const [newPassword, setNewPassword] = useState(''); // État pour le nouveau mot de passe
   const [oldPasswordVisible, setOldPasswordVisible] = useState(false); // État pour l'affichage de l'ancien mot de passe
   const [newPasswordVisible, setNewPasswordVisible] = useState(false); // État pour l'affichage du nouveau mot de passe
-  const [linkedProviders, setLinkedProviders] = useState([]); // Providers liés au compte
+  const [linkedProviders, setLinkedProviders] = useState<string[]>([]); // Providers liés au compte
   const [loadingProviders, setLoadingProviders] = useState(true); // État de chargement des providers
-  const [connectingProvider, setConnectingProvider] = useState(null); // Provider en cours de connexion
+  const [connectingProvider, setConnectingProvider] = useState<string | null>(null); // Provider en cours de connexion
 
   const isGoogleUser = userInfo?.provider === 'google';
 
   // Liste des providers disponibles dans l'app
-  const availableProviders = [
+  const availableProviders: SecurityProviderItem<IconType>[] = [
     { 
       id: 'google', 
       name: 'Google', 
@@ -108,7 +110,7 @@ export default function Security() {
   }, []);
 
   // Connecter un nouveau provider
-  const handleConnectProvider = async (provider) => {
+  const handleConnectProvider = async (provider: SecurityProviderItem<IconType>) => {
     try {
       setConnectingProvider(provider.id);
       // Construire l'URL de redirection avec la langue et la page actuelle
@@ -133,7 +135,7 @@ export default function Security() {
     if (error) throw new Error(t('security.current_password.incorrect'));
   };
 
-  const handleUpdatePassword = async (e) => {
+  const handleUpdatePassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       // Vérifier que le nouveau mot de passe est différent de l'ancien

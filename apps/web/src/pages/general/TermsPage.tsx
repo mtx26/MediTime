@@ -1,8 +1,8 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileText, Info, Mail, Globe, Github } from 'lucide-react';
+import type { TermsSectionProps } from '@meditime/types';
 
-function TermsSection({ titleKey, paragraphs = [], list = [], conclusionKey }) {
+function TermsSection({ titleKey, paragraphs = [], list = [], conclusionKey }: TermsSectionProps) {
   const { t } = useTranslation();
   return (
     <div className="mb-8">

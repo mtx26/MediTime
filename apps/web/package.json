@@ -12,8 +12,8 @@
     "@fullcalendar/react": "^6.1.17",
     "@google-cloud/translate": "^9.3.0",
     "@hookform/resolvers": "^5.2.2",
-    "@meditime/constants": "*",
     "@meditime/config": "*",
+    "@meditime/constants": "*",
     "@meditime/i18n": "*",
     "@meditime/types": "*",
     "@meditime/utils": "*",
@@ -86,6 +86,7 @@
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^7.0.2",
+    "@types/lodash": "^4.17.24",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

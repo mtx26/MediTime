@@ -71,8 +71,11 @@ export interface QRCodeScannerHandle {
 export interface QRCodeScannerProps {
   modal?: boolean;
   singleScan?: boolean;
-  onAddAll?: (medicines: QRScannedMedicine[]) => Promise<QRScanImportResult> | QRScanImportResult;
-  onStateChange?: (state: QRScanImportState) => void;
+  show?: boolean;
+  onAddAll?: ((medicines: QRScannedMedicine[]) => Promise<QRScanImportResult> | QRScanImportResult) | null;
+  onStateChange?: ((state: QRScanImportState) => void) | null;
+  onMedicineFound?: ((medicine: QRScannedMedicine) => void) | null;
+  onClose?: (() => void) | null;
 }
 
 export interface AddCalendarPagePersonalCalendars

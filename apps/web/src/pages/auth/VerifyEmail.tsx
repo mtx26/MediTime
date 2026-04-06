@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import { useEffect, useContext } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
@@ -29,7 +29,7 @@ function VerifyEmail() {
     }
   }, [userInfo, navigate]); // ✅ Si userInfo.emailVerified change, on redirige
 
-  const handleSendVerification = async (e) => {
+  const handleSendVerification = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const user = userInfo;
@@ -45,15 +45,15 @@ function VerifyEmail() {
         log.info('Email de vérification envoyé', {
           code: 'EMAIL_VERIFICATION_SENT',
           origin: 'VerifyEmail',
-          uid: user.id,
+          uid: user.uid,
         });
-      } catch (error) {
+      } catch (error: unknown) {
         log.error("Erreur d'envoi du mail de vérification", {
-          uid: user.id,
+          uid: user.uid,
           origin: 'EMAIL_VERIFICATION_ERROR',
           error,
         });
-        showAlert('danger', t(`supabase-error.${error.code || 'unexpected_error'}`));
+        showAlert('danger', t(`supabase-error.${(error as { code?: string }).code || 'unexpected_error'}`));
       }
     } else {
       showAlert('danger', t('verify_email.no_user'));
@@ -64,7 +64,6 @@ function VerifyEmail() {
     const intervalId = setInterval(async () => {
       const user = userInfo;
       if (user) {
-        await user.reload();
         const reloadUser = getGlobalReloadUser();
         if (reloadUser) {
           reloadUser();

@@ -1,5 +1,5 @@
-import React, { useEffect, useContext, useState } from 'react';
-import { useNavigate, useParams,  useSearchParams} from 'react-router-dom';
+import { useEffect, useContext, useState, useMemo } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
 import { UserContext } from '../../contexts/UserContext';
 import { getCalendarSourceMap } from '@meditime/utils';
@@ -12,6 +12,13 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, AlertTriangle, RefreshCw, ArrowLeft, ArrowRight } from 'lucide-react';
 import { LoadingProvider } from '@/components/ui/loading';
 import { DAYS, PILL_COUNT } from '@meditime/constants';
+import type {
+  PillboxContentProps,
+  PillboxCalendarSource,
+  PillboxTable,
+  PillboxOrderedMed,
+  PillboxTableMed,
+} from '@meditime/types';
 
 function PillboxContent({
   type,
@@ -23,31 +30,32 @@ function PillboxContent({
   sharedUserCalendars,
   tokenCalendars,
   setNotFound,
-}) {
+}: PillboxContentProps) {
   const { t } = useTranslation();
-  const { userInfo } = useContext(UserContext);
+  const userContext = useContext(UserContext);
+  const userInfo = userContext?.userInfo ?? null;
   const navigate = useNavigate();
   const { lng } = useParams();
   const [searchParams] = useSearchParams();
 
   const medsIdParam = searchParams.get('medsId');
-  const medsId = React.useMemo(() => 
-    medsIdParam ? JSON.parse(decodeURIComponent(medsIdParam)) : [], 
+  const medsId = useMemo(() => 
+    medsIdParam ? JSON.parse(decodeURIComponent(medsIdParam)) as string[] : [], 
     [medsIdParam]
   );
 
-  const [calendarTable, setCalendarTable] = useState([]);
+  const [calendarTable, setCalendarTable] = useState<PillboxTable>({});
   const [selectedMedIndex, setSelectedMedIndex] = useState(0);
-  const [orderedMeds, setOrderedMeds] = useState([]);
-  const [loading, setLoading] = useState(undefined);
+  const [orderedMeds, setOrderedMeds] = useState<PillboxOrderedMed[]>([]);
+  const [loading, setLoading] = useState<boolean | undefined>(undefined);
   const { showConfirm } = useAlert();
   const [isPillboxUsed, setIsPillboxUsed] = useState(false);
   const [pillboxError, setPillboxError] = useState(false);
 
   // Calculer les dates de la semaine à partir du lundi fourni
-  const weekDates = React.useMemo(() => {
+  const weekDates = useMemo(() => {
     if (!selectedDate) return [];
-    const base = new Date(getMondayDate(selectedDate));
+    const base = new Date(getMondayDate(selectedDate)!);
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(base);
       d.setDate(base.getDate() + i);
@@ -59,7 +67,7 @@ function PillboxContent({
     personalCalendars,
     sharedUserCalendars,
     tokenCalendars
-  )[calendarType];
+  )[calendarType] as unknown as PillboxCalendarSource;
 
   const handleNextMed = () => {
     setSelectedMedIndex((prev) => (prev + 1 < orderedMeds.length ? prev + 1 : prev));
@@ -71,9 +79,9 @@ function PillboxContent({
 
   const getSchedule = async () => {
     setLoading(undefined);
-    const rep = await calendarSource.fetchSchedule(calendarId, toISO(selectedDate));
+    const rep = await calendarSource.fetchSchedule(calendarId!, toISO(selectedDate as Date));
     if (rep.success && !isEqual(rep.table, calendarTable)) {
-      setCalendarTable(rep.table);
+      setCalendarTable(rep.table as PillboxTable);
     } else if (rep.status === 404) {
       setNotFound(true);
     }
@@ -82,9 +90,9 @@ function PillboxContent({
 
   const getScheduleNegativeStock = async () => {
     setLoading(undefined);
-    const rep = await calendarSource.fetchScheduleNegativeStock(calendarId, medsId);
+    const rep = await calendarSource.fetchScheduleNegativeStock(calendarId!, medsId);
     if (rep.success && !isEqual(rep.table, calendarTable)) {
-      setCalendarTable(rep.table);
+      setCalendarTable(rep.table as PillboxTable);
     } else if (rep.status === 404) {
       setNotFound(true);
     }
@@ -105,8 +113,8 @@ function PillboxContent({
 
   useEffect(() => {
     const time_order = ['morning', 'noon', 'evening'];
-    const allMeds = time_order.flatMap((moment) => {
-      const meds = calendarTable[moment] || [];
+    const allMeds: PillboxOrderedMed[] = time_order.flatMap((moment) => {
+      const meds: PillboxTableMed[] = calendarTable[moment] || [];
       return meds
         .slice()
         .sort((a, b) => a.title.localeCompare(b.title))
@@ -124,9 +132,9 @@ function PillboxContent({
       if (calendarType === 'personal' || calendarType === 'sharedUser') {
         if (!userInfo) return;
       }
-      const rep = await calendarSource.fetchIfPillboxUsed(calendarId, toISO(selectedDate));
+      const rep = await calendarSource.fetchIfPillboxUsed(calendarId, toISO(selectedDate as Date));
       if (rep.success) {
-        setIsPillboxUsed(rep.if_pillbox_used);
+        setIsPillboxUsed(rep.if_pillbox_used ?? false);
       }
     };
 
@@ -223,7 +231,7 @@ function PillboxContent({
                             {orderedMeds[selectedMedIndex].cells[day] !== undefined && (
                               <div className="w-full aspect-square">
                                 <img
-                                  src={`/icons/pills/${PILL_COUNT[orderedMeds[selectedMedIndex].cells[day]]}_pills.svg`}
+                                  src={`/icons/pills/${PILL_COUNT[orderedMeds[selectedMedIndex].cells[day] as keyof typeof PILL_COUNT]}_pills.svg`}
                                   alt="Pills"
                                   className="w-full h-full object-contain"
                                 />
@@ -294,7 +302,7 @@ function PillboxContent({
                               : t('pillbox_refill_description'),
                             async () => {
                               if (medsId.length === 0) {
-                                const rep = await calendarSource.decreaseStock(calendarId, toISO(selectedDate));
+                                const rep = await calendarSource.decreaseStock(calendarId!, toISO(selectedDate as Date));
                                 if (!rep.success) {
                                   setPillboxError(true);
                                 }
@@ -304,7 +312,7 @@ function PillboxContent({
                                 }
                               } else {
                                 for (const medId of medsId) {
-                                  const rep = await calendarSource.restockBox(calendarId, medId);
+                                  const rep = await calendarSource.restockBox(calendarId!, medId);
                                   if (!rep.success) {
                                     setPillboxError(true);
                                     break;
@@ -336,7 +344,7 @@ function PillboxContent({
   );
 }
 
-export default function PillboxDisplay(props) {
+export default function PillboxDisplay(props: PillboxContentProps) {
   return (
     <LoadingProvider name="pillbox" className="min-h-75">
       <PillboxContent {...props} />

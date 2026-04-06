@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import LanguageSelector from '../../components/common/LanguageSelector';
 import ThemeToggle from '../../components/common/ThemeToggle';

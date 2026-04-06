@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
-import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
+import { useState, useEffect, useCallback, useContext } from 'react';
+import Joyride, { ACTIONS, EVENTS, STATUS, type CallBackProps, type TooltipRenderProps, type Step } from 'react-joyride';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { UserContext } from '../../contexts/UserContext';
 
 const Tooltip = ({
@@ -15,7 +14,7 @@ const Tooltip = ({
   tooltipProps,
   skipProps,
   size,
-}) => {
+}: TooltipRenderProps) => {
   const { t } = useTranslation();
 
   return (
@@ -56,30 +55,20 @@ const Tooltip = ({
   );
 };
 
-Tooltip.propTypes = {
-  continuous: PropTypes.bool,
-  index: PropTypes.number.isRequired,
-  step: PropTypes.shape({
-    title: PropTypes.string,
-    content: PropTypes.node.isRequired,
-  }).isRequired,
-  backProps: PropTypes.object.isRequired,
-  closeProps: PropTypes.object.isRequired,
-  primaryProps: PropTypes.object.isRequired,
-  tooltipProps: PropTypes.object.isRequired,
-  skipProps: PropTypes.object.isRequired,
-  size: PropTypes.number.isRequired,
-};
+interface OnboardingTourProps {
+  isAppLoading: boolean;
+}
 
-const OnboardingTour = ({ isAppLoading }) => {
+const OnboardingTour = ({ isAppLoading }: OnboardingTourProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { lng } = useParams();
-  const { userInfo } = useContext(UserContext);
+  const userContext = useContext(UserContext);
+  const userInfo = userContext?.userInfo ?? null;
   
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
-  const [waitingForStep, setWaitingForStep] = useState(null);
+  const [waitingForStep, setWaitingForStep] = useState<number | null>(null);
 
   // Check if tour has been completed
   useEffect(() => {
@@ -90,7 +79,7 @@ const OnboardingTour = ({ isAppLoading }) => {
     }
   }, [isAppLoading, userInfo]);
 
-  const steps = [
+  const steps: Step[] = [
     // 0. Welcome (Dashboard)
     {
       target: 'body',
@@ -311,18 +300,18 @@ const OnboardingTour = ({ isAppLoading }) => {
     }
   ];
 
-  const ensureActionSheetOpen = useCallback((selector) => {
+  const ensureActionSheetOpen = useCallback((selector: string) => {
     const btn = document.querySelector(selector);
     if (btn) {
-      const isMenuOpen = btn.parentNode.querySelector('.dropdown-menu') !== null;
+      const isMenuOpen = btn.parentNode?.querySelector('.dropdown-menu') !== null;
       if (!isMenuOpen) {
-        btn.click();
+        (btn as HTMLElement).click();
       }
     }
   }, []);
 
-  const handleNextStep = useCallback((currentIndex, nextIndex) => {
-    const transitions = {
+  const handleNextStep = useCallback((currentIndex: number, nextIndex: number) => {
+    const transitions: Record<number, string> = {
       0: `/${lng}/calendars`,
       1: `/${lng}/add-calendar`,
       4: `/${lng}/calendar/demo`,
@@ -362,10 +351,10 @@ const OnboardingTour = ({ isAppLoading }) => {
     setStepIndex(nextIndex);
   }, [lng, navigate, ensureActionSheetOpen]);
 
-  const handleJoyrideCallback = useCallback((data) => {
+  const handleJoyrideCallback = useCallback((data: CallBackProps) => {
     const { action, index, status, type } = data;
 
-    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
+    if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
       setRun(false);
       localStorage.setItem('meditime_tour_completed_v1', 'true');
       return;
@@ -463,7 +452,3 @@ const OnboardingTour = ({ isAppLoading }) => {
 };
 
 export default OnboardingTour;
-
-OnboardingTour.propTypes = {
-  isAppLoading: PropTypes.bool.isRequired,
-};

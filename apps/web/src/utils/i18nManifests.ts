@@ -6,7 +6,7 @@ import { enabledLanguageCodes } from '@meditime/config';
 /**
  * Lit les traductions d'un fichier de langue
  */
-const loadTranslations = (langCode) => {
+const loadTranslations = (langCode: string): Record<string, Record<string, string>> | null => {
   try {
     const translationPath = path.join(
       process.cwd(),
@@ -22,7 +22,7 @@ const loadTranslations = (langCode) => {
     const translationContent = fs.readFileSync(translationPath, 'utf8');
     return JSON.parse(translationContent);
   } catch (error) {
-    console.warn(`⚠️  Impossible de charger les traductions pour ${langCode}:`, error.message);
+    console.warn(`⚠️  Impossible de charger les traductions pour ${langCode}:`, (error as Error).message);
     return null;
   }
 };
@@ -85,7 +85,7 @@ export const generateI18nManifests = async () => {
       manifestsGenerated++;
       
     } catch (error) {
-      console.error(`❌ Erreur lors de la génération du manifest pour ${langCode}:`, error.message);
+      console.error(`❌ Erreur lors de la génération du manifest pour ${langCode}:`, (error as Error).message);
     }
   }
   
@@ -117,7 +117,7 @@ export const generateI18nManifests = async () => {
 /**
  * Fonction utilitaire pour obtenir l'URL du manifest selon la langue
  */
-export const getManifestUrl = (language = 'en') => {
+export const getManifestUrl = (language = 'en'): string => {
   if (enabledLanguageCodes.includes(language)) {
     return `/manifests/manifest-${language}.json`;
   }
@@ -128,7 +128,7 @@ export const getManifestUrl = (language = 'en') => {
  * Version synchrone pour les cas où on a déjà les traductions
  * (utilisée dans le hook React)
  */
-export const generateManifestForLanguage = (language) => {
+export const generateManifestForLanguage = (language: string) => {
   const translations = loadTranslations(language);
   
   return {

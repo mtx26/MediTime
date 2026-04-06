@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
+import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import { useTranslation } from "react-i18next";
-import { readBarcodes } from "zxing-wasm/reader";
+import { readBarcodes, type ReaderOptions } from "zxing-wasm/reader";
 import { fetchMedicaments } from "../../utils/api/scanner";
 import { useAlert } from "../../contexts/AlertContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
@@ -23,6 +23,7 @@ import {
   XCircle, 
   AlertTriangle
 } from "lucide-react";
+import type { QRCodeScannerProps, QRCodeScannerHandle, QRScannedMedicine } from "@meditime/types";
 
 // Styles CSS pour les contrôles
 const controlsStyle = `
@@ -45,13 +46,13 @@ if (typeof document !== 'undefined' && !document.getElementById('scanner-control
   document.head.appendChild(style);
 }
 
-const readerOptions = {
+const readerOptions: ReaderOptions = {
   tryHarder: true,
   formats: ["DataMatrix"],
   maxNumberOfSymbols: 1,
 };
 
-const QRCodeScanner = forwardRef(({
+const QRCodeScanner = forwardRef<QRCodeScannerHandle, QRCodeScannerProps>(({
   onMedicineFound = null,
   singleScan = false,
   onClose = null,   // Fonction pour fermer la modal
@@ -62,22 +63,22 @@ const QRCodeScanner = forwardRef(({
 }, ref) => {
   const { t } = useTranslation();
   const { showAlert } = useAlert();
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const rafRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const rafRef = useRef<number | null>(null);
   const [error, setError] = useState("");
-  const [gtins, setGtins] = useState([]); // liste des GTIN uniques (01)
-  const [medicines, setMedicines] = useState(() => Object.create(null)); // cache des médicaments trouvés par GTIN - contient directement les medicine_boxes
-  const [loadingGtin, setLoadingGtin] = useState(null); // GTIN en cours de recherche
+  const [gtins, setGtins] = useState<string[]>([]); // liste des GTIN uniques (01)
+  const [medicines, setMedicines] = useState<Record<string, QRScannedMedicine | null>>(() => Object.create(null)); // cache des médicaments trouvés par GTIN - contient directement les medicine_boxes
+  const [loadingGtin, setLoadingGtin] = useState<string | null>(null); // GTIN en cours de recherche
   
   // Nouveaux états pour les contrôles de caméra
   const [zoom, setZoom] = useState(1); // Zoom par défaut à 1
-  const [availableCameras, setAvailableCameras] = useState([]);
-  const [selectedCamera, setSelectedCamera] = useState(null);
+  const [availableCameras, setAvailableCameras] = useState<MediaDeviceInfo[]>([]);
+  const [selectedCamera, setSelectedCamera] = useState<MediaDeviceInfo | null>(null);
   const [isFrontCamera, setIsFrontCamera] = useState(false); // Pour détecter si c'est une caméra frontale
   const [showControls, setShowControls] = useState(false);
-  const hideControlsTimeoutRef = useRef(null);
-  const streamRef = useRef(null);
+  const hideControlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const isLoadingRef = useRef(false);
   const lastScanTimeRef = useRef(0);
   const scanIntervalMs = 100; // Intervalle entre les scans en ms (réduit la consommation)
@@ -119,7 +120,7 @@ const QRCodeScanner = forwardRef(({
 
   useEffect(() => {
     // Fonction pour obtenir la liste des caméras disponibles
-    async function getCameras(stream) {
+    async function getCameras(_stream: MediaStream) {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         let cameras = devices.filter(device => device.kind === 'videoinput');
@@ -241,7 +242,7 @@ const QRCodeScanner = forwardRef(({
         }
       } catch (e) {
         console.error(e);
-        let errorMessage = e?.message || t('scanner.camera_error');
+        let errorMessage = (e instanceof Error ? e.message : null) || t('scanner.camera_error');
         
         setError(errorMessage);
       } finally {
@@ -282,7 +283,7 @@ const QRCodeScanner = forwardRef(({
   }, [show, modal, selectedCamera]); // Retiré zoom des dépendances pour éviter les rechargements
 
   // Fonction helper pour déterminer le type de caméra
-  const getCameraType = (camera) => {
+  const getCameraType = (camera: MediaDeviceInfo): string => {
     const label = camera.label.toLowerCase();
     
     // Détecter caméra arrière explicitement
@@ -308,12 +309,12 @@ const QRCodeScanner = forwardRef(({
   };
 
   // Fonction pour changer le zoom (zoom numérique CSS)
-  const handleZoomChange = (newZoom) => {
+  const handleZoomChange = (newZoom: number) => {
     setZoom(newZoom);
   };
 
   // Fonction pour changer de caméra
-  const handleCameraChange = (camera) => {
+  const handleCameraChange = (camera: MediaDeviceInfo) => {
     setSelectedCamera(camera);
     
     // Utiliser la fonction helper simplifiée
@@ -323,7 +324,7 @@ const QRCodeScanner = forwardRef(({
   };
 
   // Fonction pour obtenir un nom de caméra court
-  const getCameraDisplayName = (camera, index) => {
+  const getCameraDisplayName = (camera: MediaDeviceInfo, index: number): string => {
     if (!camera.label) return t('scanner.camera') + ` ${index + 1}`;
     
     const type = getCameraType(camera);
@@ -402,6 +403,10 @@ const QRCodeScanner = forwardRef(({
         tempCanvas.width = w;
         tempCanvas.height = h;
         const tempCtx = tempCanvas.getContext('2d');
+        if (!tempCtx) {
+          rafRef.current = requestAnimationFrame(scanLoop);
+          return;
+        }
         
         // Dessiner sur le canvas temporaire CACHÉ (pas visible = pas de lag)
         tempCtx.drawImage(video, 0, 0, w, h);
@@ -412,6 +417,10 @@ const QRCodeScanner = forwardRef(({
 
         // Canvas visible pour overlay seulement
         const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          rafRef.current = requestAnimationFrame(scanLoop);
+          return;
+        }
         ctx.clearRect(0, 0, w, h); // Clear seulement l'overlay
 
         if (results && results.length) {
@@ -446,8 +455,8 @@ const QRCodeScanner = forwardRef(({
     rafRef.current = requestAnimationFrame(scanLoop);
   };
 
-  function drawDetection(ctx, r) {
-    let points = [];
+  function drawDetection(ctx: CanvasRenderingContext2D, r: { position?: { points?: Array<{x: number; y: number}>; topLeft?: {x: number; y: number}; topRight?: {x: number; y: number}; bottomRight?: {x: number; y: number}; bottomLeft?: {x: number; y: number} } }) {
+    let points: Array<{x: number; y: number}> = [];
 
     if (Array.isArray(r?.position?.points) && r.position.points.length) {
       points = r.position.points;
@@ -475,7 +484,7 @@ const QRCodeScanner = forwardRef(({
       if (Number.isFinite(firstX) && Number.isFinite(firstY)) {
         ctx.moveTo(firstX, firstY);
         for (let i = 1; i < points.length; i++) {
-          const p = Array.isArray(points) ? Array.prototype.at.call(points, i) : undefined;
+          const p = points[i];
           if (!p || typeof p !== 'object') continue;
           const x = Number(p.x);
           const y = Number(p.y);
@@ -490,7 +499,7 @@ const QRCodeScanner = forwardRef(({
   }
 
   // Fonction pour chercher le médicament associé au GTIN et créer directement une medicine_box
-  const searchMedicine = async (gtin) => {
+  const searchMedicine = async (gtin: string) => {
     // Vérifier si le médicament est déjà en cours de recherche ou s'il est dans la liste active
     if (loadingGtin === gtin || (Object.prototype.hasOwnProperty.call(medicines, gtin) && gtins.includes(gtin))) return;
     
@@ -498,15 +507,15 @@ const QRCodeScanner = forwardRef(({
     try {
       const results = await fetchMedicaments(gtin);
       if (results && results.length > 0) {
-        const medicineData = results[0]; // Prendre le premier résultat
+        const medicineData = results[0] as Record<string, string | undefined>;
         
         // Créer directement une structure medicine_box
-        const dose = parseInt(medicineData.dose?.replace(/\D/g, '') || 0);
-        const conditionnement = parseInt(medicineData.conditionnement?.replace(/\D/g, '') || 0);
+        const dose = parseInt(medicineData.dose?.replace(/\D/g, '') || '0');
+        const conditionnement = parseInt(medicineData.conditionnement?.replace(/\D/g, '') || '0');
         
         const medicineBox = {
           gtin,
-          name: medicineData.name,
+          name: medicineData.name || 'Unknown',
           dose: dose,
           box_capacity: conditionnement,
           stock_quantity: conditionnement,
@@ -546,7 +555,7 @@ const QRCodeScanner = forwardRef(({
   };
 
   // Fonction pour supprimer un médicament scanné
-  const removeMedicine = (gtinToRemove) => {
+  const removeMedicine = (gtinToRemove: string) => {
     setGtins(prev => prev.filter(gtin => gtin !== gtinToRemove));
     setMedicines(prev => {
       if (!Object.prototype.hasOwnProperty.call(prev, gtinToRemove)) return prev;
@@ -593,7 +602,7 @@ const QRCodeScanner = forwardRef(({
   // Extraction GTIN (AI 01) : 14 chiffres
   // Gère plusieurs formats courants : "(01)12345678901234", "0112345678901234",
   // ou avec séparateurs FNC1 (\x1D) présents.
-  function extractGTIN01(text) {
+  function extractGTIN01(text: string): string | null {
     if (!text) return null;
 
     // Normaliser les séparateurs GS1
@@ -733,7 +742,7 @@ const QRCodeScanner = forwardRef(({
                   value={selectedCamera?.deviceId || ''}
                   onValueChange={(deviceId) => {
                     const camera = availableCameras.find(c => c.deviceId === deviceId);
-                    handleCameraChange(camera);
+                    if (camera) handleCameraChange(camera);
                     autoHideControls();
                   }}
                 >

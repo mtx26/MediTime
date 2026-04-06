@@ -49,3 +49,7 @@ export interface HeaderSharedProps {
   };
   notifications: HeaderNotificationsState;
 }
+
+export interface NotificationsPageProps {
+  notifications: HeaderNotificationsState;
+}

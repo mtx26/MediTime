@@ -5,7 +5,7 @@ import {
 } from '../../hooks/realtime/useRealtimeCalendars';
 import { useRealtimeNotifications } from '../../hooks/realtime/useRealtimeNotifications';
 import { useRealtimeTokens } from '../../hooks/realtime/useRealtimeTokens';
-import PropTypes from 'prop-types';
+import type { RealtimeManagerProps } from '@meditime/types';
 
 export default function RealtimeManager({
   setCalendarsData,
@@ -15,7 +15,7 @@ export default function RealtimeManager({
   setLoadingStates,
   calendarsData,
   sharedCalendarsData,
-}) {
+}: RealtimeManagerProps) {
   const location = useLocation();
 
   // Liste blanche des routes où on active le realtime
@@ -59,13 +59,3 @@ export default function RealtimeManager({
 
   return null; // pas de rendu visuel, juste des hooks
 }
-
-RealtimeManager.propTypes = {
-  setCalendarsData: PropTypes.func.isRequired,
-  setSharedCalendarsData: PropTypes.func.isRequired,
-  setNotificationsData: PropTypes.func.isRequired,
-  setTokensList: PropTypes.func.isRequired,
-  setLoadingStates: PropTypes.func.isRequired,
-  calendarsData: PropTypes.array,
-  sharedCalendarsData: PropTypes.array,
-};

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Security from './Security';
 import Notification from './Notification';
 import Account from './Account';
@@ -11,8 +11,9 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, ShieldCheck, Bell, Sliders, LogOut, Mail } from 'lucide-react';
+import type { AppSharedProps } from '@meditime/types';
 
-export default function SettingsPage( sharedProps ) {
+export default function SettingsPage( sharedProps: AppSharedProps ) {
   const { t } = useTranslation();
   const location = useLocation();
   const { lng } = useParams();

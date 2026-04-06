@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { resetPassword } from '../../services/auth/authService';
 import { useAlert } from '../../contexts/AlertContext';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,7 @@ function ResetPassword() {
   const [formValid, setFormValid] = useState(true);
 
   // 🔄 Réinitialisation du mot de passe
-  const handleReset = async (e) => {
+  const handleReset = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const isFormValid =
       typeof email === 'string' && email.includes('@') && email.includes('.');

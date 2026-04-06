@@ -184,3 +184,34 @@ export interface MedicineDisplayItem extends MedicineItem {
   interval_days?: number;
   start_date?: string;
 }
+
+/* ------------------------------------------------------------------ */
+/* PillboxDisplay                                                     */
+/* ------------------------------------------------------------------ */
+
+export interface PillboxTableMed {
+  title: string;
+  cells: Record<string, number>;
+}
+
+export interface PillboxOrderedMed extends PillboxTableMed {
+  moment: string;
+}
+
+export type PillboxTable = Record<string, PillboxTableMed[]>;
+
+export interface PillboxCalendarSource {
+  fetchSchedule: (calendarId: string, date: string) => Promise<CalendarScheduleResult>;
+  fetchScheduleNegativeStock: (calendarId: string, medsId: string[]) => Promise<CalendarScheduleResult>;
+  fetchIfPillboxUsed: (calendarId: string, date: string) => Promise<ApiResult & { if_pillbox_used?: boolean }>;
+  decreaseStock: (calendarId: string, date: string) => Promise<ApiResult>;
+  restockBox: (calendarId: string, boxId: string) => Promise<ApiResult>;
+}
+
+export interface PillboxContentProps extends CalendarDataSourceProps, CalendarNotFoundProps {
+  type: string;
+  selectedDate: Date | string | null;
+  calendarType: CalendarPageSourceType;
+  calendarId: string | undefined;
+  basePath: string;
+}

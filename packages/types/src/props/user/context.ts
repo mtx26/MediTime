@@ -10,6 +10,8 @@ export interface UserInfo {
   pushEnabled: boolean;
   uid: string;
   role?: string | null;
+  provider?: string | null;
+  emailVerified?: boolean;
 }
 
 export interface UserContextValue {

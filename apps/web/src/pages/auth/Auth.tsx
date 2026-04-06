@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useLocation, useParams, useNavigate, Link } from 'react-router-dom';
 import {
   GoogleHandleLogin,
@@ -26,7 +26,8 @@ import { FaMicrosoft } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 
 function Auth() {
-  const { userInfo } = useContext(UserContext);
+  const userContext = useContext(UserContext);
+  const userInfo = userContext?.userInfo ?? null;
   const { t } = useTranslation();
   const { showAlert } = useAlert();
   // 👤 Authentification utilisateur
@@ -39,23 +40,23 @@ function Auth() {
   const location = useLocation();
   const { lng } = useParams();
   const navigate = useNavigate();
-  const [redirect, setRedirect] = useState();
+  const [redirect, setRedirect] = useState<string | undefined>();
   useEffect(() => {
     const last = location.pathname.split('/').pop();
     setActiveTab(last === 'register' ? 'register' : 'login');
     setRedirect(
-      getValidRedirect(new URLSearchParams(location.search).get('redirect'))
+      getValidRedirect(new URLSearchParams(location.search).get('redirect')) ?? undefined
     );
   }, [location.pathname, location.search]);
   
-  const switchTab = (tab) => {
+  const switchTab = (tab: string) => {
     if (tab !== activeTab) setActiveTab(tab);
   };
 
   const handleLogin = async () => {
     const error = await loginWithEmail(email, password);
     if (error) {
-      showAlert('danger', t(`supabase-error.${error.code || 'unexpected_error'}`));
+      showAlert('danger', t(`supabase-error.${(error as { code?: string })?.code || 'unexpected_error'}`));
       return;
     }
     log.info('Connexion réussie', {
@@ -72,7 +73,7 @@ function Auth() {
   const handleRegister = async () => {
     const error = await registerWithEmail(email, password, name, redirect);
     if (error) {
-      showAlert('danger', t(`supabase-error.${error.code || 'unexpected_error'}`));
+      showAlert('danger', t(`supabase-error.${(error as { code?: string })?.code || 'unexpected_error'}`));
       return;
     }
     log.info('Inscription réussie', {
@@ -83,7 +84,7 @@ function Auth() {
     showAlert('success', t('auth.verification_sent'));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       if (activeTab === 'login') {
@@ -91,11 +92,11 @@ function Auth() {
       } else {
         await handleRegister();
       }
-    } catch (err) {
+    } catch (err: unknown) {
       log.error('Supabase auth error', {
         id: 'AUTH-ERROR',
         origin: 'Auth.jsx',
-        stack: err.stack,
+        stack: err instanceof Error ? err.stack : undefined,
       });
     }
   };
@@ -166,7 +167,7 @@ function Auth() {
                     type="text" 
                     required 
                     value={name} 
-                    autoComplete={activeTab === 'login' ? 'name' : 'new-name'} 
+                    autoComplete='name' 
                     onChange={(e) => setName(e.target.value)} 
                     aria-label={t('auth.name')}
                   />

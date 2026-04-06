@@ -1,4 +1,4 @@
-// src/pages/AuthCallback.jsx
+// src/pages/AuthCallback.tsx
 import { useEffect, useContext, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../services/supabase/supabaseClient';
@@ -17,8 +17,8 @@ const AuthCallback = () => {
   const { showLoading } = useLoading();
 
   // Pour stocker redirect et type
-  const redirectRef = useRef(null);
-  const typeRef = useRef(null);
+  const redirectRef = useRef<string | null>(null);
+  const typeRef = useRef<string | null>(null);
   const [isUrlProcessed, setIsUrlProcessed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { useAlert } from '../../contexts/AlertContext';
@@ -42,7 +42,7 @@ export default function ResetPasswordConfirm() {
   }, []);
   
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 

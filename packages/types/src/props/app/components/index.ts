@@ -6,3 +6,6 @@ export * from './calendar-pages';
 export * from './feedback';
 export * from './notifications';
 export * from './boxes';
+export * from './settings';
+export * from './realtime-manager';
+export * from './pages';
