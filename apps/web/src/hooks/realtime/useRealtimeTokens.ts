@@ -9,7 +9,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 
 export const useRealtimeTokens = (
-  setTokensList: Dispatch<SetStateAction<TokenItem[]>>,
+  setTokensList: Dispatch<SetStateAction<TokenItem[]>> | null,
   setLoadingStates: Dispatch<SetStateAction<LoadingStates>>
 ): void => {
   const userContext = useContext(UserContext) as UserContextValue | null;
@@ -17,7 +17,7 @@ export const useRealtimeTokens = (
   const uid = userInfo?.uid;
 
   const fetchTokens = useCallback(async () => {
-    if (!uid) return;
+    if (!uid || !setTokensList) return;
     try {
       const {
         data: { session },

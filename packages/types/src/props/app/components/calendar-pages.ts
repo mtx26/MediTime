@@ -62,6 +62,7 @@ export interface CalendarNotificationsSource {
 }
 
 export interface CalendarStockPersonalCalendars {
+  [key: string]: unknown;
   updatePersonalStockDecrementMethod: (calendarId: string | undefined, method: string) => Promise<ApiResult>;
   fetchPersonalStockDecrementMethod: (calendarId: string | undefined) => Promise<StockMethodResult>;
 }

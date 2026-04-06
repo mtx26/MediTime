@@ -22,7 +22,8 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }:
   const params = useParams<{ lng?: string; calendarId?: string; sharedToken?: string }>();
   const { lng } = params;
 
-  const { userInfo } = useContext(UserContext);
+  const userContext = useContext(UserContext);
+  const userInfo = userContext?.userInfo;
   const { showConfirm } = useAlert();
 
   const [pillboxUsesData, setPillboxUsesData] = useState<PillboxUseItem[]>([]);
@@ -41,6 +42,7 @@ const PillboxUses = ({ personalCalendars, sharedUserCalendars, tokenCalendars }:
   const formatWeek = (dateString: string) => {
     const date = new Date(dateString);
     const monday = getMondayDate(date);
+    if (!monday) return dateString;
     const sunday = new Date(monday);
     sunday.setDate(monday.getDate() + 6);
     

@@ -41,21 +41,28 @@ export default function RealtimeManager({
   );
 
   // ✅ Appel des hooks (OK car toujours dans un composant monté dans <Router>)
+  // Les setters proviennent de useState et sont compatibles à l'exécution,
+  // mais RealtimeManagerProps utilise des signatures plus étroites.
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   useRealtimeCalendars(
-    isRealtimeEnabled ? setCalendarsData : null,
-    setLoadingStates,
-    calendarsData
+    isRealtimeEnabled ? (setCalendarsData as any) : null,
+    setLoadingStates as any,
+    calendarsData ?? undefined
   );
   useRealtimeSharedCalendars(
-    isRealtimeEnabled ? setSharedCalendarsData : null,
-    setLoadingStates,
-    sharedCalendarsData
+    isRealtimeEnabled ? (setSharedCalendarsData as any) : null,
+    setLoadingStates as any,
+    sharedCalendarsData ?? undefined
   );
   useRealtimeNotifications(
-    isRealtimeEnabled ? setNotificationsData : null,
-    setLoadingStates
+    isRealtimeEnabled ? (setNotificationsData as any) : null,
+    setLoadingStates as any
   );
-  useRealtimeTokens(isRealtimeEnabled ? setTokensList : null, setLoadingStates);
+  useRealtimeTokens(
+    isRealtimeEnabled ? (setTokensList as any) : null,
+    setLoadingStates as any
+  );
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   return null; // pas de rendu visuel, juste des hooks
 }

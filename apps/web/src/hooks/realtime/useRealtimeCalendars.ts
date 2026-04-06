@@ -118,7 +118,7 @@ const fetchSharedCalendars = async (
 };
 
 export const useRealtimeCalendars = (
-  setCalendarsData: SetUnknown,
+  setCalendarsData: SetUnknown | null,
   setLoadingStates: SetLoadingStates,
   calendarsData: Array<{ id: string }> = []
 ): void => {
@@ -132,7 +132,7 @@ export const useRealtimeCalendars = (
   }, [calendarsData]);
 
   const fetchData = useCallback(() => {
-    if (!uid) return;
+    if (!uid || !setCalendarsData) return;
     setLoadingStates((prev: LoadingStates) => ({ ...prev, calendars: true }));
     fetchCalendars(uid, setCalendarsData, setLoadingStates);
   }, [uid, setCalendarsData, setLoadingStates]);
@@ -170,7 +170,7 @@ export const useRealtimeCalendars = (
 };
 
 export const useRealtimeSharedCalendars = (
-  setSharedCalendarsData: SetUnknown,
+  setSharedCalendarsData: SetUnknown | null,
   setLoadingStates: SetLoadingStates,
   sharedCalendarsData: Array<{ id: string }> = []
 ): void => {
@@ -184,7 +184,7 @@ export const useRealtimeSharedCalendars = (
   }, [sharedCalendarsData]);
 
   const fetchData = useCallback(() => {
-    if (!uid) return;
+    if (!uid || !setSharedCalendarsData) return;
     setLoadingStates((prev: LoadingStates) => ({ ...prev, sharedCalendars: true }));
     fetchSharedCalendars(uid, setSharedCalendarsData, setLoadingStates);
   }, [uid, setSharedCalendarsData, setLoadingStates]);

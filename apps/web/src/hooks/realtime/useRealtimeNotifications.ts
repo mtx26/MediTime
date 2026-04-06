@@ -69,7 +69,7 @@ const fetchNotifications = async (
 };
 
 export const useRealtimeNotifications = (
-  setNotificationsData: SetNotificationsData,
+  setNotificationsData: SetNotificationsData | null,
   setLoadingStates: SetLoadingStates
 ): void => {
   const userContext = useContext(UserContext) as UserContextValue | null;
@@ -77,7 +77,7 @@ export const useRealtimeNotifications = (
   const uid = userInfo?.uid;
 
   const fetchData = useCallback(() => {
-    if (!uid) return;
+    if (!uid || !setNotificationsData) return;
     setLoadingStates((prev: LoadingStates) => ({ ...prev, notifications: true }));
     fetchNotifications(uid, setNotificationsData, setLoadingStates);
   }, [uid, setNotificationsData, setLoadingStates]);

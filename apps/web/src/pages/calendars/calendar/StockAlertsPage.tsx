@@ -14,7 +14,6 @@ import { AlertTriangle, CheckCircle, PlusCircle, Package } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
 import type {
   CalendarBoxAlertItem,
-  CalendarPageSourceType,
   CalendarStockAlertsSource,
   StockAlertsPageProps,
 } from '@meditime/types';
@@ -51,7 +50,7 @@ function StockAlertsPage({
         {
           id: 'demo-box-1',
           name: 'Doliprane',
-          dose: '1000 mg',
+          dose: 1000,
           stock_quantity: 2,
           stock_alert_threshold: 5,
           box_capacity: 10,
@@ -59,7 +58,7 @@ function StockAlertsPage({
         {
           id: 'demo-box-2',
           name: 'Vitamin C',
-          dose: '500 mg',
+          dose: 500,
           stock_quantity: 0,
           stock_alert_threshold: 3,
           box_capacity: 20,
