@@ -26,5 +26,5 @@ export interface AcceptInviteSharedUserCalendars {
 }
 
 export interface AcceptInvitePageProps {
-  sharedUserCalendars: AcceptInviteSharedUserCalendars | Record<string, unknown>;
+  sharedUserCalendars: AcceptInviteSharedUserCalendars;
 }

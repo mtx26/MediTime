@@ -1,14 +1,24 @@
 import type { ApiResult } from '../../../contracts';
 import type { UserProfile, CalendarListItem } from '../../../models/common';
-import type { MedicineItem } from '../../../models/realtime';
+import type { BoxItem, IcsTokenItem, MedicineItem, StockDecrementMethod } from '../../../models/realtime';
+import type { WeeklyEventItem, CalendarTable } from '../../../models/schedule';
+import type { PersonalCalendarsApi } from '../../../contracts/api/factories';
+import type { AppPersonalCalendars, AppSharedUserCalendars, AppTokenCalendars } from '../shared-props';
+
+export type {
+  CalendarTable,
+  PillboxTable,
+  PillboxTableMed,
+  PillboxOrderedMed,
+} from '../../../models/schedule';
 
 // ─── Base ────────────────────────────────────────────────────────────
 
 /** Props communes à toutes les pages calendrier (personal / shared / token). */
 export interface CalendarDataSourceProps {
-  personalCalendars: Record<string, unknown>;
-  sharedUserCalendars: Record<string, unknown>;
-  tokenCalendars: Record<string, unknown>;
+  personalCalendars: AppPersonalCalendars;
+  sharedUserCalendars: AppSharedUserCalendars;
+  tokenCalendars: AppTokenCalendars;
 }
 
 export type CalendarPageSourceType = 'personal' | 'sharedUser' | 'token';
@@ -16,8 +26,8 @@ export type CalendarPageSourceType = 'personal' | 'sharedUser' | 'token';
 // ─── API Results ─────────────────────────────────────────────────────
 
 export type CalendarScheduleResult = ApiResult & {
-  schedule?: unknown[];
-  table?: Record<string, unknown>;
+  schedule?: WeeklyEventItem[];
+  table?: CalendarTable;
   ifLowStock?: boolean;
   calendarName?: string;
   status?: number;
@@ -29,7 +39,7 @@ export type NotificationSettingResult = ApiResult & {
 };
 
 export type StockMethodResult = ApiResult & {
-  method?: string;
+  method?: StockDecrementMethod;
   status?: number;
 };
 
@@ -45,16 +55,10 @@ export type IcsTokensResult = ApiResult & {
 
 // ─── Data Items ──────────────────────────────────────────────────────
 
-export interface CalendarBoxAlertItem {
-  id: string;
-  name: string;
-  dose?: number | null;
-  stock_quantity: number;
-  stock_alert_threshold: number;
-  box_capacity: number;
-  conditions?: Array<{ max_date?: string | null }>;
-  [key: string]: unknown;
-}
+export type CalendarBoxAlertItem = Pick<
+  BoxItem,
+  'id' | 'name' | 'dose' | 'stock_quantity' | 'stock_alert_threshold' | 'box_capacity' | 'conditions'
+>;
 
 export interface PillboxUseItem {
   id: string;
@@ -62,38 +66,14 @@ export interface PillboxUseItem {
   prepared_by: UserProfile;
 }
 
-export interface IcsTokenEntry {
-  id: string;
-  token: string;
-  owner_photo_url: string;
-  owner_display_name: string;
-  owner_email?: string;
-}
+export type IcsTokenEntry = Required<Pick<
+  IcsTokenItem,
+  'id' | 'token' | 'owner_photo_url' | 'owner_display_name'
+>> & Pick<IcsTokenItem, 'owner_email'>;
 
-export interface MedicineDisplayItem extends MedicineItem {
-  dose?: number | null;
-  time_of_day?: string[];
-  tablet_count?: number;
-  interval_days?: number;
-  start_date?: string;
-}
+export type MedicineDisplayItem = MedicineItem;
 
 export type GroupedMedicines = Record<string, MedicineItem[]>;
-
-export type CalendarTable = Record<string, unknown[]>;
-
-// ─── Pillbox table ───────────────────────────────────────────────────
-
-export interface PillboxTableMed {
-  title: string;
-  cells: Record<string, number>;
-}
-
-export interface PillboxOrderedMed extends PillboxTableMed {
-  moment: string;
-}
-
-export type PillboxTable = Record<string, PillboxTableMed[]>;
 
 // ─── Data Sources (méthodes d'accès API par type de calendrier) ─────
 
@@ -106,11 +86,7 @@ export interface CalendarNotificationsSource {
   updateNotificationsEnabled: (calendarId: string | undefined, enabled: boolean) => Promise<ApiResult>;
 }
 
-export interface CalendarStockPersonalCalendars {
-  [key: string]: unknown;
-  updatePersonalStockDecrementMethod: (calendarId: string | undefined, method: string) => Promise<ApiResult>;
-  fetchPersonalStockDecrementMethod: (calendarId: string | undefined) => Promise<StockMethodResult>;
-}
+export type CalendarStockPersonalCalendars = Pick<PersonalCalendarsApi, 'updatePersonalStockDecrementMethod' | 'fetchPersonalStockDecrementMethod'>;
 
 export interface CalendarStockAlertsSource {
   fetchPillboxUses: (calendarId: string | undefined) => Promise<ApiResult>;
@@ -149,14 +125,14 @@ export interface CalendarNotFoundProps {
 
 // ─── Page Props ──────────────────────────────────────────────────────
 
-export interface PillboxPageProps extends CalendarDataSourceProps {}
-export interface PillboxUsesPageProps extends CalendarDataSourceProps {}
-export interface IcsListPageProps extends CalendarDataSourceProps {}
-export interface CalendarSettingsPageProps extends CalendarDataSourceProps {}
-export interface DailyCalendarPageProps extends CalendarDataSourceProps {}
-export interface StockAlertsPageProps extends CalendarDataSourceProps {}
-export interface SharedListPageProps extends CalendarDataSourceProps {}
-export interface BoxesViewPageProps extends CalendarDataSourceProps {}
+export type PillboxPageProps = CalendarDataSourceProps;
+export type PillboxUsesPageProps = CalendarDataSourceProps;
+export type IcsListPageProps = CalendarDataSourceProps;
+export type CalendarSettingsPageProps = CalendarDataSourceProps;
+export type DailyCalendarPageProps = CalendarDataSourceProps;
+export type StockAlertsPageProps = CalendarDataSourceProps;
+export type SharedListPageProps = CalendarDataSourceProps;
+export type BoxesViewPageProps = CalendarDataSourceProps;
 
 export interface CalendarNotificationsProps extends CalendarDataSourceProps, CalendarNotFoundProps {}
 
@@ -164,8 +140,10 @@ export interface CalendarStockProps extends CalendarNotFoundProps {
   personalCalendars: CalendarStockPersonalCalendars;
 }
 
+export type PillboxDisplayType = 'pillbox' | 'calendar';
+
 export interface PillboxContentProps extends CalendarDataSourceProps, CalendarNotFoundProps {
-  type: string;
+  type: PillboxDisplayType;
   selectedDate: Date | string | null;
   calendarType: CalendarPageSourceType;
   calendarId: string | undefined;

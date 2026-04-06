@@ -1,5 +1,5 @@
 import { fetchSuggestionsFromSupabase } from '@meditime/utils';
-import type { CalendarBoxInput } from '@meditime/types';
+import type { CalendarBoxInput, MedicineReviewSuggestion } from '@meditime/types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -7,7 +7,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 export const fetchSuggestions = async (
   name: string,
   dose?: CalendarBoxInput['dose']
-): Promise<unknown[]> => {
+): Promise<MedicineReviewSuggestion[]> => {
   return fetchSuggestionsFromSupabase({
     supabaseUrl: SUPABASE_URL,
     supabaseAnonKey: SUPABASE_ANON_KEY,

@@ -14,7 +14,6 @@ import QRCodeScanner from '@/components/scanner/QRCodeScanner';
 import Tooltips from '@/components/common/Tooltips';
 import IconButton from '@/components/common/UtilityComponents';
 import type {
-  AnyRecord,
   BoxesViewPageProps,
   BoxesViewBoxItem,
   MedicineReviewSuggestion,
@@ -23,6 +22,9 @@ import type {
   ActionCardProps as SharedActionCardProps,
   InputDropdownProps,
 } from '@meditime/types';
+
+// TODO: Replace AnyRecord usages with proper types
+type AnyRecord = Record<string, any>;
 
 // Composants shadcn/ui
 import { Card, CardContent } from '@/components/ui/card';

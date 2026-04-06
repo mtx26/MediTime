@@ -1,4 +1,6 @@
-import type { DateLike } from './core';
+import type { DateLike, WeeklyEventItem } from '../../../models';
+
+export type { DateLike, WeeklyEventItem };
 
 export interface WeekDayCirclesProps {
   selectedDate: Exclude<DateLike, number>;
@@ -8,16 +10,6 @@ export interface WeekDayCirclesProps {
 export interface WeekCalendarSelectorProps {
   selectedDate?: DateLike | null;
   onWeekSelect: (date: Date) => void;
-}
-
-export interface WeeklyEventItem {
-  start: string;
-  title: string;
-  color?: string;
-  dose?: number | null;
-  notes?: string | null;
-  tablet_count?: number | null;
-  [key: string]: unknown;
 }
 
 export interface WeeklyEventContentProps {

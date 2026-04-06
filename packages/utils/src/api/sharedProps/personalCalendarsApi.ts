@@ -5,12 +5,11 @@ import type {
   BoxId,
   CalendarBoxInput,
   CalendarId,
+  MedicineReviewConditionInput,
+  PersonalBoxResult,
+  StockDecrementMethod,
   TokenId,
 } from '@meditime/types';
-
-type PersonalBoxResult = ApiResult & {
-  boxId?: unknown;
-};
 
 export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiCall }: ApiFactoryOptions) {
   return {
@@ -71,7 +70,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
     updatePersonalBox: async (
       calendarId: CalendarId,
       boxId: BoxId,
-      box: Record<string, unknown>
+      box: Partial<CalendarBoxInput>
     ): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/boxes/${boxId}`,
@@ -92,7 +91,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       stockAlertThreshold: number,
       stockQuantity: number,
       dose: number | string | null,
-      conditions: unknown[],
+      conditions: MedicineReviewConditionInput[],
       codeFmd: string | null = null
     ): Promise<PersonalBoxResult> => {
       const result = await performApiCall({
@@ -207,7 +206,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
-    updatePersonalStockDecrementMethod: async (calendarId: CalendarId, method: string): Promise<ApiResult> => {
+    updatePersonalStockDecrementMethod: async (calendarId: CalendarId, method: StockDecrementMethod): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/stock-decrement-method`,
         method: 'PATCH',
@@ -258,7 +257,7 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
 
     fetchPersonalScheduleNegativeStock: async (
       calendarId: CalendarId,
-      medsId: unknown[]
+      medsId: string[]
     ): Promise<ApiResult> => {
       const medsIdParam = encodeURIComponent(JSON.stringify(medsId));
       return performApiCall({

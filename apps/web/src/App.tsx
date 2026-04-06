@@ -30,7 +30,7 @@ import useSEO from './hooks/useSEO';
 import OnboardingTour from './components/onboarding/OnboardingTour';
 import { requestPermissionAndGetToken } from './services/firebase/firebase';
 import { useAlert } from './contexts/AlertContext';
-import type { AppSharedProps, LoadingStates, UnknownRecord } from '@meditime/types';
+import type { ApiResult, AppSharedProps, CalendarInfo, LoadingStates, NotificationItem, SharedTokenItem } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -56,16 +56,16 @@ export default function App(): ReactElement {
   const location = useLocation();
   const { showAlert } = useAlert();
 
-  const [tokensList, setTokensList] = useState<unknown[]>([]);
-  const [calendarsData, setCalendarsData] = useState<unknown>(null);
-  const [notificationsData, setNotificationsData] = useState<unknown>(null);
-  const [sharedCalendarsData, setSharedCalendarsData] = useState<unknown>(null);
+  const [tokensList, setTokensList] = useState<SharedTokenItem[]>([]);
+  const [calendarsData, setCalendarsData] = useState<CalendarInfo[] | null>(null);
+  const [notificationsData, setNotificationsData] = useState<NotificationItem[] | null>(null);
+  const [sharedCalendarsData, setSharedCalendarsData] = useState<CalendarInfo[] | null>(null);
 
   const pathAfterLang = location.pathname.split('/').slice(2).join('/');
   const pathParts = pathAfterLang.split('/').filter(Boolean);
   const isPillboxPage = isPillbox(pathParts);
 
-  const userContext = useContext(UserContext) as unknown as { userInfo?: { uid?: string } | null } | null;
+  const userContext = useContext(UserContext) as { userInfo?: { uid?: string } | null } | null;
   const userInfo = userContext?.userInfo;
   const uid = userInfo?.uid ?? null;
 
@@ -112,7 +112,7 @@ export default function App(): ReactElement {
     window.open(url, '_blank');
   }, [personalCalendarsApi]);
 
-  const sendTokenToBackend = useCallback(async (maxRetries = 4): Promise<unknown> => {
+  const sendTokenToBackend = useCallback(async (maxRetries = 4): Promise<ApiResult | null> => {
     if (!uid) return null;
     const token = await requestPermissionAndGetToken(uid);
     if (!token) {
@@ -256,8 +256,8 @@ export default function App(): ReactElement {
               setNotificationsData={setNotificationsData as Dispatch<SetStateAction<unknown>>}
               setTokensList={setTokensList as Dispatch<SetStateAction<unknown[]>>}
               setLoadingStates={setLoadingStates as Dispatch<SetStateAction<LoadingStates>>}
-              calendarsData={calendarsData as UnknownRecord[] | null}
-              sharedCalendarsData={sharedCalendarsData as UnknownRecord[] | null}
+              calendarsData={calendarsData as CalendarInfo[] | null}
+              sharedCalendarsData={sharedCalendarsData as CalendarInfo[] | null}
             />
           )}
 

@@ -3,7 +3,7 @@ import type { ApiResult } from '../../../contracts';
 // ─── FCM / Notification Settings ────────────────────────────────────────────
 
 export interface FcmSettingsProps {
-  sendTokenToBackend: () => Promise<ApiResult & { success: boolean }>;
+  sendTokenToBackend: () => Promise<ApiResult>;
 }
 
 export interface UserSettingsProps {

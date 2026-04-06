@@ -5,7 +5,7 @@ import { useLoading } from '@/components/ui/loading';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package } from 'lucide-react';
-import type { CalendarStockProps } from '@meditime/types';
+import type { CalendarStockProps, StockDecrementMethod, StockMethodResult } from '@meditime/types';
 
 
 const Stock = ({ personalCalendars, setNotFound }: CalendarStockProps) => {
@@ -16,7 +16,8 @@ const Stock = ({ personalCalendars, setNotFound }: CalendarStockProps) => {
 
   const calendarId = params.calendarId;
 
-  const modifyStockDecrementMethod = async (method: string) => {
+  const modifyStockDecrementMethod = async (method: StockDecrementMethod) => {
+    if (!calendarId) return;
     const rep = await personalCalendars.updatePersonalStockDecrementMethod(calendarId, method);
     if (rep.success) {
       setSelectedMethod(method);
@@ -25,7 +26,8 @@ const Stock = ({ personalCalendars, setNotFound }: CalendarStockProps) => {
 
   useEffect(() => {
     const initialize = async () => {
-      const rep = await personalCalendars.fetchPersonalStockDecrementMethod(calendarId);
+      if (!calendarId) return;
+      const rep = await personalCalendars.fetchPersonalStockDecrementMethod(calendarId) as StockMethodResult;
       if (rep.success) {
         setSelectedMethod(rep.method ?? '');
         setLoading(false);
@@ -56,7 +58,7 @@ const Stock = ({ personalCalendars, setNotFound }: CalendarStockProps) => {
         <CardDescription>{t('calendar_settings.stock.description')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <RadioGroup value={selectedMethod} onValueChange={modifyStockDecrementMethod} data-tour="settings-stock-methods" className="space-y-3">
+        <RadioGroup value={selectedMethod} onValueChange={(v) => modifyStockDecrementMethod(v as StockDecrementMethod)} data-tour="settings-stock-methods" className="space-y-3">
           <label 
             htmlFor="weeklyPillbox" 
             className="flex items-start gap-3 p-4 border rounded-lg hover:bg-accent/50 transition cursor-pointer"

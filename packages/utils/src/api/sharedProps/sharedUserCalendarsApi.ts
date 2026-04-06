@@ -6,6 +6,8 @@ import type {
   CalendarBoxInput,
   CalendarId,
   InvitationToken,
+  MedicineReviewConditionInput,
+  PersonalBoxResult,
   TokenId,
 } from '@meditime/types';
 
@@ -161,7 +163,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    updateSharedUserBox: async (calendarId: CalendarId, boxId: BoxId, box: Record<string, unknown>) => {
+    updateSharedUserBox: async (calendarId: CalendarId, boxId: BoxId, box: Partial<CalendarBoxInput>) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/boxes/${boxId}`,
         method: 'PUT',
@@ -181,9 +183,9 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       stockAlertThreshold: number,
       stockQuantity: number,
       dose: number | string | null,
-      conditions: unknown[],
+      conditions: MedicineReviewConditionInput[],
       codeFmd: string | null = null
-    ) => {
+    ): Promise<PersonalBoxResult> => {
       const result = await performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/boxes`,
         method: 'POST',
@@ -326,7 +328,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
-    fetchSharedUserScheduleNegativeStock: async (calendarId: CalendarId, medsId: unknown[]) => {
+    fetchSharedUserScheduleNegativeStock: async (calendarId: CalendarId, medsId: string[]) => {
       const medsIdParam = encodeURIComponent(JSON.stringify(medsId));
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/schedule/negative-stock?medsId=${medsIdParam}`,

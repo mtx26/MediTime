@@ -1,4 +1,10 @@
 import type { ApiResult } from '../../../contracts';
+export type {
+  MedicineReviewConditionInput,
+  MedicineReviewMedicineInput,
+  MedicineReviewSuggestion,
+} from '../../../models/medicine';
+import type { MedicineReviewConditionInput, MedicineReviewMedicineInput } from '../../../models/medicine';
 
 export interface ImageUploadImportState {
   hasFile: boolean;
@@ -6,7 +12,7 @@ export interface ImageUploadImportState {
 }
 
 export type AnalyzeImageResult = ApiResult & {
-  medicines?: unknown[];
+  medicines?: MedicineReviewMedicineInput[];
 };
 
 export interface ImageUploadImportPersonalCalendars {
@@ -83,41 +89,12 @@ export interface AddCalendarPagePersonalCalendars
     QRScanImportPersonalCalendars {}
 
 export interface AddCalendarPageProps {
-  personalCalendars: AddCalendarPagePersonalCalendars | Record<string, unknown>;
-}
-
-export interface MedicineReviewConditionInput {
-  time_of_day?: string;
-  interval_days?: number | string;
-  start_date?: string | null;
-  tablet_count?: number | string;
-  max_date_mode?: string;
-  max_date?: string | null;
-  max_date_days?: number | string | null;
-  [key: string]: unknown;
-}
-
-export interface MedicineReviewMedicineInput {
-  name: string;
-  dose: number | string | null;
-  stock_quantity?: number | string;
-  stock_max?: number | string;
-  stock_alert_threshold?: number | string;
-  conditions: MedicineReviewConditionInput[];
-  [key: string]: unknown;
+  personalCalendars: AddCalendarPagePersonalCalendars;
 }
 
 export interface MedicineReviewLocationState {
   importedMedicines?: MedicineReviewMedicineInput[];
   calendarName?: string;
-}
-
-export interface MedicineReviewSuggestion {
-  name: string;
-  dose: string;
-  conditionnement: string;
-  forme_pharmaceutique?: string;
-  code_fmd?: string | null;
 }
 
 export type SaveAnalysisResult = ApiResult & {
@@ -132,5 +109,5 @@ export interface MedicineReviewPersonalCalendars {
 }
 
 export interface MedicineReviewProps {
-  personalCalendars: MedicineReviewPersonalCalendars | Record<string, unknown>;
+  personalCalendars: MedicineReviewPersonalCalendars;
 }

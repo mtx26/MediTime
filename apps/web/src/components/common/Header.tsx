@@ -7,7 +7,7 @@ import NotificationLine from './NotificationLine';
 import LanguageSelector from './LanguageSelector';
 import ThemeToggle from './ThemeToggle';
 import { useTranslation } from 'react-i18next';
-import type { AppNotification, AppSharedProps, CalendarInfo } from '@meditime/types';
+import type { NotificationItem, AppSharedProps, CalendarInfo } from '@meditime/types';
 import {
   buildLocationList,
   buildReturnToCalendarList,
@@ -66,7 +66,7 @@ function Navbar({ sharedProps }: { sharedProps: AppSharedProps }) {
 
   const personalCalendarsData = sharedProps.personalCalendars.calendarsData as CalendarInfo[] | undefined;
   const sharedCalendarsData = sharedProps.sharedUserCalendars.sharedCalendarsData as CalendarInfo[] | undefined;
-  const notificationsData = (sharedProps.notifications.notificationsData as AppNotification[] | null | undefined) ?? null;
+  const notificationsData = (sharedProps.notifications.notificationsData as NotificationItem[] | null | undefined) ?? null;
   const readNotification = sharedProps.notifications.readNotification as (notificationId: string) => void;
   const readAllNotifications = sharedProps.notifications.readAllNotifications as () => void;
 
@@ -285,7 +285,7 @@ function Navbar({ sharedProps }: { sharedProps: AppSharedProps }) {
                       notificationsData
                         .filter((n) => !n.read)
                         .slice(0, 5)
-                        .map((notif: AppNotification) => (
+                        .map((notif: NotificationItem) => (
                           <NotificationLine
                             key={notif.notification_id}
                             notif={notif}

@@ -1,4 +1,4 @@
-import { useState, useEffect, type Dispatch, type SetStateAction } from 'react';
+import { useState, useEffect } from 'react';
 import { getCalendarSourceMap, buildStockAlertActions, detectCalendarType } from '@meditime/utils';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -74,7 +74,8 @@ function StockAlertsPage({
   useRealtimeBoxesSwitcher(
     isDemo ? 'token' : calendarType,
     calendarId ?? null,
-    setBoxes as unknown as Dispatch<SetStateAction<{ name: string; [key: string]: unknown }[]>>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setBoxes as any,
     setLoadingBoxes,
     setRep
   );

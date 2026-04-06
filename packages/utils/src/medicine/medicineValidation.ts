@@ -37,7 +37,7 @@ export function calculateMaxDateFromDays(
  */
 export function applyConditionFieldSideEffects(
   condition: MedicineReviewConditionInput,
-  field: string,
+  field: keyof MedicineReviewConditionInput,
   value: string | number | null,
 ): MedicineReviewConditionInput {
   const updated = { ...condition };
@@ -67,7 +67,7 @@ export function applyConditionFieldSideEffects(
   }
 
   // Set the actual field value
-  (updated as Record<string, unknown>)[field] = value ?? '';
+  Object.assign(updated, { [field]: value ?? '' });
 
   return updated;
 }

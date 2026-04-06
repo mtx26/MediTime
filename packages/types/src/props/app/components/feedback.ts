@@ -10,7 +10,7 @@ export interface ActionSheetAction<TLabel = unknown> {
 
 export interface ActionSheetProps<TLabel = unknown> {
   actions: ActionSheetAction<TLabel>[];
-  buttonSize?: 'sm' | 'default' | string;
+  buttonSize?: 'sm' | 'default';
   dataTour?: string;
 }
 

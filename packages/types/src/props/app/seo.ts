@@ -36,6 +36,12 @@ export interface PwaShortcut {
   icons: Array<{ src: string; sizes: string }>;
 }
 
+export interface RelatedApplication {
+  platform: string;
+  url: string;
+  id?: string;
+}
+
 export interface PwaConfig {
   scope: string;
   display: string;
@@ -45,7 +51,7 @@ export interface PwaConfig {
   categories: string[];
   icons: PwaIcon[];
   screenshots: PwaScreenshot[];
-  related_applications: unknown[];
+  related_applications: RelatedApplication[];
   prefer_related_applications: boolean;
   dir: string;
 }
@@ -58,7 +64,11 @@ export interface SeoConfig {
   PWA: PwaConfig;
 }
 
-export type TranslatorInput = ((key: string) => string) | Record<string, unknown>;
+export interface TranslationMap {
+  [key: string]: string | TranslationMap;
+}
+
+export type TranslatorInput = ((key: string) => string) | TranslationMap;
 
 export interface SchemaOrgDocument {
   '@context': string;

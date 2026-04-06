@@ -1,4 +1,4 @@
-import type { ApiFactoryOptions } from '@meditime/types';
+import type { ApiFactoryOptions, MedicineReviewMedicineInput } from '@meditime/types';
 
 interface DocumentsApiFactoryOptions extends ApiFactoryOptions {
   fileToBase64: (file: File) => Promise<string>;
@@ -21,7 +21,7 @@ export function createDocumentsApi({ apiUrl, uid, showAlert, performApiCall, fil
       });
     },
 
-    saveAnalysisResult: async (calendarName: string, boxes: unknown[]) => {
+    saveAnalysisResult: async (calendarName: string, boxes: MedicineReviewMedicineInput[]) => {
       return performApiCall({
         url: `${apiUrl}/api/documents/analyze/save`,
         method: 'POST',

@@ -12,7 +12,6 @@ interface BackendPayload {
   message?: string;
   error?: string;
   code?: string;
-  [key: string]: unknown;
 }
 
 interface CalendarTableEntry {
@@ -21,12 +20,21 @@ interface CalendarTableEntry {
   cells: Record<string, number>;
 }
 
+interface DemoScheduleEvent {
+  id: string;
+  title: string;
+  start: string;
+  color: string;
+  dose: number;
+  tablet_count: number;
+  taken: boolean;
+}
+
 interface DemoScheduleResponse {
-  [key: string]: unknown;
   success: true;
   message: string;
   code: number;
-  schedule: Array<Record<string, unknown>>;
+  schedule: DemoScheduleEvent[];
   calendar_name: string;
   table: {
     morning: CalendarTableEntry[];
@@ -61,7 +69,7 @@ function translateBackendMessage(data: BackendPayload | null | undefined): Backe
   return data;
 }
 
-function withQuery(url: string, params: Record<string, unknown>): string {
+function withQuery(url: string, params: Record<string, string | number | boolean | null | undefined>): string {
   const clean = Object.fromEntries(
     Object.entries(params || {}).filter(([, v]) => v !== undefined && v !== null && v !== '')
   );

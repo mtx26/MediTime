@@ -2,6 +2,8 @@
 
 import type { ApiResponse } from '../api/index';
 import type { Calendar } from '../../models/index';
+import type { MedicineReviewConditionInput } from '../../models/medicine';
+import type { CalendarTable, WeeklyEventItem } from '../../models/schedule';
 
 export type CalendarId = Calendar['id'];
 export type BoxId = string;
@@ -15,14 +17,14 @@ export interface CalendarBoxInput {
   stock_alert_threshold: number;
   stock_quantity: number;
   code_fmd?: string | null;
-  conditions: unknown[];
+  conditions: MedicineReviewConditionInput[];
 }
 
 export interface CalendarScheduleResponse extends ApiResponse {
-  schedule: unknown[];
+  schedule: WeeklyEventItem[];
   calendar_name?: string;
   if_low_stock?: boolean;
-  table?: Record<string, unknown>;
+  table?: CalendarTable;
 }
 
 export interface IcsToken {
@@ -32,8 +34,8 @@ export interface IcsToken {
 }
 
 export interface NormalizedCalendarSchedule extends ApiResponse {
-  schedule: unknown[];
+  schedule: WeeklyEventItem[];
   calendarName: string;
-  table: Record<string, unknown>;
+  table: CalendarTable;
   ifLowStock?: boolean;
 }

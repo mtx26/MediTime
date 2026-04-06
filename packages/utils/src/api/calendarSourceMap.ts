@@ -1,7 +1,40 @@
 
-interface CalendarSourceMapInput extends Record<string, unknown> {}
+import type {
+  ApiResult,
+  AppPersonalCalendars,
+  AppSharedUserCalendars,
+  AppTokenCalendars,
+  BoxId,
+  CalendarBoxInput,
+  CalendarId,
+  MedicineReviewConditionInput,
+  PersonalBoxResult,
+  TokenId,
+} from '@meditime/types';
+import type { CalendarInfo } from '@meditime/types';
 
-type CalendarSourceGroup = Record<string, unknown>;
+export interface CalendarSourceGroup {
+  fetchSchedule: ((calendarId: string, date?: string | null) => Promise<ApiResult>) | null;
+  calendarsData: CalendarInfo[] | null;
+  setCalendarsData: ((data: CalendarInfo[] | null) => void) | null;
+  updateBox: ((calendarId: CalendarId, boxId: BoxId, box: Partial<CalendarBoxInput>) => Promise<ApiResult>) | null;
+  createBox: ((calendarId: CalendarId, name: string, boxCapacity: number, stockAlertThreshold: number, stockQuantity: number, dose: number | string | null, conditions: MedicineReviewConditionInput[], codeFmd?: string | null) => Promise<PersonalBoxResult>) | null;
+  deleteBox: ((calendarId: CalendarId, boxId: BoxId) => Promise<ApiResult>) | null;
+  downloadCalendarPdf: ((calendarId: string, includeInactive: boolean) => void) | null;
+  deleteCalendar: ((calendarId: CalendarId) => Promise<ApiResult>) | null;
+  fetchIfPillboxUsed: ((calendarId: CalendarId, startDate?: string | null) => Promise<ApiResult>) | null;
+  decreaseStock: ((calendarId: CalendarId, startDate?: string | null) => Promise<ApiResult>) | null;
+  cancelUse: ((calendarId: CalendarId, useId: string) => Promise<ApiResult>) | null;
+  fetchPillboxUses: ((calendarId: CalendarId) => Promise<ApiResult>) | null;
+  restockBox: ((calendarId: CalendarId, boxId: BoxId) => Promise<ApiResult>) | null;
+  fetchNotificationsEnabled: ((calendarId: CalendarId) => Promise<ApiResult>) | null;
+  updateNotificationsEnabled: ((calendarId: CalendarId) => Promise<ApiResult>) | null;
+  fetchStockDecrementMethod: ((calendarId: CalendarId) => Promise<ApiResult>) | null;
+  getTokensIcs: ((calendarId: CalendarId) => Promise<ApiResult>) | null;
+  createTokenIcs: ((calendarId: CalendarId) => Promise<ApiResult>) | null;
+  deleteTokenIcs: ((calendarId: CalendarId, tokenId: TokenId) => Promise<ApiResult>) | null;
+  fetchScheduleNegativeStock: ((calendarId: CalendarId, medsId: string[]) => Promise<ApiResult>) | null;
+}
 
 interface CalendarSourceMap {
   personal: CalendarSourceGroup;
@@ -10,9 +43,9 @@ interface CalendarSourceMap {
 }
 
 export const getCalendarSourceMap = (
-  personalCalendars: CalendarSourceMapInput,
-  sharedUserCalendars: CalendarSourceMapInput,
-  tokenCalendars: CalendarSourceMapInput
+  personalCalendars: AppPersonalCalendars,
+  sharedUserCalendars: AppSharedUserCalendars,
+  tokenCalendars: AppTokenCalendars
 ): CalendarSourceMap => ({
   personal: {
     fetchSchedule: personalCalendars.fetchPersonalCalendarSchedule,

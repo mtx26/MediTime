@@ -1,3 +1,5 @@
+import type { MedicineReviewSuggestion } from '@meditime/types';
+
 interface SuggestionsUrlParams {
   supabaseUrl: string;
   name: string;
@@ -48,7 +50,7 @@ export async function fetchSuggestionsFromSupabase({
   name,
   dose = null,
   limit = 40,
-}: FetchSuggestionsParams): Promise<unknown[]> {
+}: FetchSuggestionsParams): Promise<MedicineReviewSuggestion[]> {
   if (!name || name.length < 2) return [];
 
   const url = buildSuggestionsUrl({ supabaseUrl, name, dose, limit });
@@ -72,7 +74,7 @@ export async function fetchMedicamentsFromSupabase({
   supabaseUrl,
   supabaseAnonKey,
   codeFmd,
-}: FetchMedicamentsParams): Promise<unknown[]> {
+}: FetchMedicamentsParams): Promise<Pick<MedicineReviewSuggestion, 'name' | 'dose' | 'conditionnement'>[]> {
   if (!codeFmd) return [];
 
   const url = buildMedicamentsByCodeUrl({ supabaseUrl, codeFmd });

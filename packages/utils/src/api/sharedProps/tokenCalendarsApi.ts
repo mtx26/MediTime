@@ -1,5 +1,5 @@
 import { toISO } from '../../date/dateUtils';
-import type { ApiFactoryOptions, ApiResult, CalendarId } from '@meditime/types';
+import type { ApiFactoryOptions, ApiResult, CalendarId, SharedCalendarAccess } from '@meditime/types';
 
 export function createTokenCalendarsApi({ apiUrl, uid, showAlert, performApiCall }: ApiFactoryOptions) {
   return {
@@ -19,7 +19,7 @@ export function createTokenCalendarsApi({ apiUrl, uid, showAlert, performApiCall
       });
     },
 
-    createToken: async (calendarId: CalendarId, expiresAt: string | null, permissions: unknown) => {
+    createToken: async (calendarId: CalendarId, expiresAt: string | null, permissions: SharedCalendarAccess) => {
       return performApiCall({
         url: `${apiUrl}/api/tokens/${calendarId}`,
         method: 'POST',

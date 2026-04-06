@@ -1,5 +1,5 @@
 import type { CalendarBoxAlertItem } from './calendar-pages';
-import type { MedicineReviewConditionInput } from './imports';
+import type { MedicineReviewConditionInput, MedicineReviewSuggestion } from './imports';
 
 // ─── BoxesView Types ─────────────────────────────────────────────────────────
 
@@ -35,5 +35,5 @@ export interface InputDropdownProps {
   onChangeBoxCapacity: (value: number) => void;
   onChangeStockQuantity: (value: number) => void;
   onChangeCodeFmd: (value: string) => void;
-  fetchSuggestions: (name: string, dose?: number | null) => Promise<unknown[]>;
+  fetchSuggestions: (name: string, dose?: number | null) => Promise<MedicineReviewSuggestion[]>;
 }

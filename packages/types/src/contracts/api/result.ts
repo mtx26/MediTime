@@ -21,6 +21,6 @@ export interface ApiFailure {
   status: number | null;
 }
 
-export type ApiSuccess = { success: true } & Record<string, unknown>;
+export type ApiSuccess<T = Record<string, unknown>> = { success: true } & T;
 
 export type ApiResult = ApiSuccess | ApiFailure;

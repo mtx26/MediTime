@@ -8,7 +8,7 @@ import { Pill, Bell, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import NotFound from '@/pages/general/NotFound';
 import { detectCalendarType } from '@meditime/utils';
-import type { CalendarSettingsPageProps, CalendarStockPersonalCalendars } from '@meditime/types';
+import type { CalendarSettingsPageProps } from '@meditime/types';
 
 // import Sharing from './calendar-settings/Sharing';
 
@@ -60,7 +60,7 @@ function CalendarSettingsPage({
     switch (activeTab) {
       case 'stock':
         if (calendarType === 'personal') {
-          return <Stock personalCalendars={personalCalendars as CalendarStockPersonalCalendars} setNotFound={setNotFound}/>;
+          return <Stock personalCalendars={personalCalendars} setNotFound={setNotFound}/>;
         }
         break;
       case 'notifications':
@@ -72,7 +72,7 @@ function CalendarSettingsPage({
       //   return <Sharing {...sharedProps} />;
       default:
         if (calendarType === 'personal') {
-          return <Stock personalCalendars={personalCalendars as CalendarStockPersonalCalendars} setNotFound={setNotFound} />;
+          return <Stock personalCalendars={personalCalendars} setNotFound={setNotFound} />;
         } else if (calendarType === 'sharedUser') {
           return <Notifications {...sharedProps} setNotFound={setNotFound} />;
         }

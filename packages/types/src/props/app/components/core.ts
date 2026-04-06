@@ -1,3 +1,7 @@
+import type { DateLike } from '../../../models/schedule';
+
+export type { DateLike };
+
 export interface ArrowControlsProps {
   onLeft: () => void;
   onRight: () => void;
@@ -6,8 +10,6 @@ export interface ArrowControlsProps {
 export interface ThemeToggleProps {
   className?: string;
 }
-
-export type DateLike = string | number | Date;
 
 export interface ForcedLandscapeWrapperProps<TNode = unknown> {
   children: TNode;

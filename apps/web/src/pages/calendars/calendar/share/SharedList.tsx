@@ -14,7 +14,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Users, Link2, Trash2, Plus, Clipboard, Mail, User } from 'lucide-react';
-import type { AnyRecord, SharedListPageProps } from '@meditime/types';
+import type { SharedListPageProps } from '@meditime/types';
+
+// TODO: Replace AnyRecord usages with proper types
+type AnyRecord = Record<string, any>;
 
 const VITE_URL = import.meta.env.VITE_VITE_URL ?? '';
 

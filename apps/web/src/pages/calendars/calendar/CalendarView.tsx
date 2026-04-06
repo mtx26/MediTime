@@ -186,7 +186,7 @@ function CalendarPage({
       t('calendar.delete_title'),
       t('calendar.delete_description'),
       async () => {
-        const rep = await (personalCalendars as Record<string, unknown> & { deleteCalendar: (id?: string) => Promise<{ success: boolean }> }).deleteCalendar(calendarId);
+        const rep = await personalCalendars.deleteCalendar(calendarId!);
         if (rep.success) {
           navigate(`/${lng}/calendars`);
         }
@@ -201,7 +201,7 @@ function CalendarPage({
       t('calendar.delete_shared_title'),
       t('calendar.delete_shared_description'),
       async () => {
-        const rep = await (sharedUserCalendars as Record<string, unknown> & { deleteSharedCalendar: (id?: string) => Promise<{ success: boolean }> }).deleteSharedCalendar(calendarId);
+        const rep = await sharedUserCalendars.deleteSharedCalendar(calendarId!);
         if (rep.success) {
           navigate(`/${lng}/calendars`);
         }
