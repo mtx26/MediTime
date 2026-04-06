@@ -26,10 +26,10 @@ x-backend-env: &backend-env
 services:
   backend-api:
     build:
-      context: .
+      context: ./apps/backend
       dockerfile: Dockerfile
     image: ${BACKEND_IMAGE:-ghcr.io/mtx26/meditime-backend:latest}
-    working_dir: /app/backend
+    working_dir: /app
     environment: *backend-env
     ports:
       - "${HOST_PORT:-5000}:5000"
@@ -43,10 +43,10 @@ services:
 
   backend-scheduler:
     build:
-      context: .
+      context: ./apps/backend
       dockerfile: Dockerfile
     image: ${BACKEND_IMAGE:-ghcr.io/mtx26/meditime-backend:latest}
-    working_dir: /app/backend
+    working_dir: /app
     environment: *backend-env
     command: python scheduler.py
     deploy:

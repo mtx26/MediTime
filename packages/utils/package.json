@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@meditime/constants": "*",
+    "@meditime/constants": "file:../constants",
     "firebase": "^12.4.0",
-    "@meditime/types": "*"
+    "@meditime/types": "file:../types"
   },
   "exports": {
     ".": "./src/index.ts"

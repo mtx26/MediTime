@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@meditime/constants": "*"
+    "@meditime/constants": "file:../constants"
   },
   "exports": {
     ".": "./src/index.ts"
