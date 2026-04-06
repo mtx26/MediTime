@@ -52,8 +52,11 @@
 
 ```
 MediTime/
-├── frontend/         # React 19 app (user interface)
-├── backend/          # Flask API (auth, logic, Supabase access)
+├── apps/
+│   ├── web/          # React 19 app (Vite frontend)
+│   └── backend/      # Flask API + scheduler
+├── packages/         # Shared monorepo packages
+├── scripts/          # Shared build and i18n scripts
 ├── dumps/            # Database dumps
 ├── .github/          # GitHub Actions workflows (CI/CD)
 ├── captain-definition # CapRover deployment config
@@ -74,35 +77,37 @@ MediTime/
 
 ### 🚀 Automatic Launch (Recommended)
 ```bash
-# Windows - Launches API (Gunicorn), Scheduler, and Frontend
-.\MediTime\launch.bat
+# Windows - launches backend API, scheduler, and frontend
+.\launch.bat
 ```
 
 ### 🛠️ Manual Setup
 
 #### Backend API
 ```bash
-cd backend
+cd apps/backend
 python -m venv .venv
 .venv\Scripts\activate         # or source .venv/bin/activate on macOS/Linux
 pip install -r requirements.txt
 
-# Launch API with Gunicorn (9 workers optimized for 4 CPU / 8 GB RAM)
+# Windows development
+python -m app.main
+
+# macOS/Linux or production
 gunicorn -w 9 --threads 2 -b 0.0.0.0:5000 --timeout 120 --reload app.main:app
 ```
 
 #### Scheduler (separate process)
 ```bash
-cd backend
+cd apps/backend
 .venv\Scripts\activate
 python scheduler.py
 ```
 
 #### Frontend
 ```bash
-cd frontend
 npm install
-npm run dev
+npm run dev --workspace=apps/web
 ```
 
 ---
