@@ -3,10 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import type { NotificationsPageProps } from '@meditime/types';
+import { buildNotificationActions } from '@meditime/utils';
 import NotificationLine from '../../components/common/NotificationLine';
 import ActionSheet from '../../components/common/ActionSheet';
+import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Bell, Settings, Info } from 'lucide-react';
+import { Bell, Info } from 'lucide-react';
 
 function NotificationsPage({ notifications }: NotificationsPageProps) {
   const { t } = useTranslation();
@@ -29,30 +31,19 @@ function NotificationsPage({ notifications }: NotificationsPageProps) {
           <Bell className="h-5 w-5" /> {t('notification.label')}
         </h4>
         <ActionSheet
-          actions={[
-            {
-              label: (
-                <>
-                  <Bell className="h-4 w-4 mr-2" /> {t('notification.mark_all_read')}
-                </>
-              ),
-              onClick: () => {
-                if (notifications.notificationsData && notifications.notificationsData.length > 0 && notifications.notificationsData.some(n => !n.read)) {
-                  notifications.readAllNotifications();
-                }
+          actions={toActionSheetItems(
+            buildNotificationActions(
+              { lng: lng! },
+              {
+                onMarkAllRead: () => {
+                  if (notifications.notificationsData && notifications.notificationsData.length > 0 && notifications.notificationsData.some(n => !n.read)) {
+                    notifications.readAllNotifications();
+                  }
+                },
               },
-              title: t('notification.mark_all_read')
-            },
-            {
-              label: (
-                <>
-                  <Settings className="h-4 w-4 mr-2" /> {t('settings.label')}
-                </>
-              ),
-              linkTo: `/${lng}/settings?tab=notifications`,
-              title: t('settings.label')
-            },
-          ]}
+            ),
+            t,
+          )}
         />
       </div>
 

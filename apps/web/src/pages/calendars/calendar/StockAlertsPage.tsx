@@ -1,15 +1,16 @@
 import { useState, useEffect, type Dispatch, type SetStateAction } from 'react';
-import { getCalendarSourceMap } from '@meditime/utils';
+import { getCalendarSourceMap, buildStockAlertActions } from '@meditime/utils';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import { useRealtimeBoxesSwitcher } from '@/hooks/realtime/useRealtimeBoxesSwitcher';
 import ActionSheet from '@/components/common/ActionSheet';
+import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import IconButton from '@/components/common/UtilityComponents';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, CheckCircle, Pencil, Calendar, PlusCircle, Package } from 'lucide-react';
+import { AlertTriangle, CheckCircle, PlusCircle, Package } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
 import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
 import type {
@@ -162,7 +163,8 @@ function StockAlertsPage({
   }
 
   return (
-    <div className="container mx-auto max-w-7xl">
+    <div className="container mx-auto flex flex-col items-center gap-4">
+      <div className="w-full max-w-3xl">
       <div className="mb-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <AlertTriangle className="h-6 w-6" />        
@@ -172,30 +174,13 @@ function StockAlertsPage({
         </div>
         <ActionSheet
           dataTour="stock-alerts-actions-btn"
-          actions={[
-            {
-              label: (
-                <div className="flex items-center gap-2">
-                  <Pencil className="h-4 w-4" />
-                  {t('send_sms')}
-                </div>
-              ),
-              onClick: () => sendStockAlertsSMS(),
-              title: t('send_sms'),
-              dataTour: 'send-sms-btn',
-            },
-            {
-              label: (
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  {t('ics.calendar_ics')}
-                </div>
-              ),
-              linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
-              title: t('ics.calendar_ics'),
-              dataTour: 'ics-calendar-btn',
-            },
-          ]}
+          actions={toActionSheetItems(
+            buildStockAlertActions(
+              { calendarId: calendarId!, lng: lng!, basePath },
+              { onSendSms: () => sendStockAlertsSMS() },
+            ),
+            t,
+          )}
         />
       </div>
 
@@ -265,8 +250,10 @@ function StockAlertsPage({
                     </div>
                   </div>
                   <Badge
-                    variant={med.stock_quantity <= 0 ? 'destructive' : undefined}
-                    className={med.stock_quantity > 0 ? 'bg-amber-500 text-white hover:bg-amber-600' : ''}
+                    variant="outline"
+                    className={med.stock_quantity <= 0
+                      ? 'bg-red-500/15 text-foreground border-red-500/50'
+                      : 'bg-yellow-500/15 text-foreground border-yellow-500/50'}
                   >
                     {med.stock_quantity <= 0
                       ? t('critical_stock')
@@ -278,6 +265,7 @@ function StockAlertsPage({
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

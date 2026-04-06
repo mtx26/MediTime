@@ -3,16 +3,17 @@ import { UserContext } from "@/contexts/UserContext";
 import { useAlert } from "@/contexts/AlertContext";
 import { useLoading } from '@/components/ui/loading';
 import HoveredUserProfile from "@/components/common/HoveredUserProfile";
-import { toISO } from '@meditime/utils';
+import { toISO, buildPersonalCalendarActions } from '@meditime/utils';
 import { useTranslation } from "react-i18next";
 import ActionSheet from '@/components/common/ActionSheet';
+import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import { useSearchParams, useNavigate, useParams, Link } from "react-router-dom";
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, Link2, Eye, Pill, Trash2, Plus, Clipboard, Mail, User } from 'lucide-react';
+import { Users, Link2, Trash2, Plus, Clipboard, Mail, User } from 'lucide-react';
 import type { AnyRecord, SharedListPageProps } from '@meditime/types';
 
 const VITE_URL = import.meta.env.VITE_VITE_URL ?? '';
@@ -322,44 +323,24 @@ const calendarActions = ({
   t,
   lng,
 }: AnyRecord) => {
-  return [
-    {
-      label: (
-        <>
-          <Eye className="h-4 w-4 mr-2" /> {t("open")}
-        </>
-      ),
-      linkTo: `/${lng}/calendar/${calendarId}`,
-      title: t("open"),
-    },
-    {
-      label: (
-        <>
-          <Pill className="h-4 w-4 mr-2" /> {t("medicines.label")}
-        </>
-      ),
-      linkTo: `/${lng}/calendar/${calendarId}/boxes`,
-      title: t("medicines.label"),
-    },
-    { separator: true },
-    {
-      label: (
-        <>
-          <Trash2 className="h-4 w-4 mr-2" /> {t("delete")}
-        </>
-      ),
-      onClick: () =>
-        promptDeleteCalendar({
-          calendarId,
-          navigate,
-          personalCalendars,
-          t,
-          lng,
-        }),
-        title: t("delete"),
-      danger: true,
-    },
-  ];
+  return toActionSheetItems(
+    buildPersonalCalendarActions(
+      { calendarId, lng, basePath: 'calendar', selectedDate: null },
+      {
+        onDelete: () =>
+          promptDeleteCalendar({
+            calendarId,
+            navigate,
+            personalCalendars,
+            t,
+            lng,
+          }),
+        onExportPdf: () => personalCalendars.downloadPersonalCalendarPdf(calendarId),
+      },
+      ['rename'],
+    ),
+    t,
+  );
 };
 
 function CalendarCard({

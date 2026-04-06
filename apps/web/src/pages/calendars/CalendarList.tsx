@@ -8,11 +8,12 @@ import { useAlert } from '@/contexts/AlertContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Calendar, Users, Pencil, Share, Pill, Download, AlertTriangle, Settings, Trash2, Plus, X, AlertCircle } from 'lucide-react';
+import { Calendar, Users, Pencil, Download, AlertTriangle, Plus, X, Info } from 'lucide-react';
+import { buildPersonalCalendarActions, buildSharedCalendarActions } from '@meditime/utils';
+import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import type { CalendarListItem, CalendarListPageProps } from '@meditime/types';
 
@@ -138,89 +139,24 @@ function SelectCalendar({
 
                   {/* ActionSheet */}
                   <ActionSheet
-                    actions={[
-                      {
-                        label: (
-                          <div className="flex items-center gap-2">
-                            <Pencil className="h-4 w-4" />
-                            {t('rename')}
-                          </div>
-                        ),
-                        onClick: () => setRenameMode(calendarData.id),
-                        title: t('rename')
-                      },
-                      { separator: true },
-                      {
-                        label: (
-                          <div className="flex items-center gap-2">
-                            <Share className="h-4 w-4" />
-                            {t('share')}
-                          </div>
-                        ),
-                        linkTo: `/${lng}/shared-calendars?calendar=${calendarData.id}`,
-                        title: t('share'),
-                      },
-                      { separator: true },
-                      {
-                        label: (
-                          <div className="flex items-center gap-2">
-                            <Pill className="h-4 w-4" />
-                            {t('medicines.label')}
-                          </div>
-                        ),
-                        linkTo: `/${lng}/calendar/${calendarData.id}/boxes`,
-                        title: t('medicines.label'),
-                      },
-                      {
-                        label: (
-                          <div className="flex items-center gap-2">
-                            <Download className="h-4 w-4" />
-                            {t('boxes.export_pdf')}
-                          </div>
-                        ),
-                        onClick: () => openPdfDialog(calendarData.id),
-                        title: t('boxes.export_pdf'),
-                      },
-                      {
-                        label: (
-                          <div className="flex items-center gap-2">
-                            <AlertTriangle className="h-4 w-4" />
-                            {t('stock')}
-                          </div>
-                        ),
-                        linkTo: `/${lng}/calendar/${calendarData.id}/stock-alerts`,
-                        title: t('stock'),
-                      },
-                      { separator: true },
-                      {
-                        label: (
-                          <div className="flex items-center gap-2">
-                            <Settings className="h-4 w-4" />
-                            {t('settings.label')}
-                          </div>
-                        ),
-                        linkTo: `/${lng}/calendar/${calendarData.id}/settings`,
-                        title: t('settings.label'),
-                      },
-                      { separator: true },
-                      {
-                        label: (
-                          <div className="flex items-center gap-2">
-                            <Trash2 className="h-4 w-4" />
-                            {t('delete')}
-                          </div>
-                        ),
-                        onClick: () => handleDeleteCalendarClick(calendarData.id),
-                        title: t('delete'),
-                        danger: true,
-                      },
-                    ]}
+                    actions={toActionSheetItems(
+                      buildPersonalCalendarActions(
+                        { calendarId: calendarData.id, lng: lng!, basePath: 'calendar', selectedDate: null },
+                        {
+                          onRename: () => setRenameMode(calendarData.id),
+                          onDelete: () => handleDeleteCalendarClick(calendarData.id),
+                          onExportPdf: () => openPdfDialog(calendarData.id),
+                        },
+                        ['pillbox', 'day_view'],
+                      ),
+                      t,
+                    )}
                   />
                 </div>
                 {calendarData.ifLowStock && (
                   <Link to={`/${lng}/calendar/${calendarData.id}/stock-alerts`}>
-                    <Badge variant="outline" className="mt-2 gap-1 bg-yellow-50 text-yellow-800 border-yellow-200">
-                      <AlertTriangle className="h-3 w-3" />
+                    <Badge variant="outline" className="mt-2 gap-1 bg-yellow-500/15 text-foreground border-yellow-500/50">
+                      <AlertTriangle className="h-3 w-3 text-yellow-600" />
                       {t('stock_alert')}
                     </Badge>
                   </Link>
@@ -338,67 +274,23 @@ function SelectCalendar({
                     </Link>
 
                     <ActionSheet
-                      actions={[
-                        {
-                          label: (
-                            <div className="flex items-center gap-2">
-                              <Pill className="h-4 w-4" />
-                              {t('medicines.label')}
-                            </div>
-                          ),
-                          linkTo: `/${lng}/shared-user-calendar/${calendarData.id}/boxes`,
-                          title: t('medicines.label'),
-                        },
-                        {
-                          label: (
-                            <div className="flex items-center gap-2">
-                              <Download className="h-4 w-4" />
-                              {t('boxes.export_pdf')}
-                            </div>
-                          ),
-                          onClick: () => openPdfDialog(calendarData.id),
-                          title: t('boxes.export_pdf'),
-                        },
-                        {
-                          label: (
-                            <div className="flex items-center gap-2">
-                              <AlertTriangle className="h-4 w-4" />
-                              {t('stock')}
-                            </div>
-                          ),
-                          linkTo: `/${lng}/shared-user-calendar/${calendarData.id}/stock-alerts`,
-                          title: t('stock'),
-                        },
-                        { separator: true },
-                        {
-                          label: (
-                            <div className="flex items-center gap-2">
-                              <Settings className="h-4 w-4" />
-                              {t('settings.label')}
-                            </div>
-                          ),
-                          linkTo: `/${lng}/shared-user-calendar/${calendarData.id}/settings`,
-                          title: t('settings.label'),
-                        },
-                        { separator: true },
-                        {
-                          label: (
-                            <div className="flex items-center gap-2">
-                              <Trash2 className="h-4 w-4" />
-                              {t('delete')}
-                            </div>
-                          ),
-                          onClick: () => handleDeleteSharedCalendarClick(calendarData.id),
-                          title: t('delete'),
-                          danger: true,
-                        },
-                      ]}
+                      actions={toActionSheetItems(
+                        buildSharedCalendarActions(
+                          { calendarId: calendarData.id, lng: lng!, basePath: 'shared-user-calendar', selectedDate: null },
+                          {
+                            onDelete: () => handleDeleteSharedCalendarClick(calendarData.id),
+                            onExportPdf: () => openPdfDialog(calendarData.id),
+                          },
+                          ['pillbox', 'day_view'],
+                        ),
+                        t,
+                      )}
                     />
                   </div>
                   {calendarData.ifLowStock && (
                     <Link to={`/${lng}/shared-user-calendar/${calendarData.id}/stock-alerts`}>
-                      <Badge variant="outline" className="mt-2 gap-1 bg-yellow-50 text-yellow-800 border-yellow-200">
-                        <AlertTriangle className="h-3 w-3" />
+                      <Badge variant="outline" className="mt-2 gap-1 bg-yellow-500/15 text-foreground border-yellow-500/50">
+                        <AlertTriangle className="h-3 w-3 text-yellow-600" />
                         {t('stock_alert')}
                       </Badge>
                     </Link>
@@ -408,12 +300,10 @@ function SelectCalendar({
             )}
           </div>
         ) : (
-          <Alert className="bg-yellow-50 border-yellow-200">
-            <AlertCircle className="h-4 w-4 text-yellow-600" />
-            <AlertDescription className="text-yellow-800 ml-2">
-              {t('no_shared_calendars')}
-            </AlertDescription>
-          </Alert>
+          <div className="flex items-center w-full px-3 py-2 rounded-md bg-blue-500/15 border border-blue-500/50 text-foreground shadow">
+            <Info className="h-5 w-5 mr-2 text-blue-600" />
+            <span className="font-semibold">{t('no_shared_calendars')}</span>
+          </div>
         )}
       </div>
 

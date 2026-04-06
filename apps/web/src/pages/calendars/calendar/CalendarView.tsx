@@ -7,9 +7,9 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '@/contexts/UserContext';
 import { useLoading } from '@/components/ui/loading';
-import { toISO } from '@meditime/utils';
-import { getCalendarSourceMap } from '@meditime/utils';
+import { toISO, getCalendarSourceMap, buildPersonalCalendarActions, buildSharedCalendarActions } from '@meditime/utils';
 import { useAlert } from '@/contexts/AlertContext';
+import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import DateModal from '@/components/calendar/DateModal';
 import WeekCalendarSelector from '@/components/calendar/WeekCalendarSelector';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
@@ -19,7 +19,7 @@ import NotFound from '@/pages/general/NotFound';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Pill, Grid3X3, CalendarDays, Share2, Download, AlertTriangle, Calendar, Clock, Settings, Trash2, ChevronRight, Pin } from 'lucide-react';
+import { Pill, AlertTriangle, CalendarDays, ChevronRight, Pin } from 'lucide-react';
 import '@/styles/fullcalendar-custom.css';
 import { getLocale } from '@meditime/config';
 import { CALENDAR_ROUTE_PREFIXES } from '@meditime/constants';
@@ -286,173 +286,32 @@ function CalendarPage({
                 {calendarType === 'personal' && (
                   <ActionSheet
                     dataTour="calendar-actions-btn"
-                    actions={[
-                      // view toggle actions
-                      {
-                        label: (
-                          <>
-                            <Grid3X3 className="h-4 w-4 mr-2" /> {t('pillbox.title')}
-                          </>
-                        ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate || new Date())}`,
-                        title: t('pillbox.title'),
-                      },
-                      {
-                        label: (
-                          <>
-                            <CalendarDays className="h-4 w-4 mr-2" /> {t('day_view.title')}
-                          </>
-                        ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/daily?date=${toISO(new Date().setHours(0,0,0,0))}`,
-                        title: t('day_view.title'),
-                      },
-                      { separator: true },
-                      {
-                        label: (
-                          <>
-                            <Share2 className="h-4 w-4 mr-2" /> {t('share')}
-                          </>
-                        ),
-                        linkTo: `/${lng}/shared-calendars?calendar=${calendarId}`,
-                        title: t('share'),
-                        dataTour: 'share-calendar-btn',
-                      },
-                      { separator: true },
-                      {
-                        label: (
-                          <>
-                            <Download className="h-4 w-4 mr-2" /> {t('boxes.export_pdf')}
-                          </>
-                        ),
-                        onClick: () => calendarSource.downloadCalendarPdf(calendarId),
-                        title: t('boxes.export_pdf'),
-                        dataTour: 'export-pdf-btn',
-                      },
-                      {
-                        label: (
-                          <>
-                            <AlertTriangle className="h-4 w-4 mr-2" /> {t('stock')}
-                          </>
-                        ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/stock-alerts`,
-                        title: t('stock'),
-                        dataTour: 'stock-alerts-btn',
-                      },
-                      {
-                        label: (
-                          <>
-                            <Calendar className="h-4 w-4 mr-2" /> {t('ics.calendar_ics')}
-                          </>
-                        ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
-                        title: t('ics.calendar_ics'),
-                      },
-                      {
-                        label: (
-                          <>
-                            <Clock className="h-4 w-4 mr-2" /> {t('pillbox_uses')}
-                          </>
-                        ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox-uses`,
-                        title: t('pillbox_uses'),
-                        dataTour: 'pillbox-history-btn',
-                      },
-                      { separator: true },
-                      {
-                        label: (
-                          <>
-                            <Settings className="h-4 w-4 mr-2" /> {t('settings.label')}
-                          </>
-                        ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
-                        title: t('settings.label'),
-                        dataTour: 'calendar-settings-btn',
-                      },
-                      { separator: true },
-                      {
-                        label: (
-                          <>
-                            <Trash2 className="h-4 w-4 mr-2" /> {t('delete')}
-                          </>
-                        ),
-                        onClick: handleDeleteCalendar,
-                        title: t('delete'),
-                        danger: true,
-                      },
-                    ]}
+                    actions={toActionSheetItems(
+                      buildPersonalCalendarActions(
+                        { calendarId: calendarId!, lng: lng!, basePath, selectedDate },
+                        {
+                          onDelete: handleDeleteCalendar,
+                          onExportPdf: () => calendarSource.downloadCalendarPdf(calendarId),
+                        },
+                        ['rename', 'medicines'],
+                      ),
+                      t,
+                    )}
                   />
                 )}
                 {calendarType === 'sharedUser' && (
                   <ActionSheet
-                    actions={[
-                      // view toggle for shared users too
-                      {
-                        label: (
-                          <>
-                            <Grid3X3 className="h-4 w-4 mr-2" /> {t('pillbox.title')}
-                          </>
-                        ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate || new Date())}`,
-                        title: t('pillbox.title'),
-                      },
-                      {
-                        label: (
-                          <>
-                            <CalendarDays className="h-4 w-4 mr-2" /> {t('day_view.title')}
-                          </>
-                        ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/daily?date=${toISO(new Date().setHours(0,0,0,0))}`,
-                        title: t('day_view.title'),
-                      },
-                      { separator: true },
-                      {
-                        label: (
-                          <>
-                            <Download className="h-4 w-4 mr-2" /> {t('boxes.export_pdf')}
-                          </>
-                        ),
-                        onClick: () => calendarSource.downloadCalendarPdf(calendarId),
-                        title: t('boxes.export_pdf'),
-                      },
-                      {
-                        label: (
-                          <>
-                            <Calendar className="h-4 w-4 mr-2" /> {t('ics.calendar_ics')}
-                          </>
-                        ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
-                        title: t('ics.calendar_ics'),
-                      },
-                      {
-                        label: (
-                          <>
-                            <Clock className="h-4 w-4 mr-2" /> {t('pillbox_uses')}
-                          </>
-                        ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox-uses`,
-                        title: t('pillbox_uses'),
-                      },
-                      { separator: true },
-                      {
-                        label: (
-                          <>
-                            <Settings className="h-4 w-4 mr-2" /> {t('settings.label')}
-                          </>
-                        ),
-                        linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
-                        title: t('settings.label'),},
-                      { separator: true },
-                      {
-                        label: (
-                          <>
-                            <Trash2 className="h-4 w-4 mr-2" /> {t('delete')}
-                          </>
-                        ),
-                        onClick: handleDeleteSharedCalendar,
-                        title: t('delete'),
-                        danger: true,
-                      },
-                    ]}
+                    actions={toActionSheetItems(
+                      buildSharedCalendarActions(
+                        { calendarId: calendarId!, lng: lng!, basePath, selectedDate },
+                        {
+                          onDelete: handleDeleteSharedCalendar,
+                          onExportPdf: () => calendarSource.downloadCalendarPdf(calendarId),
+                        },
+                        ['medicines'],
+                      ),
+                      t,
+                    )}
                   />
                 )}
               </div>

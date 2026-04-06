@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import type { FormEvent } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
 import { useRealtimeBoxesSwitcher } from '@/hooks/realtime/useRealtimeBoxesSwitcher';
 import { useAlert } from '@/contexts/AlertContext';
 import { useLoading } from '@/components/ui/loading';
-import { getCalendarSourceMap } from '@meditime/utils';
+import { getCalendarSourceMap, buildPersonalCalendarActions, buildSharedCalendarActions, buildBoxActions } from '@meditime/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { fetchSuggestions } from '@/utils/api/fetchSuggestions';
 import ActionSheet from '@/components/common/ActionSheet';
 import { useTranslation } from 'react-i18next';
+import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import QRCodeScanner from '@/components/scanner/QRCodeScanner';
 import Tooltips from '@/components/common/Tooltips';
 import IconButton from '@/components/common/UtilityComponents';
@@ -46,17 +47,11 @@ import {
   BellOff,
   ChevronUp, 
   ChevronDown, 
+  ChevronRight,
   Trash2, 
   Save, 
   X,
   PlusCircle,
-  Download,
-  Share2,
-  Calendar,
-  Settings,
-  FileText,
-  Pencil,
-  ScanLine
 } from 'lucide-react';
 import NotFound from '../../../general/NotFound';
 
@@ -71,15 +66,15 @@ const QRCodeScannerAny = QRCodeScanner as any;
 
 const StatusBadge = ({ variant, icon: Icon, text, tooltip }: StatusBadgeProps) => {
   const variantMap = {
-    warning: 'bg-amber-500 text-white hover:bg-amber-600',
-    danger: 'bg-destructive text-white',
-    success: 'bg-green-500 text-white hover:bg-green-600',
-    secondary: 'bg-secondary text-secondary-foreground',
-    info: 'bg-blue-500 text-white hover:bg-blue-600',
+    warning: 'bg-yellow-500/15 text-foreground border-yellow-500/50',
+    danger: 'bg-red-500/15 text-foreground border-red-500/50',
+    success: 'bg-green-500/15 text-foreground border-green-500/50',
+    secondary: 'bg-secondary/15 text-foreground border-secondary/50',
+    info: 'bg-blue-500/15 text-foreground border-blue-500/50',
   };
 
   const content = (
-    <Badge className={cn('gap-1', variantMap[variant] || variantMap.secondary)}>
+    <Badge variant="outline" className={cn('gap-1', variantMap[variant] || variantMap.secondary)}>
       {Icon && <Icon className="h-3 w-3" />}
       {text}
     </Badge>
@@ -542,97 +537,25 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
   };
 
   const getCommonActions = () => {
-    const actions: AnyRecord[] = [
-      {
-        label: (
-          <>
-            <Download className="h-4 w-4 mr-2" />
-            {t('boxes.export_pdf')}
-          </>
-        ),
-        onClick: () => calendarSource.downloadCalendarPdf(calendarId),
-        title: t('boxes.export_pdf'),
-      },
-    ];
-    
-    if (calendarType === 'personal') {
-      actions.unshift({
-        label: (
-          <>
-            <Share2 className="h-4 w-4 mr-2" />
-            {t('share')}
-          </>
-        ),
-        linkTo: `/${lng}/shared-calendars?calendar=${calendarId}`,
-        title: t('share'),
-      });
-      actions.push(
-        { separator: true },
-        {
-          label: (
-            <>
-              <AlertTriangle className="h-4 w-4 mr-2" />
-              {t('stock')}
-            </>
-          ),
-          linkTo: `/${lng}/${basePath}/${calendarId}/stock-alerts`,
-          title: t('stock'),
-        }
-      );
-    }
-    
-    actions.push(
-      {
-        label: (
-          <>
-            <Calendar className="h-4 w-4 mr-2" />
-            {t('ics.calendar_ics')}
-          </>
-        ),
-        linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
-        title: t('ics.calendar_ics'),
-      },
-      { separator: true },
-      {
-        label: (
-          <>
-            <Settings className="h-4 w-4 mr-2" />
-            {t('settings.label')}
-          </>
-        ),
-        linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
-        title: t('settings.label'),
-      },
-      { separator: true }
-    );
-    
-    if (calendarType === 'personal') {
-      actions.push({
-        label: (
-          <>
-            <Trash2 className="h-4 w-4 mr-2" />
-            {t('delete')}
-          </>
-        ),
-        onClick: handleDeleteCalendar,
-        title: t('delete'),
-        danger: true,
-      });
-    } else if (calendarType === 'sharedUser') {
-      actions.push({
-        label: (
-          <>
-            <Trash2 className="h-4 w-4 mr-2" />
-            {t('delete')}
-          </>
-        ),
-        onClick: handleDeleteSharedCalendar,
-        title: t('delete'),
-        danger: true,
-      });
-    }
-    
-    return actions;
+    const builder = calendarType === 'personal'
+      ? buildPersonalCalendarActions(
+          { calendarId: calendarId!, lng: lng!, basePath, selectedDate: null },
+          {
+            onRename: undefined,
+            onDelete: handleDeleteCalendar,
+            onExportPdf: () => calendarSource.downloadCalendarPdf(calendarId),
+          },
+          ['rename', 'medicines'],
+        )
+      : buildSharedCalendarActions(
+          { calendarId: calendarId!, lng: lng!, basePath, selectedDate: null },
+          {
+            onDelete: handleDeleteSharedCalendar,
+            onExportPdf: () => calendarSource.downloadCalendarPdf(calendarId),
+          },
+          ['medicines'],
+        );
+    return toActionSheetItems(builder, t);
   };
 
   // =========================================================================
@@ -670,6 +593,22 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
           </h4>
           <ActionSheet actions={getCommonActions()} />
         </div>
+
+        {/* Stock Alert Banner */}
+        {boxes.some(box => box.stock_quantity <= box.stock_alert_threshold && box.stock_alert_threshold > 0) && (
+          <Link
+            className="flex items-center justify-between w-full px-3 py-2 mb-4 rounded-md bg-yellow-500/15 border border-yellow-500/50 text-foreground no-underline shadow"
+            to={`/${lng}/${basePath}/${calendarId}/stock-alerts`}
+            title={t('stock_alert_tooltip')}
+            aria-label={t('stock_alert')}
+          >
+            <div className="flex items-center">
+              <AlertTriangle className="h-5 w-5 mr-2 text-yellow-600" />
+              <span className="font-semibold">{t('stock_alert')}</span>
+            </div>
+            <ChevronRight className="h-4 w-4 ml-2" />
+          </Link>
+        )}
 
         {/* Boxes Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -953,52 +892,15 @@ function BoxCard({
     }));
   };
 
-  const getBoxActions = () => [
-    {
-      label: (
-        <>
-          <ScanLine className="h-4 w-4 mr-2" />
-          {t('boxes.scan_qr_code')}
-        </>
-      ),
-      onClick: onUpdateScan,
-      title: t('boxes.scan_qr_code'),
-    },
-    { separator: true },
-    {
-      label: (
-        <>
-          <Pencil className="h-4 w-4 mr-2" />
-          {t('boxes.edit')}
-        </>
-      ),
-      onClick: () => onEdit(box),
-      title: t('boxes.edit'),
-      dataTour: 'box-edit-btn',
-    },
-    {
-      label: (
-        <>
-          <FileText className="h-4 w-4 mr-2" />
-          {t('boxes.view_notice')}
-        </>
-      ),
-      onClick: openNotice,
-      title: t('boxes.view_notice'),
-    },
-    { separator: true },
-    {
-      label: (
-        <>
-          <Trash2 className="h-4 w-4 mr-2" />
-          {t('boxes.delete')}
-        </>
-      ),
-      onClick: () => deleteBox(calendarId, box.id),
-      title: t('boxes.delete'),
-      danger: true,
-    },
-  ];
+  const getBoxActions = () => toActionSheetItems(
+    buildBoxActions({
+      onScanQr: onUpdateScan,
+      onEdit: () => onEdit(box),
+      onViewNotice: openNotice,
+      onDelete: () => deleteBox(calendarId, box.id),
+    }),
+    t,
+  );
 
   const getBorderClass = () => {
     const allExpired = box.conditions?.every((c: AnyRecord) => {
