@@ -1,0 +1,12 @@
+{
+  "name": "@meditime/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@meditime/constants": "file:../constants"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

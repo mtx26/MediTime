@@ -6,17 +6,17 @@ permissions:
 on:
   push:
     paths:
-      - 'backend/**'
+      - 'apps/backend/**'
   pull_request:
     paths:
-      - 'backend/**'
+      - 'apps/backend/**'
 
 jobs:
   test-backend:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: apps/backend
 
     env:
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
