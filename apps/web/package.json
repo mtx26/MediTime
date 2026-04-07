@@ -96,6 +96,11 @@
     "vite": "^7.1.12",
     "vite-plugin-compression": "^0.5.1"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.54.0",
+    "@tailwindcss/oxide-linux-x64-gnu": "4.1.18",
+    "lightningcss-linux-x64-gnu": "1.30.2"
+  },
   "main": "vite.config.js",
   "keywords": [],
   "author": "",
