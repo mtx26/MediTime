@@ -181,7 +181,29 @@ The frontend currently supports the following languages: English, French, Spanis
 
 ## ☁️ Deployment
 
-This project uses [CapRover](https://caprover.com/) for containerized hosting. The `captain-definition` file at the repository root describes how the application is built and deployed on the platform.
+### Frontend – Vercel
+
+The frontend (`apps/web`) is deployed on [Vercel](https://vercel.com/). The `vercel.json` at the repository root contains all the necessary build configuration. The only settings you need to configure **manually in the Vercel dashboard** are:
+
+| Setting | Value |
+|---|---|
+| **Root Directory** | *(leave empty – repository root)* |
+| **Framework Preset** | Other |
+| **Build Command** | `npm run build --workspace=apps/web` |
+| **Output Directory** | `apps/web/dist` |
+| **Install Command** | `npm install --legacy-peer-deps` |
+| **Node.js Version** | **22.x** (set in *Settings → General → Node.js Version*) |
+
+All environment variables (`VITE_*`) must also be added in *Settings → Environment Variables*.
+
+> **Important – monorepo notes:**
+> - The repository uses **npm workspaces**. There must be only **one** `package-lock.json` at the repository root. Never commit a separate `package-lock.json` inside `apps/web/`.
+> - The `package-lock.json` is generated on Linux so it includes the correct platform-specific native binaries (e.g. `@rollup/rollup-linux-x64-gnu`). If you regenerate it on Windows, delete it and let Vercel (or a Linux/macOS environment) recreate it.
+> - The `.nvmrc` file pins Node **22** and the `engines` field in `package.json` requires `>=22.12.0`. Vercel detects both and uses Node 22 automatically.
+
+### Backend – Portainer / CapRover
+
+See [PORTAINER.md](./PORTAINER.md) for backend deployment instructions. The `captain-definition` file at the repository root describes how the application is built and deployed on CapRover.
 
 ---
 
