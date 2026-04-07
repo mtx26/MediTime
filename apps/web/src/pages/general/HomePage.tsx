@@ -7,7 +7,8 @@ import { Pill, Calendar, Users, Lock, Phone, CheckCircle } from 'lucide-react';
 
 function HomePage() {
   const { lng } = useParams();
-  const { userInfo } = useContext(UserContext);
+  const context = useContext(UserContext);
+  const userInfo = context?.userInfo;
   const { t } = useTranslation();
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isAndroid = /android/i.test(navigator.userAgent);
@@ -135,7 +136,7 @@ function HomePage() {
               )}
 
               {!isIOS && !isAndroid && (
-                <Alert className="mt-4" variant="secondary">
+                <Alert className="mt-4" variant="default">
                   <AlertDescription>{t('mobile.other')}</AlertDescription>
                 </Alert>
               )}

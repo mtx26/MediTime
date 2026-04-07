@@ -58,7 +58,7 @@ export function UserProvider({ children }: UserProviderProps<ReactNode>) {
 
       if (res.status === 404) {
         const metadata = user.user_metadata || {};
-        const bodyBackend = buildUserCreationPayload(user.id, user.email, metadata);
+        const bodyBackend = buildUserCreationPayload(user.id, user.email ?? undefined, metadata);
 
         const creationRes = await fetch(`${API_URL}/api/user/update`, {
           method: 'PUT',
