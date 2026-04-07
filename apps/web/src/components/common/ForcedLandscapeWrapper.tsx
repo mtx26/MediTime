@@ -27,7 +27,7 @@ export default function ForcedLandscapeWrapper({ children }: ForcedLandscapeWrap
     const lockOrientation = async () => {
       const orientation = screen.orientation as OrientationWithLock;
       try {
-        if (orientation?.lock) {
+        if (orientation.lock) {
           await orientation.lock('landscape').catch(() => {
             // Silently fail if not supported or denied
           });
@@ -54,7 +54,7 @@ export default function ForcedLandscapeWrapper({ children }: ForcedLandscapeWrap
       const orientation = screen.orientation as OrientationWithLock;
       
       // Déverrouiller l'orientation à la sortie
-      if (orientation?.unlock) {
+      if (orientation.unlock) {
         orientation.unlock();
       }
     };

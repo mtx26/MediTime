@@ -267,7 +267,7 @@ function SharedList({
             </Button>
           )}
           {/* --- MOCK DEMO END --- */}
-          {(((personalCalendars as AnyRecord)?.calendarsData || []) as AnyRecord[]).map((calendar) => (
+          {(((personalCalendars as AnyRecord).calendarsData || []) as AnyRecord[]).map((calendar) => (
             <Button
               key={calendar.id}
               asChild

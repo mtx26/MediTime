@@ -16,6 +16,7 @@ import IconButton from '@/components/common/UtilityComponents';
 import type {
   BoxesViewPageProps,
   BoxesViewBoxItem,
+  MedicineReviewConditionInput,
   MedicineReviewSuggestion,
   QRScannedMedicine,
   StatusBadgeProps as SharedStatusBadgeProps,
@@ -25,6 +26,27 @@ import type {
 
 // TODO: Replace AnyRecord usages with proper types
 type AnyRecord = Record<string, any>;
+type EditableCondition = MedicineReviewConditionInput & { id: string };
+type ConditionFieldKey = keyof MedicineReviewConditionInput;
+type ConditionValue = string | number | null | undefined;
+type ConditionFieldType = 'number' | 'select' | 'date';
+type ConditionOption = { value: string; label: string };
+type ConditionFieldConfig = {
+  label: string | ((cond: EditableCondition) => string);
+  field: ConditionFieldKey | ((cond: EditableCondition) => ConditionFieldKey);
+  type: ConditionFieldType | ((cond: EditableCondition) => ConditionFieldType);
+  min?: string;
+  step?: string;
+  format?: string | ((cond: EditableCondition) => string);
+  options?: ConditionOption[];
+  ifComplete?: (cond: EditableCondition) => boolean;
+  onChange?: (
+    cond: EditableCondition,
+    value: ConditionValue,
+    updateFn: (field: ConditionFieldKey, value: ConditionValue) => void,
+  ) => void;
+  required?: boolean | ((cond: EditableCondition) => boolean);
+};
 
 // Composants shadcn/ui
 import { Card, CardContent } from '@/components/ui/card';
@@ -726,7 +748,7 @@ function BoxCard({
     evening: t('evening'),
   };
   
-  const conditionFields: AnyRecord[] = [
+  const conditionFields: ConditionFieldConfig[] = [
     {
       label: t('boxes.condition.tablet_count'),
       field: 'tablet_count',
@@ -754,8 +776,8 @@ function BoxCard({
       min: '0',
       step: '1',
       format: 'int',
-      onChange: (_cond: AnyRecord, value: number, updateFn: (field: string, v: unknown) => void) => {
-        if (value <= 1) {
+      onChange: (_cond, value, updateFn) => {
+        if (Number(value) <= 1) {
           updateFn('start_date', null);
         }
       },
@@ -765,8 +787,8 @@ function BoxCard({
       label: t('boxes.condition.start_date'),
       field: 'start_date',
       type: 'date',
-      ifComplete: (cond: AnyRecord) => cond.interval_days > 1,
-      required: (cond: AnyRecord) => cond.interval_days > 1,
+      ifComplete: (cond) => Number(cond.interval_days) > 1,
+      required: (cond) => Number(cond.interval_days) > 1,
     },
     {
       label: t('boxes.condition.max_date_mode'),
@@ -777,22 +799,22 @@ function BoxCard({
         { value: 'until_date', label: t('boxes.condition.until_date') },
         { value: 'for_days', label: t('boxes.condition.for_days') },
       ],
-      onChange: (_cond: AnyRecord, _value: string, updateFn: (field: string, v: any) => void) => {
+      onChange: (_cond, _value, updateFn) => {
         updateFn('max_date', null);
         updateFn('max_date_days', null);
       },
       required: false,
     },
     {
-      label: (cond: AnyRecord) => cond.max_date_mode === 'until_date' 
+      label: (cond) => cond.max_date_mode === 'until_date' 
         ? t('boxes.condition.end_date') 
         : t('boxes.condition.duration_days'),
-      field: (cond: AnyRecord) => cond.max_date_mode === 'until_date' ? 'max_date' : 'max_date_days',
-      type: (cond: AnyRecord) => cond.max_date_mode === 'until_date' ? 'date' : 'number',
+      field: (cond) => cond.max_date_mode === 'until_date' ? 'max_date' : 'max_date_days',
+      type: (cond) => cond.max_date_mode === 'until_date' ? 'date' : 'number',
       min: '1',
       step: '1',
-      format: (cond: AnyRecord) => cond.max_date_mode === 'until_date' ? '' : 'int',
-      onChange: (cond: AnyRecord, value: any, updateFn: (field: string, v: any) => void) => {
+      format: (cond) => cond.max_date_mode === 'until_date' ? '' : 'int',
+      onChange: (cond, value, updateFn) => {
         if (!value || value === '') {
           updateFn('max_date', null);
           if (cond.max_date_mode === 'for_days') updateFn('max_date_days', null);
@@ -802,23 +824,24 @@ function BoxCard({
         if (cond.max_date_mode === 'for_days') {
           const now = new Date();
           const target = new Date(now);
-          const hourByTime: AnyRecord = { morning: 8, noon: 12, evening: 18 };
-          const targetHour = hourByTime[cond.time_of_day] ?? 8;
+          const hourByTime = { morning: 8, noon: 12, evening: 18 } as const;
+          const targetHour = cond.time_of_day ? hourByTime[cond.time_of_day] : 8;
           target.setHours(targetHour, 0, 0, 0);
           const includeToday = now < target;
           const endDate = new Date(now);
-          endDate.setDate(endDate.getDate() + (includeToday ? value - 1 : value));
+          const daysValue = Number(value);
+          endDate.setDate(endDate.getDate() + (includeToday ? daysValue - 1 : daysValue));
           endDate.setHours(23, 59, 59, 999);
           updateFn('max_date', endDate.toISOString());
-          updateFn('max_date_days', value);
+          updateFn('max_date_days', daysValue);
         } else {
-          const selectedDate = new Date(value);
+          const selectedDate = new Date(String(value));
           selectedDate.setHours(23, 59, 59, 999);
           updateFn('max_date', selectedDate.toISOString());
         }
       },
-      ifComplete: (cond: AnyRecord) => cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
-      required: (cond: AnyRecord) => cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
+      ifComplete: (cond) => cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
+      required: (cond) => cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
     },
   ];
 
@@ -873,7 +896,7 @@ function BoxCard({
     }));
   };
 
-  const updateCondition = (id: string, field: string, val: any) => {
+  const updateCondition = (id: string, field: ConditionFieldKey, val: ConditionValue) => {
     setEditingBox((p: AnyRecord) => ({
       ...p,
       conditions: {
@@ -1160,8 +1183,11 @@ function BoxCard({
               {isEditing ? (
                 <>
                   {Object.values(editingBox.conditions || {})
-                    .filter((c: any) => c !== undefined)
-                    .map((cond: any) => (
+                    .filter(
+                      (c): c is EditableCondition =>
+                        !!c && typeof c === 'object' && typeof (c as { id?: unknown }).id === 'string'
+                    )
+                    .map((cond) => (
                       <div
                         key={cond.id}
                         className="p-3 border rounded-md bg-muted/50 space-y-3"
@@ -1183,11 +1209,11 @@ function BoxCard({
                                 <Label className="text-sm">{resolvedLabel}</Label>
                                 {resolvedType === 'select' ? (
                                   <Select
-                                    value={cond[resolvedField] || 'none'}
+                                    value={String(cond[resolvedField] ?? 'none')}
                                     onValueChange={(value) => {
                                       updateCondition(cond.id, resolvedField, value);
                                       if (onChange) {
-                                        onChange(cond, value, (f: string, v: any) => updateCondition(cond.id, f, v));
+                                        onChange(cond, value, (f, v) => updateCondition(cond.id, f, v));
                                       }
                                     }}
                                     required={resolvedRequired}
@@ -1196,7 +1222,7 @@ function BoxCard({
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      {options.map((o: AnyRecord) => (
+                                      {options?.map((o) => (
                                         <SelectItem key={o.value} value={o.value}>
                                           {o.label}
                                         </SelectItem>
@@ -1214,15 +1240,15 @@ function BoxCard({
                                     min={min}
                                     step={step}
                                     onChange={(e) => {
-                                      let value: any = e.target.value;
+                                      let value: ConditionValue = e.target.value;
                                       if (resolvedFormat === 'int') {
-                                        value = parseInt(value);
+                                        value = value === '' ? '' : parseInt(String(value), 10);
                                       } else if (resolvedFormat === 'float') {
-                                        value = parseFloat(value);
+                                        value = value === '' ? '' : parseFloat(String(value));
                                       }
                                       updateCondition(cond.id, resolvedField, value);
                                       if (onChange) {
-                                        onChange(cond, value, (f: string, v: any) => updateCondition(cond.id, f, v));
+                                        onChange(cond, value, (f, v) => updateCondition(cond.id, f, v));
                                       }
                                     }}
                                     aria-label={resolvedLabel}

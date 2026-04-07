@@ -56,7 +56,8 @@ function Auth() {
   const handleLogin = async () => {
     const error = await loginWithEmail(email, password);
     if (error) {
-      showAlert('danger', t(`supabase-error.${(error as { code?: string })?.code || 'unexpected_error'}`));
+      const errorCode = (error as { code?: string }).code || 'unexpected_error';
+      showAlert('danger', t(`supabase-error.${errorCode}`));
       return;
     }
     log.info('Connexion réussie', {
@@ -73,7 +74,8 @@ function Auth() {
   const handleRegister = async () => {
     const error = await registerWithEmail(email, password, name, redirect);
     if (error) {
-      showAlert('danger', t(`supabase-error.${(error as { code?: string })?.code || 'unexpected_error'}`));
+      const errorCode = (error as { code?: string }).code || 'unexpected_error';
+      showAlert('danger', t(`supabase-error.${errorCode}`));
       return;
     }
     log.info('Inscription réussie', {

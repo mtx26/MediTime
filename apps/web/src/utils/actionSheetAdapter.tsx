@@ -10,7 +10,7 @@ import {
 /* Icon mapping: kebab-case name → Lucide React component             */
 /* ------------------------------------------------------------------ */
 
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+const ICON_MAP: Partial<Record<string, React.ComponentType<{ className?: string }>>> = {
   'eye': Eye,
   'pencil': Pencil,
   'grid-3x3': Grid3X3,

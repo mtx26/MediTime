@@ -52,9 +52,7 @@ function MedicinesList() {
     );
   }
 
-  const groupedMedicines: GroupedMedicines = medicinesData
-    ? groupMedicinesByName(medicinesData)
-    : {};
+  const groupedMedicines: GroupedMedicines = groupMedicinesByName(medicinesData);
 
   return (
     <div className="container mx-auto mt-4 px-4">

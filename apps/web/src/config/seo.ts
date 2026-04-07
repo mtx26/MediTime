@@ -3,7 +3,7 @@
  */
 
 import { enabledLanguageCodes } from '@meditime/config';
-import type { PwaShortcut, SchemaOrgDocument, SeoConfig, TranslatorInput } from '@meditime/types';
+import type { PwaShortcut, SchemaOrgDocument, SeoConfig, TranslationMap, TranslatorInput } from '@meditime/types';
 
 // Constantes de l'application
 const APP_VERSION = '0.1.0';
@@ -74,10 +74,16 @@ function resolveTranslation(t: TranslatorInput, key: string): string {
   const keys = key.split('.');
   let value: unknown = t;
   for (const k of keys) {
-    if (!value || typeof value !== 'object') {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
       return key;
     }
-    value = (value as Record<string, unknown>)[k];
+
+    const translationMap = value as TranslationMap;
+    if (!Object.prototype.hasOwnProperty.call(translationMap, k)) {
+      return key;
+    }
+
+    value = translationMap[k];
   }
   return typeof value === 'string' ? value : key;
 }
