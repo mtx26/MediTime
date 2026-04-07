@@ -16,8 +16,15 @@ def create_app():
     app.config.from_object(Config)
     Compress(app)
 
-    # 🌍 Active CORS avec cookies
-    CORS(app, supports_credentials=True)
+    # L'API utilise des jetons Bearer Supabase, pas des cookies de session Flask.
+    # On restreint donc CORS aux origines frontend explicites sans activer les credentialed requests.
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": app.config["CORS_ALLOWED_ORIGINS"]}},
+        allow_headers=app.config["CORS_ALLOW_HEADERS"],
+        methods=app.config["CORS_METHODS"],
+        supports_credentials=False,
+    )
 
     # 🔧 Initialisation des services partagés (DB, Firebase, Vertex)
     verify_db_connection()

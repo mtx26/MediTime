@@ -5,6 +5,16 @@ from dotenv import load_dotenv
 
 load_dotenv()  # Charge les variables du fichier .env
 
+
+def _parse_csv_env(raw_value: str | None) -> tuple[str, ...]:
+    if not raw_value:
+        return ()
+    return tuple(
+        value.strip().rstrip('/')
+        for value in raw_value.split(',')
+        if value.strip()
+    )
+
 class Config:
     """Classe de configuration pour l'application Flask.
     """
@@ -34,6 +44,17 @@ class Config:
 
     # Frontend URL
     FRONTEND_URL = os.getenv("FRONTEND_URL")
+    CORS_ALLOWED_ORIGINS = tuple(dict.fromkeys(
+        origin
+        for origin in (
+            *((FRONTEND_URL.rstrip('/'),) if FRONTEND_URL else ()),
+            *_parse_csv_env(os.getenv("CORS_ALLOWED_ORIGINS")),
+            "http://localhost:3000",
+        )
+        if origin
+    ))
+    CORS_ALLOW_HEADERS = ("Authorization", "Content-Type")
+    CORS_METHODS = ("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 
     # Email
     SMTP_HOST = os.getenv("SMTP_HOST")
