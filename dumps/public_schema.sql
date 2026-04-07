@@ -268,7 +268,6 @@ CREATE TABLE public.users (
     sms_enabled boolean DEFAULT false NOT NULL,
     phone text,
     updated_at timestamp with time zone DEFAULT now(),
-    deleted_at timestamp with time zone,
     notification_time time without time zone DEFAULT '08:00:00'::time without time zone NOT NULL
 );
 
