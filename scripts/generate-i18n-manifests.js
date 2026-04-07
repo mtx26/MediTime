@@ -35,7 +35,7 @@ const resolveTranslation = (translations, key) => {
     if (!value || typeof value !== 'object') {
       return undefined;
     }
-    return value[segment];
+    return Object.hasOwn(value, segment) ? value[segment] : undefined;
   }, translations);
 };
 
@@ -63,10 +63,21 @@ const getShortcuts = (langCode, translations) => {
   ];
 };
 
+const SAFE_LANG_CODE = /^[a-z]{2}(-[A-Z]{2})?$/;
+
 const loadTranslations = (langCode) => {
+  if (!SAFE_LANG_CODE.test(langCode)) {
+    console.warn(`Code langue invalide: ${langCode}`);
+    return null;
+  }
   try {
     const translationPath = path.join(localesRoot, langCode, 'translation.json');
-    const translationContent = fs.readFileSync(translationPath, 'utf8');
+    const resolvedPath = path.resolve(translationPath);
+    if (!resolvedPath.startsWith(path.resolve(localesRoot))) {
+      console.warn(`Chemin de traduction invalide pour ${langCode}`);
+      return null;
+    }
+    const translationContent = fs.readFileSync(resolvedPath, 'utf8');
     return JSON.parse(translationContent);
   } catch (error) {
     console.warn(`Impossible de charger les traductions pour ${langCode}:`, error.message);
@@ -105,8 +116,13 @@ async function generateI18nManifests() {
     const translations = loadTranslations(langCode);
     const manifest = createManifest(langCode, translations);
 
+    const manifestPath = path.resolve(path.join(manifestDir, `manifest-${langCode}.json`));
+    if (!manifestPath.startsWith(path.resolve(manifestDir))) {
+      console.warn(`Chemin de manifest invalide pour ${langCode}`);
+      continue;
+    }
     fs.writeFileSync(
-      path.join(manifestDir, `manifest-${langCode}.json`),
+      manifestPath,
       JSON.stringify(manifest, null, 2)
     );
 

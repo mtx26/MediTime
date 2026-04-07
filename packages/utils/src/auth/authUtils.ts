@@ -87,7 +87,7 @@ export function buildUserUpdatePayload({
 }
 
 export function getOAuthSignInOptions(provider: string, redirectTo: string): { redirectTo: string } & OAuthProviderOptions {
-  const providerOptions = OAUTH_PROVIDER_OPTIONS[provider] || {};
+  const providerOptions = OAUTH_PROVIDER_OPTIONS[provider] ?? {};
   return {
     redirectTo,
     ...providerOptions,

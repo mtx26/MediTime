@@ -36,12 +36,16 @@ function loadMonorepoEnv() {
 
   const loaded = [];
   for (const envFile of envFiles) {
-    if (!fs.existsSync(envFile)) {
+    const resolvedEnvFile = path.resolve(envFile);
+    if (!resolvedEnvFile.startsWith(path.resolve(workspaceRootDir))) {
+      continue;
+    }
+    if (!fs.existsSync(resolvedEnvFile)) {
       continue;
     }
 
-    dotenv.config({ path: envFile, override: true });
-    loaded.push(envFile);
+    dotenv.config({ path: resolvedEnvFile, override: true });
+    loaded.push(resolvedEnvFile);
   }
 
   return loaded;

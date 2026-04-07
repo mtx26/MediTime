@@ -754,7 +754,7 @@ function BoxCard({
       min: '0',
       step: '1',
       format: 'int',
-      onChange: (_cond: AnyRecord, value: number, updateFn: (field: string, v: any) => void) => {
+      onChange: (_cond: AnyRecord, value: number, updateFn: (field: string, v: unknown) => void) => {
         if (value <= 1) {
           updateFn('start_date', null);
         }

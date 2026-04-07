@@ -392,7 +392,7 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
                           onClick={() => setOpenDropdownKey(`${i}:${field}:${cond[field] || ''}:${Date.now()}`)}
                           aria-label={label}
                         >
-                          {(typeof (cond as Record<string, unknown>)[field] === 'string'
+                          {(Object.hasOwn(cond, field) && typeof (cond as Record<string, unknown>)[field] === 'string'
                             ? (field !== 'max_date'
                               ? String((cond as Record<string, unknown>)[field])
                               : String((cond as Record<string, unknown>)[field]).split('T')[0])
@@ -430,9 +430,9 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
                         id={field}
                         type={type}
                         value={
-                          field === 'max_date' && typeof (cond as Record<string, unknown>)[field] === 'string'
+                          Object.hasOwn(cond, field) && field === 'max_date' && typeof (cond as Record<string, unknown>)[field] === 'string'
                             ? String((cond as Record<string, unknown>)[field]).split('T')[0]
-                            : String((cond as Record<string, unknown>)[field] ?? '')
+                            : String(Object.hasOwn(cond, field) ? (cond as Record<string, unknown>)[field] ?? '' : '')
                         }
                         onChange={(e) => handleConditionChange(i, field, e.target.value)}
                         step={step}

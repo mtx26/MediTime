@@ -17,7 +17,7 @@ for (const lang of enabledLanguageCodes) {
   }
 }
 
-i18n
+void i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({

@@ -67,7 +67,7 @@ const fetchBoxes = async ({
       import('../../services/firebase/firebase'),
       import('firebase/analytics'),
     ]);
-    analyticsPromise.then((analytics: unknown) => {
+    void analyticsPromise.then((analytics: unknown) => {
       if (analytics) {
         (logEvent as (instance: unknown, name: string, params?: Record<string, unknown>) => void)(analytics, eventName, {
           uid,

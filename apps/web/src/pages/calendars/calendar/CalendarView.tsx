@@ -186,7 +186,8 @@ function CalendarPage({
       t('calendar.delete_title'),
       t('calendar.delete_description'),
       async () => {
-        const rep = await personalCalendars.deleteCalendar(calendarId!);
+        if (!calendarId) return;
+        const rep = await personalCalendars.deleteCalendar(calendarId);
         if (rep.success) {
           navigate(`/${lng}/calendars`);
         }

@@ -78,8 +78,9 @@ function PillboxContent({
   };
 
   const getSchedule = async () => {
+    if (!calendarId) return;
     setLoading(undefined);
-    const rep = await calendarSource.fetchSchedule(calendarId!, toISO(selectedDate as Date));
+    const rep = await calendarSource.fetchSchedule(calendarId, toISO(selectedDate as Date));
     if (rep.success && !isEqual(rep.table, calendarTable)) {
       setCalendarTable(rep.table as PillboxTable);
     } else if (rep.status === 404) {
@@ -89,8 +90,9 @@ function PillboxContent({
   };
 
   const getScheduleNegativeStock = async () => {
+    if (!calendarId) return;
     setLoading(undefined);
-    const rep = await calendarSource.fetchScheduleNegativeStock(calendarId!, medsId);
+    const rep = await calendarSource.fetchScheduleNegativeStock(calendarId, medsId);
     if (rep.success && !isEqual(rep.table, calendarTable)) {
       setCalendarTable(rep.table as PillboxTable);
     } else if (rep.status === 404) {
@@ -301,8 +303,9 @@ function PillboxContent({
                               ? t('pillbox_completion_description')
                               : t('pillbox_refill_description'),
                             async () => {
+                              if (!calendarId) return;
                               if (medsId.length === 0) {
-                                const rep = await calendarSource.decreaseStock(calendarId!, toISO(selectedDate as Date));
+                                const rep = await calendarSource.decreaseStock(calendarId, toISO(selectedDate as Date));
                                 if (!rep.success) {
                                   setPillboxError(true);
                                 }
@@ -312,7 +315,7 @@ function PillboxContent({
                                 }
                               } else {
                                 for (const medId of medsId) {
-                                  const rep = await calendarSource.restockBox(calendarId!, medId);
+                                  const rep = await calendarSource.restockBox(calendarId, medId);
                                   if (!rep.success) {
                                     setPillboxError(true);
                                     break;
