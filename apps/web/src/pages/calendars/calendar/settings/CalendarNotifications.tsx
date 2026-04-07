@@ -48,7 +48,6 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars,
   }, [calendarId, calendarSource, enabled, setNotFound]);
 
   const toggleNotifications = async () => {
-    // TODO: alert 
     const newValue = !enabled;
     const rep = await calendarSource.updateNotificationsEnabled(calendarId, newValue);
     if (rep.success) {
