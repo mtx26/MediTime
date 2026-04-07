@@ -55,7 +55,7 @@ export function AlertProvider({ children }: AlertProviderProps<ReactNode>) {
         />
       )}
       {alertMessage && !isConfirm && (
-        <Toast type={alertType as ToastType} message={alertMessage} onClose={closeAlert} duration={4000} />
+        <Toast type={alertType as ToastType} message={alertMessage} onClose={closeAlert} duration={3000} />
       )}
     </AlertContext.Provider>
   );
