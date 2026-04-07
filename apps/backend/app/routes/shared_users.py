@@ -1,0 +1,479 @@
+from flask import request, g
+from . import api
+from datetime import datetime, timezone
+from urllib.parse import urljoin
+from app.db.connection import get_connection
+from app.services.calendar import generate_calendar_schedule, generate_table_negative_stock
+from app.services.medication import check_if_stock_is_low
+from app.services.notifications import notify_and_record
+from app.config import Config
+from app.utils.responses import success_response, error_response, warning_response
+from app.utils.decorators import require_auth, verify_calendar_share, measure_time, with_query_origin
+import json
+
+
+ERROR_CALENDAR_NOT_FOUND = "calendar not found"
+ERROR_UNAUTHORIZED_ACCESS = "unauthorized access to shared calendar"
+SUCCESS_SHARED_CALENDARS_LOAD = "shared calendars retrieved"
+
+SELECT_SHARED_CALENDAR = "SELECT * FROM calendars WHERE id = %s"
+
+# Route pour récupérer les calendriers partagés
+@api.route("/shared/users/calendars", methods=["GET"])
+@measure_time()
+@require_auth
+@with_query_origin(default_origin="REALTIME_SHARED_CALENDARS_FETCH")
+def handle_shared_calendars():
+    try:
+        uid = g.uid if hasattr(g, "uid") else None
+
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT
+                        sc.calendar_id AS id,
+                        sc.access,
+                        c.name AS name,
+                        c.owner_uid,
+                        u.display_name AS owner_name,
+                        u.email AS owner_email,
+                        COALESCE(u.photo_url, 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg') AS owner_photo_url,
+                        scs.notifications_enabled,
+                        (
+                            SELECT COUNT(*)
+                            FROM medicine_boxes mb
+                            WHERE mb.calendar_id = c.id
+                                AND mb.deleted_at IS NULL
+                        ) AS "boxes_count",
+                        EXISTS (
+                            SELECT 1
+                            FROM medicine_boxes mb
+                            WHERE mb.calendar_id = c.id
+                                AND mb.deleted_at IS NULL
+                                AND mb.stock_quantity <= mb.stock_alert_threshold
+                                AND mb.stock_alert_threshold > 0
+                                AND mb.box_capacity > 0
+                                AND EXISTS (
+                                    SELECT 1 
+                                    FROM medicine_box_conditions mbc
+                                    WHERE mbc.box_id = mb.id
+                                        AND mbc.deleted_at IS NULL
+                                        AND (mbc.max_date IS NULL OR mbc.max_date >= CURRENT_DATE)
+                                        AND (mbc.start_date IS NULL OR mbc.start_date <= CURRENT_DATE)
+                                )
+                        ) AS "ifLowStock"
+                    FROM shared_calendars sc
+                    INNER JOIN calendars c ON sc.calendar_id = c.id AND c.deleted_at IS NULL
+                    INNER JOIN users u ON c.owner_uid = u.id
+                    INNER JOIN shared_calendar_settings scs ON scs.shared_calendar_id = sc.id
+                    WHERE sc.receiver_uid = %s
+                        AND sc.accepted_at IS NOT NULL
+                        AND sc.deleted_at IS NULL
+                """, (uid,))
+                rows = cursor.fetchall()
+
+        if not rows:
+            return success_response(
+                message=SUCCESS_SHARED_CALENDARS_LOAD,
+                code="SHARED_CALENDARS_LOAD_EMPTY",
+                data={"calendars": []},
+                i18n_key="api.shared_calendar.fetch_empty"
+            )
+
+        calendars_list = [
+            dict(row)
+            for row in rows
+            if verify_calendar_share(row["id"], uid)
+        ]
+
+        return success_response(
+            message=SUCCESS_SHARED_CALENDARS_LOAD,
+            code="SHARED_CALENDARS_LOAD_SUCCESS",
+            data={"calendars": calendars_list},
+            i18n_key="api.shared_calendar.calendars_retrieved",
+            log_extra={"calendars_count": len(calendars_list)}
+        )
+
+    except Exception as e:
+        return error_response(
+            message="Error retrieving shared calendars",
+            code="SHARED_CALENDARS_ERROR",
+            i18n_key="api.shared_calendar.fetch_error",
+            status_code=500,
+            error=str(e)
+        )
+
+
+@api.route("/shared/users/calendars/<calendar_id>/schedule", methods=["GET"])
+@measure_time()
+@require_auth
+@verify_calendar_share
+@with_query_origin(default_origin="SHARED_CALENDAR_FETCH_SCHEDULE")
+def handle_user_shared_calendar_schedule(calendar_id):
+    try:
+
+        start_date = request.args.get("startDate")
+
+        if not start_date:
+            start_date = datetime.now(timezone.utc).date()
+        else:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+
+        schedule, table, calendar_name = generate_calendar_schedule(calendar_id, start_date)
+
+        if_low_stock = check_if_stock_is_low(calendar_id)
+
+        return success_response(
+            message=SUCCESS_SHARED_CALENDARS_LOAD, 
+            code="SHARED_CALENDARS_LOAD_SUCCESS", 
+            data={
+                "schedule": schedule,
+                "table": table,
+                "calendarName": calendar_name,
+                "ifLowStock": if_low_stock,
+            },
+            log_extra={"calendar_id": calendar_id},
+            i18n_key="api.shared_calendar.calendars_retrieved"
+        )
+
+    except Exception as e:
+        return error_response(
+            message="Error retrieving shared calendar",
+            code="SHARED_CALENDARS_ERROR",
+            i18n_key="api.shared_calendar.fetch_error", 
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
+
+
+# Route pour supprimer un calendrier partagé pour le receiver
+@api.route("/shared/users/calendars/<calendar_id>", methods=["DELETE"])
+@measure_time()
+@require_auth
+@verify_calendar_share
+@with_query_origin(default_origin="SHARED_CALENDAR_DELETE")
+def handle_delete_user_shared_calendar(calendar_id):
+    try:
+        receiver_uid = g.uid if hasattr(g, "uid") else None
+
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE shared_calendars sc
+                    SET deleted_at = COALESCE(deleted_at, NOW())
+                    FROM calendars c
+                    WHERE sc.calendar_id = c.id
+                        AND sc.receiver_uid = %s
+                        AND sc.calendar_id = %s
+                        AND sc.deleted_at IS NULL
+                    RETURNING c.owner_uid
+                """, (receiver_uid, calendar_id))
+                result = cursor.fetchone()
+                conn.commit()
+
+                if not result:
+                    return warning_response(
+                        message=ERROR_CALENDAR_NOT_FOUND,
+                        code="SHARED_CALENDAR_DELETE_ERROR",
+                        status_code=404,
+                        log_extra={"calendar_id": calendar_id},
+                        i18n_key="api.shared_calendar.invalid_id"
+                    )
+
+                owner_uid = result.get("owner_uid") if result else None
+                link = urljoin(Config.FRONTEND_URL or "", "/calendars")
+
+                notify_and_record(
+                    user_id=owner_uid,
+                    body_or_list={
+                        "link": link,
+                        "calendar_id": calendar_id,
+                        "sender_uid": receiver_uid
+                    },
+                    notification_type="calendar_shared_deleted_by_receiver",
+                )
+
+        return success_response(
+            message="shared calendar removed",
+            code="SHARED_CALENDAR_DELETE_SUCCESS",
+            i18n_key="api.shared_calendar.deleted",
+            log_extra={"calendar_id": calendar_id}
+        )
+
+    except Exception as e:
+        return error_response(
+            message="Error deleting shared calendar",
+            code="SHARED_CALENDARS_DELETE_ERROR",
+            i18n_key="api.shared_calendar.delete_error",
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
+
+
+@api.route("/shared/grouped", methods=["GET"])
+@measure_time()
+@require_auth
+@with_query_origin(default_origin="SHARED_FETCH")
+def handle_grouped_shared():
+    uid = g.uid if hasattr(g, "uid") else None
+
+    sql = """
+    SELECT
+      c.id   AS calendar_id,
+      c.name AS calendar_name,
+
+      -- USERS (shared_calendars x users)
+      COALESCE(
+        (
+          SELECT jsonb_agg(
+                   jsonb_build_object(
+                     'receiver_uid', sc.receiver_uid,
+                                         'access', sc.access,
+                                         'accepted', sc.accepted_at IS NOT NULL,
+                                         'accepted_at', sc.accepted_at,
+                     'token', sc.token,
+                     'receiver_photo_url', COALESCE(u.photo_url, 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg'),
+                     'receiver_name', u.display_name,
+                     'receiver_email', u.email
+                   )
+                   ORDER BY u.display_name NULLS LAST
+                 )
+          FROM shared_calendars sc
+          JOIN users u ON u.id = sc.receiver_uid
+                    WHERE sc.calendar_id = c.id
+                        AND sc.deleted_at IS NULL
+        ),
+        '[]'::jsonb
+      ) AS users,
+
+        -- TOKENS
+        COALESCE(
+        (
+            SELECT jsonb_agg(to_jsonb(st) ORDER BY st.created_at)
+            FROM shared_tokens st
+                        WHERE st.calendar_id = c.id
+                            AND st.deleted_at IS NULL
+        ),
+        '[]'::jsonb
+        ) AS tokens,
+
+      -- INVITATIONS
+      COALESCE(
+        (
+          SELECT jsonb_agg( (to_jsonb(i) - 'id') ORDER BY i.created_at )
+          FROM invitations i
+                    WHERE i.calendar_id = c.id
+                        AND i.deleted_at IS NULL
+        ),
+        '[]'::jsonb
+      ) AS invitations
+
+        FROM calendars c
+        WHERE c.owner_uid = %s
+            AND c.deleted_at IS NULL
+    ORDER BY c.name;
+    """
+
+    try:
+        with get_connection() as conn, conn.cursor() as cursor:
+            cursor.execute(sql, (uid,))
+            rows = cursor.fetchall()
+
+        grouped = {
+            row["calendar_id"]: {
+                "calendar_name": row["calendar_name"],
+                "users": row["users"],            # jsonb list
+                "tokens": row["tokens"],          # jsonb list
+                "invitation": row["invitations"], # garde ta clé existante
+            }
+            for row in rows
+        }
+
+        return success_response(
+            message="Grouped shared data retrieved",
+            code="SHARED_GROUPED_LOAD_SUCCESS",
+            i18n_key="api.shared_calendar.grouped_data_retrieved",
+            data={"grouped": grouped},
+            log_extra={"calendar_count": len(grouped)}
+        )
+
+    except Exception as e:
+        return error_response(
+            message="Error loading grouped shared data",
+            code="SHARED_GROUPED_LOAD_ERROR",
+            i18n_key="api.shared_calendar.grouped_data_error",
+            error=str(e)
+        )
+
+
+
+@api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["GET"])
+@measure_time()
+@require_auth
+@verify_calendar_share
+@with_query_origin(default_origin="SHARED_USER_NOTIFICATIONS_ENABLED_FETCH")
+def handle_shared_user_notifications(calendar_id):
+    try:
+        
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT scs.notifications_enabled 
+                    FROM shared_calendar_settings scs 
+                    JOIN shared_calendars sc ON scs.shared_calendar_id = sc.id 
+                    WHERE sc.calendar_id = %s 
+                      AND sc.receiver_uid = %s
+                      AND sc.accepted_at IS NOT NULL
+                      AND sc.deleted_at IS NULL
+                """, (calendar_id, g.uid))
+                calendar = cursor.fetchone()
+                if not calendar:
+                    return warning_response(
+                        message="shared calendar not found",
+                        code="CALENDAR_NOT_FOUND",
+                        i18n_key="api.shared_calendar.invalid_id",
+                        status_code=404,
+                        log_extra={"calendar_id": calendar_id}
+                    )
+                notifications_enabled = calendar.get("notifications_enabled", False)
+
+        return success_response(
+            message="notifications retrieved",
+            code="SHARED_CALENDARS_NOTIFICATIONS_SUCCESS",
+            i18n_key="api.shared_calendar.notifications_retrieved",
+            data={"notifications-enabled": notifications_enabled},
+            log_extra={"calendar_id": calendar_id}
+        )
+    except Exception as e:
+        return error_response(
+            message="error retrieving notifications",
+            code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
+            i18n_key="api.shared_calendar.notifications_fetch_error",
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
+
+@api.route("/shared/users/calendars/<calendar_id>/notifications", methods=["PATCH"])
+@measure_time()
+@require_auth
+@verify_calendar_share
+@with_query_origin(default_origin="SHARED_USER_NOTIFICATIONS_ENABLED_UPDATE")
+def handle_shared_user_notifications_update(calendar_id):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                # Mise à jour directe en une seule requête
+                cursor.execute("""
+                    UPDATE shared_calendar_settings 
+                    SET notifications_enabled = NOT notifications_enabled 
+                    FROM shared_calendars sc 
+                    WHERE shared_calendar_settings.shared_calendar_id = sc.id 
+                      AND sc.calendar_id = %s
+                      AND sc.receiver_uid = %s
+                      AND sc.accepted_at IS NOT NULL
+                      AND sc.deleted_at IS NULL
+                """, (calendar_id, g.uid))
+                conn.commit()
+
+        return success_response(
+            message="Updated notifications",
+            code="SHARED_CALENDARS_NOTIFICATIONS_SUCCESS",
+            i18n_key="api.shared_calendar.notifications_retrieved",
+            log_extra={"calendar_id": calendar_id}
+        )
+    except Exception as e:
+        return error_response(
+            message="Error updating notifications",
+            code="SHARED_CALENDARS_NOTIFICATIONS_ERROR",
+            i18n_key="api.shared_calendar.notifications_fetch_error",
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
+
+@api.route("/shared/users/calendars/<calendar_id>/stock-decrement-method", methods=["GET"])
+@measure_time()
+@require_auth
+@verify_calendar_share
+@with_query_origin(default_origin="SHARED_USER_STOCK_DECREMENT_METHOD_FETCH")
+def get_shared_user_stock_decrement_method(calendar_id):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT stock_decrement_method FROM calendar_settings WHERE calendar_id = %s", (calendar_id,))
+                result = cursor.fetchone()
+                if result is None:
+                    return warning_response(
+                        message=ERROR_CALENDAR_NOT_FOUND,
+                        code="SHARED_USER_STOCK_DECREMENT_METHOD_FETCH_ERROR",
+                        status_code=404,
+                        log_extra={"calendar_id": calendar_id},
+                        i18n_key="api.shared_calendar.invalid_id"
+                    )
+                method = result.get("stock_decrement_method")
+
+        return success_response(
+            message="inventory reduction method recovered",
+            code="SHARED_USER_STOCK_DECREMENT_METHOD_FETCH_SUCCESS",
+            i18n_key="api.shared_calendar.stock_method_retrieved",
+            data={"method": method},
+            log_extra={"calendar_id": calendar_id, "method": method}
+        )
+    except Exception as e:
+        return error_response(
+            message="error during retrieval of the stock reduction method",
+            code="SHARED_USER_STOCK_DECREMENT_METHOD_FETCH_ERROR",
+            i18n_key="api.shared_calendar.stock_method_fetch_error",
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )
+        
+
+@api.route("/shared/users/calendars/<calendar_id>/schedule/negative-stock", methods=["GET"])
+@measure_time()
+@require_auth
+@verify_calendar_share
+@with_query_origin(default_origin="SHARED_USER_NEGATIVE_STOCK_TABLE_FETCH")
+def get_shared_user_negative_stock_table(calendar_id):
+    try:
+        meds_id_str = request.args.get("medsId")
+        if not meds_id_str:
+            return warning_response(
+                message="missing medsId",
+                code="SHARED_USER_NEGATIVE_STOCK_TABLE_FETCH_ERROR",
+                i18n_key="api.shared_calendar.negative_stock_table_fetch_error",
+                status_code=400,
+                log_extra={"calendar_id": calendar_id}
+            )
+        
+        meds_id = json.loads(meds_id_str)
+        if not meds_id:
+            return warning_response(
+                message="medsId is empty",
+                code="SHARED_USER_NEGATIVE_STOCK_TABLE_FETCH_ERROR",
+                i18n_key="api.shared_calendar.negative_stock_table_fetch_error",
+                status_code=400,
+                log_extra={"calendar_id": calendar_id}
+            )
+        
+        table, calendar_name = generate_table_negative_stock(calendar_id, meds_id)
+        return success_response(
+            message="negative stock table retrieved",
+            code="SHARED_USER_NEGATIVE_STOCK_TABLE_FETCH_SUCCESS",
+            i18n_key="api.shared_calendar.negative_stock_table_retrieved",
+            data={"table": table, "calendar_name": calendar_name},
+            log_extra={"calendar_id": calendar_id}
+        )
+    except Exception as e:
+        return error_response(
+            message="Error retrieving negative stock table",
+            code="SHARED_USER_NEGATIVE_STOCK_TABLE_FETCH_ERROR",
+            i18n_key="api.shared_calendar.negative_stock_table_fetch_error",
+            status_code=500,
+            error=str(e),
+            log_extra={"calendar_id": calendar_id}
+        )

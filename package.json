@@ -1,0 +1,28 @@
+{
+  "name": "meditime-monorepo",
+  "version": "0.1.0",
+  "description": "MediTime - Full-stack medication management application",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=apps/web",
+    "build": "npm run build --workspace=apps/web",
+    "preview": "npm run preview --workspace=apps/web",
+    "i18n:sync": "node scripts/i18n/run.js",
+    "i18n:sync:dry": "node scripts/i18n/run.js --dry-run",
+    "lint": "npm run lint --workspace=apps/web",
+    "type-check": "npm run type-check --workspace=apps/web"
+  },
+  "dependencies": {
+    "@google-cloud/translate": "^9.3.0",
+    "dotenv": "^17.0.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=10.0.0"
+  }
+}

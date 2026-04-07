@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@meditime/config": ["../../packages/config/src/index.ts"],
+      "@meditime/config/*": ["../../packages/config/src/*"],
+      "@meditime/i18n": ["../../packages/i18n/src/index.ts"],
+      "@meditime/i18n/*": ["../../packages/i18n/src/*"],
+      "@meditime/utils": ["../../packages/utils/src/index.ts"],
+      "@meditime/utils/*": ["../../packages/utils/src/*"]
+    }
+  },
+  "include": ["src"]
+}

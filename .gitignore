@@ -23,7 +23,7 @@ yarn-debug.log*
 yarn-error.log*
 
 node_modules
-backend/__pycache__
+apps/backend/__pycache__
 tests
 .env
 .env.dev
@@ -31,11 +31,14 @@ tests
 serviceAccountKey.json
 .venv/
 *.log
-backend/pils.json
-frontend/src/pages/SharedCalendar.jsx
-frontend/src/styles/test.scss
+apps/backend/pils.json
+apps/web/src/pages/SharedCalendar.jsx
+apps/web/src/styles/test.scss
 
 __pycache__/
-backend/app/test/
-frontend/massReplace.js
-frontend/src/test/
+apps/backend/app/test/
+apps/web/massReplace.js
+apps/web/src/test/
+
+dist/
+.vercel
