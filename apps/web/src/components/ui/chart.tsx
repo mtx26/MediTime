@@ -359,7 +359,7 @@ function getPayloadConfigFromPayload(
     ] as string
   }
 
-  return Object.hasOwn(config, configLabelKey) ? config[configLabelKey] : config[key]
+  return configLabelKey in config ? config[configLabelKey] : config[key]
 }
 
 export {
