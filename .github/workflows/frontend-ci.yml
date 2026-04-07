@@ -3,10 +3,12 @@ name: Frontend CI
 on:
   push:
     paths:
-      - 'frontend/**'
+      - 'apps/web/**'
+      - 'packages/**'
   pull_request:
     paths:
-      - 'frontend/**'
+      - 'apps/web/**'
+      - 'packages/**'
 
 permissions:
   contents: read
@@ -16,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend
+        working-directory: .
 
     steps:
       - uses: actions/checkout@v3
@@ -24,13 +26,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm install
 
       - name: Lint the code
-        run: npm run lint || echo "No linter configured"
+        run: npm run lint --workspace=apps/web || echo "No linter configured"
 
-      - name: Build the app (if applicable)
-        run: npm run build || echo "No build script defined"
+      - name: Build the app
+        run: npm run build --workspace=apps/web
