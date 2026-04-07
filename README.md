@@ -197,9 +197,11 @@ The frontend (`apps/web`) is deployed on [Vercel](https://vercel.com/). The `ver
 All environment variables (`VITE_*`) must also be added in *Settings → Environment Variables*.
 
 > **Important – monorepo notes:**
-> - The repository uses **npm workspaces**. There must be only **one** `package-lock.json` at the repository root. Never commit a separate `package-lock.json` inside `apps/web/`.
-> - The `package-lock.json` is generated on Linux so it includes the correct platform-specific native binaries (e.g. `@rollup/rollup-linux-x64-gnu`). If you regenerate it on Windows, delete it and let Vercel (or a Linux/macOS environment) recreate it.
-> - The `.nvmrc` file pins Node **22** and the `engines` field in `package.json` requires `>=22.12.0`. Vercel detects both and uses Node 22 automatically.
+>
+> * The repository uses **npm workspaces**. There must be only **one** `package-lock.json` at the repository root. Never commit a separate `package-lock.json` inside `apps/web/`.
+> * The `package-lock.json` is generated on Linux so it includes the correct platform-specific native binaries (e.g. `@rollup/rollup-linux-x64-gnu`). If you regenerate it on Windows, delete it and let Vercel (or a Linux/macOS environment) recreate it.
+> * The `.nvmrc` file pins Node **22** and the `engines` field in `package.json` requires `>=22.12.0`. Vercel detects both and uses Node 22 automatically.
+>
 
 ### Backend – Portainer / CapRover
 
