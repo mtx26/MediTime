@@ -53,3 +53,22 @@ export interface QRCodeScannerHandle {
   handleAddAll: () => Promise<void>;
 }
 
+// ─── Medicine Review ─────────────────────────────────────────────────────────
+
+export type SaveAnalysisResultResult = ApiResult & {
+  calendar_id?: string;
+};
+
+export interface MedicineReviewPersonalCalendars {
+  saveAnalysisResult: (calendarName: string, boxes: MedicineReviewMedicineInput[]) => Promise<SaveAnalysisResultResult>;
+}
+
+export interface MedicineReviewProps {
+  personalCalendars: MedicineReviewPersonalCalendars;
+}
+
+export interface MedicineReviewLocationState {
+  importedMedicines?: MedicineReviewMedicineInput[];
+  calendarName?: string;
+}
+

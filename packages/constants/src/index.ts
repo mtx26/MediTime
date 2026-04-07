@@ -1,6 +1,6 @@
 import { fr, enUS, es, de, it, ja, zhCN, ptBR, ru } from 'date-fns/locale';
 import type { Locale as DateLocale } from 'date-fns';
-import type { Language } from '@meditime/types';
+import type { Language, MedicineReviewConditionInput } from '@meditime/types';
 import * as Flags from 'country-flag-icons/react/3x2';
 
 // ============================================================================
@@ -20,12 +20,12 @@ export const PILL_COUNT = {
 // 💊 Medicine Defaults
 // ============================================================================
 
-export const DEFAULT_CONDITION = {
-  time_of_day: '',
+export const DEFAULT_CONDITION: MedicineReviewConditionInput = {
+  time_of_day: undefined,
   interval_days: '',
   start_date: '',
   tablet_count: '',
-  max_date_mode: '',
+  max_date_mode: undefined,
   max_date: null,
   max_date_days: null,
 };

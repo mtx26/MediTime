@@ -19,19 +19,13 @@ function pushSep(actions: ActionItem[]) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Personal calendar actions (unified)                                */
+/* Shared calendar actions builder                                    */
 /* ------------------------------------------------------------------ */
 
-/**
- * Builds the full, unified action list for a **personal** calendar.
- *
- * Pass `exclude` to remove actions that are not relevant in a given
- * view (e.g. exclude `'medicines'` when already on the Boxes page).
- */
-export function buildPersonalCalendarActions(
+function buildCalendarActionsBase(
   ctx: CalendarActionContext,
-  handlers: CalendarActionHandlers,
-  exclude: string[] = [],
+  handlers: Partial<CalendarActionHandlers>,
+  exclude: string[],
 ): ActionItem[] {
   const { calendarId, lng, basePath, selectedDate } = ctx;
   const actions: ActionItem[] = [];
@@ -151,6 +145,24 @@ export function buildPersonalCalendarActions(
 }
 
 /* ------------------------------------------------------------------ */
+/* Personal calendar actions (unified)                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Builds the full, unified action list for a **personal** calendar.
+ *
+ * Pass `exclude` to remove actions that are not relevant in a given
+ * view (e.g. exclude `'medicines'` when already on the Boxes page).
+ */
+export function buildPersonalCalendarActions(
+  ctx: CalendarActionContext,
+  handlers: CalendarActionHandlers,
+  exclude: string[] = [],
+): ActionItem[] {
+  return buildCalendarActionsBase(ctx, handlers, exclude);
+}
+
+/* ------------------------------------------------------------------ */
 /* Shared-user calendar actions (unified)                             */
 /* ------------------------------------------------------------------ */
 
@@ -164,98 +176,5 @@ export function buildSharedCalendarActions(
   handlers: Omit<CalendarActionHandlers, 'onRename'>,
   exclude: string[] = [],
 ): ActionItem[] {
-  const { calendarId, lng, basePath, selectedDate } = ctx;
-  const actions: ActionItem[] = [];
-
-  const add = (a: ActionItem) => {
-    if ('separator' in a) {
-      pushSep(actions);
-      return;
-    }
-    if (!exclude.includes(a.id)) actions.push(a);
-  };
-
-  // ── View toggles ──────────────────────────────────────────────────
-  add({
-    id: 'pillbox',
-    icon: 'grid-3x3',
-    labelKey: 'pillbox.title',
-    titleKey: 'pillbox.title',
-    linkTo: `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate || new Date())}`,
-  });
-  add({
-    id: 'day_view',
-    icon: 'calendar-days',
-    labelKey: 'day_view.title',
-    titleKey: 'day_view.title',
-    linkTo: `/${lng}/${basePath}/${calendarId}/daily?date=${toISO(new Date(new Date().setHours(0, 0, 0, 0)))}`,
-  });
-
-  add({ separator: true });
-
-  // ── Content actions ───────────────────────────────────────────────
-  add({
-    id: 'medicines',
-    icon: 'pill',
-    labelKey: 'medicines.label',
-    titleKey: 'medicines.label',
-    linkTo: `/${lng}/${basePath}/${calendarId}/boxes`,
-  });
-  add({
-    id: 'export_pdf',
-    icon: 'download',
-    labelKey: 'boxes.export_pdf',
-    titleKey: 'boxes.export_pdf',
-    onClick: handlers.onExportPdf,
-    dataTour: 'export-pdf-btn',
-  });
-  add({
-    id: 'stock_alerts',
-    icon: 'alert-triangle',
-    labelKey: 'stock',
-    titleKey: 'stock',
-    linkTo: `/${lng}/${basePath}/${calendarId}/stock-alerts`,
-    dataTour: 'stock-alerts-btn',
-  });
-  add({
-    id: 'ics_calendar',
-    icon: 'calendar',
-    labelKey: 'ics.calendar_ics',
-    titleKey: 'ics.calendar_ics',
-    linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
-  });
-  add({
-    id: 'pillbox_history',
-    icon: 'clock',
-    labelKey: 'pillbox_uses',
-    titleKey: 'pillbox_uses',
-    linkTo: `/${lng}/${basePath}/${calendarId}/pillbox-uses`,
-    dataTour: 'pillbox-history-btn',
-  });
-
-  add({ separator: true });
-
-  // ── Settings ──────────────────────────────────────────────────────
-  add({
-    id: 'settings',
-    icon: 'settings',
-    labelKey: 'settings.label',
-    titleKey: 'settings.label',
-    linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
-    dataTour: 'calendar-settings-btn',
-  });
-
-  add({ separator: true });
-
-  // ── Danger zone ───────────────────────────────────────────────────
-  add({
-    id: 'delete',
-    icon: 'trash-2',
-    labelKey: 'delete',
-    titleKey: 'delete',
-    onClick: handlers.onDelete,
-    danger: true,
-  });
-
-  return actions;
+  return buildCalendarActionsBase(ctx, handlers, [...exclude, 'share', 'rename']);
 }

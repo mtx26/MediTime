@@ -63,7 +63,7 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
       return;
     }
     const updated = [...medicines];
-    (updated[index] as Record<string, unknown>)[field] = value ?? '';
+    (updated[index] as unknown as Record<string, unknown>)[field] = value ?? '';
     setMedicines(updated);
   };
 
@@ -73,7 +73,7 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
     }
     const updated = [...medicines];
     const currentCondition = (updated[index].conditions[i] ?? {}) as MedicineReviewConditionInput;
-    updated[index].conditions[i] = applyConditionFieldSideEffects(currentCondition, field, value);
+    updated[index].conditions[i] = applyConditionFieldSideEffects(currentCondition, field as keyof MedicineReviewConditionInput, value);
     setMedicines(updated);
   };
 
@@ -171,7 +171,7 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
     }
 
     const timeout = setTimeout(async () => {
-      const results = await fetchSuggestions(current.name, current.dose || '');
+      const results = await fetchSuggestions(current.name, typeof current.dose === 'number' ? current.dose : null);
       setSuggestions((results || []).filter(isMedicineSuggestion));
     }, 300);
 
@@ -299,7 +299,7 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
                   <Input
                     id={field}
                     type={type}
-                    value={String((current as Record<string, unknown>)[field] ?? '')}
+                    value={String((current as unknown as Record<string, unknown>)[field] ?? '')}
                     onChange={(e) => handleChange(field, e.target.value)}
                     title={label}
                     aria-label={label}
@@ -389,7 +389,7 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
                           variant="outline"
                           size="sm"
                           className="w-full justify-start"
-                          onClick={() => setOpenDropdownKey(`${i}:${field}:${cond[field] || ''}:${Date.now()}`)}
+                          onClick={() => setOpenDropdownKey(`${i}:${field}:${(cond as unknown as Record<string, unknown>)[field] || ''}:${Date.now()}`)}
                           aria-label={label}
                         >
                           {(Object.hasOwn(cond, field) && typeof (cond as Record<string, unknown>)[field] === 'string'

@@ -2,6 +2,7 @@ import { useContext, useCallback, type Dispatch, type SetStateAction } from 'rea
 import { UserContext } from '../../contexts/UserContext';
 import { log, getErrorMessage } from '@meditime/utils';
 import { supabase } from '../../services/supabase/supabaseClient';
+import { logAnalyticsEvent } from '../../services/firebase/logAnalyticsEvent';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 import type { LoadingStates, TokenItem, TokensResponse, UserContextValue } from '@meditime/types';
 
@@ -34,18 +35,7 @@ export const useRealtimeTokens = (
       setTokensList(data.tokens);
       setLoadingStates((prev: LoadingStates) => ({ ...prev, tokens: false }));
 
-      const [{ analyticsPromise }, { logEvent }] = await Promise.all([
-        import('../../services/firebase/firebase'),
-        import('firebase/analytics'),
-      ]);
-      analyticsPromise.then((analytics: unknown) => {
-        if (analytics) {
-          (logEvent as (instance: unknown, name: string, params?: Record<string, unknown>) => void)(analytics, 'fetch_tokens', {
-            uid,
-            count: data.tokens?.length,
-          });
-        }
-      });
+      void logAnalyticsEvent('fetch_tokens', { uid, count: data.tokens?.length });
 
       log.info(data.message || 'Tokens synchronises', {
         origin: 'REALTIME_TOKENS_FETCH',

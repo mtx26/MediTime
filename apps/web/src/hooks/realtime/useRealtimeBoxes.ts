@@ -2,6 +2,7 @@ import { useEffect, useContext, useCallback, type Dispatch, type SetStateAction 
 import { supabase } from '../../services/supabase/supabaseClient';
 import { UserContext } from '../../contexts/UserContext';
 import { log, getErrorMessage } from '@meditime/utils';
+import { logAnalyticsEvent } from '../../services/firebase/logAnalyticsEvent';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 import type { BoxItem, BoxesResponse, SourceType, UserContextValue } from '@meditime/types';
 
@@ -63,19 +64,7 @@ const fetchBoxes = async ({
         ? 'REALTIME_PERSONAL_CALENDAR_BOXES'
         : 'REALTIME_SHARED_CALENDAR_BOXES';
 
-    const [{ analyticsPromise }, { logEvent }] = await Promise.all([
-      import('../../services/firebase/firebase'),
-      import('firebase/analytics'),
-    ]);
-    void analyticsPromise.then((analytics: unknown) => {
-      if (analytics) {
-        (logEvent as (instance: unknown, name: string, params?: Record<string, unknown>) => void)(analytics, eventName, {
-          uid,
-          count: data.boxes.length,
-          calendarId,
-        });
-      }
-    });
+    void logAnalyticsEvent(eventName, { uid, count: data.boxes.length, calendarId });
 
     log.info(data.message || 'Boites synchronisees', {
       origin: logOrigin,

@@ -9,7 +9,7 @@ export interface SharedInvitation {
 
 export type SharedInvitationResult = ApiResult & {
   invitation?: SharedInvitation;
-  status?: number;
+  status?: number | null;
 };
 
 export type SharedInvitationActionResult = ApiResult & {

@@ -504,6 +504,13 @@ const QRCodeScanner = forwardRef<QRCodeScannerHandle, QRCodeScannerProps>(({
     if (loadingGtin === gtin || (Object.prototype.hasOwnProperty.call(medicines, gtin) && gtins.includes(gtin))) return;
     
     setLoadingGtin(gtin);
+    const setMedicineEntry = (key: string, value: unknown) => {
+      setMedicines(prev => {
+        const updated = Object.assign(Object.create(null), prev);
+        Object.defineProperty(updated, key, { value, enumerable: true, configurable: true, writable: true });
+        return updated;
+      });
+    };
     try {
       const results = await fetchMedicaments(gtin);
       if (results && results.length > 0) {
@@ -525,30 +532,18 @@ const QRCodeScanner = forwardRef<QRCodeScannerHandle, QRCodeScannerProps>(({
           original_data: medicineData
         };
 
-    setMedicines(prev => {
-      const updated = Object.assign(Object.create(null), prev);
-      Object.defineProperty(updated, gtin, { value: medicineBox, enumerable: true, configurable: true, writable: true });
-      return updated;
-    });
+        setMedicineEntry(gtin, medicineBox);
         
         // Callback optionnel pour notifier le parent
         if (onMedicineFound) {
           onMedicineFound(medicineBox);
         }
       } else {
-        setMedicines(prev => {
-          const updated = Object.assign(Object.create(null), prev);
-          Object.defineProperty(updated, gtin, { value: null, enumerable: true, configurable: true, writable: true });
-          return updated;
-        }); // Aucun résultat trouvé
+        setMedicineEntry(gtin, null); // Aucun résultat trouvé
       }
     } catch (error) {
       console.error("Erreur lors de la recherche du médicament:", error);
-      setMedicines(prev => {
-        const updated = Object.assign(Object.create(null), prev);
-        Object.defineProperty(updated, gtin, { value: null, enumerable: true, configurable: true, writable: true });
-        return updated;
-      });
+      setMedicineEntry(gtin, null);
     } finally {
       setLoadingGtin(null);
     }

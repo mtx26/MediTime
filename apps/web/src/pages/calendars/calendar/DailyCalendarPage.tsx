@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
@@ -10,8 +10,8 @@ import { useTranslation } from 'react-i18next';
 import { Alert } from '@/components/ui/alert';
 import { AlertTriangle, ChevronRight } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
+import { useFilteredEventsForDay, useCalendarDayNavigation } from '@/hooks/useCalendarNavigation';
 import type {
-  CalendarPageSourceType,
   CalendarScheduleSource,
   DailyCalendarPageProps,
   WeeklyEventItem,
@@ -73,7 +73,7 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
     // Fonction pour naviguer vers la semaine suivante ou precedente
     // accepte un second argument optionnel `desiredSelectedDate` (ISO string)
     // pour préserver le jour sélectionné lors du changement de semaine.
-    const onWeekSelect = async (newSelectedDate: Date) => {
+    const onWeekSelect = useCallback(async (newSelectedDate: Date) => {
       onSelectDate(newSelectedDate);
       const isoDate = toISO(newSelectedDate);
       const rep = await calendarSource.fetchSchedule(calendarId, isoDate);
@@ -81,23 +81,9 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
         setCalendarEvents((rep.schedule as WeeklyEventItem[]) || []);
         setCalendarTable(rep.table || {});
       }
-    };
+    }, [calendarId, calendarSource, onSelectDate]);
   
-    // Fonction pour naviguer vers la date suivante ou precedente
-    const navigateDay = (direction: number) => {
-      if (!selectedDate) return;
-      const current = new Date(selectedDate);
-      current.setDate(current.getDate() + direction);
-      setSelectedDate(current);
-    };
-  
-    const navigateWeek = (direction: number) => {
-      if (!selectedDate) return;
-      const current = new Date(selectedDate);
-      current.setDate(current.getDate() + direction);
-      const newSelectedDate = current;
-      void onWeekSelect(newSelectedDate);
-    };
+    const { navigateDay, navigateWeek } = useCalendarDayNavigation(selectedDate, setSelectedDate, onWeekSelect);
   
     // Fonction pour charger le calendrier lorsque l'utilisateur est connecté ou que le calendrier est un token
     useEffect(() => {
@@ -134,22 +120,7 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
       void load();
     }, [calendarId, calendarEvents, calendarSource, calendarTable, isLowStock, userInfo, selectedDate]);
 
-    useEffect(() => {
-      if (!selectedDate || !calendarEvents.length) return;
-      // Copier avant de trier pour éviter de muter le tableau d'état `calendarEvents`
-      const sortedEvents = [...calendarEvents].sort((a, b) => {
-        const dateA = new Date(a.start);
-        const dateB = new Date(b.start);
-        if (dateA.getTime() === dateB.getTime()) {
-          return a.title.localeCompare(b.title);
-        }
-        return dateA.getTime() - dateB.getTime();
-      });
-      const filtered = sortedEvents.filter((event) =>
-        event.start.startsWith(toISO(selectedDate))
-      );
-      setEventsForDay(filtered);
-    }, [selectedDate, calendarEvents]);
+    useFilteredEventsForDay(selectedDate, calendarEvents, setEventsForDay);
 
   const { showLoading } = useLoading();
 

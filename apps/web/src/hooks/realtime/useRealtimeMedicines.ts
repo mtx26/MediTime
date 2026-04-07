@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { log, getErrorMessage } from '@meditime/utils';
+import { logAnalyticsEvent } from '../../services/firebase/logAnalyticsEvent';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 import type { MedicineItem, MedicinesResponse } from '@meditime/types';
 
@@ -23,17 +24,7 @@ const fetchTokenMedicines = async (
     setMedicinesData(sorted);
     setLoadingMedicines(true);
 
-    const [{ analyticsPromise }, { logEvent }] = await Promise.all([
-      import('../../services/firebase/firebase'),
-      import('firebase/analytics'),
-    ]);
-    analyticsPromise.then((analytics: unknown) => {
-      if (analytics) {
-        (logEvent as (instance: unknown, name: string, params?: Record<string, unknown>) => void)(analytics, 'fetch_token_calendar_medicines', {
-          count: data.medicines.length,
-        });
-      }
-    });
+    void logAnalyticsEvent('fetch_token_calendar_medicines', { count: data.medicines.length });
 
     log.info(data.message || 'Medicaments synchronises', {
       origin: 'REALTIME_TOKEN_MEDICINES',

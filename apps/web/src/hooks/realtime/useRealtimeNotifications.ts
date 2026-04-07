@@ -2,6 +2,7 @@ import { useContext, useCallback, type Dispatch, type SetStateAction } from 'rea
 import { UserContext } from '../../contexts/UserContext';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { log, getErrorMessage } from '@meditime/utils';
+import { logAnalyticsEvent } from '../../services/firebase/logAnalyticsEvent';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 import type { LoadingStates, NotificationItem, NotificationsResponse, UserContextValue } from '@meditime/types';
 
@@ -38,18 +39,7 @@ const fetchNotifications = async (
     setNotificationsData(sortedNotifications);
     setLoadingStates((prev: LoadingStates) => ({ ...prev, notifications: false }));
 
-    const [{ analyticsPromise }, { logEvent }] = await Promise.all([
-      import('../../services/firebase/firebase'),
-      import('firebase/analytics'),
-    ]);
-    analyticsPromise.then((analytics: unknown) => {
-      if (analytics) {
-        (logEvent as (instance: unknown, name: string, params?: Record<string, unknown>) => void)(analytics, 'fetch_notifications', {
-          uid,
-          count: data.notifications?.length,
-        });
-      }
-    });
+    void logAnalyticsEvent('fetch_notifications', { uid, count: data.notifications?.length });
 
     log.info(data.message || 'Notifications synchronisees', {
       origin: 'REALTIME_NOTIFICATIONS_FETCH',

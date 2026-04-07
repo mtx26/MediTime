@@ -77,10 +77,7 @@ function PillboxContent({
     setSelectedMedIndex((prev) => (prev > 0 ? prev - 1 : 0));
   };
 
-  const getSchedule = async () => {
-    if (!calendarId) return;
-    setLoading(undefined);
-    const rep = await calendarSource.fetchSchedule(calendarId, toISO(selectedDate as Date));
+  const handleScheduleResponse = (rep: { success?: boolean; status?: number; table?: unknown }) => {
     if (rep.success && !isEqual(rep.table, calendarTable)) {
       setCalendarTable(rep.table as PillboxTable);
     } else if (rep.status === 404) {
@@ -89,16 +86,18 @@ function PillboxContent({
     setLoading(rep.success);
   };
 
+  const getSchedule = async () => {
+    if (!calendarId) return;
+    setLoading(undefined);
+    const rep = await calendarSource.fetchSchedule(calendarId, toISO(selectedDate as Date));
+    handleScheduleResponse(rep);
+  };
+
   const getScheduleNegativeStock = async () => {
     if (!calendarId) return;
     setLoading(undefined);
     const rep = await calendarSource.fetchScheduleNegativeStock(calendarId, medsId);
-    if (rep.success && !isEqual(rep.table, calendarTable)) {
-      setCalendarTable(rep.table as PillboxTable);
-    } else if (rep.status === 404) {
-      setNotFound(true);
-    }
-    setLoading(rep.success);
+    handleScheduleResponse(rep);
   };
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 import { useContext, useCallback, useMemo, type Dispatch, type SetStateAction } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { log, getErrorMessage } from '@meditime/utils';
+import { logAnalyticsEvent } from '../../services/firebase/logAnalyticsEvent';
 import { UserContext } from '../../contexts/UserContext';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
 import type { CalendarItem, CalendarsResponse, LoadingStates, UserContextValue } from '@meditime/types';
@@ -34,18 +35,7 @@ const fetchCalendars = async (uid: string, setCalendarsData: SetUnknown, setLoad
     setCalendarsData(calendars as unknown);
     setLoadingStates((prev: LoadingStates) => ({ ...prev, calendars: false }));
 
-    const [{ analyticsPromise }, { logEvent }] = await Promise.all([
-      import('../../services/firebase/firebase'),
-      import('firebase/analytics'),
-    ]);
-    analyticsPromise.then((analytics: unknown) => {
-      if (analytics) {
-        (logEvent as (instance: unknown, name: string, params?: Record<string, unknown>) => void)(analytics, 'fetch_calendars', {
-          uid,
-          count: calendars.length,
-        });
-      }
-    });
+    void logAnalyticsEvent('fetch_calendars', { uid, count: calendars.length });
 
     log.info(data.message || 'Calendriers synchronises', {
       origin: 'REALTIME_CALENDAR_FETCH',
@@ -88,18 +78,7 @@ const fetchSharedCalendars = async (
     setSharedCalendarsData((data.calendars || []) as unknown);
     setLoadingStates((prev: LoadingStates) => ({ ...prev, sharedCalendars: false }));
 
-    const [{ analyticsPromise }, { logEvent }] = await Promise.all([
-      import('../../services/firebase/firebase'),
-      import('firebase/analytics'),
-    ]);
-    analyticsPromise.then((analytics: unknown) => {
-      if (analytics) {
-        (logEvent as (instance: unknown, name: string, params?: Record<string, unknown>) => void)(analytics, 'fetch_shared_calendars', {
-          uid,
-          count: data.calendars?.length,
-        });
-      }
-    });
+    void logAnalyticsEvent('fetch_shared_calendars', { uid, count: data.calendars?.length });
 
     log.info(data.message || 'Calendriers partages synchronises', {
       origin: 'REALTIME_SHARED_CALENDARS_FETCH',

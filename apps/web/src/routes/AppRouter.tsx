@@ -83,6 +83,77 @@ function RouteWithLoader({ element, isLoading }: { element: ReactElement; isLoad
   return element;
 }
 
+function PrivateCalendarSubRoutes({ sharedProps, isInitialLoading }: { sharedProps: AppSharedProps; isInitialLoading: boolean }): ReactElement {
+  return (
+    <>
+      <Route
+        index
+        element={
+          <PrivateRoute
+            element={<RouteWithLoader element={<CalendarView {...sharedProps} />} isLoading={isInitialLoading} />}
+          />
+        }
+      />
+      <Route
+        path="boxes"
+        element={
+          <PrivateRoute
+            element={<RouteWithLoader element={<BoxesView {...sharedProps} />} isLoading={isInitialLoading} />}
+          />
+        }
+      />
+      <Route
+        path="pillbox"
+        element={
+          <PrivateRoute
+            element={<RouteWithLoader element={<PillboxPage {...sharedProps} />} isLoading={isInitialLoading} />}
+          />
+        }
+      />
+      <Route
+        path="daily"
+        element={
+          <PrivateRoute
+            element={<RouteWithLoader element={<DailyCalendarPage {...sharedProps} />} isLoading={isInitialLoading} />}
+          />
+        }
+      />
+      <Route
+        path="settings"
+        element={
+          <PrivateRoute
+            element={<RouteWithLoader element={<CalendarSettingsPage {...sharedProps} />} isLoading={isInitialLoading} />}
+          />
+        }
+      />
+      <Route
+        path="stock-alerts"
+        element={
+          <PrivateRoute
+            element={<RouteWithLoader element={<StockAlertsPage {...sharedProps} />} isLoading={isInitialLoading} />}
+          />
+        }
+      />
+      <Route
+        path="pillbox-uses"
+        element={
+          <PrivateRoute
+            element={<RouteWithLoader element={<PillboxUses {...sharedProps} />} isLoading={isInitialLoading} />}
+          />
+        }
+      />
+      <Route
+        path="ics-tokens"
+        element={
+          <PrivateRoute
+            element={<RouteWithLoader element={<IcsList {...sharedProps} />} isLoading={isInitialLoading} />}
+          />
+        }
+      />
+    </>
+  );
+}
+
 export default function AppRoutes({ sharedProps }: { sharedProps: AppSharedProps }): ReactElement {
   const context = useContext(UserContext) as unknown as { userInfo?: unknown | null } | null;
   const userInfo = context?.userInfo || null;
@@ -130,70 +201,7 @@ export default function AppRoutes({ sharedProps }: { sharedProps: AppSharedProps
         </Route>
 
         <Route path="calendar/:calendarId">
-          <Route
-            index
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<CalendarView {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="boxes"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<BoxesView {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="pillbox"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<PillboxPage {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="daily"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<DailyCalendarPage {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="settings"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<CalendarSettingsPage {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="stock-alerts"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<StockAlertsPage {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="pillbox-uses"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<PillboxUses {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="ics-tokens"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<IcsList {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
+          {PrivateCalendarSubRoutes({ sharedProps, isInitialLoading })}
         </Route>
 
         <Route
@@ -206,70 +214,7 @@ export default function AppRoutes({ sharedProps }: { sharedProps: AppSharedProps
         />
 
         <Route path="shared-user-calendar/:calendarId">
-          <Route
-            index
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<CalendarView {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="boxes"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<BoxesView {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="pillbox"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<PillboxPage {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="daily"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<DailyCalendarPage {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="settings"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<CalendarSettingsPage {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="stock-alerts"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<StockAlertsPage {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="pillbox-uses"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<PillboxUses {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
-          <Route
-            path="ics-tokens"
-            element={
-              <PrivateRoute
-                element={<RouteWithLoader element={<IcsList {...sharedProps} />} isLoading={isInitialLoading} />}
-              />
-            }
-          />
+          {PrivateCalendarSubRoutes({ sharedProps, isInitialLoading })}
         </Route>
 
         <Route path="shared-token-calendar/:sharedToken">

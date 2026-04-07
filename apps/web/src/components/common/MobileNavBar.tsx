@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, type CSSProperties } from 'react';
+import { useContext, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +7,35 @@ import { computeMobileBottomOffset } from '@meditime/utils';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Calendar, Share2, Bell, User } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
+const ICON_BASE = 'mb-1 shrink-0 text-muted-foreground group-hover:text-primary !size-[36px]';
+const ICON_STYLE: CSSProperties = { width: 36, height: 36, flexShrink: 0 };
+const ITEM_BASE = 'inline-flex flex-col items-center justify-center h-full px-7 hover:bg-accent/50 group';
+
+function NavItem({ to, label, icon: Icon, isActive, customIcon }: {
+  to: string;
+  label: string;
+  icon?: LucideIcon;
+  isActive: boolean;
+  customIcon?: ReactNode;
+}) {
+  return (
+    <Button variant="ghost" asChild className={ITEM_BASE}>
+      <Link
+        to={to}
+        className={isActive ? 'bg-secondary rounded-xl' : ''}
+        aria-current={isActive ? 'page' : undefined}
+        aria-label={label}
+      >
+        {customIcon ?? (
+          Icon && <Icon className={`${ICON_BASE} ${isActive ? 'text-primary' : ''}`} style={ICON_STYLE} />
+        )}
+        <span className="sr-only">{label}</span>
+      </Link>
+    </Button>
+  );
+}
 
 function MobileNavBar() {
   const { lng = 'en' } = useParams();
@@ -41,9 +70,9 @@ function MobileNavBar() {
   }, []);
 
   const isActive = (path: string): boolean => location.pathname.startsWith(path);
-  const itemBase = 'inline-flex flex-col items-center justify-center h-full px-7 hover:bg-accent/50 group';
-  const iconBase = 'mb-1 shrink-0 text-muted-foreground group-hover:text-primary !size-[36px]';
-  const iconStyle: CSSProperties = { width: 36, height: 36, flexShrink: 0 };
+
+  const settingsPath = `/${lng}/settings`;
+  const settingsActive = isActive(settingsPath);
 
   const nav = (
     <nav
@@ -52,86 +81,26 @@ function MobileNavBar() {
     >
       <div className="w-[min(100vw-8px,40rem)] mx-auto px-2">
         <div className="grid h-20 grid-cols-4 bg-background border rounded-2xl shadow-lg font-medium">
-        <Button variant="ghost" asChild className={itemBase}>
-          {(() => {
-            const path = `/${lng}/calendars`;
-            const active = isActive(path);
-            return (
-              <Link
-                to={path}
-                className={active ? 'bg-secondary rounded-xl' : ''}
-                aria-current={active ? 'page' : undefined}
-                aria-label={t('calendars')}
-              >
-                <Calendar className={`${iconBase} ${active ? 'text-primary' : ''}`} style={iconStyle} />
-                <span className="sr-only">{t('calendars')}</span>
-              </Link>
-            );
-          })()}
-        </Button>
-
-        <Button variant="ghost" asChild className={itemBase}>
-          {(() => {
-            const path = `/${lng}/shared-calendars`;
-            const active = isActive(path);
-            return (
-              <Link
-                to={path}
-                className={active ? 'bg-secondary rounded-xl' : ''}
-                aria-current={active ? 'page' : undefined}
-                aria-label={t('shared')}
-              >
-                <Share2 className={`${iconBase} ${active ? 'text-primary' : ''}`} style={iconStyle} />
-                <span className="sr-only">{t('shared')}</span>
-              </Link>
-            );
-          })()}
-        </Button>
-
-        <Button variant="ghost" asChild className={itemBase}>
-          {(() => {
-            const path = `/${lng}/notifications`;
-            const active = isActive(path);
-            return (
-              <Link
-                to={path}
-                className={active ? 'bg-secondary rounded-xl' : ''}
-                aria-current={active ? 'page' : undefined}
-                aria-label={t('notification.label')}
-              >
-                <Bell className={`${iconBase} ${active ? 'text-primary' : ''}`} style={iconStyle} />
-                <span className="sr-only">{t('notification.label')}</span>
-              </Link>
-            );
-          })()}
-        </Button>
-
-        <Button variant="ghost" asChild className={itemBase}>
-          {(() => {
-            const path = `/${lng}/settings`;
-            const active = isActive(path);
-            return (
-              <Link
-                to={path}
-                className={active ? 'bg-secondary rounded-xl' : ''}
-                aria-current={active ? 'page' : undefined}
-                aria-label={t('settings.label')}
-              >
-                {userInfo ? (
-                  <Avatar className="w-10 h-10 mb-1">
-                    <AvatarImage src={userInfo.photoUrl || undefined} alt={userInfo.displayName || t('user')} referrerPolicy="no-referrer" />
-                    <AvatarFallback>
-                      <User/>
-                    </AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <User className={`${iconBase} ${active ? 'text-primary' : ''}`} style={iconStyle} />
-                )}
-                <span className="sr-only">{t('settings.label')}</span>
-              </Link>
-            );
-          })()}
-        </Button>
+        <NavItem to={`/${lng}/calendars`} label={t('calendars')} icon={Calendar} isActive={isActive(`/${lng}/calendars`)} />
+        <NavItem to={`/${lng}/shared-calendars`} label={t('shared')} icon={Share2} isActive={isActive(`/${lng}/shared-calendars`)} />
+        <NavItem to={`/${lng}/notifications`} label={t('notification.label')} icon={Bell} isActive={isActive(`/${lng}/notifications`)} />
+        <NavItem
+          to={settingsPath}
+          label={t('settings.label')}
+          isActive={settingsActive}
+          customIcon={
+            userInfo ? (
+              <Avatar className="w-10 h-10 mb-1">
+                <AvatarImage src={userInfo.photoUrl || undefined} alt={userInfo.displayName || t('user')} referrerPolicy="no-referrer" />
+                <AvatarFallback>
+                  <User/>
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <User className={`${ICON_BASE} ${settingsActive ? 'text-primary' : ''}`} style={ICON_STYLE} />
+            )
+          }
+        />
         </div>
       </div>
     </nav>

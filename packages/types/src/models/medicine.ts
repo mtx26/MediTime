@@ -7,7 +7,7 @@ export interface MedicineReviewConditionInput {
   interval_days?: number | string;
   start_date?: string | null;
   tablet_count?: number | string;
-  max_date_mode?: 'date' | 'days' | 'none';
+  max_date_mode?: 'until_date' | 'for_days' | 'none';
   max_date?: string | null;
   max_date_days?: number | string | null;
 }

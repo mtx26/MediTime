@@ -10,6 +10,7 @@ import { useLoading } from '@/components/ui/loading';
 import { toISO, getCalendarSourceMap, buildPersonalCalendarActions, buildSharedCalendarActions, detectCalendarType } from '@meditime/utils';
 import { useAlert } from '@/contexts/AlertContext';
 import { toActionSheetItems } from '@/utils/actionSheetAdapter';
+import { useFilteredEventsForDay } from '@/hooks/useCalendarNavigation';
 import DateModal from '@/components/calendar/DateModal';
 import WeekCalendarSelector from '@/components/calendar/WeekCalendarSelector';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
@@ -212,22 +213,7 @@ function CalendarPage({
 
 
   // 📍 Filtrage des événements pour un jour spécifique et tri par ordre alphabétique
-  useEffect(() => {
-    if (!selectedDate || !calendarEvents.length) return;
-    // Copier avant de trier pour éviter de muter le tableau d'état `calendarEvents`
-    const sortedEvents = [...calendarEvents].sort((a, b) => {
-      const dateA = new Date(a.start);
-      const dateB = new Date(b.start);
-      if (dateA.getTime() === dateB.getTime()) {
-        return a.title.localeCompare(b.title);
-      }
-      return dateA.getTime() - dateB.getTime();
-    });
-    const filtered = sortedEvents.filter((event) =>
-      event.start.startsWith(toISO(selectedDate))
-    );
-    setEventsForDay(filtered);
-  }, [selectedDate, calendarEvents]);
+  useFilteredEventsForDay(selectedDate, calendarEvents, setEventsForDay);
 
   // 📍 Mémoisation des événements pour le calendrier
   const memoizedEvents = useMemo(() => {
