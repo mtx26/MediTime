@@ -7,6 +7,7 @@ from app.routes import register_routes
 from app.core.firebase_init import init_firebase
 from app.core.vertex_init import init_vertex_ai
 from app.core.db_init import verify_db_connection
+from app.utils.logging import log_backend
 # from app.scripts import import_afmps_to_bis
 # from app.vertex import test_analyze_medical_document
 from flask_cors import CORS
@@ -28,8 +29,24 @@ def create_app():
 
     # 🔧 Initialisation des services partagés (DB, Firebase, Vertex)
     verify_db_connection()
-    init_firebase()
-    init_vertex_ai()
+
+    try:
+        init_firebase()
+    except RuntimeError as e:
+        log_backend.warning("Firebase non initialisé au démarrage, les fonctionnalités liées seront indisponibles", {
+            "origin": "APP_INIT",
+            "code": "FIREBASE_INIT_SKIPPED",
+            "error": str(e)
+        })
+
+    try:
+        init_vertex_ai()
+    except RuntimeError as e:
+        log_backend.warning("Vertex AI non initialisé au démarrage, les fonctionnalités liées seront indisponibles", {
+            "origin": "APP_INIT",
+            "code": "VERTEX_INIT_SKIPPED",
+            "error": str(e)
+        })
     
     # 🔧 Enregistrement des routes
     register_routes(app)
