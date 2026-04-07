@@ -47,7 +47,7 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
     tokenCalendars
   )[calendarType];
 
-  const fetchTokens = useCallback(async () => {
+  const fetchTokens = async () => {
     setLoading(true);
     const result = await calendarSource.getTokensIcs(calendarId);
     if (result.success) {
@@ -56,11 +56,11 @@ function IcsList({ personalCalendars, sharedUserCalendars, tokenCalendars }) {
       setNotFound(true);
     }
     setLoading(false);
-  }, [calendarId, calendarSource.getTokensIcs, t]);
+  };
 
   useEffect(() => {
     fetchTokens();
-  }, [fetchTokens]);
+  }, [calendarId]);
 
   const handleCreateToken = async () => {
     const result = await calendarSource.createTokenIcs(calendarId);
