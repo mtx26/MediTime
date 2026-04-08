@@ -67,6 +67,7 @@ DROP POLICY IF EXISTS "Public access via ics token" ON public.medicine_box_condi
 DROP POLICY IF EXISTS "Public access via ics token" ON public.ics_tokens;
 DROP POLICY IF EXISTS "Public access via ics token" ON public.calendars;
 DROP POLICY IF EXISTS "Owners can manage their ics tokens" ON public.ics_tokens;
+DROP POLICY IF EXISTS "Calendar owners can update invitations" ON public.invitations;
 DROP POLICY IF EXISTS "Calendar owners can create invitations" ON public.invitations;
 ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_id_fkey;
 ALTER TABLE IF EXISTS ONLY public.shared_tokens DROP CONSTRAINT IF EXISTS shared_tokens_owner_uid_fkey;
@@ -1065,6 +1066,13 @@ ALTER TABLE ONLY public.users
 --
 
 CREATE POLICY "Calendar owners can create invitations" ON public.invitations FOR INSERT WITH CHECK (public.is_calendar_owner(calendar_id));
+
+
+--
+-- Name: invitations Calendar owners can update invitations; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY "Calendar owners can update invitations" ON public.invitations FOR UPDATE USING (public.is_calendar_owner(calendar_id));
 
 
 --
