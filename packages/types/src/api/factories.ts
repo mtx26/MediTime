@@ -3,7 +3,7 @@
 import type { ApiResult } from './result';
 import type { CalendarId, BoxId, TokenId, InvitationToken, CalendarBoxInput } from './calendar';
 import type { MedicineReviewConditionInput, MedicineReviewMedicineInput } from '../models/medicine';
-import type { SharedCalendarAccess, StockDecrementMethod } from '../models/realtime';
+import type { MissedIntakesPayload, SharedCalendarAccess, StockDecrementMethod } from '../models/realtime';
 
 export type PersonalBoxResult = ApiResult & { boxId?: string };
 
@@ -38,6 +38,7 @@ export interface PersonalCalendarsApi {
   createTokenIcs: (calendarId: CalendarId) => Promise<ApiResult>;
   deleteTokenIcs: (calendarId: CalendarId, tokenId: TokenId) => Promise<ApiResult>;
   getPersonalCalendarPdfUrl: (calendarId: CalendarId, includeInactive: boolean) => string;
+  applyPersonalMissedIntakes: (calendarId: CalendarId, payload: MissedIntakesPayload) => Promise<ApiResult>;
 }
 
 export interface SharedUserCalendarsApi {
@@ -77,6 +78,7 @@ export interface SharedUserCalendarsApi {
   getSharedTokensIcs: (calendarId: CalendarId) => Promise<ApiResult>;
   createSharedTokenIcs: (calendarId: CalendarId) => Promise<ApiResult>;
   deleteSharedTokenIcs: (calendarId: CalendarId, tokenId: TokenId) => Promise<ApiResult>;
+  applySharedUserMissedIntakes: (calendarId: CalendarId, payload: MissedIntakesPayload) => Promise<ApiResult>;
 }
 
 export interface TokenCalendarsApi {

@@ -6,6 +6,7 @@ import type {
   CalendarBoxInput,
   CalendarId,
   MedicineReviewConditionInput,
+  MissedIntakesPayload,
   PersonalBoxResult,
   StockDecrementMethod,
   TokenId,
@@ -309,6 +310,19 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
 
     getPersonalCalendarPdfUrl: (calendarId: CalendarId, includeInactive: boolean): string => {
       return `${apiUrl}/api/calendars/${calendarId}/pdf?includeInactive=${includeInactive}`;
+    },
+
+    applyPersonalMissedIntakes: async (calendarId: CalendarId, payload: MissedIntakesPayload): Promise<ApiResult> => {
+      return performApiCall({
+        url: `${apiUrl}/api/calendars/${calendarId}/missed-intakes`,
+        method: 'POST',
+        body: payload,
+        origin: 'APPLY_PERSONAL_MISSED_INTAKES',
+        uid,
+        analyticsEvent: 'apply_personal_missed_intakes',
+        analyticsData: { calendarId, uid },
+        showAlert,
+      });
     },
   };
 }

@@ -1155,6 +1155,26 @@
     "title": "Pourquoi choisir MediTime ?"
   },
   "yes": "Oui",
+  "missed_intakes": {
+    "title": "Prise oubliée",
+    "subtitle": "Déclarez les jours où vous n'avez pas pris vos médicaments pour ajuster votre stock.",
+    "loading": "Chargement...",
+    "mode_intake": "Oubli de prise",
+    "mode_medication": "Médicament indisponible",
+    "select_days": "Sélectionnez les jours",
+    "select_times": "Sélectionnez les moments",
+    "customize_per_day": "Personnaliser par jour",
+    "select_medication": "Sélectionnez les médicaments",
+    "select_period": "Sélectionnez la période",
+    "summary": "Récapitulatif",
+    "stock": "Stock",
+    "days_count": "jour(s)",
+    "info_intake": "Les médicaments non consommés seront réajoutés à votre stock.",
+    "info_medication": "Les comprimés non consommés pendant la période seront réajoutés au stock.",
+    "affected_meds": "Médicaments concernés",
+    "apply": "Appliquer",
+    "success": "{{count}} comprimé(s) réajouté(s) au stock."
+  },
   "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier.",
   "error": "error",
   "notifications": "notifications"

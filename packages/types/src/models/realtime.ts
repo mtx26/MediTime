@@ -27,6 +27,16 @@ export interface SubscribedChannel {
 
 export type TimeOfDay = 'morning' | 'noon' | 'evening';
 
+export type MissedMode = 'intake' | 'medication';
+
+export interface MissedIntakesPayload {
+  mode: MissedMode;
+  days: string[];
+  times?: TimeOfDay[];
+  per_day_times?: Record<string, TimeOfDay[]>;
+  med_ids?: string[];
+}
+
 export type StockDecrementMethod = 'weekly_pillbox' | 'daily_midnight';
 
 export type SharedCalendarAccess = 'read' | 'write' | 'edit' | 'admin';
@@ -42,7 +52,11 @@ export type NotificationType =
 // ─── Realtime Items ──────────────────────────────────────────────────
 
 export interface BoxCondition {
+  time_of_day?: string | null;
+  interval_days?: number | null;
+  start_date?: string | null;
   max_date?: string | null;
+  tablet_count?: number | null;
 }
 
 export interface BoxItem {

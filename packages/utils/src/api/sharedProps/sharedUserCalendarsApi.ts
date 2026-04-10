@@ -7,6 +7,7 @@ import type {
   CalendarId,
   InvitationToken,
   MedicineReviewConditionInput,
+  MissedIntakesPayload,
   PersonalBoxResult,
   TokenId,
 } from '@meditime/types';
@@ -372,6 +373,19 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
         uid,
         analyticsEvent: 'delete_shared_ics_token',
         analyticsData: { calendarId, tokenId, uid },
+        showAlert,
+      });
+    },
+
+    applySharedUserMissedIntakes: async (calendarId: CalendarId, payload: MissedIntakesPayload): Promise<ApiResult> => {
+      return performApiCall({
+        url: `${apiUrl}/api/shared/users/calendars/${calendarId}/missed-intakes`,
+        method: 'POST',
+        body: payload,
+        origin: 'APPLY_SHARED_USER_MISSED_INTAKES',
+        uid,
+        analyticsEvent: 'apply_shared_user_missed_intakes',
+        analyticsData: { calendarId, uid },
         showAlert,
       });
     },
