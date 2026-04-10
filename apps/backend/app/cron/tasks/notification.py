@@ -4,88 +4,64 @@ from app.services.medication import check_low_stock_and_notify_for_calendar
 from datetime import timedelta, datetime
 
 def send_notifications_for_all_users():
-    """Vérifie et envoie les notifications aux utilisateurs dont l'heure de notification est proche."""
+    """Parcourt tous les calendriers et notifie les utilisateurs (propriétaires et partagés) dont l'heure de notification est proche."""
     try:
-        # Récupérer l'heure actuelle (datetime complet pour les calculs)
         now = datetime.now()
-        
-        # Calculer la fenêtre de ±15 minutes
-        start_datetime = now - timedelta(minutes=15)
-        end_datetime = now + timedelta(minutes=15)
-        start_time = start_datetime.time()
-        end_time = end_datetime.time()
+        start_time = (now - timedelta(minutes=2, seconds=30)).time()
+        end_time = (now + timedelta(minutes=2, seconds=30)).time()
         
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
-                    SELECT id
-                    FROM users
-                    WHERE notification_time > %s 
-                    AND notification_time <= %s
-                """, (start_time, end_time))
+                    SELECT calendar_id, array_agg(DISTINCT user_id) as user_ids
+                    FROM (
+                        -- Propriétaires dont l'heure de notification est dans la fenêtre
+                        SELECT c.id as calendar_id, u.id as user_id
+                        FROM calendars c
+                        JOIN users u ON u.id = c.owner_uid
+                        JOIN calendar_settings cs ON cs.calendar_id = c.id
+                        WHERE c.deleted_at IS NULL
+                        AND cs.notifications_enabled = TRUE
+                        AND u.notification_time > %s
+                        AND u.notification_time <= %s
+                        
+                        UNION ALL
+                        
+                        -- Utilisateurs partagés dont l'heure de notification est dans la fenêtre
+                        SELECT c.id as calendar_id, u.id as user_id
+                        FROM calendars c
+                        JOIN shared_calendars sc ON sc.calendar_id = c.id
+                        JOIN shared_calendar_settings scs ON scs.shared_calendar_id = sc.id
+                        JOIN users u ON u.id = sc.receiver_uid
+                        WHERE c.deleted_at IS NULL
+                        AND sc.deleted_at IS NULL
+                        AND sc.accepted_at IS NOT NULL
+                        AND scs.notifications_enabled = TRUE
+                        AND u.notification_time > %s
+                        AND u.notification_time <= %s
+                    ) sub
+                    GROUP BY calendar_id
+                """, (start_time, end_time, start_time, end_time))
                 rows = cursor.fetchall()
-                user_ids = [row["id"] for row in rows]
         
-        i = 0
-        for user_id in user_ids:
-           i += send_notification(user_id)
-           
+        for row in rows:
+            notify_uids = set(row["user_ids"])
+            check_low_stock_and_notify_for_calendar(row["calendar_id"], ["push"], notify_uids=notify_uids)
+        
         log_backend.info(
-            f"Notifications de stock faible envoyées pour {i} calendrier(s)",
+            f"Notifications de stock faible vérifiées pour {len(rows)} calendrier(s)",
             {
                 "origin": "STOCK",
                 "code": "STOCK_NOTIFICATION_SENT",
-                "user_ids": user_ids,
+                "calendar_count": len(rows),
             }
         )
     except Exception as e:
         log_backend.error(
-            "Erreur lors de la récupération des utilisateurs pour les notifications",
+            "Erreur lors de la récupération des calendriers pour les notifications",
             {
                 "origin": "STOCK",
                 "code": "STOCK_NOTIFICATION_USER_FETCH_ERROR",
-                "error": str(e),
-            }
-        )
-
-def send_notification(user_id):
-    """Envoie les notifications de stock faible pour tous les calendriers d'un utilisateur."""
-    try:
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("""
-                    SELECT id
-                    FROM calendars
-                    WHERE owner_uid = %s 
-                    AND deleted_at IS NULL
-                """, (user_id,))
-                calendars = cursor.fetchall()
-        
-        if not calendars:
-            log_backend.info(
-                f"Aucun calendrier trouvé pour l'utilisateur {user_id}",
-                {
-                    "origin": "NOTIFICATION",
-                    "code": "NO_CALENDARS_FOUND",
-                    "user_id": str(user_id)
-                }
-            )
-            return
-            
-        # Envoyer les notifications pour chaque calendrier
-        for calendar in calendars:
-            calendar_id = calendar["id"]
-            check_low_stock_and_notify_for_calendar(calendar_id, ["push"])
-        
-        return len(calendars)
-            
-    except Exception as e:
-        log_backend.error(
-            "Erreur lors de l'envoi des notifications de stock faible",
-            {
-                "origin": "NOTIFICATION",
-                "code": "STOCK_NOTIFICATION_ERROR",
-                "user_id": str(user_id),
                 "error": str(e),
             }
         )
