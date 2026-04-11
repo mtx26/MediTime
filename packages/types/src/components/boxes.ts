@@ -37,3 +37,28 @@ export interface InputDropdownProps {
   onChangeCodeFmd: (value: string) => void;
   fetchSuggestions: (name: string, dose?: number | null) => Promise<MedicineReviewSuggestion[]>;
 }
+
+// ─── Condition Editing Types ─────────────────────────────────────────────────
+
+export type EditableCondition = MedicineReviewConditionInput & { id: string };
+export type ConditionFieldKey = keyof MedicineReviewConditionInput;
+export type ConditionValue = string | number | null | undefined;
+export type ConditionFieldType = 'number' | 'select' | 'date';
+export type ConditionOption = { value: string; label: string };
+
+export type ConditionFieldConfig = {
+  label: string | ((cond: EditableCondition) => string);
+  field: ConditionFieldKey | ((cond: EditableCondition) => ConditionFieldKey);
+  type: ConditionFieldType | ((cond: EditableCondition) => ConditionFieldType);
+  min?: string;
+  step?: string;
+  format?: string | ((cond: EditableCondition) => string);
+  options?: ConditionOption[];
+  ifComplete?: (cond: EditableCondition) => boolean;
+  onChange?: (
+    cond: EditableCondition,
+    value: ConditionValue,
+    updateFn: (field: ConditionFieldKey, value: ConditionValue) => void,
+  ) => void;
+  required?: boolean | ((cond: EditableCondition) => boolean);
+};

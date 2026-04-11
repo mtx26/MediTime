@@ -87,13 +87,14 @@ def process_box_increment(cursor, id_box: str, qty: int, start_date: date, days:
             (new_qty, id_box)
         )
 
-def check_low_stock_and_notify_for_calendar(calendar_id: str, channels: list[str] = None) -> None:
+def check_low_stock_and_notify_for_calendar(calendar_id: str, channels: list[str] = None, notify_uids: set[str] = None) -> None:
     """
     Vérifie les stocks faibles pour un calendrier spécifique et envoie des notifications.
     
     Paramètres:
     - calendar_id: ID du calendrier à vérifier.
     - channels: liste optionnelle de canaux de notification à utiliser (ex: ["email", "push", "web"]). Si None, utilise les canaux par défaut.
+    - notify_uids: ensemble optionnel d'UIDs à notifier. Si fourni, seuls ces utilisateurs seront notifiés.
     """
     log_backend.info(
         "Vérification des stocks faibles", {
@@ -106,15 +107,19 @@ def check_low_stock_and_notify_for_calendar(calendar_id: str, channels: list[str
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
-                # Vérifier si les notifications sont activées pour ce calendrier (propriétaire)
-                cursor.execute(
-                    """
-                    SELECT notifications_enabled FROM calendar_settings WHERE calendar_id = %s
-                    """,
-                    (calendar_id,)
-                )
-                notif_row = cursor.fetchone()
-                owner_notif_enabled = notif_row.get("notifications_enabled")
+                owner_notif_enabled = False
+                shared_uids = set()
+
+                if notify_uids is None:
+                    # Vérifier si les notifications sont activées pour ce calendrier (propriétaire)
+                    cursor.execute(
+                        """
+                        SELECT notifications_enabled FROM calendar_settings WHERE calendar_id = %s
+                        """,
+                        (calendar_id,)
+                    )
+                    notif_row = cursor.fetchone()
+                    owner_notif_enabled = notif_row.get("notifications_enabled")
 
                 cursor.execute(
                     """
@@ -142,20 +147,21 @@ def check_low_stock_and_notify_for_calendar(calendar_id: str, channels: list[str
                 if not results:
                     return
 
-                # Récupération des utilisateurs partagés
-                cursor.execute(
-                    """
-                    SELECT sc.receiver_uid
-                    FROM shared_calendars sc
-                    JOIN shared_calendar_settings scs ON scs.shared_calendar_id = sc.id
-                    WHERE sc.calendar_id = %s 
-                        AND scs.notifications_enabled = TRUE
-                        AND sc.deleted_at IS NULL
-                        AND sc.accepted_at IS NOT NULL
-                    """,
-                    (calendar_id,)
-                )
-                shared_uids = {row["receiver_uid"] for row in cursor.fetchall()}
+                if notify_uids is None:
+                    # Récupération des utilisateurs partagés
+                    cursor.execute(
+                        """
+                        SELECT sc.receiver_uid
+                        FROM shared_calendars sc
+                        JOIN shared_calendar_settings scs ON scs.shared_calendar_id = sc.id
+                        WHERE sc.calendar_id = %s 
+                            AND scs.notifications_enabled = TRUE
+                            AND sc.deleted_at IS NULL
+                            AND sc.accepted_at IS NOT NULL
+                        """,
+                        (calendar_id,)
+                    )
+                    shared_uids = {row["receiver_uid"] for row in cursor.fetchall()}
 
         grouped: dict[str, list[dict]] = defaultdict(list)
         for result in results:
@@ -172,13 +178,16 @@ def check_low_stock_and_notify_for_calendar(calendar_id: str, channels: list[str
                 "sender_uid": Config.SYSTEM_UID,
             }
 
-            # Notifier le propriétaire seulement si notifications_enabled
-            if owner_notif_enabled:
-                grouped[uid_owner].append(notif)
-
-            # Notifier chaque utilisateur partagé (toujours)
-            for shared_uid in shared_uids:
-                grouped[shared_uid].append(notif)
+            if notify_uids is not None:
+                # Mode cron : notifier uniquement les UIDs fournis
+                for uid in notify_uids:
+                    grouped[uid].append(notif)
+            else:
+                # Mode par défaut : propriétaire + partagés
+                if owner_notif_enabled:
+                    grouped[uid_owner].append(notif)
+                for shared_uid in shared_uids:
+                    grouped[shared_uid].append(notif)
 
 
         for uid, notifs in grouped.items():

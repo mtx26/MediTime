@@ -89,10 +89,10 @@ def main():
         replace_existing=True
     )
     
-    # vérification et envoi de notifications pour tous les utilisateurs toute les 30 minutes
+    # vérification et envoi de notifications pour tous les utilisateurs toutes les 5 minutes
     scheduler.add_job(
         send_notifications_for_all_users,
-        CronTrigger(minute='*/30'),
+        CronTrigger(minute='*/5'),
         id='stock_notification',
         name='Notifications de stock faible',
         max_instances=1,
