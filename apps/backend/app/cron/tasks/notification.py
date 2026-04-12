@@ -13,7 +13,7 @@ def send_notifications_for_all_users():
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
-                    SELECT calendar_id, array_agg(DISTINCT user_id) as user_ids
+                    SELECT calendar_id, array_agg(DISTINCT user_id::text) as user_ids
                     FROM (
                         -- Propriétaires dont l'heure de notification est dans la fenêtre
                         SELECT c.id as calendar_id, u.id as user_id
