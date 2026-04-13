@@ -7,16 +7,15 @@ import { useLoading } from '@/components/ui/loading';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar } from '@/components/ui/calendar';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { CalendarDays, Pill, Sun, Clock, Moon, ArrowRight, CalendarRange } from 'lucide-react';
+import { CalendarDays, Pill, Sun, Clock, Moon, ArrowRight } from 'lucide-react';
+import DateSelectionCalendar from './components/DateSelectionCalendar';
 import NotFound from '@/pages/general/NotFound';
-import type { MissedIntakesPageProps, MissedMode, TimeOfDay, BoxItem } from '@meditime/types';
-import type { DateRange } from 'react-day-picker';
+import type { MissedIntakesPageProps, MissedMode, TimeOfDay, BoxItem, MissedSelectionMode } from '@meditime/types';
 
 const TIME_COLORS: Record<TimeOfDay, string> = {
   morning: 'bg-red-400/20 text-red-700 border-red-400/50',
@@ -55,8 +54,6 @@ const TIME_ICONS: Record<TimeOfDay, typeof Sun> = {
   noon: Clock,
   evening: Moon,
 };
-
-type SelectionMode = 'individual' | 'range';
 
 /** Génère toutes les dates entre from et to (inclus). */
 const expandRange = (from: Date, to: Date): Date[] => {
@@ -114,9 +111,9 @@ function MissedIntakesPage({
 
   // --- Form state ---
   const [mode, setMode] = useState<MissedMode>('intake');
-  const [selectionMode, setSelectionMode] = useState<SelectionMode>('individual');
+  const [selectionMode, setSelectionMode] = useState<MissedSelectionMode>('individual');
   const [selectedDays, setSelectedDays] = useState<Date[]>([]);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [dateRange, setDateRange] = useState<{ from: Date; to?: Date } | undefined>(undefined);
   const [selectedTimes, setSelectedTimes] = useState<TimeOfDay[]>([]);
   const [customPerDay, setCustomPerDay] = useState(false);
   const [perDayTimes, setPerDayTimes] = useState<Record<string, TimeOfDay[]>>({});
@@ -191,56 +188,15 @@ function MissedIntakesPage({
             {/* Calendar */}
             <div>
               <h5 className="font-semibold mb-1.5">{t('missed_intakes.select_days')}</h5>
-
-              {/* Selection mode toggle */}
-              <ToggleGroup
-                type="single"
-                variant="outline"
-                size="sm"
-                value={selectionMode}
-                onValueChange={(v) => { if (v) { setSelectionMode(v as SelectionMode); setSelectedDays([]); setDateRange(undefined); } }}
-                className="mb-2"
-              >
-                <ToggleGroupItem value="individual" className="gap-1.5 px-3">
-                  <CalendarDays className="size-3.5" />
-                  {t('missed_intakes.selection_individual')}
-                </ToggleGroupItem>
-                <ToggleGroupItem value="range" className="gap-1.5 px-3">
-                  <CalendarRange className="size-3.5" />
-                  {t('missed_intakes.selection_range')}
-                </ToggleGroupItem>
-              </ToggleGroup>
-
-              <Card className="py-0">
-                <CardContent className="flex justify-center px-2 py-1">
-                  {selectionMode === 'individual' ? (
-                    <Calendar
-                      mode="multiple"
-                      selected={selectedDays}
-                      onSelect={(days) => setSelectedDays(days ?? [])}
-                      disabled={{ after: new Date() }}
-                    />
-                  ) : (
-                    <Calendar
-                      mode="range"
-                      selected={dateRange}
-                      onSelect={setDateRange}
-                      disabled={{ after: new Date() }}
-                    />
-                  )}
-                </CardContent>
-              </Card>
-              {effectiveDays.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-1.5">
-                  {effectiveDays
-                    .sort((a, b) => a.getTime() - b.getTime())
-                    .map((d) => (
-                      <Badge key={toDateKey(d)} variant="secondary">
-                        {formatDay(d)}
-                      </Badge>
-                    ))}
-                </div>
-              )}
+              <DateSelectionCalendar
+                selectionMode={selectionMode}
+                onSelectionModeChange={setSelectionMode}
+                selectedDays={selectedDays}
+                onSelectedDaysChange={setSelectedDays}
+                dateRange={dateRange}
+                onDateRangeChange={setDateRange}
+                effectiveDays={effectiveDays}
+              />
             </div>
 
             {/* Time selection */}
@@ -352,56 +308,15 @@ function MissedIntakesPage({
             {selectedMedIds.length > 0 && (
               <div>
                 <h5 className="font-semibold mb-1.5">{t('missed_intakes.select_period')}</h5>
-
-                {/* Selection mode toggle */}
-                <ToggleGroup
-                  type="single"
-                  variant="outline"
-                  size="sm"
-                  value={selectionMode}
-                  onValueChange={(v) => { if (v) { setSelectionMode(v as SelectionMode); setSelectedDays([]); setDateRange(undefined); } }}
-                  className="mb-2"
-                >
-                  <ToggleGroupItem value="individual" className="gap-1.5 px-3">
-                    <CalendarDays className="size-3.5" />
-                    {t('missed_intakes.selection_individual')}
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="range" className="gap-1.5 px-3">
-                    <CalendarRange className="size-3.5" />
-                    {t('missed_intakes.selection_range')}
-                  </ToggleGroupItem>
-                </ToggleGroup>
-
-                <Card className="py-0">
-                  <CardContent className="flex justify-center px-2 py-1">
-                    {selectionMode === 'individual' ? (
-                      <Calendar
-                        mode="multiple"
-                        selected={selectedDays}
-                        onSelect={(days) => setSelectedDays(days ?? [])}
-                        disabled={{ after: new Date() }}
-                      />
-                    ) : (
-                      <Calendar
-                        mode="range"
-                        selected={dateRange}
-                        onSelect={setDateRange}
-                        disabled={{ after: new Date() }}
-                      />
-                    )}
-                  </CardContent>
-                </Card>
-                {effectiveDays.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-1.5">
-                    {effectiveDays
-                      .sort((a, b) => a.getTime() - b.getTime())
-                      .map((d) => (
-                        <Badge key={toDateKey(d)} variant="secondary">
-                          {formatDay(d)}
-                        </Badge>
-                      ))}
-                  </div>
-                )}
+                <DateSelectionCalendar
+                  selectionMode={selectionMode}
+                  onSelectionModeChange={setSelectionMode}
+                  selectedDays={selectedDays}
+                  onSelectedDaysChange={setSelectedDays}
+                  dateRange={dateRange}
+                  onDateRangeChange={setDateRange}
+                  effectiveDays={effectiveDays}
+                />
               </div>
             )}
           </div>

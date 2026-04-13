@@ -1,5 +1,6 @@
 import type { ApiResult } from '../api';
-import type { MedicineReviewMedicineInput } from '../models/medicine';
+import type { MedicineReviewConditionInput, MedicineReviewMedicineInput } from '../models/medicine';
+import type { RefObject } from 'react';
 
 export interface ImageUploadImportState {
   hasFile: boolean;
@@ -53,6 +54,28 @@ export interface QRCodeScannerHandle {
   handleAddAll: () => Promise<void>;
 }
 
+// ─── Scanner Sub-Components ──────────────────────────────────────────────────
+
+export interface ScannerControlsProps {
+  zoom: number;
+  onZoomChange: (zoom: number) => void;
+  isFrontCamera: boolean;
+  onToggleFrontCamera: () => void;
+  availableCameras: MediaDeviceInfo[];
+  selectedCamera: MediaDeviceInfo | null;
+  onCameraChange: (camera: MediaDeviceInfo) => void;
+  showControls: boolean;
+  onAutoHideControls: () => void;
+  hideControlsTimeoutRef: RefObject<ReturnType<typeof setTimeout> | null>;
+}
+
+export interface ScannerResultsListProps {
+  gtins: string[];
+  medicines: Record<string, QRScannedMedicine | null>;
+  loadingGtin: string | null;
+  onRemoveMedicine: (gtin: string) => void;
+}
+
 // ─── Medicine Review ─────────────────────────────────────────────────────────
 
 export type SaveAnalysisResultResult = ApiResult & {
@@ -70,5 +93,12 @@ export interface MedicineReviewProps {
 export interface MedicineReviewLocationState {
   importedMedicines?: MedicineReviewMedicineInput[];
   calendarName?: string;
+}
+
+export interface MedicineReviewConditionProps {
+  condition: MedicineReviewConditionInput;
+  conditionIndex: number;
+  onChange: (index: number, field: string, value: string | number | null) => void;
+  onDelete: (index: number) => void;
 }
 

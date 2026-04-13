@@ -117,7 +117,7 @@ export default function Security() {
       const currentPath = location.pathname;
       await provider.handler(currentPath);
     } catch (error) {
-      showAlert('danger', error.message || t('security.providers.connection_error'));
+      showAlert('danger', error instanceof Error ? error.message : t('security.providers.connection_error'));
       setConnectingProvider(null);
     }
   };
@@ -153,7 +153,7 @@ export default function Security() {
       setNewPassword('');
       setOldPassword('');
     } catch (error) {
-      showAlert('danger', error.message);
+      showAlert('danger', error instanceof Error ? error.message : t('security.password_section.error'));
     }
   };
 

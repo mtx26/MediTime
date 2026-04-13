@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
-import { handleLogout } from '../../services/auth/authService';
 import HoveredUserProfile from './HoveredUserProfile';
-import NotificationLine from './NotificationLine';
+import NotificationsDropdown from './NotificationsDropdown';
+import UserProfileDropdown from './UserProfileDropdown';
 import LanguageSelector from './LanguageSelector';
 import ThemeToggle from './ThemeToggle';
 import { useTranslation } from 'react-i18next';
@@ -19,29 +19,13 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from '@/components/ui/navigation-menu';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   ArrowLeft,
   Calendar,
   Share2,
-  Bell,
-  User,
-  Settings,
-  LogOut,
-  UserPlus,
-  LogIn,
-  Shield,
   X,
-  ChevronDown,
+  Shield,
 } from 'lucide-react';
 
 function Navbar({ sharedProps }: { sharedProps: AppSharedProps }) {
@@ -226,117 +210,17 @@ function Navbar({ sharedProps }: { sharedProps: AppSharedProps }) {
 
               {/* Notifications Dropdown */}
               {userInfo &&
-                <DropdownMenu
-                  onOpenChange={(open) => {
-                    if (open && notificationsData && notificationsData.length > 0 && notificationsData.some((n) => !n.read)) {
-                      readAllNotifications();
-                    }
-                  }}
-                >
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="relative"
-                    >
-                      <Bell className="h-5 w-5" />
-                      {unreadCount > 0 && (
-                        <Badge 
-                          variant="destructive" 
-                          className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                        >
-                          {unreadCount}
-                        </Badge>
-                      )}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-125">
-                    {notificationsData === null ? (
-                      <DropdownMenuItem disabled>
-                        {t('loading_notifications')}
-                      </DropdownMenuItem>
-                    ) : notificationsData.filter((n) => !n.read).length === 0 ? (
-                      <DropdownMenuItem disabled>
-                        {t('no_notifications')}
-                      </DropdownMenuItem>
-                    ) : (
-                      notificationsData
-                        .filter((n) => !n.read)
-                        .slice(0, 5)
-                        .map((notif: NotificationItem) => (
-                          <NotificationLine
-                            key={notif.notification_id}
-                            notif={notif}
-                            onRead={readNotification}
-                          />
-                        ))
-                    )}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to={`/${lng}/notifications`} className="w-full flex items-center justify-center gap-2">
-                        <Bell className="h-4 w-4" /> {t('open_notifications')}
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <NotificationsDropdown
+                  lng={lng}
+                  notificationsData={notificationsData}
+                  readNotification={readNotification}
+                  readAllNotifications={readAllNotifications}
+                  unreadCount={unreadCount}
+                />
               }
 
               {/* User Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2">
-                    {userInfo ? (
-                      <>
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={userInfo.photoUrl || undefined} alt={userInfo.displayName || t('user')} referrerPolicy="no-referrer" />
-                          <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm">{userInfo.displayName || t('user')}</span>
-                        <ChevronDown className="h-4 w-4" />
-                      </>
-                    ) : (
-                      <>
-                        <User className="h-5 w-5" />
-                        <span>{t('account.label')}</span>
-                        <ChevronDown className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {userInfo ? (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link to={`/${lng}/profile`} className="flex items-center gap-2">
-                          <User className="h-4 w-4" /> {t('profile')}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to={`/${lng}/settings`} className="flex items-center gap-2">
-                          <Settings className="h-4 w-4" /> {t('settings.label')}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 text-red-600! [&_svg]:text-red-600!">
-                        <LogOut className="h-4 w-4" /> {t('logout')}
-                      </DropdownMenuItem>
-                    </>
-                  ) : (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link to={`/${lng}/login`} className="flex items-center gap-2">
-                          <LogIn className="h-4 w-4" /> {t('login')}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to={`/${lng}/register`} className="flex items-center gap-2">
-                          <UserPlus className="h-4 w-4" /> {t('register')}
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <UserProfileDropdown lng={lng} userInfo={userInfo} />
             </div>
           </div>
         </div>

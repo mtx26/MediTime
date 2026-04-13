@@ -12,8 +12,8 @@ import { useAlert } from '@/contexts/AlertContext';
 import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import { useFilteredEventsForDay } from '@/hooks/useCalendarNavigation';
 import DateModal from '@/components/calendar/DateModal';
-import WeekCalendarSelector from '@/components/calendar/WeekCalendarSelector';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
+import CalendarWeekSelector from './components/CalendarWeekSelector';
 import PillboxDisplay from '@/components/calendar/PillboxDisplay';
 import ActionSheet from '@/components/common/ActionSheet';
 import NotFound from '@/pages/general/NotFound';
@@ -50,7 +50,7 @@ function CalendarPage({
   const userInfo = userContext?.userInfo; // Contexte de l'utilisateur connecté
   const { showLoading } = useLoading(); // Gestion du spinner global
 
-  const calendarRef = useRef<any>(null);
+  const calendarRef = useRef<InstanceType<typeof FullCalendar> | null>(null);
   // garder selectedDate comme objet Date pour manipulations faciles
   const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Date JS
   const [eventsForDay, setEventsForDay] = useState<WeeklyEventItem[]>([]); // Événements filtrés pour un jour spécifique
@@ -306,7 +306,6 @@ function CalendarPage({
                   calendarTable={calendarTable}
                   onWeekSelect={onWeekSelect}
                   selectedDate={selectedDate}
-                  t={t}
                 />
               </div>
             )}
@@ -315,7 +314,6 @@ function CalendarPage({
                 calendarTable={calendarTable}
                 onWeekSelect={onWeekSelect}
                 selectedDate={selectedDate}
-                t={t}
               />
             </div>
           </div>
@@ -371,77 +369,6 @@ function CalendarPage({
             </>
           )}
 
-          {/* Tableau hebdomadaire */}
-          {/*
-          {Object.keys(calendarTable).filter(
-            (key) => calendarTable[key].length > 0
-          ).length > 0 && (
-            <div className="col-12 col-lg-8 mb-4">
-              <div className="mb-2">
-                <h4 className="mb-3 fw-bold">
-                  <i className="bi bi-table"></i> Tableau hebdomadaire
-                </h4>
-                {/*trier matin, midi, soir et supprimer les moments non présents
-                {Object.keys(calendarTable)
-                  .sort((a, b) => {
-                    const order = ['morning', 'noon', 'evening'];
-                    return order.indexOf(a) - order.indexOf(b);
-                  })
-                  .filter((moment) => calendarTable[moment].length > 0)
-                  .map((moment, index) => (
-                    <div key={moment}>
-                      <h5 className="mb-3 fw-semibold">
-                        <i className="bi bi-clock-fill"></i>{' '}
-                        {moment_map[moment]}
-                      </h5>
-                      {calendarTable[moment].map((table, index) => (
-                        <div
-                          className="card border border-secondary-subtle mb-2 shadow-sm"
-                          key={index}
-                        >
-                          <div className="card-header bg-light fw-semibold text-dark">
-                            <i className="bi bi-capsule me-2"></i>
-                            {table.title}{' '}
-                            {table.dose != null ? `${table.dose} mg` : ''}
-                          </div>
-                          <div className="card-body p-0">
-                            <div className="table-responsive">
-                              <table className="table table-sm table-bordered text-center align-middle mb-0 table-striped">
-                                <thead className="table-light">
-                                  <tr>
-                                    {days.map((day) => (
-                                      <th key={day}>{days_map[day]}</th>
-                                    ))}
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    {days.map((day) => (
-                                      <td key={day}>
-                                        {table.cells[day] && (
-                                          <span className="text-muted small px-2 py-1 rounded d-inline-block">
-                                            {table.cells[day]}
-                                          </span>
-                                        )}
-                                      </td>
-                                    ))}
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {index <
-                        Object.keys(calendarTable).filter(
-                          (key) => calendarTable[key].length > 0
-                        ).length -
-                          1 && <hr className="mt-4 shadow-sm" />}
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}*/}
         </div>
       </div>
 
@@ -539,37 +466,6 @@ function CalendarPage({
       )}
     </>
   );
-}
-
-function CalendarWeekSelector({
-  calendarTable,
-  onWeekSelect,
-  selectedDate,
-  t
-}: {
-  calendarTable: CalendarTable;
-  onWeekSelect: (date: Date) => void;
-  selectedDate: Date | null;
-  t: (key: string) => string;
-}) {
-  return (
-    Object.keys(calendarTable).filter(
-      (key) => calendarTable[key].length > 0
-    ).length > 0 && (
-      <div className="mb-2 w-full max-w-100">
-        <h4 className="mb-3 font-bold flex items-center gap-2">
-          <CalendarDays className="h-5 w-5" /> {t('calendar.reference_week')}
-        </h4>
-        <Card className="shadow rounded-lg w-full items-center p-0">
-          <CardContent className="p-0">
-            <div className="h-full w-full">
-              <WeekCalendarSelector onWeekSelect={onWeekSelect} selectedDate={selectedDate} />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  )
 }
 
 export default CalendarPage;

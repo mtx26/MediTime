@@ -18,6 +18,14 @@ export interface CalendarDataSourceProps {
 
 export type CalendarPageSourceType = 'personal' | 'sharedUser' | 'token';
 
+// ─── Sub-component Props ─────────────────────────────────────────────
+
+export interface CalendarWeekSelectorProps {
+  calendarTable: CalendarTable;
+  onWeekSelect: (date: Date) => void;
+  selectedDate: Date | null;
+}
+
 // ─── API Results ─────────────────────────────────────────────────────
 
 export type CalendarScheduleResult = ApiResult & {
@@ -128,6 +136,18 @@ export type DailyCalendarPageProps = CalendarDataSourceProps;
 export type StockAlertsPageProps = CalendarDataSourceProps;
 export type MissedIntakesPageProps = CalendarDataSourceProps;
 export type SharedListPageProps = CalendarDataSourceProps;
+
+export type MissedSelectionMode = 'individual' | 'range';
+
+export interface DateSelectionCalendarProps {
+  selectionMode: MissedSelectionMode;
+  onSelectionModeChange: (mode: MissedSelectionMode) => void;
+  selectedDays: Date[];
+  onSelectedDaysChange: (days: Date[]) => void;
+  dateRange: { from: Date; to?: Date } | undefined;
+  onDateRangeChange: (range: { from: Date; to?: Date } | undefined) => void;
+  effectiveDays: Date[];
+}
 export type BoxesViewPageProps = CalendarDataSourceProps;
 
 export interface CalendarNotificationsProps extends CalendarDataSourceProps, CalendarNotFoundProps {}

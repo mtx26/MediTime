@@ -3,15 +3,14 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ArrowControls from '@/components/calendar/ArrowControls';
+import MedicineReviewCondition from './components/MedicineReviewCondition';
 import { useAlert } from '@/contexts/AlertContext';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { Pencil, Trash2, Plus, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
-import { Calendar } from '@/components/ui/calendar';
-import { applyConditionFieldSideEffects, toInt } from '@meditime/utils';
+import { applyConditionFieldSideEffects } from '@meditime/utils';
 import {
   DEFAULT_CONDITION,
   MEDICINE_REVIEW_CONDITION_FIELDS,
@@ -50,7 +49,6 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
   const current = medicines[index] ?? null;
   const [suggestions, setSuggestions] = useState<MedicineReviewSuggestion[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [openDropdownKey, setOpenDropdownKey] = useState<string | null>(null);
 
   useEffect(() => {
     if (!calendarName || medicines.length === 0) {
@@ -63,7 +61,7 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
       return;
     }
     const updated = [...medicines];
-    (updated[index] as unknown as Record<string, unknown>)[field] = value ?? '';
+    (updated[index] as unknown as Record<string, string | number | null>)[field] = value ?? '';
     setMedicines(updated);
   };
 
@@ -299,7 +297,7 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
                   <Input
                     id={field}
                     type={type}
-                    value={String((current as unknown as Record<string, unknown>)[field] ?? '')}
+                    value={String((current as unknown as Record<string, string | number | null>)[field] ?? '')}
                     onChange={(e) => handleChange(field, e.target.value)}
                     title={label}
                     aria-label={label}
@@ -315,149 +313,13 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
             </div>
 
             {current.conditions.map((cond: MedicineReviewConditionInput, i: number) => (
-              <div key={i} className="mb-3 border rounded p-3 text-start bg-muted/30">
-                {[{
-                  label: t('boxes.condition.tablet_count'),
-                  field: 'tablet_count',
-                  type: 'number',
-                  step: '0.25',
-                  min: '0',
-                  required: true,
-                }, {
-                  label: t('boxes.condition.time_of_day'),
-                  field: 'time_of_day',
-                  type: 'select',
-                  options: [
-                    { value: 'morning', label: t('morning') },
-                    { value: 'noon', label: t('noon') },
-                    { value: 'evening', label: t('evening') },
-                  ],
-                  required: true,
-                }, {
-                  label: t('boxes.condition.interval_days'),
-                  field: 'interval_days',
-                  type: 'number',
-                  min: '1',
-                  required: true,
-                }, {
-                  label: t('boxes.condition.start_date'),
-                  field: 'start_date',
-                  type: 'date',
-                  show: toInt(cond.interval_days ?? 0) > 1,
-                  required: toInt(cond.interval_days ?? 0) > 1,
-                }, {
-                  label: t('boxes.condition.max_date_mode'),
-                  field: 'max_date_mode',
-                  type: 'select',
-                  options: [
-                    { value: 'none', label: t('boxes.condition.no_limit') },
-                    { value: 'until_date', label: t('boxes.condition.until_date') },
-                    { value: 'for_days', label: t('boxes.condition.for_days') },
-                  ],
-                  required: false,
-                }, {
-                  label: cond.max_date_mode === 'until_date' 
-                    ? t('boxes.condition.end_date') 
-                    : t('boxes.condition.duration_days'),
-                  field: cond.max_date_mode === 'until_date' ? 'max_date' : 'max_date_days',
-                  type: cond.max_date_mode === 'until_date' ? 'date' : 'number',
-                  min: '1',
-                  step: '1',
-                  show: cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
-                  required: cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
-                }].filter(item => item.show !== false).map(({ label, field, type, step, min, options, required }: { label: string; field: string; type: string; step?: string; min?: string; options?: { value: string; label: string }[]; required?: boolean; show?: boolean }) => (
-                  <div key={field} className="mb-2">
-                    <Label htmlFor={field}>{label} :</Label>
-                    {type === 'select' ? (
-                      <Select
-                        value={String((cond as Record<string, unknown>)[field] ?? '')}
-                        onValueChange={(val) => handleConditionChange(i, field, (field === 'max_date_mode' && val === 'none') ? '' : val)}
-                      >
-                        <SelectTrigger id={field} size="sm" className="w-full mt-1">
-                          <SelectValue placeholder={field === 'time_of_day' ? t('medicine_review.select_option') : (options?.[0]?.label || '')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {options?.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : type === 'date' ? (
-                      <div className="mt-1">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="w-full justify-start"
-                          onClick={() => setOpenDropdownKey(`${i}:${field}:${(cond as unknown as Record<string, unknown>)[field] || ''}:${Date.now()}`)}
-                          aria-label={label}
-                        >
-                          {(Object.hasOwn(cond, field) && typeof (cond as Record<string, unknown>)[field] === 'string'
-                            ? (field !== 'max_date'
-                              ? String((cond as Record<string, unknown>)[field])
-                              : String((cond as Record<string, unknown>)[field]).split('T')[0])
-                            : t('medicine_review.select_option'))}
-                        </Button>
-                        {/* Inline popover calendar */}
-                        <div className="relative">
-                          {/* Simple toggle: render when last opened matches this field */}
-                          {openDropdownKey?.startsWith(`${i}:${field}`) && (
-                            <div className="absolute z-20 mt-2 border rounded-md bg-popover p-2 shadow">
-                              <Calendar
-                                mode="single"
-                                selected={typeof (cond as Record<string, unknown>)[field] === 'string' ? new Date(String((cond as Record<string, unknown>)[field])) : undefined}
-                                onSelect={(date) => {
-                                  if (!date) return;
-                                  if (field === 'max_date') {
-                                    const d = new Date(date);
-                                    d.setHours(23, 59, 59, 999);
-                                    handleConditionChange(i, field, d.toISOString());
-                                  } else {
-                                    const yyyy = date.getFullYear();
-                                    const mm = String(date.getMonth() + 1).padStart(2, '0');
-                                    const dd = String(date.getDate()).padStart(2, '0');
-                                    handleConditionChange(i, field, `${yyyy}-${mm}-${dd}`);
-                                  }
-                                  setOpenDropdownKey(null);
-                                }}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <Input
-                        id={field}
-                        type={type}
-                        value={
-                          Object.hasOwn(cond, field) && field === 'max_date' && typeof (cond as Record<string, unknown>)[field] === 'string'
-                            ? String((cond as Record<string, unknown>)[field]).split('T')[0]
-                            : String(Object.hasOwn(cond, field) ? (cond as Record<string, unknown>)[field] ?? '' : '')
-                        }
-                        onChange={(e) => handleConditionChange(i, field, e.target.value)}
-                        step={step}
-                        min={min}
-                        title={label}
-                        aria-label={label}
-                        required={required}
-                        className="mt-1"
-                      />
-                    )}
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => deleteCondition(i)}
-                  title={t('boxes.condition.delete')}
-                  aria-label={t('boxes.condition.delete')}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  {t('boxes.condition.delete')}
-                </Button>
-              </div>
+              <MedicineReviewCondition
+                key={i}
+                condition={cond}
+                conditionIndex={i}
+                onChange={handleConditionChange}
+                onDelete={deleteCondition}
+              />
             ))}
 
             <Button

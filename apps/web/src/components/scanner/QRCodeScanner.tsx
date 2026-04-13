@@ -1,56 +1,29 @@
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import { useTranslation } from "react-i18next";
-import { readBarcodes, type ReaderOptions } from "zxing-wasm/reader";
+import { readBarcodes } from "zxing-wasm/reader";
 import { fetchMedicaments } from "../../utils/api/scanner";
 import { useAlert } from "../../contexts/AlertContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { 
   QrCode, 
   Camera, 
-  ZoomIn, 
-  ArrowLeftRight, 
   Settings, 
   X, 
-  Trash2, 
   PlusCircle, 
   Pencil, 
   XCircle, 
   AlertTriangle
 } from "lucide-react";
 import type { QRCodeScannerProps, QRCodeScannerHandle, QRScannedMedicine } from "@meditime/types";
-
-// Styles CSS pour les contrôles
-const controlsStyle = `
-  .scanner-controls .form-range {
-    height: 0.5rem;
-    width: 120px;
-  }
-  .scanner-controls .form-select-sm {
-    padding: 0.125rem 0.25rem;
-    font-size: 0.75rem;
-    min-width: 120px;
-  }
-`;
+import { readerOptions, injectScannerStyles, getCameraType, drawDetection, extractGTIN01 } from "./scannerUtils";
+import ScannerControls from "./ScannerControls";
+import ScannerResultsList from "./ScannerResultsList";
 
 // Injecter les styles
-if (typeof document !== 'undefined' && !document.getElementById('scanner-controls-styles')) {
-  const style = document.createElement('style');
-  style.id = 'scanner-controls-styles';
-  style.textContent = controlsStyle;
-  document.head.appendChild(style);
-}
-
-const readerOptions: ReaderOptions = {
-  tryHarder: true,
-  formats: ["DataMatrix"],
-  maxNumberOfSymbols: 1,
-};
+injectScannerStyles();
 
 const QRCodeScanner = forwardRef<QRCodeScannerHandle, QRCodeScannerProps>(({
   onMedicineFound = null,
@@ -282,32 +255,6 @@ const QRCodeScanner = forwardRef<QRCodeScannerHandle, QRCodeScannerProps>(({
     return stop;
   }, [show, modal, selectedCamera]); // Retiré zoom des dépendances pour éviter les rechargements
 
-  // Fonction helper pour déterminer le type de caméra
-  const getCameraType = (camera: MediaDeviceInfo): string => {
-    const label = camera.label.toLowerCase();
-    
-    // Détecter caméra arrière explicitement
-    if (label.includes('back') || label.includes('rear') || 
-        label.includes('environment') || label.includes('arriere')) {
-      return 'back';
-    }
-    
-    // Détecter caméra frontale explicitement
-    if (label.includes('front') || label.includes('user') || 
-        label.includes('facing') || label.includes('avant')) {
-      return 'front';
-    }
-    
-    // Détecter caméras PC (considérées comme frontales)
-    if (label.includes('integrated') || label.includes('webcam') || 
-        label.includes('built-in')) {
-      return 'front';
-    }
-    
-    // Par défaut, considérer comme frontale
-    return 'front';
-  };
-
   // Fonction pour changer le zoom (zoom numérique CSS)
   const handleZoomChange = (newZoom: number) => {
     setZoom(newZoom);
@@ -321,45 +268,6 @@ const QRCodeScanner = forwardRef<QRCodeScannerHandle, QRCodeScannerProps>(({
     const cameraType = getCameraType(camera);
     const isFront = cameraType === 'front';
     setIsFrontCamera(isFront);
-  };
-
-  // Fonction pour obtenir un nom de caméra court
-  const getCameraDisplayName = (camera: MediaDeviceInfo, index: number): string => {
-    if (!camera.label) return t('scanner.camera') + ` ${index + 1}`;
-    
-    const type = getCameraType(camera);
-    const label = camera.label.toLowerCase();
-    
-    // Si le label contient des mots génériques, utiliser notre traduction
-    const hasGenericTerms = ['front', 'back', 'rear', 'facing'].some(term => 
-      label.includes(term)
-    );
-    
-    if (hasGenericTerms) {
-      return type === 'front' ? t('scanner.camera_front') : 
-             type === 'back' ? t('scanner.camera_back') : 
-             camera.label;
-    } else {
-      // C'est un vrai nom de caméra, nettoyer le nom (retirer les termes génériques et ce qui suit)
-      // Trouver le premier terme générique qui apparaît et couper là
-      let cleanName = camera.label;
-      const lowerLabel = camera.label.toLowerCase();
-      const genericTerms = ['usb', 'camera', 'webcam', 'cam', 'device', 'video'];
-      
-      let earliestIndex = -1;
-      for (const term of genericTerms) {
-        const termIndex = lowerLabel.indexOf(term);
-        if (termIndex !== -1 && (earliestIndex === -1 || termIndex < earliestIndex)) {
-          earliestIndex = termIndex;
-        }
-      }
-      
-      if (earliestIndex !== -1) {
-        cleanName = camera.label.substring(0, earliestIndex).trim();
-      }
-      
-      return cleanName || camera.label;
-    }
   };
 
   // Reset des données quand la modal s'ouvre (mode modal uniquement)
@@ -454,49 +362,6 @@ const QRCodeScanner = forwardRef<QRCodeScannerHandle, QRCodeScannerProps>(({
     // Programmer le prochain scan
     rafRef.current = requestAnimationFrame(scanLoop);
   };
-
-  function drawDetection(ctx: CanvasRenderingContext2D, r: { position?: { points?: Array<{x: number; y: number}>; topLeft?: {x: number; y: number}; topRight?: {x: number; y: number}; bottomRight?: {x: number; y: number}; bottomLeft?: {x: number; y: number} } }) {
-    let points: Array<{x: number; y: number}> = [];
-
-    if (Array.isArray(r?.position?.points) && r.position.points.length) {
-      points = r.position.points;
-    } else if (
-      r?.position?.topLeft &&
-      r?.position?.topRight &&
-      r?.position?.bottomRight &&
-      r?.position?.bottomLeft
-    ) {
-      points = [
-        r.position.topLeft,
-        r.position.topRight,
-        r.position.bottomRight,
-        r.position.bottomLeft,
-      ];
-    }
-
-    if (points.length >= 4) {
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "#00FF00";
-      ctx.beginPath();
-      const first = points[0];
-      const firstX = Number(first.x);
-      const firstY = Number(first.y);
-      if (Number.isFinite(firstX) && Number.isFinite(firstY)) {
-        ctx.moveTo(firstX, firstY);
-        for (let i = 1; i < points.length; i++) {
-          const p = points[i];
-          if (!p || typeof p !== 'object') continue;
-          const x = Number(p.x);
-          const y = Number(p.y);
-          if (Number.isFinite(x) && Number.isFinite(y)) {
-            ctx.lineTo(x, y);
-          }
-        }
-        ctx.closePath();
-        ctx.stroke();
-      }
-    }
-  }
 
   // Fonction pour chercher le médicament associé au GTIN et créer directement une medicine_box
   const searchMedicine = async (gtin: string) => {
@@ -594,27 +459,6 @@ const QRCodeScanner = forwardRef<QRCodeScannerHandle, QRCodeScannerProps>(({
     }
   };
 
-  // Extraction GTIN (AI 01) : 14 chiffres
-  // Gère plusieurs formats courants : "(01)12345678901234", "0112345678901234",
-  // ou avec séparateurs FNC1 (\x1D) présents.
-  function extractGTIN01(text: string): string | null {
-    if (!text) return null;
-
-    // Normaliser les séparateurs GS1
-    const GS1_SEPARATOR = String.fromCharCode(29); // Caractère de séparation GS1 (Group Separator, code ASCII 29)
-    const cleaned = text.replaceAll(GS1_SEPARATOR, ""); // retire le GS (FNC1) si présent
-
-    // 1) Format standard parenthésé "(01) 14chiffres"
-    let m = cleaned.match(/\(01\)\s*([0-9]{14})/);
-    if (m) return m[1];
-
-    // 2) Format sans parenthèses mais AI concaténé "01" + 14 chiffres
-    m = cleaned.match(/(?:^|[^0-9])01([0-9]{14})(?:[^0-9]|$)/);
-    if (m) return m[1];
-
-    return null;
-  }
-
   return (
     <>
       {modal ? (
@@ -673,88 +517,18 @@ const QRCodeScanner = forwardRef<QRCodeScannerHandle, QRCodeScannerProps>(({
           />
           
           {/* Contrôles discrets */}
-          <div 
-            className={cn(
-              "scanner-controls absolute top-0 right-0 p-2 min-w-35 rounded-bl-xl transition-all duration-300",
-              "bg-black/80 backdrop-blur-md border border-white/10",
-              showControls ? "opacity-100" : "opacity-0 pointer-events-none"
-            )}
-            onMouseEnter={() => {
-              if (showControls && hideControlsTimeoutRef.current) {
-                clearTimeout(hideControlsTimeoutRef.current);
-              }
-            }}
-            onMouseLeave={() => {
-              if (showControls) {
-                autoHideControls();
-              }
-            }}
-          >
-            {/* Contrôle de zoom */}
-            <div className="mb-2 text-center">
-              <Label className="text-white text-xs mb-1 flex items-center justify-center gap-1">
-                <ZoomIn className="h-3 w-3" />
-                {t('scanner.controls.zoom')}: {zoom}x
-              </Label>
-              <Slider
-                value={[zoom]}
-                onValueChange={([value]) => {
-                  handleZoomChange(value);
-                  autoHideControls();
-                }}
-                min={1}
-                max={5}
-                step={0.5}
-                className="w-30"
-              />
-            </div>
-            
-            {/* Bouton pour inverser manuellement */}
-            <div className="mb-2">
-              <Button
-                type="button"
-                variant={isFrontCamera ? "default" : "outline"}
-                size="sm"
-                className="w-full text-xs py-1 px-2"
-                onClick={() => {
-                  setIsFrontCamera(!isFrontCamera);
-                  autoHideControls();
-                }}
-              >
-                <ArrowLeftRight className="h-3 w-3 mr-1" />
-                {isFrontCamera ? t('scanner.camera_inverted') : t('scanner.camera_normal')}
-              </Button>
-            </div>
-            
-            {/* Sélection de caméra */}
-            {availableCameras.length > 1 && (
-              <div className="text-center">
-                <Label className="text-white text-xs mb-1 flex items-center justify-center gap-1">
-                  <Camera className="h-3 w-3" />
-                  {t('scanner.controls.camera')}
-                </Label>
-                <Select
-                  value={selectedCamera?.deviceId || ''}
-                  onValueChange={(deviceId) => {
-                    const camera = availableCameras.find(c => c.deviceId === deviceId);
-                    if (camera) handleCameraChange(camera);
-                    autoHideControls();
-                  }}
-                >
-                  <SelectTrigger size="sm" className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableCameras.map((camera, index) => (
-                      <SelectItem key={camera.deviceId} value={camera.deviceId}>
-                        {getCameraDisplayName(camera, index)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
+          <ScannerControls
+            zoom={zoom}
+            onZoomChange={handleZoomChange}
+            isFrontCamera={isFrontCamera}
+            onToggleFrontCamera={() => setIsFrontCamera(!isFrontCamera)}
+            availableCameras={availableCameras}
+            selectedCamera={selectedCamera}
+            onCameraChange={handleCameraChange}
+            showControls={showControls}
+            onAutoHideControls={autoHideControls}
+            hideControlsTimeoutRef={hideControlsTimeoutRef}
+          />
           
           {/* Bouton discret pour ouvrir/fermer les contrôles */}
           <Button
@@ -796,52 +570,12 @@ const QRCodeScanner = forwardRef<QRCodeScannerHandle, QRCodeScannerProps>(({
         )}
 
         {/* Résultats */}
-        {gtins.length > 0 && (
-          <div className="space-y-2">
-            {gtins.map((gtin) => {
-              const medicine = Object.getOwnPropertyDescriptor(medicines, gtin)?.value;
-              const isLoading = loadingGtin === gtin;
-              
-              return (
-                <div key={gtin} className="flex justify-between items-center p-3 border rounded-md bg-card">
-                  {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
-                      {t('scanner.searching')}
-                    </div>
-                  ) : medicine ? (
-                    <div className="flex-1">
-                      <h6 className="font-semibold text-primary mb-1">
-                        {medicine.name}
-                        {medicine.dose && ` (${medicine.dose} mg)`}
-                      </h6>
-                      {medicine.box_capacity && (
-                        <p className="text-sm text-muted-foreground">{t('scanner.quantity', { quantity: medicine.box_capacity })}</p>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 text-amber-500">
-                      <AlertTriangle className="h-4 w-4" />
-                      {t('scanner.medicine_not_found')}
-                    </div>
-                  )}
-                  
-                  {medicine && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
-                      onClick={() => removeMedicine(gtin)}
-                      title={t('scanner.remove_from_list')}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <ScannerResultsList
+          gtins={gtins}
+          medicines={medicines}
+          loadingGtin={loadingGtin}
+          onRemoveMedicine={removeMedicine}
+        />
       </div>
     );
   }
