@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Trash2, Plus } from 'lucide-react';
 
 interface ConditionEditorProps {
-  conditions: Record<string, any>;
+  conditions: Record<string, EditableCondition | undefined>;
   conditionFields: ConditionFieldConfig[];
   onAdd: () => void;
   onDelete: (id: string) => void;

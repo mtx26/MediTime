@@ -4,15 +4,15 @@ import { log, getErrorMessage } from '@meditime/utils';
 import { logAnalyticsEvent } from '../../services/firebase/logAnalyticsEvent';
 import { UserContext } from '../../contexts/UserContext';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
-import type { CalendarItem, CalendarsResponse, LoadingStates, UserContextValue } from '@meditime/types';
+import type { CalendarInfo, CalendarItem, CalendarsResponse, LoadingStates, UserContextValue } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-type SetUnknown = Dispatch<SetStateAction<unknown>>;
+type SetCalendarsData = Dispatch<SetStateAction<CalendarInfo[] | null>>;
 type SetLoadingStates = Dispatch<SetStateAction<LoadingStates>>;
 
 
-const fetchCalendars = async (uid: string, setCalendarsData: SetUnknown, setLoadingStates: SetLoadingStates): Promise<void> => {
+const fetchCalendars = async (uid: string, setCalendarsData: SetCalendarsData, setLoadingStates: SetLoadingStates): Promise<void> => {
   try {
     const {
       data: { session },
@@ -32,7 +32,7 @@ const fetchCalendars = async (uid: string, setCalendarsData: SetUnknown, setLoad
       a.name.localeCompare(b.name)
     );
 
-    setCalendarsData(calendars as unknown);
+    setCalendarsData(calendars);
     setLoadingStates((prev: LoadingStates) => ({ ...prev, calendars: false }));
 
     void logAnalyticsEvent('fetch_calendars', { uid, count: calendars.length });
@@ -57,7 +57,7 @@ const fetchCalendars = async (uid: string, setCalendarsData: SetUnknown, setLoad
 
 const fetchSharedCalendars = async (
   uid: string,
-  setSharedCalendarsData: SetUnknown,
+  setSharedCalendarsData: SetCalendarsData,
   setLoadingStates: SetLoadingStates
 ): Promise<void> => {
   try {
@@ -75,7 +75,7 @@ const fetchSharedCalendars = async (
     const data = (await res.json()) as CalendarsResponse;
     if (!res.ok) throw new Error(data.error);
 
-    setSharedCalendarsData((data.calendars || []) as unknown);
+    setSharedCalendarsData(data.calendars || []);
     setLoadingStates((prev: LoadingStates) => ({ ...prev, sharedCalendars: false }));
 
     void logAnalyticsEvent('fetch_shared_calendars', { uid, count: data.calendars?.length });
@@ -97,7 +97,7 @@ const fetchSharedCalendars = async (
 };
 
 export const useRealtimeCalendars = (
-  setCalendarsData: SetUnknown | null,
+  setCalendarsData: SetCalendarsData | null,
   setLoadingStates: SetLoadingStates,
   calendarsData: Array<{ id: string }> = []
 ): void => {
@@ -149,7 +149,7 @@ export const useRealtimeCalendars = (
 };
 
 export const useRealtimeSharedCalendars = (
-  setSharedCalendarsData: SetUnknown | null,
+  setSharedCalendarsData: SetCalendarsData | null,
   setLoadingStates: SetLoadingStates,
   sharedCalendarsData: Array<{ id: string }> = []
 ): void => {

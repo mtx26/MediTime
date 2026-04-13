@@ -31,7 +31,7 @@ function StockAlertsPage({
 
   const [boxes, setBoxes] = useState<CalendarBoxAlertItem[]>([]);
   const [loadingBoxes, setLoadingBoxes] = useState<boolean | undefined>(undefined);
-  const [rep, setRep] = useState<any>(null);
+  const [rep, setRep] = useState<Response | null>(null);
   const [notFound, setNotFound] = useState(false);
 
   const { calendarType, basePath } = detectCalendarType(location.pathname);
@@ -74,8 +74,7 @@ function StockAlertsPage({
   useRealtimeBoxesSwitcher(
     isDemo ? 'token' : calendarType,
     calendarId ?? null,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setBoxes as any,
+    setBoxes,
     setLoadingBoxes,
     setRep
   );

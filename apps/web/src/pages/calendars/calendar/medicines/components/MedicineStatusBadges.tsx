@@ -1,4 +1,4 @@
-import type { BoxesViewBoxItem } from '@meditime/types';
+import type { BoxesViewBoxItem, MedicineReviewConditionInput } from '@meditime/types';
 import {
   AlertTriangle,
   CheckCircle,
@@ -9,8 +9,6 @@ import {
 } from 'lucide-react';
 import StatusBadge from '@/components/common/StatusBadge';
 
-type AnyRecord = Record<string, any>;
-
 interface MedicineStatusBadgesProps {
   box: BoxesViewBoxItem;
   onEdit: () => void;
@@ -20,7 +18,7 @@ interface MedicineStatusBadgesProps {
 const MedicineStatusBadges = ({ box, onEdit, t }: MedicineStatusBadgesProps) => {
   return (
     <div className="flex flex-wrap gap-2 mb-3">
-      {box.conditions.filter((c: AnyRecord) => c !== undefined).length === 0 && (
+      {box.conditions.filter((c: MedicineReviewConditionInput) => c !== undefined).length === 0 && (
         <button
           className="p-0 border-0 bg-transparent"
           onClick={onEdit}
@@ -35,7 +33,7 @@ const MedicineStatusBadges = ({ box, onEdit, t }: MedicineStatusBadgesProps) => 
         </button>
       )}
 
-      {box.conditions?.every((c: AnyRecord) => {
+      {box.conditions?.every((c: MedicineReviewConditionInput) => {
         if (!c?.max_date) return false;
         return new Date() > new Date(c.max_date);
       }) ? (
@@ -46,7 +44,7 @@ const MedicineStatusBadges = ({ box, onEdit, t }: MedicineStatusBadgesProps) => 
           tooltip={t('boxes.condition.inactive_tooltip')}
         />
       ) : (
-        box.conditions?.some((c: AnyRecord) => {
+        box.conditions?.some((c: MedicineReviewConditionInput) => {
           if (!c?.max_date) return false;
           return new Date() > new Date(c.max_date);
         }) ? (

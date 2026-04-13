@@ -3,9 +3,9 @@ import type { MedicineReviewConditionInput, MedicineReviewSuggestion } from '../
 
 // ─── BoxesView Types ─────────────────────────────────────────────────────────
 
-export type BoxesViewBoxItem = CalendarBoxAlertItem & {
+export type BoxesViewBoxItem = Omit<CalendarBoxAlertItem, 'conditions'> & {
   code_fmd?: string | null;
-  conditions: MedicineReviewConditionInput[];
+  conditions: EditableCondition[];
 };
 
 export type StatusBadgeVariant = 'warning' | 'danger' | 'success' | 'secondary' | 'info';
@@ -62,3 +62,15 @@ export type ConditionFieldConfig = {
   ) => void;
   required?: boolean | ((cond: EditableCondition) => boolean);
 };
+
+// ─── Editing State Types ─────────────────────────────────────────────────────
+
+export interface EditingBoxState {
+  name: string;
+  dose: number | null;
+  box_capacity: number | null;
+  stock_alert_threshold: number | null;
+  stock_quantity: number | null;
+  code_fmd: string | null;
+  conditions: Record<string, EditableCondition | undefined>;
+}

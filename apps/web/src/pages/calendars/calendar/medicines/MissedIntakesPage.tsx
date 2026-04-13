@@ -96,8 +96,7 @@ function MissedIntakesPage({
   useRealtimeBoxesSwitcher(
     calendarType,
     calendarId ?? null,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setBoxes as any,
+    setBoxes,
     setLoadingBoxes,
     setRep,
   );

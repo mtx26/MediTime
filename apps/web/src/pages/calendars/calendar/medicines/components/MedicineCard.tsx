@@ -4,7 +4,8 @@ import ActionSheet from '@/components/common/ActionSheet';
 import IconButton from '@/components/common/UtilityComponents';
 import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import { buildBoxActions } from '@meditime/utils';
-import type { BoxesViewBoxItem } from '@meditime/types';
+import type { BoxesViewBoxItem, MedicineReviewConditionInput } from '@meditime/types';
+import type { CalendarSourceGroup } from '@meditime/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
@@ -12,14 +13,12 @@ import { PlusCircle, Package } from 'lucide-react';
 import MedicineStatusBadges from './MedicineStatusBadges';
 import ConditionsList from './ConditionsList';
 
-type AnyRecord = Record<string, any>;
-
 interface MedicineCardProps {
   box: BoxesViewBoxItem;
   expandedBoxes: Record<string, boolean>;
   setExpandedBoxes: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   calendarId: string | undefined;
-  calendarSource: AnyRecord;
+  calendarSource: CalendarSourceGroup;
   onEdit: (box: BoxesViewBoxItem) => void;
   onUpdateScan: () => void;
   basePath: string;
@@ -55,7 +54,7 @@ function MedicineCard({
       t('boxes.delete_title'),
       t('boxes.delete_description'),
       async () => {
-        await calendarSource.deleteBox(calId, boxId);
+        await calendarSource.deleteBox!(calId, boxId);
       }
     );
   };
@@ -71,7 +70,7 @@ function MedicineCard({
   );
 
   const getBorderClass = () => {
-    const allExpired = box.conditions?.every((c: AnyRecord) => {
+    const allExpired = box.conditions?.every((c: MedicineReviewConditionInput) => {
       if (!c?.max_date) return false;
       return new Date() > new Date(c.max_date);
     });
@@ -121,7 +120,7 @@ function MedicineCard({
                 className="w-full border-green-500 text-green-600 hover:bg-green-50"
                 icon={PlusCircle}
                 text={t('boxes.restock')}
-                onClick={() => calendarSource.restockBox(calendarId, box.id)}
+                onClick={() => calendarSource.restockBox!(calendarId!, box.id)}
                 disabled={box.box_capacity === 0}
                 helpDisabled={t('boxes.restock_disabled_tooltip')}
               />

@@ -18,10 +18,10 @@ import type {
   ConditionFieldKey,
   ConditionValue,
   ConditionFieldConfig,
+  EditingBoxState,
+  EditableCondition,
 } from '@meditime/types';
-
-// TODO: Replace AnyRecord usages with proper types
-type AnyRecord = Record<string, any>;
+import type { CalendarSourceGroup } from '@meditime/utils';
 
 import { Package, PlusCircle, QrCode, AlertTriangle } from 'lucide-react';
 import NotFound from '../../../general/NotFound';
@@ -30,8 +30,6 @@ import NotFound from '../../../general/NotFound';
 import ActionCard from './components/ActionCard';
 import MedicineCard from './components/MedicineCard';
 import EditBoxDialog from './components/EditBoxDialog';
-
-const QRCodeScannerAny = QRCodeScanner as any;
 
 // ============================================================================
 // MAIN COMPONENT: BoxesView
@@ -56,8 +54,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
   const [currentEditingBoxId, setCurrentEditingBoxId] = useState<string | null>(null);
   const [editingBoxId, setEditingBoxId] = useState<string | null>(null);
   const [expandedBoxes, setExpandedBoxes] = useState<Record<string, boolean>>({});
-  const [editingBox, setEditingBox] = useState<AnyRecord | null>(null);
-  const [rep, setRep] = useState<AnyRecord | null>(null);
+  const [editingBox, setEditingBox] = useState<EditingBoxState | null>(null);
+  const [rep, setRep] = useState<Response | null>(null);
   const [notFound, setNotFound] = useState(false);
 
   // =========================================================================
@@ -71,7 +69,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
     personalCalendars, 
     sharedUserCalendars, 
     tokenCalendars
-  )[calendarType] || {}) as AnyRecord;
+  )[calendarType] || {}) as CalendarSourceGroup;
   
   const isDemo = calendarId === 'demo';
 
@@ -82,7 +80,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
   useRealtimeBoxesSwitcher(
     isDemo ? '' : calendarType,
     calendarId ?? null,
-    setBoxes as any,
+    setBoxes,
     setLoadingBoxes,
     setRep
   );
@@ -157,7 +155,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
       t('calendar.delete_title'),
       t('calendar.delete_description'),
       async () => {
-        const r = await (personalCalendars as AnyRecord).deleteCalendar(calendarId);
+        const r = await personalCalendars.deleteCalendar(calendarId!);
         if (r.success) {
           navigate(`/${lng}/calendars`);
         }
@@ -172,7 +170,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
       t('delete_calendar_title'),
       t('delete_calendar_description'),
       async () => {
-        const r = await (sharedUserCalendars as AnyRecord).deleteSharedCalendar(calendarId);
+        const r = await sharedUserCalendars.deleteSharedCalendar(calendarId!);
         if (r.success) {
           navigate(`/${lng}/calendars`);
         }
@@ -184,13 +182,13 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
     setEditingBoxId(box.id);
     setEditingBox({
       name: box.name,
-      dose: box.dose,
+      dose: box.dose ?? null,
       box_capacity: box.box_capacity,
       stock_alert_threshold: box.stock_alert_threshold,
       stock_quantity: box.stock_quantity,
       code_fmd: box.code_fmd || null,
-      conditions: (box.conditions || []).reduce(
-        (acc: AnyRecord, c: AnyRecord) => ({
+      conditions: (box.conditions || []).reduce<Record<string, EditableCondition>>(
+        (acc, c) => ({
           ...acc,
           [c.id]: {
             ...c,
@@ -219,7 +217,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
 
   const addCondition = () => {
     const id = uuidv4();
-    setEditingBox((p: AnyRecord) => ({
+    setEditingBox((p) => p ? ({
       ...p,
       conditions: {
         ...p.conditions,
@@ -234,24 +232,24 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
           max_date_days: null,
         },
       },
-    }));
+    }) : p);
   };
 
   const deleteCondition = (id: string) => {
-    setEditingBox((p: AnyRecord) => ({
+    setEditingBox((p) => p ? ({
       ...p,
       conditions: { ...p.conditions, [id]: undefined },
-    }));
+    }) : p);
   };
 
   const updateCondition = (id: string, field: ConditionFieldKey, val: ConditionValue) => {
-    setEditingBox((p: AnyRecord) => ({
+    setEditingBox((p) => p ? ({
       ...p,
       conditions: {
         ...p.conditions,
-        [id]: { ...p.conditions[id], [field]: val },
+        [id]: { ...p.conditions[id]!, [field]: val },
       },
-    }));
+    }) : p);
   };
 
   const conditionFields: ConditionFieldConfig[] = [
@@ -353,29 +351,37 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const currentEditing = editingBox || {};
-    const conditions = Object.values(currentEditing.conditions || {}).filter(
-      (c) => c !== undefined
+    if (!editingBox) return;
+    const conditions = Object.values(editingBox.conditions || {}).filter(
+      (c): c is EditableCondition => c !== undefined
     );
     
     // Si c'est une nouvelle box temporaire (ID commence par "temp-")
     if (String(editingBoxId || '').startsWith('temp-')) {
-      await calendarSource.createBox(
-        calendarId,
-        currentEditing.name,
-        currentEditing.box_capacity,
-        currentEditing.stock_alert_threshold,
-        currentEditing.stock_quantity,
-        currentEditing.dose,
+      await calendarSource.createBox!(
+        calendarId!,
+        editingBox.name,
+        editingBox.box_capacity ?? 0,
+        editingBox.stock_alert_threshold ?? 0,
+        editingBox.stock_quantity ?? 0,
+        editingBox.dose,
         conditions,
-        currentEditing.code_fmd
+        editingBox.code_fmd
       );
     } else {
       // Mise à jour d'une box existante
-      await calendarSource.updateBox(
-        calendarId, 
-        editingBoxId, 
-        { ...currentEditing, conditions }
+      await calendarSource.updateBox!(
+        calendarId!, 
+        editingBoxId!, 
+        {
+          name: editingBox.name,
+          dose: editingBox.dose ?? undefined,
+          box_capacity: editingBox.box_capacity ?? undefined,
+          stock_alert_threshold: editingBox.stock_alert_threshold ?? undefined,
+          stock_quantity: editingBox.stock_quantity ?? undefined,
+          code_fmd: editingBox.code_fmd,
+          conditions,
+        }
       );
     }
     
@@ -383,8 +389,8 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
   };
 
   const processMedicineCreation = async (med: QRScannedMedicine) => {
-    const res = await calendarSource.createBox(
-      calendarId,
+    const res = await calendarSource.createBox!(
+      calendarId!,
       med.name,
       med.box_capacity,
       med.stock_alert_threshold,
@@ -424,9 +430,9 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
     const med = medicines[0];
     const currentBox = boxes.find((b) => b.id === currentEditingBoxId);
     
-    const res = await calendarSource.updateBox(
-      calendarId,
-      currentEditingBoxId,
+    const res = await calendarSource.updateBox!(
+      calendarId!,
+      currentEditingBoxId!,
       {
         name: med.name,
         dose: med.dose,
@@ -456,7 +462,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
           {
             onRename: undefined,
             onDelete: handleDeleteCalendar,
-            onExportPdf: () => calendarSource.downloadCalendarPdf(calendarId),
+            onExportPdf: () => calendarSource.downloadCalendarPdf!(calendarId!, false),
           },
           ['rename', 'medicines'],
         )
@@ -464,7 +470,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
           { calendarId: calendarId!, lng: lng!, basePath, selectedDate: null },
           {
             onDelete: handleDeleteSharedCalendar,
-            onExportPdf: () => calendarSource.downloadCalendarPdf(calendarId),
+            onExportPdf: () => calendarSource.downloadCalendarPdf!(calendarId!, false),
           },
           ['medicines'],
         );
@@ -567,7 +573,7 @@ function BoxesView({ personalCalendars, sharedUserCalendars, tokenCalendars }: B
       </div>
 
       {/* QR Code Scanner Modal */}
-      <QRCodeScannerAny
+      <QRCodeScanner
         modal={true}
         show={showQRModal}
         singleScan={singleScan}

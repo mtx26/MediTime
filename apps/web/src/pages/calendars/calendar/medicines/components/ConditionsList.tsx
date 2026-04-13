@@ -1,17 +1,16 @@
 import { ChevronUp, ChevronDown, AlertCircle } from 'lucide-react';
 import StatusBadge from '@/components/common/StatusBadge';
-
-type AnyRecord = Record<string, any>;
+import type { EditableCondition } from '@meditime/types';
 
 interface ConditionsListProps {
-  conditions: AnyRecord[];
+  conditions: EditableCondition[];
   expanded: boolean;
   onToggle: () => void;
   t: (key: string) => string;
 }
 
 const ConditionsList = ({ conditions, expanded, onToggle, t }: ConditionsListProps) => {
-  const timeOfDayMap: AnyRecord = {
+  const timeOfDayMap: Record<string, string> = {
     morning: t('morning'),
     noon: t('noon'),
     evening: t('evening'),
@@ -38,26 +37,26 @@ const ConditionsList = ({ conditions, expanded, onToggle, t }: ConditionsListPro
 
       {expanded && (
         <div className="mt-3 space-y-3">
-          {conditions.filter((c: AnyRecord) => c !== undefined).length > 0 ? (
+          {conditions.filter((c) => c !== undefined).length > 0 ? (
             conditions
-              .filter((c: AnyRecord) => c !== undefined)
-              .map((cond: AnyRecord) => (
+              .filter((c) => c !== undefined)
+              .map((cond) => (
                 <div
                   key={cond.id}
                   className="p-3 border rounded-md bg-muted/50"
                 >
                   <p className="mb-1">
                     <strong>{cond.tablet_count}</strong>{' '}
-                    {cond.tablet_count > 1 ? t('boxes.tablets') : t('boxes.tablet')}{' '}
+                    {Number(cond.tablet_count) > 1 ? t('boxes.tablets') : t('boxes.tablet')}{' '}
                     {t('boxes.every')}{' '}
                     <strong>{cond.interval_days}</strong>{' '}
-                    {cond.interval_days > 1 ? t('boxes.days') : t('boxes.day')}{' '}
+                    {Number(cond.interval_days) > 1 ? t('boxes.days') : t('boxes.day')}{' '}
                     {t('boxes.each')}{' '}
-                    <strong>{timeOfDayMap[cond.time_of_day]}</strong>
+                    <strong>{timeOfDayMap[cond.time_of_day ?? '']}</strong>
                   </p>
-                  {cond.interval_days > 1 && (
+                  {Number(cond.interval_days) > 1 && (
                     <p className="text-sm text-muted-foreground">
-                      {t('boxes.from')} {new Date(cond.start_date).toLocaleDateString()}
+                      {t('boxes.from')} {new Date(cond.start_date!).toLocaleDateString()}
                     </p>
                   )}
                   {cond.max_date && (

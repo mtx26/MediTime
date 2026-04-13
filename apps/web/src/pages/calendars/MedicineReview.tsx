@@ -365,7 +365,7 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
                   step: '1',
                   show: cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
                   required: cond.max_date_mode === 'until_date' || cond.max_date_mode === 'for_days',
-                }].filter(item => item.show !== false).map(({ label, field, type, step, min, options, required }: any) => (
+                }].filter(item => item.show !== false).map(({ label, field, type, step, min, options, required }: { label: string; field: string; type: string; step?: string; min?: string; options?: { value: string; label: string }[]; required?: boolean; show?: boolean }) => (
                   <div key={field} className="mb-2">
                     <Label htmlFor={field}>{label} :</Label>
                     {type === 'select' ? (
@@ -377,7 +377,7 @@ export default function MedicineReview({ personalCalendars }: MedicineReviewProp
                           <SelectValue placeholder={field === 'time_of_day' ? t('medicine_review.select_option') : (options?.[0]?.label || '')} />
                         </SelectTrigger>
                         <SelectContent>
-                          {options?.map((opt: any) => (
+                          {options?.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                           ))}
                         </SelectContent>

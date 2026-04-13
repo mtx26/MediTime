@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import type { ConditionFieldKey, ConditionValue, ConditionFieldConfig } from '@meditime/types';
+import type { ConditionFieldKey, ConditionValue, ConditionFieldConfig, EditingBoxState } from '@meditime/types';
 import { fetchSuggestions } from '@/utils/api/fetchSuggestions';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -11,13 +11,11 @@ import { Save, X } from 'lucide-react';
 import SearchInput from '@/components/common/SearchInput';
 import ConditionEditor from './ConditionEditor';
 
-type AnyRecord = Record<string, any>;
-
 interface EditBoxDialogProps {
   editingBoxId: string | null;
-  editingBox: AnyRecord | null;
+  editingBox: EditingBoxState | null;
   conditionFields: ConditionFieldConfig[];
-  setEditingBox: React.Dispatch<React.SetStateAction<AnyRecord | null>>;
+  setEditingBox: React.Dispatch<React.SetStateAction<EditingBoxState | null>>;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
   onAddCondition: () => void;
@@ -58,11 +56,11 @@ const EditBoxDialog = ({
                 <SearchInput
                   name={editingBox.name}
                   dose={editingBox.dose}
-                  onChangeName={(value) => setEditingBox((p: AnyRecord) => ({ ...p, name: value }))}
-                  onChangeDose={(value) => setEditingBox((p: AnyRecord) => ({ ...p, dose: value }))}
-                  onChangeBoxCapacity={(value) => setEditingBox((p: AnyRecord) => ({ ...p, box_capacity: value }))}
-                  onChangeStockQuantity={(value) => setEditingBox((p: AnyRecord) => ({ ...p, stock_quantity: value }))}
-                  onChangeCodeFmd={(value) => setEditingBox((p: AnyRecord) => ({ ...p, code_fmd: value }))}
+                  onChangeName={(value) => setEditingBox((p) => p ? ({ ...p, name: value }) : p)}
+                  onChangeDose={(value) => setEditingBox((p) => p ? ({ ...p, dose: value }) : p)}
+                  onChangeBoxCapacity={(value) => setEditingBox((p) => p ? ({ ...p, box_capacity: value }) : p)}
+                  onChangeStockQuantity={(value) => setEditingBox((p) => p ? ({ ...p, stock_quantity: value }) : p)}
+                  onChangeCodeFmd={(value) => setEditingBox((p) => p ? ({ ...p, code_fmd: value }) : p)}
                   fetchSuggestions={fetchSuggestions}
                 />
 
@@ -74,10 +72,10 @@ const EditBoxDialog = ({
                       type="number"
                       value={editingBox.box_capacity ?? ''}
                       onChange={(e) =>
-                        setEditingBox((p: AnyRecord) => ({
+                        setEditingBox((p) => p ? ({
                           ...p,
                           box_capacity: e.target.value === '' ? null : Number(e.target.value),
-                        }))
+                        }) : p)
                       }
                       aria-label={t('boxes.capacity')}
                     />
@@ -88,10 +86,10 @@ const EditBoxDialog = ({
                       type="number"
                       value={editingBox.stock_alert_threshold ?? ''}
                       onChange={(e) =>
-                        setEditingBox((p: AnyRecord) => ({
+                        setEditingBox((p) => p ? ({
                           ...p,
                           stock_alert_threshold: e.target.value === '' ? null : Number(e.target.value),
-                        }))
+                        }) : p)
                       }
                       aria-label={t('boxes.alert_threshold')}
                     />
@@ -105,10 +103,10 @@ const EditBoxDialog = ({
                     type="number"
                     value={editingBox.stock_quantity ?? ''}
                     onChange={(e) =>
-                      setEditingBox((p: AnyRecord) => ({
+                      setEditingBox((p) => p ? ({
                         ...p,
                         stock_quantity: e.target.value === '' ? null : Number(e.target.value),
-                      }))
+                      }) : p)
                     }
                     aria-label={t('boxes.remaining_qty')}
                   />

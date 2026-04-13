@@ -6,10 +6,10 @@ import {
   useRealtimeSharedBoxes,
 } from './useRealtimeBoxes';
 
-export const useRealtimeBoxesSwitcher = (
+export const useRealtimeBoxesSwitcher = <T extends { name: string } = BoxItem>(
   calendarType: CalendarPageSourceType | '',
   calendarId: string | null,
-  setBoxes: Dispatch<SetStateAction<BoxItem[]>>,
+  setBoxes: Dispatch<SetStateAction<T[]>>,
   setLoadingBoxes: Dispatch<SetStateAction<boolean | undefined>>,
   setRep: Dispatch<SetStateAction<Response | null>>
 ): void => {
@@ -17,13 +17,13 @@ export const useRealtimeBoxesSwitcher = (
   const isPersonal = calendarType === 'personal';
   const isShared = calendarType === 'sharedUser';
 
-  useRealtimePersonalBoxes(
+  useRealtimePersonalBoxes<T>(
     isPersonal ? calendarId : null,
     setBoxes,
     setLoadingBoxes,
     setRep
   );
-  useRealtimeSharedBoxes(
+  useRealtimeSharedBoxes<T>(
     isShared ? calendarId : null,
     setBoxes,
     setLoadingBoxes,
