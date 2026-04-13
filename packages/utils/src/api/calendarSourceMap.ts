@@ -8,6 +8,7 @@ import type {
   CalendarBoxInput,
   CalendarId,
   MedicineReviewConditionInput,
+  MissedIntakesPayload,
   PersonalBoxResult,
   TokenId,
 } from '@meditime/types';
@@ -34,6 +35,8 @@ export interface CalendarSourceGroup {
   createTokenIcs: ((calendarId: CalendarId) => Promise<ApiResult>) | null;
   deleteTokenIcs: ((calendarId: CalendarId, tokenId: TokenId) => Promise<ApiResult>) | null;
   fetchScheduleNegativeStock: ((calendarId: CalendarId, medsId: string[]) => Promise<ApiResult>) | null;
+  applyMissedIntakes: ((calendarId: CalendarId, payload: MissedIntakesPayload) => Promise<ApiResult>) | null;
+  previewMissedIntakes: ((calendarId: CalendarId, payload: MissedIntakesPayload) => Promise<ApiResult>) | null;
 }
 
 interface CalendarSourceMap {
@@ -68,6 +71,8 @@ export const getCalendarSourceMap = (
     createTokenIcs: personalCalendars.createTokenIcs,
     deleteTokenIcs: personalCalendars.deleteTokenIcs,
     fetchScheduleNegativeStock: personalCalendars.fetchPersonalScheduleNegativeStock ,
+    applyMissedIntakes: personalCalendars.applyPersonalMissedIntakes,
+    previewMissedIntakes: personalCalendars.previewPersonalMissedIntakes,
     },
   sharedUser: {
     fetchSchedule: sharedUserCalendars.fetchSharedUserCalendarSchedule,
@@ -90,6 +95,8 @@ export const getCalendarSourceMap = (
     createTokenIcs: sharedUserCalendars.createSharedTokenIcs,
     deleteTokenIcs: sharedUserCalendars.deleteSharedTokenIcs,
     fetchScheduleNegativeStock: sharedUserCalendars.fetchSharedUserScheduleNegativeStock,
+    applyMissedIntakes: sharedUserCalendars.applySharedUserMissedIntakes,
+    previewMissedIntakes: sharedUserCalendars.previewSharedUserMissedIntakes,
   },
   token: {
     fetchSchedule: tokenCalendars.fetchTokenCalendarSchedule,
@@ -113,5 +120,7 @@ export const getCalendarSourceMap = (
     createTokenIcs: null,
     deleteTokenIcs: null,
     fetchScheduleNegativeStock: null,
+    applyMissedIntakes: null,
+    previewMissedIntakes: null,
   },
 });

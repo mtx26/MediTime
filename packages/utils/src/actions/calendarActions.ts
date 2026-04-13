@@ -116,6 +116,13 @@ function buildCalendarActionsBase(
     linkTo: `/${lng}/${basePath}/${calendarId}/pillbox-uses`,
     dataTour: 'pillbox-history-btn',
   });
+  add({
+    id: 'missed_intakes',
+    icon: 'calendar-off',
+    labelKey: 'missed_intakes.title',
+    titleKey: 'missed_intakes.title',
+    linkTo: `/${lng}/${basePath}/${calendarId}/missed-intakes`,
+  });
 
   add({ separator: true });
 

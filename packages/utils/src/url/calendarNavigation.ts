@@ -13,6 +13,7 @@ const CALENDAR_DETAIL_PAGES = [
   'daily',
   'pillbox-uses',
   'ics-tokens',
+  'missed-intakes',
 ] as const;
 
 export function buildLocationList(pathWithSlash: string): CalendarLocationList {
@@ -32,12 +33,14 @@ export function buildReturnToCalendarList(pathParts: string[]): ReturnToCalendar
 }
 
 export function buildReturnToCalendar(pathParts: string[]): ReturnToCalendarState {
-  const isDetailPage = pathParts.length === 3 && CALENDAR_DETAIL_PAGES.includes(pathParts[2] as (typeof CALENDAR_DETAIL_PAGES)[number]);
+  const isDetailPage =
+    (pathParts.length === 3 || pathParts.length === 4) &&
+    CALENDAR_DETAIL_PAGES.includes(pathParts[2] as (typeof CALENDAR_DETAIL_PAGES)[number]);
 
   return {
     calendar: pathParts[0] === 'calendar' && isDetailPage,
     sharedUserCalendar: pathParts[0] === 'shared-user-calendar' && isDetailPage,
-    tokenCalendar: pathParts.length === 3 && pathParts[0] === 'shared-token-calendar',
+    tokenCalendar: (pathParts.length === 3 || pathParts.length === 4) && pathParts[0] === 'shared-token-calendar',
   };
 }
 

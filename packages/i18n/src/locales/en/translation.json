@@ -233,6 +233,12 @@
       "notification_time_error": "Error retrieving or updating notification time",
       "notification_time_retrieved": "notification time retrieved",
       "notification_time_updated": "notification time update"
+    },
+    "missed_intakes": {
+      "error": "Error applying missed intakes"
+    },
+    "shared_missed_intakes": {
+      "error": "Error applying shared missed intakes"
     }
   },
   "app": {
@@ -1153,6 +1159,35 @@
     "title": "Why choose MediTime?"
   },
   "yes": "Yes",
+  "missed_intakes": {
+    "title": "Missed intake",
+    "subtitle": "Report the days when you did not take your medications to adjust your stock.",
+    "loading": "Loading...",
+    "mode_intake": "Missed intake",
+    "mode_medication": "Medication unavailable",
+    "select_days": "Select the days",
+    "selection_individual": "Days",
+    "selection_range": "Range",
+    "select_times": "Select the time slots",
+    "customize_per_day": "Customize per day",
+    "select_medication": "Select medications",
+    "select_period": "Select the period",
+    "summary": "Summary",
+    "stock": "Stock",
+    "days_count": "day(s)",
+    "info_intake": "Unused medications will be added back to your stock.",
+    "info_medication": "Tablets not consumed during the period will be added back to stock.",
+    "affected_meds": "Affected medications",
+    "apply": "Apply",
+    "success": "{{count}} tablet(s) added back to stock.",
+    "next": "Next",
+    "back": "Back",
+    "recap_title": "Summary",
+    "recap_subtitle": "Review the changes before applying them.",
+    "total": "Total to re-add",
+    "tablets": "tablet(s)",
+    "no_affected_meds": "No medications affected for the selected criteria."
+  },
   "you_have_no_pillbox_use_history": "You have no usage history for the pill organizer.",
   "confirm_calendar_refill": "Confirm that the pillbox is full",
   "pillbox_refill_description": "The pill organizer will refill with any missing medication (negative stock) for this week. This action is irreversible.",

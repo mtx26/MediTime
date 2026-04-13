@@ -18,6 +18,7 @@ from .pdf import *
 from .gemini import *
 from .ics import *
 from .docs import *
+from .missed_intakes import *
 
 
 def register_routes(app):

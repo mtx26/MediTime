@@ -24,7 +24,7 @@ const workspaceFrontendDir = path.join(workspaceRootDir, 'apps', 'web');
 const workspaceBackendDir = path.join(workspaceRootDir, 'apps', 'backend');
 const workspaceBackendAppDir = path.join(workspaceRootDir, 'apps', 'backend', 'app');
 const frontendSrcDir = path.join(workspaceFrontendDir, 'src');
-const localesRootDir = path.join(frontendSrcDir, 'locales');
+const localesRootDir = path.join(workspaceRootDir, 'packages', 'i18n', 'src', 'locales');
 const frPath = localeFilePath(localesRootDir, 'fr');
 
 function loadMonorepoEnv() {
