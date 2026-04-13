@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import type { ActionItem, ActionSheetAction } from '@meditime/types';
 import {
   Eye, Pencil, Grid3X3, CalendarDays, Share2, Pill, Download,
-  AlertTriangle, Calendar, Clock, Settings, Trash2, ScanLine,
+  AlertTriangle, Calendar, CalendarOff, Clock, Settings, Trash2, ScanLine,
   FileText, Bell, MessageSquare,
 } from 'lucide-react';
 
@@ -20,6 +20,7 @@ const ICON_MAP: Partial<Record<string, React.ComponentType<{ className?: string 
   'download': Download,
   'alert-triangle': AlertTriangle,
   'calendar': Calendar,
+  'calendar-off': CalendarOff,
   'clock': Clock,
   'settings': Settings,
   'trash-2': Trash2,

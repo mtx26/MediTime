@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Pill, Sun, Clock, Moon, Info, Loader2, ArrowRight, CalendarDays } from 'lucide-react';
-import { toast } from 'sonner';
 import type { MissedIntakesPageProps, MissedIntakesPayload, MissedIntakesPreviewBox } from '@meditime/types';
 
 const TIME_COLORS: Record<string, string> = {
@@ -88,8 +87,6 @@ function MissedIntakesRecapPage({
     try {
       const result = await calendarSource.applyMissedIntakes(calendarId, payload);
       if (result?.success) {
-        const total = (result as unknown as { total_tablets_added?: number }).total_tablets_added ?? 0;
-        toast.success(t('missed_intakes.success', { count: total }));
         // Retour 2 niveaux (recap -> missed-intakes -> calendar)
         navigate('../..', { relative: 'path' });
       }
