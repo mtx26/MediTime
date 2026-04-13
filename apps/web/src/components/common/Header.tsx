@@ -10,8 +10,7 @@ import { useTranslation } from 'react-i18next';
 import type { NotificationItem, AppSharedProps, CalendarInfo } from '@meditime/types';
 import {
   buildLocationList,
-  buildReturnToCalendarList,
-  buildReturnToCalendar,
+  buildBackLink,
   isPillboxPath,
 } from '@meditime/utils';
 import {
@@ -59,9 +58,6 @@ function Navbar({ sharedProps }: { sharedProps: AppSharedProps }) {
   const pathWithSlash = '/' + pathAfterLang;
   const pathParts = pathAfterLang.split('/').filter(Boolean);
   const locationList = buildLocationList(pathWithSlash);
-  const locationAvailableForReturnToCalendarList = buildReturnToCalendarList(pathParts);
-  const shouldShowReturnToCalendarList = Object.values(locationAvailableForReturnToCalendarList).some(Boolean);
-  const locationAvailableForReturnToCalendar = buildReturnToCalendar(pathParts);
   const isPillboxPage = isPillboxPath(pathParts);
 
   const personalCalendarsData = sharedProps.personalCalendars.calendarsData as CalendarInfo[] | undefined;
@@ -98,6 +94,7 @@ function Navbar({ sharedProps }: { sharedProps: AppSharedProps }) {
     locationList.tokenCalendar,
   ]);
   const unreadCount = notificationsData?.filter((n) => !n.read).length || 0;
+  const backLink = buildBackLink(pathParts, lng, calendarInfo?.id ?? null, basePath, tokenId);
 
   return (
     <>
@@ -107,27 +104,8 @@ function Navbar({ sharedProps }: { sharedProps: AppSharedProps }) {
           <div className="flex h-16 w-full items-center justify-between">
             {/* Logo / Retour */}
             <div className="flex items-center">
-              {shouldShowReturnToCalendarList ? (
-                <Link to={`/${lng}/calendars`} className="flex items-center gap-2 text-lg font-semibold">
-                  <ArrowLeft className="h-5 w-5" /> {t('back')}
-                </Link>
-              ) : calendarInfo?.id &&
-                basePath &&
-                (locationAvailableForReturnToCalendar.calendar ||
-                  locationAvailableForReturnToCalendar.sharedUserCalendar) ? (
-                <Link
-                  to={`/${lng}/${basePath}/${calendarInfo.id}`}
-                  className="flex items-center gap-2 text-lg font-semibold"
-                >
-                  <ArrowLeft className="h-5 w-5" /> {t('back')}
-                </Link>
-              ) : locationList.tokenCalendar &&
-                tokenId &&
-                locationAvailableForReturnToCalendar.tokenCalendar ? (
-                <Link
-                  to={`/${lng}/shared-token-calendar/${tokenId}`}
-                  className="flex items-center gap-2 text-lg font-semibold"
-                >
+              {backLink ? (
+                <Link to={backLink} className="flex items-center gap-2 text-lg font-semibold">
                   <ArrowLeft className="h-5 w-5" /> {t('back')}
                 </Link>
               ) : (
