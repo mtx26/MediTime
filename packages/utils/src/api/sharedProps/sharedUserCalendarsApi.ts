@@ -386,7 +386,6 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
         uid,
         analyticsEvent: 'apply_shared_user_missed_intakes',
         analyticsData: { calendarId, uid },
-        showAlert,
       });
     },
 

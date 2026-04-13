@@ -321,7 +321,6 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
         uid,
         analyticsEvent: 'apply_personal_missed_intakes',
         analyticsData: { calendarId, uid },
-        showAlert,
       });
     },
 
