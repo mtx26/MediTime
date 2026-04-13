@@ -233,6 +233,12 @@
       "photo_error": "erreur lors de la mise à jour de la photo de l'utilisateur",
       "photo_success": "photo de l'utilisateur mise à jour",
       "updated": "données utilisateur mises à jour"
+    },
+    "missed_intakes": {
+      "error": "Error applying missed intakes"
+    },
+    "shared_missed_intakes": {
+      "error": "Error applying shared missed intakes"
     }
   },
   "app": {
@@ -1155,6 +1161,35 @@
     "title": "Pourquoi choisir MediTime ?"
   },
   "yes": "Oui",
+  "missed_intakes": {
+    "title": "Prise oubliée",
+    "subtitle": "Déclarez les jours où vous n'avez pas pris vos médicaments pour ajuster votre stock.",
+    "loading": "Chargement...",
+    "mode_intake": "Oubli de prise",
+    "mode_medication": "Médicament indisponible",
+    "select_days": "Sélectionnez les jours",
+    "selection_individual": "Jours",
+    "selection_range": "Période",
+    "select_times": "Sélectionnez les moments",
+    "customize_per_day": "Personnaliser par jour",
+    "select_medication": "Sélectionnez les médicaments",
+    "select_period": "Sélectionnez la période",
+    "summary": "Récapitulatif",
+    "stock": "Stock",
+    "days_count": "jour(s)",
+    "info_intake": "Les médicaments non consommés seront réajoutés à votre stock.",
+    "info_medication": "Les comprimés non consommés pendant la période seront réajoutés au stock.",
+    "affected_meds": "Médicaments concernés",
+    "apply": "Appliquer",
+    "success": "{{count}} comprimé(s) réajouté(s) au stock.",
+    "next": "Suivant",
+    "back": "Retour",
+    "recap_title": "Récapitulatif",
+    "recap_subtitle": "Vérifiez les modifications avant de les appliquer.",
+    "total": "Total à réajouter",
+    "tablets": "comprimé(s)",
+    "no_affected_meds": "Aucun médicament concerné pour la sélection choisie."
+  },
   "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier.",
   "error": "error",
   "notifications": "notifications"

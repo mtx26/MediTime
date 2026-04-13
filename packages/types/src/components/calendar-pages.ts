@@ -126,6 +126,7 @@ export type IcsListPageProps = CalendarDataSourceProps;
 export type CalendarSettingsPageProps = CalendarDataSourceProps;
 export type DailyCalendarPageProps = CalendarDataSourceProps;
 export type StockAlertsPageProps = CalendarDataSourceProps;
+export type MissedIntakesPageProps = CalendarDataSourceProps;
 export type SharedListPageProps = CalendarDataSourceProps;
 export type BoxesViewPageProps = CalendarDataSourceProps;
 

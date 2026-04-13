@@ -233,6 +233,12 @@
       "notification_time_error": "Error al recuperar o actualizar la hora de notificación.",
       "notification_time_retrieved": "hora de notificación recuperada",
       "notification_time_updated": "Actualización de la hora de notificación"
+    },
+    "missed_intakes": {
+      "error": "Error applying missed intakes"
+    },
+    "shared_missed_intakes": {
+      "error": "Error applying shared missed intakes"
     }
   },
   "app": {
@@ -1157,5 +1163,30 @@
   "confirm_calendar_refill": "Confirme que el pastillero esté lleno",
   "pillbox_refill_description": "El pastillero se reabastecerá con cualquier medicamento faltante (stock negativo) para esta semana. Esta acción es irreversible.",
   "error": "error",
-  "notifications": "notificaciones"
+  "notifications": "notificaciones",
+  "missed_intakes": {
+    "affected_meds": "Médicaments concernés",
+    "apply": "Appliquer",
+    "customize_per_day": "Personnaliser par jour",
+    "days_count": "jour(s)",
+    "info_intake": "Les médicaments non consommés seront réajoutés à votre stock.",
+    "info_medication": "Les comprimés non consommés pendant la période seront réajoutés au stock.",
+    "loading": "Chargement...",
+    "mode_intake": "Oubli de prise",
+    "mode_medication": "Médicament indisponible",
+    "next": "Suivant",
+    "no_affected_meds": "Aucun médicament concerné pour la sélection choisie.",
+    "recap_subtitle": "Vérifiez les modifications avant de les appliquer.",
+    "recap_title": "Récapitulatif",
+    "select_days": "Sélectionnez les jours",
+    "select_medication": "Sélectionnez les médicaments",
+    "select_period": "Sélectionnez la période",
+    "select_times": "Sélectionnez les moments",
+    "selection_individual": "Jours",
+    "selection_range": "Période",
+    "stock": "Stock",
+    "subtitle": "Déclarez les jours où vous n'avez pas pris vos médicaments pour ajuster votre stock.",
+    "success": "{{count}} comprimé(s) réajouté(s) au stock.",
+    "title": "Prise oubliée"
+  }
 }

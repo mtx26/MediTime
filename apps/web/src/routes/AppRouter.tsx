@@ -23,9 +23,10 @@ const PillboxPage = lazy(() => import('../pages/calendars/calendar/pillbox/Pillb
 const DailyCalendarPage = lazy(() => import('../pages/calendars/calendar/DailyCalendarPage'));
 const CalendarList = lazy(() => import('../pages/calendars/CalendarList'));
 const SharedList = lazy(() => import('../pages/calendars/calendar/share/SharedList'));
-const StockAlertsPage = lazy(() => import('../pages/calendars/calendar/StockAlertsPage'));
+const StockAlertsPage = lazy(() => import('../pages/calendars/calendar/medicines/StockAlertsPage'));
 const PillboxUses = lazy(() => import('../pages/calendars/calendar/pillbox/PillboxUses'));
-
+const MissedIntakesPage = lazy(() => import('../pages/calendars/calendar/medicines/MissedIntakesPage'));
+const MissedIntakesRecapPage = lazy(() => import('../pages/calendars/calendar/medicines/MissedIntakesRecapPage'));
 const MedicinesList = lazy(() => import('../pages/calendars/calendar/medicines/MedicinesList'));
 const BoxesView = lazy(() => import('../pages/calendars/calendar/medicines/BoxesView'));
 const IcsList = lazy(() => import('../pages/calendars/calendar/medicines/IcsList'));
@@ -150,6 +151,24 @@ function PrivateCalendarSubRoutes({ sharedProps, isInitialLoading }: { sharedPro
           />
         }
       />
+      <Route path="missed-intakes">
+        <Route
+          index
+          element={
+            <PrivateRoute
+              element={<RouteWithLoader element={<MissedIntakesPage {...sharedProps} />} isLoading={isInitialLoading} />}
+            />
+          }
+        />
+        <Route
+          path="recap"
+          element={
+            <PrivateRoute
+              element={<RouteWithLoader element={<MissedIntakesRecapPage {...sharedProps} />} isLoading={isInitialLoading} />}
+            />
+          }
+        />
+      </Route>
     </>
   );
 }
