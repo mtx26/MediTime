@@ -211,7 +211,7 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       if (result.success) {
         return {
           ...result,
-          boxId: result.box_id,
+          boxId: result.box_id as string,
         };
       }
 
@@ -385,6 +385,19 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
         origin: 'APPLY_SHARED_USER_MISSED_INTAKES',
         uid,
         analyticsEvent: 'apply_shared_user_missed_intakes',
+        analyticsData: { calendarId, uid },
+        showAlert,
+      });
+    },
+
+    previewSharedUserMissedIntakes: async (calendarId: CalendarId, payload: MissedIntakesPayload): Promise<ApiResult> => {
+      return performApiCall({
+        url: `${apiUrl}/api/shared/users/calendars/${calendarId}/missed-intakes/preview`,
+        method: 'POST',
+        body: payload,
+        origin: 'PREVIEW_SHARED_USER_MISSED_INTAKES',
+        uid,
+        analyticsEvent: 'preview_shared_user_missed_intakes',
         analyticsData: { calendarId, uid },
         showAlert,
       });

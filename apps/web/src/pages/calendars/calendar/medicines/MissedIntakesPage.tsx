@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getCalendarSourceMap, detectCalendarType } from '@meditime/utils';
 import { useRealtimeBoxesSwitcher } from '@/hooks/realtime/useRealtimeBoxesSwitcher';
@@ -13,10 +13,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { CalendarDays, Pill, Sun, Clock, Moon, Info, Loader2, ArrowRight } from 'lucide-react';
+import { CalendarDays, Pill, Sun, Clock, Moon, ArrowRight, CalendarRange } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
-import { toast } from 'sonner';
-import type { MissedIntakesPageProps, MissedMode, TimeOfDay, BoxItem, BoxCondition } from '@meditime/types';
+import type { MissedIntakesPageProps, MissedMode, TimeOfDay, BoxItem } from '@meditime/types';
+import type { DateRange } from 'react-day-picker';
 
 const TIME_COLORS: Record<TimeOfDay, string> = {
   morning: 'bg-red-400/20 text-red-700 border-red-400/50',
@@ -34,29 +34,13 @@ const isBoxActive = (box: BoxItem): boolean => {
   });
 };
 
-/** Vérifie si une condition est active à une date donnée. */
-const isConditionActiveAt = (cond: BoxCondition, day: Date): boolean => {
-  if (!cond) return false;
-  if (cond.max_date && new Date(cond.max_date) < day) return false;
-  if (cond.start_date) {
-    const start = new Date(cond.start_date + 'T00:00:00');
-    if (day < start) return false;
-  }
-  return true;
-};
-
-/** Extrait les time_of_day distincts des conditions actives d'une box aux dates données (ou maintenant si absent). */
-const getBoxTimes = (box: BoxItem, forDays?: Date[]): TimeOfDay[] => {
+/** Extrait les time_of_day distincts des conditions actives d'une box. */
+const getBoxTimes = (box: BoxItem): TimeOfDay[] => {
   if (!box.conditions) return [];
   const times = new Set<TimeOfDay>();
   for (const c of box.conditions) {
     if (!c.time_of_day) continue;
-    // Si des jours sont fournis, vérifier que la condition est active sur au moins un jour
-    if (forDays && forDays.length > 0) {
-      if (!forDays.some((d) => isConditionActiveAt(c, d))) continue;
-    } else {
-      if (c.max_date && new Date(c.max_date) < new Date()) continue;
-    }
+    if (c.max_date && new Date(c.max_date) < new Date()) continue;
     times.add(c.time_of_day as TimeOfDay);
   }
   return Array.from(times);
@@ -66,44 +50,26 @@ const getBoxTimes = (box: BoxItem, forDays?: Date[]): TimeOfDay[] => {
 const toDateKey = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-/** Estime le nombre de comprimés à réajouter pour une box donnée. */
-const estimateTabletsToAdd = (
-  box: BoxItem,
-  days: Date[],
-  filterTimes?: TimeOfDay[],
-  perDayTimes?: Record<string, TimeOfDay[]>,
-): number => {
-  if (!box.conditions) return 0;
-  let total = 0;
-  for (const cond of box.conditions) {
-    const tabletCount = cond.tablet_count ?? 0;
-    if (tabletCount <= 0) continue;
-    const intervalDays = cond.interval_days ?? 1;
-    const startDate = cond.start_date ? new Date(cond.start_date + 'T00:00:00') : null;
-    for (const day of days) {
-      // Vérifier si la condition est active à cette date
-      if (!isConditionActiveAt(cond, day)) continue;
-      // Vérifier interval
-      if (startDate) {
-        const delta = Math.round((day.getTime() - startDate.getTime()) / 86400000);
-        if (delta < 0 || delta % intervalDays !== 0) continue;
-      }
-      // Filtrer par moment si fourni
-      if (filterTimes || perDayTimes) {
-        const dayKey = toDateKey(day);
-        const dayTimes = perDayTimes?.[dayKey] ?? filterTimes ?? [];
-        if (cond.time_of_day && !dayTimes.includes(cond.time_of_day as TimeOfDay)) continue;
-      }
-      total += tabletCount;
-    }
-  }
-  return total;
-};
-
 const TIME_ICONS: Record<TimeOfDay, typeof Sun> = {
   morning: Sun,
   noon: Clock,
   evening: Moon,
+};
+
+type SelectionMode = 'individual' | 'range';
+
+/** Génère toutes les dates entre from et to (inclus). */
+const expandRange = (from: Date, to: Date): Date[] => {
+  const days: Date[] = [];
+  const current = new Date(from);
+  current.setHours(0, 0, 0, 0);
+  const end = new Date(to);
+  end.setHours(0, 0, 0, 0);
+  while (current <= end) {
+    days.push(new Date(current));
+    current.setDate(current.getDate() + 1);
+  }
+  return days;
 };
 
 function MissedIntakesPage({
@@ -113,6 +79,7 @@ function MissedIntakesPage({
 }: MissedIntakesPageProps) {
   const params = useParams<{ lng?: string; calendarId?: string; sharedToken?: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { showLoading } = useLoading();
 
@@ -120,16 +87,11 @@ function MissedIntakesPage({
   const [loadingBoxes, setLoadingBoxes] = useState<boolean | undefined>(undefined);
   const [rep, setRep] = useState<Response | null>(null);
   const [notFound, setNotFound] = useState(false);
-  const [applying, setApplying] = useState(false);
 
   const { calendarType } = detectCalendarType(location.pathname);
   const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
 
-  const calendarSource = getCalendarSourceMap(
-    personalCalendars,
-    sharedUserCalendars,
-    tokenCalendars,
-  )[calendarType];
+  getCalendarSourceMap(personalCalendars, sharedUserCalendars, tokenCalendars)[calendarType];
 
   useRealtimeBoxesSwitcher(
     calendarType,
@@ -153,11 +115,21 @@ function MissedIntakesPage({
 
   // --- Form state ---
   const [mode, setMode] = useState<MissedMode>('intake');
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>('individual');
   const [selectedDays, setSelectedDays] = useState<Date[]>([]);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [selectedTimes, setSelectedTimes] = useState<TimeOfDay[]>([]);
   const [customPerDay, setCustomPerDay] = useState(false);
   const [perDayTimes, setPerDayTimes] = useState<Record<string, TimeOfDay[]>>({});
   const [selectedMedIds, setSelectedMedIds] = useState<string[]>([]);
+
+  // Les jours effectifs (merge des deux modes de sélection)
+  const effectiveDays = useMemo(() => {
+    if (selectionMode === 'range' && dateRange?.from) {
+      return expandRange(dateRange.from, dateRange.to ?? dateRange.from);
+    }
+    return selectedDays;
+  }, [selectionMode, selectedDays, dateRange]);
 
   const allTimes: TimeOfDay[] = ['morning', 'noon', 'evening'];
 
@@ -169,37 +141,17 @@ function MissedIntakesPage({
     : selectedTimes.length > 0;
 
   const isValid =
-    selectedDays.length > 0 &&
+    effectiveDays.length > 0 &&
     (mode === 'intake' ? hasTimesSelected : selectedMedIds.length > 0);
 
-  const resetForm = () => {
-    setSelectedDays([]);
-    setSelectedTimes([]);
-    setSelectedMedIds([]);
-    setPerDayTimes({});
-    setCustomPerDay(false);
-  };
-
-  const handleApply = async () => {
-    if (!calendarId || !calendarSource.applyMissedIntakes || !isValid) return;
-    setApplying(true);
-
-    const days = selectedDays.map((d) => toDateKey(d));
+  const handleNext = () => {
+    const days = effectiveDays.map((d) => toDateKey(d));
     const payload =
       mode === 'intake'
         ? { mode, days, ...(customPerDay ? { per_day_times: perDayTimes } : { times: selectedTimes }) }
         : { mode, days, med_ids: selectedMedIds };
 
-    try {
-      const result = await calendarSource.applyMissedIntakes(calendarId, payload);
-      if (result?.success) {
-        const total = (result as unknown as { total_tablets_added?: number }).total_tablets_added ?? 0;
-        toast.success(t('missed_intakes.success', { count: total }));
-        resetForm();
-      }
-    } finally {
-      setApplying(false);
-    }
+    navigate('recap', { state: { payload } });
   };
 
   const formatDay = (d: Date) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
@@ -208,7 +160,7 @@ function MissedIntakesPage({
   if (notFound) return <NotFound />;
 
   return (
-    <div className="container mx-auto flex flex-col items-center gap-3 pb-20">
+    <div className="container mx-auto flex flex-col items-center gap-3">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <h4 className="text-xl font-bold mb-0.5">{t('missed_intakes.title')}</h4>
@@ -240,22 +192,51 @@ function MissedIntakesPage({
             {/* Calendar */}
             <div>
               <h5 className="font-semibold mb-1.5">{t('missed_intakes.select_days')}</h5>
+
+              {/* Selection mode toggle */}
+              <ToggleGroup
+                type="single"
+                variant="outline"
+                size="sm"
+                value={selectionMode}
+                onValueChange={(v) => { if (v) { setSelectionMode(v as SelectionMode); setSelectedDays([]); setDateRange(undefined); } }}
+                className="mb-2"
+              >
+                <ToggleGroupItem value="individual" className="gap-1.5 px-3">
+                  <CalendarDays className="size-3.5" />
+                  {t('missed_intakes.selection_individual')}
+                </ToggleGroupItem>
+                <ToggleGroupItem value="range" className="gap-1.5 px-3">
+                  <CalendarRange className="size-3.5" />
+                  {t('missed_intakes.selection_range')}
+                </ToggleGroupItem>
+              </ToggleGroup>
+
               <Card className="py-0">
                 <CardContent className="flex justify-center px-2 py-1">
-                  <Calendar
-                    mode="multiple"
-                    selected={selectedDays}
-                    onSelect={(days) => setSelectedDays(days ?? [])}
-                    disabled={{ after: new Date() }}
-                  />
+                  {selectionMode === 'individual' ? (
+                    <Calendar
+                      mode="multiple"
+                      selected={selectedDays}
+                      onSelect={(days) => setSelectedDays(days ?? [])}
+                      disabled={{ after: new Date() }}
+                    />
+                  ) : (
+                    <Calendar
+                      mode="range"
+                      selected={dateRange}
+                      onSelect={setDateRange}
+                      disabled={{ after: new Date() }}
+                    />
+                  )}
                 </CardContent>
               </Card>
-              {selectedDays.length > 0 && (
+              {effectiveDays.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-1.5">
-                  {selectedDays
+                  {effectiveDays
                     .sort((a, b) => a.getTime() - b.getTime())
                     .map((d) => (
-                      <Badge key={d.toISOString()} variant="secondary">
+                      <Badge key={toDateKey(d)} variant="secondary">
                         {formatDay(d)}
                       </Badge>
                     ))}
@@ -264,7 +245,7 @@ function MissedIntakesPage({
             </div>
 
             {/* Time selection */}
-            {selectedDays.length > 0 && (
+            {effectiveDays.length > 0 && (
               <div>
                 <h5 className="font-semibold mb-1.5">{t('missed_intakes.select_times')}</h5>
 
@@ -295,7 +276,7 @@ function MissedIntakesPage({
 
                 {customPerDay && (
                   <div className="space-y-2 mt-3">
-                    {selectedDays.sort((a, b) => a.getTime() - b.getTime()).map((day) => {
+                    {effectiveDays.sort((a, b) => a.getTime() - b.getTime()).map((day) => {
                       const dayKey = toDateKey(day);
                       const dayTimes = perDayTimes[dayKey] ?? [];
                       return (
@@ -319,93 +300,6 @@ function MissedIntakesPage({
                     })}
                   </div>
                 )}
-              </div>
-            )}
-
-            {/* Summary */}
-            {hasTimesSelected && selectedDays.length > 0 && (
-              <div>
-                <Separator className="mb-3" />
-                <h5 className="font-semibold mb-1.5">{t('missed_intakes.summary')}</h5>
-
-                {/* Per-day breakdown */}
-                <div className="space-y-0.5 mb-3">
-                  {selectedDays.sort((a, b) => a.getTime() - b.getTime()).map((day) => {
-                    const dayKey = toDateKey(day);
-                    const times = customPerDay ? (perDayTimes[dayKey] ?? []) : selectedTimes;
-                    if (times.length === 0) return null;
-                    return (
-                      <div key={dayKey} className="text-sm flex gap-2 items-center">
-                        <span className="font-medium">{formatDay(day)}</span>
-                        <span className="text-muted-foreground">→</span>
-                        <div className="flex gap-1">
-                          {times.map((time) => (
-                            <Badge key={time} variant="outline" className={`text-xs ${TIME_COLORS[time]}`}>
-                              {t(time)}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Affected medications with stock */}
-                {(() => {
-                  const affectedBoxes = activeBoxes
-                    .map((box) => ({
-                      box,
-                      tablets: estimateTabletsToAdd(
-                        box, selectedDays,
-                        customPerDay ? undefined : selectedTimes,
-                        customPerDay ? perDayTimes : undefined,
-                      ),
-                    }))
-                    .filter(({ tablets }) => tablets > 0);
-                  if (affectedBoxes.length === 0) return null;
-                  return (
-                    <>
-                      <p className="text-xs font-medium text-muted-foreground mb-1.5">{t('missed_intakes.affected_meds')}</p>
-                      <Card className="py-0">
-                        <CardContent className="px-4 py-2">
-                          <div className="space-y-2">
-                            {affectedBoxes.map(({ box, tablets }) => {
-                              const newStock = box.stock_quantity + tablets;
-                              return (
-                                <div key={box.id}>
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-1.5">
-                                      <Pill className="size-3.5 text-muted-foreground" />
-                                      <span className="font-medium text-sm">{box.name}{box.dose ? ` (${box.dose} mg)` : ''}</span>
-                                    </div>
-                                    <div className="flex gap-1">
-                                      {getBoxTimes(box, selectedDays).map((time) => (
-                                        <Badge key={time} variant="outline" className={`text-[10px] py-0 px-1 ${TIME_COLORS[time]}`}>
-                                          {t(time)}
-                                        </Badge>
-                                      ))}
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center gap-1.5 mt-0.5 ml-5 text-xs text-muted-foreground">
-                                    <span>{t('missed_intakes.stock')}: {box.stock_quantity}</span>
-                                    <ArrowRight className="size-3" />
-                                    <span className="text-foreground font-medium">{newStock}</span>
-                                    <Badge variant="secondary" className="text-[10px] py-0 px-1">+{tablets}</Badge>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </>
-                  );
-                })()}
-
-                <div className="flex items-start gap-2 mt-3 text-xs text-muted-foreground">
-                  <Info className="size-4 mt-0.5 shrink-0" />
-                  <span>{t('missed_intakes.info_intake')}</span>
-                </div>
               </div>
             )}
           </div>
@@ -459,22 +353,51 @@ function MissedIntakesPage({
             {selectedMedIds.length > 0 && (
               <div>
                 <h5 className="font-semibold mb-1.5">{t('missed_intakes.select_period')}</h5>
+
+                {/* Selection mode toggle */}
+                <ToggleGroup
+                  type="single"
+                  variant="outline"
+                  size="sm"
+                  value={selectionMode}
+                  onValueChange={(v) => { if (v) { setSelectionMode(v as SelectionMode); setSelectedDays([]); setDateRange(undefined); } }}
+                  className="mb-2"
+                >
+                  <ToggleGroupItem value="individual" className="gap-1.5 px-3">
+                    <CalendarDays className="size-3.5" />
+                    {t('missed_intakes.selection_individual')}
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="range" className="gap-1.5 px-3">
+                    <CalendarRange className="size-3.5" />
+                    {t('missed_intakes.selection_range')}
+                  </ToggleGroupItem>
+                </ToggleGroup>
+
                 <Card className="py-0">
                   <CardContent className="flex justify-center px-2 py-1">
-                    <Calendar
-                      mode="multiple"
-                      selected={selectedDays}
-                      onSelect={(days) => setSelectedDays(days ?? [])}
-                      disabled={{ after: new Date() }}
-                    />
+                    {selectionMode === 'individual' ? (
+                      <Calendar
+                        mode="multiple"
+                        selected={selectedDays}
+                        onSelect={(days) => setSelectedDays(days ?? [])}
+                        disabled={{ after: new Date() }}
+                      />
+                    ) : (
+                      <Calendar
+                        mode="range"
+                        selected={dateRange}
+                        onSelect={setDateRange}
+                        disabled={{ after: new Date() }}
+                      />
+                    )}
                   </CardContent>
                 </Card>
-                {selectedDays.length > 0 && (
+                {effectiveDays.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1.5">
-                    {selectedDays
+                    {effectiveDays
                       .sort((a, b) => a.getTime() - b.getTime())
                       .map((d) => (
-                        <Badge key={d.toISOString()} variant="secondary">
+                        <Badge key={toDateKey(d)} variant="secondary">
                           {formatDay(d)}
                         </Badge>
                       ))}
@@ -482,93 +405,17 @@ function MissedIntakesPage({
                 )}
               </div>
             )}
-
-            {/* Summary */}
-            {selectedMedIds.length > 0 && selectedDays.length > 0 && (
-              <div>
-                <Separator className="mb-3" />
-                <h5 className="font-semibold mb-1.5">{t('missed_intakes.summary')}</h5>
-
-                {/* Days badge row */}
-                <div className="flex flex-wrap items-center gap-1.5 mb-3 text-sm">
-                  <CalendarDays className="size-4 text-muted-foreground" />
-                  <span className="font-medium">{selectedDays.length} {t('missed_intakes.days_count')}</span>
-                </div>
-
-                {/* Affected medications with stock */}
-                {(() => {
-                  const affectedBoxes = selectedMedIds
-                    .map((medId) => {
-                      const box = activeBoxes.find((b) => b.id === medId);
-                      if (!box) return null;
-                      return { box, tablets: estimateTabletsToAdd(box, selectedDays) };
-                    })
-                    .filter((item): item is { box: BoxItem; tablets: number } => item !== null && item.tablets > 0);
-                  if (affectedBoxes.length === 0) return null;
-                  return (
-                    <>
-                      <p className="text-xs font-medium text-muted-foreground mb-1.5">{t('missed_intakes.affected_meds')}</p>
-                      <Card className="py-0">
-                        <CardContent className="px-4 py-2">
-                          <div className="space-y-2">
-                            {affectedBoxes.map(({ box, tablets }) => {
-                              const newStock = box.stock_quantity + tablets;
-                              const boxTimes = getBoxTimes(box, selectedDays);
-                              return (
-                                <div key={box.id}>
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-1.5">
-                                      <Pill className="size-3.5 text-muted-foreground" />
-                                      <span className="font-medium text-sm">{box.name}{box.dose ? ` (${box.dose} mg)` : ''}</span>
-                                    </div>
-                                    {boxTimes.length > 0 && (
-                                      <div className="flex gap-1">
-                                        {boxTimes.map((time) => (
-                                          <Badge key={time} variant="outline" className={`text-[10px] py-0 px-1 ${TIME_COLORS[time]}`}>
-                                            {t(time)}
-                                          </Badge>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="flex items-center gap-1.5 mt-0.5 ml-5 text-xs text-muted-foreground">
-                                    <span>{t('missed_intakes.stock')}: {box.stock_quantity}</span>
-                                    <ArrowRight className="size-3" />
-                                    <span className="text-foreground font-medium">{newStock}</span>
-                                    <Badge variant="secondary" className="text-[10px] py-0 px-1">+{tablets}</Badge>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </>
-                  );
-                })()}
-
-                <div className="flex items-start gap-2 mt-3 text-xs text-muted-foreground">
-                  <Info className="size-4 mt-0.5 shrink-0" />
-                  <span>{t('missed_intakes.info_medication')}</span>
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>
 
-      {/* Sticky bottom bar */}
+      {/* Bottom bar */}
       {isValid && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-3 flex items-center justify-end max-w-2xl mx-auto">
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={resetForm}>
-              {t('cancel')}
-            </Button>
-            <Button onClick={handleApply} disabled={applying}>
-              {applying && <Loader2 className="size-4 mr-2 animate-spin" />}
-              {t('missed_intakes.apply')}
-            </Button>
-          </div>
+        <div className="w-full max-w-2xl border-t p-3 flex items-center justify-end">
+          <Button onClick={handleNext}>
+            {t('missed_intakes.next')}
+            <ArrowRight className="size-4 ml-2" />
+          </Button>
         </div>
       )}
     </div>

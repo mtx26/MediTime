@@ -36,6 +36,7 @@ export interface CalendarSourceGroup {
   deleteTokenIcs: ((calendarId: CalendarId, tokenId: TokenId) => Promise<ApiResult>) | null;
   fetchScheduleNegativeStock: ((calendarId: CalendarId, medsId: string[]) => Promise<ApiResult>) | null;
   applyMissedIntakes: ((calendarId: CalendarId, payload: MissedIntakesPayload) => Promise<ApiResult>) | null;
+  previewMissedIntakes: ((calendarId: CalendarId, payload: MissedIntakesPayload) => Promise<ApiResult>) | null;
 }
 
 interface CalendarSourceMap {
@@ -71,6 +72,7 @@ export const getCalendarSourceMap = (
     deleteTokenIcs: personalCalendars.deleteTokenIcs,
     fetchScheduleNegativeStock: personalCalendars.fetchPersonalScheduleNegativeStock ,
     applyMissedIntakes: personalCalendars.applyPersonalMissedIntakes,
+    previewMissedIntakes: personalCalendars.previewPersonalMissedIntakes,
     },
   sharedUser: {
     fetchSchedule: sharedUserCalendars.fetchSharedUserCalendarSchedule,
@@ -94,6 +96,7 @@ export const getCalendarSourceMap = (
     deleteTokenIcs: sharedUserCalendars.deleteSharedTokenIcs,
     fetchScheduleNegativeStock: sharedUserCalendars.fetchSharedUserScheduleNegativeStock,
     applyMissedIntakes: sharedUserCalendars.applySharedUserMissedIntakes,
+    previewMissedIntakes: sharedUserCalendars.previewSharedUserMissedIntakes,
   },
   token: {
     fetchSchedule: tokenCalendars.fetchTokenCalendarSchedule,
@@ -118,5 +121,6 @@ export const getCalendarSourceMap = (
     deleteTokenIcs: null,
     fetchScheduleNegativeStock: null,
     applyMissedIntakes: null,
+    previewMissedIntakes: null,
   },
 });

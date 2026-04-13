@@ -39,6 +39,7 @@ export interface PersonalCalendarsApi {
   deleteTokenIcs: (calendarId: CalendarId, tokenId: TokenId) => Promise<ApiResult>;
   getPersonalCalendarPdfUrl: (calendarId: CalendarId, includeInactive: boolean) => string;
   applyPersonalMissedIntakes: (calendarId: CalendarId, payload: MissedIntakesPayload) => Promise<ApiResult>;
+  previewPersonalMissedIntakes: (calendarId: CalendarId, payload: MissedIntakesPayload) => Promise<ApiResult>;
 }
 
 export interface SharedUserCalendarsApi {
@@ -79,6 +80,7 @@ export interface SharedUserCalendarsApi {
   createSharedTokenIcs: (calendarId: CalendarId) => Promise<ApiResult>;
   deleteSharedTokenIcs: (calendarId: CalendarId, tokenId: TokenId) => Promise<ApiResult>;
   applySharedUserMissedIntakes: (calendarId: CalendarId, payload: MissedIntakesPayload) => Promise<ApiResult>;
+  previewSharedUserMissedIntakes: (calendarId: CalendarId, payload: MissedIntakesPayload) => Promise<ApiResult>;
 }
 
 export interface TokenCalendarsApi {
