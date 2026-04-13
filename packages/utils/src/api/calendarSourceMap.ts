@@ -27,6 +27,7 @@ export interface CalendarSourceGroup {
   cancelUse: ((calendarId: CalendarId, useId: string) => Promise<ApiResult>) | null;
   fetchPillboxUses: ((calendarId: CalendarId) => Promise<ApiResult>) | null;
   restockBox: ((calendarId: CalendarId, boxId: BoxId) => Promise<ApiResult>) | null;
+  restockBoxSilent: ((calendarId: CalendarId, boxId: BoxId) => Promise<ApiResult>) | null;
   fetchNotificationsEnabled: ((calendarId: CalendarId) => Promise<ApiResult>) | null;
   updateNotificationsEnabled: ((calendarId: CalendarId) => Promise<ApiResult>) | null;
   fetchStockDecrementMethod: ((calendarId: CalendarId) => Promise<ApiResult>) | null;
@@ -61,6 +62,7 @@ export const getCalendarSourceMap = (
     cancelUse: personalCalendars.cancelUsePersonalPillbox,
     fetchPillboxUses: personalCalendars.fetchPersonalPillboxUses,
     restockBox: personalCalendars.personalRestockBox,
+    restockBoxSilent: personalCalendars.personalRestockBoxSilent,
     fetchNotificationsEnabled: personalCalendars.fetchPersonalNotificationsEnabled,
     updateNotificationsEnabled: personalCalendars.updatePersonalNotificationsEnabled,
     fetchStockDecrementMethod: personalCalendars.fetchPersonalStockDecrementMethod,
@@ -83,6 +85,7 @@ export const getCalendarSourceMap = (
     cancelUse: sharedUserCalendars.cancelUseSharedUserPillbox,
     fetchPillboxUses: sharedUserCalendars.fetchSharedUserPillboxUses,
     restockBox: sharedUserCalendars.sharedUserRestockBox,
+    restockBoxSilent: sharedUserCalendars.sharedUserRestockBoxSilent,
     fetchNotificationsEnabled: sharedUserCalendars.fetchSharedUserNotificationsEnabled,
     updateNotificationsEnabled: sharedUserCalendars.updateSharedUserNotificationsEnabled,
     fetchStockDecrementMethod: sharedUserCalendars.fetchSharedUserStockDecrementMethod,
@@ -106,6 +109,7 @@ export const getCalendarSourceMap = (
     cancelUse: null,
     fetchPillboxUses: null,
     restockBox: null,
+    restockBoxSilent: null,
     fetchNotificationsEnabled: null,
     updateNotificationsEnabled: null,
     fetchStockDecrementMethod: null,

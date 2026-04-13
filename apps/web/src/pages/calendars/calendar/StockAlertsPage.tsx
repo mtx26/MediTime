@@ -132,6 +132,13 @@ function StockAlertsPage({
     window.location.href = `sms:?&body=${encodedMessage}`;
   };
 
+  const negativeMeds = alerts.filter(box => box.stock_quantity < 0);
+
+  const handleMissingPillbox = () => {
+    const medsIdParam = encodeURIComponent(JSON.stringify(negativeMeds.map(m => m.id)));
+    navigate(`/${lng}/${basePath}/${calendarId}/pillbox?medsId=${medsIdParam}`);
+  };
+
   const { showLoading } = useLoading();
 
   // Gérer l'affichage du spinner global
@@ -162,7 +169,7 @@ function StockAlertsPage({
           actions={toActionSheetItems(
             buildStockAlertActions(
               { calendarId: calendarId!, lng: lng!, basePath },
-              { onSendSms: () => sendStockAlertsSMS() },
+              { onSendSms: () => sendStockAlertsSMS(), ...(negativeMeds.length > 0 ? { onMissingPillbox: handleMissingPillbox } : {}) },
             ),
             t,
           )}

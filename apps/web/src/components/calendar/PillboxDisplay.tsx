@@ -314,7 +314,7 @@ function PillboxContent({
                                 }
                               } else {
                                 for (const medId of medsId) {
-                                  const rep = await calendarSource.restockBox(calendarId, medId);
+                                  const rep = await calendarSource.restockBoxSilent(calendarId, medId);
                                   if (!rep.success) {
                                     setPillboxError(true);
                                     break;

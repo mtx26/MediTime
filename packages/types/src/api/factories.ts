@@ -31,6 +31,7 @@ export interface PersonalCalendarsApi {
   fetchPersonalStockDecrementMethod: (calendarId: CalendarId) => Promise<ApiResult>;
   updatePersonalStockDecrementMethod: (calendarId: CalendarId, method: StockDecrementMethod) => Promise<ApiResult>;
   personalRestockBox: (calendarId: CalendarId, boxId: BoxId) => Promise<ApiResult>;
+  personalRestockBoxSilent: (calendarId: CalendarId, boxId: BoxId) => Promise<ApiResult>;
   fetchPersonalNotificationsEnabled: (calendarId: CalendarId) => Promise<ApiResult>;
   updatePersonalNotificationsEnabled: (calendarId: CalendarId) => Promise<ApiResult>;
   fetchPersonalScheduleNegativeStock: (calendarId: CalendarId, medsId: string[]) => Promise<ApiResult>;
@@ -70,6 +71,7 @@ export interface SharedUserCalendarsApi {
   cancelUseSharedUserPillbox: (calendarId: CalendarId, useId: string) => Promise<ApiResult>;
   fetchSharedUserPillboxUses: (calendarId: CalendarId) => Promise<ApiResult>;
   sharedUserRestockBox: (calendarId: CalendarId, boxId: BoxId) => Promise<ApiResult>;
+  sharedUserRestockBoxSilent: (calendarId: CalendarId, boxId: BoxId) => Promise<ApiResult>;
   fetchSharedUserNotificationsEnabled: (calendarId: CalendarId) => Promise<ApiResult>;
   updateSharedUserNotificationsEnabled: (calendarId: CalendarId) => Promise<ApiResult>;
   fetchSharedUserStockDecrementMethod: (calendarId: CalendarId) => Promise<ApiResult>;

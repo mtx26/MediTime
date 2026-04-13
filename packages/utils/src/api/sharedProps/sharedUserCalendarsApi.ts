@@ -292,6 +292,17 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
+    sharedUserRestockBoxSilent: async (calendarId: CalendarId, boxId: BoxId) => {
+      return performApiCall({
+        url: `${apiUrl}/api/shared/users/calendars/${calendarId}/boxes/${boxId}/restock`,
+        method: 'POST',
+        origin: 'BOX_RESTOCK',
+        uid,
+        analyticsEvent: 'restock_shared_user_box',
+        analyticsData: { calendarId, boxId, uid },
+      });
+    },
+
     fetchSharedUserNotificationsEnabled: async (calendarId: CalendarId) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/notifications`,

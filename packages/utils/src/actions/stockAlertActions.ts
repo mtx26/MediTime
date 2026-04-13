@@ -20,6 +20,13 @@ export function buildStockAlertActions(
       onClick: handlers.onSendSms,
       dataTour: 'send-sms-btn',
     },
+    ...(handlers.onMissingPillbox ? [{
+      id: 'missing_pillbox',
+      icon: 'package',
+      labelKey: 'boxes.missing_pillbox',
+      titleKey: 'boxes.missing_pillbox',
+      onClick: handlers.onMissingPillbox,
+    } as ActionItem] : []),
     {
       id: 'ics_calendar',
       icon: 'calendar',

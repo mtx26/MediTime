@@ -84,4 +84,5 @@ export interface StockAlertActionContext {
 /** Callback handlers for stock alert actions */
 export interface StockAlertActionHandlers {
   onSendSms: () => void;
+  onMissingPillbox?: () => void;
 }

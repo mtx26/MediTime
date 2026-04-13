@@ -110,6 +110,7 @@ export interface PillboxCalendarSource {
   fetchIfPillboxUsed: (calendarId: string, date: string) => Promise<ApiResult & { if_pillbox_used?: boolean }>;
   decreaseStock: (calendarId: string, date: string) => Promise<ApiResult>;
   restockBox: (calendarId: string, boxId: string) => Promise<ApiResult>;
+  restockBoxSilent: (calendarId: string, boxId: string) => Promise<ApiResult>;
 }
 
 // ─── Utility Props ───────────────────────────────────────────────────

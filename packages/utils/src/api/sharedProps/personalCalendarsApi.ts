@@ -231,6 +231,17 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
+    personalRestockBoxSilent: async (calendarId: CalendarId, boxId: BoxId): Promise<ApiResult> => {
+      return performApiCall({
+        url: `${apiUrl}/api/calendars/${calendarId}/boxes/${boxId}/restock`,
+        method: 'POST',
+        origin: 'BOX_RESTOCK',
+        uid,
+        analyticsEvent: 'restock_personal_box',
+        analyticsData: { calendarId, boxId, uid },
+      });
+    },
+
     fetchPersonalNotificationsEnabled: async (calendarId: CalendarId): Promise<ApiResult> => {
       return performApiCall({
         url: `${apiUrl}/api/calendars/${calendarId}/notifications`,
