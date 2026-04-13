@@ -3,7 +3,7 @@ import type { ActionItem, ActionSheetAction } from '@meditime/types';
 import {
   Eye, Pencil, Grid3X3, CalendarDays, Share2, Pill, Download,
   AlertTriangle, Calendar, Clock, Settings, Trash2, ScanLine,
-  FileText, Bell, MessageSquare,
+  FileText, Bell, MessageSquare, CalendarOff,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -27,6 +27,7 @@ const ICON_MAP: Partial<Record<string, React.ComponentType<{ className?: string 
   'file-text': FileText,
   'bell': Bell,
   'message-square': MessageSquare,
+  'calendar-off': CalendarOff,
 };
 
 /* ------------------------------------------------------------------ */
