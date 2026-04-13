@@ -1,14 +1,14 @@
 
 import { useState, useEffect, useContext, useCallback } from 'react';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { useLoading } from '@/components/ui/loading';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
 import { toISO, toDate } from '@meditime/utils';
 import { getCalendarSourceMap, detectCalendarType } from '@meditime/utils';
 import { UserContext } from '@/contexts/UserContext';
 import { useTranslation } from 'react-i18next';
-import { Alert } from '@/components/ui/alert';
-import { AlertTriangle, ChevronRight } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
+import AlertBanner from '@/components/common/AlertBanner';
 import NotFound from '@/pages/general/NotFound';
 import { useFilteredEventsForDay, useCalendarDayNavigation } from '@/hooks/useCalendarNavigation';
 import type {
@@ -140,20 +140,13 @@ export default function DailyCalendarPage({ personalCalendars, sharedUserCalenda
     <div className="daily-calendar-page">
       {/* Affichage alert stock */}
       {isLowStock && (
-        <Link
-          className="block w-full"
+        <AlertBanner
           to={`/${params.lng || 'fr'}/${basePath}/${calendarId}/stock-alerts`}
-          title={t('stock_alert_tooltip')}
-          aria-label={t('stock_alert')}
-        >
-          <Alert className="flex items-center justify-between bg-yellow-50 border-yellow-200 hover:bg-yellow-100 transition cursor-pointer">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-600" />
-              <span className="font-semibold text-yellow-900">{t('stock_alert')}</span>
-            </div>
-            <ChevronRight className="h-5 w-5 text-yellow-600" />
-          </Alert>
-        </Link>
+          icon={AlertTriangle}
+          text={t('stock_alert')}
+          tooltip={t('stock_alert_tooltip')}
+          variant="warning"
+        />
       )}
       <div className="max-w-200 mx-auto border shadow rounded my-4 p-3">
         <WeeklyEventContent

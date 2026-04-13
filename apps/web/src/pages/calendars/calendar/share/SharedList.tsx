@@ -11,7 +11,7 @@ import { useSearchParams, useNavigate, useParams, Link } from "react-router-dom"
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import StatusBadge from '@/components/common/StatusBadge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Users, Link2, Trash2, Plus, Clipboard, Mail, User } from 'lucide-react';
 import type { SharedListPageProps } from '@meditime/types';
@@ -549,9 +549,7 @@ function UserList({
                   }
                 />
               </div>
-              <Badge variant={user.accepted ? "default" : "secondary"} className={user.accepted ? "bg-green-500" : "bg-yellow-500 text-foreground"}>
-                {user.accepted ? t("accepted") : t("pending")}
-              </Badge>
+              <StatusBadge variant={user.accepted ? "success" : "warning"} text={user.accepted ? t("accepted") : t("pending")} />
               <Button
                 variant="destructive"
                 size="sm"
@@ -598,9 +596,7 @@ function UserList({
                 </Button>
               </div>
               <div className="flex justify-center mt-2">
-                <Badge variant={user.accepted ? "default" : "secondary"} className={user.accepted ? "bg-green-500" : "bg-yellow-500 text-foreground"}>
-                  {user.accepted ? t("accepted") : t("pending")}
-                </Badge>
+                <StatusBadge variant={user.accepted ? "success" : "warning"} text={user.accepted ? t("accepted") : t("pending")} />
               </div>
             </div>
           </div>
@@ -630,9 +626,7 @@ function UserList({
                   />
                   <strong className="truncate">{displayName}</strong>
                 </div>
-                <Badge variant="secondary" className="bg-yellow-500 text-foreground">
-                  {t("pending")}
-                </Badge>
+                <StatusBadge variant="warning" text={t("pending")} />
                 <Button
                   variant="destructive"
                   size="sm"
@@ -679,9 +673,7 @@ function UserList({
                   </Button>
                 </div>
                 <div className="flex justify-center mt-2">
-                  <Badge variant="secondary" className="bg-yellow-500 text-foreground">
-                    {t("pending")}
-                  </Badge>
+                  <StatusBadge variant="warning" text={t("pending")} />
                 </div>
               </div>
             </div>

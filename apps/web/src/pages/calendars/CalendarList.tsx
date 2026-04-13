@@ -7,13 +7,13 @@ import { useTranslation } from 'react-i18next';
 import { useAlert } from '@/contexts/AlertContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Calendar, Users, Pencil, Download, AlertTriangle, Plus, X, Info } from 'lucide-react';
 import { buildPersonalCalendarActions, buildSharedCalendarActions } from '@meditime/utils';
 import { toActionSheetItems } from '@/utils/actionSheetAdapter';
+import StatusBadge from '@/components/common/StatusBadge';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import type { CalendarListItem, CalendarListPageProps } from '@meditime/types';
 
@@ -155,10 +155,7 @@ function SelectCalendar({
                 </div>
                 {calendarData.ifLowStock && (
                   <Link to={`/${lng}/calendar/${calendarData.id}/stock-alerts`}>
-                    <Badge variant="outline" className="mt-2 gap-1 bg-yellow-500/15 text-foreground border-yellow-500/50">
-                      <AlertTriangle className="h-3 w-3 text-yellow-600" />
-                      {t('stock_alert')}
-                    </Badge>
+                    <StatusBadge variant="warning" icon={AlertTriangle} text={t('stock_alert')} />
                   </Link>
                 )}
                 {/* afficher la form si on est en mode renommage */}
@@ -289,10 +286,7 @@ function SelectCalendar({
                   </div>
                   {calendarData.ifLowStock && (
                     <Link to={`/${lng}/shared-user-calendar/${calendarData.id}/stock-alerts`}>
-                      <Badge variant="outline" className="mt-2 gap-1 bg-yellow-500/15 text-foreground border-yellow-500/50">
-                        <AlertTriangle className="h-3 w-3 text-yellow-600" />
-                        {t('stock_alert')}
-                      </Badge>
+                      <StatusBadge variant="warning" icon={AlertTriangle} text={t('stock_alert')} />
                     </Link>
                   )}
                 </div>

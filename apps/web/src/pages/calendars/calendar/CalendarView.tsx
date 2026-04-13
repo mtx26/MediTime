@@ -20,7 +20,8 @@ import NotFound from '@/pages/general/NotFound';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Pill, AlertTriangle, CalendarDays, ChevronRight, Pin } from 'lucide-react';
+import { Pill, AlertTriangle, CalendarDays, Pin } from 'lucide-react';
+import AlertBanner from '@/components/common/AlertBanner';
 import '@/styles/fullcalendar-custom.css';
 import { getLocale } from '@meditime/config';
 import type {
@@ -288,18 +289,13 @@ function CalendarPage({
               </div>
               {/* Affichage alert stock */}
               {isLowStock && (
-                <Link
-                  className="flex items-center justify-between w-full px-3 py-2 rounded-md bg-yellow-500/15 border border-yellow-500/50 text-foreground no-underline shadow"
+                <AlertBanner
                   to={`/${lng}/${basePath}/${calendarId}/stock-alerts`}
-                  title={t('stock_alert_tooltip')}
-                  aria-label={t('stock_alert')}
-                >
-                  <div className="flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-yellow-600" />
-                    <span className="font-semibold">{t('stock_alert')}</span>
-                  </div>
-                  <ChevronRight className="h-4 w-4 ml-2" />
-                </Link>
+                  icon={AlertTriangle}
+                  text={t('stock_alert')}
+                  tooltip={t('stock_alert_tooltip')}
+                  variant="warning"
+                />
               )}
 
             </div>

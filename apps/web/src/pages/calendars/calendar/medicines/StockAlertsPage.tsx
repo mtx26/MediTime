@@ -8,7 +8,7 @@ import ActionSheet from '@/components/common/ActionSheet';
 import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import IconButton from '@/components/common/UtilityComponents';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import StatusBadge from '@/components/common/StatusBadge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, CheckCircle, PlusCircle, Package } from 'lucide-react';
 import NotFound from '@/pages/general/NotFound';
@@ -234,16 +234,13 @@ function StockAlertsPage({
                       )}
                     </div>
                   </div>
-                  <Badge
-                    variant="outline"
-                    className={med.stock_quantity <= 0
-                      ? 'bg-red-500/15 text-foreground border-red-500/50'
-                      : 'bg-yellow-500/15 text-foreground border-yellow-500/50'}
-                  >
-                    {med.stock_quantity <= 0
+                  <StatusBadge
+                    variant={med.stock_quantity <= 0 ? 'danger' : 'warning'}
+                    icon={AlertTriangle}
+                    text={med.stock_quantity <= 0
                       ? t('critical_stock')
                       : t('low_stock')}
-                  </Badge>
+                  />
                 </div>
               </CardContent>
             </Card>
