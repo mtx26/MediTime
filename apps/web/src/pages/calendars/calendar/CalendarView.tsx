@@ -1,16 +1,11 @@
-// CalendarPage.jsx
-import { useEffect, useContext, useRef, useState, useMemo } from 'react';
-import { useNavigate, useParams, useLocation, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { useTranslation } from 'react-i18next';
-import { UserContext } from '@/contexts/UserContext';
-import { useLoading } from '@/components/ui/loading';
-import { toISO, getCalendarSourceMap, buildPersonalCalendarActions, buildSharedCalendarActions, detectCalendarType } from '@meditime/utils';
-import { useAlert } from '@/contexts/AlertContext';
+import { toISO, buildPersonalCalendarActions, buildSharedCalendarActions } from '@meditime/utils';
 import { toActionSheetItems } from '@/utils/actionSheetAdapter';
-import { useFilteredEventsForDay } from '@/hooks/useCalendarNavigation';
+import { useCalendarData } from '@/hooks/calendar/useCalendarData';
 import DateModal from '@/components/calendar/DateModal';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
 import CalendarWeekSelector from './components/CalendarWeekSelector';
@@ -25,10 +20,6 @@ import AlertBanner from '@/components/common/AlertBanner';
 import '@/styles/fullcalendar-custom.css';
 import { getLocale } from '@meditime/config';
 import type {
-  CalendarTable,
-  CalendarViewSource,
-  DateModalRef,
-  WeeklyEventItem,
   DailyCalendarPageProps as CalendarViewProps,
 } from '@meditime/types';
 
@@ -38,194 +29,17 @@ function CalendarPage({
   sharedUserCalendars,
   tokenCalendars,
 }: CalendarViewProps) {
-  // 📍 Paramètres d'URL et navigation
-  const navigate = useNavigate(); // Hook de navigation
-  const location = useLocation();
-  const params = useParams<{ lng?: string; calendarId?: string; sharedToken?: string }>();
-  const { lng } = params;
   const { t } = useTranslation();
 
-  // 🔐 Contexte d'authentification
-  const userContext = useContext(UserContext);
-  const userInfo = userContext?.userInfo; // Contexte de l'utilisateur connecté
-  const { showLoading } = useLoading(); // Gestion du spinner global
+  const {
+    lng, calendarType, basePath, calendarId, calendarSource,
+    calendarRef, dateModalRef,
+    selectedDate, eventsForDay, calendarTable, isLowStock, stockDecrementMethod,
+    notFound, setNotFound, memoizedEvents,
+    onSelectDate, onWeekSelect, handleDateClick, navigateDay, navigateWeek,
+    handleDeleteCalendar, handleDeleteSharedCalendar,
+  } = useCalendarData({ personalCalendars, sharedUserCalendars, tokenCalendars });
 
-  const calendarRef = useRef<InstanceType<typeof FullCalendar> | null>(null);
-  // garder selectedDate comme objet Date pour manipulations faciles
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Date JS
-  const [eventsForDay, setEventsForDay] = useState<WeeklyEventItem[]>([]); // Événements filtrés pour un jour spécifique
-  const [calendarEvents, setCalendarEvents] = useState<WeeklyEventItem[]>([]); // Événements du calendrier
-  const [calendarTable, setCalendarTable] = useState<CalendarTable>({}); // Événements du calendrier
-  const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
-  const { showConfirm } = useAlert();
-
-  // Méthode de décrémentation du stock (pour affichage différencié)
-  const [stockDecrementMethod, setStockDecrementMethod] = useState('');
-  const [loadingStockMethod, setLoadingStockMethod] = useState(false);
-
-  // 🔄 Références et chargement
-  const dateModalRef = useRef<DateModalRef | null>(null);
-  const [loading, setLoading] = useState(true); // État de chargement du calendrier
-  const [notFound, setNotFound] = useState(false);
-  const initialNextDate = useMemo(() => new Date(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0)), []);
-
-  const { calendarType, basePath } = detectCalendarType(location.pathname);
-  const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
-
-  const calendarSource = getCalendarSourceMap(
-    personalCalendars,
-    sharedUserCalendars,
-    tokenCalendars
-  )[calendarType] as unknown as CalendarViewSource;
-
-  // Fonction pour naviguer vers une date
-  const onSelectDate = (dateInput: string | number | Date) => {
-    // accepte Date ou ISO string
-    const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
-    setSelectedDate(d);
-    setEventsForDay(calendarEvents.filter((e) => e.start.startsWith(toISO(d))));
-  };
-
-  // Fonction pour naviguer vers la semaine suivante ou precedente
-  const onWeekSelect = async (newSelectedDate: Date) => {
-    onSelectDate(newSelectedDate);
-    const isoDate = toISO(newSelectedDate);
-    const rep = await calendarSource.fetchSchedule(calendarId, isoDate);
-    if (rep.success) {
-      setCalendarEvents((rep.schedule || []) as WeeklyEventItem[]);
-      setCalendarTable((rep.table || {}) as CalendarTable);
-      calendarRef.current?.getApi().gotoDate(isoDate);
-    }
-  };
-
-  // Fonction pour gérer le clic sur une date
-  const handleDateClick = (info: { dateStr: string }) => {
-    const clickedDate = info.dateStr; // YYYY-MM-DD
-    setSelectedDate(new Date(clickedDate));
-    dateModalRef.current?.open();
-  };
-
-  // Fonction pour naviguer vers la date suivante ou precedente
-  const navigateDay = (direction: number) => {
-    if (!selectedDate) return;
-    const current = new Date(selectedDate);
-    current.setDate(current.getDate() + direction);
-    setSelectedDate(current);
-  };
-
-  const navigateWeek = (direction: number) => {
-    if (!selectedDate) return;
-    const current = new Date(selectedDate);
-    current.setDate(current.getDate() + direction);
-    const newSelectedDate = current;
-    void onWeekSelect(newSelectedDate);
-  };
-
-  // Fonction pour charger le calendrier lorsque l'utilisateur est connecté ou que le calendrier est un token
-  useEffect(() => {
-    if (!calendarId) return setLoading(false);
-    if (!selectedDate) return 
-    if (calendarType === 'personal' || calendarType === 'sharedUser') {
-      if (!userInfo) return setLoading(true);
-    }
-    const load = async () => {
-      const rep = await calendarSource.fetchSchedule(calendarId, toISO(selectedDate));
-      if (rep.success) {
-        const nextSchedule = (rep.schedule || []) as WeeklyEventItem[];
-        setCalendarEvents(prev => JSON.stringify(nextSchedule) !== JSON.stringify(prev) ? nextSchedule : prev);
-        const nextTable = (rep.table || {}) as CalendarTable;
-        setCalendarTable(prev => JSON.stringify(nextTable) !== JSON.stringify(prev) ? nextTable : prev);
-        setIsLowStock(prev => rep.ifLowStock !== undefined && rep.ifLowStock !== prev ? rep.ifLowStock : prev);
-      } else {;
-        // Si l'API retourne un 404, le calendrier n'existe pas
-        if (rep.status === 404) {
-          setNotFound(true);
-        }
-      }
-      setLoading(false);
-    };
-
-    void load();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [calendarId, calendarType, userInfo, selectedDate]);
-
-  // Gérer l'affichage du spinner global
-  useEffect(() => {
-    showLoading(Boolean((loading === true || loadingStockMethod === true) && calendarId), t('loading_calendar'));
-  }, [loading, loadingStockMethod, calendarId, showLoading, t]);
-
-  // Charger la méthode de décrémentation du stock (si disponible)
-  useEffect(() => {
-    const fetchMethod = async () => {
-      if (!calendarId) return setLoadingStockMethod(false);
-      if (calendarType === 'personal' || calendarType === 'sharedUser') {
-        if (!userInfo) return setLoadingStockMethod(true);
-      }
-      // On tente pour les calendriers personal et sharedUser en appelant l'API exposée
-      const rep = await calendarSource.fetchStockDecrementMethod(calendarId);
-      if (rep.success) {
-        const method = rep.method || '';
-        setStockDecrementMethod(method);
-        if (method === 'weekly_pillbox') {
-          setSelectedDate(new Date(initialNextDate));
-        } else {
-          setSelectedDate(new Date(new Date().setHours(0,0,0,0)));
-        }
-      } else if (rep.status === 404) {
-        setNotFound(true);
-        setSelectedDate(new Date(new Date().setHours(0,0,0,0)));
-      }
-      setLoadingStockMethod(false);
-    };
-    void fetchMethod();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [calendarId, calendarType, userInfo]);
-
-  // Fonction pour supprimer le calendrier avec confirmation
-  const handleDeleteCalendar = () => {
-    showConfirm(
-      'confirm-danger',
-      t('calendar.delete_title'),
-      t('calendar.delete_description'),
-      async () => {
-        if (!calendarId) return;
-        const rep = await personalCalendars.deleteCalendar(calendarId);
-        if (rep.success) {
-          navigate(`/${lng}/calendars`);
-        }
-      }
-    );
-  };
-
-  // Fonction pour supprimer un calendrier partagé avec confirmation
-  const handleDeleteSharedCalendar = () => {
-    showConfirm(
-      'confirm-danger',
-      t('calendar.delete_shared_title'),
-      t('calendar.delete_shared_description'),
-      async () => {
-        const rep = await sharedUserCalendars.deleteSharedCalendar(calendarId!);
-        if (rep.success) {
-          navigate(`/${lng}/calendars`);
-        }
-      }
-    );
-  };
-
-
-  // 📍 Filtrage des événements pour un jour spécifique et tri par ordre alphabétique
-  useFilteredEventsForDay(selectedDate, calendarEvents, setEventsForDay);
-
-  // 📍 Mémoisation des événements pour le calendrier
-  const memoizedEvents = useMemo(() => {
-    return calendarEvents.map((event) => ({
-      title: `${event.title} ${event.dose != null ? `${event.dose} mg` : ''} (${event.tablet_count})`,
-      start: event.start,
-      color: event.color,
-    }));
-  }, [calendarEvents]);
-
-  // Affichage de la page 404 si le calendrier n'existe pas
   if (notFound) {
     return <NotFound />;
   }

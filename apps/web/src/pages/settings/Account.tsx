@@ -12,14 +12,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
-import { Pencil, Check, X, User, Camera, UserCircle } from 'lucide-react';
+import { Pencil, Check, X, Camera, UserCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Account() {
   const { t } = useTranslation();
-  const { userInfo } = useContext(UserContext);
+  const userContext = useContext(UserContext);
+  const userInfo = userContext?.userInfo ?? null;
   const uid = userInfo?.uid ?? null;
 
   const [displayName, setDisplayName] = useState(userInfo?.displayName || '');
@@ -28,7 +29,6 @@ export default function Account() {
     userInfo?.photoUrl ||
       'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person-circle.svg'
   );
-  const [photoFile, setPhotoFile] = useState<Blob | null>(null);
   const [isModified, setIsModified] = useState(false);
   const [showCropModal, setShowCropModal] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -54,7 +54,7 @@ export default function Account() {
       const response = await fetch(`${API_URL}/api/user/photo`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session?.access_token}`,
         },
         body: formData,
       });
@@ -69,7 +69,7 @@ export default function Account() {
         log.info(data.message, {
           origin: 'USER_PHOTO',
           code: 'PHOTO_UPLOAD_SUCCESS',
-          uid: userInfo.uid,
+          uid: userInfo?.uid,
         });
       } else {
         toast.error(t('account.photo_error'));
@@ -79,12 +79,13 @@ export default function Account() {
       log.error('Error uploading photo', {
         origin: 'USER_PHOTO',
         code: 'PHOTO_UPLOAD_ERROR',
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       });
     }
   };
 
   const handleCropConfirm = async () => {
+    if (!rawImage || !croppedAreaPixels) return;
     const croppedImage = await getCroppedImg(rawImage, croppedAreaPixels);
     setPreviewURL(croppedImage); 
     const blob = await fetch(croppedImage).then((r) => r.blob());
@@ -106,7 +107,7 @@ export default function Account() {
         log.error('Error updating profile', {
           origin: 'USER_PROFILE',
           code: 'PROFILE_UPDATE_ERROR',
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
         });
         return;
       }
@@ -119,7 +120,8 @@ export default function Account() {
     input.type = 'file';
     input.accept = 'image/*';
     input.onchange = (e) => {
-      const file = e.target.files[0];
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
       if (file) {
         const maxSize = 1024 * 1024 * 5; // 5MB
         if (file.size > maxSize) {
@@ -240,7 +242,7 @@ export default function Account() {
                     variant="outline"
                     className="gap-2"
                     onClick={() => {
-                      setDisplayName(userInfo?.displayName);
+                      setDisplayName(userInfo?.displayName ?? '');
                       setIsModified(false);
                     }}
                   >
@@ -266,7 +268,7 @@ export default function Account() {
             style={{ height: '400px' }}
           >
             <Cropper
-              image={rawImage}
+              image={rawImage ?? undefined}
               crop={crop}
               zoom={zoom}
               aspect={1}

@@ -17,7 +17,8 @@ export default function SettingsPage( sharedProps: AppSharedProps ) {
   const { t } = useTranslation();
   const location = useLocation();
   const { lng } = useParams();
-  const { userInfo } = useContext(UserContext);
+  const userContext = useContext(UserContext);
+  const userInfo = userContext?.userInfo ?? null;
   const { showAlert } = useAlert();
 
   const getInitialTab = () => {
@@ -35,15 +36,15 @@ export default function SettingsPage( sharedProps: AppSharedProps ) {
   const renderTab = () => {
     switch (activeTab) {
       case 'account':
-        return <Account {...sharedProps} />;
+        return <Account />;
       case 'security':
-        return <Security {...sharedProps} />;
+        return <Security />;
       case 'notifications':
-        return <Notification {...sharedProps} />;
+        return <Notification fcm={sharedProps.fcm} user={sharedProps.user} />;
       case 'preferences':
-        return <Preferences {...sharedProps} />;
+        return <Preferences />;
       default:
-        return <Account {...sharedProps} />;
+        return <Account />;
     }
   };
 
@@ -108,8 +109,10 @@ export default function SettingsPage( sharedProps: AppSharedProps ) {
                   aria-label={t('reset_password.title')}
                   title={t('reset_password.title')}
                   onClick={() => {
-                    resetPassword(userInfo.email);
-                    showAlert('success', t('reset_password.success'));
+                    if (userInfo?.email) {
+                      resetPassword(userInfo.email);
+                      showAlert('success', t('reset_password.success'));
+                    }
                   }}
                 >
                   <Mail className="h-4 w-4 mr-2" /> {t('reset_password.title')}

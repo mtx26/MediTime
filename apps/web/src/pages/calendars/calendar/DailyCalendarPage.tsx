@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from 'lucide-react';
 import AlertBanner from '@/components/common/AlertBanner';
 import NotFound from '@/pages/general/NotFound';
-import { useFilteredEventsForDay, useCalendarDayNavigation } from '@/hooks/useCalendarNavigation';
+import { useFilteredEventsForDay, useCalendarDayNavigation } from '@/hooks/calendar/useCalendarNavigation';
 import type {
   CalendarScheduleSource,
   DailyCalendarPageProps,

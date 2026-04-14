@@ -24,7 +24,7 @@ import {
   createUserApi,
 } from '@meditime/utils';
 import { useTranslation } from 'react-i18next';
-import useSEO from './hooks/useSEO';
+import useSEO from './hooks/seo/useSEO';
 import OnboardingTour from './components/onboarding/OnboardingTour';
 import { requestPermissionAndGetToken } from './services/firebase/firebase';
 import { useAlert } from './contexts/AlertContext';

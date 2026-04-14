@@ -1,10 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useLoading } from '@/components/ui/loading';
+import { Link } from 'react-router-dom';
 import HoveredUserProfile from '@/components/common/HoveredUserProfile';
 import ActionSheet from '@/components/common/ActionSheet';
-import { useTranslation } from 'react-i18next';
-import { useAlert } from '@/contexts/AlertContext';
+import { useCalendarListActions } from '@/hooks/calendar/useCalendarListActions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -18,87 +15,15 @@ import type { CheckedState } from '@radix-ui/react-checkbox';
 import type { CalendarListItem, CalendarListPageProps } from '@meditime/types';
 
 
-function SelectCalendar({
-  personalCalendars,
-  sharedUserCalendars
-}: CalendarListPageProps) {
-  const { lng } = useParams();
-  const { t } = useTranslation();
-  const { showConfirm } = useAlert();
-
-  // 📅 Gestion des calendriers
-  const [renameValues, setRenameValues] = useState<Record<string, string>>({}); // État pour les valeurs de renommage de calendrier
-  const [renameMode, setRenameMode] = useState<string | null>(null); // État pour le mode de renommage
-
-  // 📄 Export PDF
-  const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
-  const [pdfCalendarId, setPdfCalendarId] = useState<string | null>(null);
-  const [includeInactive, setIncludeInactive] = useState(false);
-
-  const openPdfDialog = (calendarId: string) => {
-    setPdfCalendarId(calendarId);
-    setIncludeInactive(false);
-    setPdfDialogOpen(true);
-  };
-
-  const handleDownloadPdf = () => {
-    if (pdfCalendarId) {
-      personalCalendars.downloadPersonalCalendarPdf(pdfCalendarId, includeInactive);
-    }
-    setPdfDialogOpen(false);
-  };
-
-  const renameConfirmAction = async (calendarId: string) => {
-    const rep = await personalCalendars.renameCalendar(
-      calendarId,
-      renameValues[String(calendarId)]
-    );
-    if (rep.success) {
-      setRenameValues((prev) => ({ ...prev, [String(calendarId)]: '' }));
-    }
-  };
-
-  // 🔄 Renommage d'un calendrier
-  const handleRenameClick = (calendarId: string) => {
-    showConfirm(
-      'confirm-safe',
-      t('calendar.rename_title'),
-      t('calendar.rename_description'),
-      () => renameConfirmAction(calendarId)
-    );
-  };
-
-  const deleteConfirmAction = async (calendarId: string) => {
-    await personalCalendars.deleteCalendar(calendarId);
-  };
-
-  const handleDeleteCalendarClick = (calendarId: string) => {
-    showConfirm(
-      'confirm-danger',
-      t('calendar.delete_title'),
-      t('calendar.delete_description'),
-      () => deleteConfirmAction(calendarId)
-    );
-  };
-
-  const deleteSharedCalendarConfirmAction = async (calendarId: string) => {
-    await sharedUserCalendars.deleteSharedCalendar(calendarId);
-  };
-
-  const handleDeleteSharedCalendarClick = (calendarId: string) => {
-    showConfirm(
-      'confirm-danger',
-      t('calendar.delete_shared_title'),
-      t('calendar.delete_shared_description'),
-      () => deleteSharedCalendarConfirmAction(calendarId)
-    );
-  };
-
-  const { showLoading } = useLoading();
-
-  useEffect(() => {
-    showLoading(personalCalendars.calendarsData === null, t('loading_calendars'));
-  }, [personalCalendars.calendarsData, showLoading, t]);
+function SelectCalendar(props: CalendarListPageProps) {
+  const {
+    t, lng,
+    renameValues, setRenameValues, renameMode, setRenameMode,
+    pdfDialogOpen, setPdfDialogOpen, includeInactive, setIncludeInactive,
+    openPdfDialog, handleDownloadPdf, handleRenameClick,
+    handleDeleteCalendarClick, handleDeleteSharedCalendarClick,
+    personalCalendars, sharedUserCalendars,
+  } = useCalendarListActions(props);
 
   if (personalCalendars.calendarsData === null) {
     return null;

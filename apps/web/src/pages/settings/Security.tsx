@@ -1,161 +1,19 @@
-import { useState, useContext, useEffect } from 'react';
-import { 
-  updateUserPassword,
-  GoogleHandleLogin,
-  GithubHandleLogin,
-  TwitterHandleLogin,
-  FacebookHandleLogin,
-  DiscordHandleLogin,
-  MicrosoftHandleLogin
-} from '../../services/auth/authService';
-import { UserContext } from '../../contexts/UserContext';
-import { useAlert } from '../../contexts/AlertContext';
-import { supabase } from '../../services/supabase/supabaseClient';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useSecurityData } from '@/hooks/settings/useSecurityData';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye, EyeOff, Info, CheckCircle2, XCircle, Mail } from 'lucide-react';
-import { FaGoogle, FaGithub, FaTwitter, FaFacebook, FaDiscord, FaMicrosoft } from 'react-icons/fa';
-import type { SecurityProviderItem } from '@meditime/types';
-import type { IconType } from 'react-icons';
+import { Eye, EyeOff, Info, CheckCircle2, Mail } from 'lucide-react';
 
 export default function Security() {
-  const { t, i18n } = useTranslation();
-  const { showAlert } = useAlert();
-  const navigate = useNavigate();
-  const location = useLocation();
-  // 👤 Contexte utilisateur
-  const { userInfo } = useContext(UserContext); // Contexte de l'utilisateur connecté
-
-  // 🔒 Changement de mot de passe
-  const [oldPassword, setOldPassword] = useState(''); // État pour l'ancien mot de passe
-  const [newPassword, setNewPassword] = useState(''); // État pour le nouveau mot de passe
-  const [oldPasswordVisible, setOldPasswordVisible] = useState(false); // État pour l'affichage de l'ancien mot de passe
-  const [newPasswordVisible, setNewPasswordVisible] = useState(false); // État pour l'affichage du nouveau mot de passe
-  const [linkedProviders, setLinkedProviders] = useState<string[]>([]); // Providers liés au compte
-  const [loadingProviders, setLoadingProviders] = useState(true); // État de chargement des providers
-  const [connectingProvider, setConnectingProvider] = useState<string | null>(null); // Provider en cours de connexion
-
-  const isGoogleUser = userInfo?.provider === 'google';
-
-  // Liste des providers disponibles dans l'app
-  const availableProviders: SecurityProviderItem<IconType>[] = [
-    { 
-      id: 'google', 
-      name: 'Google', 
-      color: 'text-red-500',
-      icon: FaGoogle,
-      handler: GoogleHandleLogin
-    },
-    { 
-      id: 'github', 
-      name: 'GitHub', 
-      color: 'text-gray-800 dark:text-gray-100',
-      icon: FaGithub,
-      handler: GithubHandleLogin
-    },
-    { 
-      id: 'twitter', 
-      name: 'Twitter', 
-      color: 'text-blue-400',
-      icon: FaTwitter,
-      handler: TwitterHandleLogin
-    },
-    { 
-      id: 'facebook', 
-      name: 'Facebook', 
-      color: 'text-blue-600',
-      icon: FaFacebook,
-      handler: FacebookHandleLogin
-    },
-    { 
-      id: 'discord', 
-      name: 'Discord', 
-      color: 'text-indigo-500',
-      icon: FaDiscord,
-      handler: DiscordHandleLogin
-    },
-    { 
-      id: 'azure', 
-      name: 'Microsoft', 
-      color: 'text-blue-500',
-      icon: FaMicrosoft,
-      handler: MicrosoftHandleLogin
-    },
-  ];
-
-  // Récupérer les identités liées au compte
-  useEffect(() => {
-    const fetchLinkedProviders = async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error) throw error;
-        
-        if (user?.identities) {
-          const providers = user.identities.map(identity => identity.provider);
-          setLinkedProviders(providers);
-        }
-      } catch (error) {
-        console.error('Error fetching linked providers:', error);
-      } finally {
-        setLoadingProviders(false);
-      }
-    };
-
-    fetchLinkedProviders();
-  }, []);
-
-  // Connecter un nouveau provider
-  const handleConnectProvider = async (provider: SecurityProviderItem<IconType>) => {
-    try {
-      setConnectingProvider(provider.id);
-      // Construire l'URL de redirection avec la langue et la page actuelle
-      const currentPath = location.pathname;
-      await provider.handler(currentPath);
-    } catch (error) {
-      showAlert('danger', error instanceof Error ? error.message : t('security.providers.connection_error'));
-      setConnectingProvider(null);
-    }
-  };
-
-  const reauthenticate = async () => {
-    if (!userInfo || !oldPassword)
-      throw new Error(t('security.current_password.required'));
-    
-    // Vérifier l'ancien mot de passe en tentant une connexion
-    const { error } = await supabase.auth.signInWithPassword({
-      email: userInfo.email,
-      password: oldPassword,
-    });
-    
-    if (error) throw new Error(t('security.current_password.incorrect'));
-  };
-
-  const handleUpdatePassword = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      // Vérifier que le nouveau mot de passe est différent de l'ancien
-      if (oldPassword === newPassword) {
-        showAlert('danger', t('security.password_section.same_password_error'));
-        return;
-      }
-
-      await reauthenticate();
-      await updateUserPassword(newPassword);
-
-      showAlert('success', t('security.password_updated'));
-
-      // Réinitialiser les champs
-      setNewPassword('');
-      setOldPassword('');
-    } catch (error) {
-      showAlert('danger', error instanceof Error ? error.message : t('security.password_section.error'));
-    }
-  };
+  const {
+    t, userInfo, isGoogleUser,
+    oldPassword, setOldPassword, newPassword, setNewPassword,
+    oldPasswordVisible, setOldPasswordVisible, newPasswordVisible, setNewPasswordVisible,
+    linkedProviders, loadingProviders, connectingProvider,
+    availableProviders, handleConnectProvider, handleUpdatePassword,
+  } = useSecurityData();
 
   if (!userInfo) {
     return <div>{t('loading')}</div>;

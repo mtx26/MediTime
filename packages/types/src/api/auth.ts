@@ -10,10 +10,10 @@ export interface OAuthLoginOptions {
 }
 
 export interface UpdateUserInfoPayload {
-  display_name: string | null;
-  email: string | null;
-  photo_url: string | null;
-  email_enabled: boolean;
-  push_enabled: boolean;
-  uid: string;
+  display_name?: string | null;
+  email?: string | null;
+  photo_url?: string | null;
+  email_enabled?: boolean;
+  push_enabled?: boolean;
+  uid?: string | null;
 }

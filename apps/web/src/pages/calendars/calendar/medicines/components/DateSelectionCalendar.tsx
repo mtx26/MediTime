@@ -61,7 +61,9 @@ export default function DateSelectionCalendar({
             <Calendar
               mode="range"
               selected={dateRange}
-              onSelect={onDateRangeChange}
+              onSelect={(range) =>
+                onDateRangeChange(range?.from ? { from: range.from, to: range.to } : undefined)
+              }
               disabled={{ after: new Date() }}
             />
           )}
