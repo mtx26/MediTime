@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Shield, UserCheck, Pill, Phone, Lock, Mail, Globe, Github } from 'lucide-react';
+import { Shield, UserCheck, Pill, Phone, Mail, Globe, Github } from 'lucide-react';
 
 export default function PrivacyPage() {
   const { t } = useTranslation();

@@ -17,7 +17,7 @@ function PillboxPage({ personalCalendars, sharedUserCalendars, tokenCalendars }:
   const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
 
   const selectedDateParam = new URLSearchParams(location.search).get('date');
-  const selectedDate = selectedDateParam ? new Date(selectedDateParam) : undefined;
+  const selectedDate = selectedDateParam ? new Date(selectedDateParam) : null;
 
   if (notFound) {
     return <NotFound />;

@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
-import { UserContext } from '../../contexts/UserContext';
+import { UserContext } from '@/contexts/UserContext';
 import { useTranslation } from 'react-i18next';
-import { updateUserInfo } from '../../services/auth/authService';
+import { updateUserInfo } from '@/services/auth/authService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -10,11 +10,10 @@ import { Input } from '@/components/ui/input';
 import { Bell, RefreshCw, Smartphone, Settings } from 'lucide-react';
 import type { NotificationSettingsProps } from '@meditime/types';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 export default function Notification({ fcm, user }: NotificationSettingsProps) {
   const { t } = useTranslation();
-  const { userInfo } = useContext(UserContext);
+  const userContext = useContext(UserContext);
+  const userInfo = userContext?.userInfo ?? null;
   const uid = userInfo?.uid ?? null;
   const [notificationsEnabled, setNotificationsEnabled] = useState(window?.Notification?.permission === 'granted');
   const notificationNotSupported = !('Notification' in window) || window.Notification.permission === 'denied';
@@ -26,7 +25,7 @@ export default function Notification({ fcm, user }: NotificationSettingsProps) {
     const fetchNotificationTime = async () => {
       const rep = await user.fetchNotificationTime();
       if (rep.success) {
-        setNotificationTime(rep.notification_time);
+        setNotificationTime(rep.notification_time ?? null);
       }
     };
 
@@ -169,7 +168,7 @@ export default function Notification({ fcm, user }: NotificationSettingsProps) {
                   setIsRegistering(true);
                   const rep = await fcm.sendTokenToBackend()
                   setIsRegistering(false);
-                  setNotificationsEnabled(rep.success ? true : false);
+                  setNotificationsEnabled(rep?.success ? true : false);
                 }}
                 disabled={isRegistering}
               >

@@ -3,12 +3,12 @@ import type { ApiResult } from '../api';
 // ─── FCM / Notification Settings ────────────────────────────────────────────
 
 export interface FcmSettingsProps {
-  sendTokenToBackend: () => Promise<ApiResult>;
+  sendTokenToBackend: () => Promise<ApiResult | null>;
 }
 
 export interface UserSettingsProps {
   fetchNotificationTime: () => Promise<ApiResult & { notification_time?: string }>;
-  updateNotificationTime: (time: string) => Promise<void>;
+  updateNotificationTime: (time: string) => Promise<ApiResult>;
 }
 
 export interface NotificationSettingsProps {

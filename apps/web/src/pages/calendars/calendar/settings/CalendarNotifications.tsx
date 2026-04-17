@@ -1,65 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useLoading } from '@/components/ui/loading';
-import { getCalendarSourceMap, detectCalendarType } from '@meditime/utils';
+import { useCalendarNotifications } from '@/hooks/calendars/useCalendarNotifications';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell } from 'lucide-react';
-import type {
-  CalendarNotificationsProps,
-  CalendarNotificationsSource,
-} from '@meditime/types';
+import type { CalendarNotificationsProps } from '@meditime/types';
 
-
-const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars, setNotFound }: CalendarNotificationsProps) => {
+function Notifications(props: CalendarNotificationsProps) {
   const { t } = useTranslation();
-  const [enabled, setEnabled] = useState(true);
-  const [loading, setLoading] = useState<boolean | undefined>(undefined);
-  const params = useParams<{ calendarId?: string; sharedToken?: string }>();
-  const location = useLocation();
-
-  const { calendarType } = detectCalendarType(location.pathname);
-  const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
-
-  const calendarSource = getCalendarSourceMap(
-    personalCalendars,
-    sharedUserCalendars,
-    tokenCalendars
-  )[calendarType] as unknown as CalendarNotificationsSource;
-
-  useEffect(() => {
-    const fetchNotificationSetting = async () => {
-      const rep = await calendarSource.fetchNotificationsEnabled(calendarId);
-      if (rep.success) {
-        setEnabled(rep["notifications-enabled"] ?? false);
-        setLoading(false);
-      } else {
-        // Si l'API retourne un 404, le calendrier n'existe pas
-        if (rep.status === 404) {
-          setNotFound(true);
-        }
-        setLoading(false);
-      }
-    };
-
-    fetchNotificationSetting();
-  }, [calendarId, calendarSource, enabled, setNotFound]);
-
-  const toggleNotifications = async () => {
-    const newValue = !enabled;
-    const rep = await calendarSource.updateNotificationsEnabled(calendarId, newValue);
-    if (rep.success) {
-      setEnabled(newValue);
-    }
-  };
-
-  const { showLoading } = useLoading();
-
-  useEffect(() => {
-    showLoading(Boolean(loading === undefined && calendarId), t('calendar_settings.loading_notification_settings'));
-  }, [loading, calendarId, showLoading, t]);
+  const { enabled, toggleNotifications } = useCalendarNotifications(props);
 
   return (
     <Card>
@@ -87,6 +36,6 @@ const Notifications = ({ personalCalendars, sharedUserCalendars, tokenCalendars,
       </CardContent>
     </Card>
   );
-};
+}
 
 export default Notifications;

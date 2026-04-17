@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/components/ui/loading';
 import type { NotificationsPageProps } from '@meditime/types';
@@ -12,7 +12,6 @@ import { Bell, Info } from 'lucide-react';
 
 function NotificationsPage({ notifications }: NotificationsPageProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { lng } = useParams();
   const { showLoading } = useLoading();
 

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import LanguageSelector from '../../components/common/LanguageSelector';
-import ThemeToggle from '../../components/common/ThemeToggle';
+import LanguageSelector from '@/components/common/LanguageSelector';
+import ThemeToggle from '@/components/common/ThemeToggle';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Languages, Palette } from 'lucide-react';

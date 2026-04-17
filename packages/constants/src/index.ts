@@ -113,3 +113,47 @@ export const CALENDAR_ROUTE_PREFIXES = {
   SHARED_USER: '/shared-user-calendar',
   SHARED_TOKEN: '/shared-token-calendar',
 } as const;
+
+// ============================================================================
+// Settings Tabs
+// ============================================================================
+
+export const SETTINGS_TABS = {
+  ACCOUNT: 'account',
+  SECURITY: 'security',
+  NOTIFICATIONS: 'notifications',
+  PREFERENCES: 'preferences',
+} as const;
+
+export const CALENDAR_SETTINGS_TABS = {
+  STOCK: 'stock',
+  NOTIFICATIONS: 'notifications',
+} as const;
+
+// ============================================================================
+// Stock Decrement Methods
+// ============================================================================
+
+export const STOCK_DECREMENT_METHODS = {
+  WEEKLY_PILLBOX: 'weekly_pillbox',
+  DAILY_MIDNIGHT: 'daily_midnight',
+} as const;
+
+export const INVITE_TYPES = {
+  LOGIN: 'login',
+  REGISTRATION: 'registration',
+} as const;
+
+export const DEMO_CALENDAR_ID = 'demo';
+
+// ============================================================================
+// Time of Day Constants
+// ============================================================================
+
+export const ALL_TIMES = ['morning', 'noon', 'evening'] as const;
+
+export const TIME_OF_DAY_COLORS: Record<string, string> = {
+  morning: 'bg-red-400/20 text-red-700 border-red-400/50',
+  noon: 'bg-emerald-400/20 text-emerald-700 border-emerald-400/50',
+  evening: 'bg-blue-400/20 text-blue-700 border-blue-400/50',
+};

@@ -4,13 +4,13 @@ import { log, getErrorMessage } from '@meditime/utils';
 import { supabase } from '../../services/supabase/supabaseClient';
 import { logAnalyticsEvent } from '../../services/firebase/logAnalyticsEvent';
 import { useSupabaseRealtime } from './useSupabaseRealtime';
-import type { LoadingStates, TokenItem, TokensResponse, UserContextValue } from '@meditime/types';
+import type { LoadingStates, SharedTokenItem, TokensResponse, UserContextValue } from '@meditime/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 
 export const useRealtimeTokens = (
-  setTokensList: Dispatch<SetStateAction<TokenItem[]>> | null,
+  setTokensList: Dispatch<SetStateAction<SharedTokenItem[]>> | null,
   setLoadingStates: Dispatch<SetStateAction<LoadingStates>>
 ): void => {
   const userContext = useContext(UserContext) as UserContextValue | null;
@@ -32,7 +32,7 @@ export const useRealtimeTokens = (
       const data = (await res.json()) as TokensResponse;
       if (!res.ok) throw new Error(data.error);
 
-      setTokensList(data.tokens);
+      setTokensList(data.tokens as SharedTokenItem[]);
       setLoadingStates((prev: LoadingStates) => ({ ...prev, tokens: false }));
 
       void logAnalyticsEvent('fetch_tokens', { uid, count: data.tokens?.length });
