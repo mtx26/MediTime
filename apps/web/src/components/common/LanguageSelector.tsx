@@ -6,8 +6,21 @@ import { Button } from '@/components/ui/button';
 import { LANGUAGES } from '@meditime/constants';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { Language } from '@meditime/types';
+import * as Flags from 'country-flag-icons/react/3x2';
 
 type LanguageFlagCode = Language['flag'];
+
+const FLAG_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  FR: Flags.FR,
+  US: Flags.US,
+  ES: Flags.ES,
+  DE: Flags.DE,
+  IT: Flags.IT,
+  JP: Flags.JP,
+  CN: Flags.CN,
+  PT: Flags.PT,
+  RU: Flags.RU,
+};
 
 function LanguageSelector() {
   const { i18n } = useTranslation();
@@ -33,7 +46,7 @@ function LanguageSelector() {
   };
 
   const currentLang = LANGUAGES.find(lang => lang.flag === selected);
-  const CurrentFlag = currentLang?.FlagComponent;
+  const CurrentFlag = FLAG_MAP[selected];
 
   return (
     <DropdownMenu>
@@ -46,14 +59,14 @@ function LanguageSelector() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {LANGUAGES.map((lang) => {
-          const FlagComponent = lang.FlagComponent;
+          const FlagIcon = FLAG_MAP[lang.flag];
           return (
             <DropdownMenuItem
               key={lang.flag}
               onClick={() => onSelect(lang.flag)}
               className="gap-2 cursor-pointer"
             >
-              {FlagComponent && <FlagComponent className="w-5 h-4" />}
+              {FlagIcon && <FlagIcon className="w-5 h-4" />}
               <span className="flex-1">{lang.label}</span>
               {selected === lang.flag && <Check className="w-4 h-4" />}
             </DropdownMenuItem>
