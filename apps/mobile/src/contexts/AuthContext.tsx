@@ -90,6 +90,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         origin: 'USER_SYNC_GET',
         code: 'USER_SYNC_ERROR',
       });
+      // Fallback: use Supabase user data so the user is still logged in
+      const metadata = (user.user_metadata ?? {}) as Record<string, string | undefined>;
+      setUserInfo({
+        uid: user.id,
+        email: user.email ?? '',
+        name: metadata.full_name ?? metadata.name ?? '',
+      } as UserInfo);
     } finally {
       setIsLoading(false);
     }

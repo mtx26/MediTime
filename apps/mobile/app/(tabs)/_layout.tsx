@@ -1,17 +1,19 @@
 import { Tabs, Redirect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../src/hooks/useAuth';
 
 export default function TabsLayout() {
   const { t } = useTranslation();
   const { userInfo, isLoading } = useAuth();
+  const theme = useTheme();
 
   if (isLoading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#4f46e5" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -23,9 +25,16 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#4f46e5',
+        tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: '#94a3b8',
         headerTitleStyle: { fontWeight: '600' },
+        tabBarStyle: {
+          borderTopWidth: 0,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+        },
       }}
     >
       <Tabs.Screen
@@ -42,5 +51,5 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
-  loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  loader: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc' },
 });
