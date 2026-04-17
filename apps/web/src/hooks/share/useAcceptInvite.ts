@@ -6,7 +6,6 @@ import { INVITE_TYPES } from '@meditime/constants';
 import type {
   AcceptInvitePageProps,
   AcceptInviteSharedUserCalendars,
-  InviteType,
   SharedInvitation,
 } from '@meditime/types';
 
