@@ -24,7 +24,7 @@ const CalendarView = lazy(() => import('../pages/calendars/calendar/CalendarView
 const PillboxPage = lazy(() => import('../pages/calendars/calendar/pillbox/Pillbox'));
 const CalendarList = lazy(() => import('../pages/calendars/CalendarList'));
 const SharedList = lazy(() => import('../pages/calendars/calendar/share/SharedList'));
-const MedicinesList = lazy(() => import('../pages/calendars/calendar/medicines/MedicinesList'));
+// TODO: MedicinesList page removed — recreate or replace
 const NotFound = lazy(() => import('../pages/general/NotFound'));
 
 const PrivacyPage = lazy(() => import('../pages/general/PrivacyPage'));
@@ -99,7 +99,7 @@ export default function AppRoutes({ sharedProps }: { sharedProps: AppSharedProps
 
         <Route path="shared-token-calendar/:sharedToken">
           <Route index element={<CalendarView {...sharedProps} />} />
-          <Route path="boxes" element={<MedicinesList />} />
+          {/* TODO: MedicinesList page removed — recreate or replace */}
           <Route path="pillbox" element={<PillboxPage {...sharedProps} />} />
         </Route>
 
