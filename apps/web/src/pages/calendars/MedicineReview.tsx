@@ -1,4 +1,4 @@
-import { useMedicineReview } from '@/hooks/medicine/useMedicineReview';
+import { useMedicineReview } from '@/hooks/medicines/useMedicineReview';
 import ArrowControls from '@/components/calendar/ArrowControls';
 import MedicineReviewCondition from '@/components/medicines/MedicineReviewCondition';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';

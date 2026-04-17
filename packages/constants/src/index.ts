@@ -113,3 +113,15 @@ export const CALENDAR_ROUTE_PREFIXES = {
   SHARED_USER: '/shared-user-calendar',
   SHARED_TOKEN: '/shared-token-calendar',
 } as const;
+
+// ============================================================================
+// Time of Day Constants
+// ============================================================================
+
+export const ALL_TIMES = ['morning', 'noon', 'evening'] as const;
+
+export const TIME_OF_DAY_COLORS: Record<string, string> = {
+  morning: 'bg-red-400/20 text-red-700 border-red-400/50',
+  noon: 'bg-emerald-400/20 text-emerald-700 border-emerald-400/50',
+  evening: 'bg-blue-400/20 text-blue-700 border-blue-400/50',
+};
