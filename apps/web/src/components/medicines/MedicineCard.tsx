@@ -1,81 +1,53 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useAlert } from '@/contexts/AlertContext';
-import ActionSheet from '@/components/common/ActionSheet';
-import IconButton from '@/components/common/UtilityComponents';
-import { toActionSheetItems } from '@/utils/actionSheetAdapter';
-import { buildBoxActions } from '@meditime/utils';
-import type { BoxesViewBoxItem, MedicineReviewConditionInput } from '@meditime/types';
-import type { CalendarSourceGroup } from '@meditime/utils';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { PlusCircle, Package } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
+import ActionSheet from '@/components/common/ActionSheet';
+import BoxRestockActions from './BoxRestockActions';
 import MedicineStatusBadges from './MedicineStatusBadges';
 import ConditionsList from './ConditionsList';
+import StatusBadge from '@/components/common/StatusBadge';
+import type { ReactNode } from 'react';
+import type {
+  BoxesViewBoxItem,
+  CalendarBoxAlertItem,
+  ActionSheetAction,
+  MedicineReviewConditionInput,
+} from '@meditime/types';
 
 interface MedicineCardProps {
-  box: BoxesViewBoxItem;
-  expandedBoxes: Record<string, boolean>;
-  setExpandedBoxes: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  calendarId: string | undefined;
-  calendarSource: CalendarSourceGroup;
-  onEdit: (box: BoxesViewBoxItem) => void;
-  onUpdateScan: () => void;
-  basePath: string;
-  t: (key: string) => string;
+  box: BoxesViewBoxItem | CalendarBoxAlertItem;
+  onRestock: (id: string) => void;
+  onMissingPillbox: (id: string) => void;
+  actions?: ActionSheetAction<ReactNode>[];
+  onEdit?: () => void;
+  expandedBoxes?: Record<string, boolean>;
+  setExpandedBoxes?: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
 }
 
 function MedicineCard({
   box,
+  onRestock,
+  onMissingPillbox,
+  actions,
+  onEdit,
   expandedBoxes,
   setExpandedBoxes,
-  calendarId,
-  calendarSource,
-  onEdit,
-  onUpdateScan,
-  basePath,
-  t,
 }: MedicineCardProps) {
-  const { showConfirm } = useAlert();
-  const { lng } = useParams<{ lng?: string }>();
-  const navigate = useNavigate();
-
-  const openNotice = () => {
-    window.open(`${import.meta.env.VITE_API_URL}/api/proxy/pdf/${box.id}`, '_blank');
-  };
-
-  const toggleExpand = () => {
-    setExpandedBoxes((p) => ({ ...p, [box.id]: !p[box.id] }));
-  };
-
-  const deleteBox = async (calId: string, boxId: string) => {
-    showConfirm(
-      'confirm-danger',
-      t('boxes.delete_title'),
-      t('boxes.delete_description'),
-      async () => {
-        await calendarSource.deleteBox!(calId, boxId);
-      }
-    );
-  };
-
-  const getBoxActions = () => toActionSheetItems(
-    buildBoxActions({
-      onScanQr: onUpdateScan,
-      onEdit: () => onEdit(box),
-      onViewNotice: openNotice,
-      onDelete: () => deleteBox(calendarId!, box.id),
-    }),
-    t,
-  );
+  const { t } = useTranslation();
+  const isFullMode = !!onEdit;
 
   const getBorderClass = () => {
-    const allExpired = box.conditions?.every((c: MedicineReviewConditionInput) => {
-      if (!c?.max_date) return false;
-      return new Date() > new Date(c.max_date);
-    });
-
-    if (allExpired) return 'border-blue-500';
+    if (isFullMode) {
+      const allExpired = (box as BoxesViewBoxItem).conditions?.every(
+        (c: MedicineReviewConditionInput) => {
+          if (!c?.max_date) return false;
+          return new Date() > new Date(c.max_date);
+        },
+      );
+      if (allExpired) return 'border-blue-500';
+    }
     if (box.box_capacity === 0) return '';
     if (box.stock_quantity <= 0) return 'border-destructive';
     if (box.stock_quantity <= box.stock_alert_threshold) return 'border-amber-500';
@@ -86,13 +58,15 @@ function MedicineCard({
     <Card className={cn('h-full shadow-sm', getBorderClass())}>
       <CardContent className="relative">
 
-        {/* Action Menu */}
-        <div className="absolute top-0 right-2">
-          <ActionSheet buttonSize="sm" actions={getBoxActions()} />
-        </div>
+        {/* Action Menu (full mode) */}
+        {actions && (
+          <div className="absolute top-0 right-2">
+            <ActionSheet buttonSize="sm" actions={actions} />
+          </div>
+        )}
 
         {/* Title */}
-        <h5 className="font-semibold text-lg mb-2 pr-8">
+        <h5 className={cn('font-semibold text-lg', actions ? 'mb-2 pr-8' : 'mb-4')}>
           {`${box.name}${(box.dose ?? 0) > 0 ? ' (' + box.dose + ' mg)' : ''}`}
         </h5>
 
@@ -112,45 +86,39 @@ function MedicineCard({
         <div className="flex gap-4 mb-3">
           <div className="flex-1">
             <Label className="text-muted-foreground text-xs">{t('boxes.remaining_qty')}</Label>
-            <p className="font-semibold">{box.stock_quantity}</p>
+            <p className={cn('font-semibold', box.stock_quantity <= 0 && 'text-destructive')}>
+              {box.stock_quantity}
+            </p>
           </div>
-          <div className='flex-1 flex flex-col gap-2'>
-            <div className="flex-1">
-              <IconButton
-                className="w-full border-green-500 text-green-600 hover:bg-green-50"
-                icon={PlusCircle}
-                text={t('boxes.restock')}
-                onClick={() => calendarSource.restockBox!(calendarId!, box.id)}
-                disabled={box.box_capacity === 0}
-                helpDisabled={t('boxes.restock_disabled_tooltip')}
-              />
-            </div>
-            {box.stock_quantity < 0 && (
-              <div className='flex-1'>
-                <IconButton
-                  className="w-full border-blue-500 text-blue-600 hover:bg-blue-50"
-                  icon={Package}
-                  text={t('boxes.missing_pillbox')}
-                  onClick={() => {
-                    const medsIdParam = encodeURIComponent(JSON.stringify([box.id]));
-                    navigate(`/${lng}/${basePath}/${calendarId}/pillbox?medsId=${medsIdParam}`);
-                  }}
-                />
-              </div>
-            )}
-          </div>
+          <BoxRestockActions
+            boxId={box.id}
+            stockQuantity={box.stock_quantity}
+            boxCapacity={box.box_capacity}
+            onRestock={onRestock}
+            onMissingPillbox={onMissingPillbox}
+          />
         </div>
 
         {/* Status Badges */}
-        <MedicineStatusBadges box={box} onEdit={() => onEdit(box)} t={t} />
+        {isFullMode ? (
+          <MedicineStatusBadges box={box as BoxesViewBoxItem} onEdit={onEdit!} t={t} />
+        ) : (
+          <StatusBadge
+            variant={box.stock_quantity <= 0 ? 'danger' : 'warning'}
+            icon={AlertTriangle}
+            text={box.stock_quantity <= 0 ? t('critical_stock') : t('low_stock')}
+          />
+        )}
 
-        {/* Conditions */}
-        <ConditionsList
-          conditions={box.conditions}
-          expanded={!!expandedBoxes[box.id]}
-          onToggle={toggleExpand}
-          t={t}
-        />
+        {/* Conditions (full mode) */}
+        {isFullMode && expandedBoxes && setExpandedBoxes && (
+          <ConditionsList
+            conditions={(box as BoxesViewBoxItem).conditions}
+            expanded={!!expandedBoxes[box.id]}
+            onToggle={() => setExpandedBoxes((p) => ({ ...p, [box.id]: !p[box.id] }))}
+            t={t}
+          />
+        )}
       </CardContent>
     </Card>
   );

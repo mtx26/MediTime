@@ -22,14 +22,16 @@ function BoxesView(props: BoxesViewPageProps) {
     expandedBoxes, setExpandedBoxes,
     notFound,
     calendarId,
-    calendarSource,
     basePath,
     getCommonActions,
+    getBoxActions,
+    restockBox,
+    navigateToMissingPillbox,
     editingBoxId, editingBox, setEditingBox, initEditing, cancelEditing,
     addCondition, deleteCondition, updateCondition, handleSubmit, createTemporaryBox,
     conditionFields,
     showQRModal, singleScan, addScannedMedicines, updateScannedMedicine,
-    openAddScan, openUpdateScan, closeScanner,
+    openAddScan, closeScanner,
   } = useBoxesView(props);
 
   if (notFound) {
@@ -73,14 +75,12 @@ function BoxesView(props: BoxesViewPageProps) {
             <MedicineCard
               key={box.id}
               box={box}
+              onRestock={restockBox}
+              onMissingPillbox={navigateToMissingPillbox}
+              actions={getBoxActions(box)}
+              onEdit={() => initEditing(box)}
               expandedBoxes={expandedBoxes}
               setExpandedBoxes={setExpandedBoxes}
-              calendarId={calendarId}
-              calendarSource={calendarSource}
-              onEdit={initEditing}
-              onUpdateScan={() => openUpdateScan(box.id)}
-              basePath={basePath}
-              t={t}
             />
           ))}
 

@@ -6,7 +6,7 @@ import { useBoxScanner } from '@/hooks/boxes/useBoxScanner';
 import { getConditionFields } from '@/utils/getConditionFields';
 import { useAlert } from '@/contexts/AlertContext';
 import { useLoading } from '@/components/ui/loading';
-import { getCalendarSourceMap, buildPersonalCalendarActions, buildSharedCalendarActions, detectCalendarType } from '@meditime/utils';
+import { getCalendarSourceMap, buildPersonalCalendarActions, buildSharedCalendarActions, buildBoxActions, detectCalendarType } from '@meditime/utils';
 import { useTranslation } from 'react-i18next';
 import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import type {
@@ -146,6 +146,28 @@ export function useBoxesView({ personalCalendars, sharedUserCalendars, tokenCale
     );
   };
 
+  const restockBox = (boxId: string) => calendarSource.restockBox!(calendarId!, boxId);
+
+  const navigateToMissingPillbox = (boxId: string) => {
+    const medsIdParam = encodeURIComponent(JSON.stringify([boxId]));
+    navigate(`/${lng}/${basePath}/${calendarId}/pillbox?medsId=${medsIdParam}`);
+  };
+
+  const getBoxActions = (box: BoxesViewBoxItem) => toActionSheetItems(
+    buildBoxActions({
+      onScanQr: () => openUpdateScan(box.id),
+      onEdit: () => initEditing(box),
+      onViewNotice: () => window.open(`${import.meta.env.VITE_API_URL}/api/proxy/pdf/${box.id}`, '_blank'),
+      onDelete: () => showConfirm(
+        'confirm-danger',
+        t('boxes.delete_title'),
+        t('boxes.delete_description'),
+        async () => calendarSource.deleteBox!(calendarId!, box.id),
+      ),
+    }),
+    t,
+  );
+
   const getCommonActions = () => {
     const builder = calendarType === 'personal'
       ? buildPersonalCalendarActions(
@@ -187,6 +209,9 @@ export function useBoxesView({ personalCalendars, sharedUserCalendars, tokenCale
     calendarSource,
     basePath,
     getCommonActions,
+    getBoxActions,
+    restockBox,
+    navigateToMissingPillbox,
     // Box editing
     editingBoxId, editingBox, setEditingBox, initEditing, cancelEditing,
     addCondition, deleteCondition, updateCondition, handleSubmit, createTemporaryBox,
