@@ -1,6 +1,6 @@
 import { useMedicineReview } from '@/hooks/medicine/useMedicineReview';
 import ArrowControls from '@/components/calendar/ArrowControls';
-import MedicineReviewCondition from './components/MedicineReviewCondition';
+import MedicineReviewCondition from '@/components/medicines/MedicineReviewCondition';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import type { MedicineReviewConditionInput, MedicineReviewProps } from '@meditim
 
 export default function MedicineReview({ personalCalendars }: MedicineReviewProps) {
   const {
-    t, lng, current, medicines, index, suggestions, showDropdown, setShowDropdown,
+    t, current, medicines, index, suggestions, showDropdown, setShowDropdown,
     handleChange, handleConditionChange, addCondition, deleteCondition,
     deleteMedicine, goPrev, goNext, handleSave, handleSubmit, setSuggestions,
   } = useMedicineReview({ personalCalendars });

@@ -22,9 +22,9 @@ import { Package, PlusCircle, QrCode, AlertTriangle } from 'lucide-react';
 import NotFound from '../../../general/NotFound';
 
 // Extracted components
-import ActionCard from './components/ActionCard';
-import MedicineCard from './components/MedicineCard';
-import EditBoxDialog from './components/EditBoxDialog';
+import ActionCard from '@/components/medicines/ActionCard';
+import MedicineCard from '@/components/medicines/MedicineCard';
+import EditBoxDialog from '@/components/medicines/EditBoxDialog';
 
 // ============================================================================
 // MAIN COMPONENT: BoxesView

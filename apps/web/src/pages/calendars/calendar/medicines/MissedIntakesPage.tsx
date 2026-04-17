@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { CalendarDays, Pill, Sun, Clock, Moon, ArrowRight } from 'lucide-react';
-import DateSelectionCalendar from './components/DateSelectionCalendar';
+import DateSelectionCalendar from '@/components/medicines/DateSelectionCalendar';
 import NotFound from '@/pages/general/NotFound';
 import type { MissedIntakesPageProps, MissedMode, TimeOfDay, BoxItem, MissedSelectionMode } from '@meditime/types';
 

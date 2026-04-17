@@ -8,7 +8,7 @@ import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import { useCalendarData } from '@/hooks/calendar/useCalendarData';
 import DateModal from '@/components/calendar/DateModal';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
-import CalendarWeekSelector from './components/CalendarWeekSelector';
+import CalendarWeekSelector from '@/components/calendar/CalendarWeekSelector';
 import PillboxDisplay from '@/components/calendar/PillboxDisplay';
 import ActionSheet from '@/components/common/ActionSheet';
 import NotFound from '@/pages/general/NotFound';

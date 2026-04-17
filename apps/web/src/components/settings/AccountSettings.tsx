@@ -1,11 +1,11 @@
 import { useContext, useState, useEffect } from 'react';
-import { UserContext, getGlobalReloadUser } from '../../contexts/UserContext';
+import { UserContext, getGlobalReloadUser } from '@/contexts/UserContext';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '../../services/supabase/supabaseClient';
+import { supabase } from '@/services/supabase/supabaseClient';
 import { log } from '@meditime/utils';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '@meditime/utils';
-import { updateUserInfo } from '../../services/auth/authService';
+import { updateUserInfo } from '@/services/auth/authService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

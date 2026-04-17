@@ -4,7 +4,7 @@ import { useLoading } from '@/components/ui/loading';
 import { useTranslation } from "react-i18next";
 import { useSearchParams, Link } from "react-router-dom";
 import { Button } from '@/components/ui/button';
-import CalendarCard from './components/CalendarCard';
+import CalendarCard from '@/components/share/CalendarCard';
 import type { SharedListPageProps, GroupedSharedCalendars, GroupedSharedCalendarsResult } from '@meditime/types';
 
 function SharedList({

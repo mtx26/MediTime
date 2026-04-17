@@ -1,12 +1,12 @@
 import { useState, useEffect, useContext } from 'react';
-import Security from './Security';
-import Notification from './Notification';
-import Account from './Account';
-import Preferences from './Preferences';
+import SecuritySettings from '@/components/settings/SecuritySettings';
+import NotificationSettings from '@/components/settings/NotificationSettings';
+import AccountSettings from '@/components/settings/AccountSettings';
+import PreferencesSettings from '@/components/settings/PreferencesSettings';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { handleLogout, resetPassword } from '../../services/auth/authService';
-import { UserContext } from '../../contexts/UserContext';
-import { useAlert } from '../../contexts/AlertContext';
+import { handleLogout, resetPassword } from '@/services/auth/authService';
+import { UserContext } from '@/contexts/UserContext';
+import { useAlert } from '@/contexts/AlertContext';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,15 +36,15 @@ export default function SettingsPage( sharedProps: AppSharedProps ) {
   const renderTab = () => {
     switch (activeTab) {
       case 'account':
-        return <Account />;
+        return <AccountSettings />;
       case 'security':
-        return <Security />;
+        return <SecuritySettings />;
       case 'notifications':
-        return <Notification fcm={sharedProps.fcm} user={sharedProps.user} />;
+        return <NotificationSettings fcm={sharedProps.fcm} user={sharedProps.user} />;
       case 'preferences':
-        return <Preferences />;
+        return <PreferencesSettings />;
       default:
-        return <Account />;
+        return <AccountSettings />;
     }
   };
 

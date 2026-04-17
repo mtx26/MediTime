@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
-import { UserContext } from '../../contexts/UserContext';
+import { UserContext } from '@/contexts/UserContext';
 import { useTranslation } from 'react-i18next';
-import { updateUserInfo } from '../../services/auth/authService';
+import { updateUserInfo } from '@/services/auth/authService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
