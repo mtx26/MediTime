@@ -112,7 +112,9 @@ export interface QRScanImportPersonalCalendars {
     boxCapacity: number,
     stockAlertThreshold: number,
     stockQuantity: number,
-    dose: number | null,
+    dose: number | string | null,
+    conditions: MedicineReviewConditionInput[],
+    codeFmd?: string | null,
   ) => Promise<ApiResult>;
 }
 
