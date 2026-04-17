@@ -18,6 +18,8 @@ export interface CalendarDataSourceProps {
 
 export type CalendarPageSourceType = 'personal' | 'sharedUser' | 'token';
 
+export type CalendarSettingsTab = 'stock' | 'notifications';
+
 // ─── Sub-component Props ─────────────────────────────────────────────
 
 export interface CalendarWeekSelectorProps {

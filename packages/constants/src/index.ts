@@ -114,6 +114,20 @@ export const CALENDAR_ROUTE_PREFIXES = {
   SHARED_TOKEN: '/shared-token-calendar',
 } as const;
 
+export const CALENDAR_SETTINGS_TABS = {
+  STOCK: 'stock',
+  NOTIFICATIONS: 'notifications',
+} as const;
+
+// ============================================================================
+// Stock Decrement Methods
+// ============================================================================
+
+export const STOCK_DECREMENT_METHODS = {
+  WEEKLY_PILLBOX: 'weekly_pillbox',
+  DAILY_MIDNIGHT: 'daily_midnight',
+} as const;
+
 // ============================================================================
 // Time of Day Constants
 // ============================================================================
