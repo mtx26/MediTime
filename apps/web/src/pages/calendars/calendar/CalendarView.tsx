@@ -4,6 +4,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { toISO, buildPersonalCalendarActions, buildSharedCalendarActions } from '@meditime/utils';
+import { STOCK_DECREMENT_METHODS } from '@meditime/constants';
 import { toActionSheetItems } from '@/utils/actionSheetAdapter';
 import { useCalendarData } from '@/hooks/calendar/useCalendarData';
 import DateModal from '@/components/calendar/DateModal';
@@ -114,7 +115,7 @@ function CalendarPage({
 
             </div>
             {/* Bouton pour naviguer vers la semaine suivante ou precedente */}
-            {stockDecrementMethod === "weekly_pillbox" && (
+            {stockDecrementMethod === STOCK_DECREMENT_METHODS.WEEKLY_PILLBOX && (
               <div className='flex lg:hidden justify-center items-center' data-tour="calendar-week-selector">
                 <CalendarWeekSelector
                   calendarTable={calendarTable}
@@ -137,7 +138,7 @@ function CalendarPage({
           .length > 0 && (
             <>
               {/* Pilulier - Vue mobile */}
-              {stockDecrementMethod === "weekly_pillbox" && (
+              {stockDecrementMethod === STOCK_DECREMENT_METHODS.WEEKLY_PILLBOX && (
                 <div className="block lg:hidden w-full lg:w-2/3 lg:px-2">
                   <div>
                     <h4 className="mb-3 font-bold flex items-center gap-2">
@@ -249,7 +250,7 @@ function CalendarPage({
           </div>
 
           {/* Calendrier - Vue mobile uniquement */}
-          {stockDecrementMethod  === "daily_midnight" && (
+          {stockDecrementMethod === STOCK_DECREMENT_METHODS.DAILY_MIDNIGHT && (
             <div className="block lg:hidden">
               <h4 className="mb-3 font-bold flex items-center gap-2">
                 <CalendarDays className="h-5 w-5" /> {t('calendar.daily_view')}

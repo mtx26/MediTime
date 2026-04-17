@@ -4,6 +4,7 @@ import type { BoxItem, IcsTokenItem, MedicineItem, StockDecrementMethod } from '
 import type { WeeklyEventItem, CalendarTable } from '../models/schedule';
 import type { PersonalCalendarsApi } from '../api/factories';
 import type { AppPersonalCalendars, AppSharedUserCalendars, AppTokenCalendars } from '../app';
+import type { QRScanImportPersonalCalendars, ImageUploadImportPersonalCalendars } from './document-import';
 
 
 
@@ -185,4 +186,14 @@ export interface CalendarListSharedUserCalendars {
 export interface CalendarListPageProps {
   personalCalendars: CalendarListPersonalCalendars;
   sharedUserCalendars: CalendarListSharedUserCalendars;
+}
+
+// ─── Add Calendar Page Props ─────────────────────────────────────────
+
+export interface AddCalendarPagePersonalCalendars
+  extends QRScanImportPersonalCalendars,
+    ImageUploadImportPersonalCalendars {}
+
+export interface AddCalendarPageProps {
+  personalCalendars: AddCalendarPagePersonalCalendars;
 }

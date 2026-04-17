@@ -4,6 +4,7 @@ import FullCalendar from '@fullcalendar/react';
 import { UserContext } from '@/contexts/UserContext';
 import { useLoading } from '@/components/ui/loading';
 import { toISO, getCalendarSourceMap, detectCalendarType } from '@meditime/utils';
+import { STOCK_DECREMENT_METHODS } from '@meditime/constants';
 import { useAlert } from '@/contexts/AlertContext';
 import { useFilteredEventsForDay } from '@/hooks/calendar/useCalendarNavigation';
 import { useTranslation } from 'react-i18next';
@@ -132,7 +133,7 @@ export function useCalendarData({
       if (rep.success) {
         const method = rep.method || '';
         setStockDecrementMethod(method);
-        if (method === 'weekly_pillbox') {
+        if (method === STOCK_DECREMENT_METHODS.WEEKLY_PILLBOX) {
           setSelectedDate(new Date(initialNextDate));
         } else {
           setSelectedDate(new Date(new Date().setHours(0, 0, 0, 0)));

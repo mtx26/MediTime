@@ -95,6 +95,33 @@ export interface MedicineReviewLocationState {
   calendarName?: string;
 }
 
+// ─── QR Scan Import ─────────────────────────────────────────────────────────
+
+export type QRScanImportState = QRCodeScannerState;
+
+export type QRScanImportResult = ApiResult & {
+  successCount?: number;
+  errorCount?: number;
+};
+
+export interface QRScanImportPersonalCalendars {
+  addCalendar: (calendarName: string) => Promise<ApiResult & { calendarId?: string }>;
+  createPersonalBox: (
+    calendarId: string,
+    name: string,
+    boxCapacity: number,
+    stockAlertThreshold: number,
+    stockQuantity: number,
+    dose: number | null,
+  ) => Promise<ApiResult>;
+}
+
+export interface QRScanImportProps {
+  calendarName: string;
+  personalCalendars: QRScanImportPersonalCalendars;
+  onStateChange?: (state: QRScanImportState) => void;
+}
+
 export interface MedicineReviewConditionProps {
   condition: MedicineReviewConditionInput;
   conditionIndex: number;

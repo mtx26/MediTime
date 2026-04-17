@@ -97,6 +97,8 @@ export interface AcceptInviteSharedUserCalendars {
   rejectRegistrationInvitation: (token: string) => Promise<ApiResult>;
 }
 
+export type InviteType = 'login' | 'registration';
+
 export interface AcceptInvitePageProps {
   sharedUserCalendars: AcceptInviteSharedUserCalendars;
 }

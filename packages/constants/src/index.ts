@@ -114,6 +114,17 @@ export const CALENDAR_ROUTE_PREFIXES = {
   SHARED_TOKEN: '/shared-token-calendar',
 } as const;
 
+// ============================================================================
+// Settings Tabs
+// ============================================================================
+
+export const SETTINGS_TABS = {
+  ACCOUNT: 'account',
+  SECURITY: 'security',
+  NOTIFICATIONS: 'notifications',
+  PREFERENCES: 'preferences',
+} as const;
+
 export const CALENDAR_SETTINGS_TABS = {
   STOCK: 'stock',
   NOTIFICATIONS: 'notifications',
@@ -127,6 +138,13 @@ export const STOCK_DECREMENT_METHODS = {
   WEEKLY_PILLBOX: 'weekly_pillbox',
   DAILY_MIDNIGHT: 'daily_midnight',
 } as const;
+
+export const INVITE_TYPES = {
+  LOGIN: 'login',
+  REGISTRATION: 'registration',
+} as const;
+
+export const DEMO_CALENDAR_ID = 'demo';
 
 // ============================================================================
 // Time of Day Constants
