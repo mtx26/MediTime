@@ -6,5 +6,6 @@ export * from './error';
 export * from './files';
 export * from './log';
 export * from './medicine';
+export * from './qr';
 export * from './realtime';
 export * from './url';

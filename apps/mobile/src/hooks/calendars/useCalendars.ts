@@ -6,7 +6,13 @@ import {
   fetchSharedCalendars,
   performApiCall,
 } from '@meditime/utils';
-import type { ApiResult, CalendarItem } from '@meditime/types';
+import type {
+  ApiResult,
+  CalendarItem,
+  MedicineReviewConditionInput,
+  MedicineReviewMedicineInput,
+  PersonalBoxResult,
+} from '@meditime/types';
 import { useAuth } from '../auth/useAuth';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
@@ -105,6 +111,87 @@ export function useCalendars() {
     [loadCalendars, personalCalendarsApi],
   );
 
+  const createPersonalBox = useCallback(
+    async (
+      calendarId: string,
+      name: string,
+      boxCapacity: number,
+      stockAlertThreshold: number,
+      stockQuantity: number,
+      dose: number | string | null,
+      conditions: MedicineReviewConditionInput[] = [],
+      codeFmd: string | null = null,
+    ): Promise<PersonalBoxResult> => {
+      setIsMutating(true);
+      try {
+        return await personalCalendarsApi.createPersonalBox(
+          calendarId,
+          name,
+          boxCapacity,
+          stockAlertThreshold,
+          stockQuantity,
+          dose,
+          conditions,
+          codeFmd,
+        );
+      } finally {
+        setIsMutating(false);
+      }
+    },
+    [personalCalendarsApi],
+  );
+
+  const analyzeImageBase64 = useCallback(
+    async (base64: string): Promise<ApiResult & { medicines?: MedicineReviewMedicineInput[] }> => {
+      setIsMutating(true);
+      try {
+        return await performApiCall({
+          url: `${API_URL}/api/documents/analyze`,
+          method: 'POST',
+          body: { image: base64 },
+          origin: 'DOCUMENT_ANALYZE',
+          uid: userInfo?.uid ?? null,
+          analyticsEvent: 'DOCUMENT_ANALYZE',
+          analyticsData: { uid: userInfo?.uid ?? null },
+          showAlert: null,
+        }) as ApiResult & { medicines?: MedicineReviewMedicineInput[] };
+      } finally {
+        setIsMutating(false);
+      }
+    },
+    [userInfo?.uid],
+  );
+
+  const saveAnalysisResult = useCallback(
+    async (
+      calendarName: string,
+      boxes: MedicineReviewMedicineInput[],
+    ): Promise<ApiResult & { calendar_id?: string }> => {
+      setIsMutating(true);
+      try {
+        const result = await performApiCall({
+          url: `${API_URL}/api/documents/analyze/save`,
+          method: 'POST',
+          body: { calendarName, boxes },
+          origin: 'DOCUMENT_ANALYZE_SAVE',
+          uid: userInfo?.uid ?? null,
+          analyticsEvent: 'DOCUMENT_ANALYZE_SAVE',
+          analyticsData: { uid: userInfo?.uid ?? null },
+          showAlert: null,
+        }) as ApiResult & { calendar_id?: string };
+
+        if (result.success) {
+          await loadCalendars();
+        }
+
+        return result;
+      } finally {
+        setIsMutating(false);
+      }
+    },
+    [loadCalendars, userInfo?.uid],
+  );
+
   const deleteSharedCalendar = useCallback(
     async (calendarId: string): Promise<ApiResult> => {
       setIsMutating(true);
@@ -138,6 +225,9 @@ export function useCalendars() {
     addCalendar,
     deleteCalendar,
     renameCalendar,
+    createPersonalBox,
+    analyzeImageBase64,
+    saveAnalysisResult,
     deleteSharedCalendar,
     getPersonalCalendarPdfUrl,
   };

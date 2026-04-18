@@ -1,16 +1,12 @@
-import { useState } from 'react';
-import { Modal, Pressable } from 'react-native';
+import { useRef, type ReactNode } from 'react';
+import { ActionSheetIOS, Alert, Animated, Platform, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { Button, ScrollView, Text, XStack, YStack } from 'tamagui';
+import { YStack } from 'tamagui';
 
-const web = {
-  background: '#ffffff',
-  foreground: '#020817',
-  mutedForeground: '#64748b',
-  border: '#e2e8f0',
-  accentHover: '#f1f5f9',
-  destructive: '#dc2626',
+const colors = {
+  systemBlue: '#007aff',
+  systemBlueBg: '#e8f3ff',
 };
 
 export type MobileActionSheetAction = {
@@ -27,124 +23,149 @@ export type MobileActionSheetAction = {
 type ActionSheetProps = {
   actions: MobileActionSheetAction[];
   buttonSize?: 'sm' | 'default';
+  children?: ReactNode;
   dataTour?: string;
+  onPress?: () => void;
   onNavigate?: (href: string) => void;
+  triggerMode?: 'button' | 'longPress';
 };
 
-function ActionSheet({ actions, buttonSize = 'default', onNavigate }: ActionSheetProps) {
+function ActionSheet({
+  actions,
+  buttonSize = 'default',
+  children,
+  onPress,
+  onNavigate,
+  triggerMode = 'button',
+}: ActionSheetProps) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
+  const longPressTriggered = useRef(false);
+  const longPressScale = useRef(new Animated.Value(1)).current;
 
-  const closeAndRun = (action: MobileActionSheetAction) => {
-    setOpen(false);
+  const animateLongPressIn = () => {
+    Animated.spring(longPressScale, {
+      toValue: 0.975,
+      useNativeDriver: true,
+      speed: 28,
+      bounciness: 0,
+    }).start();
+  };
+
+  const animateLongPressOut = () => {
+    Animated.spring(longPressScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 24,
+      bounciness: 4,
+    }).start();
+  };
+
+  const runAction = (action: MobileActionSheetAction) => {
     if (action.linkTo) {
       onNavigate?.(action.linkTo);
       return;
     }
+
     action.onClick?.();
   };
 
-  return (
-    <>
-      <Button
-        size={buttonSize === 'sm' ? '$2' : '$3'}
-        onPress={() => setOpen(true)}
-        aria-label={t('Actions')}
-        style={{
-          width: buttonSize === 'sm' ? 36 : 40,
-          minHeight: buttonSize === 'sm' ? 36 : 40,
-          paddingHorizontal: 0,
-          borderRadius: 6,
-          borderWidth: 1,
-          borderColor: web.border,
-          backgroundColor: web.background,
-        }}
-      >
-        <Ionicons name="ellipsis-vertical" size={18} color={web.foreground} />
-      </Button>
+  const openIosActionSheet = () => {
+    const visibleActions = actions.filter((action) => !action.separator);
+    const labels = visibleActions.map((action) => action.label ?? action.title ?? '');
+    const cancelButtonIndex = labels.length;
+    const destructiveButtonIndex = visibleActions.findIndex((action) => action.danger);
 
-      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
-        <Pressable
-          onPress={() => setOpen(false)}
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: [...labels, t('cancel')],
+        cancelButtonIndex,
+        destructiveButtonIndex: destructiveButtonIndex >= 0 ? destructiveButtonIndex : undefined,
+        userInterfaceStyle: 'light',
+      },
+      (buttonIndex) => {
+        if (buttonIndex === cancelButtonIndex) return;
+
+        const selected = visibleActions[buttonIndex];
+        if (selected) runAction(selected);
+      },
+    );
+  };
+
+  const openFallbackNativeAlert = () => {
+    const visibleActions = actions.filter((action) => !action.separator);
+
+    Alert.alert(
+      t('Actions'),
+      undefined,
+      [
+        ...visibleActions.map((action) => ({
+          text: action.label ?? action.title ?? '',
+          style: action.danger ? 'destructive' as const : 'default' as const,
+          onPress: () => runAction(action),
+        })),
+        { text: t('cancel'), style: 'cancel' as const },
+      ],
+    );
+  };
+
+  const openActionSheet = () => {
+    if (Platform.OS === 'ios') {
+      openIosActionSheet();
+      return;
+    }
+
+    openFallbackNativeAlert();
+  };
+
+  if (triggerMode === 'longPress') {
+    return (
+      <Pressable
+        onPressIn={animateLongPressIn}
+        onPressOut={animateLongPressOut}
+        onPress={() => {
+          if (longPressTriggered.current) {
+            longPressTriggered.current = false;
+            return;
+          }
+          onPress?.();
+        }}
+        onLongPress={() => {
+          longPressTriggered.current = true;
+          openActionSheet();
+        }}
+        delayLongPress={350}
+        accessibilityRole="button"
+      >
+        <Animated.View style={{ transform: [{ scale: longPressScale }] }}>
+          {children}
+        </Animated.View>
+      </Pressable>
+    );
+  }
+
+  const size = buttonSize === 'sm' ? 36 : 40;
+
+  return (
+    <Pressable
+      onPress={openActionSheet}
+      accessibilityRole="button"
+      accessibilityLabel={t('Actions')}
+    >
+      {({ pressed }) => (
+        <YStack
           style={{
-            flex: 1,
-            justifyContent: 'flex-end',
-            backgroundColor: 'rgba(2, 8, 23, 0.35)',
+            width: size,
+            height: size,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 12,
+            backgroundColor: pressed ? '#d7ebff' : colors.systemBlueBg,
           }}
         >
-          <Pressable>
-            <YStack
-              style={{
-                margin: 12,
-                overflow: 'hidden',
-                borderWidth: 1,
-                borderColor: web.border,
-                borderRadius: 8,
-                backgroundColor: web.background,
-                shadowColor: '#000',
-                shadowOpacity: 0.18,
-                shadowRadius: 12,
-                shadowOffset: { width: 0, height: 8 },
-                elevation: 10,
-              }}
-            >
-              <ScrollView style={{ maxHeight: 520 }}>
-                {actions.map((action, index) => {
-                  if (action.separator) {
-                    return (
-                      <YStack
-                        key={`separator-${index}`}
-                        style={{ height: 1, backgroundColor: web.border, marginVertical: 4 }}
-                      />
-                    );
-                  }
-
-                  return (
-                    <Pressable
-                      key={`${action.title ?? action.label ?? 'action'}-${index}`}
-                      onPress={() => closeAndRun(action)}
-                      accessibilityRole="button"
-                      accessibilityLabel={action.title}
-                    >
-                      {({ pressed }) => (
-                        <XStack
-                          style={{
-                            minHeight: 44,
-                            alignItems: 'center',
-                            gap: 10,
-                            paddingHorizontal: 12,
-                            paddingVertical: 10,
-                            backgroundColor: pressed ? web.accentHover : web.background,
-                          }}
-                        >
-                          {action.iconName && (
-                            <Ionicons
-                              name={action.iconName}
-                              size={18}
-                              color={action.danger ? web.destructive : web.foreground}
-                            />
-                          )}
-                          <Text
-                            style={{
-                              flex: 1,
-                              color: action.danger ? web.destructive : web.foreground,
-                              fontSize: 15,
-                              fontWeight: '600',
-                            }}
-                          >
-                            {action.label}
-                          </Text>
-                        </XStack>
-                      )}
-                    </Pressable>
-                  );
-                })}
-              </ScrollView>
-            </YStack>
-          </Pressable>
-        </Pressable>
-      </Modal>
-    </>
+          <Ionicons name="ellipsis-horizontal" size={18} color={colors.systemBlue} />
+        </YStack>
+      )}
+    </Pressable>
   );
 }
 

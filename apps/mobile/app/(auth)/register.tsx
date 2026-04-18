@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { YStack, XStack, Input, Button, H2, Text, Separator } from 'tamagui';
+import { Mail, Lock, User, Eye, EyeOff } from '@tamagui/lucide-icons';
 import { authService } from '../../src/contexts/AuthContext';
 
 export default function RegisterScreen() {
@@ -21,7 +22,7 @@ export default function RegisterScreen() {
     setError(null);
     setLoading(true);
     try {
-      const err = await authService.registerWithEmail(email.trim(), password, name.trim());
+      const err = await authService.registerWithEmail(email, password, name);
       if (err) {
         const code = (err as { code?: string }).code ?? 'unexpected_error';
         setError(t(`supabase-error.${code}`));
@@ -29,7 +30,7 @@ export default function RegisterScreen() {
         setSuccess(true);
       }
     } catch {
-      setError(t('supabase-error.unexpected_error'));
+      setError(t('auth.register_error'));
     } finally {
       setLoading(false);
     }
@@ -37,16 +38,19 @@ export default function RegisterScreen() {
 
   if (success) {
     return (
-      <YStack style={{ flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#fff', gap: 16 }}>
-        <H2 style={{ textAlign: 'center' }} color="$color">
+      <YStack flex={1} justifyContent="center" padding="$5" backgroundColor="$background" gap="$4">
+        <H2 textAlign="center" color="$color">
           {t('auth.verification_sent')}
         </H2>
+        <Text textAlign="center" color="$gray10" fontSize="$4">
+          {t('auth.check_email')}
+        </Text>
         <Button
           size="$4"
           theme="blue"
           onPress={() => router.replace('/(auth)/login')}
         >
-          {t('back')}
+          {t('auth.back_to_login')}
         </Button>
       </YStack>
     );
@@ -57,19 +61,20 @@ export default function RegisterScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
     >
-      <YStack style={{ flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#fff', gap: 16 }}>
-        <H2 style={{ textAlign: 'center' }} color="$color">
+      <YStack flex={1} justifyContent="center" padding="$5" backgroundColor="$background" gap="$4">
+        <H2 textAlign="center" color="$color">
           {t('auth.register')}
         </H2>
 
         {error && (
-          <Text color="$red10" style={{ textAlign: 'center' }} fontSize="$3">
+          <Text color="$red10" textAlign="center" fontSize="$3">
             {error}
           </Text>
         )}
 
         <YStack gap="$3">
-          <XStack style={{ alignItems: 'center', gap: 8 }}>
+          <XStack alignItems="center" gap="$2">
+            <User size={20} color="$gray10" />
             <Input
               flex={1}
               size="$4"
@@ -81,7 +86,8 @@ export default function RegisterScreen() {
             />
           </XStack>
 
-          <XStack style={{ alignItems: 'center', gap: 8 }}>
+          <XStack alignItems="center" gap="$2">
+            <Mail size={20} color="$gray10" />
             <Input
               flex={1}
               size="$4"
@@ -94,7 +100,8 @@ export default function RegisterScreen() {
             />
           </XStack>
 
-          <XStack style={{ alignItems: 'center', gap: 8 }}>
+          <XStack alignItems="center" gap="$2">
+            <Lock size={20} color="$gray10" />
             <Input
               flex={1}
               size="$4"
@@ -107,10 +114,9 @@ export default function RegisterScreen() {
             <Button
               size="$3"
               chromeless
+              icon={passwordVisible ? EyeOff : Eye}
               onPress={() => setPasswordVisible(!passwordVisible)}
-            >
-              {passwordVisible ? t('auth.hide_password') : t('auth.show_password')}
-            </Button>
+            />
           </XStack>
         </YStack>
 
@@ -118,15 +124,18 @@ export default function RegisterScreen() {
           size="$4"
           theme="blue"
           onPress={handleRegister}
-          disabled={loading || !email.trim() || !password || !name.trim()}
+          disabled={loading || !email || !password || !name}
           opacity={loading ? 0.7 : 1}
         >
-          {loading ? t('loading') : t('auth.register')}
+          {loading ? t('common.loading') : t('auth.register')}
         </Button>
 
-        <Separator style={{ marginVertical: 8 }} />
+        <Separator marginVertical="$2" />
 
-        <XStack style={{ justifyContent: 'center', alignItems: 'center', gap: 8 }}>
+        <XStack justifyContent="center" gap="$2" alignItems="center">
+          <Text color="$gray10" fontSize="$3">
+            {t('auth.already_have_account')}
+          </Text>
           <Button
             size="$3"
             chromeless

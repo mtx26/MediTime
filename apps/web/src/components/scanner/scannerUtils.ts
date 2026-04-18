@@ -1,5 +1,6 @@
 import type { ReaderOptions } from "zxing-wasm/reader";
 import type { TFunction } from "i18next";
+export { extractGTIN01 } from "@meditime/utils";
 
 // ─── Reader Options ──────────────────────────────────────────────────────────
 
@@ -149,17 +150,3 @@ export function drawDetection(ctx: CanvasRenderingContext2D, r: BarcodeDetection
 
 // ─── GTIN Extraction ─────────────────────────────────────────────────────────
 
-export function extractGTIN01(text: string): string | null {
-  if (!text) return null;
-
-  const GS1_SEPARATOR = String.fromCharCode(29);
-  const cleaned = text.replaceAll(GS1_SEPARATOR, "");
-
-  let m = cleaned.match(/\(01\)\s*([0-9]{14})/);
-  if (m) return m[1];
-
-  m = cleaned.match(/(?:^|[^0-9])01([0-9]{14})(?:[^0-9]|$)/);
-  if (m) return m[1];
-
-  return null;
-}
