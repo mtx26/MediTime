@@ -7,7 +7,7 @@ export default function Index() {
 
   if (isLoading) {
     return (
-      <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="$background">
+      <YStack style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
         <Spinner size="large" color="$blue10" />
       </YStack>
     );

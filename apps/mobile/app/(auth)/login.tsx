@@ -3,7 +3,6 @@ import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { YStack, XStack, Input, Button, H2, Text, Separator } from 'tamagui';
-import { Mail, Lock, Eye, EyeOff } from '@tamagui/lucide-icons';
 import { authService } from '../../src/contexts/AuthContext';
 
 export default function LoginScreen() {
@@ -20,13 +19,13 @@ export default function LoginScreen() {
     setError(null);
     setLoading(true);
     try {
-      const err = await authService.loginWithEmail(email, password);
+      const err = await authService.loginWithEmail(email.trim(), password);
       if (err) {
         const code = (err as { code?: string }).code ?? 'unexpected_error';
         setError(t(`supabase-error.${code}`));
       }
     } catch {
-      setError(t('auth.login_error'));
+      setError(t('supabase-error.unexpected_error'));
     } finally {
       setLoading(false);
     }
@@ -37,20 +36,19 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
     >
-      <YStack flex={1} justifyContent="center" padding="$5" backgroundColor="$background" gap="$4">
-        <H2 textAlign="center" color="$color">
+      <YStack style={{ flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#fff', gap: 16 }}>
+        <H2 style={{ textAlign: 'center' }} color="$color">
           {t('auth.login')}
         </H2>
 
         {error && (
-          <Text color="$red10" textAlign="center" fontSize="$3">
+          <Text color="$red10" style={{ textAlign: 'center' }} fontSize="$3">
             {error}
           </Text>
         )}
 
         <YStack gap="$3">
-          <XStack alignItems="center" gap="$2">
-            <Mail size={20} color="$gray10" />
+          <XStack style={{ alignItems: 'center', gap: 8 }}>
             <Input
               flex={1}
               size="$4"
@@ -63,8 +61,7 @@ export default function LoginScreen() {
             />
           </XStack>
 
-          <XStack alignItems="center" gap="$2">
-            <Lock size={20} color="$gray10" />
+          <XStack style={{ alignItems: 'center', gap: 8 }}>
             <Input
               flex={1}
               size="$4"
@@ -77,9 +74,10 @@ export default function LoginScreen() {
             <Button
               size="$3"
               chromeless
-              icon={passwordVisible ? EyeOff : Eye}
               onPress={() => setPasswordVisible(!passwordVisible)}
-            />
+            >
+              {passwordVisible ? t('auth.hide_password') : t('auth.show_password')}
+            </Button>
           </XStack>
         </YStack>
 
@@ -87,28 +85,14 @@ export default function LoginScreen() {
           size="$4"
           theme="blue"
           onPress={handleLogin}
-          disabled={loading || !email || !password}
+          disabled={loading || !email.trim() || !password}
           opacity={loading ? 0.7 : 1}
         >
-          {loading ? t('common.loading') : t('auth.login')}
+          {loading ? t('loading') : t('auth.login')}
         </Button>
+        <Separator style={{ marginVertical: 8 }} />
 
-        <Button
-          size="$3"
-          chromeless
-          onPress={() => router.push('/(auth)/forgot-password')}
-        >
-          <Text color="$blue10" fontSize="$3">
-            {t('auth.forgot_password')}
-          </Text>
-        </Button>
-
-        <Separator marginVertical="$2" />
-
-        <XStack justifyContent="center" gap="$2" alignItems="center">
-          <Text color="$gray10" fontSize="$3">
-            {t('auth.no_account')}
-          </Text>
+        <XStack style={{ justifyContent: 'center', alignItems: 'center', gap: 8 }}>
           <Button
             size="$3"
             chromeless

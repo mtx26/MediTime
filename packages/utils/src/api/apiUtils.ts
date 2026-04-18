@@ -1,5 +1,5 @@
 // apiUtils.js
-import { log } from '@meditime/utils';
+import { log } from '../log/logger';
 import { getApiDeps } from './apiConfig';
 import type { ApiError, ApiResult, ApiSuccess, PerformApiCallOptions } from '@meditime/types';
 
@@ -27,7 +27,7 @@ interface DemoScheduleEvent {
   taken: boolean;
 }
 
-interface DemoScheduleResponse {
+interface DemoScheduleResponse extends Record<string, unknown> {
   success: true;
   message: string;
   code: number;

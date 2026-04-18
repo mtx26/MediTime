@@ -18,7 +18,6 @@
     "@tamagui/babel-plugin": "^2.0.0-rc.41",
     "@tamagui/config": "^2.0.0-rc.41",
     "@tamagui/font-inter": "^2.0.0-rc.41",
-    "@tamagui/lucide-icons": "^1.144.4",
     "expo": "~54.0.33",
     "expo-font": "~14.0.11",
     "expo-linking": "~8.0.11",

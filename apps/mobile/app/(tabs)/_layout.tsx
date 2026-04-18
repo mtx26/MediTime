@@ -10,7 +10,7 @@ export default function TabsLayout() {
 
   if (isLoading) {
     return (
-      <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="$background">
+      <YStack style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
         <Spinner size="large" color="$blue10" />
       </YStack>
     );
@@ -24,21 +24,36 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: true,
-        tabBarActiveTintColor: '#4f46e5',
+        headerTitle: t('calendars'),
+        headerTitleStyle: {
+          fontWeight: '800',
+          color: '#0f172a',
+        },
+        headerStyle: {
+          backgroundColor: '#ffffff',
+        },
+        tabBarActiveTintColor: '#2563eb',
+        tabBarInactiveTintColor: '#64748b',
+        tabBarStyle: {
+          height: 64,
+          paddingTop: 8,
+          paddingBottom: 10,
+          borderTopColor: '#e2e8f0',
+          backgroundColor: '#ffffff',
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '700',
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: t('nav.home'),
-          tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" color={color} size={size} />,
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: t('nav.settings'),
-          tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" color={color} size={size} />,
+          title: t('calendars'),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="calendar-outline" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>
