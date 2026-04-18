@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { View, StyleSheet } from 'react-native';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../../src/hooks/useAuth';
+import { useAuth } from '../../src/hooks/auth/useAuth';
 
 export default function TabsLayout() {
   const { t } = useTranslation();
@@ -40,9 +40,9 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: t('tabs.home', 'Accueil'),
+          title: t('my_calendars'),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
+            <Ionicons name="calendar-outline" size={size} color={color} />
           ),
         }}
       />

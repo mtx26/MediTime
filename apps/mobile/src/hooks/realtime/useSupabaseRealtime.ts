@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { supabase } from '../../services/supabase/supabaseClient';
+import { supabase } from '../../services/supabase';
 import { log, subscribeRealtimeChannels, unsubscribeRealtimeChannels } from '@meditime/utils';
 import type { RealtimeOptions, SubscribedChannel } from '@meditime/types';
 

@@ -1,88 +1,134 @@
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, Card, useTheme, Avatar, Button } from 'react-native-paper';
+import { ScrollView, View } from 'react-native';
+import { List, Divider, ActivityIndicator, FAB, Text, Card, Button, Banner } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../../src/hooks/useAuth';
+import { useCalendars } from '../../src/hooks/realtime/useCalendars';
+import type { CalendarItem } from '@meditime/types';
 
-export default function HomeScreen() {
+function CalendarRow({ cal }: { cal: CalendarItem }) {
   const { t } = useTranslation();
-  const { userInfo } = useAuth();
-  const theme = useTheme();
-
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.header}>
-        <Ionicons name="medkit" size={48} color={theme.colors.primary} />
-        <Text variant="headlineMedium" style={[styles.appTitle, { color: theme.colors.primary }]}>
-          MediTime
-        </Text>
-        <Text variant="bodyLarge" style={styles.subtitle}>
-          {t('home.welcome', 'Bienvenue sur MediTime')}
-        </Text>
-        {userInfo?.email && (
-          <Text variant="bodySmall" style={styles.email}>{userInfo.email}</Text>
+    <>
+      <List.Item
+        title={cal.name}
+        titleStyle={{ fontWeight: 'bold' }}
+        description={`${t('medicines.label')}: ${cal.boxes_count ?? '...'}`}
+        left={(props) => (
+          <List.Icon {...props} icon="calendar-month" />
         )}
-      </View>
-
-      <View style={styles.features}>
-        <Card style={styles.featureCard} mode="elevated">
-          <Card.Content style={styles.featureContent}>
-            <Avatar.Icon size={48} icon="calendar" style={{ backgroundColor: theme.colors.primaryContainer }} />
-            <Text variant="titleMedium" style={styles.featureTitle}>
-              {t('features.title1', 'Calendrier')}
-            </Text>
-            <Text variant="bodySmall" style={styles.featureDesc}>
-              {t('features.desc1', 'Gérez vos prises de médicaments')}
-            </Text>
-          </Card.Content>
-        </Card>
-
-        <Card style={styles.featureCard} mode="elevated">
-          <Card.Content style={styles.featureContent}>
-            <Avatar.Icon size={48} icon="account-group" style={{ backgroundColor: theme.colors.primaryContainer }} />
-            <Text variant="titleMedium" style={styles.featureTitle}>
-              {t('features.title2', 'Partage')}
-            </Text>
-            <Text variant="bodySmall" style={styles.featureDesc}>
-              {t('features.desc2', 'Partagez avec vos proches')}
-            </Text>
-          </Card.Content>
-        </Card>
-
-        <Card style={styles.featureCard} mode="elevated">
-          <Card.Content style={styles.featureContent}>
-            <Avatar.Icon size={48} icon="shield-lock" style={{ backgroundColor: theme.colors.primaryContainer }} />
-            <Text variant="titleMedium" style={styles.featureTitle}>
-              {t('features.title3', 'Sécurité')}
-            </Text>
-            <Text variant="bodySmall" style={styles.featureDesc}>
-              {t('features.desc3', 'Données protégées')}
-            </Text>
-          </Card.Content>
-        </Card>
-      </View>
-    </ScrollView>
+        right={(props) => <List.Icon {...props} icon="chevron-right" />}
+      />
+      {cal.ifLowStock && (
+        <Banner
+          visible
+          icon="alert-circle-outline"
+          style={{ paddingVertical: 0 }}
+        >
+          {t('stock_alert')}
+        </Banner>
+      )}
+    </>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
-  content: { paddingBottom: 32 },
-  header: {
-    alignItems: 'center',
-    paddingVertical: 32,
-    paddingHorizontal: 20,
-    backgroundColor: '#fff',
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    marginBottom: 20,
-  },
-  appTitle: { fontWeight: 'bold', marginTop: 8 },
-  subtitle: { color: '#64748b', marginTop: 4, textAlign: 'center' },
-  email: { color: '#94a3b8', marginTop: 8 },
-  features: { paddingHorizontal: 20, gap: 12 },
-  featureCard: { borderRadius: 16, backgroundColor: '#fff' },
-  featureContent: { alignItems: 'center', paddingVertical: 20 },
-  featureTitle: { fontWeight: '600', marginTop: 12 },
-  featureDesc: { color: '#64748b', textAlign: 'center', marginTop: 4 },
-});
+function SharedCalendarRow({ cal }: { cal: CalendarItem }) {
+  const { t } = useTranslation();
+  return (
+    <>
+      <List.Item
+        title={cal.name}
+        titleStyle={{ fontWeight: 'bold' }}
+        description={() => (
+          <View>
+            <Text variant="bodySmall">{t('medicines.label')}: {cal.boxes_count ?? '...'}</Text>
+            {cal.owner_name ? <Text variant="bodySmall">{cal.owner_name}</Text> : null}
+          </View>
+        )}
+        left={(props) => (
+          <List.Icon {...props} icon="calendar-month" />
+        )}
+        right={(props) => <List.Icon {...props} icon="chevron-right" />}
+      />
+      {cal.ifLowStock && (
+        <Banner
+          visible
+          icon="alert-circle-outline"
+          style={{ paddingVertical: 0 }}
+        >
+          {t('stock_alert')}
+        </Banner>
+      )}
+    </>
+  );
+}
+
+export default function CalendarsScreen() {
+  const { t } = useTranslation();
+  const { calendars, sharedCalendars, loading } = useCalendars();
+
+  if (loading) {
+    return <ActivityIndicator style={{ flex: 1, marginTop: 40 }} />;
+  }
+
+  return (
+    <>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, gap: 24, paddingBottom: 80 }}>
+        {/* ── Mes calendriers ── */}
+        <View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <List.Icon icon="calendar" />
+            <Text variant="titleLarge" style={{ fontWeight: 'bold' }}>{t('my_calendars')}</Text>
+          </View>
+
+          <Card>
+            <Card.Content style={{ paddingHorizontal: 0, paddingVertical: 0 }}>
+              {calendars.length > 0 ? (
+                calendars.map((cal, index) => (
+                  <View key={cal.id}>
+                    <CalendarRow cal={cal} />
+                    {index < calendars.length - 1 && <Divider />}
+                  </View>
+                ))
+              ) : null}
+              <Divider />
+              <Button
+                icon="plus"
+                mode="text"
+                style={{ marginVertical: 4 }}
+              >
+                {t('calendar.add_calendar')}
+              </Button>
+            </Card.Content>
+          </Card>
+        </View>
+
+        {/* ── Calendriers partagés ── */}
+        <View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <List.Icon icon="account-group" />
+            <Text variant="titleLarge" style={{ fontWeight: 'bold' }}>{t('shared_calendars')}</Text>
+          </View>
+
+          {sharedCalendars.length > 0 ? (
+            <Card>
+              <Card.Content style={{ paddingHorizontal: 0, paddingVertical: 0 }}>
+                {sharedCalendars.map((cal, index) => (
+                  <View key={cal.id}>
+                    <SharedCalendarRow cal={cal} />
+                    {index < sharedCalendars.length - 1 && <Divider />}
+                  </View>
+                ))}
+              </Card.Content>
+            </Card>
+          ) : (
+            <Card>
+              <Card.Content style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <List.Icon icon="information-outline" />
+                <Text variant="bodyMedium" style={{ fontWeight: '600', flex: 1 }}>{t('no_shared_calendars')}</Text>
+              </Card.Content>
+            </Card>
+          )}
+        </View>
+      </ScrollView>
+    </>
+  );
+}

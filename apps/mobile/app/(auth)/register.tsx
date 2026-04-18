@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import {
-  View, KeyboardAvoidingView, Platform, Alert, StyleSheet, ScrollView,
+  View, KeyboardAvoidingView, Platform, Alert, StyleSheet, ScrollView, Image,
 } from 'react-native';
 import {
   Text, TextInput, Button, Card, Checkbox, Divider, IconButton, useTheme,
 } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { authService } from '../../src/contexts/AuthContext';
+
+const LOGO = require('../../assets/logo.png');
 
 export default function RegisterScreen() {
   const { t } = useTranslation();
@@ -46,9 +47,9 @@ export default function RegisterScreen() {
     >
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
-          <Ionicons name="medkit" size={48} color={theme.colors.primary} />
+          <Image source={LOGO} style={styles.logo} resizeMode="contain" />
           <Text variant="headlineMedium" style={[styles.appTitle, { color: theme.colors.primary }]}>
-            MediTime
+            {t('app.title')}
           </Text>
         </View>
 
@@ -162,7 +163,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8fafc' },
   scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 40 },
   header: { alignItems: 'center', marginBottom: 24 },
-  appTitle: { fontWeight: 'bold', marginTop: 8 },
+  logo: { width: 64, height: 64, marginBottom: 4 },
+  appTitle: { fontWeight: 'bold', marginTop: 4 },
   card: { borderRadius: 16, backgroundColor: '#fff' },
   title: { fontWeight: 'bold', textAlign: 'center', marginBottom: 16 },
   socialLabel: { textAlign: 'center', color: '#64748b', marginBottom: 8 },
