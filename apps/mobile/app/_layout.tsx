@@ -1,13 +1,17 @@
+import { useEffect } from 'react';
+import { useColorScheme } from 'react-native';
 import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { PaperProvider, MD3LightTheme } from 'react-native-paper';
+import { TamaguiProvider } from 'tamagui';
+import { tamaguiConfig } from '../tamagui.config';
 import { AuthProvider } from '../src/contexts/AuthContext';
-import i18n from '../src/i18n';
 import { supabase } from '../src/services/supabase';
 import { configureApi, initLogger } from '@meditime/utils';
+import i18n from '../src/i18n';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? null;
+const API_URL = process.env.EXPO_PUBLIC_API_URL!;
 
 configureApi({
   getToken: async () => {
@@ -19,31 +23,24 @@ configureApi({
 
 initLogger(API_URL, __DEV__, false);
 
-const theme = {
-  ...MD3LightTheme,
-  colors: {
-    ...MD3LightTheme.colors,
-    primary: '#4f46e5',
-    primaryContainer: '#e0e7ff',
-    secondary: '#64748b',
-    secondaryContainer: '#f1f5f9',
-    surface: '#ffffff',
-    surfaceVariant: '#f8fafc',
-    background: '#ffffff',
-    error: '#ef4444',
-    outline: '#e2e8f0',
-  },
-};
-
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
+
+  const [fontsLoaded] = useFonts({
+    Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
+    InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
+  });
+
+  if (!fontsLoaded) return null;
+
   return (
     <SafeAreaProvider>
-      <PaperProvider theme={theme}>
+      <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme ?? 'light'}>
         <AuthProvider>
           <Slot />
           <StatusBar style="auto" />
         </AuthProvider>
-      </PaperProvider>
+      </TamaguiProvider>
     </SafeAreaProvider>
   );
 }

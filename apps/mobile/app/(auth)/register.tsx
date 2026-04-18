@@ -1,183 +1,152 @@
 import { useState } from 'react';
-import {
-  View, KeyboardAvoidingView, Platform, Alert, StyleSheet, ScrollView, Image,
-} from 'react-native';
-import {
-  Text, TextInput, Button, Card, Checkbox, Divider, IconButton, useTheme,
-} from 'react-native-paper';
+import { KeyboardAvoidingView, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'expo-router';
+import { YStack, XStack, Input, Button, H2, Text, Separator } from 'tamagui';
+import { Mail, Lock, User, Eye, EyeOff } from '@tamagui/lucide-icons';
 import { authService } from '../../src/contexts/AuthContext';
-
-const LOGO = require('../../assets/logo.png');
 
 export default function RegisterScreen() {
   const { t } = useTranslation();
-  const theme = useTheme();
+  const router = useRouter();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const handleRegister = async () => {
-    if (!email || !password || !name) return;
-    if (!termsAccepted) {
-      Alert.alert(t('auth.error', 'Erreur'), t('auth.accept_terms_required', 'Veuillez accepter les conditions.'));
-      return;
-    }
+    setError(null);
     setLoading(true);
-    const error = await authService.registerWithEmail(email, password, name);
-    setLoading(false);
-    if (error) {
-      Alert.alert(t('auth.error', 'Erreur'), error.message);
-    } else {
-      Alert.alert(
-        t('auth.registrationSuccess', 'Inscription réussie'),
-        t('auth.checkEmail', 'Vérifiez votre boîte mail.'),
-      );
+    try {
+      const err = await authService.registerWithEmail(email, password, name);
+      if (err) {
+        const code = (err as { code?: string }).code ?? 'unexpected_error';
+        setError(t(`supabase-error.${code}`));
+      } else {
+        setSuccess(true);
+      }
+    } catch {
+      setError(t('auth.register_error'));
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (success) {
+    return (
+      <YStack flex={1} justifyContent="center" padding="$5" backgroundColor="$background" gap="$4">
+        <H2 textAlign="center" color="$color">
+          {t('auth.verification_sent')}
+        </H2>
+        <Text textAlign="center" color="$gray10" fontSize="$4">
+          {t('auth.check_email')}
+        </Text>
+        <Button
+          size="$4"
+          theme="blue"
+          onPress={() => router.replace('/(auth)/login')}
+        >
+          {t('auth.back_to_login')}
+        </Button>
+      </YStack>
+    );
+  }
+
   return (
     <KeyboardAvoidingView
-      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
     >
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <View style={styles.header}>
-          <Image source={LOGO} style={styles.logo} resizeMode="contain" />
-          <Text variant="headlineMedium" style={[styles.appTitle, { color: theme.colors.primary }]}>
-            {t('app.title')}
+      <YStack flex={1} justifyContent="center" padding="$5" backgroundColor="$background" gap="$4">
+        <H2 textAlign="center" color="$color">
+          {t('auth.register')}
+        </H2>
+
+        {error && (
+          <Text color="$red10" textAlign="center" fontSize="$3">
+            {error}
           </Text>
-        </View>
+        )}
 
-        <Card style={styles.card} mode="elevated">
-          <Card.Content>
-            <Text variant="titleLarge" style={styles.title}>
-              {t('auth.register', 'Inscription')}
-            </Text>
-
-            <Text variant="bodyMedium" style={styles.socialLabel}>
-              {t('auth.register_with', "S'inscrire avec")}
-            </Text>
-            <View style={styles.socialRow}>
-              <IconButton icon="google" mode="outlined" size={28} onPress={() => {}} />
-              <IconButton icon="github" mode="outlined" size={28} onPress={() => {}} />
-              <IconButton icon="facebook" mode="outlined" size={28} onPress={() => {}} />
-              <IconButton icon="microsoft" mode="outlined" size={28} onPress={() => {}} />
-            </View>
-
-            <View style={styles.divider}>
-              <Divider style={styles.dividerLine} />
-              <Text variant="bodySmall" style={styles.dividerText}>
-                {t('auth.or_with_email', 'ou par email')}
-              </Text>
-              <Divider style={styles.dividerLine} />
-            </View>
-
-            <TextInput
-              label={t('auth.name', 'Nom')}
+        <YStack gap="$3">
+          <XStack alignItems="center" gap="$2">
+            <User size={20} color="$gray10" />
+            <Input
+              flex={1}
+              size="$4"
+              placeholder={t('auth.name')}
               value={name}
               onChangeText={setName}
-              textContentType="name"
-              mode="outlined"
-              left={<TextInput.Icon icon="account-outline" />}
-              style={styles.input}
+              autoCapitalize="words"
+              autoComplete="name"
             />
+          </XStack>
 
-            <TextInput
-              label={t('auth.email', 'Email')}
+          <XStack alignItems="center" gap="$2">
+            <Mail size={20} color="$gray10" />
+            <Input
+              flex={1}
+              size="$4"
+              placeholder={t('auth.email')}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
               keyboardType="email-address"
-              textContentType="emailAddress"
-              mode="outlined"
-              left={<TextInput.Icon icon="email-outline" />}
-              style={styles.input}
+              autoComplete="email"
             />
+          </XStack>
 
-            <TextInput
-              label={t('auth.password', 'Mot de passe')}
+          <XStack alignItems="center" gap="$2">
+            <Lock size={20} color="$gray10" />
+            <Input
+              flex={1}
+              size="$4"
+              placeholder={t('auth.password')}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!passwordVisible}
-              textContentType="newPassword"
-              mode="outlined"
-              left={<TextInput.Icon icon="lock-outline" />}
-              right={
-                <TextInput.Icon
-                  icon={passwordVisible ? 'eye-off' : 'eye'}
-                  onPress={() => setPasswordVisible(!passwordVisible)}
-                />
-              }
-              style={styles.input}
+              autoComplete="new-password"
             />
-
-            <View style={styles.termsRow}>
-              <Checkbox
-                status={termsAccepted ? 'checked' : 'unchecked'}
-                onPress={() => setTermsAccepted(!termsAccepted)}
-                color={theme.colors.primary}
-              />
-              <Text variant="bodySmall" style={styles.termsText}>
-                {t('auth.accept_terms', "J'accepte les conditions d'utilisation")}
-              </Text>
-            </View>
-
             <Button
-              mode="contained"
-              onPress={handleRegister}
-              loading={loading}
-              disabled={loading}
-              style={styles.button}
-              contentStyle={styles.buttonContent}
-              icon="account-plus"
-            >
-              {t('auth.register', 'Inscription')}
-            </Button>
-          </Card.Content>
-        </Card>
+              size="$3"
+              chromeless
+              icon={passwordVisible ? EyeOff : Eye}
+              onPress={() => setPasswordVisible(!passwordVisible)}
+            />
+          </XStack>
+        </YStack>
 
-        <View style={styles.footer}>
-          <Text variant="bodyMedium" style={styles.footerText}>
-            {t('auth.hasAccount', 'Déjà un compte ?')}{' '}
+        <Button
+          size="$4"
+          theme="blue"
+          onPress={handleRegister}
+          disabled={loading || !email || !password || !name}
+          opacity={loading ? 0.7 : 1}
+        >
+          {loading ? t('common.loading') : t('auth.register')}
+        </Button>
+
+        <Separator marginVertical="$2" />
+
+        <XStack justifyContent="center" gap="$2" alignItems="center">
+          <Text color="$gray10" fontSize="$3">
+            {t('auth.already_have_account')}
           </Text>
-          <Link href="/(auth)/login" asChild>
-            <Text
-              variant="bodyMedium"
-              style={[styles.footerLink, { color: theme.colors.primary }]}
-            >
-              {t('auth.login', 'Connexion')}
+          <Button
+            size="$3"
+            chromeless
+            onPress={() => router.push('/(auth)/login')}
+          >
+            <Text color="$blue10" fontWeight="bold" fontSize="$3">
+              {t('auth.login')}
             </Text>
-          </Link>
-        </View>
-      </ScrollView>
+          </Button>
+        </XStack>
+      </YStack>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
-  scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 40 },
-  header: { alignItems: 'center', marginBottom: 24 },
-  logo: { width: 64, height: 64, marginBottom: 4 },
-  appTitle: { fontWeight: 'bold', marginTop: 4 },
-  card: { borderRadius: 16, backgroundColor: '#fff' },
-  title: { fontWeight: 'bold', textAlign: 'center', marginBottom: 16 },
-  socialLabel: { textAlign: 'center', color: '#64748b', marginBottom: 8 },
-  socialRow: { flexDirection: 'row', justifyContent: 'center', gap: 4, marginBottom: 8 },
-  divider: { flexDirection: 'row', alignItems: 'center', marginVertical: 12 },
-  dividerLine: { flex: 1 },
-  dividerText: { marginHorizontal: 12, color: '#94a3b8' },
-  input: { marginBottom: 12, backgroundColor: '#fff' },
-  termsRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  termsText: { flex: 1, color: '#64748b' },
-  button: { marginTop: 8, borderRadius: 10 },
-  buttonContent: { paddingVertical: 6 },
-  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 20 },
-  footerText: { color: '#64748b' },
-  footerLink: { fontWeight: '600' },
-});

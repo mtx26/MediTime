@@ -1,175 +1,125 @@
 import { useState } from 'react';
-import {
-  View, KeyboardAvoidingView, Platform, Alert, StyleSheet, ScrollView, Image,
-} from 'react-native';
-import {
-  Text, TextInput, Button, Card, Divider, IconButton, useTheme,
-} from 'react-native-paper';
+import { KeyboardAvoidingView, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'expo-router';
+import { YStack, XStack, Input, Button, H2, Text, Separator } from 'tamagui';
+import { Mail, Lock, Eye, EyeOff } from '@tamagui/lucide-icons';
 import { authService } from '../../src/contexts/AuthContext';
-
-const LOGO = require('../../assets/logo.png');
 
 export default function LoginScreen() {
   const { t } = useTranslation();
-  const theme = useTheme();
+  const router = useRouter();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async () => {
-    if (!email || !password) return;
+    setError(null);
     setLoading(true);
-    const error = await authService.loginWithEmail(email, password);
-    setLoading(false);
-    if (error) {
-      Alert.alert(t('auth.error', 'Erreur'), error.message);
-    }
-  };
-
-  const handleMagicLink = async () => {
-    if (!email) return;
-    setLoading(true);
-    const error = await authService.loginWithMagicLink(email);
-    setLoading(false);
-    if (error) {
-      Alert.alert(t('auth.error', 'Erreur'), error.message);
-    } else {
-      Alert.alert(
-        t('auth.magicLinkSent', 'Lien envoyé'),
-        t('auth.checkEmail', 'Vérifiez votre boîte mail.'),
-      );
+    try {
+      const err = await authService.loginWithEmail(email, password);
+      if (err) {
+        const code = (err as { code?: string }).code ?? 'unexpected_error';
+        setError(t(`supabase-error.${code}`));
+      }
+    } catch {
+      setError(t('auth.login_error'));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
     >
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <View style={styles.header}>
-          <Image source={LOGO} style={styles.logo} resizeMode="contain" />
-          <Text variant="headlineMedium" style={[styles.appTitle, { color: theme.colors.primary }]}>
-            {t('app.title')}
+      <YStack flex={1} justifyContent="center" padding="$5" backgroundColor="$background" gap="$4">
+        <H2 textAlign="center" color="$color">
+          {t('auth.login')}
+        </H2>
+
+        {error && (
+          <Text color="$red10" textAlign="center" fontSize="$3">
+            {error}
           </Text>
-        </View>
+        )}
 
-        <Card style={styles.card} mode="elevated">
-          <Card.Content>
-            <Text variant="titleLarge" style={styles.title}>
-              {t('auth.login', 'Connexion')}
-            </Text>
-
-            <Text variant="bodyMedium" style={styles.socialLabel}>
-              {t('auth.login_with', 'Se connecter avec')}
-            </Text>
-            <View style={styles.socialRow}>
-              <IconButton icon="google" mode="outlined" size={28} onPress={() => {}} />
-              <IconButton icon="github" mode="outlined" size={28} onPress={() => {}} />
-              <IconButton icon="facebook" mode="outlined" size={28} onPress={() => {}} />
-              <IconButton icon="microsoft" mode="outlined" size={28} onPress={() => {}} />
-            </View>
-
-            <View style={styles.divider}>
-              <Divider style={styles.dividerLine} />
-              <Text variant="bodySmall" style={styles.dividerText}>
-                {t('auth.or_with_email', 'ou par email')}
-              </Text>
-              <Divider style={styles.dividerLine} />
-            </View>
-
-            <TextInput
-              label={t('auth.email', 'Email')}
+        <YStack gap="$3">
+          <XStack alignItems="center" gap="$2">
+            <Mail size={20} color="$gray10" />
+            <Input
+              flex={1}
+              size="$4"
+              placeholder={t('auth.email')}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
               keyboardType="email-address"
-              textContentType="emailAddress"
-              mode="outlined"
-              left={<TextInput.Icon icon="email-outline" />}
-              style={styles.input}
+              autoComplete="email"
             />
+          </XStack>
 
-            <TextInput
-              label={t('auth.password', 'Mot de passe')}
+          <XStack alignItems="center" gap="$2">
+            <Lock size={20} color="$gray10" />
+            <Input
+              flex={1}
+              size="$4"
+              placeholder={t('auth.password')}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!passwordVisible}
-              textContentType="password"
-              mode="outlined"
-              left={<TextInput.Icon icon="lock-outline" />}
-              right={
-                <TextInput.Icon
-                  icon={passwordVisible ? 'eye-off' : 'eye'}
-                  onPress={() => setPasswordVisible(!passwordVisible)}
-                />
-              }
-              style={styles.input}
+              autoComplete="password"
             />
-
             <Button
-              mode="contained"
-              onPress={handleLogin}
-              loading={loading}
-              disabled={loading}
-              style={styles.button}
-              contentStyle={styles.buttonContent}
-              icon="login"
-            >
-              {t('auth.login', 'Connexion')}
-            </Button>
+              size="$3"
+              chromeless
+              icon={passwordVisible ? EyeOff : Eye}
+              onPress={() => setPasswordVisible(!passwordVisible)}
+            />
+          </XStack>
+        </YStack>
 
-            <Button
-              mode="text"
-              onPress={handleMagicLink}
-              style={styles.magicLink}
-              icon="link-variant"
-              compact
-            >
-              {t('auth.magicLink', 'Connexion par lien magique')}
-            </Button>
-          </Card.Content>
-        </Card>
+        <Button
+          size="$4"
+          theme="blue"
+          onPress={handleLogin}
+          disabled={loading || !email || !password}
+          opacity={loading ? 0.7 : 1}
+        >
+          {loading ? t('common.loading') : t('auth.login')}
+        </Button>
 
-        <View style={styles.footer}>
-          <Text variant="bodyMedium" style={styles.footerText}>
-            {t('auth.noAccount', 'Pas de compte ?')}{' '}
+        <Button
+          size="$3"
+          chromeless
+          onPress={() => router.push('/(auth)/forgot-password')}
+        >
+          <Text color="$blue10" fontSize="$3">
+            {t('auth.forgot_password')}
           </Text>
-          <Link href="/(auth)/register" asChild>
-            <Text
-              variant="bodyMedium"
-              style={[styles.footerLink, { color: theme.colors.primary }]}
-            >
-              {t('auth.register', 'Inscription')}
+        </Button>
+
+        <Separator marginVertical="$2" />
+
+        <XStack justifyContent="center" gap="$2" alignItems="center">
+          <Text color="$gray10" fontSize="$3">
+            {t('auth.no_account')}
+          </Text>
+          <Button
+            size="$3"
+            chromeless
+            onPress={() => router.push('/(auth)/register')}
+          >
+            <Text color="$blue10" fontWeight="bold" fontSize="$3">
+              {t('auth.register')}
             </Text>
-          </Link>
-        </View>
-      </ScrollView>
+          </Button>
+        </XStack>
+      </YStack>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
-  scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 40 },
-  header: { alignItems: 'center', marginBottom: 24 },
-  logo: { width: 64, height: 64, marginBottom: 4 },
-  appTitle: { fontWeight: 'bold', marginTop: 4 },
-  card: { borderRadius: 16, backgroundColor: '#fff' },
-  title: { fontWeight: 'bold', textAlign: 'center', marginBottom: 16 },
-  socialLabel: { textAlign: 'center', color: '#64748b', marginBottom: 8 },
-  socialRow: { flexDirection: 'row', justifyContent: 'center', gap: 4, marginBottom: 8 },
-  divider: { flexDirection: 'row', alignItems: 'center', marginVertical: 12 },
-  dividerLine: { flex: 1 },
-  dividerText: { marginHorizontal: 12, color: '#94a3b8' },
-  input: { marginBottom: 12, backgroundColor: '#fff' },
-  button: { marginTop: 8, borderRadius: 10 },
-  buttonContent: { paddingVertical: 6 },
-  magicLink: { marginTop: 8 },
-  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 20 },
-  footerText: { color: '#64748b' },
-  footerLink: { fontWeight: '600' },
-});

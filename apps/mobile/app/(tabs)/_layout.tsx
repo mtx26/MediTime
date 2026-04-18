@@ -1,20 +1,18 @@
-import { Tabs, Redirect } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { View, StyleSheet } from 'react-native';
-import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../src/hooks/auth/useAuth';
+import { YStack, Spinner } from 'tamagui';
 
 export default function TabsLayout() {
-  const { t } = useTranslation();
   const { userInfo, isLoading } = useAuth();
-  const theme = useTheme();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
-      <View style={styles.loader}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-      </View>
+      <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="$background">
+        <Spinner size="large" color="$blue10" />
+      </YStack>
     );
   }
 
@@ -25,31 +23,24 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: '#94a3b8',
-        headerTitleStyle: { fontWeight: '600' },
-        tabBarStyle: {
-          borderTopWidth: 0,
-          elevation: 8,
-          shadowColor: '#000',
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-        },
+        headerShown: true,
+        tabBarActiveTintColor: '#4f46e5',
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: t('my_calendars'),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar-outline" size={size} color={color} />
-          ),
+          title: t('nav.home'),
+          tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: t('nav.settings'),
+          tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" color={color} size={size} />,
         }}
       />
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  loader: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc' },
-});

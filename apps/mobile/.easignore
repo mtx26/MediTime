@@ -1,6 +1,0 @@
-# Ignore files not needed by EAS Build
-.expo/
-dist/
-node_modules/
-.env.local
-*.log

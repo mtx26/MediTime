@@ -3,16 +3,11 @@ import { supabase } from '../services/supabase';
 import { log, mapApiResponseToUserInfo, buildUserCreationPayload, createAuthService } from '@meditime/utils';
 import type { UserInfo, SessionLike, ReloadUserFn } from '@meditime/types';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
+const API_URL = process.env.EXPO_PUBLIC_API_URL!;
 
-// Auth service shared with web — only the supabase instance differs
 const authService = createAuthService(
   supabase,
-  (_redirect?: string) => {
-    // Mobile doesn't use redirect URLs for email callbacks the same way as web.
-    // Deep link scheme is used instead.
-    return 'meditime://auth/callback';
-  },
+  (_redirect?: string) => 'meditime://auth/callback',
 );
 
 export { authService };
@@ -90,21 +85,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         origin: 'USER_SYNC_GET',
         code: 'USER_SYNC_ERROR',
       });
-      // Fallback: use Supabase user data so the user is still logged in
       const metadata = (user.user_metadata ?? {}) as Record<string, string | undefined>;
       setUserInfo({
         uid: user.id,
         email: user.email ?? '',
-        name: metadata.full_name ?? metadata.name ?? '',
+        displayName: metadata.full_name ?? metadata.name ?? null,
+        photoUrl: null,
+        emailEnabled: true,
+        pushEnabled: true,
       } as UserInfo);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Listen to auth state changes
   useEffect(() => {
-    // Initial session check
     void reloadUser();
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
