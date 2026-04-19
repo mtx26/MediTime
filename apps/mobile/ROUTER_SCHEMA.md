@@ -11,7 +11,7 @@ apps/mobile/app
     ✅ login.tsx
     ✅ register.tsx
     ✅ reset-password.tsx
-    reset-password-confirm.tsx
+    ✅ reset-password-confirm.tsx
     verify-email.tsx
 
   auth
