@@ -14,9 +14,6 @@ apps/mobile/app
   auth
     callback.tsx
 
-  calendars
-    index.tsx
-
   settings
     index.tsx
 
@@ -32,41 +29,44 @@ apps/mobile/app
   add-calendar
     index.tsx
     review.tsx
-
-  calendar
-    [calendarId]
-      _layout.tsx
-      index.tsx
-      boxes.tsx
-      pillbox.tsx
-      daily.tsx
-      settings.tsx
-      stock-alerts.tsx
-      pillbox-uses.tsx
-      ics-tokens.tsx
-      missed-intakes
+  
+  calendars
+    index.tsx
+    
+    calendar
+      [calendarId]
+        _layout.tsx
         index.tsx
-        recap.tsx
+        boxes.tsx
+        pillbox.tsx
+        daily.tsx
+        settings.tsx
+        stock-alerts.tsx
+        pillbox-uses.tsx
+        ics-tokens.tsx
+        missed-intakes
+          index.tsx
+          recap.tsx
 
-  shared-user-calendar
-    [calendarId]
-      _layout.tsx
-      index.tsx
-      boxes.tsx
-      pillbox.tsx
-      daily.tsx
-      settings.tsx
-      stock-alerts.tsx
-      pillbox-uses.tsx
-      ics-tokens.tsx
-      missed-intakes
+    shared-user-calendar
+      [calendarId]
+        _layout.tsx
         index.tsx
-        recap.tsx
+        boxes.tsx
+        pillbox.tsx
+        daily.tsx
+        settings.tsx
+        stock-alerts.tsx
+        pillbox-uses.tsx
+        ics-tokens.tsx
+        missed-intakes
+          index.tsx
+          recap.tsx
 
-  shared-token-calendar
-    [sharedToken]
-      index.tsx
-      pillbox.tsx
+    shared-token-calendar
+      [sharedToken]
+        index.tsx
+        pillbox.tsx
 
   privacy.tsx
   terms.tsx
