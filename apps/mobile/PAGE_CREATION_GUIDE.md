@@ -74,7 +74,9 @@ useSomethingList(...)
 
 ## Components
 
-Use one React component per file.
+Use exactly one React component per file.
+
+Do not declare helper/sub components in the same file as a screen, layout, hook consumer, or another component. If JSX becomes reusable or needs its own name, create a new file for it.
 
 Reusable UI goes in:
 
