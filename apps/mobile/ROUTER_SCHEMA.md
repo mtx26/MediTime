@@ -10,7 +10,7 @@ apps/mobile/app
     ✅ _layout.tsx
     ✅ login.tsx
     ✅ register.tsx
-    reset-password.tsx
+    ✅ reset-password.tsx
     reset-password-confirm.tsx
     verify-email.tsx
 
@@ -71,5 +71,5 @@ apps/mobile/app
         index.tsx
         pillbox.tsx
 
-  privacy.tsx
-  terms.tsx
+  ✅ privacy.tsx
+  ✅ terms.tsx

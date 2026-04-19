@@ -98,7 +98,7 @@ export default function LoginScreen() {
         <Button
           size="$3"
           chromeless
-          onPress={() => router.push('/(auth)/forgot-password')}
+          onPress={() => router.push('/(auth)/reset-password')}
         >
           <Text color="$blue10" fontSize="$3">
             {t('auth.forgot_password')}

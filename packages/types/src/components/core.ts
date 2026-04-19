@@ -58,3 +58,20 @@ export interface TermsSectionProps {
   list?: string[];
   conclusionKey?: string;
 }
+
+// ─── Privacy ────────────────────────────────────────────────────────────────
+
+export interface PrivacySectionProps {
+  titleKey: string;
+  paragraphs?: string[];
+  list?: string[];
+  conclusionKey?: string;
+  highlightKey?: string;
+  withDivider?: boolean;
+}
+
+export interface PrivacyDataGroupProps<TIconName = string> {
+  titleKey: string;
+  itemKeys: string[];
+  iconName: TIconName;
+}
