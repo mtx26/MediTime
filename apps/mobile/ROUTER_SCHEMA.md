@@ -1,12 +1,15 @@
+Legend:
+  ✅ = route created in mobile app
+
 apps/mobile/app
-  _layout.tsx
-  index.tsx
+  ✅ _layout.tsx
+  ✅ index.tsx
   +not-found.tsx
 
   (auth)
-    _layout.tsx
-    login.tsx
-    register.tsx
+    ✅ _layout.tsx
+    ✅ login.tsx
+    ✅ register.tsx
     reset-password.tsx
     reset-password-confirm.tsx
     verify-email.tsx
@@ -29,17 +32,17 @@ apps/mobile/app
   add-calendar
     index.tsx
     review.tsx
-  
+
   calendars
-    index.tsx
-    
+    ✅ index.tsx
+
     calendar
       [calendarId]
         _layout.tsx
-        index.tsx
+        ✅ index.tsx
         boxes.tsx
         pillbox.tsx
-        daily.tsx
+        ✅ daily.tsx
         settings.tsx
         stock-alerts.tsx
         pillbox-uses.tsx
@@ -51,10 +54,10 @@ apps/mobile/app
     shared-user-calendar
       [calendarId]
         _layout.tsx
-        index.tsx
+        ✅ index.tsx
         boxes.tsx
         pillbox.tsx
-        daily.tsx
+        ✅ daily.tsx
         settings.tsx
         stock-alerts.tsx
         pillbox-uses.tsx

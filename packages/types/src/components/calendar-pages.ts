@@ -21,6 +21,9 @@ export type CalendarPageSourceType = 'personal' | 'sharedUser' | 'token';
 
 export type CalendarSettingsTab = 'stock' | 'notifications';
 
+export type CalendarDetailSourceType = Extract<CalendarPageSourceType, 'personal' | 'sharedUser'>;
+export type CalendarDetailMode = 'overview' | 'daily';
+
 // ─── Sub-component Props ─────────────────────────────────────────────
 
 export interface CalendarWeekSelectorProps {

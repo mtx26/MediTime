@@ -1,31 +1,11 @@
 import { Redirect, Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
-import type { ComponentProps } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Spinner, YStack } from 'tamagui';
 import { useAuth } from '../../src/hooks/auth/useAuth';
+import { TabIcon } from '../../src/components/common/TabIcon';
 import { useIosTheme } from '../../src/theme/ios';
-
-type IconName = ComponentProps<typeof Ionicons>['name'];
-
-type TabIconProps = {
-  color: string;
-  focused: boolean;
-  iconName: IconName;
-  focusedIconName: IconName;
-};
-
-function TabIcon({ color, focused, iconName, focusedIconName }: TabIconProps) {
-  const ios = useIosTheme();
-
-  return (
-    <View style={[styles.iconShell, focused && { backgroundColor: ios.blueInfoBg }]}>
-      <Ionicons name={focused ? focusedIconName : iconName} size={25} color={color} />
-    </View>
-  );
-}
 
 export default function TabsLayout() {
   const { userInfo, isLoading } = useAuth();
@@ -109,13 +89,3 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  iconShell: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 42,
-    height: 31,
-    borderRadius: 8,
-  },
-});

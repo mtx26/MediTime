@@ -36,6 +36,20 @@ export interface ViewportDimensions {
   height: number;
 }
 
+export type LoadingIndicatorVariant = 'inline' | 'screen';
+
+export interface LoadingIndicatorProps {
+  label: string;
+  variant?: LoadingIndicatorVariant;
+}
+
+export interface TabIconProps<TIconName = string> {
+  color: string;
+  focused: boolean;
+  iconName: TIconName;
+  focusedIconName: TIconName;
+}
+
 // ─── Terms ───────────────────────────────────────────────────────────────────
 
 export interface TermsSectionProps {

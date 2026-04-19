@@ -27,3 +27,11 @@ export interface DateModalRef {
   open: () => void;
   close: () => void;
 }
+
+export interface CalendarHeaderTitleProps {
+  title: string;
+}
+
+export interface CalendarNotFoundStateProps {
+  onBackToCalendars: () => void;
+}
