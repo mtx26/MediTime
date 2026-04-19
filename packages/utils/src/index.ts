@@ -1,6 +1,7 @@
 export * from './actions';
 export * from './api';
 export * from './auth';
+export * from './calendar';
 export * from './date';
 export * from './error';
 export * from './files';

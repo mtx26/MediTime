@@ -9,23 +9,23 @@ import {
   buildPersonalCalendarActions,
   buildSharedCalendarActions,
 } from '@meditime/utils';
-import { OutlineButton } from '../../src/components/common/OutlineButton';
+import { OutlineButton } from '../components/common/OutlineButton';
 import {
   AddCalendarFooter,
   CalendarSection,
-} from '../../src/components/calendar';
-import { useIosTheme } from '../../src/theme/ios';
-import { useAddCalendar, useCalendars } from '../../src/hooks/calendars';
-import { toActionSheetItems, toMobileHref } from '../../src/utils';
+} from '../components/calendar';
+import { useIosTheme } from '../theme/ios';
+import { useAddCalendar, useCalendars } from '../hooks/calendars';
+import { toActionSheetItems, toMobileHref } from '../utils';
 
 const AddCalendarModal = lazy(() =>
-  import('../../src/components/calendar/AddCalendarModal').then((module) => ({
+  import('../components/calendar/AddCalendarModal').then((module) => ({
     default: module.AddCalendarModal,
   })),
 );
 
 const PdfDialog = lazy(() =>
-  import('../../src/components/calendar/PdfDialog').then((module) => ({
+  import('../components/calendar/PdfDialog').then((module) => ({
     default: module.PdfDialog,
   })),
 );
@@ -189,11 +189,11 @@ export default function CalendarsScreen() {
   };
 
   const openPersonalCalendar = (calendar: CalendarItem) => {
-    router.push(`/calendar/${calendar.id}` as never);
+    router.push(`/calendars/calendar/${calendar.id}` as never);
   };
 
   const openSharedCalendar = (calendar: CalendarItem) => {
-    router.push(`/shared-user-calendar/${calendar.id}` as never);
+    router.push(`/calendars/shared-user-calendar/${calendar.id}` as never);
   };
 
   if (isLoading && personalCalendars.length === 0 && sharedCalendars.length === 0) {
@@ -240,7 +240,7 @@ export default function CalendarsScreen() {
                 padding: 12,
                 borderWidth: 1,
                 borderColor: ios.destructiveBorder,
-                borderRadius: 16,
+                borderRadius: 8,
                 backgroundColor: ios.destructiveBg,
               }}
             >

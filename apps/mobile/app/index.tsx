@@ -16,7 +16,7 @@ export default function Index() {
   }
 
   if (userInfo) {
-    return <Redirect href="/(tabs)" />;
+    return <Redirect href="/calendars" />;
   }
 
   return <Redirect href="/(auth)/login" />;

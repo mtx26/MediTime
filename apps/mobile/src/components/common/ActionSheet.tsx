@@ -23,6 +23,7 @@ type ActionSheetProps = {
   dataTour?: string;
   onPress?: () => void;
   onNavigate?: (href: string) => void;
+  variant?: 'filled' | 'plain';
   triggerMode?: 'button' | 'longPress';
 };
 
@@ -32,6 +33,7 @@ function ActionSheet({
   children,
   onPress,
   onNavigate,
+  variant = 'filled',
   triggerMode = 'button',
 }: ActionSheetProps) {
   const { t } = useTranslation();
@@ -141,6 +143,7 @@ function ActionSheet({
   }
 
   const size = buttonSize === 'sm' ? 36 : 40;
+  const isPlain = variant === 'plain';
 
   return (
     <Pressable
@@ -155,8 +158,10 @@ function ActionSheet({
             height: size,
             alignItems: 'center',
             justifyContent: 'center',
-            borderRadius: 12,
-            backgroundColor: pressed ? ios.blueInfoBorder : ios.blueInfoBg,
+            borderRadius: 8,
+            backgroundColor: isPlain
+              ? pressed ? ios.accentHover : 'transparent'
+              : pressed ? ios.blueInfoBorder : ios.blueInfoBg,
           }}
         >
           <Ionicons name="ellipsis-horizontal" size={18} color={ios.primary} />

@@ -4,8 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Spinner, YStack } from 'tamagui';
 import { useAuth } from '../../src/hooks/auth/useAuth';
-import { YStack, Spinner } from 'tamagui';
 import { useIosTheme } from '../../src/theme/ios';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
@@ -50,16 +50,7 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown: true,
-        headerTitle: t('calendars'),
-        headerTitleStyle: {
-          fontWeight: '700',
-          color: ios.foreground,
-        },
-        headerStyle: {
-          backgroundColor: ios.background,
-        },
-        headerShadowVisible: false,
+        headerShown: false,
         tabBarActiveTintColor: ios.primary,
         tabBarInactiveTintColor: ios.mutedForeground,
         tabBarStyle: {
@@ -102,7 +93,7 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="calendars"
         options={{
           title: t('calendars'),
           tabBarIcon: ({ color, focused }) => (
