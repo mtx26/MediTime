@@ -548,6 +548,8 @@
     "analysis_error": "Erreur lors de l'analyse de l'image.",
     "click_to_change": "Cliquez pour changer de fichier",
     "click_to_select_file": "Cliquez ou glissez-déposez pour sélectionner un fichier",
+    "choose_file": "Choisir un fichier",
+    "choose_from_library": "Photothèque",
     "file_analysis_error": "Erreur lors de l'analyse du fichier",
     "file_selected": "Fichier sélectionné",
     "file_type_error": "Seuls les fichiers image sont acceptés (jpg, png, webp, gif).",
@@ -557,6 +559,7 @@
     "preview_error": "Erreur lors de l'affichage de la prévisualisation",
     "remove_image": "Supprimer l'image",
     "select_file_error": "Veuillez sélectionner un fichier image.",
+    "take_photo": "Prendre une photo",
     "title": "Sélectionner et prévisualiser un fichier"
   },
   "invalid_or_expired_link": "Ce lien de calendrier partagé est invalide ou a expiré.",

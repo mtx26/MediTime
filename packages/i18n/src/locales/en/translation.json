@@ -548,6 +548,8 @@
     "analysis_error": "Error parsing image.",
     "click_to_change": "Click to change file",
     "click_to_select_file": "Click or drag and drop to select a file",
+    "choose_file": "Choose File",
+    "choose_from_library": "Photo Library",
     "file_analysis_error": "Error parsing file",
     "file_selected": "Selected file",
     "file_type_error": "Only image files are accepted (jpg, png, webp, gif).",
@@ -557,6 +559,7 @@
     "preview_error": "Error displaying preview",
     "remove_image": "Delete image",
     "select_file_error": "Please select an image file.",
+    "take_photo": "Take Photo",
     "title": "Select and preview a file"
   },
   "invalid_or_expired_link": "This shared calendar link is invalid or has expired.",

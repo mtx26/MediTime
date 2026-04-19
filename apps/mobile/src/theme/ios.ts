@@ -1,0 +1,15 @@
+export const ios = {
+  background: '#f2f2f7',
+  card: '#ffffff',
+  foreground: '#111111',
+  primary: '#007aff',
+  mutedForeground: '#8e8e93',
+  border: '#d1d1d6',
+  accentHover: '#e5e5ea',
+  blueInfoBg: '#e8f3ff',
+  blueInfoBorder: '#bfddff',
+  blueText: '#007aff',
+  warningBg: '#fff8e1',
+  warningText: '#a05a00',
+  destructive: '#ff3b30',
+};
