@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack, YStack } from 'tamagui';
 import type { CalendarItem } from '@meditime/types';
 import ActionSheet, { type MobileActionSheetAction } from '../common/ActionSheet';
-import { ios } from '../../theme/ios';
+import { useIosTheme } from '../../theme/ios';
 import { RenameForm } from './RenameForm';
 import { StatusBadge } from './StatusBadge';
 
@@ -35,6 +35,7 @@ export function CalendarRow({
   onRenameCancel,
 }: CalendarRowProps) {
   const { t } = useTranslation();
+  const ios = useIosTheme();
 
   return (
     <ActionSheet

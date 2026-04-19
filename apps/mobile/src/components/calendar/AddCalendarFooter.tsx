@@ -2,7 +2,7 @@ import { Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack } from 'tamagui';
-import { ios } from '../../theme/ios';
+import { useIosTheme } from '../../theme/ios';
 
 type AddCalendarFooterProps = {
   onPress: () => void;
@@ -10,6 +10,7 @@ type AddCalendarFooterProps = {
 
 export function AddCalendarFooter({ onPress }: AddCalendarFooterProps) {
   const { t } = useTranslation();
+  const ios = useIosTheme();
 
   return (
     <Pressable onPress={onPress} accessibilityRole="button">

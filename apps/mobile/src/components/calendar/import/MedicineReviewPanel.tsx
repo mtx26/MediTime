@@ -5,7 +5,7 @@ import type { MedicineReviewMedicineInput } from '@meditime/types';
 import { IconButton } from '../../common/IconButton';
 import { InfoBanner } from '../../common/InfoBanner';
 import { OutlineButton } from '../../common/OutlineButton';
-import { ios } from '../../../theme/ios';
+import { useIosTheme } from '../../../theme/ios';
 import type { MedicineReviewField } from './types';
 import { ReviewField } from './ReviewField';
 
@@ -31,6 +31,7 @@ export function MedicineReviewPanel({
   onSave,
 }: MedicineReviewPanelProps) {
   const { t } = useTranslation();
+  const ios = useIosTheme();
   const current = medicines[index];
 
   if (!current) {
@@ -117,13 +118,13 @@ export function MedicineReviewPanel({
             minHeight: 40,
             paddingHorizontal: 16,
             borderRadius: 14,
-            backgroundColor: canGoNext ? ios.primary : '#34c759',
+            backgroundColor: canGoNext ? ios.primary : ios.success,
             opacity: disabled || !String(current.name ?? '').trim() ? 0.55 : 1,
           }}
         >
           <XStack style={{ alignItems: 'center', gap: 8 }}>
-            <Ionicons name={canGoNext ? 'chevron-forward' : 'checkmark-circle-outline'} size={16} color={ios.card} />
-            <Text style={{ color: ios.card, fontWeight: '800' }}>
+            <Ionicons name={canGoNext ? 'chevron-forward' : 'checkmark-circle-outline'} size={16} color={ios.primaryForeground} />
+            <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
               {canGoNext ? t('next') : t('medicine_review.finish')}
             </Text>
           </XStack>

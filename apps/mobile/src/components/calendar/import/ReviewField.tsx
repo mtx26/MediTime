@@ -1,5 +1,5 @@
 import { Text, Input, YStack } from 'tamagui';
-import { ios } from '../../../theme/ios';
+import { useIosTheme } from '../../../theme/ios';
 
 type ReviewFieldProps = {
   label: string;
@@ -16,6 +16,8 @@ export function ReviewField({
   keyboardType = 'default',
   required = false,
 }: ReviewFieldProps) {
+  const ios = useIosTheme();
+
   return (
     <YStack style={{ gap: 7 }}>
       <Text style={{ color: ios.foreground, fontSize: 14, fontWeight: '700' }}>

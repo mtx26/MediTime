@@ -1,26 +1,44 @@
 import { Redirect, Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../src/hooks/auth/useAuth';
 import { YStack, Spinner } from 'tamagui';
+import { useIosTheme } from '../../src/theme/ios';
 
-const ios = {
-  groupedBackground: '#f2f2f7',
-  card: '#ffffff',
-  text: '#111111',
-  label: '#8e8e93',
-  separator: '#d1d1d6',
-  systemBlue: '#007aff',
+type IconName = ComponentProps<typeof Ionicons>['name'];
+
+type TabIconProps = {
+  color: string;
+  focused: boolean;
+  iconName: IconName;
+  focusedIconName: IconName;
 };
+
+function TabIcon({ color, focused, iconName, focusedIconName }: TabIconProps) {
+  const ios = useIosTheme();
+
+  return (
+    <View style={[styles.iconShell, focused && { backgroundColor: ios.blueInfoBg }]}>
+      <Ionicons name={focused ? focusedIconName : iconName} size={25} color={color} />
+    </View>
+  );
+}
 
 export default function TabsLayout() {
   const { userInfo, isLoading } = useAuth();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const ios = useIosTheme();
+  const tabBarHeight = 56 + insets.bottom;
+  const tabBarPaddingBottom = Math.max(insets.bottom, 5);
 
   if (isLoading) {
     return (
-      <YStack style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: ios.groupedBackground }}>
-        <Spinner size="large" color={ios.systemBlue} />
+      <YStack style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: ios.background }}>
+        <Spinner size="large" color={ios.primary} />
       </YStack>
     );
   }
@@ -36,24 +54,50 @@ export default function TabsLayout() {
         headerTitle: t('calendars'),
         headerTitleStyle: {
           fontWeight: '700',
-          color: ios.text,
+          color: ios.foreground,
         },
         headerStyle: {
-          backgroundColor: ios.groupedBackground,
+          backgroundColor: ios.background,
         },
         headerShadowVisible: false,
-        tabBarActiveTintColor: ios.systemBlue,
-        tabBarInactiveTintColor: ios.label,
+        tabBarActiveTintColor: ios.primary,
+        tabBarInactiveTintColor: ios.mutedForeground,
         tabBarStyle: {
-          height: 70,
-          paddingTop: 8,
-          paddingBottom: 12,
-          borderTopColor: ios.separator,
-          backgroundColor: 'rgba(255, 255, 255, 0.94)',
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: tabBarHeight,
+          paddingTop: 4,
+          paddingBottom: tabBarPaddingBottom,
+          borderTopWidth: 1,
+          borderTopColor: ios.tabBarBorder,
+          borderTopLeftRadius: 8,
+          borderTopRightRadius: 8,
+          backgroundColor: ios.tabBarBackground,
+          ...Platform.select({
+            ios: {
+              shadowColor: ios.shadow,
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.14,
+              shadowRadius: 24,
+            },
+            android: {
+              elevation: 14,
+            },
+          }),
+        },
+        tabBarItemStyle: {
+          borderRadius: 8,
+          paddingVertical: 2,
+        },
+        tabBarIconStyle: {
+          marginBottom: 2,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
+          fontSize: 11,
+          fontWeight: '700',
+          letterSpacing: 0,
         },
       }}
     >
@@ -61,11 +105,26 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: t('calendars'),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar-outline" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              color={color}
+              focused={focused}
+              iconName="calendar-outline"
+              focusedIconName="calendar"
+            />
           ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  iconShell: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 42,
+    height: 31,
+    borderRadius: 8,
+  },
+});

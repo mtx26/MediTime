@@ -256,12 +256,17 @@
   "auth": {
     "accept_terms": "J’accepte les ",
     "accept_terms_aria": "Accepter les conditions générales",
+    "already_have_account": "Vous avez déjà un compte ?",
+    "back_to_login": "Retour à la connexion",
+    "check_email": "Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.",
     "email": "Adresse e-mail",
     "forgot_password": "Mot de passe oublié ?",
     "hide_password": "Masquer le mot de passe",
     "login": "Connexion",
+    "login_error": "Impossible de se connecter.",
     "login_with": "Se connecter avec :",
     "name": "Nom complet",
+    "no_account": "Pas encore de compte ?",
     "or_with_email": "ou avec email :",
     "password": "Mot de passe",
     "provider": {
@@ -273,6 +278,7 @@
       "twitter": "Twitter"
     },
     "register": "Inscription",
+    "register_error": "Impossible de créer votre compte.",
     "register_with": "S'inscrire avec :",
     "show_password": "Afficher le mot de passe",
     "terms_link": "conditions générales",
@@ -839,6 +845,7 @@
     },
     "password_section": {
       "description": "Modifiez votre mot de passe pour renforcer la sécurité de votre compte.",
+      "error": "Erreur lors de la mise à jour du mot de passe.",
       "hint": "Utilisez au moins 8 caractères avec des lettres, chiffres et symboles.",
       "same_password_error": "Le nouveau mot de passe doit être différent de l'ancien.",
       "title": "Mot de passe"

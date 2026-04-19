@@ -2,7 +2,7 @@ import { Image, Pressable, type GestureResponderEvent } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, YStack } from 'tamagui';
-import { ios } from '../../../theme/ios';
+import { useIosTheme } from '../../../theme/ios';
 
 type ImageImportPanelProps = {
   fileName: string | null;
@@ -20,6 +20,7 @@ export function ImageImportPanel({
   onRemoveImage,
 }: ImageImportPanelProps) {
   const { t } = useTranslation();
+  const ios = useIosTheme();
 
   const handleRemoveImage = (event: GestureResponderEvent) => {
     event.stopPropagation();
@@ -67,7 +68,7 @@ export function ImageImportPanel({
             >
               <Text
                 numberOfLines={1}
-                style={{ color: ios.card, fontSize: 13, fontWeight: '700' }}
+                style={{ color: ios.primaryForeground, fontSize: 13, fontWeight: '700' }}
               >
                 {fileName ?? t('image_upload.file_selected')}
               </Text>
@@ -95,7 +96,7 @@ export function ImageImportPanel({
                     backgroundColor: closePressed ? 'rgba(0, 0, 0, 0.68)' : 'rgba(0, 0, 0, 0.52)',
                   }}
                 >
-                  <Ionicons name="close" size={20} color={ios.card} />
+                  <Ionicons name="close" size={20} color={ios.primaryForeground} />
                 </YStack>
               )}
             </Pressable>

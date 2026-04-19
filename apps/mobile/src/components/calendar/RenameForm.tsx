@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Input, XStack, YStack } from 'tamagui';
 import type { CalendarItem } from '@meditime/types';
 import { IconButton } from '../common/IconButton';
-import { ios } from '../../theme/ios';
+import { useIosTheme } from '../../theme/ios';
 
 type RenameFormProps = {
   calendar: CalendarItem;
@@ -22,6 +22,7 @@ export function RenameForm({
   onCancel,
 }: RenameFormProps) {
   const { t } = useTranslation();
+  const ios = useIosTheme();
 
   return (
     <YStack

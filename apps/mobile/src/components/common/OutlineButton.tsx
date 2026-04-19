@@ -1,5 +1,5 @@
 import { Button, Text } from 'tamagui';
-import { ios } from '../../theme/ios';
+import { useIosTheme } from '../../theme/ios';
 
 type OutlineButtonProps = {
   label: string;
@@ -7,6 +7,8 @@ type OutlineButtonProps = {
 };
 
 export function OutlineButton({ label, onPress }: OutlineButtonProps) {
+  const ios = useIosTheme();
+
   return (
     <Button
       size="$3"
@@ -17,7 +19,7 @@ export function OutlineButton({ label, onPress }: OutlineButtonProps) {
         borderRadius: 12,
         borderWidth: 0,
         borderColor: 'transparent',
-        backgroundColor: '#e8f3ff',
+        backgroundColor: ios.blueInfoBg,
       }}
     >
       <Text style={{ color: ios.primary, fontWeight: '700' }}>{label}</Text>

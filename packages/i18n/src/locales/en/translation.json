@@ -256,12 +256,17 @@
   "auth": {
     "accept_terms": "I accept the",
     "accept_terms_aria": "Accept the terms and conditions",
+    "already_have_account": "Already have an account?",
+    "back_to_login": "Back to login",
+    "check_email": "Check your inbox and confirm your email before logging in.",
     "email": "E-mail address",
     "forgot_password": "Forgot your password?",
     "hide_password": "Hide password",
     "login": "Login",
+    "login_error": "Unable to log in.",
     "login_with": "Connect with:",
     "name": "Full name",
+    "no_account": "No account yet?",
     "or_with_email": "or with email:",
     "password": "Password",
     "provider": {
@@ -273,6 +278,7 @@
       "twitter": "Twitter"
     },
     "register": "Registration",
+    "register_error": "Unable to create your account.",
     "register_with": "Register with:",
     "show_password": "Show password",
     "terms_link": "general conditions",
@@ -837,6 +843,7 @@
     },
     "password_section": {
       "description": "Change your password to strengthen the security of your account.",
+      "error": "Error updating password.",
       "hint": "Use at least 8 characters with letters, numbers and symbols.",
       "same_password_error": "The new password must be different from the old one.",
       "title": "Password"

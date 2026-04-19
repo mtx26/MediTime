@@ -6,6 +6,7 @@ type ImageSourceSheetOptions = {
   fileLabel: string;
   libraryLabel: string;
   title: string;
+  userInterfaceStyle?: 'light' | 'dark';
   onCamera: () => void;
   onFile: () => void;
   onLibrary: () => void;
@@ -17,6 +18,7 @@ export function openImageSourceSheet({
   fileLabel,
   libraryLabel,
   title,
+  userInterfaceStyle = 'light',
   onCamera,
   onFile,
   onLibrary,
@@ -27,7 +29,7 @@ export function openImageSourceSheet({
         title,
         options: [cameraLabel, libraryLabel, fileLabel, cancelLabel],
         cancelButtonIndex: 3,
-        userInterfaceStyle: 'light',
+        userInterfaceStyle,
       },
       (buttonIndex) => {
         if (buttonIndex === 0) onCamera();

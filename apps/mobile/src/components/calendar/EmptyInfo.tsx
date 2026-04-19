@@ -1,12 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack } from 'tamagui';
-import { ios } from '../../theme/ios';
+import { useIosTheme } from '../../theme/ios';
 
 type EmptyInfoProps = {
   text: string;
 };
 
 export function EmptyInfo({ text }: EmptyInfoProps) {
+  const ios = useIosTheme();
+
   return (
     <XStack
       style={{

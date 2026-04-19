@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import type { HTMLAttributes } from 'react';
 import type { TooltipRenderProps } from 'react-joyride';
 
 export default function TourTooltip({
@@ -15,7 +16,11 @@ export default function TourTooltip({
   const { t } = useTranslation();
 
   return (
-    <div {...tooltipProps} className="card shadow" style={{ maxWidth: 400, width: '90vw', zIndex: 10000 }}>
+    <div
+      {...(tooltipProps as unknown as HTMLAttributes<HTMLDivElement>)}
+      className="card shadow"
+      style={{ maxWidth: 400, width: '90vw', zIndex: 10000 }}
+    >
       <div className="card-body">
         {step.title && <h5 className="card-title mb-3">{step.title}</h5>}
         <div className="card-text mb-4">{step.content}</div>

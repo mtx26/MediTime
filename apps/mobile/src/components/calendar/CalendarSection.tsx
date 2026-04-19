@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack, YStack } from 'tamagui';
 import type { CalendarItem } from '@meditime/types';
 import type { MobileActionSheetAction } from '../common/ActionSheet';
-import { ios } from '../../theme/ios';
+import { useIosTheme } from '../../theme/ios';
 import { CalendarRow } from './CalendarRow';
 import { EmptyInfo } from './EmptyInfo';
 
@@ -42,6 +42,8 @@ export function CalendarSection({
   onRenameSubmit,
   onRenameCancel,
 }: CalendarSectionProps) {
+  const ios = useIosTheme();
+
   return (
     <YStack style={{ width: '100%', maxWidth: 672, gap: 16 }}>
       <XStack style={{ alignItems: 'center', gap: 8, marginBottom: 0 }}>
@@ -61,7 +63,7 @@ export function CalendarSection({
             borderColor: ios.border,
             borderRadius: 16,
             backgroundColor: ios.card,
-            shadowColor: '#000',
+            shadowColor: ios.shadow,
             shadowOpacity: 0.08,
             shadowRadius: 12,
             shadowOffset: { width: 0, height: 4 },

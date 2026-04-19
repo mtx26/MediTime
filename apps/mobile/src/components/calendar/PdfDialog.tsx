@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, Text, XStack, YStack } from 'tamagui';
 import { OutlineButton } from '../common/OutlineButton';
-import { ios } from '../../theme/ios';
+import { useIosTheme } from '../../theme/ios';
 
 type PdfDialogProps = {
   open: boolean;
@@ -21,6 +21,7 @@ export function PdfDialog({
   onDownload,
 }: PdfDialogProps) {
   const { t } = useTranslation();
+  const ios = useIosTheme();
 
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onCancel}>
@@ -30,7 +31,7 @@ export function PdfDialog({
           flex: 1,
           justifyContent: 'center',
           padding: 20,
-          backgroundColor: 'rgba(0, 0, 0, 0.25)',
+          backgroundColor: ios.overlay,
         }}
       >
         <Pressable>
@@ -42,7 +43,7 @@ export function PdfDialog({
               borderColor: ios.border,
               borderRadius: 20,
               backgroundColor: ios.card,
-              shadowColor: '#000',
+              shadowColor: ios.shadow,
               shadowOpacity: 0.18,
               shadowRadius: 12,
               shadowOffset: { width: 0, height: 8 },
@@ -84,8 +85,8 @@ export function PdfDialog({
                 }}
               >
                 <XStack style={{ alignItems: 'center', gap: 8 }}>
-                  <Ionicons name="download-outline" size={16} color={ios.card} />
-                  <Text style={{ color: ios.card, fontWeight: '700' }}>{t('boxes.export_pdf')}</Text>
+                  <Ionicons name="download-outline" size={16} color={ios.primaryForeground} />
+                  <Text style={{ color: ios.primaryForeground, fontWeight: '700' }}>{t('boxes.export_pdf')}</Text>
                 </XStack>
               </Button>
             </XStack>

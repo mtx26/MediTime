@@ -3,11 +3,7 @@ import { ActionSheetIOS, Alert, Animated, Platform, Pressable } from 'react-nati
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { YStack } from 'tamagui';
-
-const colors = {
-  systemBlue: '#007aff',
-  systemBlueBg: '#e8f3ff',
-};
+import { useAppTheme } from '../../theme/ios';
 
 export type MobileActionSheetAction = {
   label?: string;
@@ -39,6 +35,7 @@ function ActionSheet({
   triggerMode = 'button',
 }: ActionSheetProps) {
   const { t } = useTranslation();
+  const { colorScheme, ios } = useAppTheme();
   const longPressTriggered = useRef(false);
   const longPressScale = useRef(new Animated.Value(1)).current;
 
@@ -80,7 +77,7 @@ function ActionSheet({
         options: [...labels, t('cancel')],
         cancelButtonIndex,
         destructiveButtonIndex: destructiveButtonIndex >= 0 ? destructiveButtonIndex : undefined,
-        userInterfaceStyle: 'light',
+        userInterfaceStyle: colorScheme,
       },
       (buttonIndex) => {
         if (buttonIndex === cancelButtonIndex) return;
@@ -159,10 +156,10 @@ function ActionSheet({
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 12,
-            backgroundColor: pressed ? '#d7ebff' : colors.systemBlueBg,
+            backgroundColor: pressed ? ios.blueInfoBorder : ios.blueInfoBg,
           }}
         >
-          <Ionicons name="ellipsis-horizontal" size={18} color={colors.systemBlue} />
+          <Ionicons name="ellipsis-horizontal" size={18} color={ios.primary} />
         </YStack>
       )}
     </Pressable>

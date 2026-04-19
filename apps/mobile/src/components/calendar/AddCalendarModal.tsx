@@ -1,4 +1,5 @@
-import { Modal, Pressable, useWindowDimensions } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Animated, Modal, PanResponder, Pressable, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, Input, ScrollView, Spinner, Text, XStack, YStack } from 'tamagui';
@@ -10,7 +11,7 @@ import {
 } from '@meditime/constants';
 import { InfoBanner } from '../common/InfoBanner';
 import { OutlineButton } from '../common/OutlineButton';
-import { ios } from '../../theme/ios';
+import { useAppTheme } from '../../theme/ios';
 import type { AddCalendarStep, MedicineReviewField } from './import/types';
 import { ImageImportPanel } from './import/ImageImportPanel';
 import { ImportTypeOption } from './import/ImportTypeOption';
@@ -71,7 +72,9 @@ export function AddCalendarModal({
   onSubmit,
 }: AddCalendarModalProps) {
   const { t } = useTranslation();
-  const { height } = useWindowDimensions();
+  const { ios, isDark } = useAppTheme();
+  const { height, width } = useWindowDimensions();
+  const dragY = useRef(new Animated.Value(0)).current;
   const isManual = importType === ADD_CALENDAR_IMPORT_TYPES.MANUAL;
   const isQr = importType === ADD_CALENDAR_IMPORT_TYPES.QR;
   const isFile = importType === ADD_CALENDAR_IMPORT_TYPES.FILE;
@@ -87,29 +90,103 @@ export function AddCalendarModal({
         : t('calendar.import_type_manual_description');
   const modalMaxHeight = Math.max(420, height - 48);
   const scrollMaxHeight = Math.max(280, modalMaxHeight - 104);
+  const isWideLayout = width >= 720;
+  const sheetHorizontalPadding = isWideLayout ? 24 : 0;
+  const sheetBottomPadding = isWideLayout ? 24 : 0;
+  const sheetTranslateY = dragY.interpolate({
+    inputRange: [0, modalMaxHeight],
+    outputRange: [0, modalMaxHeight],
+    extrapolate: 'clamp',
+  });
+
+  useEffect(() => {
+    if (open) {
+      dragY.stopAnimation();
+      dragY.setValue(0);
+    }
+  }, [dragY, open]);
+
+  const resetSheetPosition = useCallback(() => {
+    Animated.spring(dragY, {
+      toValue: 0,
+      useNativeDriver: true,
+      speed: 22,
+      bounciness: 0,
+    }).start();
+  }, [dragY]);
+
+  const closeFromSwipe = useCallback(() => {
+    Animated.timing(dragY, {
+      toValue: modalMaxHeight,
+      duration: 180,
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      dragY.setValue(0);
+      if (finished) onCancel();
+    });
+  }, [dragY, modalMaxHeight, onCancel]);
+
+  const panResponder = useMemo(
+    () => PanResponder.create({
+      onMoveShouldSetPanResponderCapture: (_, gestureState) => (
+        gestureState.dy > 8
+        && Math.abs(gestureState.dy) > Math.abs(gestureState.dx) * 1.2
+      ),
+      onPanResponderMove: (_, gestureState) => {
+        dragY.setValue(Math.max(0, gestureState.dy));
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dy > 96 || gestureState.vy > 0.85) {
+          closeFromSwipe();
+          return;
+        }
+
+        resetSheetPosition();
+      },
+      onPanResponderTerminate: resetSheetPosition,
+    }),
+    [closeFromSwipe, dragY, resetSheetPosition],
+  );
 
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onCancel}>
-      <Pressable
-        onPress={onCancel}
+      <YStack
         style={{
           flex: 1,
           justifyContent: 'flex-end',
-          paddingHorizontal: 12,
+          paddingHorizontal: sheetHorizontalPadding,
           paddingTop: 24,
-          paddingBottom: 12,
-          backgroundColor: 'rgba(0, 0, 0, 0.25)',
+          paddingBottom: sheetBottomPadding,
+          backgroundColor: ios.overlay,
         }}
       >
-        <Pressable style={{ width: '100%' }}>
+        <Pressable
+          onPress={onCancel}
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+          }}
+        />
+        <Animated.View
+          style={{
+            width: '100%',
+            maxWidth: 672,
+            alignSelf: 'center',
+            transform: [{ translateY: sheetTranslateY }],
+          }}
+        >
           <YStack
             style={{
               width: '100%',
-              maxWidth: 672,
               maxHeight: modalMaxHeight,
-              alignSelf: 'center',
               overflow: 'hidden',
-              borderRadius: 20,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              borderBottomLeftRadius: isWideLayout ? 20 : 0,
+              borderBottomRightRadius: isWideLayout ? 20 : 0,
               backgroundColor: ios.card,
             }}
           >
@@ -125,14 +202,23 @@ export function AddCalendarModal({
               }}
             >
               <YStack
+                {...panResponder.panHandlers}
                 style={{
-                  width: 42,
-                  height: 5,
-                  borderRadius: 3,
-                  backgroundColor: ios.border,
-                  marginBottom: 6,
+                  width: 72,
+                  height: 24,
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
-              />
+              >
+                <YStack
+                  style={{
+                    width: 42,
+                    height: 5,
+                    borderRadius: 3,
+                    backgroundColor: ios.border,
+                  }}
+                />
+              </YStack>
               <Ionicons name={step === 'review' ? 'pencil-outline' : 'calendar-outline'} size={34} color={ios.primary} />
               <Text style={{ color: ios.foreground, fontSize: 24, lineHeight: 30, fontWeight: '800' }}>
                 {step === 'review' ? t('medicine_review.title') : t('calendar.add_calendar')}
@@ -142,7 +228,7 @@ export function AddCalendarModal({
             <ScrollView
               style={{ maxHeight: scrollMaxHeight }}
               showsVerticalScrollIndicator
-              indicatorStyle="black"
+              indicatorStyle={isDark ? 'white' : 'black'}
               keyboardShouldPersistTaps="handled"
               bounces
             >
@@ -247,11 +333,11 @@ export function AddCalendarModal({
                     >
                       <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                         {disabled ? (
-                          <Spinner size="small" color={ios.card} />
+                          <Spinner size="small" color={ios.primaryForeground} />
                         ) : (
-                          <Ionicons name={isFile ? 'arrow-forward' : 'add-outline'} size={19} color={ios.card} />
+                          <Ionicons name={isFile ? 'arrow-forward' : 'add-outline'} size={19} color={ios.primaryForeground} />
                         )}
-                        <Text style={{ color: ios.card, fontSize: 17, fontWeight: '800' }}>
+                        <Text style={{ color: ios.primaryForeground, fontSize: 17, fontWeight: '800' }}>
                           {isFile ? t('next') : t('add')}
                         </Text>
                       </XStack>
@@ -262,8 +348,8 @@ export function AddCalendarModal({
               )}
             </ScrollView>
           </YStack>
-        </Pressable>
-      </Pressable>
+        </Animated.View>
+      </YStack>
     </Modal>
   );
 }

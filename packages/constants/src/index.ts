@@ -1,6 +1,10 @@
-import { fr, enUS, es, de, it, ja, zhCN, ptBR, ru } from 'date-fns/locale';
-import type { Locale as DateLocale } from 'date-fns';
+/// <reference path="./date-fns-locale-zh-cn.d.ts" />
+
+import { fr, enUS, es, de, it, ja, ptBR, ru } from 'date-fns/locale';
+import { zhCN } from 'date-fns/locale/zh-CN';
 import type { Language, MedicineReviewConditionInput } from '@meditime/types';
+
+type DateLocale = typeof fr;
 
 // ============================================================================
 //  Pillbox Display Constants

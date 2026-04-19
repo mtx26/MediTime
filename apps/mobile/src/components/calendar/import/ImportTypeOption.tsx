@@ -1,7 +1,7 @@
 import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack } from 'tamagui';
-import { ios } from '../../../theme/ios';
+import { useIosTheme } from '../../../theme/ios';
 
 type ImportTypeOptionProps = {
   label: string;
@@ -16,6 +16,8 @@ export function ImportTypeOption({
   selected,
   onPress,
 }: ImportTypeOptionProps) {
+  const ios = useIosTheme();
+
   return (
     <Pressable onPress={onPress} accessibilityRole="button">
       {({ pressed }) => (

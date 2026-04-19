@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack } from 'tamagui';
-import { ios } from '../../theme/ios';
+import { useIosTheme } from '../../theme/ios';
 
 type InfoBannerProps = {
   iconName: keyof typeof Ionicons.glyphMap;
@@ -9,6 +9,7 @@ type InfoBannerProps = {
 };
 
 export function InfoBanner({ iconName, text, tone = 'info' }: InfoBannerProps) {
+  const ios = useIosTheme();
   const isInfo = tone === 'info';
 
   return (

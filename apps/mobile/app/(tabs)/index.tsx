@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useState } from 'react';
 import { Alert, Linking, RefreshControl } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Spinner, Text, YStack } from 'tamagui';
 import type { CalendarItem } from '@meditime/types';
@@ -13,7 +14,7 @@ import {
   AddCalendarFooter,
   CalendarSection,
 } from '../../src/components/calendar';
-import { ios } from '../../src/theme/ios';
+import { useIosTheme } from '../../src/theme/ios';
 import { useAddCalendar, useCalendars } from '../../src/hooks/calendars';
 import { toActionSheetItems, toMobileHref } from '../../src/utils';
 
@@ -32,7 +33,10 @@ const PdfDialog = lazy(() =>
 export default function CalendarsScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const ios = useIosTheme();
   const lng = i18n.language || 'fr';
+  const bottomContentInset = 56 + insets.bottom + 14;
   const [renameValues, setRenameValues] = useState<Record<string, string>>({});
   const [renameMode, setRenameMode] = useState<string | null>(null);
   const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
@@ -91,7 +95,7 @@ export default function CalendarsScreen() {
     try {
       await Linking.openURL(url);
     } catch {
-      Alert.alert(String(t('errors.pdf_download_error')), String(t('errors.pdf_download_error')));
+      Alert.alert(String(t('api.calendar.pdf_download_error')), String(t('api.calendar.pdf_download_error')));
     }
   };
 
@@ -113,7 +117,7 @@ export default function CalendarsScreen() {
                 setRenameMode(null);
                 return;
               }
-              Alert.alert(String(t('calendar.rename_error')), result.error ?? String(t('calendar.rename_error')));
+              Alert.alert(String(t('api.calendar.rename_error')), result.error ?? String(t('api.calendar.rename_error')));
             });
           },
         },
@@ -206,7 +210,15 @@ export default function CalendarsScreen() {
       <ScrollView
         flex={1}
         style={{ flex: 1, backgroundColor: ios.background }}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={loadCalendars} />}
+        refreshControl={(
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={loadCalendars}
+            tintColor={ios.primary}
+            colors={[ios.primary]}
+            progressBackgroundColor={ios.card}
+          />
+        )}
       >
         <YStack
           style={{
@@ -215,7 +227,7 @@ export default function CalendarsScreen() {
             gap: 24,
             paddingHorizontal: 16,
             paddingTop: 16,
-            paddingBottom: 96,
+            paddingBottom: bottomContentInset,
             backgroundColor: ios.background,
           }}
         >
@@ -227,9 +239,9 @@ export default function CalendarsScreen() {
                 gap: 10,
                 padding: 12,
                 borderWidth: 1,
-                borderColor: '#fecaca',
+                borderColor: ios.destructiveBorder,
                 borderRadius: 16,
-                backgroundColor: '#fff1f0',
+                backgroundColor: ios.destructiveBg,
               }}
             >
               <Text style={{ color: ios.destructive, fontWeight: '700' }}>{error}</Text>

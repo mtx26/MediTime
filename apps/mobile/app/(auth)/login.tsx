@@ -5,10 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { YStack, XStack, Input, Button, H2, Text, Separator } from 'tamagui';
 import { Mail, Lock, Eye, EyeOff } from '@tamagui/lucide-icons';
 import { authService } from '../../src/contexts/AuthContext';
+import { useIosTheme } from '../../src/theme/ios';
 
 export default function LoginScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const ios = useIosTheme();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,19 +39,19 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
     >
-      <YStack flex={1} justifyContent="center" padding="$5" backgroundColor="$background" gap="$4">
-        <H2 textAlign="center" color="$color">
+      <YStack flex={1} gap="$4" style={{ justifyContent: 'center', padding: 20, backgroundColor: ios.background }}>
+        <H2 style={{ textAlign: 'center' }} color="$color">
           {t('auth.login')}
         </H2>
 
         {error && (
-          <Text color="$red10" textAlign="center" fontSize="$3">
+          <Text color="$red10" style={{ textAlign: 'center' }} fontSize="$3">
             {error}
           </Text>
         )}
 
         <YStack gap="$3">
-          <XStack alignItems="center" gap="$2">
+          <XStack style={{ alignItems: 'center' }} gap="$2">
             <Mail size={20} color="$gray10" />
             <Input
               flex={1}
@@ -63,7 +65,7 @@ export default function LoginScreen() {
             />
           </XStack>
 
-          <XStack alignItems="center" gap="$2">
+          <XStack style={{ alignItems: 'center' }} gap="$2">
             <Lock size={20} color="$gray10" />
             <Input
               flex={1}
@@ -90,7 +92,7 @@ export default function LoginScreen() {
           disabled={loading || !email || !password}
           opacity={loading ? 0.7 : 1}
         >
-          {loading ? t('common.loading') : t('auth.login')}
+          {loading ? t('loading') : t('auth.login')}
         </Button>
 
         <Button
@@ -103,9 +105,9 @@ export default function LoginScreen() {
           </Text>
         </Button>
 
-        <Separator marginVertical="$2" />
+        <Separator my="$2" />
 
-        <XStack justifyContent="center" gap="$2" alignItems="center">
+        <XStack style={{ justifyContent: 'center', alignItems: 'center' }} gap="$2">
           <Text color="$gray10" fontSize="$3">
             {t('auth.no_account')}
           </Text>

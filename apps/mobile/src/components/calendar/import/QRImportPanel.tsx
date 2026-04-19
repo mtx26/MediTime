@@ -5,7 +5,7 @@ import { Text, Spinner, XStack, YStack } from 'tamagui';
 import type { QRScannedMedicine } from '@meditime/types';
 import { IconButton } from '../../common/IconButton';
 import { OutlineButton } from '../../common/OutlineButton';
-import { ios } from '../../../theme/ios';
+import { useIosTheme } from '../../../theme/ios';
 
 type QRImportPanelProps = {
   medicines: QRScannedMedicine[];
@@ -23,6 +23,7 @@ export function QRImportPanel({
   onRemoveMedicine,
 }: QRImportPanelProps) {
   const { t } = useTranslation();
+  const ios = useIosTheme();
   const [permission, requestPermission] = useCameraPermissions();
   const hasPermission = permission?.granted;
 
