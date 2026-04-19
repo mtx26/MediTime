@@ -14,8 +14,8 @@
     "preview": "npm run preview --workspace=apps/web",
     "i18n:sync": "node scripts/i18n/run.js",
     "i18n:sync:dry": "node scripts/i18n/run.js --dry-run",
-    "lint": "npm run lint --workspace=apps/web",
-    "type-check": "npm run type-check --workspace=apps/web"
+    "lint": "npm run lint --workspace=apps/web && npm run lint --workspace=apps/mobile",
+    "type-check": "npm run type-check --workspace=apps/web && npm run type-check --workspace=apps/mobile"
   },
   "dependencies": {
     "@google-cloud/translate": "^9.3.0",

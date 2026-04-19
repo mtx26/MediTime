@@ -836,7 +836,8 @@
       "description": "Cambia la tua password per rafforzare la sicurezza del tuo account.",
       "hint": "Utilizzare almeno 8 caratteri con lettere, numeri e simboli.",
       "same_password_error": "La nuova password deve essere diversa da quella vecchia.",
-      "title": "Password"
+      "title": "Password",
+      "error": "Errore durante l'aggiornamento della password."
     },
     "password_updated": "Password aggiornata con successo.",
     "providers": {

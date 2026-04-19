@@ -81,7 +81,8 @@
     "build": "npm run build:i18n && vite build",
     "build:i18n": "node ../../scripts/generate-i18n-manifests.js",
     "i18n:sync": "node ../../scripts/i18n/run.js",
-    "type-check": "tsc --noEmit -p tsconfig.json",
+    "type-check": "node ../../node_modules/typescript/bin/tsc --noEmit -p tsconfig.json",
+    "lint": "npm run type-check",
     "preview": "vite preview"
   },
   "devDependencies": {

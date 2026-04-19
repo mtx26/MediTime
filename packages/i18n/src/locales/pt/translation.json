@@ -836,7 +836,8 @@
       "description": "Altere sua senha para reforçar a segurança da sua conta.",
       "hint": "Use pelo menos 8 caracteres, incluindo letras, números e símbolos.",
       "same_password_error": "A nova senha deve ser diferente da antiga.",
-      "title": "Senha"
+      "title": "Senha",
+      "error": "Erro ao atualizar a senha."
     },
     "password_updated": "Senha atualizada com sucesso.",
     "providers": {

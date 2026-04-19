@@ -836,7 +836,8 @@
       "description": "Cambie su contraseña para fortalecer la seguridad de su cuenta.",
       "hint": "Utilice al menos 8 caracteres con letras, números y símbolos.",
       "same_password_error": "La nueva contraseña debe ser diferente de la anterior.",
-      "title": "Contraseña"
+      "title": "Contraseña",
+      "error": "Error al actualizar la contraseña."
     },
     "password_updated": "Contraseña actualizada exitosamente.",
     "providers": {

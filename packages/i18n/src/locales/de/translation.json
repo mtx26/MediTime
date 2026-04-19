@@ -836,7 +836,8 @@
       "description": "Ändern Sie Ihr Passwort, um die Sicherheit Ihres Kontos zu erhöhen.",
       "hint": "Verwenden Sie mindestens 8 Zeichen mit Buchstaben, Zahlen und Symbolen.",
       "same_password_error": "Das neue Passwort muss sich vom alten unterscheiden.",
-      "title": "Passwort"
+      "title": "Passwort",
+      "error": "Fehler beim Aktualisieren des Passworts."
     },
     "password_updated": "Passwort erfolgreich aktualisiert.",
     "providers": {

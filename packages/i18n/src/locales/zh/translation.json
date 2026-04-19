@@ -836,7 +836,8 @@
       "description": "请更改密码以加强账户安全。",
       "hint": "请使用至少 8 个字符，包括字母、数字和符号。",
       "same_password_error": "新密码必须与旧密码不同。",
-      "title": "密码"
+      "title": "密码",
+      "error": "更新密码时出错。"
     },
     "password_updated": "密码已成功更新。",
     "providers": {
