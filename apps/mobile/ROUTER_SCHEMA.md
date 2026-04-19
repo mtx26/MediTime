@@ -12,13 +12,10 @@ apps/mobile/app
     ✅ register.tsx
     ✅ reset-password.tsx
     ✅ reset-password-confirm.tsx
-    verify-email.tsx
+    ✅ verify-email.tsx
 
   auth
-    callback.tsx
-
-  settings
-    index.tsx
+    ✅ callback.tsx
 
   notifications
     index.tsx
@@ -33,43 +30,47 @@ apps/mobile/app
     index.tsx
     review.tsx
 
-  calendars
-    ✅ index.tsx
+  (tabs)
+    calendars
+      ✅ index.tsx
 
-    calendar
-      [calendarId]
-        _layout.tsx
-        ✅ index.tsx
-        boxes.tsx
-        pillbox.tsx
-        ✅ daily.tsx
-        settings.tsx
-        stock-alerts.tsx
-        pillbox-uses.tsx
-        ics-tokens.tsx
-        missed-intakes
+      calendar
+        [calendarId]
+          _layout.tsx
+          ✅ index.tsx
+          boxes.tsx
+          pillbox.tsx
+          ✅ daily.tsx
+          settings.tsx
+          stock-alerts.tsx
+          pillbox-uses.tsx
+          ics-tokens.tsx
+          missed-intakes
+            index.tsx
+            recap.tsx
+
+      shared-user-calendar
+        [calendarId]
+          _layout.tsx
+          ✅ index.tsx
+          boxes.tsx
+          pillbox.tsx
+          ✅ daily.tsx
+          settings.tsx
+          stock-alerts.tsx
+          pillbox-uses.tsx
+          ics-tokens.tsx
+          missed-intakes
+            index.tsx
+            recap.tsx
+
+      shared-token-calendar
+        [sharedToken]
           index.tsx
-          recap.tsx
+          pillbox.tsx
 
-    shared-user-calendar
-      [calendarId]
-        _layout.tsx
-        ✅ index.tsx
-        boxes.tsx
-        pillbox.tsx
-        ✅ daily.tsx
-        settings.tsx
-        stock-alerts.tsx
-        pillbox-uses.tsx
-        ics-tokens.tsx
-        missed-intakes
-          index.tsx
-          recap.tsx
-
-    shared-token-calendar
-      [sharedToken]
-        index.tsx
-        pillbox.tsx
+    settings
+      ✅ index.tsx
 
   ✅ privacy.tsx
   ✅ terms.tsx

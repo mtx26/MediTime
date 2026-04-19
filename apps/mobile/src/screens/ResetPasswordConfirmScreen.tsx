@@ -1,5 +1,5 @@
 import { KeyboardAvoidingView, Platform } from 'react-native';
-import { Eye, EyeOff, Lock } from '@tamagui/lucide-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, H2, Input, Text, XStack, YStack } from 'tamagui';
 import { InfoBanner } from '../components/common/InfoBanner';
@@ -48,7 +48,7 @@ export default function ResetPasswordConfirmScreen() {
         )}
 
         <XStack style={{ alignItems: 'center' }} gap="$2">
-          <Lock size={20} color="$gray10" />
+          <Ionicons name="lock-closed-outline" size={20} color={ios.mutedForeground} />
           <Input
             flex={1}
             size="$4"
@@ -61,9 +61,14 @@ export default function ResetPasswordConfirmScreen() {
           <Button
             size="$3"
             chromeless
-            icon={resetPasswordConfirm.showPassword ? EyeOff : Eye}
             onPress={() => resetPasswordConfirm.setShowPassword(!resetPasswordConfirm.showPassword)}
-          />
+          >
+            <Ionicons
+              name={resetPasswordConfirm.showPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color={ios.mutedForeground}
+            />
+          </Button>
         </XStack>
 
         <Button
@@ -76,11 +81,15 @@ export default function ResetPasswordConfirmScreen() {
             !resetPasswordConfirm.password
           }
           opacity={resetPasswordConfirm.loading ? 0.7 : 1}
-          icon={Lock}
         >
-          {resetPasswordConfirm.loading
-            ? t('reset_password_confirm.saving')
-            : t('reset_password_confirm.save_password')}
+          <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <Ionicons name="lock-closed-outline" size={18} color={ios.primaryForeground} />
+            <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
+              {resetPasswordConfirm.loading
+                ? t('reset_password_confirm.saving')
+                : t('reset_password_confirm.save_password')}
+            </Text>
+          </XStack>
         </Button>
       </YStack>
     </KeyboardAvoidingView>

@@ -50,6 +50,27 @@ export interface TabIconProps<TIconName = string> {
   focusedIconName: TIconName;
 }
 
+// ─── Auth ───────────────────────────────────────────────────────────────────
+
+export type AuthMode = 'login' | 'register';
+
+export interface AuthScreenProps {
+  initialMode: AuthMode;
+}
+
+export interface AuthModeToggleProps {
+  activeMode: AuthMode;
+  onModeChange: (mode: AuthMode) => void;
+}
+
+export interface SocialProviderButtonProps<TIconName = string> {
+  label: string;
+  iconName: TIconName;
+  color: string;
+  disabled?: boolean;
+  onPress: () => void;
+}
+
 // ─── Terms ───────────────────────────────────────────────────────────────────
 
 export interface TermsSectionProps {

@@ -21,8 +21,8 @@ const styles = StyleSheet.create({
   iconShell: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 42,
-    height: 31,
+    width: 38,
+    height: 28,
     borderRadius: 8,
   },
 });

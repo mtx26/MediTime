@@ -1,6 +1,6 @@
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Mail } from '@tamagui/lucide-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, H2, Input, Text, XStack, YStack } from 'tamagui';
 import { InfoBanner } from '../components/common/InfoBanner';
@@ -45,7 +45,7 @@ export default function ResetPasswordScreen() {
         )}
 
         <XStack style={{ alignItems: 'center' }} gap="$2">
-          <Mail size={20} color="$gray10" />
+          <Ionicons name="mail-outline" size={20} color={ios.mutedForeground} />
           <Input
             flex={1}
             size="$4"
@@ -65,9 +65,13 @@ export default function ResetPasswordScreen() {
           onPress={() => void resetPassword.handleReset()}
           disabled={resetPassword.isSubmitting || !resetPassword.email.trim()}
           opacity={resetPassword.isSubmitting ? 0.7 : 1}
-          icon={Mail}
         >
-          {resetPassword.isSubmitting ? t('loading') : t('reset_password.send_link')}
+          <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <Ionicons name="mail-outline" size={18} color={ios.primaryForeground} />
+            <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
+              {resetPassword.isSubmitting ? t('loading') : t('reset_password.send_link')}
+            </Text>
+          </XStack>
         </Button>
 
         <Button

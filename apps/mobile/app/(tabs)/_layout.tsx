@@ -1,10 +1,10 @@
 import { Redirect, Tabs } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Spinner, YStack } from 'tamagui';
 import { useAuth } from '../../src/hooks/auth/useAuth';
-import { TabIcon } from '../../src/components/common/TabIcon';
 import { useIosTheme } from '../../src/theme/ios';
 
 export default function TabsLayout() {
@@ -31,20 +31,16 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
+        tabBarShowLabel: true,
         tabBarActiveTintColor: ios.primary,
         tabBarInactiveTintColor: ios.mutedForeground,
         tabBarStyle: {
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: tabBarHeight,
-          paddingTop: 4,
+          height: tabBarHeight + 4,
+          paddingTop: 7,
           paddingBottom: tabBarPaddingBottom,
           borderTopWidth: 1,
           borderTopColor: ios.tabBarBorder,
-          borderTopLeftRadius: 8,
-          borderTopRightRadius: 8,
           backgroundColor: ios.tabBarBackground,
           ...Platform.select({
             ios: {
@@ -60,15 +56,20 @@ export default function TabsLayout() {
         },
         tabBarItemStyle: {
           borderRadius: 8,
+          minHeight: 50,
           paddingVertical: 2,
         },
         tabBarIconStyle: {
-          marginBottom: 2,
+          width: 34,
+          height: 25,
+          marginBottom: 0,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: '700',
           letterSpacing: 0,
+          lineHeight: 15,
+          marginTop: 1,
         },
       }}
     >
@@ -76,12 +77,26 @@ export default function TabsLayout() {
         name="calendars"
         options={{
           title: t('calendars'),
+          tabBarLabel: t('calendars'),
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon
+            <Ionicons
+              name={focused ? 'calendar' : 'calendar-outline'}
+              size={24}
               color={color}
-              focused={focused}
-              iconName="calendar-outline"
-              focusedIconName="calendar"
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: t('settings.label'),
+          tabBarLabel: t('settings.label'),
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'settings' : 'settings-outline'}
+              size={24}
+              color={color}
             />
           ),
         }}

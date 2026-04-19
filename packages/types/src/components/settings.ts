@@ -25,3 +25,70 @@ export interface SecurityProviderItem<TIcon = unknown> {
   icon: TIcon;
   handler: (redirect?: string | null) => Promise<void> | void;
 }
+
+// ─── Mobile Settings ────────────────────────────────────────────────────────
+
+export type SettingsTabId = 'account' | 'security' | 'notifications' | 'preferences';
+
+export interface SettingsTabItem<TIconName = string> {
+  id: SettingsTabId;
+  label: string;
+  iconName: TIconName;
+}
+
+export interface SettingsTabBarProps<TIconName = string> {
+  tabs: SettingsTabItem<TIconName>[];
+  activeTab: SettingsTabId;
+  onTabChange: (tab: SettingsTabId) => void;
+}
+
+export interface SettingsPanelSectionProps<TIconName = string, TNode = unknown> {
+  title: string;
+  description?: string;
+  iconName: TIconName;
+  children: TNode;
+}
+
+export interface MobileAccountSettingsProps {
+  displayName: string;
+  email: string;
+  photoUrl: string | null;
+  isSaving: boolean;
+  onChangePhoto: () => void;
+  onDisplayNameChange: (value: string) => void;
+  onSaveDisplayName: () => void;
+  onResetDisplayName: () => void;
+}
+
+export interface MobileSecuritySettingsProps {
+  email: string;
+  oldPassword: string;
+  newPassword: string;
+  oldPasswordVisible: boolean;
+  newPasswordVisible: boolean;
+  isSaving: boolean;
+  onOldPasswordChange: (value: string) => void;
+  onNewPasswordChange: (value: string) => void;
+  onOldPasswordVisibleChange: (value: boolean) => void;
+  onNewPasswordVisibleChange: (value: boolean) => void;
+  onUpdatePassword: () => void;
+}
+
+export interface MobileNotificationSettingsProps {
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  notificationTime: string;
+  isSaving: boolean;
+  onEmailEnabledChange: (value: boolean) => void;
+  onPushEnabledChange: (value: boolean) => void;
+  onNotificationTimeChange: (value: string) => void;
+  onSaveNotificationTime: () => void;
+}
+
+export interface MobilePreferencesSettingsProps {
+  language: string;
+  languages: { code: string; label: string }[];
+  themePreference: 'light' | 'dark' | 'system';
+  onLanguageChange: (value: string) => void;
+  onThemePreferenceChange: (value: 'light' | 'dark' | 'system') => void;
+}

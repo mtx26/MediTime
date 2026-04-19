@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, XStack, YStack } from 'tamagui';
+import { HomeReturnButton } from '../components/common/HomeReturnButton';
 import { PrivacyDataGroup } from '../components/common/PrivacyDataGroup';
 import { PrivacySection } from '../components/common/PrivacySection';
 import { useIosTheme } from '../theme/ios';
@@ -24,6 +25,8 @@ export default function PrivacyScreen() {
           backgroundColor: ios.background,
         }}
       >
+        <HomeReturnButton />
+
         <YStack style={{ gap: 8 }}>
           <XStack style={{ alignItems: 'center', gap: 10 }}>
             <Ionicons name="shield-checkmark-outline" size={28} color={ios.primary} />
