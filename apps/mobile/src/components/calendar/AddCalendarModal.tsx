@@ -25,6 +25,7 @@ type AddCalendarModalProps = {
   disabled: boolean;
   qrMedicines: QRScannedMedicine[];
   qrLoadingGtin: string | null;
+  imageAssetUri: string | null;
   imageFileName: string | null;
   importedMedicines: MedicineReviewMedicineInput[];
   medicineReviewIndex: number;
@@ -51,6 +52,7 @@ export function AddCalendarModal({
   disabled,
   qrMedicines,
   qrLoadingGtin,
+  imageAssetUri,
   imageFileName,
   importedMedicines,
   medicineReviewIndex,
@@ -224,6 +226,7 @@ export function AddCalendarModal({
                   {isFile && (
                     <ImageImportPanel
                       fileName={imageFileName}
+                      imageUri={imageAssetUri}
                       disabled={disabled}
                       onChooseSource={onChooseImageSource}
                       onRemoveImage={onRemoveImage}

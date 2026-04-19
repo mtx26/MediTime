@@ -401,6 +401,7 @@ export function useAddCalendar({
     isBusy: isMutating || isImporting || Boolean(qrLoadingGtin),
     qrMedicines,
     qrLoadingGtin,
+    imageAssetUri,
     imageFileName,
     importedMedicines,
     medicineReviewIndex,

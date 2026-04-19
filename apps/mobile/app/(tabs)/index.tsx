@@ -285,6 +285,7 @@ export default function CalendarsScreen() {
           disabled={addCalendarFlow.isBusy}
           qrMedicines={addCalendarFlow.qrMedicines}
           qrLoadingGtin={addCalendarFlow.qrLoadingGtin}
+          imageAssetUri={addCalendarFlow.imageAssetUri}
           imageFileName={addCalendarFlow.imageFileName}
           importedMedicines={addCalendarFlow.importedMedicines}
           medicineReviewIndex={addCalendarFlow.medicineReviewIndex}
