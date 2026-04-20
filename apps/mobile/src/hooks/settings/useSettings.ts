@@ -9,6 +9,7 @@ import { enabledLanguageCodes, getFlag, getLabel } from '@meditime/config';
 import { SETTINGS_TABS } from '@meditime/constants';
 import { buildUserUpdatePayload, getOAuthSignInOptions, log, performApiCall } from '@meditime/utils';
 import type { OAuthProvider, SettingsTabId, SettingsTabItem } from '@meditime/types';
+import { authService } from '../../contexts/AuthContext';
 import { useAuth } from '../auth/useAuth';
 import { supabase } from '../../services/supabase';
 import { useAppTheme } from '../../theme/ios';
@@ -16,6 +17,7 @@ import { MOBILE_LANGUAGE_STORAGE_KEY } from '../../i18n';
 import {
   applySupabaseAuthCallback,
   buildMobileAuthCallbackUrl,
+  buildWebResetPasswordCallbackUrl,
   openAuthUrlInApp,
 } from '../../utils';
 
@@ -336,12 +338,11 @@ export function useSettings() {
   const resetPassword = useCallback(async () => {
     if (!userInfo?.email) return;
 
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(userInfo.email, {
-      redirectTo: buildMobileAuthCallbackUrl('recovery'),
-    });
-
-    if (resetError) {
-      Alert.alert(String(t('error')), resetError.message);
+    try {
+      await authService.resetPassword(userInfo.email, buildWebResetPasswordCallbackUrl());
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(t('unexpected_error'));
+      Alert.alert(String(t('error')), message);
       return;
     }
 

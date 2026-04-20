@@ -38,6 +38,21 @@ function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
+function toAuthError(error: unknown, fallback: string): AuthError {
+  if (error && typeof error === 'object' && 'message' in error) {
+    const candidate = error as { message?: unknown; code?: unknown };
+    return {
+      message: typeof candidate.message === 'string' ? candidate.message : fallback,
+      code: typeof candidate.code === 'string' ? candidate.code : 'unexpected_error',
+    };
+  }
+
+  return {
+    message: getErrorMessage(error, fallback),
+    code: 'unexpected_error',
+  };
+}
+
 /**
  * Creates a platform-agnostic auth service.
  * Web and mobile each pass their own Supabase client instance.
@@ -63,7 +78,7 @@ export function createAuthService(
         uid: null,
         error,
       });
-      return null;
+      return toAuthError(error, 'Erreur lors de la connexion avec email');
     }
   }
 
@@ -96,7 +111,7 @@ export function createAuthService(
         uid: null,
         error,
       });
-      return null;
+      return toAuthError(error, "Erreur lors de l'inscription avec email");
     }
   }
 
@@ -112,17 +127,19 @@ export function createAuthService(
     }
   }
 
-  async function resetPassword(email: string): Promise<void> {
+  async function resetPassword(email: string, redirectTo?: string): Promise<void> {
     try {
-      await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: buildCallbackUrl(undefined, 'recovery'),
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectTo ?? buildCallbackUrl(undefined, 'recovery'),
       });
+      if (error) throw error;
     } catch (error: unknown) {
       log.error("Erreur lors de l'envoi de l'email de réinitialisation :", {
         origin: 'RESET_PASSWORD',
         uid: null,
         error,
       });
+      throw error;
     }
   }
 
@@ -148,7 +165,7 @@ export function createAuthService(
         uid: null,
         error,
       });
-      return null;
+      return toAuthError(error, 'Erreur lors de la connexion par magic link');
     }
   }
 
@@ -181,7 +198,7 @@ export function createAuthService(
         uid: null,
         error,
       });
-      return null;
+      return toAuthError(error, "Erreur lors du changement d'email");
     }
   }
 

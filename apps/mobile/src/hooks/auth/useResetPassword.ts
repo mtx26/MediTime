@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { authService } from '../../contexts/AuthContext';
+import { buildWebResetPasswordCallbackUrl } from '../../utils';
 
 function isValidEmail(value: string) {
   return value.includes('@') && value.includes('.');
@@ -35,7 +36,7 @@ export function useResetPassword() {
 
     setIsSubmitting(true);
     try {
-      await authService.resetPassword(trimmedEmail);
+      await authService.resetPassword(trimmedEmail, buildWebResetPasswordCallbackUrl());
       setSent(true);
     } catch {
       setError(String(t('unexpected_error')));

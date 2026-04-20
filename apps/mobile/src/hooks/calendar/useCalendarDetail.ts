@@ -32,6 +32,16 @@ type CalendarSource = {
 };
 
 const HEADER_TITLE_MAX_LENGTH = 26;
+const MOBILE_UNAVAILABLE_DETAIL_ACTIONS = [
+  'pillbox',
+  'share',
+  'medicines',
+  'stock_alerts',
+  'ics_calendar',
+  'pillbox_history',
+  'missed_intakes',
+  'settings',
+];
 
 function truncateHeaderTitle(value: string) {
   if (value.length <= HEADER_TITLE_MAX_LENGTH) return value;
@@ -247,28 +257,12 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
       ? buildPersonalCalendarActions(
           context,
           { ...handlers, onRename: undefined },
-          ['rename', 'medicines'],
+          ['rename', ...MOBILE_UNAVAILABLE_DETAIL_ACTIONS],
         )
-      : buildSharedCalendarActions(context, handlers, ['medicines']);
+      : buildSharedCalendarActions(context, handlers, MOBILE_UNAVAILABLE_DETAIL_ACTIONS);
 
     return toActionSheetItems(items, translate);
   }, [basePath, calendarId, lng, selectedDate, sourceType, translate]);
-
-  const goToBoxes = () => {
-    if (!calendarId) return;
-    router.push(`/calendars/${basePath}/${calendarId}/boxes` as never);
-  };
-
-  const goToPillbox = () => {
-    if (!calendarId) return;
-    const date = toISO(selectedDate || new Date());
-    router.push(`/calendars/${basePath}/${calendarId}/pillbox?date=${date}` as never);
-  };
-
-  const goToStockAlerts = () => {
-    if (!calendarId) return;
-    router.push(`/calendars/${basePath}/${calendarId}/stock-alerts` as never);
-  };
 
   const hasCalendarItems = calendarTableHasItems(calendarTable);
 
@@ -279,9 +273,6 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     calendarTable,
     error,
     eventsForDay,
-    goToBoxes,
-    goToPillbox,
-    goToStockAlerts,
     handleRefresh,
     headerTitle: truncateHeaderTitle(calendarName ?? String(t('calendars'))),
     isLowStock,
@@ -296,7 +287,7 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     selectWeek,
     showBackendLoading: (scheduleLoading || refreshing) && !loading,
     showDailyContent: mode === 'daily' || stockDecrementMethod === STOCK_DECREMENT_METHODS.DAILY_MIDNIGHT,
-    showPillboxShortcut: hasCalendarItems && stockDecrementMethod === STOCK_DECREMENT_METHODS.WEEKLY_PILLBOX,
+    showPillboxShortcut: false,
     hasCalendarItems,
   };
 }

@@ -292,7 +292,9 @@
   },
   "auth_callback": {
     "loading": "Connexion en cours...",
-    "session_error": "Échec de récupération de session après OAuth",
+    "missing_payload": "Le lien s'est ouvert sans les informations de session. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
+    "session_error": "Échec de récupération de session",
+    "session_unavailable": "Le lien a été ouvert, mais la session n'a pas pu être créée. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
     "success": "Connexion réussie via callback"
   },
   "back": "Retour",
@@ -786,6 +788,7 @@
     "invalid_link": "Lien de réinitialisation invalide ou expiré.",
     "invalid_session": "Session invalide. Merci de redemander un lien.",
     "new_password_label": "Nouveau mot de passe",
+    "request_new_link": "Demander un nouveau lien",
     "save_password": "Enregistrer le mot de passe",
     "saving": "Enregistrement...",
     "success": "Votre mot de passe a bien été modifié.",

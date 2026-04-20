@@ -1,10 +1,11 @@
-import { createContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
+import { createContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { supabase } from '../services/supabase';
 import { log, mapApiResponseToUserInfo, buildUserCreationPayload, createAuthService } from '@meditime/utils';
 import type { UserInfo, SessionLike, ReloadUserFn } from '@meditime/types';
 import { buildMobileAuthCallbackUrl } from '../utils/inAppBrowser';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL!;
+const USER_SYNC_TIMEOUT_MS = 8000;
 
 const authService = createAuthService(
   supabase,
@@ -22,21 +23,46 @@ export interface AuthContextValue {
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
+function getLocalUserInfo(user: NonNullable<NonNullable<SessionLike>['user']>): UserInfo {
+  const metadata = (user.user_metadata ?? {}) as Record<string, string | undefined>;
+
+  return {
+    uid: user.id,
+    email: user.email ?? '',
+    displayName: metadata.full_name ?? metadata.name ?? null,
+    photoUrl: null,
+    emailEnabled: true,
+    pushEnabled: true,
+  } as UserInfo;
+}
+
+async function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), USER_SYNC_TIMEOUT_MS);
+
+  try {
+    return await fetch(input, {
+      ...init,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const tokenRef = useRef<string | null>(null);
 
   const reloadUser = useCallback<ReloadUserFn>(async (currentSession) => {
-    let session = currentSession;
-    let user = currentSession?.user ?? null;
+    let session = currentSession ?? null;
 
-    if (!session || !user) {
+    if (!session) {
       const { data: { session: fetchedSession } } = await supabase.auth.getSession();
-      const { data: { user: fetchedUser } } = await supabase.auth.getUser();
       session = fetchedSession as SessionLike;
-      user = fetchedUser as SessionLike extends { user?: infer U } ? U : never;
     }
+
+    const user = session?.user ?? null;
 
     if (!user || !session) {
       setUserInfo(null);
@@ -44,19 +70,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    tokenRef.current = session.access_token;
-
     try {
-      const res = await fetch(`${API_URL}/api/user/sync`, {
+      const res = await fetchWithTimeout(`${API_URL}/api/user/sync`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
 
       if (res.status === 404) {
-        const metadata = (user.user_metadata ?? {}) as Record<string, string | undefined>;
-        const bodyBackend = buildUserCreationPayload(user.id, user.email ?? undefined, metadata);
+        const bodyBackend = buildUserCreationPayload(
+          user.id,
+          user.email ?? undefined,
+          (user.user_metadata ?? {}) as Record<string, string | undefined>,
+        );
 
-        const creationRes = await fetch(`${API_URL}/api/user/update`, {
+        const creationRes = await fetchWithTimeout(`${API_URL}/api/user/update`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -86,15 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         origin: 'USER_SYNC_GET',
         code: 'USER_SYNC_ERROR',
       });
-      const metadata = (user.user_metadata ?? {}) as Record<string, string | undefined>;
-      setUserInfo({
-        uid: user.id,
-        email: user.email ?? '',
-        displayName: metadata.full_name ?? metadata.name ?? null,
-        photoUrl: null,
-        emailEnabled: true,
-        pushEnabled: true,
-      } as UserInfo);
+      setUserInfo(getLocalUserInfo(user));
     } finally {
       setIsLoading(false);
     }
@@ -106,13 +125,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         void reloadUser(session as SessionLike);
-      } else if (event === 'TOKEN_REFRESHED' && session) {
-        if (tokenRef.current && tokenRef.current !== session.access_token) {
-          void reloadUser(session as SessionLike);
-        }
       } else if (event === 'SIGNED_OUT') {
         setUserInfo(null);
-        tokenRef.current = null;
       }
     });
 

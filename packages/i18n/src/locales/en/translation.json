@@ -292,7 +292,9 @@
   },
   "auth_callback": {
     "loading": "Connecting...",
-    "session_error": "Session recovery failed after OAuth",
+    "missing_payload": "The link opened without session information. Reopen the latest email or request a new link.",
+    "session_error": "Session recovery failed",
+    "session_unavailable": "The link opened, but the session could not be created. Reopen the latest email or request a new link.",
     "success": "Successful connection via callback"
   },
   "back": "Back",
@@ -784,6 +786,7 @@
     "invalid_link": "Invalid or expired reset link.",
     "invalid_session": "Invalid session. Please request a link again.",
     "new_password_label": "New Password",
+    "request_new_link": "Request a new link",
     "save_password": "Save password",
     "saving": "Registration...",
     "success": "Your password has been changed successfully.",

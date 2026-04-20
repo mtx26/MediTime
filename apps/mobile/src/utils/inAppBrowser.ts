@@ -6,6 +6,7 @@ import { buildAuthCallbackUrl } from '@meditime/utils';
 
 // Utilise la variable d'env unifiée pour le callback auth mobile
 const configuredAuthRedirectUrl = process.env.EXPO_PUBLIC_AUTH_REDIRECT_URL?.trim();
+const configuredWebUrl = process.env.EXPO_PUBLIC_WEB_URL?.trim();
 
 export const MOBILE_AUTH_CALLBACK_URL =
   configuredAuthRedirectUrl || Linking.createURL('auth/callback');
@@ -22,6 +23,19 @@ export function buildMobileAuthCallbackUrl(type?: string, redirect?: string) {
   } catch {
     return buildAuthCallbackUrl(MOBILE_AUTH_CALLBACK_URL, redirect, '', type);
   }
+}
+
+export function buildWebResetPasswordCallbackUrl() {
+  if (!configuredWebUrl) {
+    throw new Error('Missing EXPO_PUBLIC_WEB_URL');
+  }
+
+  return buildAuthCallbackUrl(
+    configuredWebUrl.replace(/\/+$/, ''),
+    undefined,
+    '/auth/callback',
+    'recovery',
+  );
 }
 
 WebBrowser.maybeCompleteAuthSession();

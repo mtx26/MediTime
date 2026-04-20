@@ -1,7 +1,7 @@
-import { KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, H2, Input, Text, XStack, YStack } from 'tamagui';
+import { Button, Text, XStack, YStack } from 'tamagui';
+import { AuthPageShell, PasswordInput } from '../components/auth';
 import { InfoBanner } from '../components/common/InfoBanner';
 import { LoadingIndicator } from '../components/common/LoadingIndicator';
 import { useResetPasswordConfirm } from '../hooks/auth/useResetPasswordConfirm';
@@ -17,28 +17,12 @@ export default function ResetPasswordConfirmScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
+    <AuthPageShell
+      iconName="lock-closed-outline"
+      title={String(t('reset_password_confirm.title'))}
+      description={String(t('reset_password_confirm.instructions'))}
     >
-      <YStack
-        flex={1}
-        gap="$4"
-        style={{
-          justifyContent: 'center',
-          padding: 20,
-          backgroundColor: ios.background,
-        }}
-      >
-        <YStack gap="$2">
-          <H2 style={{ textAlign: 'center' }} color="$color">
-            {t('reset_password_confirm.title')}
-          </H2>
-          <Text style={{ textAlign: 'center' }} color="$gray10" fontSize="$4">
-            {t('reset_password_confirm.instructions')}
-          </Text>
-        </YStack>
-
+      <YStack gap="$4">
         {resetPasswordConfirm.success && (
           <InfoBanner iconName="checkmark-circle-outline" text={String(t('reset_password_confirm.success'))} />
         )}
@@ -47,29 +31,14 @@ export default function ResetPasswordConfirmScreen() {
           <InfoBanner iconName="warning-outline" text={resetPasswordConfirm.error} tone="warning" />
         )}
 
-        <XStack style={{ alignItems: 'center' }} gap="$2">
-          <Ionicons name="lock-closed-outline" size={20} color={ios.mutedForeground} />
-          <Input
-            flex={1}
-            size="$4"
-            placeholder={t('reset_password_confirm.new_password_label')}
-            value={resetPasswordConfirm.password}
-            onChangeText={resetPasswordConfirm.setPassword}
-            secureTextEntry={!resetPasswordConfirm.showPassword}
-            autoComplete="new-password"
-          />
-          <Button
-            size="$3"
-            chromeless
-            onPress={() => resetPasswordConfirm.setShowPassword(!resetPasswordConfirm.showPassword)}
-          >
-            <Ionicons
-              name={resetPasswordConfirm.showPassword ? 'eye-off-outline' : 'eye-outline'}
-              size={20}
-              color={ios.mutedForeground}
-            />
-          </Button>
-        </XStack>
+        <PasswordInput
+          placeholder={String(t('reset_password_confirm.new_password_label'))}
+          value={resetPasswordConfirm.password}
+          onChangeText={resetPasswordConfirm.setPassword}
+          visible={resetPasswordConfirm.showPassword}
+          onVisibleChange={resetPasswordConfirm.setShowPassword}
+          autoComplete="new-password"
+        />
 
         <Button
           size="$4"
@@ -92,6 +61,6 @@ export default function ResetPasswordConfirmScreen() {
           </XStack>
         </Button>
       </YStack>
-    </KeyboardAvoidingView>
+    </AuthPageShell>
   );
 }

@@ -1,9 +1,8 @@
-import { Pressable, RefreshControl } from 'react-native';
+import { RefreshControl } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { Button, ScrollView, Text, XStack, YStack } from 'tamagui';
+import { ScrollView, Text, YStack } from 'tamagui';
 import ActionSheet from '../components/common/ActionSheet';
 import { InfoBanner } from '../components/common/InfoBanner';
 import { LoadingIndicator } from '../components/common/LoadingIndicator';
@@ -90,33 +89,12 @@ export default function CalendarDetailScreen({
             backgroundColor: ios.background,
           }}
         >
-          <Button
-            onPress={detail.goToBoxes}
-            style={{
-              minHeight: 44,
-              borderRadius: 8,
-              backgroundColor: ios.card,
-              borderWidth: 1,
-              borderColor: ios.border,
-            }}
-          >
-            <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              <Ionicons name="medkit-outline" size={18} color={ios.primary} />
-              <Text style={{ color: ios.foreground, fontWeight: '800' }}>{t('medicines.label')}</Text>
-            </XStack>
-          </Button>
-
           {detail.error && (
             <InfoBanner iconName="warning-outline" text={detail.error} tone="warning" />
           )}
 
           {detail.isLowStock && (
-            <Pressable
-              onPress={detail.goToStockAlerts}
-              accessibilityRole="button"
-            >
-              <InfoBanner iconName="warning-outline" text={String(t('stock_alert'))} tone="warning" />
-            </Pressable>
+            <InfoBanner iconName="warning-outline" text={String(t('stock_alert'))} tone="warning" />
           )}
 
           <MobileCalendarWeekSelector
@@ -127,30 +105,6 @@ export default function CalendarDetailScreen({
 
           {detail.showBackendLoading && (
             <LoadingIndicator label={String(t('loading_calendar'))} />
-          )}
-
-          {detail.showPillboxShortcut && (
-            <YStack style={{ gap: 10 }}>
-              <XStack style={{ alignItems: 'center', gap: 8 }}>
-                <Ionicons name="grid-outline" size={20} color={ios.primary} />
-                <Text style={{ color: ios.foreground, fontSize: 16, fontWeight: '800' }}>
-                  {t('pillbox.title')}
-                </Text>
-              </XStack>
-              <Button
-                onPress={detail.goToPillbox}
-                style={{
-                  minHeight: 44,
-                  borderRadius: 8,
-                  backgroundColor: ios.blueInfoBg,
-                }}
-              >
-                <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <Ionicons name="grid-outline" size={18} color={ios.primary} />
-                  <Text style={{ color: ios.primary, fontWeight: '900' }}>{t('pillbox.fill')}</Text>
-                </XStack>
-              </Button>
-            </YStack>
           )}
 
           {detail.hasCalendarItems ? (

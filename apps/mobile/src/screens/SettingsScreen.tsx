@@ -74,6 +74,7 @@ export default function SettingsScreen() {
             onOldPasswordVisibleChange={settings.setOldPasswordVisible}
             onNewPasswordVisibleChange={settings.setNewPasswordVisible}
             onUpdatePassword={settings.updatePassword}
+            onResetPassword={settings.resetPassword}
             onConnectProvider={settings.connectProvider}
           />
         )}
@@ -122,15 +123,6 @@ export default function SettingsScreen() {
             borderTopColor: ios.border,
           }}
         >
-          <Button size="$4" onPress={() => void settings.resetPassword()}>
-            <XStack style={{ alignItems: 'center', gap: 8 }}>
-              <Ionicons name="mail-outline" size={18} color={ios.primary} />
-              <Text style={{ color: ios.primary, fontWeight: '800' }}>
-                {t('reset_password.title')}
-              </Text>
-            </XStack>
-          </Button>
-
           <Button size="$4" onPress={settings.confirmLogout}>
             <XStack style={{ alignItems: 'center', gap: 8 }}>
               <Ionicons name="log-out-outline" size={18} color={ios.destructive} />

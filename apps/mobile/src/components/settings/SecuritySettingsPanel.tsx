@@ -21,6 +21,7 @@ export function SecuritySettingsPanel({
   onOldPasswordVisibleChange,
   onNewPasswordVisibleChange,
   onUpdatePassword,
+  onResetPassword,
   onConnectProvider,
 }: MobileSecuritySettingsProps<keyof typeof Ionicons.glyphMap>) {
   const { t } = useTranslation();
@@ -216,6 +217,15 @@ export function SecuritySettingsPanel({
           onPress={onUpdatePassword}
         >
           {t('security.update_password')}
+        </Button>
+
+        <Button size="$4" onPress={onResetPassword}>
+          <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <Ionicons name="mail-outline" size={18} color={ios.primary} />
+            <Text style={{ color: ios.primary, fontWeight: '800' }}>
+              {t('reset_password.title')}
+            </Text>
+          </XStack>
         </Button>
       </SettingsPanelSection>
     </YStack>

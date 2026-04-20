@@ -29,6 +29,13 @@ export default function AuthCallbackScreen() {
         text={callback.error ?? String(t('auth_callback.session_error'))}
         tone="warning"
       />
+      {callback.isRecovery && (
+        <Button size="$4" theme="blue" onPress={callback.requestNewResetLink}>
+          <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
+            {t('reset_password_confirm.request_new_link')}
+          </Text>
+        </Button>
+      )}
       <Button size="$4" theme="blue" onPress={callback.backToLogin}>
         <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
           {t('auth.back_to_login')}

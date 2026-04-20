@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, H2, Input, ScrollView, Separator, Text, XStack, YStack } from 'tamagui';
 import type { AuthScreenProps } from '@meditime/types';
-import { AuthModeToggle, SocialProviderButton } from '../components/auth';
+import { AuthModeToggle, PasswordInput, SocialProviderButton } from '../components/auth';
 import { InfoBanner } from '../components/common/InfoBanner';
 import { useAuthForm } from '../hooks/auth/useAuthForm';
 import { useIosTheme } from '../theme/ios';
@@ -175,28 +175,13 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
                 <Text style={{ color: ios.foreground, fontSize: 13, fontWeight: '800' }}>
                   {t('auth.password')}
                 </Text>
-                <XStack style={{ alignItems: 'center', gap: 9 }}>
-                  <Ionicons name="lock-closed-outline" size={20} color={ios.mutedForeground} />
-                  <Input
-                    flex={1}
-                    size="$4"
-                    value={auth.password}
-                    onChangeText={auth.setPassword}
-                    secureTextEntry={!auth.passwordVisible}
-                    autoComplete={isLogin ? 'current-password' : 'new-password'}
-                  />
-                  <Button
-                    size="$3"
-                    chromeless
-                    onPress={() => auth.setPasswordVisible(!auth.passwordVisible)}
-                  >
-                    <Ionicons
-                      name={auth.passwordVisible ? 'eye-off-outline' : 'eye-outline'}
-                      size={20}
-                      color={ios.mutedForeground}
-                    />
-                  </Button>
-                </XStack>
+                <PasswordInput
+                  value={auth.password}
+                  onChangeText={auth.setPassword}
+                  visible={auth.passwordVisible}
+                  onVisibleChange={auth.setPasswordVisible}
+                  autoComplete={isLogin ? 'current-password' : 'new-password'}
+                />
               </YStack>
 
               {isLogin && (

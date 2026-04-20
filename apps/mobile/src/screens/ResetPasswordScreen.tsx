@@ -1,8 +1,8 @@
-import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, H2, Input, Text, XStack, YStack } from 'tamagui';
+import { Button, Input, Text, XStack, YStack } from 'tamagui';
+import { AuthPageShell } from '../components/auth';
 import { InfoBanner } from '../components/common/InfoBanner';
 import { useResetPassword } from '../hooks/auth/useResetPassword';
 import { useIosTheme } from '../theme/ios';
@@ -14,28 +14,12 @@ export default function ResetPasswordScreen() {
   const resetPassword = useResetPassword();
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
+    <AuthPageShell
+      iconName="mail-outline"
+      title={String(t('reset_password.title'))}
+      description={String(t('reset_password.instructions'))}
     >
-      <YStack
-        flex={1}
-        gap="$4"
-        style={{
-          justifyContent: 'center',
-          padding: 20,
-          backgroundColor: ios.background,
-        }}
-      >
-        <YStack gap="$2">
-          <H2 style={{ textAlign: 'center' }} color="$color">
-            {t('reset_password.title')}
-          </H2>
-          <Text style={{ textAlign: 'center' }} color="$gray10" fontSize="$4">
-            {t('reset_password.instructions')}
-          </Text>
-        </YStack>
-
+      <YStack gap="$4">
         {resetPassword.sent && (
           <InfoBanner iconName="checkmark-circle-outline" text={String(t('reset_password.success'))} />
         )}
@@ -84,6 +68,6 @@ export default function ResetPasswordScreen() {
           </Text>
         </Button>
       </YStack>
-    </KeyboardAvoidingView>
+    </AuthPageShell>
   );
 }

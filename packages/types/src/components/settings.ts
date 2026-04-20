@@ -83,6 +83,7 @@ export interface MobileSecuritySettingsProps<TIconName = string> {
   onOldPasswordVisibleChange: (value: boolean) => void;
   onNewPasswordVisibleChange: (value: boolean) => void;
   onUpdatePassword: () => void;
+  onResetPassword: () => void;
   onConnectProvider: (provider: OAuthProvider) => void;
 }
 
