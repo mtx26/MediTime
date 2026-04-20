@@ -49,13 +49,15 @@ const OAUTH_PROVIDER_OPTIONS: Record<string, OAuthProviderOptions> = {
 export function buildAuthCallbackUrl(
   origin: string,
   redirect: string | null | undefined,
-  callbackPath = '/auth/callback'
+  callbackPath = '/auth/callback',
+  type?: string | null
 ): string {
-  return (
-    origin +
-    callbackPath +
-    (redirect ? `?redirect=${encodeURIComponent(redirect)}` : '')
-  );
+  const params = new URLSearchParams();
+  if (type) params.set('type', type);
+  if (redirect) params.set('redirect', redirect);
+
+  const query = params.toString();
+  return origin + callbackPath + (query ? `?${query}` : '');
 }
 
 export function buildUserUpdatePayload({

@@ -12,8 +12,8 @@ import type { UpdateUserInfoPayload } from '@meditime/types';
 // URL de l'API
 const API_URL = import.meta.env.VITE_API_URL;
 
-function buildCallbackUrl(redirect?: string): string {
-  return buildAuthCallbackUrl(window.location.origin, redirect);
+function buildCallbackUrl(redirect?: string, type?: string): string {
+  return buildAuthCallbackUrl(window.location.origin, redirect, '/auth/callback', type);
 }
 
 // ─── Shared auth service (used by both web & mobile) ────────────────────────

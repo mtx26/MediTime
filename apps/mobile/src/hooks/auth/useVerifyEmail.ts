@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { log } from '@meditime/utils';
 import { useAuth } from './useAuth';
 import { supabase } from '../../services/supabase';
-
-const EMAIL_REDIRECT_TO = 'meditime://auth/callback';
+import { buildMobileAuthCallbackUrl } from '../../utils/inAppBrowser';
 
 export function useVerifyEmail() {
   const { t } = useTranslation();
@@ -59,7 +58,7 @@ export function useVerifyEmail() {
       type: 'signup',
       email: user.email,
       options: {
-        emailRedirectTo: EMAIL_REDIRECT_TO,
+        emailRedirectTo: buildMobileAuthCallbackUrl('signup'),
       },
     });
 

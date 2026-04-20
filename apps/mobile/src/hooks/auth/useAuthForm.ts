@@ -8,7 +8,7 @@ import { useAuth } from './useAuth';
 import { supabase } from '../../services/supabase';
 import {
   applySupabaseAuthCallback,
-  MOBILE_AUTH_CALLBACK_URL,
+  buildMobileAuthCallbackUrl,
   openAuthUrlInApp,
 } from '../../utils';
 
@@ -113,7 +113,7 @@ export function useAuthForm(initialMode: AuthMode) {
 
     try {
       const options = {
-        ...getOAuthSignInOptions(provider, MOBILE_AUTH_CALLBACK_URL),
+        ...getOAuthSignInOptions(provider, buildMobileAuthCallbackUrl('oauth')),
         skipBrowserRedirect: true,
       };
       const { data, error: oauthError } = await supabase.auth.signInWithOAuth({

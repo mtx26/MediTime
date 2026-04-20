@@ -15,7 +15,7 @@ import { useAppTheme } from '../../theme/ios';
 import { MOBILE_LANGUAGE_STORAGE_KEY } from '../../i18n';
 import {
   applySupabaseAuthCallback,
-  MOBILE_AUTH_CALLBACK_URL,
+  buildMobileAuthCallbackUrl,
   openAuthUrlInApp,
 } from '../../utils';
 
@@ -260,7 +260,7 @@ export function useSettings() {
       const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          ...getOAuthSignInOptions(provider, MOBILE_AUTH_CALLBACK_URL),
+          ...getOAuthSignInOptions(provider, buildMobileAuthCallbackUrl('oauth')),
           skipBrowserRedirect: true,
         },
       });
@@ -337,7 +337,7 @@ export function useSettings() {
     if (!userInfo?.email) return;
 
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(userInfo.email, {
-      redirectTo: MOBILE_AUTH_CALLBACK_URL,
+      redirectTo: buildMobileAuthCallbackUrl('recovery'),
     });
 
     if (resetError) {

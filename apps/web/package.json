@@ -78,7 +78,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:i18n && vite build",
+    "build": "npm run build:i18n && npm run build:aasa && vite build",
+    "build:aasa": "node ../../scripts/generate-apple-app-site-association.cjs",
     "build:i18n": "node ../../scripts/generate-i18n-manifests.js",
     "i18n:sync": "node ../../scripts/i18n/run.js",
     "type-check": "node ../../node_modules/typescript/bin/tsc --noEmit -p tsconfig.json",

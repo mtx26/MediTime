@@ -2,12 +2,13 @@ import { createContext, useState, useEffect, useCallback, useRef, type ReactNode
 import { supabase } from '../services/supabase';
 import { log, mapApiResponseToUserInfo, buildUserCreationPayload, createAuthService } from '@meditime/utils';
 import type { UserInfo, SessionLike, ReloadUserFn } from '@meditime/types';
+import { buildMobileAuthCallbackUrl } from '../utils/inAppBrowser';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL!;
 
 const authService = createAuthService(
   supabase,
-  (_redirect?: string) => 'meditime://auth/callback',
+  (redirect?: string, type?: string) => buildMobileAuthCallbackUrl(type, redirect),
 );
 
 export { authService };

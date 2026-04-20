@@ -4,7 +4,7 @@ import { supabase } from '@/services/supabase/supabaseClient';
 import { UserContext, getGlobalReloadUser } from '@/contexts/UserContext';
 import type { UserContextValue } from '@meditime/types';
 import { useAlert } from '@/contexts/AlertContext';
-import { log } from '@meditime/utils';
+import { buildAuthCallbackUrl, log } from '@meditime/utils';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Mail } from 'lucide-react';
@@ -54,7 +54,7 @@ function VerifyEmailForm() {
           type: 'signup',
           email: user.email!,
           options: {
-            emailRedirectTo: `${window.location.origin}/${lng}/auth/callback`,
+            emailRedirectTo: buildAuthCallbackUrl(window.location.origin, undefined, `/${lng}/auth/callback`, 'signup'),
           },
         });
         showAlert('success', t('auth.verification_sent'));

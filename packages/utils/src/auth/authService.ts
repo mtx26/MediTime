@@ -42,7 +42,10 @@ function getErrorMessage(error: unknown, fallback: string): string {
  * Creates a platform-agnostic auth service.
  * Web and mobile each pass their own Supabase client instance.
  */
-export function createAuthService(supabase: SupabaseClient, buildCallbackUrl: (redirect?: string) => string) {
+export function createAuthService(
+  supabase: SupabaseClient,
+  buildCallbackUrl: (redirect?: string, type?: string) => string,
+) {
   async function loginWithEmail(email: string, password: string): Promise<AuthError | null> {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -75,7 +78,7 @@ export function createAuthService(supabase: SupabaseClient, buildCallbackUrl: (r
         email,
         password,
         options: {
-          emailRedirectTo: buildCallbackUrl(redirect),
+          emailRedirectTo: buildCallbackUrl(redirect, 'signup'),
           data: { full_name: name },
         },
       });
@@ -112,7 +115,7 @@ export function createAuthService(supabase: SupabaseClient, buildCallbackUrl: (r
   async function resetPassword(email: string): Promise<void> {
     try {
       await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: buildCallbackUrl(),
+        redirectTo: buildCallbackUrl(undefined, 'recovery'),
       });
     } catch (error: unknown) {
       log.error("Erreur lors de l'envoi de l'email de réinitialisation :", {
@@ -128,7 +131,7 @@ export function createAuthService(supabase: SupabaseClient, buildCallbackUrl: (r
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: buildCallbackUrl(redirect),
+          emailRedirectTo: buildCallbackUrl(redirect, 'magiclink'),
         },
       });
       if (error) {
@@ -192,7 +195,7 @@ export function createAuthService(supabase: SupabaseClient, buildCallbackUrl: (r
     try {
       await supabase.auth.signInWithOAuth({
         provider,
-        options: getOAuthSignInOptions(provider, buildCallbackUrl(redirect)) as unknown as Record<string, unknown>,
+        options: getOAuthSignInOptions(provider, buildCallbackUrl(redirect, 'oauth')) as unknown as Record<string, unknown>,
       });
     } catch (err: unknown) {
       log.error(getErrorMessage(err, `Erreur lors de la connexion avec ${providerLabel ?? provider}`), err, {
