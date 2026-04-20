@@ -1,7 +1,7 @@
 import { Redirect, Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Spinner, YStack } from 'tamagui';
 import { useAuth } from '../../src/hooks/auth/useAuth';
@@ -37,6 +37,14 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: ios.mutedForeground,
         tabBarStyle: {
           height: tabBarHeight + 4,
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,
           paddingTop: 7,
           paddingBottom: tabBarPaddingBottom,
           borderTopWidth: 1,
@@ -57,6 +65,7 @@ export default function TabsLayout() {
         tabBarItemStyle: {
           borderRadius: 8,
           minHeight: 50,
+          marginHorizontal: 6,
           paddingVertical: 2,
         },
         tabBarIconStyle: {
@@ -79,25 +88,47 @@ export default function TabsLayout() {
           title: t('calendars'),
           tabBarLabel: t('calendars'),
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'calendar' : 'calendar-outline'}
-              size={24}
-              color={color}
-            />
+            <View
+              style={{
+                width: 34,
+                height: 28,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 8,
+                backgroundColor: focused ? ios.blueInfoBg : 'transparent',
+              }}
+            >
+              <Ionicons
+                name={focused ? 'calendar' : 'calendar-outline'}
+                size={24}
+                color={color}
+              />
+            </View>
           ),
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="settings/index"
         options={{
           title: t('settings.label'),
           tabBarLabel: t('settings.label'),
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'settings' : 'settings-outline'}
-              size={24}
-              color={color}
-            />
+            <View
+              style={{
+                width: 34,
+                height: 28,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 8,
+                backgroundColor: focused ? ios.blueInfoBg : 'transparent',
+              }}
+            >
+              <Ionicons
+                name={focused ? 'settings' : 'settings-outline'}
+                size={24}
+                color={color}
+              />
+            </View>
           ),
         }}
       />

@@ -6,6 +6,7 @@ import { getValidRedirect, log } from '@meditime/utils';
 import type { SessionLike } from '@meditime/types';
 import { useAuth } from './useAuth';
 import { supabase } from '../../services/supabase';
+import { applySupabaseAuthParams, collectAuthCallbackParams } from '../../utils';
 
 type RouteParamValue = string | string[] | undefined;
 type CallbackParams = Record<string, string | undefined>;
@@ -21,32 +22,6 @@ const redirectMap = new Map([
 
 function firstParam(value: RouteParamValue) {
   return Array.isArray(value) ? value[0] : value;
-}
-
-function collectSearchParams(input: string | null | undefined) {
-  const collected: CallbackParams = {};
-  if (!input) return collected;
-
-  const pushParams = (raw: string) => {
-    const params = new URLSearchParams(raw);
-    params.forEach((value, key) => {
-      collected[key] = value;
-    });
-  };
-
-  const queryIndex = input.indexOf('?');
-  const hashIndex = input.indexOf('#');
-
-  if (queryIndex >= 0) {
-    const end = hashIndex >= 0 && hashIndex > queryIndex ? hashIndex : input.length;
-    pushParams(input.slice(queryIndex + 1, end));
-  }
-
-  if (hashIndex >= 0) {
-    pushParams(input.slice(hashIndex + 1));
-  }
-
-  return collected;
 }
 
 function getRouteParams(params: Record<string, RouteParamValue>) {
@@ -101,27 +76,13 @@ export function useAuthCallback() {
     const handleCallback = async () => {
       try {
         const initialUrl = await Linking.getInitialURL();
-        const urlCallbackParams = collectSearchParams(initialUrl);
+        const urlCallbackParams = collectAuthCallbackParams(initialUrl);
         const params = {
           ...urlCallbackParams,
           ...routeCallbackParams,
         };
 
-        const callbackError = params.error_description ?? params.error;
-        if (callbackError) {
-          throw new Error(callbackError);
-        }
-
-        if (params.code) {
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(params.code);
-          if (exchangeError) throw exchangeError;
-        } else if (params.access_token && params.refresh_token) {
-          const { error: setSessionError } = await supabase.auth.setSession({
-            access_token: params.access_token,
-            refresh_token: params.refresh_token,
-          });
-          if (setSessionError) throw setSessionError;
-        }
+        await applySupabaseAuthParams(supabase, params);
 
         const {
           data: { session },

@@ -1,6 +1,7 @@
-import { lazy, Suspense, useCallback, useState } from 'react';
-import { Alert, Linking, RefreshControl } from 'react-native';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { Alert, RefreshControl } from 'react-native';
+import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Spinner, Text, YStack } from 'tamagui';
@@ -24,12 +25,6 @@ const AddCalendarModal = lazy(() =>
   })),
 );
 
-const PdfDialog = lazy(() =>
-  import('../components/calendar/PdfDialog').then((module) => ({
-    default: module.PdfDialog,
-  })),
-);
-
 export default function CalendarsScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -39,9 +34,6 @@ export default function CalendarsScreen() {
   const bottomContentInset = 56 + insets.bottom + 14;
   const [renameValues, setRenameValues] = useState<Record<string, string>>({});
   const [renameMode, setRenameMode] = useState<string | null>(null);
-  const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
-  const [pdfCalendarId, setPdfCalendarId] = useState<string | null>(null);
-  const [includeInactive, setIncludeInactive] = useState(false);
 
   const calendars = useCalendars();
   const {
@@ -66,11 +58,9 @@ export default function CalendarsScreen() {
     saveAnalysisResult: calendars.saveAnalysisResult,
   });
 
-  useFocusEffect(
-    useCallback(() => {
-      void loadCalendars();
-    }, [loadCalendars]),
-  );
+  useEffect(() => {
+    void loadCalendars();
+  }, [loadCalendars]);
 
   const translate = useCallback((key: string) => String(t(key)), [t]);
 
@@ -81,19 +71,13 @@ export default function CalendarsScreen() {
     [router],
   );
 
-  const openPdfDialog = (calendarId: string) => {
-    setPdfCalendarId(calendarId);
-    setIncludeInactive(false);
-    setPdfDialogOpen(true);
-  };
-
-  const handleDownloadPdf = async () => {
-    if (!pdfCalendarId) return;
-
-    const url = getPersonalCalendarPdfUrl(pdfCalendarId, includeInactive);
-    setPdfDialogOpen(false);
+  const openCalendarPdf = async (calendarId: string) => {
+    const url = getPersonalCalendarPdfUrl(calendarId, false);
     try {
-      await Linking.openURL(url);
+      await WebBrowser.openBrowserAsync(url, {
+        dismissButtonStyle: 'close',
+        presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
+      });
     } catch {
       Alert.alert(String(t('api.calendar.pdf_download_error')), String(t('api.calendar.pdf_download_error')));
     }
@@ -166,7 +150,7 @@ export default function CalendarsScreen() {
         {
           onRename: () => setRenameMode(calendar.id),
           onDelete: () => handleDeleteCalendarClick(calendar.id),
-          onExportPdf: () => openPdfDialog(calendar.id),
+          onExportPdf: () => void openCalendarPdf(calendar.id),
         },
         ['pillbox', 'day_view'],
       ),
@@ -180,7 +164,7 @@ export default function CalendarsScreen() {
         { calendarId: calendar.id, lng, basePath: 'shared-user-calendar', selectedDate: null },
         {
           onDelete: () => handleDeleteSharedCalendarClick(calendar.id),
-          onExportPdf: () => openPdfDialog(calendar.id),
+          onExportPdf: () => void openCalendarPdf(calendar.id),
         },
         ['pillbox', 'day_view'],
       ),
@@ -281,14 +265,6 @@ export default function CalendarsScreen() {
       </ScrollView>
 
       <Suspense fallback={null}>
-        <PdfDialog
-          open={pdfDialogOpen}
-          includeInactive={includeInactive}
-          onIncludeInactiveChange={setIncludeInactive}
-          onCancel={() => setPdfDialogOpen(false)}
-          onDownload={handleDownloadPdf}
-        />
-
         <AddCalendarModal
           open={addCalendarFlow.open}
           name={addCalendarFlow.calendarName}

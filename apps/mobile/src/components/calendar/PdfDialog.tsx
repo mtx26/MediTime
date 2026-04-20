@@ -10,7 +10,7 @@ type PdfDialogProps = {
   includeInactive: boolean;
   onIncludeInactiveChange: (value: boolean) => void;
   onCancel: () => void;
-  onDownload: () => void;
+  onDownload: () => void | Promise<void>;
 };
 
 export function PdfDialog({

@@ -1,13 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { getOAuthSignInOptions, log } from '@meditime/utils';
-import type { AuthMode, OAuthProvider } from '@meditime/types';
+import type { AuthMode, OAuthProvider, SessionLike } from '@meditime/types';
 import { authService } from '../../contexts/AuthContext';
+import { useAuth } from './useAuth';
 import { supabase } from '../../services/supabase';
-
-const CALLBACK_URL = 'meditime://auth/callback';
+import {
+  applySupabaseAuthCallback,
+  MOBILE_AUTH_CALLBACK_URL,
+  openAuthUrlInApp,
+} from '../../utils';
 
 const socialProviders: {
   id: OAuthProvider;
@@ -27,6 +30,7 @@ const socialProviders: {
 export function useAuthForm(initialMode: AuthMode) {
   const { t } = useTranslation();
   const router = useRouter();
+  const { reloadUser } = useAuth();
   const [activeMode, setActiveMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,12 +56,7 @@ export function useAuthForm(initialMode: AuthMode) {
     setActiveMode(mode);
     setError(null);
     setSuccess(false);
-    if (mode === 'login') {
-      router.replace('/(auth)/login');
-    } else {
-      router.replace('/(auth)/register');
-    }
-  }, [router]);
+  }, []);
 
   const handleSubmit = useCallback(async () => {
     setError(null);
@@ -114,7 +113,7 @@ export function useAuthForm(initialMode: AuthMode) {
 
     try {
       const options = {
-        ...getOAuthSignInOptions(provider, CALLBACK_URL),
+        ...getOAuthSignInOptions(provider, MOBILE_AUTH_CALLBACK_URL),
         skipBrowserRedirect: true,
       };
       const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
@@ -129,7 +128,22 @@ export function useAuthForm(initialMode: AuthMode) {
       }
 
       if (data.url) {
-        await Linking.openURL(data.url);
+        const callbackUrl = await openAuthUrlInApp(data.url);
+        if (!callbackUrl) return;
+
+        await applySupabaseAuthCallback(supabase, callbackUrl);
+
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+
+        if (sessionError || !session?.user) {
+          throw sessionError ?? new Error(String(t('auth_callback.session_error')));
+        }
+
+        await reloadUser(session as SessionLike);
+        router.replace('/calendars' as never);
       }
     } catch (oauthError) {
       log.error('OAuth mobile error', {
@@ -142,7 +156,7 @@ export function useAuthForm(initialMode: AuthMode) {
     } finally {
       setSocialLoading(null);
     }
-  }, [t]);
+  }, [reloadUser, router, t]);
 
   return {
     activeMode,

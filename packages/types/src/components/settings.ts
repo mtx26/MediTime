@@ -1,4 +1,4 @@
-import type { ApiResult } from '../api';
+import type { ApiResult, OAuthProvider } from '../api';
 
 // ─── FCM / Notification Settings ────────────────────────────────────────────
 
@@ -49,6 +49,13 @@ export interface SettingsPanelSectionProps<TIconName = string, TNode = unknown> 
   children: TNode;
 }
 
+export interface MobileSecurityProviderItem<TIconName = string> {
+  id: OAuthProvider;
+  name: string;
+  iconName: TIconName;
+  color: string;
+}
+
 export interface MobileAccountSettingsProps {
   displayName: string;
   email: string;
@@ -60,18 +67,23 @@ export interface MobileAccountSettingsProps {
   onResetDisplayName: () => void;
 }
 
-export interface MobileSecuritySettingsProps {
+export interface MobileSecuritySettingsProps<TIconName = string> {
   email: string;
   oldPassword: string;
   newPassword: string;
   oldPasswordVisible: boolean;
   newPasswordVisible: boolean;
   isSaving: boolean;
+  providers: MobileSecurityProviderItem<TIconName>[];
+  linkedProviders: string[];
+  loadingProviders: boolean;
+  connectingProvider: string | null;
   onOldPasswordChange: (value: string) => void;
   onNewPasswordChange: (value: string) => void;
   onOldPasswordVisibleChange: (value: boolean) => void;
   onNewPasswordVisibleChange: (value: boolean) => void;
   onUpdatePassword: () => void;
+  onConnectProvider: (provider: OAuthProvider) => void;
 }
 
 export interface MobileNotificationSettingsProps {
@@ -87,7 +99,7 @@ export interface MobileNotificationSettingsProps {
 
 export interface MobilePreferencesSettingsProps {
   language: string;
-  languages: { code: string; label: string }[];
+  languages: { code: string; label: string; flag: string }[];
   themePreference: 'light' | 'dark' | 'system';
   onLanguageChange: (value: string) => void;
   onThemePreferenceChange: (value: 'light' | 'dark' | 'system') => void;

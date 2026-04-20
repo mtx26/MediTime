@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, Platform, Pressable } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, H2, Input, ScrollView, Separator, Text, XStack, YStack } from 'tamagui';
@@ -90,10 +90,14 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
                   backgroundColor: ios.blueInfoBg,
                 }}
               >
-                <Ionicons name="medical-outline" size={32} color={ios.primary} />
+                <Image
+                  source={require('../../assets/icons/og-image.png')}
+                  style={{ width: 48, height: 48 }}
+                  resizeMode="contain"
+                />
               </YStack>
               <H2 style={{ textAlign: 'center', color: ios.foreground }}>
-                MediTime
+                {t('app.shortName')}
               </H2>
               <Text style={{ textAlign: 'center', color: ios.mutedForeground, fontSize: 14, lineHeight: 20 }}>
                 {isLogin ? t('auth.login') : t('auth.register')}

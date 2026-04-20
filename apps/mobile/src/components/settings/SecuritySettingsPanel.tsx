@@ -12,12 +12,17 @@ export function SecuritySettingsPanel({
   oldPasswordVisible,
   newPasswordVisible,
   isSaving,
+  providers,
+  linkedProviders,
+  loadingProviders,
+  connectingProvider,
   onOldPasswordChange,
   onNewPasswordChange,
   onOldPasswordVisibleChange,
   onNewPasswordVisibleChange,
   onUpdatePassword,
-}: MobileSecuritySettingsProps) {
+  onConnectProvider,
+}: MobileSecuritySettingsProps<keyof typeof Ionicons.glyphMap>) {
   const { t } = useTranslation();
   const ios = useIosTheme();
 
@@ -43,6 +48,100 @@ export function SecuritySettingsPanel({
         <Text style={{ color: ios.foreground, fontSize: 15, lineHeight: 22, fontWeight: '800' }}>
           {email}
         </Text>
+
+        <YStack
+          style={{
+            gap: 12,
+            paddingTop: 14,
+            borderTopWidth: 1,
+            borderTopColor: ios.border,
+          }}
+        >
+          <Text style={{ color: ios.foreground, fontSize: 13, lineHeight: 18, fontWeight: '900' }}>
+            {t('security.providers.section_title')}
+          </Text>
+          <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 18 }}>
+            {t('security.providers.help_text')}
+          </Text>
+
+          {loadingProviders ? (
+            <Text style={{ color: ios.mutedForeground, fontSize: 13, lineHeight: 18 }}>
+              {t('loading')}
+            </Text>
+          ) : (
+            <YStack style={{ gap: 10 }}>
+              {providers.map((provider) => {
+                const isLinked = linkedProviders.includes(provider.id);
+                const isConnecting = connectingProvider === provider.id;
+
+                return (
+                  <XStack
+                    key={provider.id}
+                    style={{
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: 12,
+                      borderWidth: 1,
+                      borderColor: ios.border,
+                      borderRadius: 8,
+                      backgroundColor: ios.background,
+                    }}
+                  >
+                    <YStack
+                      style={{
+                        width: 36,
+                        height: 36,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: ios.border,
+                        backgroundColor: ios.card,
+                      }}
+                    >
+                      <Ionicons name={provider.iconName} size={20} color={provider.color} />
+                    </YStack>
+                    <Text
+                      numberOfLines={1}
+                      style={{ flex: 1, color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}
+                    >
+                      {provider.name}
+                    </Text>
+
+                    {isLinked ? (
+                      <XStack
+                        style={{
+                          alignItems: 'center',
+                          gap: 5,
+                          paddingHorizontal: 9,
+                          paddingVertical: 6,
+                          borderRadius: 8,
+                          backgroundColor: ios.successBg,
+                        }}
+                      >
+                        <Ionicons name="checkmark-circle-outline" size={15} color={ios.success} />
+                        <Text style={{ color: ios.success, fontSize: 12, fontWeight: '900' }}>
+                          {t('security.providers.connected')}
+                        </Text>
+                      </XStack>
+                    ) : (
+                      <Button
+                        size="$3"
+                        disabled={Boolean(connectingProvider)}
+                        opacity={isConnecting ? 0.7 : 1}
+                        onPress={() => onConnectProvider(provider.id)}
+                      >
+                        <Text style={{ color: ios.primary, fontSize: 12, fontWeight: '900' }}>
+                          {isConnecting ? t('security.providers.connecting') : t('security.providers.connect')}
+                        </Text>
+                      </Button>
+                    )}
+                  </XStack>
+                );
+              })}
+            </YStack>
+          )}
+        </YStack>
       </SettingsPanelSection>
 
       <SettingsPanelSection

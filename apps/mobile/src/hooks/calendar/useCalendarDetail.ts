@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Linking } from 'react-native';
+import { Alert } from 'react-native';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { useTranslation } from 'react-i18next';
 import { STOCK_DECREMENT_METHODS } from '@meditime/constants';
 import {
@@ -222,13 +223,16 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     );
   };
 
-  const handleExportPdf = async () => {
+  const handleExportPdf = () => {
     if (!calendarId) return;
-    try {
-      await Linking.openURL(source.getPdfUrl(calendarId, false));
-    } catch {
-      Alert.alert(String(t('api.calendar.pdf_download_error')), String(t('api.calendar.pdf_download_error')));
-    }
+    void WebBrowser
+      .openBrowserAsync(source.getPdfUrl(calendarId, false), {
+        dismissButtonStyle: 'close',
+        presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
+      })
+      .catch(() => {
+        Alert.alert(String(t('api.calendar.pdf_download_error')), String(t('api.calendar.pdf_download_error')));
+      });
   };
 
   const actions = useMemo(() => {
@@ -237,7 +241,7 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     const context = { calendarId, lng, basePath, selectedDate };
     const handlers = {
       onDelete: handleDelete,
-      onExportPdf: () => void handleExportPdf(),
+      onExportPdf: handleExportPdf,
     };
     const items = sourceType === 'personal'
       ? buildPersonalCalendarActions(

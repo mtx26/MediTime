@@ -2,16 +2,22 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import * as SecureStore from 'expo-secure-store';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { getLabel, enabledLanguageCodes } from '@meditime/config';
+import { enabledLanguageCodes, getFlag, getLabel } from '@meditime/config';
 import { SETTINGS_TABS } from '@meditime/constants';
-import { buildUserUpdatePayload, log, performApiCall } from '@meditime/utils';
-import type { SettingsTabId, SettingsTabItem } from '@meditime/types';
-import { authService } from '../../contexts/AuthContext';
+import { buildUserUpdatePayload, getOAuthSignInOptions, log, performApiCall } from '@meditime/utils';
+import type { OAuthProvider, SettingsTabId, SettingsTabItem } from '@meditime/types';
 import { useAuth } from '../auth/useAuth';
 import { supabase } from '../../services/supabase';
 import { useAppTheme } from '../../theme/ios';
+import { MOBILE_LANGUAGE_STORAGE_KEY } from '../../i18n';
+import {
+  applySupabaseAuthCallback,
+  MOBILE_AUTH_CALLBACK_URL,
+  openAuthUrlInApp,
+} from '../../utils';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL!;
 
@@ -39,8 +45,9 @@ export function useSettings() {
   const [emailEnabled, setEmailEnabled] = useState(Boolean(userInfo?.emailEnabled));
   const [pushEnabled, setPushEnabled] = useState(Boolean(userInfo?.pushEnabled));
   const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [linkedProviders, setLinkedProviders] = useState<string[]>([]);
+  const [loadingProviders, setLoadingProviders] = useState(true);
+  const [connectingProvider, setConnectingProvider] = useState<OAuthProvider | null>(null);
 
   useEffect(() => {
     setActiveTabState(normalizeTab(params.tab));
@@ -55,33 +62,27 @@ export function useSettings() {
     setPushEnabled(Boolean(userInfo?.pushEnabled));
   }, [userInfo?.emailEnabled, userInfo?.pushEnabled]);
 
-  useEffect(() => {
-    let active = true;
+  const refreshNotificationTime = useCallback(async () => {
+    if (!userInfo?.uid) return;
 
-    const loadNotificationTime = async () => {
-      if (!userInfo?.uid) return;
+    const result = await performApiCall({
+      url: `${API_URL}/api/user/notification-time`,
+      method: 'GET',
+      origin: 'NOTIFICATION_TIME_FETCH',
+      uid: userInfo.uid,
+    });
 
-      const result = await performApiCall({
-        url: `${API_URL}/api/user/notification-time`,
-        method: 'GET',
-        origin: 'NOTIFICATION_TIME_FETCH',
-        uid: userInfo.uid,
-      });
+    if (!result.success) return;
 
-      if (!active || !result.success) return;
-
-      const time = typeof result.notification_time === 'string'
-        ? result.notification_time.slice(0, 5)
-        : '';
-      setNotificationTime(time);
-    };
-
-    void loadNotificationTime();
-
-    return () => {
-      active = false;
-    };
+    const time = typeof result.notification_time === 'string'
+      ? result.notification_time.slice(0, 5)
+      : '';
+    setNotificationTime(time);
   }, [userInfo?.uid]);
+
+  useEffect(() => {
+    void refreshNotificationTime();
+  }, [refreshNotificationTime]);
 
   const tabs = useMemo<SettingsTabItem<keyof typeof Ionicons.glyphMap>[]>(() => [
     { id: SETTINGS_TABS.ACCOUNT as SettingsTabId, label: String(t('settings.account')), iconName: 'person-circle-outline' },
@@ -90,9 +91,40 @@ export function useSettings() {
     { id: SETTINGS_TABS.PREFERENCES as SettingsTabId, label: String(t('settings.preferences')), iconName: 'options-outline' },
   ], [t]);
 
+  const availableProviders = useMemo(() => [
+    { id: 'google' as OAuthProvider, name: 'Google', iconName: 'logo-google' as keyof typeof Ionicons.glyphMap, color: '#DB4437' },
+    { id: 'github' as OAuthProvider, name: 'GitHub', iconName: 'logo-github' as keyof typeof Ionicons.glyphMap, color: '#111111' },
+    { id: 'twitter' as OAuthProvider, name: 'Twitter', iconName: 'logo-twitter' as keyof typeof Ionicons.glyphMap, color: '#111111' },
+    { id: 'facebook' as OAuthProvider, name: 'Facebook', iconName: 'logo-facebook' as keyof typeof Ionicons.glyphMap, color: '#1877F2' },
+    { id: 'discord' as OAuthProvider, name: 'Discord', iconName: 'logo-discord' as keyof typeof Ionicons.glyphMap, color: '#5865F2' },
+    { id: 'azure' as OAuthProvider, name: 'Microsoft', iconName: 'logo-windows' as keyof typeof Ionicons.glyphMap, color: '#5E5E5E' },
+  ], []);
+
+  const refreshLinkedProviders = useCallback(async () => {
+    setLoadingProviders(true);
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      setLinkedProviders(user?.identities?.map((identity) => identity.provider) ?? []);
+    } catch (providerError) {
+      log.error('Erreur lors du chargement des providers', {
+        origin: 'MOBILE_SETTINGS_PROVIDERS',
+        error: providerError,
+      });
+    } finally {
+      setLoadingProviders(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!userInfo?.uid) return;
+    void refreshLinkedProviders();
+  }, [refreshLinkedProviders, userInfo?.uid]);
+
   const setActiveTab = useCallback((tab: SettingsTabId) => {
-    setMessage(null);
-    setError(null);
     setActiveTabState(tab);
     router.setParams({ tab });
   }, [router]);
@@ -121,38 +153,24 @@ export function useSettings() {
   }, [t, userInfo?.uid]);
 
   const saveDisplayName = useCallback(async () => {
-    setError(null);
-    setMessage(null);
-
     await runSavingAction(async () => {
-      const result = await updateUserInfo(buildUserUpdatePayload({
+      await updateUserInfo(buildUserUpdatePayload({
         display_name: displayName.trim() || null,
       }));
 
-      if (result.success) {
-        await reloadUser();
-        setMessage(String(t('account.profile_updated')));
-      } else {
-        setError(result.error ?? String(t('account.profile_error')));
-      }
+      await reloadUser();
     });
-  }, [displayName, reloadUser, runSavingAction, t, updateUserInfo]);
+  }, [displayName, reloadUser, runSavingAction, updateUserInfo]);
 
   const resetDisplayName = useCallback(() => {
     setDisplayName(userInfo?.displayName ?? '');
-    setMessage(null);
-    setError(null);
   }, [userInfo?.displayName]);
 
   const changePhoto = useCallback(async () => {
     if (!userInfo?.uid) return;
 
-    setError(null);
-    setMessage(null);
-
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      setError(String(t('image_upload.select_file_error')));
       return;
     }
 
@@ -169,7 +187,6 @@ export function useSettings() {
     const maxSize = 1024 * 1024 * 5;
 
     if (typeof asset.fileSize === 'number' && asset.fileSize > maxSize) {
-      setError(String(t('account.image_size_error')));
       return;
     }
 
@@ -194,27 +211,21 @@ export function useSettings() {
       });
 
       if (!response.ok) {
-        setError(String(t('account.photo_error')));
+        await reloadUser();
         return;
       }
 
       await reloadUser();
-      setMessage(String(t('account.photo_updated')));
     });
   }, [reloadUser, runSavingAction, t, userInfo?.uid]);
 
   const updatePassword = useCallback(async () => {
-    setError(null);
-    setMessage(null);
-
     if (!userInfo?.email || !oldPassword) {
-      setError(String(t('security.current_password.required')));
       return;
     }
     const email = userInfo.email;
 
     if (oldPassword === newPassword) {
-      setError(String(t('security.password_section.same_password_error')));
       return;
     }
 
@@ -225,7 +236,6 @@ export function useSettings() {
       });
 
       if (loginError) {
-        setError(String(t('security.current_password.incorrect')));
         return;
       }
 
@@ -235,23 +245,53 @@ export function useSettings() {
         log.error('Erreur lors du changement de mot de passe', updateError, {
           origin: 'MOBILE_SETTINGS_PASSWORD_UPDATE',
         });
-        setError(updateError.message || String(t('security.password_section.error')));
         return;
       }
 
       setOldPassword('');
       setNewPassword('');
-      setMessage(String(t('security.password_updated')));
     });
   }, [newPassword, oldPassword, runSavingAction, t, userInfo?.email]);
+
+  const connectProvider = useCallback(async (provider: OAuthProvider) => {
+    setConnectingProvider(provider);
+
+    try {
+      const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          ...getOAuthSignInOptions(provider, MOBILE_AUTH_CALLBACK_URL),
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (oauthError) {
+        return;
+      }
+
+      if (data.url) {
+        const callbackUrl = await openAuthUrlInApp(data.url);
+        if (callbackUrl) {
+          await applySupabaseAuthCallback(supabase, callbackUrl);
+        }
+      }
+
+      await refreshLinkedProviders();
+    } catch (providerError) {
+      log.error('Erreur lors de la connexion du provider', {
+        origin: 'MOBILE_SETTINGS_PROVIDER_CONNECT',
+        provider,
+        error: providerError,
+      });
+    } finally {
+      setConnectingProvider(null);
+    }
+  }, [refreshLinkedProviders, t]);
 
   const updateNotificationFlag = useCallback(async (
     key: 'email_enabled' | 'push_enabled',
     value: boolean,
   ) => {
-    setError(null);
-    setMessage(null);
-
     if (key === 'email_enabled') {
       setEmailEnabled(value);
     } else {
@@ -259,47 +299,29 @@ export function useSettings() {
     }
 
     await runSavingAction(async () => {
-      const result = await updateUserInfo(buildUserUpdatePayload({ [key]: value }));
-
-      if (result.success) {
-        await reloadUser();
-        setMessage(String(t('account.profile_updated')));
-      } else {
-        if (key === 'email_enabled') {
-          setEmailEnabled(!value);
-        } else {
-          setPushEnabled(!value);
-        }
-        setError(result.error ?? String(t('supabase-error.unexpected_error')));
-      }
+      await updateUserInfo(buildUserUpdatePayload({ [key]: value }));
+      await reloadUser();
     });
-  }, [reloadUser, runSavingAction, t, updateUserInfo]);
+  }, [reloadUser, runSavingAction, updateUserInfo]);
 
   const updateNotificationTime = useCallback((value: string) => {
     setNotificationTime(value);
-    setError(null);
-    setMessage(null);
   }, []);
 
   const saveNotificationTime = useCallback(async () => {
     if (!userInfo?.uid) return;
 
     if (!/^\d{2}:\d{2}$/.test(notificationTime)) {
-      setError(String(t('settings.notification_time_label')));
       return;
     }
 
     const [hours, minutes] = notificationTime.split(':').map(Number);
     if (hours > 23 || minutes > 59) {
-      setError(String(t('settings.notification_time_label')));
       return;
     }
 
-    setError(null);
-    setMessage(null);
-
     await runSavingAction(async () => {
-      const result = await performApiCall({
+      await performApiCall({
         url: `${API_URL}/api/user/notification-time`,
         method: 'PUT',
         body: { notification_time: notificationTime },
@@ -307,18 +329,23 @@ export function useSettings() {
         uid: userInfo.uid,
       });
 
-      if (result.success) {
-        setMessage(String(t('account.profile_updated')));
-      } else {
-        setError(result.error ?? String(t('supabase-error.unexpected_error')));
-      }
+      await refreshNotificationTime();
     });
-  }, [notificationTime, runSavingAction, t, userInfo?.uid]);
+  }, [notificationTime, refreshNotificationTime, runSavingAction, t, userInfo?.uid]);
 
   const resetPassword = useCallback(async () => {
     if (!userInfo?.email) return;
-    await authService.resetPassword(userInfo.email);
-    setMessage(String(t('reset_password.success')));
+
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(userInfo.email, {
+      redirectTo: MOBILE_AUTH_CALLBACK_URL,
+    });
+
+    if (resetError) {
+      Alert.alert(String(t('error')), resetError.message);
+      return;
+    }
+
+    Alert.alert(String(t('reset_password.title')), String(t('reset_password.success')));
   }, [t, userInfo?.email]);
 
   const confirmLogout = useCallback(() => {
@@ -333,7 +360,10 @@ export function useSettings() {
   }, [signOut, t]);
 
   const changeLanguage = useCallback((language: string) => {
-    void i18n.changeLanguage(language);
+    void (async () => {
+      await SecureStore.setItemAsync(MOBILE_LANGUAGE_STORAGE_KEY, language);
+      await i18n.changeLanguage(language);
+    })();
   }, [i18n]);
 
   return {
@@ -350,10 +380,12 @@ export function useSettings() {
     newPasswordVisible,
     notificationTime,
     isSaving,
-    message,
-    error,
+    availableProviders,
+    linkedProviders,
+    loadingProviders,
+    connectingProvider,
     language: i18n.language,
-    languages: enabledLanguageCodes.map((code) => ({ code, label: getLabel(code) })),
+    languages: enabledLanguageCodes.map((code) => ({ code, flag: getFlag(code), label: getLabel(code) })),
     themePreference,
     setActiveTab,
     setDisplayName,
@@ -365,6 +397,7 @@ export function useSettings() {
     setOldPasswordVisible,
     setNewPasswordVisible,
     updatePassword,
+    connectProvider,
     updateEmailNotifications: (value: boolean) => void updateNotificationFlag('email_enabled', value),
     updatePushNotifications: (value: boolean) => void updateNotificationFlag('push_enabled', value),
     updateNotificationTime,

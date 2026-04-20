@@ -10,6 +10,10 @@ export const getLabel = (code: string): string => {
   return LANGUAGES.find((lang) => lang.code === code)?.label || code;
 };
 
+export const getFlag = (code: string): string => {
+  return LANGUAGES.find((lang) => lang.code === code)?.flag || code.toUpperCase();
+};
+
 export const enabledLanguageCodes: string[] = LANGUAGES.map(lang => lang.code);
 
 export const getDateLocale = (langCode: string): DateLocale => {

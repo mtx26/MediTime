@@ -6,6 +6,18 @@ import type { MobilePreferencesSettingsProps } from '@meditime/types';
 import { SettingsPanelSection } from './SettingsPanelSection';
 import { useIosTheme } from '../../theme/ios';
 
+const FLAG_EMOJI: Record<string, string> = {
+  CN: '🇨🇳',
+  DE: '🇩🇪',
+  ES: '🇪🇸',
+  FR: '🇫🇷',
+  IT: '🇮🇹',
+  JP: '🇯🇵',
+  PT: '🇵🇹',
+  RU: '🇷🇺',
+  US: '🇺🇸',
+};
+
 export function PreferencesSettingsPanel({
   language,
   languages,
@@ -58,9 +70,17 @@ export function PreferencesSettingsPanel({
                       opacity: pressed ? 0.75 : 1,
                     }}
                   >
-                    <Text style={{ color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}>
-                      {item.label}
-                    </Text>
+                    <XStack style={{ alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+                      <Text style={{ fontSize: 20, lineHeight: 24 }}>
+                        {FLAG_EMOJI[item.flag] ?? item.flag}
+                      </Text>
+                      <Text
+                        numberOfLines={1}
+                        style={{ flex: 1, color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}
+                      >
+                        {item.label}
+                      </Text>
+                    </XStack>
                     <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 18, fontWeight: '800' }}>
                       {item.code.toUpperCase()}
                     </Text>

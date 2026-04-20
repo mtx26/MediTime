@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { Button, ScrollView, Text, XStack, YStack } from 'tamagui';
 import { Ionicons } from '@expo/vector-icons';
 import { SETTINGS_TABS } from '@meditime/constants';
-import { InfoBanner } from '../components/common/InfoBanner';
 import { LoadingIndicator } from '../components/common/LoadingIndicator';
 import {
   AccountSettingsPanel,
@@ -58,14 +57,6 @@ export default function SettingsScreen() {
           onTabChange={settings.setActiveTab}
         />
 
-        {settings.message && (
-          <InfoBanner iconName="checkmark-circle-outline" text={settings.message} />
-        )}
-
-        {settings.error && (
-          <InfoBanner iconName="warning-outline" text={settings.error} tone="warning" />
-        )}
-
         {settings.activeTab === SETTINGS_TABS.SECURITY && (
           <SecuritySettingsPanel
             email={settings.userInfo.email ?? ''}
@@ -74,11 +65,16 @@ export default function SettingsScreen() {
             oldPasswordVisible={settings.oldPasswordVisible}
             newPasswordVisible={settings.newPasswordVisible}
             isSaving={settings.isSaving}
+            providers={settings.availableProviders}
+            linkedProviders={settings.linkedProviders}
+            loadingProviders={settings.loadingProviders}
+            connectingProvider={settings.connectingProvider}
             onOldPasswordChange={settings.setOldPassword}
             onNewPasswordChange={settings.setNewPassword}
             onOldPasswordVisibleChange={settings.setOldPasswordVisible}
             onNewPasswordVisibleChange={settings.setNewPasswordVisible}
             onUpdatePassword={settings.updatePassword}
+            onConnectProvider={settings.connectProvider}
           />
         )}
 
