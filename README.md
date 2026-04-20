@@ -43,7 +43,7 @@
 * 🔄 Real-time data updates via Supabase Realtime
 * 🌍 Multilingual interface powered by i18next
 * ⏰ Automatic stock checks via daily cron tasks
-* ☁️ Cloudinary uploads and email notifications (Zoho Mail)
+* ☁️ Cloudinary uploads and email notifications (Resend)
 * 📱 Responsive interface, mobile-optimized
 
 ---
@@ -147,7 +147,7 @@ scheduler: python scheduler.py
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 ![UptimeRobot](https://img.shields.io/badge/UptimeRobot-45C4B0?style=for-the-badge&logo=uptimekuma&logoColor=white)
 ![CapRover](https://img.shields.io/badge/CapRover-1E90FF?style=for-the-badge&logo=caprover&logoColor=white)
-![Zoho](https://img.shields.io/badge/Zoho-DB2828?style=for-the-badge&logo=zoho&logoColor=white)
+![Resend](https://img.shields.io/badge/Resend-000000?style=for-the-badge&logo=resend&logoColor=white)
 ![GitHub Copilot](https://img.shields.io/badge/GitHub%20Copilot-000000?style=for-the-badge&logo=github-copilot&logoColor=white)
 
 ---
@@ -169,7 +169,7 @@ scheduler: python scheduler.py
 * **Google Cloud Translate** – automatic generation of translation files.
 * **Google Cloud Console** – service configuration and management.
 * **Cloudinary** – storage of uploaded images.
-* **Zoho Mail** – SMTP provider for outgoing notifications.
+* **Resend** – email delivery provider for outgoing notifications.
 * **UptimeRobot** – monitoring backend and frontend availability.
 * **schedule** – cron-style background tasks for stock management.
 * **CapRover** – self-hosted PaaS for deployment.
