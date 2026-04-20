@@ -28,7 +28,7 @@ export function CalendarNotFoundState({ onBackToCalendars }: CalendarNotFoundSta
           borderColor: ios.border,
         }}
       >
-        <Text style={{ color: ios.foreground, fontSize: 20, fontWeight: '900' }}>{t('not_found')}</Text>
+        <Text style={{ color: ios.foreground, fontSize: 20, fontWeight: '900' }}>{t('api.ics.calendar_not_found')}</Text>
         <Text style={{ color: ios.mutedForeground, lineHeight: 20 }}>{t('invalid_or_expired_link')}</Text>
         <OutlineButton label={String(t('calendars'))} onPress={onBackToCalendars} />
       </YStack>

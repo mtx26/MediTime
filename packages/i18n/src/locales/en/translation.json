@@ -660,8 +660,8 @@
   "no_shared_calendars": "You don't have a shared calendar.",
   "noon": "Noon",
   "not_found": {
-    "message": "Page not found.",
-    "title": "Error 404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> invites you to join the calendar <1>{{name}}</1>",
@@ -1205,5 +1205,6 @@
   "confirm_calendar_refill": "Confirm that the pillbox is full",
   "pillbox_refill_description": "The pill organizer will refill with any missing medication (negative stock) for this week. This action is irreversible.",
   "error": "error",
-  "notifications": "notifications"
+  "notifications": "notifications",
+  "unexpected_error": "unexpected error"
 }

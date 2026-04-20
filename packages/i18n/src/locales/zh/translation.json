@@ -282,12 +282,20 @@
     "with_github": "与 Github 连接",
     "with_google": "使用 Google 登录",
     "with_microsoft": "使用 Microsoft 登录",
-    "with_twitter": "与 Twitter 建立联系"
+    "with_twitter": "与 Twitter 建立联系",
+    "already_have_account": "Vous avez déjà un compte ?",
+    "back_to_login": "Retour à la connexion",
+    "check_email": "Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.",
+    "login_error": "Impossible de se connecter.",
+    "no_account": "Pas encore de compte ?",
+    "register_error": "Impossible de créer votre compte."
   },
   "auth_callback": {
     "loading": "正在连接...",
     "session_error": "OAuth 后会话恢复失败",
-    "success": "通过回调成功连接"
+    "success": "通过回调成功连接",
+    "missing_payload": "Le lien s'est ouvert sans les informations de session. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
+    "session_unavailable": "Le lien a été ouvert, mais la session n'a pas pu être créée. Rouvrez le dernier email reçu ou demandez un nouveau lien."
   },
   "back": "后退",
   "boxes": {
@@ -557,7 +565,10 @@
     "preview_error": "显示预览时出错",
     "remove_image": "删除图片",
     "select_file_error": "请选择一个图像文件。",
-    "title": "选择并预览文件"
+    "title": "选择并预览文件",
+    "choose_file": "Choisir un fichier",
+    "choose_from_library": "Photothèque",
+    "take_photo": "Prendre une photo"
   },
   "invalid_or_expired_link": "此共享日历链接无效或已过期。",
   "invitation": {
@@ -649,8 +660,8 @@
   "no_shared_calendars": "您没有共享日历。",
   "noon": "中午",
   "not_found": {
-    "message": "未找到页面。",
-    "title": "错误 404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> 邀请您加入日历 <1>{{name} </1>",
@@ -778,7 +789,8 @@
     "save_password": "保存密码",
     "saving": "登记...",
     "success": "您的密码已成功更改。",
-    "title": "新密码"
+    "title": "新密码",
+    "request_new_link": "Demander un nouveau lien"
   },
   "restore": "恢复",
   "restore_error": "恢复过程中出错",
@@ -1188,6 +1200,11 @@
     "stock": "Stock",
     "subtitle": "Déclarez les jours où vous n'avez pas pris vos médicaments pour ajuster votre stock.",
     "success": "{{count}} comprimé(s) réajouté(s) au stock.",
-    "title": "Prise oubliée"
-  }
+    "title": "Prise oubliée",
+    "back": "Retour",
+    "summary": "Récapitulatif",
+    "tablets": "comprimé(s)",
+    "total": "Total à réajouter"
+  },
+  "unexpected_error": "unexpected error"
 }

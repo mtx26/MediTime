@@ -282,12 +282,20 @@
     "with_github": "Conectando con Github",
     "with_google": "Iniciar sesión con Google",
     "with_microsoft": "Iniciar sesión con Microsoft",
-    "with_twitter": "Conectarse con Twitter"
+    "with_twitter": "Conectarse con Twitter",
+    "already_have_account": "Vous avez déjà un compte ?",
+    "back_to_login": "Retour à la connexion",
+    "check_email": "Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.",
+    "login_error": "Impossible de se connecter.",
+    "no_account": "Pas encore de compte ?",
+    "register_error": "Impossible de créer votre compte."
   },
   "auth_callback": {
     "loading": "Conectando...",
     "session_error": "La recuperación de la sesión falló después de OAuth",
-    "success": "Conexión exitosa mediante devolución de llamada"
+    "success": "Conexión exitosa mediante devolución de llamada",
+    "missing_payload": "Le lien s'est ouvert sans les informations de session. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
+    "session_unavailable": "Le lien a été ouvert, mais la session n'a pas pu être créée. Rouvrez le dernier email reçu ou demandez un nouveau lien."
   },
   "back": "Atrás",
   "boxes": {
@@ -557,7 +565,10 @@
     "preview_error": "Error al mostrar la vista previa",
     "remove_image": "Eliminar imagen",
     "select_file_error": "Seleccione un archivo de imagen.",
-    "title": "Seleccionar y obtener una vista previa de un archivo"
+    "title": "Seleccionar y obtener una vista previa de un archivo",
+    "choose_file": "Choisir un fichier",
+    "choose_from_library": "Photothèque",
+    "take_photo": "Prendre une photo"
   },
   "invalid_or_expired_link": "Este enlace de calendario compartido no es válido o ha expirado.",
   "invitation": {
@@ -649,8 +660,8 @@
   "no_shared_calendars": "No tienes un calendario compartido.",
   "noon": "Mediodía",
   "not_found": {
-    "message": "Página no encontrada.",
-    "title": "Error 404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> te invita a unirte al calendario <1>{{name}}</1>",
@@ -778,7 +789,8 @@
     "save_password": "Guardar contraseña",
     "saving": "Registro...",
     "success": "Su contraseña ha sido cambiada exitosamente",
-    "title": "Nueva contraseña"
+    "title": "Nueva contraseña",
+    "request_new_link": "Demander un nouveau lien"
   },
   "restore": "Restaurar",
   "restore_error": "Error durante la restauración",
@@ -1188,6 +1200,11 @@
     "stock": "Stock",
     "subtitle": "Déclarez les jours où vous n'avez pas pris vos médicaments pour ajuster votre stock.",
     "success": "{{count}} comprimé(s) réajouté(s) au stock.",
-    "title": "Prise oubliée"
-  }
+    "title": "Prise oubliée",
+    "back": "Retour",
+    "summary": "Récapitulatif",
+    "tablets": "comprimé(s)",
+    "total": "Total à réajouter"
+  },
+  "unexpected_error": "unexpected error"
 }

@@ -660,8 +660,8 @@
   "no_shared_calendars": "Vous n'avez pas de calendrier partagé.",
   "noon": "Midi",
   "not_found": {
-    "message": "Page introuvable.",
-    "title": "Erreur 404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> vous invite à rejoindre le calendrier <1>{{name}}</1>",
@@ -1205,5 +1205,6 @@
   },
   "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier.",
   "error": "error",
-  "notifications": "notifications"
+  "notifications": "notifications",
+  "unexpected_error": "unexpected error"
 }

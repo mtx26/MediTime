@@ -282,12 +282,20 @@
     "with_github": "Githubとの接続",
     "with_google": "Googleでログイン",
     "with_microsoft": "Microsoftでサインイン",
-    "with_twitter": "Twitterでつながる"
+    "with_twitter": "Twitterでつながる",
+    "already_have_account": "Vous avez déjà un compte ?",
+    "back_to_login": "Retour à la connexion",
+    "check_email": "Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.",
+    "login_error": "Impossible de se connecter.",
+    "no_account": "Pas encore de compte ?",
+    "register_error": "Impossible de créer votre compte."
   },
   "auth_callback": {
     "loading": "接続中...",
     "session_error": "OAuth後のセッション回復に失敗しました",
-    "success": "コールバックによる接続成功"
+    "success": "コールバックによる接続成功",
+    "missing_payload": "Le lien s'est ouvert sans les informations de session. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
+    "session_unavailable": "Le lien a été ouvert, mais la session n'a pas pu être créée. Rouvrez le dernier email reçu ou demandez un nouveau lien."
   },
   "back": "戻る",
   "boxes": {
@@ -557,7 +565,10 @@
     "preview_error": "プレビューの表示中にエラーが発生しました",
     "remove_image": "画像を削除",
     "select_file_error": "画像ファイルを選択してください。",
-    "title": "ファイルを選択してプレビューする"
+    "title": "ファイルを選択してプレビューする",
+    "choose_file": "Choisir un fichier",
+    "choose_from_library": "Photothèque",
+    "take_photo": "Prendre une photo"
   },
   "invalid_or_expired_link": "この共有カレンダーのリンクは無効か期限が切れています。",
   "invitation": {
@@ -649,8 +660,8 @@
   "no_shared_calendars": "共有カレンダーがありません。",
   "noon": "正午",
   "not_found": {
-    "message": "ページが見つかりません。",
-    "title": "エラー404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> さんがカレンダー <1>{{name}></1> に参加するよう招待しています",
@@ -778,7 +789,8 @@
     "save_password": "パスワードを保存",
     "saving": "登録...",
     "success": "パスワードが正常に変更されました。",
-    "title": "新しいパスワード"
+    "title": "新しいパスワード",
+    "request_new_link": "Demander un nouveau lien"
   },
   "restore": "復元する",
   "restore_error": "復元中にエラーが発生しました",
@@ -1188,6 +1200,11 @@
     "stock": "Stock",
     "subtitle": "Déclarez les jours où vous n'avez pas pris vos médicaments pour ajuster votre stock.",
     "success": "{{count}} comprimé(s) réajouté(s) au stock.",
-    "title": "Prise oubliée"
-  }
+    "title": "Prise oubliée",
+    "back": "Retour",
+    "summary": "Récapitulatif",
+    "tablets": "comprimé(s)",
+    "total": "Total à réajouter"
+  },
+  "unexpected_error": "unexpected error"
 }

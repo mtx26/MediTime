@@ -6,6 +6,7 @@ import { v2 as Translate } from '@google-cloud/translate';
 import { collectBackendKeys, collectFrontendKeys } from './collect-keys.js';
 import {
   getByKeyPath,
+  flattenTranslationKeys,
   isValidTranslationValue,
   keyToFallbackText,
   listLocaleCodes,
@@ -20,10 +21,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const workspaceRootDir = path.join(__dirname, '..', '..');
-const workspaceFrontendDir = path.join(workspaceRootDir, 'apps', 'web');
 const workspaceBackendDir = path.join(workspaceRootDir, 'apps', 'backend');
-const workspaceBackendAppDir = path.join(workspaceRootDir, 'apps', 'backend', 'app');
-const frontendSrcDir = path.join(workspaceFrontendDir, 'src');
+const workspaceWebDir = path.join(workspaceRootDir, 'apps', 'web');
+const backendAppDir = path.join(workspaceBackendDir, 'app');
+const frontendSourceDirs = [
+  path.join(workspaceWebDir, 'src'),
+  path.join(workspaceRootDir, 'apps', 'mobile', 'src'),
+  path.join(workspaceRootDir, 'apps', 'mobile', 'app'),
+];
 const localesRootDir = path.join(workspaceRootDir, 'packages', 'i18n', 'src', 'locales');
 const frPath = localeFilePath(localesRootDir, 'fr');
 
@@ -31,7 +36,7 @@ function loadMonorepoEnv() {
   const envFiles = [
     path.join(workspaceRootDir, '.env'),
     path.join(workspaceBackendDir, '.env'),
-    path.join(workspaceFrontendDir, '.env'),
+    path.join(workspaceWebDir, '.env'),
   ];
 
   const loaded = [];
@@ -56,25 +61,36 @@ const dryRun = args.includes('--dry-run');
 const noTranslate = args.includes('--no-translate');
 const strict = args.includes('--strict');
 
-const apiKey = process.env.VITE_GOOGLE_TRANSLATE_API_KEY;
-const canTranslate = !noTranslate && Boolean(apiKey);
-const translateClient = canTranslate ? new Translate.Translate({ key: apiKey }) : null;
-
-function mergeKeyMaps(primary, secondary) {
-  const merged = new Map(primary);
-
-  for (const [key, refs] of secondary.entries()) {
-    if (!merged.has(key)) {
-      merged.set(key, []);
-    }
-    merged.get(key).push(...refs);
-  }
-
-  return merged;
+function createTranslateClient() {
+  const apiKey = process.env.VITE_GOOGLE_TRANSLATE_API_KEY;
+  return !noTranslate && apiKey ? new Translate.Translate({ key: apiKey }) : null;
 }
 
-function chooseFrValue(key, refs) {
-  const backendRef = refs.find((ref) => ref.source === 'backend' && ref.message && ref.message.trim() !== '');
+function collectFrontendSourceKeys() {
+  return frontendSourceDirs.reduce((keys, dir) => collectFrontendKeys(dir, keys), new Map());
+}
+
+function sortUniqueKeys(...keyLists) {
+  return [...new Set(keyLists.flatMap((keys) => [...keys]))].sort();
+}
+
+async function fillMissingTranslations(data, keys, resolveValue) {
+  let added = 0;
+
+  for (const key of keys) {
+    if (isValidTranslationValue(getByKeyPath(data, key))) {
+      continue;
+    }
+
+    setByKeyPath(data, key, await resolveValue(key));
+    added += 1;
+  }
+
+  return added;
+}
+
+function chooseFrValue(key, backendRefs = []) {
+  const backendRef = backendRefs.find((ref) => ref.message && ref.message.trim() !== '');
   if (backendRef) {
     return backendRef.message;
   }
@@ -92,32 +108,23 @@ async function main() {
       : 'env loaded: none (.env not found)',
   );
 
-  const backendKeys = collectBackendKeys(workspaceBackendAppDir);
-  const frontendKeys = collectFrontendKeys(frontendSrcDir);
-  const allKeys = mergeKeyMaps(backendKeys, frontendKeys);
+  const frData = readJson(frPath);
+  const frLocaleKeys = flattenTranslationKeys(frData);
+  const backendKeys = collectBackendKeys(backendAppDir);
+  const frontendKeys = collectFrontendSourceKeys();
+  const allSortedKeys = sortUniqueKeys(backendKeys.keys(), frontendKeys.keys(), frLocaleKeys);
+  const translateClient = createTranslateClient();
 
-  const allSortedKeys = [...allKeys.keys()].sort();
   const localeCodes = listLocaleCodes(localesRootDir);
 
   console.log(`backend keys: ${backendKeys.size}`);
+  console.log(`frontend dirs: ${frontendSourceDirs.map((dir) => path.relative(workspaceRootDir, dir)).join(', ')}`);
   console.log(`frontend keys: ${frontendKeys.size}`);
+  console.log(`fr locale keys: ${frLocaleKeys.length}`);
   console.log(`total unique keys: ${allSortedKeys.length}`);
   console.log(`locales: ${localeCodes.join(', ')}`);
 
-  const frData = readJson(frPath);
-
-  let frAdded = 0;
-  for (const key of allSortedKeys) {
-    const current = getByKeyPath(frData, key);
-    if (isValidTranslationValue(current)) {
-      continue;
-    }
-
-    const refs = allKeys.get(key) || [];
-    const value = chooseFrValue(key, refs);
-    setByKeyPath(frData, key, value);
-    frAdded += 1;
-  }
+  const frAdded = await fillMissingTranslations(frData, allSortedKeys, (key) => chooseFrValue(key, backendKeys.get(key)));
 
   if (!dryRun && frAdded > 0) {
     writeJson(frPath, frData);
@@ -125,6 +132,7 @@ async function main() {
 
   let translatedAdded = 0;
   const perLocaleAdded = new Map();
+  const localeDataByCode = new Map([['fr', frData]]);
 
   for (const code of localeCodes) {
     if (code === 'fr') {
@@ -133,23 +141,15 @@ async function main() {
 
     const filePath = localeFilePath(localesRootDir, code);
     const data = readJson(filePath);
-    let added = 0;
-
-    for (const key of allSortedKeys) {
-      const current = getByKeyPath(data, key);
-      if (isValidTranslationValue(current)) {
-        continue;
-      }
-
+    const added = await fillMissingTranslations(data, allSortedKeys, async (key) => {
       const frValue = getByKeyPath(frData, key);
       const sourceText = isValidTranslationValue(frValue) ? frValue : keyToFallbackText(key);
-      const translated = await translateTextSafe(sourceText, code, translateClient);
-      setByKeyPath(data, key, translated);
-      added += 1;
-      translatedAdded += 1;
-    }
+      return translateTextSafe(sourceText, code, translateClient);
+    });
 
     perLocaleAdded.set(code, added);
+    translatedAdded += added;
+    localeDataByCode.set(code, data);
 
     if (!dryRun && added > 0) {
       writeJson(filePath, data);
@@ -159,8 +159,7 @@ async function main() {
   const missingAfter = [];
 
   for (const code of localeCodes) {
-    const filePath = localeFilePath(localesRootDir, code);
-    const data = code === 'fr' ? frData : readJson(filePath);
+    const data = localeDataByCode.get(code) || readJson(localeFilePath(localesRootDir, code));
 
     const missing = allSortedKeys.filter((key) => !isValidTranslationValue(getByKeyPath(data, key)));
     if (missing.length > 0) {
@@ -174,7 +173,7 @@ async function main() {
   }
   console.log(`non-fr added total: ${translatedAdded}`);
 
-  if (!canTranslate) {
+  if (!translateClient) {
     console.log('translation API disabled or missing: fallback value copied from fr for non-fr locales');
   }
 
