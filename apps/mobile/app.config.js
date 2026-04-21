@@ -1,6 +1,10 @@
 const path = require('path');
 
-require('dotenv').config({ path: path.resolve(__dirname, '.env'), quiet: true });
+try {
+  require('dotenv').config({ path: path.resolve(__dirname, '.env'), quiet: true });
+} catch {
+  // Expo can still boot with environment variables provided by the shell or CI.
+}
 
 const appJson = require('./app.json');
 

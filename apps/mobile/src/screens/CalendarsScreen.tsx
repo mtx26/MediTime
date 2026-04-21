@@ -25,18 +25,6 @@ const AddCalendarModal = lazy(() =>
   })),
 );
 
-const MOBILE_UNAVAILABLE_CALENDAR_ACTIONS = [
-  'pillbox',
-  'day_view',
-  'share',
-  'medicines',
-  'stock_alerts',
-  'ics_calendar',
-  'pillbox_history',
-  'missed_intakes',
-  'settings',
-];
-
 export default function CalendarsScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -164,7 +152,7 @@ export default function CalendarsScreen() {
           onDelete: () => handleDeleteCalendarClick(calendar.id),
           onExportPdf: () => void openCalendarPdf(calendar.id),
         },
-        MOBILE_UNAVAILABLE_CALENDAR_ACTIONS,
+        ['pillbox', 'day_view'],
       ),
       translate,
     );
@@ -178,7 +166,7 @@ export default function CalendarsScreen() {
           onDelete: () => handleDeleteSharedCalendarClick(calendar.id),
           onExportPdf: () => void openCalendarPdf(calendar.id),
         },
-        MOBILE_UNAVAILABLE_CALENDAR_ACTIONS,
+        ['pillbox', 'day_view'],
       ),
       translate,
     );
@@ -293,7 +281,9 @@ export default function CalendarsScreen() {
           onImportTypeChange={addCalendarFlow.changeImportType}
           onQrBarcodeScanned={addCalendarFlow.handleQrBarcodeScanned}
           onRemoveQrMedicine={addCalendarFlow.removeQrMedicine}
-          onChooseImageSource={addCalendarFlow.chooseImageSource}
+          onChooseCamera={addCalendarFlow.chooseCamera}
+          onChooseFile={addCalendarFlow.chooseFile}
+          onChooseLibrary={addCalendarFlow.chooseLibrary}
           onRemoveImage={addCalendarFlow.removeImage}
           onMedicineReviewIndexChange={addCalendarFlow.setMedicineReviewIndex}
           onMedicineReviewFieldChange={addCalendarFlow.changeReviewField}

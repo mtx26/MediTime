@@ -32,24 +32,38 @@ type CalendarSource = {
 };
 
 const HEADER_TITLE_MAX_LENGTH = 26;
-const MOBILE_UNAVAILABLE_DETAIL_ACTIONS = [
-  'pillbox',
-  'share',
-  'medicines',
-  'stock_alerts',
-  'ics_calendar',
-  'pillbox_history',
-  'missed_intakes',
-  'settings',
-];
 
 function truncateHeaderTitle(value: string) {
   if (value.length <= HEADER_TITLE_MAX_LENGTH) return value;
   return `${value.slice(0, HEADER_TITLE_MAX_LENGTH - 1)}...`;
 }
 
+function getRouteDateParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function getInitialSelectedDateForDailyRoute(dateParam: string | string[] | undefined) {
+  const rawDate = getRouteDateParam(dateParam);
+
+  if (rawDate) {
+    const isoDateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(rawDate);
+    const parsedDate = isoDateMatch
+      ? new Date(Number(isoDateMatch[1]), Number(isoDateMatch[2]) - 1, Number(isoDateMatch[3]))
+      : new Date(rawDate);
+
+    if (!Number.isNaN(parsedDate.getTime())) {
+      parsedDate.setHours(0, 0, 0, 0);
+      return parsedDate;
+    }
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+}
+
 export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: CalendarDetailMode) {
-  const { calendarId } = useLocalSearchParams<{ calendarId?: string }>();
+  const { calendarId, date } = useLocalSearchParams<{ calendarId?: string; date?: string | string[] }>();
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const { personalCalendarsApi, sharedUserCalendarsApi } = useCalendarApis();
@@ -135,6 +149,14 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     setError(null);
 
     try {
+      if (mode === 'daily') {
+        const initialDate = getInitialSelectedDateForDailyRoute(date);
+        setStockDecrementMethod('');
+        setSelectedDate(initialDate);
+        await loadSchedule(initialDate);
+        return;
+      }
+
       const stockResult = await source.fetchStockDecrementMethod(calendarId) as StockMethodResult;
       const method = stockResult.success ? stockResult.method ?? '' : '';
       const initialDate = getInitialSelectedDateForStockMethod(method);
@@ -151,7 +173,7 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     } finally {
       setLoading(false);
     }
-  }, [calendarId, loadSchedule, source, t]);
+  }, [calendarId, date, loadSchedule, mode, source, t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -193,7 +215,7 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
   const navigateWeek = (direction: number) => {
     if (!selectedDate) return;
     const next = new Date(selectedDate);
-    next.setDate(next.getDate() + direction * 7);
+    next.setDate(next.getDate() + direction);
     void selectWeek(next);
   };
 
@@ -207,6 +229,21 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
 
   const backToCalendars = () => {
     router.replace('/calendars' as never);
+  };
+
+  const goToPillbox = () => {
+    if (!calendarId) return;
+    navigateToHref(`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate || new Date())}`);
+  };
+
+  const goToBoxes = () => {
+    if (!calendarId) return;
+    navigateToHref(`/${lng}/${basePath}/${calendarId}/boxes`);
+  };
+
+  const goToStockAlerts = () => {
+    if (!calendarId) return;
+    navigateToHref(`/${lng}/${basePath}/${calendarId}/stock-alerts`);
   };
 
   const handleDelete = () => {
@@ -246,6 +283,7 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
   };
 
   const actions = useMemo(() => {
+    if (mode === 'daily') return [];
     if (!calendarId) return [];
 
     const context = { calendarId, lng, basePath, selectedDate };
@@ -257,14 +295,15 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
       ? buildPersonalCalendarActions(
           context,
           { ...handlers, onRename: undefined },
-          ['rename', ...MOBILE_UNAVAILABLE_DETAIL_ACTIONS],
+          ['rename', 'medicines'],
         )
-      : buildSharedCalendarActions(context, handlers, MOBILE_UNAVAILABLE_DETAIL_ACTIONS);
+      : buildSharedCalendarActions(context, handlers, ['rename', 'medicines']);
 
     return toActionSheetItems(items, translate);
-  }, [basePath, calendarId, lng, selectedDate, sourceType, translate]);
+  }, [basePath, calendarId, lng, mode, selectedDate, sourceType, translate]);
 
   const hasCalendarItems = calendarTableHasItems(calendarTable);
+  const isDailyRoute = mode === 'daily';
 
   return {
     actions,
@@ -273,6 +312,9 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     calendarTable,
     error,
     eventsForDay,
+    goToBoxes,
+    goToPillbox,
+    goToStockAlerts,
     handleRefresh,
     headerTitle: truncateHeaderTitle(calendarName ?? String(t('calendars'))),
     isLowStock,
@@ -285,9 +327,11 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     selectedDate,
     selectDate,
     selectWeek,
+    showOverviewControls: !isDailyRoute,
     showBackendLoading: (scheduleLoading || refreshing) && !loading,
-    showDailyContent: mode === 'daily' || stockDecrementMethod === STOCK_DECREMENT_METHODS.DAILY_MIDNIGHT,
-    showPillboxShortcut: false,
+    showCalendarContent: isDailyRoute || hasCalendarItems,
+    showDailyContent: isDailyRoute || stockDecrementMethod === STOCK_DECREMENT_METHODS.DAILY_MIDNIGHT,
+    showPillboxShortcut: !isDailyRoute && hasCalendarItems && stockDecrementMethod === STOCK_DECREMENT_METHODS.WEEKLY_PILLBOX,
     hasCalendarItems,
   };
 }

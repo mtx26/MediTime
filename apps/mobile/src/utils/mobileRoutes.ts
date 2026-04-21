@@ -25,6 +25,10 @@ export function toMobileHref(webHref: string) {
     return `/${root}`;
   }
 
+  if (['shared-calendars', 'add-calendar', 'notifications', 'accept-invite'].includes(root)) {
+    return appendQuery(`/${routeParts.join('/')}`);
+  }
+
   if (root === 'calendars') {
     const type = firstParam;
     const calendarId = routeParts[2];
@@ -32,7 +36,7 @@ export function toMobileHref(webHref: string) {
 
     if ((type === 'calendar' || type === 'shared-user-calendar') && calendarId) {
       const detailHref = `/calendars/${type}/${calendarId}`;
-      return calendarPage === 'daily' ? appendQuery(`${detailHref}/daily`) : detailHref;
+      return calendarPage ? appendQuery(`${detailHref}/${calendarPage}`) : detailHref;
     }
 
     return '/calendars';
@@ -40,7 +44,7 @@ export function toMobileHref(webHref: string) {
 
   if ((root === 'calendar' || root === 'shared-user-calendar') && firstParam) {
     const detailHref = `/calendars/${root}/${firstParam}`;
-    return page === 'daily' ? appendQuery(`${detailHref}/daily`) : detailHref;
+    return page ? appendQuery(`${detailHref}/${page}`) : detailHref;
   }
 
   return '/calendars';

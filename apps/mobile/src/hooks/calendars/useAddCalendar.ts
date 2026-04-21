@@ -16,8 +16,6 @@ import {
 } from '@meditime/utils';
 import type { useCalendars } from './useCalendars';
 import type { AddCalendarStep, MedicineReviewField } from '../../components/calendar/import/types';
-import { openImageSourceSheet } from '../../components/common/ImageSourceSheet';
-import { useAppTheme } from '../../theme/ios';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
@@ -73,7 +71,6 @@ export function useAddCalendar({
   saveAnalysisResult,
 }: UseAddCalendarFlowParams) {
   const { t } = useTranslation();
-  const { colorScheme } = useAppTheme();
   const [open, setOpen] = useState(false);
   const [calendarName, setCalendarName] = useState('');
   const [importType, setImportType] = useState<AddCalendarImportType>(ADD_CALENDAR_IMPORT_TYPES.MANUAL);
@@ -170,20 +167,6 @@ export function useAddCalendar({
       setSelectedImage(asset.uri, asset.name);
     }
   }, [setSelectedImage]);
-
-  const chooseImageSource = useCallback(() => {
-    openImageSourceSheet({
-      title: String(t('calendar.choose_image')),
-      cameraLabel: String(t('image_upload.take_photo')),
-      libraryLabel: String(t('image_upload.choose_from_library')),
-      fileLabel: String(t('image_upload.choose_file')),
-      cancelLabel: String(t('cancel')),
-      userInterfaceStyle: colorScheme,
-      onCamera: () => void takePhoto(),
-      onLibrary: () => void pickFromLibrary(),
-      onFile: () => void pickFile(),
-    });
-  }, [colorScheme, pickFile, pickFromLibrary, takePhoto, t]);
 
   const removeImage = useCallback(() => {
     setImageAssetUri(null);
@@ -410,7 +393,9 @@ export function useAddCalendar({
     medicineReviewIndex,
     setMedicineReviewIndex,
     changeImportType,
-    chooseImageSource,
+    chooseCamera: () => void takePhoto(),
+    chooseFile: () => void pickFile(),
+    chooseLibrary: () => void pickFromLibrary(),
     removeImage,
     handleQrBarcodeScanned,
     removeQrMedicine,
