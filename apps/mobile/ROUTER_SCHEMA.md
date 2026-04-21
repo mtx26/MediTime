@@ -17,12 +17,6 @@ apps/mobile/app
   auth
     ✅ callback.tsx
 
-  notifications
-    index.tsx
-
-  shared-calendars
-    index.tsx
-
   accept-invite
     index.tsx
 
@@ -68,6 +62,12 @@ apps/mobile/app
         [sharedToken]
           index.tsx
           pillbox.tsx
+
+    shared-calendars
+      index.tsx
+      
+    notifications
+      ✅ index.tsx
 
     settings
       ✅ index.tsx

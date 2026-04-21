@@ -108,6 +108,31 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="notifications/index"
+        options={{
+          title: t('notification.label'),
+          tabBarLabel: t('notification.label'),
+          tabBarIcon: ({ color, focused }) => (
+            <View
+              style={{
+                width: 34,
+                height: 28,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 8,
+                backgroundColor: focused ? ios.blueInfoBg : 'transparent',
+              }}
+            >
+              <Ionicons
+                name={focused ? 'notifications' : 'notifications-outline'}
+                size={24}
+                color={color}
+              />
+            </View>
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings/index"
         options={{
           title: t('settings.label'),
