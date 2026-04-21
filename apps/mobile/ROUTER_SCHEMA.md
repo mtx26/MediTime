@@ -64,7 +64,7 @@ apps/mobile/app
           pillbox.tsx
 
     shared-calendars
-      index.tsx
+      ✅ index.tsx
       
     notifications
       ✅ index.tsx
