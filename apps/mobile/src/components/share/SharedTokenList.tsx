@@ -2,15 +2,8 @@ import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, Text, XStack, YStack } from 'tamagui';
-import type { SharedCalendarToken } from '@meditime/types';
+import type { SharedTokenListProps } from '@meditime/types';
 import { useIosTheme } from '../../theme/ios';
-
-type SharedTokenListProps = {
-  tokens: SharedCalendarToken[];
-  onCreateToken: () => void;
-  onDeleteToken: (tokenId: string) => void;
-  onShareToken: (token: SharedCalendarToken) => void;
-};
 
 export function SharedTokenList({
   tokens,

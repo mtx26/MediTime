@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Linking } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { getValidRedirect, log } from '@meditime/utils';
+import { getFirstRouteParams, getValidRedirect, log } from '@meditime/utils';
 import type { SessionLike } from '@meditime/types';
 import { useAuth } from './useAuth';
 import { supabase } from '../../services/supabase';
@@ -26,15 +26,8 @@ const REDIRECT_BY_TYPE = new Map([
 
 const RECOVERY_TYPES = new Set(['recovery', 'invite']);
 
-function firstParam(value: RouteParamValue) {
-  return Array.isArray(value) ? value[0] : value;
-}
-
 function getRouteParams(params: Record<string, RouteParamValue>) {
-  return Object.entries(params).reduce<CallbackParams>((acc, [key, value]) => {
-    acc[key] = firstParam(value);
-    return acc;
-  }, {});
+  return getFirstRouteParams(params);
 }
 
 async function collectCallbackParams(routeParams: CallbackParams) {

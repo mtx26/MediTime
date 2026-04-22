@@ -1,9 +1,9 @@
 import { Redirect, Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Platform, View } from 'react-native';
+import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Spinner, YStack } from 'tamagui';
+import { TabIcon } from '../../src/components/common/TabIcon';
 import { useAuth } from '../../src/hooks/auth/useAuth';
 import { useIosTheme } from '../../src/theme/ios';
 
@@ -88,22 +88,7 @@ export default function TabsLayout() {
           title: t('calendars'),
           tabBarLabel: t('calendars'),
           tabBarIcon: ({ color, focused }) => (
-            <View
-              style={{
-                width: 34,
-                height: 28,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 8,
-                backgroundColor: focused ? ios.blueInfoBg : 'transparent',
-              }}
-            >
-              <Ionicons
-                name={focused ? 'calendar' : 'calendar-outline'}
-                size={24}
-                color={color}
-              />
-            </View>
+            <TabIcon color={color} focused={focused} iconName="calendar-outline" focusedIconName="calendar" />
           ),
         }}
       />
@@ -113,22 +98,7 @@ export default function TabsLayout() {
           title: t('shared_calendars'),
           tabBarLabel: t('shared_calendars'),
           tabBarIcon: ({ color, focused }) => (
-            <View
-              style={{
-                width: 34,
-                height: 28,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 8,
-                backgroundColor: focused ? ios.blueInfoBg : 'transparent',
-              }}
-            >
-              <Ionicons
-                name={focused ? 'people' : 'people-outline'}
-                size={24}
-                color={color}
-              />
-            </View>
+            <TabIcon color={color} focused={focused} iconName="people-outline" focusedIconName="people" />
           ),
         }}
       />
@@ -138,22 +108,7 @@ export default function TabsLayout() {
           title: t('notification.label'),
           tabBarLabel: t('notification.label'),
           tabBarIcon: ({ color, focused }) => (
-            <View
-              style={{
-                width: 34,
-                height: 28,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 8,
-                backgroundColor: focused ? ios.blueInfoBg : 'transparent',
-              }}
-            >
-              <Ionicons
-                name={focused ? 'notifications' : 'notifications-outline'}
-                size={24}
-                color={color}
-              />
-            </View>
+            <TabIcon color={color} focused={focused} iconName="notifications-outline" focusedIconName="notifications" />
           ),
         }}
       />
@@ -163,22 +118,7 @@ export default function TabsLayout() {
           title: t('settings.label'),
           tabBarLabel: t('settings.label'),
           tabBarIcon: ({ color, focused }) => (
-            <View
-              style={{
-                width: 34,
-                height: 28,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 8,
-                backgroundColor: focused ? ios.blueInfoBg : 'transparent',
-              }}
-            >
-              <Ionicons
-                name={focused ? 'settings' : 'settings-outline'}
-                size={24}
-                color={color}
-              />
-            </View>
+            <TabIcon color={color} focused={focused} iconName="settings-outline" focusedIconName="settings" />
           ),
         }}
       />

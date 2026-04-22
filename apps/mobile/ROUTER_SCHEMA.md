@@ -18,7 +18,7 @@ apps/mobile/app
     ✅ callback.tsx
 
   accept-invite
-    index.tsx
+    ✅ index.tsx
 
   add-calendar
     index.tsx

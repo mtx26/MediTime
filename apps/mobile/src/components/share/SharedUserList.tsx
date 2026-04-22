@@ -1,100 +1,10 @@
-import { Image, Pressable, TextInput } from 'react-native';
+import { Pressable, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
-import type { SharedCalendarPendingInvite, SharedCalendarUser } from '@meditime/types';
+import type { SharedUserListProps } from '@meditime/types';
+import { SharedUserRow } from './SharedUserRow';
 import { useIosTheme } from '../../theme/ios';
-
-type SharedUserListProps = {
-  emailToInvite: string;
-  invitations?: SharedCalendarPendingInvite[];
-  users: SharedCalendarUser[];
-  onDeleteInvitation: (token: string) => void;
-  onDeleteUser: (token: string) => void;
-  onEmailChange: (value: string) => void;
-  onInvite: () => void;
-};
-
-function UserRow({
-  label,
-  photoUrl,
-  status,
-  onDelete,
-}: {
-  label: string;
-  photoUrl?: string;
-  status: string;
-  onDelete: () => void;
-}) {
-  const ios = useIosTheme();
-  const hasPhoto = typeof photoUrl === 'string' && photoUrl.trim().length > 0;
-
-  return (
-    <XStack
-      style={{
-        alignItems: 'center',
-        gap: 10,
-        padding: 12,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: ios.border,
-        backgroundColor: ios.background,
-      }}
-    >
-      {hasPhoto ? (
-        <Image
-          source={{ uri: photoUrl }}
-          style={{
-            width: 38,
-            height: 38,
-            borderRadius: 19,
-            backgroundColor: ios.blueInfoBg,
-          }}
-        />
-      ) : (
-        <YStack
-          style={{
-            width: 38,
-            height: 38,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 19,
-            backgroundColor: ios.blueInfoBg,
-          }}
-        >
-          <Ionicons name="person-outline" size={18} color={ios.primary} />
-        </YStack>
-      )}
-
-      <YStack style={{ flex: 1, gap: 4 }}>
-        <Text style={{ color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}>
-          {label}
-        </Text>
-        <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16, fontWeight: '700' }}>
-          {status}
-        </Text>
-      </YStack>
-
-      <Pressable onPress={onDelete} accessibilityRole="button">
-        {({ pressed }) => (
-          <XStack
-            style={{
-              width: 36,
-              height: 36,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 8,
-              backgroundColor: ios.destructiveBg,
-              opacity: pressed ? 0.8 : 1,
-            }}
-          >
-            <Ionicons name="trash-outline" size={16} color={ios.destructive} />
-          </XStack>
-        )}
-      </Pressable>
-    </XStack>
-  );
-}
 
 export function SharedUserList({
   emailToInvite,
@@ -128,7 +38,7 @@ export function SharedUserList({
 
       <YStack style={{ gap: 10 }}>
         {users.map((user) => (
-          <UserRow
+          <SharedUserRow
             key={user.token}
             label={user.receiver_name || user.email}
             photoUrl={user.receiver_photo_url}
@@ -138,7 +48,7 @@ export function SharedUserList({
         ))}
 
         {invitations.map((invitation) => (
-          <UserRow
+          <SharedUserRow
             key={invitation.token}
             label={invitation.invited_email}
             photoUrl={invitation.receiver_photo_url}

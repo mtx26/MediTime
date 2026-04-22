@@ -9,6 +9,7 @@ import {
   buildSharedCalendarActions,
   calendarTableHasItems,
   filterEventsForDate,
+  getFirstRouteParam,
   getInitialSelectedDateForStockMethod,
   toISO,
 } from '@meditime/utils';
@@ -38,12 +39,8 @@ function truncateHeaderTitle(value: string) {
   return `${value.slice(0, HEADER_TITLE_MAX_LENGTH - 1)}...`;
 }
 
-function getRouteDateParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] : value;
-}
-
 function getInitialSelectedDateForDailyRoute(dateParam: string | string[] | undefined) {
-  const rawDate = getRouteDateParam(dateParam);
+  const rawDate = getFirstRouteParam(dateParam);
 
   if (rawDate) {
     const isoDateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(rawDate);
@@ -228,7 +225,7 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
   };
 
   const backToCalendars = () => {
-    router.replace('/calendars' as never);
+    router.dismissTo('/calendars' as never);
   };
 
   const goToPillbox = () => {

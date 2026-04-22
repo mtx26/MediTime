@@ -1,14 +1,8 @@
 import { Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, XStack } from 'tamagui';
-import type { CalendarItem } from '@meditime/types';
+import type { SharedCalendarPickerProps } from '@meditime/types';
 import { useIosTheme } from '../../theme/ios';
-
-type SharedCalendarPickerProps = {
-  calendars: CalendarItem[];
-  selectedCalendarId: string | null;
-  onSelectCalendar: (calendarId: string) => void;
-};
 
 function truncateName(name: string) {
   return name.length > 20 ? `${name.slice(0, 17)}...` : name;

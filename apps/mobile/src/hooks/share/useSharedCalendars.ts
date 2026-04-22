@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, Share } from 'react-native';
-import { Tabs, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useTranslation } from 'react-i18next';
 import {
@@ -9,6 +9,7 @@ import {
   createSharedUserCalendarsApi,
   createTokenCalendarsApi,
   fetchCalendars,
+  getFirstRouteParam,
   performApiCall,
 } from '@meditime/utils';
 import { DEMO_CALENDAR_ID } from '@meditime/constants';
@@ -24,15 +25,12 @@ import { toActionSheetItems, toMobileHref } from '../../utils';
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 
-function normalizeCalendarParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] : value;
-}
-
 export function useSharedCalendars() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ calendar?: string | string[] }>();
-  const calendarFromParams = normalizeCalendarParam(params.calendar);
+  const calendarFromParams = getFirstRouteParam(params.calendar);
+  const isDemoCalendar = calendarFromParams === DEMO_CALENDAR_ID;
   const { userInfo, isLoading: isAuthLoading } = useAuth();
   const [personalCalendars, setPersonalCalendars] = useState<CalendarItem[]>([]);
   const [groupedShared, setGroupedShared] = useState<GroupedSharedCalendars>({});
@@ -57,7 +55,7 @@ export function useSharedCalendars() {
   const tokenCalendarsApi = useMemo(() => createTokenCalendarsApi(apiOptions), [apiOptions]);
 
   const refreshGroupedShared = useCallback(async () => {
-    if (calendarFromParams === DEMO_CALENDAR_ID) {
+    if (isDemoCalendar) {
       setGroupedShared({
         [DEMO_CALENDAR_ID]: {
           calendar_name: String(t('tour.calendar_name')),
@@ -95,7 +93,7 @@ export function useSharedCalendars() {
 
     const result = await sharedUserCalendarsApi.fetchGroupedSharedCalendars() as GroupedSharedCalendarsResult;
     setGroupedShared(result.success ? result.grouped : {});
-  }, [calendarFromParams, sharedUserCalendarsApi, t]);
+  }, [isDemoCalendar, sharedUserCalendarsApi, t]);
 
   const loadPage = useCallback(async (mode: 'initial' | 'refresh' = 'initial') => {
     if (!userInfo?.uid) {

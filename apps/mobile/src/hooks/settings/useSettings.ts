@@ -7,7 +7,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { enabledLanguageCodes, getFlag, getLabel } from '@meditime/config';
 import { SETTINGS_TABS } from '@meditime/constants';
-import { buildUserUpdatePayload, getOAuthSignInOptions, log, performApiCall } from '@meditime/utils';
+import { buildUserUpdatePayload, getFirstRouteParam, getOAuthSignInOptions, log, performApiCall } from '@meditime/utils';
 import type { OAuthProvider, SettingsTabId, SettingsTabItem } from '@meditime/types';
 import { authService } from '../../contexts/AuthContext';
 import { useAuth } from '../auth/useAuth';
@@ -24,7 +24,7 @@ import {
 const API_URL = process.env.EXPO_PUBLIC_API_URL!;
 
 function normalizeTab(tab: string | string[] | undefined): SettingsTabId {
-  const value = Array.isArray(tab) ? tab[0] : tab;
+  const value = getFirstRouteParam(tab);
   const knownTabs = Object.values(SETTINGS_TABS) as SettingsTabId[];
   return knownTabs.includes(value as SettingsTabId)
     ? value as SettingsTabId
