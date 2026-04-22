@@ -12,7 +12,7 @@ export function useAcceptInvite() {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ token?: string | string[]; type?: string | string[] }>();
-  const { userInfo } = useAuth();
+  const { userInfo, isLoading: isAuthLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [invitation, setInvitation] = useState<SharedInvitation | null>(null);
   const [notFound, setNotFound] = useState(false);
@@ -59,6 +59,15 @@ export function useAcceptInvite() {
     let active = true;
 
     const loadInvitation = async () => {
+      if (isAuthLoading) return;
+
+      if (!userInfo?.uid) {
+        setInvitation(null);
+        setNotFound(false);
+        setLoading(false);
+        return;
+      }
+
       if (!token || !inviteApi) {
         setInvitation(null);
         setNotFound(true);
@@ -75,13 +84,12 @@ export function useAcceptInvite() {
 
         if (result.success) {
           setInvitation(result.invitation ?? null);
+          setNotFound(!result.invitation);
           return;
         }
 
         setInvitation(null);
-        if (result.status === 404) {
-          setNotFound(true);
-        }
+        setNotFound(true);
       } finally {
         if (active) {
           setLoading(false);
@@ -94,10 +102,10 @@ export function useAcceptInvite() {
     return () => {
       active = false;
     };
-  }, [inviteApi, token]);
+  }, [inviteApi, isAuthLoading, token, userInfo?.uid]);
 
   const handleAccept = useCallback(async () => {
-    if (!inviteApi) return;
+    if (!inviteApi || !token) return;
     setLoading(true);
 
     try {
@@ -111,7 +119,7 @@ export function useAcceptInvite() {
   }, [inviteApi, router, token]);
 
   const handleReject = useCallback(async () => {
-    if (!inviteApi) return;
+    if (!inviteApi || !token) return;
     setLoading(true);
 
     try {
@@ -128,8 +136,10 @@ export function useAcceptInvite() {
     handleAccept,
     handleReject,
     invitation,
+    isAuthLoading,
     loading,
     notFound,
     title: String(t('invitation.title')),
+    userInfo,
   };
 }

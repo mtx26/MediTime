@@ -12,7 +12,6 @@ import {
   getFirstRouteParam,
   performApiCall,
 } from '@meditime/utils';
-import { DEMO_CALENDAR_ID } from '@meditime/constants';
 import type {
   CalendarItem,
   GroupedSharedCalendars,
@@ -24,13 +23,13 @@ import { toActionSheetItems, toMobileHref } from '../../utils';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
+const isActiveDefault = () => true;
 
 export function useSharedCalendars() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ calendar?: string | string[] }>();
   const calendarFromParams = getFirstRouteParam(params.calendar);
-  const isDemoCalendar = calendarFromParams === DEMO_CALENDAR_ID;
   const { userInfo, isLoading: isAuthLoading } = useAuth();
   const [personalCalendars, setPersonalCalendars] = useState<CalendarItem[]>([]);
   const [groupedShared, setGroupedShared] = useState<GroupedSharedCalendars>({});
@@ -54,48 +53,17 @@ export function useSharedCalendars() {
   const sharedUserCalendarsApi = useMemo(() => createSharedUserCalendarsApi(apiOptions), [apiOptions]);
   const tokenCalendarsApi = useMemo(() => createTokenCalendarsApi(apiOptions), [apiOptions]);
 
-  const refreshGroupedShared = useCallback(async () => {
-    if (isDemoCalendar) {
-      setGroupedShared({
-        [DEMO_CALENDAR_ID]: {
-          calendar_name: String(t('tour.calendar_name')),
-          users: [
-            {
-              email: 'doctor@example.com',
-              receiver_name: 'Dr. Smith',
-              accepted: true,
-              permission: 'read',
-              receiver_photo_url: '',
-              token: 'demo-user-1',
-            },
-            {
-              email: 'family@example.com',
-              receiver_name: 'Family Member',
-              accepted: false,
-              permission: 'write',
-              receiver_photo_url: '',
-              token: 'demo-user-2',
-            },
-          ],
-          tokens: [
-            {
-              id: 'demo-token-1',
-              token: 'demo-link-123',
-              permission: 'read',
-              expires_at: null,
-              is_revoked: false,
-            },
-          ],
-        },
-      });
-      return;
-    }
-
+  const refreshGroupedShared = useCallback(async (isActive: () => boolean = isActiveDefault) => {
     const result = await sharedUserCalendarsApi.fetchGroupedSharedCalendars() as GroupedSharedCalendarsResult;
-    setGroupedShared(result.success ? result.grouped : {});
-  }, [isDemoCalendar, sharedUserCalendarsApi, t]);
+    if (!isActive()) return;
 
-  const loadPage = useCallback(async (mode: 'initial' | 'refresh' = 'initial') => {
+    setGroupedShared(result.success ? result.grouped : {});
+  }, [sharedUserCalendarsApi]);
+
+  const loadPage = useCallback(async (
+    mode: 'initial' | 'refresh' = 'initial',
+    isActive: () => boolean = isActiveDefault,
+  ) => {
     if (!userInfo?.uid) {
       setPersonalCalendars([]);
       setGroupedShared({});
@@ -114,28 +82,36 @@ export function useSharedCalendars() {
 
     try {
       const calendars = await fetchCalendars(API_URL);
+      if (!isActive()) return;
+
       setPersonalCalendars(calendars);
-      await refreshGroupedShared();
+      await refreshGroupedShared(isActive);
+      if (!isActive()) return;
+
       setError(null);
     } catch (loadError) {
+      if (!isActive()) return;
       setError(loadError instanceof Error ? loadError.message : String(t('loading_share')));
     } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
+      if (isActive()) {
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
     }
   }, [refreshGroupedShared, t, userInfo?.uid]);
 
   useEffect(() => {
     if (isAuthLoading) return;
-    void loadPage();
+
+    let active = true;
+    void loadPage('initial', () => active);
+
+    return () => {
+      active = false;
+    };
   }, [isAuthLoading, loadPage]);
 
   useEffect(() => {
-    if (calendarFromParams === DEMO_CALENDAR_ID) {
-      setSelectedCalendarIdState(DEMO_CALENDAR_ID);
-      return;
-    }
-
     const exists = personalCalendars.some((calendar) => calendar.id === calendarFromParams);
     if (calendarFromParams && exists) {
       setSelectedCalendarIdState(calendarFromParams);
@@ -151,11 +127,6 @@ export function useSharedCalendars() {
 
     setSelectedCalendarIdState(null);
   }, [calendarFromParams, personalCalendars, router]);
-
-  const selectedCalendar = useMemo(
-    () => personalCalendars.find((calendar) => calendar.id === selectedCalendarId) ?? null,
-    [personalCalendars, selectedCalendarId],
-  );
 
   const selectedSharedData = useMemo(
     () => (selectedCalendarId ? groupedShared[selectedCalendarId] ?? null : null),
@@ -356,7 +327,6 @@ export function useSharedCalendars() {
     navigateToHref,
     personalCalendars,
     refresh: () => void loadPage('refresh'),
-    selectedCalendar,
     selectedCalendarId,
     selectedSharedData,
     setEmailToInvite,

@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, YStack } from 'tamagui';
@@ -29,13 +29,17 @@ export default function AcceptInviteScreen() {
     headerLeft: () => <BackButton fallbackHref="/calendars" variant="header" />,
   };
 
-  if (invite.loading && !invite.invitation && !invite.notFound) {
+  if (invite.isAuthLoading || (invite.loading && !invite.invitation && !invite.notFound)) {
     return (
       <>
         <Stack.Screen options={headerOptions} />
         <LoadingIndicator label={String(t('invitation.loading'))} variant="screen" />
       </>
     );
+  }
+
+  if (!invite.userInfo) {
+    return <Redirect href="/(auth)/login" />;
   }
 
   if (invite.notFound || !invite.invitation) {
