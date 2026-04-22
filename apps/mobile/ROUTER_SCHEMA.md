@@ -4,7 +4,7 @@ Legend:
 apps/mobile/app
   ✅ _layout.tsx
   ✅ index.tsx
-  +not-found.tsx
+  ✅ +not-found.tsx
 
   (auth)
     ✅ _layout.tsx
@@ -19,10 +19,6 @@ apps/mobile/app
 
   accept-invite
     ✅ index.tsx
-
-  add-calendar
-    index.tsx
-    review.tsx
 
   (tabs)
     calendars
