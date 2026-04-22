@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, Share } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import { useTranslation } from 'react-i18next';
 import {
   buildPersonalCalendarActions,
@@ -19,7 +18,7 @@ import type {
   SharedCalendarToken,
 } from '@meditime/types';
 import { useAuth } from '../auth/useAuth';
-import { toActionSheetItems, toMobileHref } from '../../utils';
+import { openPdfUrl, toActionSheetItems, toMobileHref } from '../../utils';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
@@ -38,6 +37,8 @@ export function useSharedCalendars() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailToInvite, setEmailToInvite] = useState('');
+  const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
+  const [includeInactive, setIncludeInactive] = useState(false);
 
   const apiOptions = useMemo(
     () => ({
@@ -146,17 +147,18 @@ export function useSharedCalendars() {
     if (!selectedCalendarId) return;
 
     try {
-      await WebBrowser.openBrowserAsync(
-        personalCalendarsApi.getPersonalCalendarPdfUrl(selectedCalendarId, false),
-        {
-          dismissButtonStyle: 'close',
-          presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
-        },
-      );
+      await openPdfUrl(personalCalendarsApi.getPersonalCalendarPdfUrl(selectedCalendarId, includeInactive));
+      setPdfDialogOpen(false);
     } catch {
       Alert.alert(String(t('api.calendar.pdf_download_error')), String(t('api.calendar.pdf_download_error')));
     }
-  }, [personalCalendarsApi, selectedCalendarId, t]);
+  }, [includeInactive, personalCalendarsApi, selectedCalendarId, t]);
+
+  const openPdfDialog = useCallback(() => {
+    if (!selectedCalendarId) return;
+    setIncludeInactive(false);
+    setPdfDialogOpen(true);
+  }, [selectedCalendarId]);
 
   const deleteCalendar = useCallback(() => {
     if (!selectedCalendarId) return;
@@ -309,13 +311,13 @@ export function useSharedCalendars() {
         {
           onRename: undefined,
           onDelete: deleteCalendar,
-          onExportPdf: () => void openCalendarPdf(),
+          onExportPdf: openPdfDialog,
         },
         ['rename'],
       ),
       (key) => String(t(key)),
     );
-  }, [deleteCalendar, i18n.language, openCalendarPdf, selectedCalendarId, t]);
+  }, [deleteCalendar, i18n.language, openPdfDialog, selectedCalendarId, t]);
 
   return {
     actions,
@@ -326,10 +328,13 @@ export function useSharedCalendars() {
     isRefreshing,
     navigateToHref,
     personalCalendars,
+    pdfDialogOpen,
     refresh: () => void loadPage('refresh'),
     selectedCalendarId,
     selectedSharedData,
     setEmailToInvite,
+    setIncludeInactive,
+    setPdfDialogOpen,
     setSelectedCalendarId,
     shareLink,
     createPublicLink,
@@ -338,5 +343,7 @@ export function useSharedCalendars() {
     deleteLoginInvitation,
     deleteRegistrationInvitation,
     userInfo,
+    includeInactive,
+    openCalendarPdf,
   };
 }

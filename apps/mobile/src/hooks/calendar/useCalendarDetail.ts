@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import { useTranslation } from 'react-i18next';
 import { STOCK_DECREMENT_METHODS } from '@meditime/constants';
 import {
@@ -23,7 +22,7 @@ import type {
   WeeklyEventItem,
 } from '@meditime/types';
 import { useCalendarApis } from './useCalendarApis';
-import { toActionSheetItems, toMobileHref } from '../../utils';
+import { openPdfUrl, toActionSheetItems, toMobileHref } from '../../utils';
 
 type CalendarSource = {
   fetchSchedule: (calendarId: string, startDate?: string | null) => Promise<ApiResult>;
@@ -79,6 +78,8 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
   const [refreshing, setRefreshing] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
+  const [includeInactive, setIncludeInactive] = useState(false);
 
   const source: CalendarSource = useMemo(() => {
     if (sourceType === 'personal') {
@@ -269,14 +270,18 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
 
   const handleExportPdf = () => {
     if (!calendarId) return;
-    void WebBrowser
-      .openBrowserAsync(source.getPdfUrl(calendarId, false), {
-        dismissButtonStyle: 'close',
-        presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
-      })
-      .catch(() => {
-        Alert.alert(String(t('api.calendar.pdf_download_error')), String(t('api.calendar.pdf_download_error')));
-      });
+    setIncludeInactive(false);
+    setPdfDialogOpen(true);
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!calendarId) return;
+    try {
+      await openPdfUrl(source.getPdfUrl(calendarId, includeInactive));
+      setPdfDialogOpen(false);
+    } catch {
+      Alert.alert(String(t('api.calendar.pdf_download_error')), String(t('api.calendar.pdf_download_error')));
+    }
   };
 
   const actions = useMemo(() => {
@@ -312,6 +317,7 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     goToBoxes,
     goToPillbox,
     goToStockAlerts,
+    handleDownloadPdf,
     handleRefresh,
     headerTitle: truncateHeaderTitle(calendarName ?? String(t('calendars'))),
     isLowStock,
@@ -324,6 +330,10 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     selectedDate,
     selectDate,
     selectWeek,
+    pdfDialogOpen,
+    setPdfDialogOpen,
+    includeInactive,
+    setIncludeInactive,
     showOverviewControls: !isDailyRoute,
     showBackendLoading: (scheduleLoading || refreshing) && !loading,
     showCalendarContent: isDailyRoute || hasCalendarItems,

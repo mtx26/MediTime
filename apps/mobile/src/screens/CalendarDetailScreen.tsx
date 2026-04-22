@@ -11,6 +11,7 @@ import { CalendarHeaderTitle } from '../components/calendar/CalendarHeaderTitle'
 import { CalendarNotFoundState } from '../components/calendar/CalendarNotFoundState';
 import { MobileCalendarWeekSelector } from '../components/calendar/MobileCalendarWeekSelector';
 import { MobileWeeklyEventContent } from '../components/calendar/MobileWeeklyEventContent';
+import { PdfDialog } from '../components/calendar/PdfDialog';
 import type { CalendarDetailMode, CalendarDetailSourceType } from '@meditime/types';
 import { useCalendarDetail } from '../hooks/calendar';
 import { useIosTheme } from '../theme/ios';
@@ -185,6 +186,13 @@ export default function CalendarDetailScreen({
           )}
         </YStack>
       </ScrollView>
+      <PdfDialog
+        open={detail.pdfDialogOpen}
+        includeInactive={detail.includeInactive}
+        onIncludeInactiveChange={detail.setIncludeInactive}
+        onCancel={() => detail.setPdfDialogOpen(false)}
+        onDownload={detail.handleDownloadPdf}
+      />
     </>
   );
 }

@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, YStack } from 'tamagui';
 import { SharedCalendarPanel, SharedCalendarPicker } from '../components/share';
+import { PdfDialog } from '../components/calendar';
 import ActionSheet from '../components/common/ActionSheet';
 import { InfoBanner } from '../components/common/InfoBanner';
 import { LoadingIndicator } from '../components/common/LoadingIndicator';
@@ -122,6 +123,13 @@ export default function SharedCalendarsScreen() {
           )}
         </YStack>
       </ScrollView>
+      <PdfDialog
+        open={shared.pdfDialogOpen}
+        includeInactive={shared.includeInactive}
+        onIncludeInactiveChange={shared.setIncludeInactive}
+        onCancel={() => shared.setPdfDialogOpen(false)}
+        onDownload={() => void shared.openCalendarPdf()}
+      />
     </>
   );
 }
