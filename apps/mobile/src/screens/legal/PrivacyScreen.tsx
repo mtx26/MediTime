@@ -3,9 +3,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, XStack, YStack } from 'tamagui';
-import { PrivacyDataGroup } from '../components/common/PrivacyDataGroup';
-import { PrivacySection } from '../components/common/PrivacySection';
-import { useIosTheme } from '../theme/ios';
+import { PrivacyDataGroup } from '../../components/common/PrivacyDataGroup';
+import { PrivacySection } from '../../components/common/PrivacySection';
+import { useIosTheme } from '../../theme/ios';
 
 export default function PrivacyScreen() {
   const { t } = useTranslation();

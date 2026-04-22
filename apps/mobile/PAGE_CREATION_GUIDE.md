@@ -21,7 +21,7 @@ Route files in `apps/mobile/app` should stay tiny.
 They should usually only import a screen and pass route-specific props:
 
 ```tsx
-import SomeScreen from '../../../../../src/screens/SomeScreen';
+import SomeScreen from '../../../../../src/screens/calendar/SomeScreen';
 
 export default function Page() {
   return <SomeScreen sourceType="personal" />;
@@ -32,7 +32,24 @@ For paired routes like personal and shared-user calendars, use one shared screen
 
 ## Screen Files
 
-Screen files in `apps/mobile/src/screens` should mostly compose UI.
+Screen files in `apps/mobile/src/screens` should be grouped by route/domain and should mostly compose UI.
+
+Current screen folders:
+
+- `auth`: login, register, reset password, auth callback, email verification
+- `calendar`: calendar detail subpages such as overview, daily, ICS tokens, boxes, pillbox, settings
+- `calendars`: the main calendars list and calendar-list-level pages
+- `share`: shared calendars and invitation acceptance
+- `notifications`: notification routes
+- `settings`: settings routes
+- `legal`: privacy and terms
+- `general`: app-level fallback pages such as not found
+
+Prefer matching hooks and screens by domain, for example:
+
+- `src/screens/calendar/IcsTokensScreen.tsx`
+- `src/hooks/calendar/useIcsTokens.ts`
+- `src/components/calendar/IcsTokenCard.tsx`
 
 Avoid putting large API logic, action builders, route decisions, and data transformations directly in screen files. Move that work into hooks or package helpers.
 

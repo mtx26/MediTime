@@ -1,4 +1,5 @@
 import type { DateLike, WeeklyEventItem } from '../models';
+import type { IcsTokenEntry } from './calendar-pages';
 
 export interface WeekDayCirclesProps {
   selectedDate: Exclude<DateLike, number>;
@@ -34,4 +35,13 @@ export interface CalendarHeaderTitleProps {
 
 export interface CalendarNotFoundStateProps {
   onBackToCalendars: () => void;
+}
+
+export interface IcsTokenCardProps {
+  token: IcsTokenEntry;
+  webcalUrl: string;
+  disabled?: boolean;
+  onDelete: (token: IcsTokenEntry) => void;
+  onShare: (url: string) => void;
+  onSubscribe: (url: string) => void;
 }

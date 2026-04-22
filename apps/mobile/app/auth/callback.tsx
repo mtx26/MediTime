@@ -1,4 +1,4 @@
-import AuthCallbackScreen from '../../src/screens/AuthCallbackScreen';
+import AuthCallbackScreen from '../../src/screens/auth/AuthCallbackScreen';
 
 export default function AuthCallbackPage() {
   return <AuthCallbackScreen />;

@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, Text, XStack, YStack } from 'tamagui';
-import { AuthPageShell } from '../components/auth';
-import { InfoBanner } from '../components/common/InfoBanner';
-import { useVerifyEmail } from '../hooks/auth/useVerifyEmail';
-import { useIosTheme } from '../theme/ios';
+import { AuthPageShell } from '../../components/auth';
+import { InfoBanner } from '../../components/common/InfoBanner';
+import { useVerifyEmail } from '../../hooks/auth/useVerifyEmail';
+import { useIosTheme } from '../../theme/ios';
 
 export default function VerifyEmailScreen() {
   const { t } = useTranslation();

@@ -9,18 +9,18 @@ import {
   buildPersonalCalendarActions,
   buildSharedCalendarActions,
 } from '@meditime/utils';
-import { OutlineButton } from '../components/common/OutlineButton';
+import { OutlineButton } from '../../components/common/OutlineButton';
 import {
   AddCalendarFooter,
   CalendarSection,
   PdfDialog,
-} from '../components/calendar';
-import { useIosTheme } from '../theme/ios';
-import { useAddCalendar, useCalendars } from '../hooks/calendars';
-import { openPdfUrl, toActionSheetItems, toMobileHref } from '../utils';
+} from '../../components/calendar';
+import { useIosTheme } from '../../theme/ios';
+import { useAddCalendar, useCalendars } from '../../hooks/calendars';
+import { openPdfUrl, toActionSheetItems, toMobileHref } from '../../utils';
 
 const AddCalendarModal = lazy(() =>
-  import('../components/calendar/AddCalendarModal').then((module) => ({
+  import('../../components/calendar/AddCalendarModal').then((module) => ({
     default: module.AddCalendarModal,
   })),
 );

@@ -2,11 +2,11 @@ import { Redirect, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, YStack } from 'tamagui';
-import { BackButton } from '../components/common/BackButton';
-import { LoadingIndicator } from '../components/common/LoadingIndicator';
-import { AcceptInviteEmptyState, AcceptInviteSummary } from '../components/share';
-import { useAcceptInvite } from '../hooks/share';
-import { useIosTheme } from '../theme/ios';
+import { BackButton } from '../../components/common/BackButton';
+import { LoadingIndicator } from '../../components/common/LoadingIndicator';
+import { AcceptInviteEmptyState, AcceptInviteSummary } from '../../components/share';
+import { useAcceptInvite } from '../../hooks/share';
+import { useIosTheme } from '../../theme/ios';
 
 export default function AcceptInviteScreen() {
   const { t } = useTranslation();

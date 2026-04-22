@@ -2,10 +2,10 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, Text, XStack, YStack } from 'tamagui';
-import { AuthPageShell } from '../components/auth';
-import { InfoBanner } from '../components/common/InfoBanner';
-import { useResetPassword } from '../hooks/auth/useResetPassword';
-import { useIosTheme } from '../theme/ios';
+import { AuthPageShell } from '../../components/auth';
+import { InfoBanner } from '../../components/common/InfoBanner';
+import { useResetPassword } from '../../hooks/auth/useResetPassword';
+import { useIosTheme } from '../../theme/ios';
 
 export default function ResetPasswordScreen() {
   const { t } = useTranslation();

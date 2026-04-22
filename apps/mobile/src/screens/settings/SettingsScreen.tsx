@@ -4,16 +4,16 @@ import { useTranslation } from 'react-i18next';
 import { Button, ScrollView, Text, XStack, YStack } from 'tamagui';
 import { Ionicons } from '@expo/vector-icons';
 import { SETTINGS_TABS } from '@meditime/constants';
-import { LoadingIndicator } from '../components/common/LoadingIndicator';
+import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import {
   AccountSettingsPanel,
   NotificationSettingsPanel,
   PreferencesSettingsPanel,
   SecuritySettingsPanel,
   SettingsTabBar,
-} from '../components/settings';
-import { useSettings } from '../hooks/settings';
-import { useIosTheme } from '../theme/ios';
+} from '../../components/settings';
+import { useSettings } from '../../hooks/settings';
+import { useIosTheme } from '../../theme/ios';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();

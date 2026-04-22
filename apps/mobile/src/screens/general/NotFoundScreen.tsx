@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Button, Text, XStack, YStack } from 'tamagui';
-import { useIosTheme } from '../theme/ios';
+import { useIosTheme } from '../../theme/ios';
 
 export default function NotFoundScreen() {
   const { t } = useTranslation();

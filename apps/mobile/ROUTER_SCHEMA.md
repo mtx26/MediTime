@@ -34,7 +34,7 @@ apps/mobile/app
           settings.tsx
           stock-alerts.tsx
           pillbox-uses.tsx
-          ics-tokens.tsx
+          ✅ ics-tokens.tsx
           missed-intakes
             index.tsx
             recap.tsx
@@ -49,7 +49,7 @@ apps/mobile/app
           settings.tsx
           stock-alerts.tsx
           pillbox-uses.tsx
-          ics-tokens.tsx
+          ✅ ics-tokens.tsx
           missed-intakes
             index.tsx
             recap.tsx

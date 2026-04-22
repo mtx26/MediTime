@@ -3,14 +3,14 @@ import { RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, YStack } from 'tamagui';
-import { SharedCalendarPanel, SharedCalendarPicker } from '../components/share';
-import { PdfDialog } from '../components/calendar';
-import ActionSheet from '../components/common/ActionSheet';
-import { InfoBanner } from '../components/common/InfoBanner';
-import { LoadingIndicator } from '../components/common/LoadingIndicator';
-import { OutlineButton } from '../components/common/OutlineButton';
-import { useSharedCalendars } from '../hooks/share';
-import { useIosTheme } from '../theme/ios';
+import { SharedCalendarPanel, SharedCalendarPicker } from '../../components/share';
+import { PdfDialog } from '../../components/calendar';
+import ActionSheet from '../../components/common/ActionSheet';
+import { InfoBanner } from '../../components/common/InfoBanner';
+import { LoadingIndicator } from '../../components/common/LoadingIndicator';
+import { OutlineButton } from '../../components/common/OutlineButton';
+import { useSharedCalendars } from '../../hooks/share';
+import { useIosTheme } from '../../theme/ios';
 
 export default function SharedCalendarsScreen() {
   const { t } = useTranslation();

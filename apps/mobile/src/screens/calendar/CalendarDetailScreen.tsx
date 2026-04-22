@@ -4,17 +4,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Button, ScrollView, Text, XStack, YStack } from 'tamagui';
-import ActionSheet from '../components/common/ActionSheet';
-import { InfoBanner } from '../components/common/InfoBanner';
-import { LoadingIndicator } from '../components/common/LoadingIndicator';
-import { CalendarHeaderTitle } from '../components/calendar/CalendarHeaderTitle';
-import { CalendarNotFoundState } from '../components/calendar/CalendarNotFoundState';
-import { MobileCalendarWeekSelector } from '../components/calendar/MobileCalendarWeekSelector';
-import { MobileWeeklyEventContent } from '../components/calendar/MobileWeeklyEventContent';
-import { PdfDialog } from '../components/calendar/PdfDialog';
+import ActionSheet from '../../components/common/ActionSheet';
+import { InfoBanner } from '../../components/common/InfoBanner';
+import { LoadingIndicator } from '../../components/common/LoadingIndicator';
+import { CalendarHeaderTitle } from '../../components/calendar/CalendarHeaderTitle';
+import { CalendarNotFoundState } from '../../components/calendar/CalendarNotFoundState';
+import { MobileCalendarWeekSelector } from '../../components/calendar/MobileCalendarWeekSelector';
+import { MobileWeeklyEventContent } from '../../components/calendar/MobileWeeklyEventContent';
+import { PdfDialog } from '../../components/calendar/PdfDialog';
 import type { CalendarDetailMode, CalendarDetailSourceType } from '@meditime/types';
-import { useCalendarDetail } from '../hooks/calendar';
-import { useIosTheme } from '../theme/ios';
+import { useCalendarDetail } from '../../hooks/calendar';
+import { useIosTheme } from '../../theme/ios';
 
 type CalendarDetailScreenProps = {
   sourceType: CalendarDetailSourceType;

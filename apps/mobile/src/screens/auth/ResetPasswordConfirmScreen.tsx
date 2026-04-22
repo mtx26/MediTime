@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, Text, XStack, YStack } from 'tamagui';
-import { AuthPageShell, PasswordInput } from '../components/auth';
-import { InfoBanner } from '../components/common/InfoBanner';
-import { LoadingIndicator } from '../components/common/LoadingIndicator';
-import { useResetPasswordConfirm } from '../hooks/auth/useResetPasswordConfirm';
-import { useIosTheme } from '../theme/ios';
+import { AuthPageShell, PasswordInput } from '../../components/auth';
+import { InfoBanner } from '../../components/common/InfoBanner';
+import { LoadingIndicator } from '../../components/common/LoadingIndicator';
+import { useResetPasswordConfirm } from '../../hooks/auth/useResetPasswordConfirm';
+import { useIosTheme } from '../../theme/ios';
 
 export default function ResetPasswordConfirmScreen() {
   const { t } = useTranslation();

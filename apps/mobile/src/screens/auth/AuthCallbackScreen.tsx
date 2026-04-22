@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { Button, Text, YStack } from 'tamagui';
-import { InfoBanner } from '../components/common/InfoBanner';
-import { LoadingIndicator } from '../components/common/LoadingIndicator';
-import { useAuthCallback } from '../hooks/auth/useAuthCallback';
-import { useIosTheme } from '../theme/ios';
+import { InfoBanner } from '../../components/common/InfoBanner';
+import { LoadingIndicator } from '../../components/common/LoadingIndicator';
+import { useAuthCallback } from '../../hooks/auth/useAuthCallback';
+import { useIosTheme } from '../../theme/ios';
 
 export default function AuthCallbackScreen() {
   const { t } = useTranslation();

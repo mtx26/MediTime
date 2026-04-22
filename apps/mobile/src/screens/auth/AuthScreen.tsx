@@ -3,10 +3,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, H2, Input, ScrollView, Separator, Text, XStack, YStack } from 'tamagui';
 import type { AuthScreenProps } from '@meditime/types';
-import { AuthModeToggle, PasswordInput, SocialProviderButton } from '../components/auth';
-import { InfoBanner } from '../components/common/InfoBanner';
-import { useAuthForm } from '../hooks/auth/useAuthForm';
-import { useIosTheme } from '../theme/ios';
+import { AuthModeToggle, PasswordInput, SocialProviderButton } from '../../components/auth';
+import { InfoBanner } from '../../components/common/InfoBanner';
+import { useAuthForm } from '../../hooks/auth/useAuthForm';
+import { useIosTheme } from '../../theme/ios';
 
 export default function AuthScreen({ initialMode }: AuthScreenProps) {
   const { t } = useTranslation();
@@ -91,7 +91,7 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
                 }}
               >
                 <Image
-                  source={require('../../assets/icons/og-image.png')}
+                  source={require('../../../assets/icons/og-image.png')}
                   style={{ width: 48, height: 48 }}
                   resizeMode="contain"
                 />
