@@ -1,5 +1,6 @@
 import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import type { MobilePreferencesSettingsProps } from '@meditime/types';
@@ -106,53 +107,19 @@ export function PreferencesSettingsPanel({
         title={String(t('settings.theme'))}
         description={String(t('settings.theme_description'))}
       >
-        <XStack style={{ gap: 8 }}>
-          {themeOptions.map((item) => {
-            const active = themePreference === item;
-
-            return (
-              <Pressable
-                key={item}
-                accessibilityRole="button"
-                accessibilityState={{ selected: active }}
-                onPress={() => onThemePreferenceChange(item)}
-                style={{ flex: 1 }}
-              >
-                {({ pressed }) => (
-                  <YStack
-                    style={{
-                      minHeight: 46,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 5,
-                      borderRadius: 10,
-                      borderWidth: 1,
-                      borderColor: active ? ios.blueInfoBorder : ios.border,
-                      backgroundColor: active ? ios.blueInfoBg : ios.card,
-                      opacity: pressed ? 0.75 : 1,
-                    }}
-                  >
-                    <Ionicons
-                      name={THEME_ICONS[item]}
-                      size={18}
-                      color={active ? ios.primary : ios.mutedForeground}
-                    />
-                    <Text
-                      style={{
-                        color: active ? ios.primary : ios.foreground,
-                        fontSize: 13,
-                        lineHeight: 18,
-                        fontWeight: '800',
-                      }}
-                    >
-                      {item === 'system' ? 'System' : t(`theme.${item}`)}
-                    </Text>
-                  </YStack>
-                )}
-              </Pressable>
-            );
-          })}
-        </XStack>
+        <SegmentedControl
+          values={themeOptions.map((item) => item === 'system' ? 'System' : String(t(`theme.${item}`)))}
+          selectedIndex={Math.max(0, themeOptions.indexOf(themePreference))}
+          onChange={(event) => {
+            const nextTheme = themeOptions[event.nativeEvent.selectedSegmentIndex];
+            if (nextTheme) {
+              onThemePreferenceChange(nextTheme);
+            }
+          }}
+          style={{
+            minHeight: 34,
+          }}
+        />
       </SettingsPanelSection>
     </YStack>
   );

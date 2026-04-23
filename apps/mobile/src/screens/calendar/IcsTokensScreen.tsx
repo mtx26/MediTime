@@ -1,14 +1,14 @@
-import { RefreshControl } from 'react-native';
+import { Pressable, RefreshControl } from 'react-native';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, Spinner, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import type { CalendarDetailSourceType } from '@meditime/types';
 import { CalendarNotFoundState, IcsTokenCard } from '../../components/calendar';
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { OutlineButton } from '../../components/common/OutlineButton';
-import { Page, PageTitle, usePageHeaderOptions } from '../../components/common/Page';
+import { Page, usePageHeaderOptions } from '../../components/common/Page';
 import { useIcsTokens } from '../../hooks/calendar';
 import { useIosTheme } from '../../theme/ios';
 
@@ -60,16 +60,17 @@ export default function IcsTokensScreen({ sourceType }: IcsTokensScreenProps) {
       gap={14}
       withBottomTabInset
     >
-      <PageTitle iconName="link-outline" title={String(t('ics.title'))} />
-
-      <InfoBanner iconName="information-circle-outline" text={String(t('ics.info_description'))} />
-
       {ics.error && (
         <YStack style={{ gap: 10 }}>
           <InfoBanner iconName="warning-outline" text={ics.error} tone="warning" />
           <OutlineButton label={String(t('retry'))} onPress={() => void ics.loadTokens('refresh')} />
         </YStack>
       )}
+
+      <InfoBanner
+        iconName="information-circle-outline"
+        text={String(t('ics.info_description'))}
+      />
 
       {ics.tokens.length === 0 ? (
         <InfoBanner iconName="calendar-outline" text={String(t('ics.no_tokens'))} />
@@ -89,28 +90,35 @@ export default function IcsTokensScreen({ sourceType }: IcsTokensScreenProps) {
         </YStack>
       )}
 
-      <Button
-        size="$5"
+      <Pressable
         onPress={() => void ics.createToken()}
         disabled={ics.isMutating}
-        style={{
-          minHeight: 50,
-          borderRadius: 14,
-          backgroundColor: ios.primary,
-          opacity: ics.isMutating ? 0.55 : 1,
-        }}
+        accessibilityRole="button"
+        accessibilityLabel={String(t('ics.add_token'))}
       >
-        <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          {ics.isMutating ? (
-            <Spinner size="small" color={ios.primaryForeground} />
-          ) : (
-            <Ionicons name="add-circle-outline" size={18} color={ios.primaryForeground} />
-          )}
-          <Text style={{ color: ios.primaryForeground, fontSize: 16, fontWeight: '900' }}>
-            {t('ics.add_token')}
-          </Text>
-        </XStack>
-      </Button>
+        {({ pressed }) => (
+          <XStack
+            style={{
+              minHeight: 52,
+              alignItems: 'center',
+              gap: 10,
+              paddingHorizontal: 14,
+              paddingVertical: 12,
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: ios.border,
+              backgroundColor: pressed ? ios.accentHover : ios.card,
+              opacity: ics.isMutating ? 0.55 : 1,
+            }}
+          >
+            <Ionicons name="add-circle-outline" size={18} color={ios.primary} />
+            <Text style={{ flex: 1, color: ios.primary, fontSize: 15, fontWeight: '800' }}>
+              {t('ics.add_token')}
+            </Text>
+            <Ionicons name="chevron-forward" size={18} color={ios.mutedForeground} />
+          </XStack>
+        )}
+      </Pressable>
     </Page>
   );
 }

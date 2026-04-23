@@ -13,16 +13,18 @@ export function OutlineButton({ label, onPress }: OutlineButtonProps) {
     <Button
       size="$3"
       onPress={onPress}
+      chromeless
       style={{
-        minHeight: 40,
-        paddingHorizontal: 16,
-        borderRadius: 12,
+        minHeight: 34,
+        alignSelf: 'flex-start',
+        paddingHorizontal: 0,
+        borderRadius: 0,
         borderWidth: 0,
         borderColor: 'transparent',
-        backgroundColor: ios.blueInfoBg,
+        backgroundColor: 'transparent',
       }}
     >
-      <Text style={{ color: ios.primary, fontWeight: '700' }}>{label}</Text>
+      <Text style={{ color: ios.primary, fontSize: 15, fontWeight: '700' }}>{label}</Text>
     </Button>
   );
 }

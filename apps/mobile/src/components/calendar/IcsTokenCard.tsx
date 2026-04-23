@@ -1,10 +1,110 @@
 import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import type { IcsTokenCardProps } from '@meditime/types';
-import { IconButton } from '../common/IconButton';
 import { useIosTheme } from '../../theme/ios';
+
+function getShortToken(token: string) {
+  if (token.length <= 8) return token.toUpperCase();
+  return token.slice(0, 8).toUpperCase();
+}
+
+type ActionIconButtonProps = {
+  disabled: boolean;
+  iconName: keyof typeof Ionicons.glyphMap;
+  label: string;
+  onPress: () => void;
+  tone?: 'default' | 'destructive';
+};
+
+function ActionIconButton({
+  disabled,
+  iconName,
+  label,
+  onPress,
+  tone = 'default',
+}: ActionIconButtonProps) {
+  const ios = useIosTheme();
+  const isDestructive = tone === 'destructive';
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+    >
+      {({ pressed }) => (
+        <YStack
+          style={{
+            width: 40,
+            height: 40,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 12,
+            backgroundColor: isDestructive
+              ? ios.destructiveBg
+              : pressed ? ios.accentHover : 'transparent',
+            opacity: disabled ? 0.55 : pressed ? 0.75 : 1,
+          }}
+        >
+          <Ionicons
+            name={iconName}
+            size={18}
+            color={isDestructive ? ios.destructive : ios.primary}
+          />
+        </YStack>
+      )}
+    </Pressable>
+  );
+}
+
+type PrimaryActionButtonProps = {
+  disabled: boolean;
+  iconName: keyof typeof Ionicons.glyphMap;
+  label: string;
+  onPress: () => void;
+};
+
+function PrimaryActionButton({
+  disabled,
+  iconName,
+  label,
+  onPress,
+}: PrimaryActionButtonProps) {
+  const ios = useIosTheme();
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+    >
+      {({ pressed }) => (
+        <XStack
+          style={{
+            minHeight: 44,
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            borderRadius: 12,
+            backgroundColor: pressed ? ios.accentHover : ios.blueInfoBg,
+            paddingHorizontal: 14,
+            opacity: disabled ? 0.55 : 1,
+          }}
+        >
+          <Ionicons name={iconName} size={18} color={ios.primary} />
+          <Text style={{ color: ios.primary, fontSize: 15, fontWeight: '800' }}>
+            {label}
+          </Text>
+        </XStack>
+      )}
+    </Pressable>
+  );
+}
 
 export function IcsTokenCard({
   token,
@@ -16,91 +116,69 @@ export function IcsTokenCard({
 }: IcsTokenCardProps) {
   const { t } = useTranslation();
   const ios = useIosTheme();
+  const ownerLabel = token.owner_display_name || token.owner_email || '-';
+  const tokenValue = getShortToken(token.token);
+  const subtitle = ownerLabel !== '-' ? ownerLabel : String(t('ics.calendar_ics'));
 
   return (
     <YStack
       style={{
         gap: 12,
-        padding: 14,
-        borderRadius: 8,
+        borderRadius: 16,
         borderWidth: 1,
         borderColor: ios.border,
         backgroundColor: ios.card,
+        paddingHorizontal: 14,
+        paddingVertical: 14,
       }}
     >
       <XStack style={{ alignItems: 'center', gap: 8 }}>
-        <Ionicons name="link-outline" size={18} color={ios.primary} />
-        <Text style={{ flex: 1, color: ios.foreground, fontSize: 16, fontWeight: '900' }}>
-          {t('ics.token_label')}
-        </Text>
-      </XStack>
-
-      <Pressable
-        onPress={() => onShare(webcalUrl)}
-        disabled={disabled}
-        accessibilityRole="button"
-        accessibilityLabel={String(t('copy_link'))}
-      >
-        {({ pressed }) => (
-          <YStack
-            style={{
-              paddingHorizontal: 12,
-              paddingVertical: 10,
-              borderRadius: 8,
-              backgroundColor: pressed ? ios.accentHover : ios.background,
-              opacity: disabled ? 0.55 : 1,
-            }}
-          >
-            <Text numberOfLines={2} style={{ color: ios.foreground, fontSize: 13, lineHeight: 18, fontWeight: '700' }}>
-              {webcalUrl}
-            </Text>
-          </YStack>
-        )}
-      </Pressable>
-
-      <Button
-        size="$4"
-        disabled={disabled}
-        onPress={() => onSubscribe(webcalUrl)}
-        style={{
-          minHeight: 46,
-          borderRadius: 12,
-          backgroundColor: ios.primary,
-          opacity: disabled ? 0.55 : 1,
-        }}
-      >
-        <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <Ionicons name="calendar-outline" size={18} color={ios.primaryForeground} />
-          <Text style={{ color: ios.primaryForeground, fontSize: 15, fontWeight: '900' }}>
-            {t('ics.sync_calendar')}
-          </Text>
+        <XStack
+          style={{
+            width: 32,
+            height: 32,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 10,
+            backgroundColor: ios.accentHover,
+          }}
+        >
+          <Ionicons name="link-outline" size={18} color={ios.primary} />
         </XStack>
-      </Button>
 
-      <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-        <YStack style={{ flex: 1, minWidth: 0 }}>
-          <Text style={{ color: ios.mutedForeground, fontSize: 13, fontWeight: '700' }}>
-            {t('creator')}
+        <YStack style={{ flex: 1, minWidth: 0, gap: 2 }}>
+          <Text style={{ color: ios.foreground, fontSize: 17, lineHeight: 22, fontWeight: '900' }}>
+            {`ICS ${tokenValue}`}
           </Text>
-          <Text numberOfLines={1} style={{ color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}>
-            {token.owner_display_name || token.owner_email || '-'}
+
+          <Text numberOfLines={1} style={{ color: ios.mutedForeground, fontSize: 13, lineHeight: 18 }}>
+            {subtitle}
           </Text>
         </YStack>
-        <XStack style={{ gap: 8 }}>
-          <IconButton
-            label={String(t('copy_link'))}
-            iconName="share-outline"
+
+        <XStack style={{ alignItems: 'center', gap: 6, alignSelf: 'flex-start' }}>
+          <ActionIconButton
             disabled={disabled}
+            iconName="share-outline"
+            label={String(t('copy_link'))}
             onPress={() => onShare(webcalUrl)}
           />
-          <IconButton
-            label={String(t('delete'))}
-            iconName="trash-outline"
+          <ActionIconButton
             disabled={disabled}
+            iconName="trash-outline"
+            label={String(t('delete'))}
             onPress={() => onDelete(token)}
+            tone="destructive"
           />
         </XStack>
       </XStack>
+
+      <PrimaryActionButton
+        disabled={disabled}
+        iconName="calendar-outline"
+        label={String(t('ics.sync_calendar'))}
+        onPress={() => onSubscribe(webcalUrl)}
+      />
     </YStack>
   );
 }

@@ -31,12 +31,12 @@ export function IconButton({
       {({ pressed }) => (
         <YStack
           style={{
-            width: 40,
-            height: 40,
+            width: isDefault ? 40 : 32,
+            height: isDefault ? 40 : 32,
             alignItems: 'center',
             justifyContent: 'center',
-            borderRadius: 12,
-            backgroundColor: isDefault ? ios.primary : ios.blueInfoBg,
+            borderRadius: isDefault ? 12 : 8,
+            backgroundColor: isDefault ? ios.primary : 'transparent',
             opacity: disabled ? 0.6 : pressed ? 0.75 : 1,
           }}
         >

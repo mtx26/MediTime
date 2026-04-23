@@ -16,6 +16,7 @@
     "@meditime/i18n": "^0.0.0",
     "@meditime/types": "^0.0.0",
     "@meditime/utils": "^0.0.0",
+    "@react-native-segmented-control/segmented-control": "2.5.7",
     "@supabase/supabase-js": "^2.103.3",
     "@tamagui/babel-plugin": "^2.0.0-rc.41",
     "@tamagui/config": "^2.0.0-rc.41",

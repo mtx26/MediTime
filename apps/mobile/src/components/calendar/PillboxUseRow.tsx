@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, Text, XStack, YStack } from 'tamagui';
+import { Pressable } from 'react-native';
+import { Text, XStack, YStack } from 'tamagui';
 import type { PillboxUseRowProps } from '@meditime/types';
 import { useIosTheme } from '../../theme/ios';
 
@@ -17,26 +18,25 @@ export function PillboxUseRow({
   return (
     <YStack
       style={{
-        gap: 12,
-        padding: 14,
-        borderRadius: 8,
+        overflow: 'hidden',
+        borderRadius: 16,
         borderWidth: 1,
         borderColor: ios.border,
         backgroundColor: ios.card,
       }}
     >
-      <XStack style={{ alignItems: 'flex-start', gap: 10 }}>
+      <XStack style={{ alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 14 }}>
         <YStack
           style={{
-            width: 38,
-            height: 38,
+            width: 34,
+            height: 34,
             alignItems: 'center',
             justifyContent: 'center',
-            borderRadius: 8,
+            borderRadius: 10,
             backgroundColor: ios.blueInfoBg,
           }}
         >
-          <Ionicons name="calendar-outline" size={20} color={ios.primary} />
+          <Ionicons name="calendar-outline" size={18} color={ios.primary} />
         </YStack>
         <YStack style={{ flex: 1, minWidth: 0, gap: 4 }}>
           <Text style={{ color: ios.foreground, fontSize: 16, lineHeight: 22, fontWeight: '900' }}>
@@ -46,26 +46,37 @@ export function PillboxUseRow({
             {t('prepared_by')}: {preparedBy}
           </Text>
         </YStack>
+        <Ionicons name="chevron-forward" size={18} color={ios.mutedForeground} />
       </XStack>
 
-      <Button
-        size="$3"
+      <Pressable
         disabled={disabled}
         onPress={() => onCancel(use.id)}
-        style={{
-          minHeight: 42,
-          borderRadius: 12,
-          backgroundColor: ios.blueInfoBg,
-          opacity: disabled ? 0.55 : 1,
-        }}
+        accessibilityRole="button"
+        accessibilityLabel={String(t('restore'))}
       >
-        <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <Ionicons name="refresh-outline" size={17} color={ios.primary} />
-          <Text style={{ color: ios.primary, fontWeight: '900' }}>
-            {t('restore')}
-          </Text>
-        </XStack>
-      </Button>
+        {({ pressed }) => (
+          <XStack
+            style={{
+              minHeight: 50,
+              alignItems: 'center',
+              gap: 10,
+              paddingHorizontal: 14,
+              paddingVertical: 12,
+              borderTopWidth: 1,
+              borderTopColor: ios.border,
+              backgroundColor: pressed ? ios.accentHover : ios.card,
+              opacity: disabled ? 0.55 : 1,
+            }}
+          >
+            <Ionicons name="refresh-outline" size={18} color={ios.primary} />
+            <Text style={{ flex: 1, color: ios.primary, fontSize: 15, fontWeight: '800' }}>
+              {t('restore')}
+            </Text>
+            <Ionicons name="chevron-forward" size={18} color={ios.mutedForeground} />
+          </XStack>
+        )}
+      </Pressable>
     </YStack>
   );
 }
