@@ -22,6 +22,7 @@ export function useCalendars() {
   const [personalCalendars, setPersonalCalendars] = useState<CalendarItem[]>([]);
   const [sharedCalendars, setSharedCalendars] = useState<CalendarItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isMutating, setIsMutating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,14 +39,19 @@ export function useCalendars() {
   const personalCalendarsApi = useMemo(() => createPersonalCalendarsApi(apiOptions), [apiOptions]);
   const sharedUserCalendarsApi = useMemo(() => createSharedUserCalendarsApi(apiOptions), [apiOptions]);
 
-  const loadCalendars = useCallback(async () => {
+  const loadCalendars = useCallback(async (mode: 'initial' | 'refresh' = 'initial') => {
     if (!API_URL) {
       setError('API URL missing');
       setIsLoading(false);
+      setIsRefreshing(false);
       return;
     }
 
-    setIsLoading(true);
+    if (mode === 'refresh') {
+      setIsRefreshing(true);
+    } else {
+      setIsLoading(true);
+    }
     setError(null);
 
     try {
@@ -60,6 +66,7 @@ export function useCalendars() {
       setError(err instanceof Error ? err.message : 'Calendars loading failed');
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   }, []);
 
@@ -219,6 +226,7 @@ export function useCalendars() {
     personalCalendars,
     sharedCalendars,
     isLoading,
+    isRefreshing,
     isMutating,
     error,
     loadCalendars,

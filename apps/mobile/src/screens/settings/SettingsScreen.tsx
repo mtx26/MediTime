@@ -1,4 +1,5 @@
 import { Redirect } from 'expo-router';
+import { RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Button, ScrollView, Text, XStack, YStack } from 'tamagui';
@@ -31,7 +32,19 @@ export default function SettingsScreen() {
   }
 
   return (
-    <ScrollView flex={1} style={{ flex: 1, backgroundColor: ios.background }}>
+    <ScrollView
+      flex={1}
+      style={{ flex: 1, backgroundColor: ios.background }}
+      refreshControl={(
+        <RefreshControl
+          refreshing={settings.isRefreshing}
+          onRefresh={() => void settings.refreshSettings()}
+          tintColor={ios.primary}
+          colors={[ios.primary]}
+          progressBackgroundColor={ios.card}
+        />
+      )}
+    >
       <YStack
         style={{
           flex: 1,

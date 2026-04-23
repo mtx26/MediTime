@@ -50,7 +50,7 @@ export default function CalendarDetailScreen({
     ),
   };
 
-  if (detail.loading && !detail.selectedDate) {
+  if (detail.loading) {
     return (
       <>
         <Stack.Screen options={headerOptions} />

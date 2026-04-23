@@ -43,6 +43,7 @@ export default function CalendarsScreen() {
     personalCalendars,
     sharedCalendars,
     isLoading,
+    isRefreshing,
     isMutating,
     error,
     loadCalendars,
@@ -205,8 +206,8 @@ export default function CalendarsScreen() {
         style={{ flex: 1, backgroundColor: ios.background }}
         refreshControl={(
           <RefreshControl
-            refreshing={isLoading}
-            onRefresh={loadCalendars}
+            refreshing={isRefreshing}
+            onRefresh={() => void loadCalendars('refresh')}
             tintColor={ios.primary}
             colors={[ios.primary]}
             progressBackgroundColor={ios.card}

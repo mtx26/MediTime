@@ -43,9 +43,11 @@ export default function CalendarsLayout() {
       <Stack.Screen name="calendar/[calendarId]" />
       <Stack.Screen name="calendar/[calendarId]/daily" />
       <Stack.Screen name="calendar/[calendarId]/ics-tokens" />
+      <Stack.Screen name="calendar/[calendarId]/pillbox-uses" />
       <Stack.Screen name="shared-user-calendar/[calendarId]" />
       <Stack.Screen name="shared-user-calendar/[calendarId]/daily" />
       <Stack.Screen name="shared-user-calendar/[calendarId]/ics-tokens" />
+      <Stack.Screen name="shared-user-calendar/[calendarId]/pillbox-uses" />
     </Stack>
   );
 }

@@ -47,6 +47,7 @@ export function useSettings() {
   const [emailEnabled, setEmailEnabled] = useState(Boolean(userInfo?.emailEnabled));
   const [pushEnabled, setPushEnabled] = useState(Boolean(userInfo?.pushEnabled));
   const [isSaving, setIsSaving] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [linkedProviders, setLinkedProviders] = useState<string[]>([]);
   const [loadingProviders, setLoadingProviders] = useState(true);
   const [connectingProvider, setConnectingProvider] = useState<OAuthProvider | null>(null);
@@ -102,8 +103,8 @@ export function useSettings() {
     { id: 'azure' as OAuthProvider, name: 'Microsoft', iconName: 'logo-windows' as keyof typeof Ionicons.glyphMap, color: '#5E5E5E' },
   ], []);
 
-  const refreshLinkedProviders = useCallback(async () => {
-    setLoadingProviders(true);
+  const refreshLinkedProviders = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoadingProviders(true);
     try {
       const {
         data: { user },
@@ -117,7 +118,7 @@ export function useSettings() {
         error: providerError,
       });
     } finally {
-      setLoadingProviders(false);
+      if (showLoading) setLoadingProviders(false);
     }
   }, []);
 
@@ -290,6 +291,26 @@ export function useSettings() {
     }
   }, [refreshLinkedProviders, t]);
 
+  const refreshSettings = useCallback(async () => {
+    if (!userInfo?.uid) return;
+
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        reloadUser(),
+        refreshNotificationTime(),
+        refreshLinkedProviders(false),
+      ]);
+    } catch (refreshError) {
+      log.error('Erreur lors du rafraichissement des settings mobiles', {
+        origin: 'MOBILE_SETTINGS_REFRESH',
+        error: refreshError,
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [refreshLinkedProviders, refreshNotificationTime, reloadUser, userInfo?.uid]);
+
   const updateNotificationFlag = useCallback(async (
     key: 'email_enabled' | 'push_enabled',
     value: boolean,
@@ -372,6 +393,7 @@ export function useSettings() {
     tabs,
     userInfo,
     isLoading,
+    isRefreshing,
     emailEnabled,
     pushEnabled,
     displayName,
@@ -407,5 +429,6 @@ export function useSettings() {
     setThemePreference,
     resetPassword,
     confirmLogout,
+    refreshSettings,
   };
 }

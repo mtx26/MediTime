@@ -1,4 +1,5 @@
 import { Redirect, Stack } from 'expo-router';
+import { RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, YStack } from 'tamagui';
@@ -28,6 +29,15 @@ export default function AcceptInviteScreen() {
     },
     headerLeft: () => <BackButton fallbackHref="/calendars" variant="header" />,
   };
+  const refreshControl = (
+    <RefreshControl
+      refreshing={invite.refreshing}
+      onRefresh={invite.refreshInvitation}
+      tintColor={ios.primary}
+      colors={[ios.primary]}
+      progressBackgroundColor={ios.card}
+    />
+  );
 
   if (invite.isAuthLoading || (invite.loading && !invite.invitation && !invite.notFound)) {
     return (
@@ -46,7 +56,13 @@ export default function AcceptInviteScreen() {
     return (
       <>
         <Stack.Screen options={headerOptions} />
-        <AcceptInviteEmptyState />
+        <ScrollView
+          flex={1}
+          style={{ flex: 1, backgroundColor: ios.background }}
+          refreshControl={refreshControl}
+        >
+          <AcceptInviteEmptyState />
+        </ScrollView>
       </>
     );
   }
@@ -54,7 +70,11 @@ export default function AcceptInviteScreen() {
   return (
     <>
       <Stack.Screen options={headerOptions} />
-      <ScrollView flex={1} style={{ flex: 1, backgroundColor: ios.background }}>
+      <ScrollView
+        flex={1}
+        style={{ flex: 1, backgroundColor: ios.background }}
+        refreshControl={refreshControl}
+      >
         <YStack
           style={{
             flex: 1,

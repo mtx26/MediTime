@@ -14,6 +14,7 @@ export function useAcceptInvite() {
   const params = useLocalSearchParams<{ token?: string | string[]; type?: string | string[] }>();
   const { userInfo, isLoading: isAuthLoading } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [invitation, setInvitation] = useState<SharedInvitation | null>(null);
   const [notFound, setNotFound] = useState(false);
 
@@ -55,54 +56,74 @@ export function useAcceptInvite() {
     return null;
   }, [sharedUserCalendarsApi, type]);
 
+  const loadInvitation = useCallback(async (
+    mode: 'initial' | 'refresh' = 'initial',
+    isActive: () => boolean = () => true,
+  ) => {
+    if (isAuthLoading) return;
+
+    if (!userInfo?.uid) {
+      if (!isActive()) return;
+      setInvitation(null);
+      setNotFound(false);
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
+
+    if (!token || !inviteApi) {
+      if (!isActive()) return;
+      setInvitation(null);
+      setNotFound(true);
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
+
+    if (mode === 'refresh') {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+    setNotFound(false);
+
+    try {
+      const result = await inviteApi.get(token) as SharedInvitationResult;
+      if (!isActive()) return;
+
+      if (result.success) {
+        setInvitation(result.invitation ?? null);
+        setNotFound(!result.invitation);
+        return;
+      }
+
+      setInvitation(null);
+      setNotFound(true);
+    } catch {
+      if (!isActive()) return;
+      setInvitation(null);
+      setNotFound(true);
+    } finally {
+      if (isActive()) {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    }
+  }, [inviteApi, isAuthLoading, token, userInfo?.uid]);
+
   useEffect(() => {
     let active = true;
 
-    const loadInvitation = async () => {
-      if (isAuthLoading) return;
-
-      if (!userInfo?.uid) {
-        setInvitation(null);
-        setNotFound(false);
-        setLoading(false);
-        return;
-      }
-
-      if (!token || !inviteApi) {
-        setInvitation(null);
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setNotFound(false);
-
-      try {
-        const result = await inviteApi.get(token) as SharedInvitationResult;
-        if (!active) return;
-
-        if (result.success) {
-          setInvitation(result.invitation ?? null);
-          setNotFound(!result.invitation);
-          return;
-        }
-
-        setInvitation(null);
-        setNotFound(true);
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void loadInvitation();
+    void loadInvitation('initial', () => active);
 
     return () => {
       active = false;
     };
-  }, [inviteApi, isAuthLoading, token, userInfo?.uid]);
+  }, [loadInvitation]);
+
+  const refreshInvitation = useCallback(() => {
+    void loadInvitation('refresh');
+  }, [loadInvitation]);
 
   const handleAccept = useCallback(async () => {
     if (!inviteApi || !token) return;
@@ -139,6 +160,8 @@ export function useAcceptInvite() {
     isAuthLoading,
     loading,
     notFound,
+    refreshing,
+    refreshInvitation,
     title: String(t('invitation.title')),
     userInfo,
   };

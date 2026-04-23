@@ -1,5 +1,5 @@
 import type { DateLike, WeeklyEventItem } from '../models';
-import type { IcsTokenEntry } from './calendar-pages';
+import type { IcsTokenEntry, PillboxUseItem } from './calendar-pages';
 
 export interface WeekDayCirclesProps {
   selectedDate: Exclude<DateLike, number>;
@@ -44,4 +44,11 @@ export interface IcsTokenCardProps {
   onDelete: (token: IcsTokenEntry) => void;
   onShare: (url: string) => void;
   onSubscribe: (url: string) => void;
+}
+
+export interface PillboxUseRowProps {
+  use: PillboxUseItem;
+  weekLabel: string;
+  disabled?: boolean;
+  onCancel: (useId: string) => void;
 }
