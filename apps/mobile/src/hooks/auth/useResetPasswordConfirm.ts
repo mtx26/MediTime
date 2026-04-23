@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { useForm, useWatch } from 'react-hook-form';
 import { log } from '@meditime/utils';
 import { authService } from '../../contexts/AuthContext';
 import { supabase } from '../../services/supabase';
@@ -8,13 +9,27 @@ import { supabase } from '../../services/supabase';
 export function useResetPasswordConfirm() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const [sessionReady, setSessionReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const form = useForm<{ password: string }>({
+    mode: 'onChange',
+    defaultValues: {
+      password: '',
+    },
+  });
+
+  useEffect(() => {
+    form.register('password', {
+      validate: (value) => value.length > 0,
+    });
+    void form.trigger();
+  }, [form]);
+
+  const password = useWatch({ control: form.control, name: 'password' }) ?? '';
 
   useEffect(() => {
     let active = true;
@@ -48,7 +63,7 @@ export function useResetPasswordConfirm() {
     };
   }, [t]);
 
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = form.handleSubmit(async (values) => {
     setError(null);
 
     if (!sessionReady) {
@@ -57,7 +72,7 @@ export function useResetPasswordConfirm() {
     }
 
     setLoading(true);
-    const { error: updateError } = await supabase.auth.updateUser({ password });
+    const { error: updateError } = await supabase.auth.updateUser({ password: values.password });
 
     if (updateError) {
       log.error('Erreur lors du changement de mot de passe', updateError, {
@@ -72,11 +87,14 @@ export function useResetPasswordConfirm() {
     await authService.handleLogout();
     setLoading(false);
     router.replace('/(auth)/login');
-  }, [password, router, sessionReady, t]);
+  });
 
   return {
     password,
-    setPassword,
+    setPassword: (value: string) => {
+      setError(null);
+      form.setValue('password', value, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+    },
     showPassword,
     setShowPassword,
     loading,

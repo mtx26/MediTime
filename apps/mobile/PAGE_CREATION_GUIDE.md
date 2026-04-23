@@ -109,6 +109,25 @@ Reusable UI goes in:
 
 If a component needs props, define the prop type in `packages/types`, not locally, unless it is truly private and temporary.
 
+## Form Pattern
+
+When a mobile page contains inputs that belong to the same action, build them as one coherent form.
+
+Rules:
+
+- use `apps/mobile/src/components/common/MobileForm.tsx` for submit behavior
+- keep the full field flow linked: previous field -> next field -> final submit
+- use `returnKeyType`, `onSubmitEditing`, and refs with `.focus()` for multi-field flows
+- for password fields, reuse `apps/mobile/src/components/auth/PasswordInput.tsx`
+- if a text value becomes editable inline, keep it in the same row when possible instead of opening a second disconnected block below
+
+Required fields:
+
+- only mark a field as required on mobile if it is also required on the matching web page
+- use the same required logic as web, not a new mobile-only rule
+- when a reusable field component supports it, expose the required state through props
+- otherwise show the required marker in the label and make sure submit is blocked when the value is mandatory
+
 ## Shared Packages
 
 Use packages consistently:

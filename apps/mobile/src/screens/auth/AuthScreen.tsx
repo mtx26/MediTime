@@ -1,3 +1,4 @@
+import { useRef, type ElementRef } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -5,6 +6,7 @@ import { Button, H2, Input, ScrollView, Separator, Text, XStack, YStack } from '
 import type { AuthScreenProps } from '@meditime/types';
 import { AuthModeToggle, PasswordInput, SocialProviderButton } from '../../components/auth';
 import { InfoBanner } from '../../components/common/InfoBanner';
+import { MobileForm } from '../../components/common/MobileForm';
 import { useAuthForm } from '../../hooks/auth/useAuthForm';
 import { useIosTheme } from '../../theme/ios';
 
@@ -13,6 +15,9 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
   const ios = useIosTheme();
   const auth = useAuthForm(initialMode);
   const isLogin = auth.activeMode === 'login';
+  const nameInputRef = useRef<ElementRef<typeof Input>>(null);
+  const emailInputRef = useRef<ElementRef<typeof Input>>(null);
+  const passwordInputRef = useRef<ElementRef<typeof Input>>(null);
 
   if (auth.success) {
     return (
@@ -133,122 +138,137 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
 
             <Separator />
 
-            <YStack style={{ gap: 13 }}>
-              {!isLogin && (
-                <YStack style={{ gap: 7 }}>
-                  <Text style={{ color: ios.foreground, fontSize: 13, fontWeight: '800' }}>
-                    {t('auth.name')}
-                  </Text>
-                  <XStack style={{ alignItems: 'center', gap: 9 }}>
-                    <Ionicons name="person-outline" size={20} color={ios.mutedForeground} />
-                    <Input
-                      flex={1}
-                      size="$4"
-                      value={auth.name}
-                      onChangeText={auth.setName}
-                      autoCapitalize="words"
-                      autoComplete="name"
+            <MobileForm onSubmit={auth.handleSubmit} disabled={auth.loading || !auth.canSubmit} style={{ gap: 13 }}>
+              {(form) => (
+                <>
+                  {!isLogin && (
+                    <YStack style={{ gap: 7 }}>
+                      <Text style={{ color: ios.foreground, fontSize: 13, fontWeight: '800' }}>
+                        {t('auth.name')} <Text style={{ color: ios.destructive }}>*</Text>
+                      </Text>
+                      <XStack style={{ alignItems: 'center', gap: 9 }}>
+                        <Ionicons name="person-outline" size={20} color={ios.mutedForeground} />
+                        <Input
+                          ref={nameInputRef}
+                          flex={1}
+                          size="$4"
+                          value={auth.name}
+                          onChangeText={auth.setName}
+                          autoCapitalize="words"
+                          autoComplete="name"
+                          returnKeyType="next"
+                          onSubmitEditing={() => emailInputRef.current?.focus()}
+                        />
+                      </XStack>
+                    </YStack>
+                  )}
+
+                  <YStack style={{ gap: 7 }}>
+                    <Text style={{ color: ios.foreground, fontSize: 13, fontWeight: '800' }}>
+                      {t('auth.email')} <Text style={{ color: ios.destructive }}>*</Text>
+                    </Text>
+                    <XStack style={{ alignItems: 'center', gap: 9 }}>
+                      <Ionicons name="mail-outline" size={20} color={ios.mutedForeground} />
+                      <Input
+                        ref={emailInputRef}
+                        flex={1}
+                        size="$4"
+                        value={auth.email}
+                        onChangeText={auth.setEmail}
+                        autoCapitalize="none"
+                        keyboardType="email-address"
+                        autoComplete="email"
+                        borderColor={auth.emailValid ? undefined : '$red8'}
+                        returnKeyType="next"
+                        onSubmitEditing={() => passwordInputRef.current?.focus()}
+                      />
+                    </XStack>
+                  </YStack>
+
+                  <YStack style={{ gap: 7 }}>
+                    <Text style={{ color: ios.foreground, fontSize: 13, fontWeight: '800' }}>
+                      {t('auth.password')} <Text style={{ color: ios.destructive }}>*</Text>
+                    </Text>
+                    <PasswordInput
+                      ref={passwordInputRef}
+                      value={auth.password}
+                      onChangeText={auth.setPassword}
+                      visible={auth.passwordVisible}
+                      onVisibleChange={auth.setPasswordVisible}
+                      autoComplete={isLogin ? 'current-password' : 'new-password'}
+                      onSubmitEditing={form.submit}
+                      returnKeyType="done"
                     />
-                  </XStack>
-                </YStack>
-              )}
+                  </YStack>
 
-              <YStack style={{ gap: 7 }}>
-                <Text style={{ color: ios.foreground, fontSize: 13, fontWeight: '800' }}>
-                  {t('auth.email')}
-                </Text>
-                <XStack style={{ alignItems: 'center', gap: 9 }}>
-                  <Ionicons name="mail-outline" size={20} color={ios.mutedForeground} />
-                  <Input
-                    flex={1}
+                  {isLogin && (
+                    <Button size="$3" chromeless style={{ alignSelf: 'flex-end' }} onPress={auth.goToResetPassword}>
+                      <Text style={{ color: ios.primary, fontSize: 13, fontWeight: '800' }}>
+                        {t('auth.forgot_password')}
+                      </Text>
+                    </Button>
+                  )}
+
+                  {!isLogin && (
+                    <Pressable
+                      accessibilityRole="checkbox"
+                      accessibilityState={{ checked: auth.termsAccepted }}
+                      onPress={() => auth.setTermsAccepted(!auth.termsAccepted)}
+                    >
+                      {({ pressed }) => (
+                        <XStack style={{ alignItems: 'flex-start', gap: 10, opacity: pressed ? 0.75 : 1 }}>
+                          <YStack
+                            style={{
+                              width: 22,
+                              height: 22,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderRadius: 6,
+                              borderWidth: 1,
+                              borderColor: auth.termsAccepted ? ios.primary : ios.border,
+                              backgroundColor: auth.termsAccepted ? ios.primary : ios.card,
+                            }}
+                          >
+                            {auth.termsAccepted && (
+                              <Ionicons name="checkmark" size={16} color={ios.primaryForeground} />
+                            )}
+                          </YStack>
+                          <Text style={{ flex: 1, color: ios.foreground, fontSize: 13, lineHeight: 19 }}>
+                            {t('auth.accept_terms')}
+                            <Text style={{ color: ios.destructive }}> *</Text>
+                            <Text
+                              style={{ color: ios.primary, fontWeight: '800' }}
+                              onPress={auth.goToTerms}
+                            >
+                              {t('auth.terms_link')}
+                            </Text>
+                          </Text>
+                        </XStack>
+                      )}
+                    </Pressable>
+                  )}
+
+                  <Button
                     size="$4"
-                    value={auth.email}
-                    onChangeText={auth.setEmail}
-                    autoCapitalize="none"
-                    keyboardType="email-address"
-                    autoComplete="email"
-                  />
-                </XStack>
-              </YStack>
-
-              <YStack style={{ gap: 7 }}>
-                <Text style={{ color: ios.foreground, fontSize: 13, fontWeight: '800' }}>
-                  {t('auth.password')}
-                </Text>
-                <PasswordInput
-                  value={auth.password}
-                  onChangeText={auth.setPassword}
-                  visible={auth.passwordVisible}
-                  onVisibleChange={auth.setPasswordVisible}
-                  autoComplete={isLogin ? 'current-password' : 'new-password'}
-                />
-              </YStack>
-
-              {isLogin && (
-                <Button size="$3" chromeless style={{ alignSelf: 'flex-end' }} onPress={auth.goToResetPassword}>
-                  <Text style={{ color: ios.primary, fontSize: 13, fontWeight: '800' }}>
-                    {t('auth.forgot_password')}
-                  </Text>
-                </Button>
-              )}
-
-              {!isLogin && (
-                <Pressable
-                  accessibilityRole="checkbox"
-                  accessibilityState={{ checked: auth.termsAccepted }}
-                  onPress={() => auth.setTermsAccepted(!auth.termsAccepted)}
-                >
-                  {({ pressed }) => (
-                    <XStack style={{ alignItems: 'flex-start', gap: 10, opacity: pressed ? 0.75 : 1 }}>
-                      <YStack
-                        style={{
-                          width: 22,
-                          height: 22,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          borderRadius: 6,
-                          borderWidth: 1,
-                          borderColor: auth.termsAccepted ? ios.primary : ios.border,
-                          backgroundColor: auth.termsAccepted ? ios.primary : ios.card,
-                        }}
-                      >
-                        {auth.termsAccepted && (
-                          <Ionicons name="checkmark" size={16} color={ios.primaryForeground} />
-                        )}
-                      </YStack>
-                      <Text style={{ flex: 1, color: ios.foreground, fontSize: 13, lineHeight: 19 }}>
-                        {t('auth.accept_terms')}
-                        <Text
-                          style={{ color: ios.primary, fontWeight: '800' }}
-                          onPress={auth.goToTerms}
-                        >
-                          {t('auth.terms_link')}
-                        </Text>
+                    theme="blue"
+                    disabled={auth.loading || !auth.canSubmit}
+                    opacity={auth.loading ? 0.7 : 1}
+                    onPress={form.submit}
+                  >
+                    <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                      <Ionicons
+                        name={isLogin ? 'log-in-outline' : 'person-add-outline'}
+                        size={18}
+                        color={ios.primaryForeground}
+                      />
+                      <Text style={{ color: ios.primaryForeground, fontWeight: '900' }}>
+                        {auth.loading ? t('loading') : isLogin ? t('auth.login') : t('auth.register')}
                       </Text>
                     </XStack>
-                  )}
-                </Pressable>
+                  </Button>
+                </>
               )}
-
-              <Button
-                size="$4"
-                theme="blue"
-                disabled={auth.loading || !auth.canSubmit}
-                opacity={auth.loading ? 0.7 : 1}
-                onPress={() => void auth.handleSubmit()}
-              >
-                <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <Ionicons
-                    name={isLogin ? 'log-in-outline' : 'person-add-outline'}
-                    size={18}
-                    color={ios.primaryForeground}
-                  />
-                  <Text style={{ color: ios.primaryForeground, fontWeight: '900' }}>
-                    {auth.loading ? t('loading') : isLogin ? t('auth.login') : t('auth.register')}
-                  </Text>
-                </XStack>
-              </Button>
-            </YStack>
+            </MobileForm>
           </YStack>
         </YStack>
       </ScrollView>

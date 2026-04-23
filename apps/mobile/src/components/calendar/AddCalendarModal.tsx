@@ -11,6 +11,7 @@ import {
   type AddCalendarImportType,
 } from '@meditime/constants';
 import { InfoBanner } from '../common/InfoBanner';
+import { MobileForm } from '../common/MobileForm';
 import { OutlineButton } from '../common/OutlineButton';
 import { useAppTheme } from '../../theme/ios';
 import type { AddCalendarStep, MedicineReviewField } from './import/types';
@@ -323,107 +324,114 @@ export function AddCalendarModal({
                     onSave={onSaveImportedMedicines}
                   />
                 ) : (
-                  <YStack style={{ gap: 18, padding: 20 }}>
-                    <YStack style={{ gap: 8 }}>
-                      <Text style={{ color: ios.foreground, fontSize: 15, fontWeight: '700' }}>
-                        {t('calendar.name')} <Text style={{ color: ios.destructive }}>*</Text>
-                      </Text>
-                      <Input
-                        value={name}
-                        onChangeText={onNameChange}
-                        disabled={disabled}
-                        placeholder={t('calendar.name')}
-                        returnKeyType="done"
-                        onSubmitEditing={onSubmit}
-                        style={{
-                          minHeight: 48,
-                          borderWidth: 0,
-                          borderRadius: 12,
-                          backgroundColor: ios.background,
-                          color: ios.foreground,
-                          fontSize: 17,
-                        }}
-                      />
-                    </YStack>
-
-                    <YStack style={{ gap: 8 }}>
-                      <Text style={{ color: ios.foreground, fontSize: 15, fontWeight: '700' }}>
-                        {t('calendar.import_type')} <Text style={{ color: ios.destructive }}>*</Text>
-                      </Text>
-                      <YStack style={{ gap: 8 }}>
-                        <ImportTypeOption
-                          label={t('calendar.import_type_manual')}
-                          iconName="add-outline"
-                          selected={isManual}
-                          onPress={() => onImportTypeChange(ADD_CALENDAR_IMPORT_TYPES.MANUAL)}
-                        />
-                        <ImportTypeOption
-                          label={t('calendar.scan_qr_option')}
-                          iconName="qr-code-outline"
-                          selected={isQr}
-                          onPress={() => onImportTypeChange(ADD_CALENDAR_IMPORT_TYPES.QR)}
-                        />
-                        <ImportTypeOption
-                          label={t('calendar.import_type_file')}
-                          iconName="cloud-upload-outline"
-                          selected={isFile}
-                          onPress={() => onImportTypeChange(ADD_CALENDAR_IMPORT_TYPES.FILE)}
-                        />
-                      </YStack>
-                    </YStack>
-
-                    <InfoBanner
-                      iconName={isManual ? 'information-circle-outline' : isQr ? 'qr-code-outline' : 'image-outline'}
-                      text={importDescription}
-                      tone="info"
-                    />
-
-                    {isQr && (
-                      <QRImportPanel
-                        medicines={qrMedicines}
-                        loadingGtin={qrLoadingGtin}
-                        disabled={disabled}
-                        onBarcodeScanned={onQrBarcodeScanned}
-                        onRemoveMedicine={onRemoveQrMedicine}
-                      />
-                    )}
-
-                    {isFile && (
-                      <ImageImportPanel
-                        fileName={imageFileName}
-                        imageUri={imageAssetUri}
-                        disabled={disabled}
-                        onChooseSource={() => setImageSourceMenuOpen(true)}
-                        onRemoveImage={onRemoveImage}
-                      />
-                    )}
-
-                    <YStack style={{ gap: 10 }}>
-                      <Button
-                        size="$5"
-                        onPress={onSubmit}
-                        disabled={disabled || !canSubmit}
-                        style={{
-                          minHeight: 50,
-                          borderRadius: 14,
-                          backgroundColor: ios.primary,
-                          opacity: disabled || !canSubmit ? 0.55 : 1,
-                        }}
-                      >
-                        <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                          {disabled ? (
-                            <Spinner size="small" color={ios.primaryForeground} />
-                          ) : (
-                            <Ionicons name={isFile ? 'arrow-forward' : 'add-outline'} size={19} color={ios.primaryForeground} />
-                          )}
-                          <Text style={{ color: ios.primaryForeground, fontSize: 17, fontWeight: '800' }}>
-                            {isFile ? t('next') : t('add')}
+                  <MobileForm
+                    onSubmit={onSubmit}
+                    disabled={disabled || !canSubmit}
+                    style={{ gap: 18, padding: 20 }}
+                  >
+                    {(form) => (
+                      <>
+                        <YStack style={{ gap: 8 }}>
+                          <Text style={{ color: ios.foreground, fontSize: 15, fontWeight: '700' }}>
+                            {t('calendar.name')} <Text style={{ color: ios.destructive }}>*</Text>
                           </Text>
-                        </XStack>
-                      </Button>
-                      <OutlineButton label={t('cancel')} onPress={onCancel} />
-                    </YStack>
-                  </YStack>
+                          <Input
+                            value={name}
+                            onChangeText={onNameChange}
+                            disabled={disabled}
+                            placeholder={t('calendar.name')}
+                            {...form.getInputProps()}
+                            style={{
+                              minHeight: 48,
+                              borderWidth: 0,
+                              borderRadius: 12,
+                              backgroundColor: ios.background,
+                              color: ios.foreground,
+                              fontSize: 17,
+                            }}
+                          />
+                        </YStack>
+
+                        <YStack style={{ gap: 8 }}>
+                          <Text style={{ color: ios.foreground, fontSize: 15, fontWeight: '700' }}>
+                            {t('calendar.import_type')} <Text style={{ color: ios.destructive }}>*</Text>
+                          </Text>
+                          <YStack style={{ gap: 8 }}>
+                            <ImportTypeOption
+                              label={t('calendar.import_type_manual')}
+                              iconName="add-outline"
+                              selected={isManual}
+                              onPress={() => onImportTypeChange(ADD_CALENDAR_IMPORT_TYPES.MANUAL)}
+                            />
+                            <ImportTypeOption
+                              label={t('calendar.scan_qr_option')}
+                              iconName="qr-code-outline"
+                              selected={isQr}
+                              onPress={() => onImportTypeChange(ADD_CALENDAR_IMPORT_TYPES.QR)}
+                            />
+                            <ImportTypeOption
+                              label={t('calendar.import_type_file')}
+                              iconName="cloud-upload-outline"
+                              selected={isFile}
+                              onPress={() => onImportTypeChange(ADD_CALENDAR_IMPORT_TYPES.FILE)}
+                            />
+                          </YStack>
+                        </YStack>
+
+                        <InfoBanner
+                          iconName={isManual ? 'information-circle-outline' : isQr ? 'qr-code-outline' : 'image-outline'}
+                          text={importDescription}
+                          tone="info"
+                        />
+
+                        {isQr && (
+                          <QRImportPanel
+                            medicines={qrMedicines}
+                            loadingGtin={qrLoadingGtin}
+                            disabled={disabled}
+                            onBarcodeScanned={onQrBarcodeScanned}
+                            onRemoveMedicine={onRemoveQrMedicine}
+                          />
+                        )}
+
+                        {isFile && (
+                          <ImageImportPanel
+                            fileName={imageFileName}
+                            imageUri={imageAssetUri}
+                            disabled={disabled}
+                            onChooseSource={() => setImageSourceMenuOpen(true)}
+                            onRemoveImage={onRemoveImage}
+                          />
+                        )}
+
+                        <YStack style={{ gap: 10 }}>
+                          <Button
+                            size="$5"
+                            onPress={form.submit}
+                            disabled={disabled || !canSubmit}
+                            style={{
+                              minHeight: 50,
+                              borderRadius: 14,
+                              backgroundColor: ios.primary,
+                              opacity: disabled || !canSubmit ? 0.55 : 1,
+                            }}
+                          >
+                            <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                              {disabled ? (
+                                <Spinner size="small" color={ios.primaryForeground} />
+                              ) : (
+                                <Ionicons name={isFile ? 'arrow-forward' : 'add-outline'} size={19} color={ios.primaryForeground} />
+                              )}
+                              <Text style={{ color: ios.primaryForeground, fontSize: 17, fontWeight: '800' }}>
+                                {isFile ? t('next') : t('add')}
+                              </Text>
+                            </XStack>
+                          </Button>
+                          <OutlineButton label={t('cancel')} onPress={onCancel} />
+                        </YStack>
+                      </>
+                    )}
+                  </MobileForm>
                 )}
               </ScrollView>
             </YStack>

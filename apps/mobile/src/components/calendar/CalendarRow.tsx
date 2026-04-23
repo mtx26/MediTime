@@ -54,18 +54,29 @@ export function CalendarRow({
       >
         <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <YStack style={{ flex: 1, minWidth: 0 }}>
-            <Text
-              numberOfLines={2}
-              style={{
-                color: ios.foreground,
-                fontSize: 18,
-                lineHeight: 24,
-                fontWeight: '700',
-                marginBottom: 4,
-              }}
-            >
-              {calendar.name}
-            </Text>
+            {isRenaming && onRenameChange && onRenameSubmit && onRenameCancel ? (
+              <RenameForm
+                calendar={calendar}
+                value={renameValue ?? ''}
+                disabled={isMutating}
+                onChange={onRenameChange}
+                onSubmit={onRenameSubmit}
+                onCancel={onRenameCancel}
+              />
+            ) : (
+              <Text
+                numberOfLines={2}
+                style={{
+                  color: ios.foreground,
+                  fontSize: 18,
+                  lineHeight: 24,
+                  fontWeight: '700',
+                  marginBottom: 4,
+                }}
+              >
+                {calendar.name}
+              </Text>
+            )}
 
             <Text style={{ color: ios.mutedForeground, fontSize: 14, lineHeight: 20 }}>
               {t('medicines.label')}:{' '}
@@ -87,23 +98,14 @@ export function CalendarRow({
             )}
           </YStack>
 
-          <YStack style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name="chevron-forward" size={20} color={ios.mutedForeground} />
-          </YStack>
+          {!isRenaming && (
+            <YStack style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="chevron-forward" size={20} color={ios.mutedForeground} />
+            </YStack>
+          )}
         </XStack>
 
         {calendar.ifLowStock && <StatusBadge text={t('stock_alert')} />}
-
-        {isRenaming && onRenameChange && onRenameSubmit && onRenameCancel && (
-          <RenameForm
-            calendar={calendar}
-            value={renameValue ?? ''}
-            disabled={isMutating}
-            onChange={onRenameChange}
-            onSubmit={onRenameSubmit}
-            onCancel={onRenameCancel}
-          />
-        )}
       </YStack>
     </ActionSheet>
   );

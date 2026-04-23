@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Input, Text, XStack, YStack } from 'tamagui';
 import { AuthPageShell } from '../../components/auth';
 import { InfoBanner } from '../../components/common/InfoBanner';
+import { MobileForm } from '../../components/common/MobileForm';
 import { useResetPassword } from '../../hooks/auth/useResetPassword';
 import { useIosTheme } from '../../theme/ios';
 
@@ -28,35 +29,49 @@ export default function ResetPasswordScreen() {
           <InfoBanner iconName="warning-outline" text={resetPassword.error} tone="warning" />
         )}
 
-        <XStack style={{ alignItems: 'center' }} gap="$2">
-          <Ionicons name="mail-outline" size={20} color={ios.mutedForeground} />
-          <Input
-            flex={1}
-            size="$4"
-            placeholder={t('auth.email')}
-            value={resetPassword.email}
-            onChangeText={resetPassword.setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            autoComplete="email"
-            borderColor={resetPassword.formValid ? undefined : '$red8'}
-          />
-        </XStack>
-
-        <Button
-          size="$4"
-          theme="blue"
-          onPress={() => void resetPassword.handleReset()}
+        <MobileForm
+          onSubmit={resetPassword.handleReset}
           disabled={resetPassword.isSubmitting || !resetPassword.email.trim()}
-          opacity={resetPassword.isSubmitting ? 0.7 : 1}
+          gap="$4"
         >
-          <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            <Ionicons name="mail-outline" size={18} color={ios.primaryForeground} />
-            <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
-              {resetPassword.isSubmitting ? t('loading') : t('reset_password.send_link')}
-            </Text>
-          </XStack>
-        </Button>
+          {(form) => (
+            <>
+              <Text style={{ color: ios.foreground, fontSize: 13, fontWeight: '800' }}>
+                {t('auth.email')} <Text style={{ color: ios.destructive }}>*</Text>
+              </Text>
+              <XStack style={{ alignItems: 'center' }} gap="$2">
+                <Ionicons name="mail-outline" size={20} color={ios.mutedForeground} />
+                <Input
+                  flex={1}
+                  size="$4"
+                  placeholder={t('auth.email')}
+                  value={resetPassword.email}
+                  onChangeText={resetPassword.setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  autoComplete="email"
+                  borderColor={resetPassword.formValid ? undefined : '$red8'}
+                  {...form.getInputProps()}
+                />
+              </XStack>
+
+              <Button
+                size="$4"
+                theme="blue"
+                onPress={form.submit}
+                disabled={resetPassword.isSubmitting || !resetPassword.email.trim()}
+                opacity={resetPassword.isSubmitting ? 0.7 : 1}
+              >
+                <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <Ionicons name="mail-outline" size={18} color={ios.primaryForeground} />
+                  <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
+                    {resetPassword.isSubmitting ? t('loading') : t('reset_password.send_link')}
+                  </Text>
+                </XStack>
+              </Button>
+            </>
+          )}
+        </MobileForm>
 
         <Button
           size="$3"

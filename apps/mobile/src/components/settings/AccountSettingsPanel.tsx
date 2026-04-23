@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, Text, XStack, YStack } from 'tamagui';
 import type { MobileAccountSettingsProps } from '@meditime/types';
+import { MobileForm } from '../common/MobileForm';
 import { SettingsPanelSection } from './SettingsPanelSection';
 import { useIosTheme } from '../../theme/ios';
 
@@ -95,37 +96,44 @@ export function AccountSettingsPanel({
           </Text>
         </YStack>
 
-        <YStack style={{ gap: 8 }}>
-          <Text style={{ color: ios.mutedForeground, fontSize: 13, lineHeight: 18, fontWeight: '700' }}>
-            {t('account.display_name.label')}
-          </Text>
-          <Input
-            size="$4"
-            value={displayName}
-            placeholder={t('account.display_name.placeholder')}
-            onChangeText={onDisplayNameChange}
-            autoCapitalize="words"
-          />
-          <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 18 }}>
-            {t('account.display_name.hint')}
-          </Text>
-        </YStack>
+        <MobileForm onSubmit={onSaveDisplayName} disabled={isSaving} gap="$3">
+          {(form) => (
+            <>
+              <YStack style={{ gap: 8 }}>
+                <Text style={{ color: ios.mutedForeground, fontSize: 13, lineHeight: 18, fontWeight: '700' }}>
+                  {t('account.display_name.label')}
+                </Text>
+                <Input
+                  size="$4"
+                  value={displayName}
+                  placeholder={t('account.display_name.placeholder')}
+                  onChangeText={onDisplayNameChange}
+                  autoCapitalize="words"
+                  {...form.getInputProps()}
+                />
+                <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 18 }}>
+                  {t('account.display_name.hint')}
+                </Text>
+              </YStack>
 
-        <XStack style={{ gap: 10 }}>
-          <Button
-            flex={1}
-            size="$4"
-            theme="blue"
-            disabled={isSaving}
-            opacity={isSaving ? 0.7 : 1}
-            onPress={onSaveDisplayName}
-          >
-            {t('account.save_changes')}
-          </Button>
-          <Button flex={1} size="$4" onPress={onResetDisplayName}>
-            {t('cancel')}
-          </Button>
-        </XStack>
+              <XStack style={{ gap: 10 }}>
+                <Button
+                  flex={1}
+                  size="$4"
+                  theme="blue"
+                  disabled={isSaving}
+                  opacity={isSaving ? 0.7 : 1}
+                  onPress={form.submit}
+                >
+                  {t('account.save_changes')}
+                </Button>
+                <Button flex={1} size="$4" onPress={onResetDisplayName}>
+                  {t('cancel')}
+                </Button>
+              </XStack>
+            </>
+          )}
+        </MobileForm>
       </SettingsPanelSection>
     </YStack>
   );

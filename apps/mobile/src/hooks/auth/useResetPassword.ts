@@ -1,39 +1,41 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useForm, useWatch } from 'react-hook-form';
 import { authService } from '../../contexts/AuthContext';
 import { buildWebResetPasswordCallbackUrl } from '../../utils';
 
-function isValidEmail(value: string) {
-  return value.includes('@') && value.includes('.');
-}
-
 export function useResetPassword() {
   const { t } = useTranslation();
-  const [email, setEmailValue] = useState('');
-  const [formValid, setFormValid] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const form = useForm<{ email: string }>({
+    mode: 'onChange',
+    defaultValues: {
+      email: '',
+    },
+  });
+
+  useEffect(() => {
+    form.register('email', {
+      validate: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+        || String(t('supabase-error.invalid_email')),
+    });
+    void form.trigger();
+  }, [form, t]);
+
+  const email = useWatch({ control: form.control, name: 'email' }) ?? '';
+  const formValid = !email.trim() || !form.formState.errors.email;
 
   const setEmail = useCallback((value: string) => {
-    setEmailValue(value);
-    setFormValid(true);
     setError(null);
     setSent(false);
-  }, []);
+    form.setValue('email', value, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+  }, [form]);
 
-  const handleReset = useCallback(async () => {
-    const trimmedEmail = email.trim();
-    const isFormValid = isValidEmail(trimmedEmail);
-
-    setFormValid(isFormValid);
+  const handleReset = form.handleSubmit(async (values) => {
+    const trimmedEmail = values.email.trim();
     setError(null);
-
-    if (!isFormValid) {
-      setError(String(t('supabase-error.invalid_email')));
-      return;
-    }
-
     setIsSubmitting(true);
     try {
       await authService.resetPassword(trimmedEmail, buildWebResetPasswordCallbackUrl());
@@ -43,7 +45,9 @@ export function useResetPassword() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [email, t]);
+  }, (errors) => {
+    setError(errors.email?.message ?? null);
+  });
 
   return {
     email,

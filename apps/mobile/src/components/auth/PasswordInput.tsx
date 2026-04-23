@@ -1,26 +1,33 @@
+import { forwardRef, type ComponentProps, type ElementRef } from 'react';
 import { Pressable, type TextInputProps } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Input, YStack, XStack } from 'tamagui';
 import { useIosTheme } from '../../theme/ios';
 
+type TamaguiInputProps = ComponentProps<typeof Input>;
+
 type PasswordInputProps = {
   autoComplete?: TextInputProps['autoComplete'];
+  onSubmitEditing?: TamaguiInputProps['onSubmitEditing'];
   placeholder?: string;
+  returnKeyType?: TamaguiInputProps['returnKeyType'];
   value: string;
   visible: boolean;
   onChangeText: (value: string) => void;
   onVisibleChange: (visible: boolean) => void;
 };
 
-export function PasswordInput({
+export const PasswordInput = forwardRef<ElementRef<typeof Input>, PasswordInputProps>(function PasswordInput({
   autoComplete,
+  onSubmitEditing,
   placeholder,
+  returnKeyType,
   value,
   visible,
   onChangeText,
   onVisibleChange,
-}: PasswordInputProps) {
+}, ref) {
   const { t } = useTranslation();
   const ios = useIosTheme();
 
@@ -29,12 +36,15 @@ export function PasswordInput({
       <Ionicons name="lock-closed-outline" size={20} color={ios.mutedForeground} />
       <YStack flex={1} style={{ position: 'relative' }}>
         <Input
+          ref={ref}
           size="$4"
           value={value}
           placeholder={placeholder}
           onChangeText={onChangeText}
+          onSubmitEditing={onSubmitEditing}
           secureTextEntry={!visible}
           autoComplete={autoComplete}
+          returnKeyType={returnKeyType}
           style={{ paddingRight: 48 }}
         />
         <Pressable
@@ -63,4 +73,4 @@ export function PasswordInput({
       </YStack>
     </XStack>
   );
-}
+});

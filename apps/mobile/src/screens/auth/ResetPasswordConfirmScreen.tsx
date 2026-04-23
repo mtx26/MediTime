@@ -4,6 +4,7 @@ import { Button, Text, XStack, YStack } from 'tamagui';
 import { AuthPageShell, PasswordInput } from '../../components/auth';
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
+import { MobileForm } from '../../components/common/MobileForm';
 import { useResetPasswordConfirm } from '../../hooks/auth/useResetPasswordConfirm';
 import { useIosTheme } from '../../theme/ios';
 
@@ -31,35 +32,54 @@ export default function ResetPasswordConfirmScreen() {
           <InfoBanner iconName="warning-outline" text={resetPasswordConfirm.error} tone="warning" />
         )}
 
-        <PasswordInput
-          placeholder={String(t('reset_password_confirm.new_password_label'))}
-          value={resetPasswordConfirm.password}
-          onChangeText={resetPasswordConfirm.setPassword}
-          visible={resetPasswordConfirm.showPassword}
-          onVisibleChange={resetPasswordConfirm.setShowPassword}
-          autoComplete="new-password"
-        />
-
-        <Button
-          size="$4"
-          theme="blue"
-          onPress={() => void resetPasswordConfirm.handleSubmit()}
+        <MobileForm
+          onSubmit={resetPasswordConfirm.handleSubmit}
           disabled={
             resetPasswordConfirm.loading ||
             !resetPasswordConfirm.sessionReady ||
             !resetPasswordConfirm.password
           }
-          opacity={resetPasswordConfirm.loading ? 0.7 : 1}
+          gap="$4"
         >
-          <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            <Ionicons name="lock-closed-outline" size={18} color={ios.primaryForeground} />
-            <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
-              {resetPasswordConfirm.loading
-                ? t('reset_password_confirm.saving')
-                : t('reset_password_confirm.save_password')}
-            </Text>
-          </XStack>
-        </Button>
+          {(form) => (
+            <>
+              <Text style={{ color: ios.foreground, fontSize: 13, fontWeight: '800' }}>
+                {t('reset_password_confirm.new_password_label')} <Text style={{ color: ios.destructive }}>*</Text>
+              </Text>
+              <PasswordInput
+                placeholder={String(t('reset_password_confirm.new_password_label'))}
+                value={resetPasswordConfirm.password}
+                onChangeText={resetPasswordConfirm.setPassword}
+                visible={resetPasswordConfirm.showPassword}
+                onVisibleChange={resetPasswordConfirm.setShowPassword}
+                autoComplete="new-password"
+                onSubmitEditing={form.submit}
+                returnKeyType="done"
+              />
+
+              <Button
+                size="$4"
+                theme="blue"
+                onPress={form.submit}
+                disabled={
+                  resetPasswordConfirm.loading ||
+                  !resetPasswordConfirm.sessionReady ||
+                  !resetPasswordConfirm.password
+                }
+                opacity={resetPasswordConfirm.loading ? 0.7 : 1}
+              >
+                <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <Ionicons name="lock-closed-outline" size={18} color={ios.primaryForeground} />
+                  <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
+                    {resetPasswordConfirm.loading
+                      ? t('reset_password_confirm.saving')
+                      : t('reset_password_confirm.save_password')}
+                  </Text>
+                </XStack>
+              </Button>
+            </>
+          )}
+        </MobileForm>
       </YStack>
     </AuthPageShell>
   );

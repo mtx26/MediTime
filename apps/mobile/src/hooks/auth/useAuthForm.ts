@@ -1,6 +1,7 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { useForm, useWatch } from 'react-hook-form';
 import { getOAuthSignInOptions, log } from '@meditime/utils';
 import type { AuthMode, OAuthProvider, SessionLike } from '@meditime/types';
 import { authService } from '../../contexts/AuthContext';
@@ -32,19 +33,50 @@ export function useAuthForm(initialMode: AuthMode) {
   const router = useRouter();
   const { reloadUser } = useAuth();
   const [activeMode, setActiveMode] = useState<AuthMode>(initialMode);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<OAuthProvider | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const form = useForm<{
+    name: string;
+    email: string;
+    password: string;
+    termsAccepted: boolean;
+  }>({
+    mode: 'onChange',
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      termsAccepted: false,
+    },
+  });
 
-  const canSubmit = activeMode === 'login'
-    ? Boolean(email.trim() && password)
-    : Boolean(email.trim() && password && name.trim() && termsAccepted);
+  useEffect(() => {
+    form.register('name', {
+      validate: (value) => activeMode === 'login' || value.trim().length > 0,
+    });
+    form.register('email', {
+      validate: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+        || String(t('supabase-error.invalid_email')),
+    });
+    form.register('password', {
+      validate: (value) => value.length > 0,
+    });
+    form.register('termsAccepted', {
+      validate: (value) => activeMode === 'login' || value || String(t('auth.accept_terms_aria')),
+    });
+    void form.trigger();
+  }, [activeMode, form, t]);
+
+  const values = useWatch({ control: form.control });
+  const name = values.name ?? '';
+  const email = values.email ?? '';
+  const password = values.password ?? '';
+  const termsAccepted = values.termsAccepted ?? false;
+  const emailValid = !email.trim() || !form.formState.errors.email;
+  const canSubmit = form.formState.isValid;
 
   const providers = useMemo(() => socialProviders.map((provider) => ({
     ...provider,
@@ -56,15 +88,18 @@ export function useAuthForm(initialMode: AuthMode) {
     setActiveMode(mode);
     setError(null);
     setSuccess(false);
-  }, []);
+    form.clearErrors();
+  }, [form]);
 
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = form.handleSubmit(async (values) => {
+    const trimmedEmail = values.email.trim();
+    const trimmedName = values.name.trim();
     setError(null);
     setLoading(true);
 
     try {
       if (activeMode === 'login') {
-        const authError = await authService.loginWithEmail(email.trim(), password);
+        const authError = await authService.loginWithEmail(trimmedEmail, values.password);
         if (authError) {
           const code = authError.code ?? 'unexpected_error';
           setError(String(t(`supabase-error.${code}`)));
@@ -83,7 +118,7 @@ export function useAuthForm(initialMode: AuthMode) {
         return;
       }
 
-      const authError = await authService.registerWithEmail(email.trim(), password, name.trim());
+      const authError = await authService.registerWithEmail(trimmedEmail, values.password, trimmedName);
       if (authError) {
         const code = authError.code ?? 'unexpected_error';
         setError(String(t(`supabase-error.${code}`)));
@@ -105,7 +140,9 @@ export function useAuthForm(initialMode: AuthMode) {
     } finally {
       setLoading(false);
     }
-  }, [activeMode, email, name, password, t, termsAccepted]);
+  }, (errors) => {
+    setError(errors.email?.message ?? errors.termsAccepted?.message ?? null);
+  });
 
   const handleSocialLogin = useCallback(async (provider: OAuthProvider) => {
     setError(null);
@@ -170,12 +207,25 @@ export function useAuthForm(initialMode: AuthMode) {
     error,
     success,
     canSubmit,
+    emailValid,
     providers,
-    setEmail,
-    setPassword,
-    setName,
+    setEmail: (value: string) => {
+      setError(null);
+      form.setValue('email', value, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+    },
+    setPassword: (value: string) => {
+      setError(null);
+      form.setValue('password', value, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+    },
+    setName: (value: string) => {
+      setError(null);
+      form.setValue('name', value, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+    },
     setPasswordVisible,
-    setTermsAccepted,
+    setTermsAccepted: (value: boolean) => {
+      setError(null);
+      form.setValue('termsAccepted', value, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+    },
     switchMode,
     handleSubmit,
     handleSocialLogin,

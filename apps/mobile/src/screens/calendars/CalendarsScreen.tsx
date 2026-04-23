@@ -84,6 +84,15 @@ export default function CalendarsScreen() {
     setPdfDialogOpen(true);
   };
 
+  const startRename = useCallback((calendar: CalendarItem) => {
+    setRenameValues((prev) => ({ ...prev, [calendar.id]: calendar.name }));
+    setRenameMode(calendar.id);
+  }, []);
+
+  const cancelRename = useCallback(() => {
+    setRenameMode(null);
+  }, []);
+
   const openCalendarPdf = async () => {
     if (!pdfCalendarId) return;
 
@@ -161,7 +170,7 @@ export default function CalendarsScreen() {
       buildPersonalCalendarActions(
         { calendarId: calendar.id, lng, basePath: 'calendar', selectedDate: null },
         {
-          onRename: () => setRenameMode(calendar.id),
+          onRename: () => startRename(calendar),
           onDelete: () => handleDeleteCalendarClick(calendar.id),
           onExportPdf: () => openPdfDialog(calendar.id),
         },
@@ -234,7 +243,7 @@ export default function CalendarsScreen() {
             setRenameValues((prev) => ({ ...prev, [calendarId]: value }))
           }
           onRenameSubmit={handleRenameSubmit}
-          onRenameCancel={() => setRenameMode(null)}
+          onRenameCancel={cancelRename}
           addFooter={<AddCalendarFooter onPress={addCalendarFlow.openModal} />}
         />
 
