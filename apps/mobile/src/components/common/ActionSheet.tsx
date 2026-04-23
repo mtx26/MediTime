@@ -1,5 +1,14 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react';
-import { Animated, Modal, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import { useMemo, useRef, useState, type ElementRef, type ReactNode } from 'react';
+import {
+  ActionSheetIOS,
+  Animated,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  findNodeHandle,
+  useWindowDimensions,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -45,6 +54,7 @@ function ActionSheet({
   const [open, setOpen] = useState(false);
   const longPressTriggered = useRef(false);
   const longPressScale = useRef(new Animated.Value(1)).current;
+  const triggerRef = useRef<ElementRef<typeof Pressable>>(null);
   const visibleActionCount = useMemo(
     () => actions.filter((action) => !action.separator).length,
     [actions],
@@ -82,6 +92,36 @@ function ActionSheet({
 
   const openActionSheet = () => {
     if (visibleActionCount === 0) return;
+
+    if (Platform.OS === 'ios') {
+      const visibleActions = actions.filter((action) => !action.separator);
+      const options = visibleActions.map((action) => action.label ?? action.title ?? '');
+      const cancelButtonIndex = options.length;
+      const destructiveButtonIndex = visibleActions
+        .map((action, index) => action.danger ? index : -1)
+        .filter((index) => index >= 0);
+      const anchor = findNodeHandle(triggerRef.current);
+
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          anchor: anchor ?? undefined,
+          cancelButtonIndex,
+          destructiveButtonIndex,
+          options: [...options, String(t('cancel'))],
+          tintColor: ios.primary,
+          userInterfaceStyle: isDark ? 'dark' : 'light',
+        },
+        (buttonIndex) => {
+          if (buttonIndex === cancelButtonIndex) return;
+
+          const action = visibleActions[buttonIndex];
+          if (!action) return;
+          runAction(action);
+        },
+      );
+      return;
+    }
+
     setOpen(true);
   };
 
@@ -286,6 +326,7 @@ function ActionSheet({
     return (
       <>
         <Pressable
+          ref={triggerRef}
           onPressIn={animateLongPressIn}
           onPressOut={animateLongPressOut}
           onPress={() => {
@@ -320,6 +361,7 @@ function ActionSheet({
   return (
     <>
       <Pressable
+        ref={triggerRef}
         onPress={openActionSheet}
         accessibilityRole="button"
         accessibilityLabel={t('Actions')}
