@@ -29,23 +29,23 @@ export function SettingsTabBar({
                   style={{
                     alignItems: 'center',
                     gap: 7,
-                    minHeight: 40,
-                    paddingHorizontal: 12,
-                    borderRadius: 8,
-                    backgroundColor: active ? ios.primary : ios.card,
+                    minHeight: 42,
+                    paddingHorizontal: 13,
+                    borderRadius: 10,
+                    backgroundColor: active ? ios.blueInfoBg : ios.card,
                     borderWidth: 1,
-                    borderColor: active ? ios.primary : ios.border,
+                    borderColor: active ? ios.blueInfoBorder : ios.border,
                     opacity: pressed ? 0.78 : 1,
                   }}
                 >
                   <Ionicons
                     name={tab.iconName}
                     size={17}
-                    color={active ? ios.primaryForeground : ios.primary}
+                    color={active ? ios.primary : ios.mutedForeground}
                   />
                   <Text
                     style={{
-                      color: active ? ios.primaryForeground : ios.foreground,
+                      color: active ? ios.primary : ios.foreground,
                       fontSize: 13,
                       lineHeight: 18,
                       fontWeight: '800',

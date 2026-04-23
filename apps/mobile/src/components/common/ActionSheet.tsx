@@ -35,7 +35,7 @@ function ActionSheet({
   dataTour,
   onPress,
   onNavigate,
-  variant = 'filled',
+  variant = 'plain',
   triggerMode = 'button',
 }: ActionSheetProps) {
   const { t } = useTranslation();
@@ -312,8 +312,10 @@ function ActionSheet({
     );
   }
 
-  const size = buttonSize === 'sm' ? 36 : 40;
   const isPlain = variant === 'plain';
+  const size = isPlain ? 36 : buttonSize === 'sm' ? 36 : 40;
+  const iconSize = isPlain ? 24 : 18;
+  const triggerShadowOpacity = isPlain ? 0 : (isDark ? 0.22 : 0.08);
 
   return (
     <>
@@ -330,13 +332,19 @@ function ActionSheet({
               height: size,
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: 8,
+              borderRadius: isPlain ? 8 : size / 2,
               backgroundColor: isPlain
-                ? pressed ? ios.accentHover : 'transparent'
+                ? 'transparent'
                 : pressed ? ios.blueInfoBorder : ios.blueInfoBg,
+              opacity: pressed ? 0.75 : 1,
+              shadowColor: ios.shadow,
+              shadowOpacity: triggerShadowOpacity,
+              shadowRadius: 10,
+              shadowOffset: { width: 0, height: 3 },
+              elevation: isPlain ? 0 : 1,
             }}
           >
-            <Ionicons name="ellipsis-horizontal" size={18} color={ios.primary} />
+            <Ionicons name="ellipsis-horizontal" size={iconSize} color={ios.primary} />
           </YStack>
         )}
       </Pressable>

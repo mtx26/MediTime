@@ -93,7 +93,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="shared-calendars/index"
+        name="shared-calendars"
         options={{
           title: t('shared_calendars'),
           tabBarLabel: t('shared_calendars'),
@@ -103,7 +103,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="notifications/index"
+        name="notifications"
         options={{
           title: t('notification.label'),
           tabBarLabel: t('notification.label'),
@@ -113,7 +113,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="settings/index"
+        name="settings"
         options={{
           title: t('settings.label'),
           tabBarLabel: t('settings.label'),

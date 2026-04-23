@@ -1,18 +1,18 @@
 import { Pressable, RefreshControl } from 'react-native';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { Button, ScrollView, Text, XStack, YStack } from 'tamagui';
-import ActionSheet from '../../components/common/ActionSheet';
-import { InfoBanner } from '../../components/common/InfoBanner';
-import { LoadingIndicator } from '../../components/common/LoadingIndicator';
+import { Button, Text, XStack, YStack } from 'tamagui';
+import type { CalendarDetailMode, CalendarDetailSourceType } from '@meditime/types';
 import { CalendarHeaderTitle } from '../../components/calendar/CalendarHeaderTitle';
 import { CalendarNotFoundState } from '../../components/calendar/CalendarNotFoundState';
 import { MobileCalendarWeekSelector } from '../../components/calendar/MobileCalendarWeekSelector';
 import { MobileWeeklyEventContent } from '../../components/calendar/MobileWeeklyEventContent';
 import { PdfDialog } from '../../components/calendar/PdfDialog';
-import type { CalendarDetailMode, CalendarDetailSourceType } from '@meditime/types';
+import ActionSheet from '../../components/common/ActionSheet';
+import { InfoBanner } from '../../components/common/InfoBanner';
+import { LoadingIndicator } from '../../components/common/LoadingIndicator';
+import { Page, usePageHeaderOptions } from '../../components/common/Page';
 import { useCalendarDetail } from '../../hooks/calendar';
 import { useIosTheme } from '../../theme/ios';
 
@@ -26,13 +26,11 @@ export default function CalendarDetailScreen({
   mode = 'overview',
 }: CalendarDetailScreenProps) {
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
   const ios = useIosTheme();
   const detail = useCalendarDetail(sourceType, mode);
-  const bottomContentInset = 56 + insets.bottom + 18;
   const isDailyRoute = mode === 'daily';
 
-  const headerOptions = {
+  const headerOptions = usePageHeaderOptions({
     headerBackButtonDisplayMode: isDailyRoute ? 'generic' as const : 'minimal' as const,
     headerBackTitle: String(t('back')),
     headerBackTitleVisible: isDailyRoute,
@@ -48,7 +46,7 @@ export default function CalendarDetailScreen({
         />
       ) : null
     ),
-  };
+  });
 
   if (detail.loading) {
     return (
@@ -70,10 +68,8 @@ export default function CalendarDetailScreen({
 
   return (
     <>
-      <Stack.Screen options={headerOptions} />
-      <ScrollView
-        flex={1}
-        style={{ flex: 1, backgroundColor: ios.background }}
+      <Page
+        screen={<Stack.Screen options={headerOptions} />}
         refreshControl={(
           <RefreshControl
             refreshing={detail.refreshing}
@@ -83,109 +79,100 @@ export default function CalendarDetailScreen({
             progressBackgroundColor={ios.card}
           />
         )}
+        gap={18}
+        withBottomTabInset
       >
-        <YStack
-          style={{
-            flex: 1,
-            gap: 18,
-            paddingHorizontal: 16,
-            paddingTop: 16,
-            paddingBottom: bottomContentInset,
-            backgroundColor: ios.background,
-          }}
-        >
-          {detail.showOverviewControls && (
+        {detail.showOverviewControls && (
+          <Button
+            onPress={detail.goToBoxes}
+            style={{
+              minHeight: 44,
+              borderRadius: 8,
+              backgroundColor: ios.card,
+              borderWidth: 1,
+              borderColor: ios.border,
+            }}
+          >
+            <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <Ionicons name="medkit-outline" size={18} color={ios.primary} />
+              <Text style={{ color: ios.foreground, fontWeight: '800' }}>{t('medicines.label')}</Text>
+            </XStack>
+          </Button>
+        )}
+
+        {detail.error && (
+          <InfoBanner iconName="warning-outline" text={detail.error} tone="warning" />
+        )}
+
+        {detail.isLowStock && (
+          <Pressable onPress={detail.goToStockAlerts} accessibilityRole="button">
+            <InfoBanner iconName="warning-outline" text={String(t('stock_alert'))} tone="warning" />
+          </Pressable>
+        )}
+
+        {detail.showOverviewControls && (
+          <MobileCalendarWeekSelector
+            calendarTable={detail.calendarTable}
+            selectedDate={detail.selectedDate}
+            onWeekSelect={(date) => void detail.selectWeek(date)}
+          />
+        )}
+
+        {detail.showBackendLoading && (
+          <LoadingIndicator label={String(t('loading_calendar'))} />
+        )}
+
+        {detail.showPillboxShortcut && (
+          <YStack style={{ gap: 10 }}>
+            <XStack style={{ alignItems: 'center', gap: 8 }}>
+              <Ionicons name="grid-outline" size={20} color={ios.primary} />
+              <Text style={{ color: ios.foreground, fontSize: 16, fontWeight: '800' }}>
+                {t('pillbox.title')}
+              </Text>
+            </XStack>
             <Button
-              onPress={detail.goToBoxes}
+              onPress={detail.goToPillbox}
               style={{
                 minHeight: 44,
                 borderRadius: 8,
-                backgroundColor: ios.card,
-                borderWidth: 1,
-                borderColor: ios.border,
+                backgroundColor: ios.blueInfoBg,
               }}
             >
               <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <Ionicons name="medkit-outline" size={18} color={ios.primary} />
-                <Text style={{ color: ios.foreground, fontWeight: '800' }}>{t('medicines.label')}</Text>
+                <Ionicons name="grid-outline" size={18} color={ios.primary} />
+                <Text style={{ color: ios.primary, fontWeight: '900' }}>{t('pillbox.fill')}</Text>
               </XStack>
             </Button>
-          )}
+          </YStack>
+        )}
 
-          {detail.error && (
-            <InfoBanner iconName="warning-outline" text={detail.error} tone="warning" />
-          )}
-
-          {detail.isLowStock && (
-            <Pressable onPress={detail.goToStockAlerts} accessibilityRole="button">
-              <InfoBanner iconName="warning-outline" text={String(t('stock_alert'))} tone="warning" />
-            </Pressable>
-          )}
-
-          {detail.showOverviewControls && (
-            <MobileCalendarWeekSelector
-              calendarTable={detail.calendarTable}
-              selectedDate={detail.selectedDate}
-              onWeekSelect={(date) => void detail.selectWeek(date)}
-            />
-          )}
-
-          {detail.showBackendLoading && (
-            <LoadingIndicator label={String(t('loading_calendar'))} />
-          )}
-
-          {detail.showPillboxShortcut && (
-            <YStack style={{ gap: 10 }}>
-              <XStack style={{ alignItems: 'center', gap: 8 }}>
-                <Ionicons name="grid-outline" size={20} color={ios.primary} />
-                <Text style={{ color: ios.foreground, fontSize: 16, fontWeight: '800' }}>
-                  {t('pillbox.title')}
-                </Text>
-              </XStack>
-              <Button
-                onPress={detail.goToPillbox}
-                style={{
-                  minHeight: 44,
-                  borderRadius: 8,
-                  backgroundColor: ios.blueInfoBg,
-                }}
-              >
-                <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <Ionicons name="grid-outline" size={18} color={ios.primary} />
-                  <Text style={{ color: ios.primary, fontWeight: '900' }}>{t('pillbox.fill')}</Text>
-                </XStack>
-              </Button>
+        {detail.showCalendarContent ? (
+          detail.showDailyContent && (
+            <YStack
+              style={{
+                gap: 12,
+                padding: 12,
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: ios.border,
+                backgroundColor: ios.card,
+              }}
+            >
+              <MobileWeeklyEventContent
+                selectedDate={detail.selectedDate}
+                eventsForDay={detail.eventsForDay}
+                onSelectDate={detail.selectDate}
+                onPrev={() => detail.navigateDay(-1)}
+                onNext={() => detail.navigateDay(1)}
+                getPastWeek={() => detail.navigateWeek(-1)}
+                getNextWeek={() => detail.navigateWeek(1)}
+              />
             </YStack>
-          )}
-
-          {detail.showCalendarContent ? (
-            detail.showDailyContent && (
-              <YStack
-                style={{
-                  gap: 12,
-                  padding: 12,
-                  borderRadius: 8,
-                  borderWidth: 1,
-                  borderColor: ios.border,
-                  backgroundColor: ios.card,
-                }}
-              >
-                <MobileWeeklyEventContent
-                  selectedDate={detail.selectedDate}
-                  eventsForDay={detail.eventsForDay}
-                  onSelectDate={detail.selectDate}
-                  onPrev={() => detail.navigateDay(-1)}
-                  onNext={() => detail.navigateDay(1)}
-                  getPastWeek={() => detail.navigateWeek(-1)}
-                  getNextWeek={() => detail.navigateWeek(1)}
-                />
-              </YStack>
-            )
-          ) : (
-            <InfoBanner iconName="pin-outline" text={String(t('no_medicines'))} />
-          )}
-        </YStack>
-      </ScrollView>
+          )
+        ) : (
+          <InfoBanner iconName="pin-outline" text={String(t('no_medicines'))} />
+        )}
+      </Page>
       <PdfDialog
         open={detail.pdfDialogOpen}
         includeInactive={detail.includeInactive}

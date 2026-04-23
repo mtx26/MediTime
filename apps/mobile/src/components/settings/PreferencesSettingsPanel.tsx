@@ -1,21 +1,16 @@
 import { Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
-import type { AppThemePreference } from '../../theme/ios';
 import type { MobilePreferencesSettingsProps } from '@meditime/types';
+import type { AppThemePreference } from '../../theme/ios';
 import { SettingsPanelSection } from './SettingsPanelSection';
 import { useIosTheme } from '../../theme/ios';
 
-const FLAG_EMOJI: Record<string, string> = {
-  CN: '🇨🇳',
-  DE: '🇩🇪',
-  ES: '🇪🇸',
-  FR: '🇫🇷',
-  IT: '🇮🇹',
-  JP: '🇯🇵',
-  PT: '🇵🇹',
-  RU: '🇷🇺',
-  US: '🇺🇸',
+const THEME_ICONS: Record<AppThemePreference, keyof typeof Ionicons.glyphMap> = {
+  system: 'contrast-outline',
+  light: 'sunny-outline',
+  dark: 'moon-outline',
 };
 
 export function PreferencesSettingsPanel({
@@ -71,9 +66,23 @@ export function PreferencesSettingsPanel({
                     }}
                   >
                     <XStack style={{ alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
-                      <Text style={{ fontSize: 20, lineHeight: 24 }}>
-                        {FLAG_EMOJI[item.flag] ?? item.flag}
-                      </Text>
+                      <YStack
+                        style={{
+                          minWidth: 36,
+                          minHeight: 28,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          paddingHorizontal: 8,
+                          borderRadius: 8,
+                          backgroundColor: ios.card,
+                          borderWidth: 1,
+                          borderColor: ios.border,
+                        }}
+                      >
+                        <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16, fontWeight: '800' }}>
+                          {(item.flag ?? item.code).toUpperCase()}
+                        </Text>
+                      </YStack>
                       <Text
                         numberOfLines={1}
                         style={{ flex: 1, color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}
@@ -112,19 +121,25 @@ export function PreferencesSettingsPanel({
                 {({ pressed }) => (
                   <YStack
                     style={{
-                      minHeight: 42,
+                      minHeight: 46,
                       alignItems: 'center',
                       justifyContent: 'center',
-                      borderRadius: 8,
+                      gap: 5,
+                      borderRadius: 10,
                       borderWidth: 1,
-                      borderColor: active ? ios.primary : ios.border,
-                      backgroundColor: active ? ios.primary : ios.background,
+                      borderColor: active ? ios.blueInfoBorder : ios.border,
+                      backgroundColor: active ? ios.blueInfoBg : ios.card,
                       opacity: pressed ? 0.75 : 1,
                     }}
                   >
+                    <Ionicons
+                      name={THEME_ICONS[item]}
+                      size={18}
+                      color={active ? ios.primary : ios.mutedForeground}
+                    />
                     <Text
                       style={{
-                        color: active ? ios.primaryForeground : ios.foreground,
+                        color: active ? ios.primary : ios.foreground,
                         fontSize: 13,
                         lineHeight: 18,
                         fontWeight: '800',
