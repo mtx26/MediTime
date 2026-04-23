@@ -17,7 +17,7 @@ export function SettingsPanelSection({
       style={{
         gap: 14,
         padding: 14,
-        borderRadius: 8,
+        borderRadius: 14,
         borderWidth: 1,
         borderColor: ios.border,
         backgroundColor: ios.card,
@@ -26,7 +26,7 @@ export function SettingsPanelSection({
       <YStack style={{ gap: 4 }}>
         <XStack style={{ alignItems: 'center', gap: 8 }}>
           <Ionicons name={iconName} size={20} color={ios.primary} />
-          <Text style={{ flex: 1, color: ios.foreground, fontSize: 17, lineHeight: 23, fontWeight: '800' }}>
+          <Text style={{ flex: 1, color: ios.foreground, fontSize: 17, lineHeight: 22, fontWeight: '700' }}>
             {title}
           </Text>
         </XStack>

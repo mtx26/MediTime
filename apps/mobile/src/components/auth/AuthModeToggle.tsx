@@ -1,67 +1,27 @@
-import { Pressable } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { useTranslation } from 'react-i18next';
-import { Text, XStack } from 'tamagui';
-import type { AuthMode, AuthModeToggleProps } from '@meditime/types';
-import { useIosTheme } from '../../theme/ios';
+import { YStack } from 'tamagui';
+import type { AuthModeToggleProps } from '@meditime/types';
+import { useAppTheme } from '../../theme/ios';
 
-const modes: { id: AuthMode; iconName: keyof typeof Ionicons.glyphMap; labelKey: string }[] = [
-  { id: 'login', iconName: 'log-in-outline', labelKey: 'auth.login' },
-  { id: 'register', iconName: 'person-add-outline', labelKey: 'auth.register' },
-];
+const modeKeys = ['auth.login', 'auth.register'] as const;
 
 export function AuthModeToggle({ activeMode, onModeChange }: AuthModeToggleProps) {
   const { t } = useTranslation();
-  const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
+  const selectedIndex = activeMode === 'register' ? 1 : 0;
 
   return (
-    <XStack
-      style={{
-        alignSelf: 'center',
-        gap: 6,
-        padding: 4,
-        borderRadius: 8,
-        backgroundColor: ios.accentHover,
-      }}
-    >
-      {modes.map((mode) => {
-        const active = activeMode === mode.id;
-
-        return (
-          <Pressable
-            key={mode.id}
-            accessibilityRole="button"
-            accessibilityState={{ selected: active }}
-            onPress={() => onModeChange(mode.id)}
-          >
-            {({ pressed }) => (
-              <XStack
-                style={{
-                  alignItems: 'center',
-                  gap: 7,
-                  minHeight: 38,
-                  paddingHorizontal: 12,
-                  borderRadius: 8,
-                  backgroundColor: active ? ios.card : 'transparent',
-                  opacity: pressed ? 0.75 : 1,
-                }}
-              >
-                <Ionicons name={mode.iconName} size={18} color={active ? ios.primary : ios.mutedForeground} />
-                <Text
-                  style={{
-                    color: active ? ios.foreground : ios.mutedForeground,
-                    fontSize: 14,
-                    lineHeight: 20,
-                    fontWeight: '800',
-                  }}
-                >
-                  {t(mode.labelKey)}
-                </Text>
-              </XStack>
-            )}
-          </Pressable>
-        );
-      })}
-    </XStack>
+    <YStack style={{ alignSelf: 'center', width: '100%' }}>
+      <SegmentedControl
+        values={modeKeys.map((key) => String(t(key)))}
+        selectedIndex={selectedIndex}
+        onChange={(event) => {
+          const nextIndex = event.nativeEvent.selectedSegmentIndex;
+          onModeChange(nextIndex === 1 ? 'register' : 'login');
+        }}
+        appearance={colorScheme}
+      />
+    </YStack>
   );
 }

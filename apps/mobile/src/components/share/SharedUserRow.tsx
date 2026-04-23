@@ -18,11 +18,9 @@ export function SharedUserRow({
       style={{
         alignItems: 'center',
         gap: 10,
-        padding: 12,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: ios.border,
-        backgroundColor: ios.background,
+        minHeight: 52,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
       }}
     >
       {hasPhoto ? (
@@ -51,10 +49,10 @@ export function SharedUserRow({
       )}
 
       <YStack style={{ flex: 1, gap: 4 }}>
-        <Text style={{ color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}>
+        <Text style={{ color: ios.foreground, fontSize: 15, lineHeight: 20, fontWeight: '600' }}>
           {label}
         </Text>
-        <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16, fontWeight: '700' }}>
+        <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
           {status}
         </Text>
       </YStack>
@@ -63,12 +61,12 @@ export function SharedUserRow({
         {({ pressed }) => (
           <XStack
             style={{
-              width: 36,
-              height: 36,
+              width: 40,
+              height: 40,
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: 8,
-              backgroundColor: ios.destructiveBg,
+              borderRadius: 12,
+              backgroundColor: pressed ? ios.destructiveBg : 'transparent',
               opacity: pressed ? 0.8 : 1,
             }}
           >

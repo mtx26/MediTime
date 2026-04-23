@@ -1,4 +1,5 @@
 import React, {
+  useEffect,
   createContext,
   useContext,
   useMemo,
@@ -7,7 +8,7 @@ import React, {
   type ReactNode,
   type SetStateAction,
 } from 'react';
-import { useColorScheme } from 'react-native';
+import { Appearance, useColorScheme } from 'react-native';
 
 export type AppThemeName = 'light' | 'dark';
 export type AppThemePreference = AppThemeName | 'system';
@@ -87,6 +88,10 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
   const colorScheme: AppThemeName = themePreference === 'system'
     ? systemColorScheme === 'dark' ? 'dark' : 'light'
     : themePreference;
+
+  useEffect(() => {
+    Appearance.setColorScheme(themePreference === 'system' ? null : themePreference);
+  }, [themePreference]);
 
   const value = useMemo<AppThemeContextValue>(() => ({
     colorScheme,

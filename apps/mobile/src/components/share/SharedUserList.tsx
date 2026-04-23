@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import type { SharedUserListProps } from '@meditime/types';
 import { SharedUserRow } from './SharedUserRow';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 export function SharedUserList({
   emailToInvite,
@@ -17,13 +17,15 @@ export function SharedUserList({
 }: SharedUserListProps) {
   const { t } = useTranslation();
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
+  const canInvite = emailToInvite.trim().length > 0;
 
   return (
     <YStack
       style={{
         gap: 12,
         padding: 14,
-        borderRadius: 8,
+        borderRadius: 14,
         borderWidth: 1,
         borderColor: ios.border,
         backgroundColor: ios.card,
@@ -36,25 +38,47 @@ export function SharedUserList({
         </Text>
       </XStack>
 
-      <YStack style={{ gap: 10 }}>
-        {users.map((user) => (
-          <SharedUserRow
+      <YStack
+        style={{
+          overflow: 'hidden',
+          borderRadius: 12,
+          borderWidth: 1,
+          borderColor: ios.border,
+          backgroundColor: ios.background,
+        }}
+      >
+        {users.map((user, index) => (
+          <YStack
             key={user.token}
-            label={user.receiver_name || user.email}
-            photoUrl={user.receiver_photo_url}
-            status={user.accepted ? String(t('accepted')) : String(t('pending'))}
-            onDelete={() => onDeleteUser(user.token)}
-          />
+            style={{
+              borderBottomWidth: index === users.length - 1 && invitations.length === 0 ? 0 : 1,
+              borderBottomColor: ios.border,
+            }}
+          >
+            <SharedUserRow
+              label={user.receiver_name || user.email}
+              photoUrl={user.receiver_photo_url}
+              status={user.accepted ? String(t('accepted')) : String(t('pending'))}
+              onDelete={() => onDeleteUser(user.token)}
+            />
+          </YStack>
         ))}
 
-        {invitations.map((invitation) => (
-          <SharedUserRow
+        {invitations.map((invitation, index) => (
+          <YStack
             key={invitation.token}
-            label={invitation.invited_email}
-            photoUrl={invitation.receiver_photo_url}
-            status={String(t('pending'))}
-            onDelete={() => onDeleteInvitation(invitation.token)}
-          />
+            style={{
+              borderBottomWidth: index === invitations.length - 1 ? 0 : 1,
+              borderBottomColor: ios.border,
+            }}
+          >
+            <SharedUserRow
+              label={invitation.invited_email}
+              photoUrl={invitation.receiver_photo_url}
+              status={String(t('pending'))}
+              onDelete={() => onDeleteInvitation(invitation.token)}
+            />
+          </YStack>
         ))}
       </YStack>
 
@@ -70,11 +94,21 @@ export function SharedUserList({
           placeholder={String(t('recipient_email'))}
           keyboardType="email-address"
           autoCapitalize="none"
+          autoCorrect={false}
+          autoComplete="email"
+          textContentType="emailAddress"
+          keyboardAppearance={colorScheme}
+          returnKeyType="send"
+          onSubmitEditing={() => {
+            if (canInvite) {
+              onInvite();
+            }
+          }}
           style={{
             flex: 1,
-            minHeight: 42,
+            minHeight: 44,
             paddingHorizontal: 12,
-            borderRadius: 8,
+            borderRadius: 12,
             borderWidth: 1,
             borderColor: ios.border,
             backgroundColor: ios.background,
@@ -82,20 +116,24 @@ export function SharedUserList({
           }}
         />
 
-        <Pressable onPress={onInvite} accessibilityRole="button">
+        <Pressable onPress={onInvite} disabled={!canInvite} accessibilityRole="button">
           {({ pressed }) => (
             <XStack
               style={{
-                width: 42,
-                height: 42,
+                width: 44,
+                height: 44,
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: 8,
-                backgroundColor: ios.primary,
-                opacity: pressed ? 0.8 : 1,
+                borderRadius: 12,
+                backgroundColor: canInvite ? ios.primary : ios.accentHover,
+                opacity: pressed ? 0.8 : canInvite ? 1 : 0.7,
               }}
             >
-              <Ionicons name="mail-outline" size={18} color={ios.primaryForeground} />
+              <Ionicons
+                name="mail-outline"
+                size={18}
+                color={canInvite ? ios.primaryForeground : ios.mutedForeground}
+              />
             </XStack>
           )}
         </Pressable>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Modal, PanResponder, Pressable, useWindowDimensions } from 'react-native';
+import { ActionSheetIOS, Animated, Modal, PanResponder, Platform, Pressable, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -110,11 +110,48 @@ export function AddCalendarModal({
     if (open) {
       dragY.stopAnimation();
       dragY.setValue(0);
+
+      if (Platform.OS === 'ios' && imageSourceMenuOpen) {
+        const options = [
+          String(t('image_upload.take_photo')),
+          String(t('image_upload.choose_from_library')),
+          String(t('image_upload.choose_file')),
+          String(t('cancel')),
+        ];
+        const cancelButtonIndex = options.length - 1;
+
+        ActionSheetIOS.showActionSheetWithOptions(
+          {
+            title: String(t('calendar.choose_image')),
+            options,
+            cancelButtonIndex,
+            userInterfaceStyle: isDark ? 'dark' : 'light',
+          },
+          (buttonIndex) => {
+            setImageSourceMenuOpen(false);
+
+            if (buttonIndex === 0) {
+              onChooseCamera();
+              return;
+            }
+
+            if (buttonIndex === 1) {
+              onChooseLibrary();
+              return;
+            }
+
+            if (buttonIndex === 2) {
+              onChooseFile();
+            }
+          },
+        );
+      }
+
       return;
     }
 
     setImageSourceMenuOpen(false);
-  }, [dragY, open]);
+  }, [dragY, imageSourceMenuOpen, isDark, onChooseCamera, onChooseFile, onChooseLibrary, open, t]);
 
   const resetSheetPosition = useCallback(() => {
     Animated.spring(dragY, {
@@ -395,7 +432,7 @@ export function AddCalendarModal({
       </Modal>
 
       <Modal
-        visible={open && imageSourceMenuOpen}
+        visible={Platform.OS !== 'ios' && open && imageSourceMenuOpen}
         transparent
         animationType="fade"
         onRequestClose={closeImageSourceMenu}

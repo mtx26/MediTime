@@ -12,6 +12,10 @@ const appleTeamId = (process.env.EXPO_PUBLIC_APPLE_TEAM_ID || process.env.APPLE_
 
 const config = {
   ...appJson.expo,
+  plugins: [
+    ...(appJson.expo.plugins ?? []),
+    '@react-native-community/datetimepicker',
+  ],
   ios: {
     ...appJson.expo.ios,
   },

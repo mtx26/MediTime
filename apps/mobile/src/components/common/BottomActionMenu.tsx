@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import {
+  ActionSheetIOS,
   Animated,
   Easing,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -54,8 +56,41 @@ export function BottomActionMenu({
     inputRange: [0, 1],
     outputRange: [28, 0],
   });
+  const iosActionItems = items.filter((item) => !item.separator && item.label);
 
   useEffect(() => {
+    if (Platform.OS === 'ios') {
+      if (!visible) {
+        setMounted(false);
+        return;
+      }
+
+      const options = iosActionItems.map((item) => item.label ?? '');
+      const cancelButtonIndex = options.length;
+      const destructiveButtonIndex = iosActionItems.findIndex((item) => item.danger);
+
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          title,
+          options: [...options, String(t('cancel'))],
+          cancelButtonIndex,
+          destructiveButtonIndex: destructiveButtonIndex >= 0 ? destructiveButtonIndex : undefined,
+          userInterfaceStyle: isDark ? 'dark' : 'light',
+        },
+        (buttonIndex) => {
+          onClose();
+
+          if (buttonIndex === cancelButtonIndex) {
+            return;
+          }
+
+          iosActionItems[buttonIndex]?.onPress?.();
+        },
+      );
+      setMounted(false);
+      return;
+    }
+
     if (visible) {
       setMounted(true);
       Animated.timing(animation, {
@@ -82,7 +117,7 @@ export function BottomActionMenu({
     setTimeout(() => item.onPress?.(), 120);
   };
 
-  if (!mounted) return null;
+  if (Platform.OS === 'ios' || !mounted) return null;
 
   return (
     <Modal

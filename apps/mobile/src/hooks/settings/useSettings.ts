@@ -331,14 +331,16 @@ export function useSettings() {
     setNotificationTime(value);
   }, []);
 
-  const saveNotificationTime = useCallback(async () => {
+  const saveNotificationTime = useCallback(async (nextTime?: string) => {
     if (!userInfo?.uid) return;
 
-    if (!/^\d{2}:\d{2}$/.test(notificationTime)) {
+    const targetTime = nextTime ?? notificationTime;
+
+    if (!/^\d{2}:\d{2}$/.test(targetTime)) {
       return;
     }
 
-    const [hours, minutes] = notificationTime.split(':').map(Number);
+    const [hours, minutes] = targetTime.split(':').map(Number);
     if (hours > 23 || minutes > 59) {
       return;
     }
@@ -347,7 +349,7 @@ export function useSettings() {
       await performApiCall({
         url: `${API_URL}/api/user/notification-time`,
         method: 'PUT',
-        body: { notification_time: notificationTime },
+        body: { notification_time: targetTime },
         origin: 'NOTIFICATION_TIME_UPDATE',
         uid: userInfo.uid,
       });

@@ -1,17 +1,34 @@
 import React from 'react';
-import { Pressable } from 'react-native';
+import { Platform, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import { calendarTableHasItems, getWeekDates, getWeekSelectionState, toISO } from '@meditime/utils';
 import type { CalendarTable } from '@meditime/types';
 import { useIosTheme } from '../../theme/ios';
+import { IosWeekCalendar } from './IosWeekCalendar';
 
 type MobileCalendarWeekSelectorProps = {
   calendarTable: CalendarTable;
   onWeekSelect: (date: Date) => void;
   selectedDate: Date | null;
 };
+
+function formatWeekRange(dates: Date[], locale: string) {
+  if (dates.length === 0) return '';
+  const first = dates[0];
+  const last = dates[dates.length - 1];
+
+  if (!first || !last) return '';
+
+  const sameMonth = first.getMonth() === last.getMonth() && first.getFullYear() === last.getFullYear();
+
+  if (sameMonth) {
+    return `${first.getDate()}-${last.getDate()} ${last.toLocaleDateString(locale, { month: 'long' })}`;
+  }
+
+  return `${first.toLocaleDateString(locale, { day: 'numeric', month: 'short' })} - ${last.toLocaleDateString(locale, { day: 'numeric', month: 'short' })}`;
+}
 
 export function MobileCalendarWeekSelector({
   calendarTable,
@@ -34,7 +51,16 @@ export function MobileCalendarWeekSelector({
   React.useEffect(() => {
     const value = new Date(normalizedSelectedDate);
     value.setDate(1);
-    setMonthDate(value);
+    setMonthDate((current) => {
+      if (
+        current.getFullYear() === value.getFullYear()
+        && current.getMonth() === value.getMonth()
+      ) {
+        return current;
+      }
+
+      return value;
+    });
   }, [selectedIso]);
 
   const monthWeeks = React.useMemo(() => {
@@ -69,13 +95,41 @@ export function MobileCalendarWeekSelector({
 
   if (!calendarTableHasItems(calendarTable)) return null;
 
+  if (Platform.OS === 'ios') {
+    return (
+      <YStack
+        style={{
+          gap: 10,
+          padding: 12,
+          borderRadius: 14,
+          backgroundColor: ios.card,
+          borderWidth: 1,
+          borderColor: ios.border,
+        }}
+      >
+        <Text style={{ color: ios.foreground, fontSize: 17, lineHeight: 22, fontWeight: '700' }}>
+          {t('calendar.reference_week')}
+        </Text>
+        <IosWeekCalendar
+          monthDate={monthDate}
+          onMonthChange={shiftMonth}
+          onSelectDate={onWeekSelect}
+          selectedDate={normalizedSelectedDate}
+          selectedWeekIsos={selectedWeekIsos}
+          locale={i18n.language}
+          todayIso={todayIso}
+        />
+      </YStack>
+    );
+  }
+
   return (
     <YStack style={{ gap: 10 }}>
       <YStack
         style={{
-          gap: 10,
-          padding: 10,
-          borderRadius: 8,
+          gap: 12,
+          padding: 12,
+          borderRadius: 14,
           backgroundColor: ios.card,
           borderWidth: 1,
           borderColor: ios.border,
@@ -85,39 +139,39 @@ export function MobileCalendarWeekSelector({
           <Pressable onPress={() => shiftMonth(-1)} accessibilityRole="button">
             <YStack
               style={{
-                width: 36,
-                height: 36,
+                width: 32,
+                height: 32,
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: 8,
-                backgroundColor: ios.blueInfoBg,
+                borderRadius: 10,
+                backgroundColor: 'transparent',
               }}
             >
-              <Ionicons name="chevron-back" size={20} color={ios.primary} />
+              <Ionicons name="chevron-back" size={18} color={ios.primary} />
             </YStack>
           </Pressable>
 
           <YStack style={{ flex: 1, alignItems: 'center' }}>
-            <Text style={{ color: ios.foreground, fontSize: 16, fontWeight: '900', textTransform: 'capitalize' }}>
+            <Text style={{ color: ios.foreground, fontSize: 17, fontWeight: '700', textTransform: 'capitalize' }}>
               {monthDate.toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' })}
             </Text>
-            <Text style={{ color: ios.mutedForeground, fontSize: 12, fontWeight: '700' }}>
-              {t('calendar.reference_week')}
+            <Text style={{ color: ios.mutedForeground, fontSize: 12, fontWeight: '500' }}>
+              {formatWeekRange(weekDates, i18n.language)}
             </Text>
           </YStack>
 
           <Pressable onPress={() => shiftMonth(1)} accessibilityRole="button">
             <YStack
               style={{
-                width: 36,
-                height: 36,
+                width: 32,
+                height: 32,
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: 8,
-                backgroundColor: ios.blueInfoBg,
+                borderRadius: 10,
+                backgroundColor: 'transparent',
               }}
             >
-              <Ionicons name="chevron-forward" size={20} color={ios.primary} />
+              <Ionicons name="chevron-forward" size={18} color={ios.primary} />
             </YStack>
           </Pressable>
         </XStack>
@@ -127,10 +181,10 @@ export function MobileCalendarWeekSelector({
             <Text
               key={label}
               style={{
-                width: 40,
+                width: 38,
                 color: ios.mutedForeground,
-                fontSize: 11,
-                fontWeight: '900',
+                fontSize: 12,
+                fontWeight: '600',
                 textAlign: 'center',
               }}
             >
@@ -145,40 +199,54 @@ export function MobileCalendarWeekSelector({
               {weekDatesInMonth.map((date) => {
                 const iso = toISO(date);
                 const isToday = iso === todayIso;
+                const isSelectedDate = iso === selectedIso;
                 const inSelectedWeek = selectedWeekIsos.has(iso);
                 const outsideMonth = date.getMonth() !== monthDate.getMonth();
-                const backgroundColor = isToday
+
+                const backgroundColor = isSelectedDate
+                  ? ios.primary
+                  : isToday
+                    ? ios.successBg
+                    : inSelectedWeek
+                      ? ios.accentHover
+                      : 'transparent';
+
+                const borderColor = isSelectedDate
+                  ? ios.primary
+                  : isToday
                     ? ios.success
                     : inSelectedWeek
-                      ? ios.blueInfoBg
+                      ? ios.border
                       : 'transparent';
+
+                const textColor = isSelectedDate
+                  ? ios.primaryForeground
+                  : isToday
+                    ? ios.success
+                    : outsideMonth
+                      ? ios.mutedForeground
+                      : ios.foreground;
 
                 return (
                   <Pressable key={iso} onPress={() => onWeekSelect(date)} accessibilityRole="button">
                     <YStack
                       style={{
-                        width: 40,
+                        width: 38,
                         height: 36,
                         alignItems: 'center',
                         justifyContent: 'center',
-                        borderRadius: 8,
+                        borderRadius: 10,
                         backgroundColor,
-                        borderWidth: inSelectedWeek && !isToday ? 1 : 0,
-                        borderColor: isToday ? ios.success : ios.blueInfoBorder,
+                        borderWidth: isSelectedDate || isToday || inSelectedWeek ? 1 : 0,
+                        borderColor,
                       }}
                     >
                       <Text
                         style={{
-                          color: isToday
-                            ? ios.primaryForeground
-                            : outsideMonth
-                              ? ios.mutedForeground
-                              : inSelectedWeek
-                                ? ios.primary
-                                : ios.foreground,
-                          opacity: outsideMonth ? 0.55 : 1,
-                          fontSize: 14,
-                          fontWeight: '900',
+                          color: textColor,
+                          opacity: outsideMonth && !isSelectedDate ? 0.55 : 1,
+                          fontSize: 15,
+                          fontWeight: isSelectedDate ? '700' : '600',
                         }}
                       >
                         {date.getDate()}

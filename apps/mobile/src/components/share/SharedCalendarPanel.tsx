@@ -25,7 +25,7 @@ export function SharedCalendarPanel({
     <YStack style={{ gap: 14 }}>
       <XStack style={{ alignItems: 'center', gap: 8 }}>
         <Ionicons name="people-outline" size={20} color={ios.primary} />
-        <Text style={{ color: ios.foreground, fontSize: 20, lineHeight: 26, fontWeight: '900' }}>
+        <Text style={{ color: ios.foreground, fontSize: 17, lineHeight: 22, fontWeight: '700' }}>
           {t('shared_calendar', { name: data.calendar_name || calendarId })}
         </Text>
       </XStack>

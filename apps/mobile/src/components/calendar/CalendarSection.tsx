@@ -61,13 +61,8 @@ export function CalendarSection({
             overflow: 'hidden',
             borderWidth: 1,
             borderColor: ios.border,
-            borderRadius: 16,
+            borderRadius: 14,
             backgroundColor: ios.card,
-            shadowColor: ios.shadow,
-            shadowOpacity: 0.08,
-            shadowRadius: 12,
-            shadowOffset: { width: 0, height: 4 },
-            elevation: 1,
           }}
         >
           {calendars.map((calendar, index) => (

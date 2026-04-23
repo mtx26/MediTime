@@ -15,9 +15,12 @@ export function InfoBanner({ iconName, text, tone = 'info' }: InfoBannerProps) {
   return (
     <XStack
       style={{
+        alignItems: 'center',
         gap: 10,
         padding: 12,
         borderRadius: 14,
+        borderWidth: 1,
+        borderColor: isInfo ? ios.blueInfoBorder : ios.border,
         backgroundColor: isInfo ? ios.blueInfoBg : ios.warningBg,
       }}
     >
@@ -32,7 +35,7 @@ export function InfoBanner({ iconName, text, tone = 'info' }: InfoBannerProps) {
           color: ios.foreground,
           fontSize: 14,
           lineHeight: 20,
-          fontWeight: '600',
+          fontWeight: '500',
         }}
       >
         {text}

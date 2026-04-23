@@ -182,20 +182,21 @@ export default function NotificationLine({ notif, onRead }: NotificationLineProp
           style={{
             gap: 12,
             padding: 12,
-            borderRadius: 8,
+            alignItems: 'flex-start',
+            borderRadius: 14,
             borderWidth: 1,
             borderColor: isUnread ? ios.blueInfoBorder : ios.border,
-            backgroundColor: isUnread ? ios.blueInfoBg : ios.card,
+            backgroundColor: ios.card,
             opacity: pressed ? 0.88 : 1,
           }}
         >
           <YStack
             style={{
-              width: 40,
-              height: 40,
+              width: 32,
+              height: 32,
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: 8,
+              borderRadius: 10,
               backgroundColor: presentation.iconBackground,
             }}
           >
@@ -212,7 +213,7 @@ export default function NotificationLine({ notif, onRead }: NotificationLineProp
                 color: ios.foreground,
                 fontSize: 14,
                 lineHeight: 20,
-                fontWeight: '600',
+                fontWeight: '500',
               }}
             >
               {presentation.message}
@@ -231,32 +232,21 @@ export default function NotificationLine({ notif, onRead }: NotificationLineProp
                 {timestamp}
               </Text>
 
-              {presentation.actionLabel && (
-                <XStack
-                  style={{
-                    alignItems: 'center',
-                    gap: 6,
-                    paddingHorizontal: 10,
-                    paddingVertical: 6,
-                    borderRadius: 8,
-                    backgroundColor: ios.card,
-                    borderWidth: 1,
-                    borderColor: ios.border,
-                  }}
-                >
-                  <Text
+              <XStack style={{ alignItems: 'center', gap: 6 }}>
+                {isUnread ? (
+                  <YStack
                     style={{
-                      color: ios.primary,
-                      fontSize: 12,
-                      lineHeight: 16,
-                      fontWeight: '900',
+                      width: 8,
+                      height: 8,
+                      borderRadius: 4,
+                      backgroundColor: ios.primary,
                     }}
-                  >
-                    {presentation.actionLabel}
-                  </Text>
-                  <Ionicons name="chevron-forward-outline" size={14} color={ios.primary} />
-                </XStack>
-              )}
+                  />
+                ) : null}
+                {presentation.actionLabel || presentation.href ? (
+                  <Ionicons name="chevron-forward" size={18} color={ios.mutedForeground} />
+                ) : null}
+              </XStack>
             </XStack>
           </YStack>
         </XStack>

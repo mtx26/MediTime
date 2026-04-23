@@ -1,9 +1,11 @@
-import { Switch } from 'react-native';
+import { useMemo, useState } from 'react';
+import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { Platform, Pressable, Switch } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Button, Input, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import type { MobileNotificationSettingsProps } from '@meditime/types';
 import { SettingsPanelSection } from './SettingsPanelSection';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 export function NotificationSettingsPanel({
   emailEnabled,
@@ -17,6 +19,44 @@ export function NotificationSettingsPanel({
 }: MobileNotificationSettingsProps) {
   const { t } = useTranslation();
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const pickerValue = useMemo(() => {
+    const next = new Date();
+    next.setSeconds(0, 0);
+
+    const match = /^(\d{2}):(\d{2})$/.exec(notificationTime);
+    if (!match) {
+      next.setHours(8, 0, 0, 0);
+      return next;
+    }
+
+    next.setHours(Number(match[1]), Number(match[2]), 0, 0);
+    return next;
+  }, [notificationTime]);
+
+  const handleTimeChange = (event: DateTimePickerEvent, date?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowTimePicker(false);
+    }
+
+    if (event.type === 'dismissed' || !date) {
+      return;
+    }
+
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const nextTime = `${hours}:${minutes}`;
+
+    if (Platform.OS === 'android') {
+      onNotificationTimeChange(nextTime);
+      void onSaveNotificationTime(nextTime);
+      return;
+    }
+
+    onNotificationTimeChange(nextTime);
+    void onSaveNotificationTime(nextTime);
+  };
 
   return (
     <YStack style={{ gap: 14 }}>
@@ -48,7 +88,7 @@ export function NotificationSettingsPanel({
             disabled={isSaving}
             onValueChange={onEmailEnabledChange}
             trackColor={{ false: ios.border, true: ios.primary }}
-            thumbColor={ios.card}
+            ios_backgroundColor={Platform.OS === 'ios' ? ios.border : undefined}
           />
         </XStack>
 
@@ -66,7 +106,7 @@ export function NotificationSettingsPanel({
             disabled={isSaving}
             onValueChange={onPushEnabledChange}
             trackColor={{ false: ios.border, true: ios.primary }}
-            thumbColor={ios.card}
+            ios_backgroundColor={Platform.OS === 'ios' ? ios.border : undefined}
           />
         </XStack>
       </SettingsPanelSection>
@@ -83,23 +123,71 @@ export function NotificationSettingsPanel({
           <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 18 }}>
             {t('settings.notification_time_note')}
           </Text>
-          <Input
-            size="$4"
-            value={notificationTime}
-            placeholder="08:00"
-            keyboardType="numbers-and-punctuation"
-            maxLength={5}
-            onChangeText={onNotificationTimeChange}
-          />
-          <Button
-            size="$4"
-            theme="blue"
-            disabled={isSaving || !notificationTime}
-            opacity={isSaving ? 0.7 : 1}
-            onPress={onSaveNotificationTime}
-          >
-            {t('account.save_changes')}
-          </Button>
+          {Platform.OS === 'ios' ? (
+            <XStack
+              style={{
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                paddingVertical: 2,
+              }}
+            >
+              <DateTimePicker
+                value={pickerValue}
+                mode="time"
+                display="compact"
+                minuteInterval={5}
+                themeVariant={colorScheme}
+                onChange={handleTimeChange}
+              />
+            </XStack>
+          ) : (
+            <YStack
+              style={{
+                overflow: 'hidden',
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: ios.border,
+                backgroundColor: ios.background,
+              }}
+            >
+              <Pressable
+                onPress={() => setShowTimePicker(true)}
+                accessibilityRole="button"
+                accessibilityLabel={String(t('settings.notification_time_label'))}
+              >
+                {({ pressed }) => (
+                  <XStack
+                    style={{
+                      minHeight: 44,
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 12,
+                      paddingHorizontal: 12,
+                      backgroundColor: pressed ? ios.accentHover : ios.background,
+                    }}
+                  >
+                    <Text style={{ color: ios.foreground, fontSize: 15, lineHeight: 20, fontWeight: '600' }}>
+                      {notificationTime || '08:00'}
+                    </Text>
+                    <Text style={{ color: ios.primary, fontSize: 14, lineHeight: 18, fontWeight: '600' }}>
+                      {t('edit')}
+                    </Text>
+                  </XStack>
+                )}
+              </Pressable>
+
+              {showTimePicker ? (
+                <DateTimePicker
+                  value={pickerValue}
+                  mode="time"
+                  display="default"
+                  is24Hour
+                  minuteInterval={5}
+                  onChange={handleTimeChange}
+                />
+              ) : null}
+            </YStack>
+          )}
         </YStack>
       </SettingsPanelSection>
     </YStack>

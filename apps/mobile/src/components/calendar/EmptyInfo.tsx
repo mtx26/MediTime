@@ -20,15 +20,11 @@ export function EmptyInfo({ text }: EmptyInfoProps) {
         borderWidth: 1,
         borderColor: ios.blueInfoBorder,
         backgroundColor: ios.blueInfoBg,
-        shadowColor: '#000',
-        shadowOpacity: 0.12,
-        shadowRadius: 3,
-        shadowOffset: { width: 0, height: 1 },
-        elevation: 2,
+        gap: 8,
       }}
     >
       <Ionicons name="information-circle-outline" size={20} color={ios.blueText} />
-      <Text style={{ marginLeft: 8, color: ios.foreground, fontWeight: '700', flex: 1 }}>
+      <Text style={{ flex: 1, color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '500' }}>
         {text}
       </Text>
     </XStack>

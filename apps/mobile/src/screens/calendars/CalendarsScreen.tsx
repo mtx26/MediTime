@@ -1,15 +1,17 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { Alert, RefreshControl } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Stack, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, Spinner, Text, YStack } from 'tamagui';
+import { YStack } from 'tamagui';
 import type { CalendarItem } from '@meditime/types';
 import {
   buildPersonalCalendarActions,
   buildSharedCalendarActions,
 } from '@meditime/utils';
 import { OutlineButton } from '../../components/common/OutlineButton';
+import { InfoBanner } from '../../components/common/InfoBanner';
+import { LoadingIndicator } from '../../components/common/LoadingIndicator';
+import { Page, usePageHeaderOptions } from '../../components/common/Page';
 import {
   AddCalendarFooter,
   CalendarSection,
@@ -28,15 +30,16 @@ const AddCalendarModal = lazy(() =>
 export default function CalendarsScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const ios = useIosTheme();
   const lng = i18n.language || 'fr';
-  const bottomContentInset = 56 + insets.bottom + 14;
   const [renameValues, setRenameValues] = useState<Record<string, string>>({});
   const [renameMode, setRenameMode] = useState<string | null>(null);
   const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
   const [pdfCalendarId, setPdfCalendarId] = useState<string | null>(null);
   const [includeInactive, setIncludeInactive] = useState(false);
+  const headerOptions = usePageHeaderOptions({
+    title: String(t('calendars')),
+  });
 
   const calendars = useCalendars();
   const {
@@ -191,19 +194,13 @@ export default function CalendarsScreen() {
   };
 
   if (isLoading && personalCalendars.length === 0 && sharedCalendars.length === 0) {
-    return (
-      <YStack style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: ios.background, gap: 12 }}>
-        <Spinner size="large" color={ios.primary} />
-        <Text style={{ color: ios.mutedForeground, fontWeight: '700' }}>{t('loading_calendars')}</Text>
-      </YStack>
-    );
+    return <LoadingIndicator label={String(t('loading_calendars'))} variant="screen" />;
   }
 
   return (
     <>
-      <ScrollView
-        flex={1}
-        style={{ flex: 1, backgroundColor: ios.background }}
+      <Page
+        screen={<Stack.Screen options={headerOptions} />}
         refreshControl={(
           <RefreshControl
             refreshing={isRefreshing}
@@ -213,66 +210,45 @@ export default function CalendarsScreen() {
             progressBackgroundColor={ios.card}
           />
         )}
+        gap={24}
+        withBottomTabInset
       >
-        <YStack
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            gap: 24,
-            paddingHorizontal: 16,
-            paddingTop: 16,
-            paddingBottom: bottomContentInset,
-            backgroundColor: ios.background,
-          }}
-        >
-          {error && (
-            <YStack
-              style={{
-                width: '100%',
-                maxWidth: 672,
-                gap: 10,
-                padding: 12,
-                borderWidth: 1,
-                borderColor: ios.destructiveBorder,
-                borderRadius: 8,
-                backgroundColor: ios.destructiveBg,
-              }}
-            >
-              <Text style={{ color: ios.destructive, fontWeight: '700' }}>{error}</Text>
-              <OutlineButton label={String(t('retry'))} onPress={loadCalendars} />
-            </YStack>
-          )}
+        {error && (
+          <YStack style={{ width: '100%', maxWidth: 672, gap: 10, alignSelf: 'center' }}>
+            <InfoBanner iconName="warning-outline" text={error} tone="warning" />
+            <OutlineButton label={String(t('retry'))} onPress={loadCalendars} />
+          </YStack>
+        )}
 
-          <CalendarSection
-            title={String(t('my_calendars'))}
-            iconName="calendar-outline"
-            calendars={personalCalendars}
-            getActions={getPersonalActions}
-            onOpen={openPersonalCalendar}
-            onNavigate={navigateToHref}
-            renameMode={renameMode}
-            renameValues={renameValues}
-            isMutating={isMutating}
-            onRenameChange={(calendarId, value) =>
-              setRenameValues((prev) => ({ ...prev, [calendarId]: value }))
-            }
-            onRenameSubmit={handleRenameSubmit}
-            onRenameCancel={() => setRenameMode(null)}
-            addFooter={<AddCalendarFooter onPress={addCalendarFlow.openModal} />}
-          />
+        <CalendarSection
+          title={String(t('my_calendars'))}
+          iconName="calendar-outline"
+          calendars={personalCalendars}
+          getActions={getPersonalActions}
+          onOpen={openPersonalCalendar}
+          onNavigate={navigateToHref}
+          renameMode={renameMode}
+          renameValues={renameValues}
+          isMutating={isMutating}
+          onRenameChange={(calendarId, value) =>
+            setRenameValues((prev) => ({ ...prev, [calendarId]: value }))
+          }
+          onRenameSubmit={handleRenameSubmit}
+          onRenameCancel={() => setRenameMode(null)}
+          addFooter={<AddCalendarFooter onPress={addCalendarFlow.openModal} />}
+        />
 
-          <CalendarSection
-            title={String(t('shared_calendars'))}
-            iconName="people-outline"
-            calendars={sharedCalendars}
-            emptyText={String(t('no_shared_calendars'))}
-            showInfoEmpty
-            getActions={getSharedActions}
-            onOpen={openSharedCalendar}
-            onNavigate={navigateToHref}
-          />
-        </YStack>
-      </ScrollView>
+        <CalendarSection
+          title={String(t('shared_calendars'))}
+          iconName="people-outline"
+          calendars={sharedCalendars}
+          emptyText={String(t('no_shared_calendars'))}
+          showInfoEmpty
+          getActions={getSharedActions}
+          onOpen={openSharedCalendar}
+          onNavigate={navigateToHref}
+        />
+      </Page>
 
       <Suspense fallback={null}>
         <AddCalendarModal

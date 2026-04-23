@@ -6,7 +6,7 @@ import { Text, XStack, YStack } from 'tamagui';
 import type { MobilePreferencesSettingsProps } from '@meditime/types';
 import type { AppThemePreference } from '../../theme/ios';
 import { SettingsPanelSection } from './SettingsPanelSection';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 const THEME_ICONS: Record<AppThemePreference, keyof typeof Ionicons.glyphMap> = {
   system: 'contrast-outline',
@@ -23,6 +23,7 @@ export function PreferencesSettingsPanel({
 }: MobilePreferencesSettingsProps) {
   const { t } = useTranslation();
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
   const themeOptions: AppThemePreference[] = ['system', 'light', 'dark'];
 
   return (
@@ -108,6 +109,7 @@ export function PreferencesSettingsPanel({
         description={String(t('settings.theme_description'))}
       >
         <SegmentedControl
+          appearance={colorScheme}
           values={themeOptions.map((item) => item === 'system' ? 'System' : String(t(`theme.${item}`)))}
           selectedIndex={Math.max(0, themeOptions.indexOf(themePreference))}
           onChange={(event) => {

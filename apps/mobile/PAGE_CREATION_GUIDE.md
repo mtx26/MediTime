@@ -4,7 +4,36 @@ Use this context for every new mobile page.
 
 ## Goal
 
-Mobile pages should reproduce the web behavior and page structure, adapted to React Native and Expo Router. The mobile implementation should avoid duplication, keep route files small, and put shared contracts in packages.
+Mobile pages should reproduce the web behavior and page structure, adapted to React Native and Expo Router.
+
+The priority is:
+
+1. use Apple-native components and interactions whenever they exist
+2. use community wrappers for native iOS components when React Native core does not expose them
+3. build a custom component only when no acceptable native option exists
+
+Do not jump directly to a custom UI.
+
+## Native-First Rule
+
+Before creating a new mobile UI element, always check whether an Apple-native component or pattern already exists.
+
+Examples:
+
+- action sheets
+- pickers
+- date and time pickers
+- segmented controls
+- switches
+- search bars
+- lists and grouped settings sections
+- native navigation headers
+
+If a native component or native-style wrapper exists, prefer it.
+
+If you find that a native option probably exists but you are not sure whether it should be used here, stop and ask before continuing.
+
+If you find a native option and a custom option is still possible, do not choose the custom option by default. Stop and ask what should be done.
 
 ## Before Creating A Page
 
@@ -13,6 +42,7 @@ Mobile pages should reproduce the web behavior and page structure, adapted to Re
 3. Read the related shared utilities in `packages/utils`.
 4. Read the related types in `packages/types`.
 5. Check `ROUTER_SCHEMA.md` and create the route at the matching path.
+6. Check whether Apple already has a native component or interaction for the UI you are about to build.
 
 ## Route Files
 
@@ -32,24 +62,7 @@ For paired routes like personal and shared-user calendars, use one shared screen
 
 ## Screen Files
 
-Screen files in `apps/mobile/src/screens` should be grouped by route/domain and should mostly compose UI.
-
-Current screen folders:
-
-- `auth`: login, register, reset password, auth callback, email verification
-- `calendar`: calendar detail subpages such as overview, daily, ICS tokens, boxes, pillbox, settings
-- `calendars`: the main calendars list and calendar-list-level pages
-- `share`: shared calendars and invitation acceptance
-- `notifications`: notification routes
-- `settings`: settings routes
-- `legal`: privacy and terms
-- `general`: app-level fallback pages such as not found
-
-Prefer matching hooks and screens by domain, for example:
-
-- `src/screens/calendar/IcsTokensScreen.tsx`
-- `src/hooks/calendar/useIcsTokens.ts`
-- `src/components/calendar/IcsTokenCard.tsx`
+Screen files in `apps/mobile/src/screens` should mostly compose UI.
 
 Avoid putting large API logic, action builders, route decisions, and data transformations directly in screen files. Move that work into hooks or package helpers.
 
@@ -59,13 +72,14 @@ Good screen responsibilities:
 - choosing which reusable components to render
 - passing hook data to components
 - rendering loading, empty, and error states
+- preferring native iOS components when available
 
 Avoid:
 
 - large API functions
 - duplicated personal/shared-user branches throughout JSX
 - long inline helper functions
-- declaring multiple React components in the same file
+- inventing custom controls when Apple already has one
 
 ## Hooks
 
@@ -81,19 +95,11 @@ Hooks should handle:
 - shared personal/shared-user branching
 - transforming backend responses into screen-ready data
 
-Prefer one page hook per complex screen, for example:
-
-```ts
-useCalendarDetail(...)
-useSomethingSettings(...)
-useSomethingList(...)
-```
-
 ## Components
 
 Use exactly one React component per file.
 
-Do not declare helper/sub components in the same file as a screen, layout, hook consumer, or another component. If JSX becomes reusable or needs its own name, create a new file for it.
+If a component needs to be custom, first confirm that no Apple-native component is the better fit.
 
 Reusable UI goes in:
 
@@ -107,9 +113,9 @@ If a component needs props, define the prop type in `packages/types`, not locall
 
 Use packages consistently:
 
-- `packages/types`: shared prop types, API result types, page modes, source types, model types
-- `packages/utils`: shared logic, route helpers, action builders, data transforms, date helpers
-- `packages/constants`: shared constants and enum-like objects
+- `packages/types`
+- `packages/utils`
+- `packages/constants`
 
 Do not duplicate logic from web when it can reasonably live in `packages/utils`.
 
@@ -118,14 +124,9 @@ Do not duplicate logic from web when it can reasonably live in `packages/utils`.
 For pushed pages:
 
 - keep the native back arrow when possible
-- use a custom title component if the title needs truncation
+- use native page actions when possible
 - put page actions in `headerRight`
 - do not add a second in-page title if the header already has the page title
-
-For root tab pages:
-
-- header title can be simple
-- bottom tab bar should remain active
 
 ## Loading Pattern
 
@@ -136,7 +137,6 @@ Recommended states:
 - full-screen loading for first page load
 - inline loading for backend updates after the page is already visible
 - refresh control for pull-to-refresh
-- avoid showing contradictory loaders for the same request
 
 ## Navigation Pattern
 
@@ -147,16 +147,6 @@ When adapting web links, convert them through the mobile route helper instead of
 ## Type Rules
 
 Always put reusable types in `packages/types`.
-
-Examples:
-
-- component prop types
-- page source types
-- page mode types
-- API response shapes
-- shared hook return/input types when used across files
-
-Avoid local exported types in app code if they describe reusable app contracts.
 
 ## Verification
 
