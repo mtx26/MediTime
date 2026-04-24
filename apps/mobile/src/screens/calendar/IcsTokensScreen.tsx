@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import type { CalendarDetailSourceType } from '@meditime/types';
-import { CalendarAmbientBackground } from '../../components/calendar/CalendarAmbientBackground';
 import { CalendarNotFoundState, IcsTokenCard } from '../../components/calendar';
 import { GlassSurface } from '../../components/common/GlassSurface';
 import { InfoBanner } from '../../components/common/InfoBanner';
@@ -49,7 +48,6 @@ export default function IcsTokensScreen({ sourceType }: IcsTokensScreenProps) {
 
   return (
     <Page
-      backgroundDecoration={<CalendarAmbientBackground />}
       screen={<Stack.Screen options={headerOptions} />}
       refreshControl={(
         <RefreshControl
@@ -101,21 +99,28 @@ export default function IcsTokensScreen({ sourceType }: IcsTokensScreenProps) {
       >
         {({ pressed }) => (
           <GlassSurface
+            glassEffectStyle="clear"
             style={{
               minHeight: 52,
               alignItems: 'center',
+              justifyContent: 'center',
               paddingHorizontal: 14,
-              paddingVertical: 12,
-              borderRadius: 16,
+              borderRadius: 18,
               borderColor: pressed ? ios.primary : ios.border,
             }}
           >
-            <XStack style={{ alignItems: 'center', gap: 10, opacity: ics.isMutating ? 0.55 : 1 }}>
+            <XStack
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+                opacity: ics.isMutating ? 0.55 : 1,
+              }}
+            >
               <Ionicons name="add-circle-outline" size={18} color={ios.primary} />
-              <Text style={{ flex: 1, color: ios.primary, fontSize: 15, fontWeight: '800' }}>
+              <Text style={{ color: ios.primary, fontSize: 15, lineHeight: 20, fontWeight: '800' }}>
                 {t('ics.add_token')}
               </Text>
-              <Ionicons name="chevron-forward" size={18} color={ios.mutedForeground} />
             </XStack>
           </GlassSurface>
         )}

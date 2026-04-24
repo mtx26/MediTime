@@ -41,7 +41,6 @@ function ActionIconButton({
       {({ pressed }) => (
         <GlassSurface
           glassEffectStyle="clear"
-          tintColor={isDestructive ? ios.destructiveBg : undefined}
           style={{
             width: 40,
             height: 40,
@@ -89,23 +88,24 @@ function PrimaryActionButton({
     >
       {({ pressed }) => (
         <GlassSurface
-          tintColor={ios.blueInfoBg}
+          glassEffectStyle="clear"
           style={{
             minHeight: 44,
             flex: 1,
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 8,
             borderRadius: 12,
-            borderColor: pressed ? ios.primary : ios.blueInfoBorder,
+            borderColor: pressed ? ios.primary : ios.border,
             paddingHorizontal: 14,
             opacity: disabled ? 0.55 : 1,
           }}
         >
-          <Ionicons name={iconName} size={18} color={ios.primary} />
-          <Text style={{ color: ios.primary, fontSize: 15, fontWeight: '800' }}>
-            {label}
-          </Text>
+          <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <Ionicons name={iconName} size={18} color={ios.primary} />
+            <Text style={{ color: ios.primary, fontSize: 15, fontWeight: '800' }}>
+              {label}
+            </Text>
+          </XStack>
         </GlassSurface>
       )}
     </Pressable>
@@ -128,9 +128,10 @@ export function IcsTokenCard({
 
   return (
     <GlassSurface
+      glassEffectStyle="clear"
       style={{
         gap: 12,
-        borderRadius: 16,
+        borderRadius: 24,
         paddingHorizontal: 14,
         paddingVertical: 14,
       }}
