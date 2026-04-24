@@ -1,22 +1,28 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
-import type { SharedCalendarPanelProps } from '@meditime/types';
+import type { GroupedSharedCalendar } from '@meditime/types';
 import { useIosTheme } from '../../theme/ios';
-import { SharedTokenList } from './SharedTokenList';
 import { SharedUserList } from './SharedUserList';
+
+type SharedCalendarPanelProps = {
+  calendarId: string;
+  data: GroupedSharedCalendar;
+  emailToInvite: string;
+  onDeleteInvitation: (token: string) => void;
+  onDeleteUser: (token: string) => void;
+  onEmailChange: (value: string) => void;
+  onInvite: () => void;
+};
 
 export function SharedCalendarPanel({
   calendarId,
   data,
   emailToInvite,
-  onCreateToken,
   onDeleteInvitation,
-  onDeleteToken,
   onDeleteUser,
   onEmailChange,
   onInvite,
-  onShareToken,
 }: SharedCalendarPanelProps) {
   const { t } = useTranslation();
   const ios = useIosTheme();
@@ -29,13 +35,6 @@ export function SharedCalendarPanel({
           {t('shared_calendar', { name: data.calendar_name || calendarId })}
         </Text>
       </XStack>
-
-      <SharedTokenList
-        tokens={data.tokens ?? []}
-        onCreateToken={onCreateToken}
-        onDeleteToken={onDeleteToken}
-        onShareToken={onShareToken}
-      />
 
       <SharedUserList
         emailToInvite={emailToInvite}

@@ -1,4 +1,6 @@
+import type { ReactElement, ReactNode } from 'react';
 import type { ApiResult, OAuthProvider } from '../api';
+import type { RefreshControlProps } from 'react-native';
 
 // ─── FCM / Notification Settings ────────────────────────────────────────────
 
@@ -30,16 +32,16 @@ export interface SecurityProviderItem<TIcon = unknown> {
 
 export type SettingsTabId = 'account' | 'security' | 'notifications' | 'preferences';
 
-export interface SettingsTabItem<TIconName = string> {
-  id: SettingsTabId;
+export interface SettingsTabItem<TIconName = string, TId = string> {
+  id: TId;
   label: string;
   iconName: TIconName;
 }
 
-export interface SettingsTabBarProps<TIconName = string> {
-  tabs: SettingsTabItem<TIconName>[];
-  activeTab: SettingsTabId;
-  onTabChange: (tab: SettingsTabId) => void;
+export interface SettingsTabBarProps<TIconName = string, TId = string> {
+  tabs: SettingsTabItem<TIconName, TId>[];
+  activeTab: TId;
+  onTabChange: (tab: TId) => void;
 }
 
 export interface SettingsPanelSectionProps<TIconName = string, TNode = unknown> {
@@ -47,6 +49,24 @@ export interface SettingsPanelSectionProps<TIconName = string, TNode = unknown> 
   description?: string;
   iconName: TIconName;
   children: TNode;
+}
+
+export interface SettingsPageShellProps<TTabId extends string = string> {
+  activeTab?: TTabId;
+  children: ReactNode;
+  error?: string | null;
+  footer?: ReactNode;
+  gap?: number;
+  loading: boolean;
+  loadingLabel: string;
+  notFound?: boolean;
+  notFoundContent?: ReactNode;
+  onRetry?: (() => void) | null;
+  refreshControl: ReactElement<RefreshControlProps>;
+  screen: ReactNode;
+  tabs?: SettingsTabItem<string, TTabId>[];
+  onTabChange?: (tab: TTabId) => void;
+  withBottomTabInset?: boolean;
 }
 
 export interface MobileSecurityProviderItem<TIconName = string> {

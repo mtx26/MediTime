@@ -87,7 +87,7 @@ export function useSettings() {
     void refreshNotificationTime();
   }, [refreshNotificationTime]);
 
-  const tabs = useMemo<SettingsTabItem<keyof typeof Ionicons.glyphMap>[]>(() => [
+  const tabs = useMemo<SettingsTabItem<keyof typeof Ionicons.glyphMap, SettingsTabId>[]>(() => [
     { id: SETTINGS_TABS.ACCOUNT as SettingsTabId, label: String(t('settings.account')), iconName: 'person-circle-outline' },
     { id: SETTINGS_TABS.SECURITY as SettingsTabId, label: String(t('settings.security')), iconName: 'shield-checkmark-outline' },
     { id: SETTINGS_TABS.NOTIFICATIONS as SettingsTabId, label: String(t('notifications')), iconName: 'notifications-outline' },

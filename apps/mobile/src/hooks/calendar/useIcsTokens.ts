@@ -10,6 +10,7 @@ import type {
   IcsTokensResult,
 } from '@meditime/types';
 import { useCalendarApis } from './useCalendarApis';
+import { dismissToCalendars } from './navigation';
 
 type IcsSource = {
   getTokensIcs: (calendarId: string) => Promise<ApiResult>;
@@ -155,7 +156,7 @@ export function useIcsTokens(sourceType: CalendarDetailSourceType) {
   const getTokenUrl = (token: string) => getWebcalUrl(apiUrl, token);
 
   return {
-    backToCalendars: () => router.dismissTo('/calendars' as never),
+    backToCalendars: () => dismissToCalendars(router),
     confirmDeleteToken,
     createToken,
     error,

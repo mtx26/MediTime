@@ -21,7 +21,7 @@ export type CalendarPageSourceType = 'personal' | 'sharedUser' | 'token';
 
 export type CalendarSettingsTab = 'stock' | 'notifications';
 
-export type CalendarDetailSourceType = Extract<CalendarPageSourceType, 'personal' | 'sharedUser'>;
+export type CalendarDetailSourceType = CalendarPageSourceType;
 export type CalendarDetailMode = 'overview' | 'daily';
 
 // ─── Sub-component Props ─────────────────────────────────────────────
@@ -160,6 +160,18 @@ export interface CalendarNotificationsProps extends CalendarDataSourceProps, Cal
 
 export interface CalendarStockProps extends CalendarNotFoundProps {
   personalCalendars: CalendarStockPersonalCalendars;
+}
+
+export interface MobileCalendarNotificationSettingsProps {
+  enabled: boolean;
+  isSaving: boolean;
+  onToggle: () => void;
+}
+
+export interface MobileCalendarStockSettingsProps {
+  selectedMethod: StockDecrementMethod | '';
+  isSaving: boolean;
+  onSelectMethod: (method: StockDecrementMethod) => void;
 }
 
 export type PillboxDisplayType = 'pillbox' | 'calendar';

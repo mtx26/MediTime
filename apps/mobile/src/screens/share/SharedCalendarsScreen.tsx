@@ -86,13 +86,10 @@ export default function SharedCalendarsScreen() {
                 calendarId={shared.selectedCalendarId}
                 data={shared.selectedSharedData}
                 emailToInvite={shared.emailToInvite}
-                onCreateToken={shared.createPublicLink}
                 onDeleteInvitation={shared.deleteRegistrationInvitation}
-                onDeleteToken={shared.deletePublicLink}
                 onDeleteUser={shared.deleteLoginInvitation}
                 onEmailChange={shared.setEmailToInvite}
                 onInvite={shared.sendInvitation}
-                onShareToken={shared.shareLink}
               />
             ) : (
               <InfoBanner iconName="people-outline" text={String(t('shared_calendar_management'))} />

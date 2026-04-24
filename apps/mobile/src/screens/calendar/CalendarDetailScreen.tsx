@@ -16,8 +16,10 @@ import { Page, usePageHeaderOptions } from '../../components/common/Page';
 import { useCalendarDetail } from '../../hooks/calendar';
 import { useIosTheme } from '../../theme/ios';
 
+type MobileCalendarDetailSourceType = Exclude<CalendarDetailSourceType, 'token'>;
+
 type CalendarDetailScreenProps = {
-  sourceType: CalendarDetailSourceType;
+  sourceType: MobileCalendarDetailSourceType;
   mode?: CalendarDetailMode;
 };
 
@@ -82,7 +84,7 @@ export default function CalendarDetailScreen({
         gap={18}
         withBottomTabInset
       >
-        {detail.showOverviewControls && (
+        {detail.showMedicinesButton && (
           <Button
             onPress={detail.goToBoxes}
             style={{
@@ -110,7 +112,7 @@ export default function CalendarDetailScreen({
           </Pressable>
         )}
 
-        {detail.showOverviewControls && (
+        {detail.showWeekSelector && (
           <MobileCalendarWeekSelector
             calendarTable={detail.calendarTable}
             selectedDate={detail.selectedDate}

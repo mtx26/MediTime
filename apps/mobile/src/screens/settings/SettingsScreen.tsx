@@ -4,14 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { Button, Text, XStack, YStack } from 'tamagui';
 import { Ionicons } from '@expo/vector-icons';
 import { SETTINGS_TABS } from '@meditime/constants';
-import { LoadingIndicator } from '../../components/common/LoadingIndicator';
-import { Page, usePageHeaderOptions } from '../../components/common/Page';
+import { usePageHeaderOptions } from '../../components/common/Page';
 import {
   AccountSettingsPanel,
   NotificationSettingsPanel,
   PreferencesSettingsPanel,
   SecuritySettingsPanel,
-  SettingsTabBar,
+  SettingsPageShell,
 } from '../../components/settings';
 import { useSettings } from '../../hooks/settings';
 import { useIosTheme } from '../../theme/ios';
@@ -24,16 +23,14 @@ export default function SettingsScreen() {
     title: String(t('settings.label')),
   });
 
-  if (settings.isLoading) {
-    return <LoadingIndicator label={String(t('loading_settings'))} variant="screen" />;
-  }
-
   if (!settings.userInfo) {
     return <Redirect href="/(auth)/login" />;
   }
 
   return (
-    <Page
+    <SettingsPageShell
+      loading={settings.isLoading}
+      loadingLabel={String(t('loading_settings'))}
       screen={<Stack.Screen options={headerOptions} />}
       refreshControl={(
         <RefreshControl
@@ -45,13 +42,29 @@ export default function SettingsScreen() {
         />
       )}
       gap={16}
-      withBottomTabInset
+      tabs={settings.tabs}
+      activeTab={settings.activeTab}
+      onTabChange={settings.setActiveTab}
+      footer={(
+        <YStack
+          style={{
+            gap: 10,
+            paddingTop: 10,
+            borderTopWidth: 1,
+            borderTopColor: ios.border,
+          }}
+        >
+          <Button size="$4" onPress={settings.confirmLogout}>
+            <XStack style={{ alignItems: 'center', gap: 8 }}>
+              <Ionicons name="log-out-outline" size={18} color={ios.destructive} />
+              <Text style={{ color: ios.destructive, fontWeight: '800' }}>
+                {t('logout')}
+              </Text>
+            </XStack>
+          </Button>
+        </YStack>
+      )}
     >
-      <SettingsTabBar
-        tabs={settings.tabs}
-        activeTab={settings.activeTab}
-        onTabChange={settings.setActiveTab}
-      />
 
       {settings.activeTab === SETTINGS_TABS.SECURITY && (
         <SecuritySettingsPanel
@@ -110,24 +123,6 @@ export default function SettingsScreen() {
           onResetDisplayName={settings.resetDisplayName}
         />
       )}
-
-      <YStack
-        style={{
-          gap: 10,
-          paddingTop: 10,
-          borderTopWidth: 1,
-          borderTopColor: ios.border,
-        }}
-      >
-        <Button size="$4" onPress={settings.confirmLogout}>
-          <XStack style={{ alignItems: 'center', gap: 8 }}>
-            <Ionicons name="log-out-outline" size={18} color={ios.destructive} />
-            <Text style={{ color: ios.destructive, fontWeight: '800' }}>
-              {t('logout')}
-            </Text>
-          </XStack>
-        </Button>
-      </YStack>
-    </Page>
+    </SettingsPageShell>
   );
 }

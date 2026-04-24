@@ -10,6 +10,7 @@ import type {
   PillboxUsesResult,
 } from '@meditime/types';
 import { useCalendarApis } from './useCalendarApis';
+import { dismissToCalendars } from './navigation';
 
 type PillboxUsesSource = {
   fetchPillboxUses: (calendarId: string) => Promise<ApiResult>;
@@ -135,7 +136,7 @@ export function usePillboxUses(sourceType: CalendarDetailSourceType) {
   );
 
   return {
-    backToCalendars: () => router.dismissTo('/calendars' as never),
+    backToCalendars: () => dismissToCalendars(router),
     confirmCancelUse,
     error,
     formatWeek,

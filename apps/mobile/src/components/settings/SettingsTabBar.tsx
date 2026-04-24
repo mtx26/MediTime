@@ -2,11 +2,11 @@ import SegmentedControl from '@react-native-segmented-control/segmented-control'
 import type { SettingsTabBarProps } from '@meditime/types';
 import { useAppTheme } from '../../theme/ios';
 
-export function SettingsTabBar({
+export function SettingsTabBar<TId extends string>({
   tabs,
   activeTab,
   onTabChange,
-}: SettingsTabBarProps<string>) {
+}: SettingsTabBarProps<string, TId>) {
   const { colorScheme } = useAppTheme();
   const selectedIndex = Math.max(0, tabs.findIndex((tab) => tab.id === activeTab));
 

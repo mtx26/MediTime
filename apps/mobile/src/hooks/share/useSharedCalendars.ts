@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Share } from 'react-native';
+import { Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import {
   buildPersonalCalendarActions,
   createPersonalCalendarsApi,
   createSharedUserCalendarsApi,
-  createTokenCalendarsApi,
   fetchCalendars,
   getFirstRouteParam,
   performApiCall,
@@ -15,13 +14,11 @@ import type {
   CalendarItem,
   GroupedSharedCalendars,
   GroupedSharedCalendarsResult,
-  SharedCalendarToken,
 } from '@meditime/types';
 import { useAuth } from '../auth/useAuth';
 import { openPdfUrl, toActionSheetItems, toMobileHref } from '../../utils';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
-const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 const isActiveDefault = () => true;
 
 export function useSharedCalendars() {
@@ -52,7 +49,6 @@ export function useSharedCalendars() {
 
   const personalCalendarsApi = useMemo(() => createPersonalCalendarsApi(apiOptions), [apiOptions]);
   const sharedUserCalendarsApi = useMemo(() => createSharedUserCalendarsApi(apiOptions), [apiOptions]);
-  const tokenCalendarsApi = useMemo(() => createTokenCalendarsApi(apiOptions), [apiOptions]);
 
   const refreshGroupedShared = useCallback(async (isActive: () => boolean = isActiveDefault) => {
     const result = await sharedUserCalendarsApi.fetchGroupedSharedCalendars() as GroupedSharedCalendarsResult;
@@ -186,53 +182,6 @@ export function useSharedCalendars() {
     );
   }, [loadPage, personalCalendarsApi, selectedCalendarId, t]);
 
-  const shareLink = useCallback(async (token: SharedCalendarToken) => {
-    const language = (i18n.language || 'fr').slice(0, 2);
-    const url = `${WEB_URL}/${language}/shared-token-calendar/${token.id}`;
-    await Share.share({
-      message: url,
-      url,
-      title: String(t('copy_link')),
-    });
-  }, [i18n.language, t]);
-
-  const createPublicLink = useCallback(() => {
-    if (!selectedCalendarId) return;
-
-    void tokenCalendarsApi.createToken(selectedCalendarId, null, 'read').then((result) => {
-      if (!result.success) {
-        Alert.alert(String(t('error')), result.error ?? String(t('error')));
-        return;
-      }
-
-      void refreshGroupedShared();
-    });
-  }, [refreshGroupedShared, selectedCalendarId, t, tokenCalendarsApi]);
-
-  const deletePublicLink = useCallback((tokenId: string) => {
-    Alert.alert(
-      String(t('delete_link_title')),
-      String(t('delete_link_description')),
-      [
-        { text: String(t('cancel')), style: 'cancel' },
-        {
-          text: String(t('delete')),
-          style: 'destructive',
-          onPress: () => {
-            void tokenCalendarsApi.deleteToken(tokenId).then((result) => {
-              if (!result.success) {
-                Alert.alert(String(t('error')), result.error ?? String(t('error')));
-                return;
-              }
-
-              void refreshGroupedShared();
-            });
-          },
-        },
-      ],
-    );
-  }, [refreshGroupedShared, t, tokenCalendarsApi]);
-
   const sendInvitation = useCallback(() => {
     if (!selectedCalendarId) return;
     const email = emailToInvite.trim();
@@ -336,9 +285,6 @@ export function useSharedCalendars() {
     setIncludeInactive,
     setPdfDialogOpen,
     setSelectedCalendarId,
-    shareLink,
-    createPublicLink,
-    deletePublicLink,
     sendInvitation,
     deleteLoginInvitation,
     deleteRegistrationInvitation,

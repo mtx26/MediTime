@@ -22,13 +22,14 @@ import type {
   WeeklyEventItem,
 } from '@meditime/types';
 import { useCalendarApis } from './useCalendarApis';
+import { dismissToCalendars } from './navigation';
 import { openPdfUrl, toActionSheetItems, toMobileHref } from '../../utils';
 
 type CalendarSource = {
   fetchSchedule: (calendarId: string, startDate?: string | null) => Promise<ApiResult>;
-  fetchStockDecrementMethod: (calendarId: string) => Promise<ApiResult>;
-  deleteCalendar: (calendarId: string) => Promise<ApiResult>;
-  getPdfUrl: (calendarId: string, includeInactive: boolean) => string;
+  fetchStockDecrementMethod?: (calendarId: string) => Promise<ApiResult>;
+  deleteCalendar?: (calendarId: string) => Promise<ApiResult>;
+  getPdfUrl?: (calendarId: string, includeInactive: boolean) => string;
 };
 
 const HEADER_TITLE_MAX_LENGTH = 26;
@@ -58,12 +59,18 @@ function getInitialSelectedDateForDailyRoute(dateParam: string | string[] | unde
   return today;
 }
 
-export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: CalendarDetailMode) {
-  const { calendarId, date } = useLocalSearchParams<{ calendarId?: string; date?: string | string[] }>();
+type MobileCalendarDetailSourceType = Exclude<CalendarDetailSourceType, 'token'>;
+
+export function useCalendarDetail(sourceType: MobileCalendarDetailSourceType, mode: CalendarDetailMode) {
+  const {
+    calendarId,
+    date,
+  } = useLocalSearchParams<{ calendarId?: string; date?: string | string[] }>();
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const { personalCalendarsApi, sharedUserCalendarsApi } = useCalendarApis();
   const lng = i18n.language || 'fr';
+  const routeId = calendarId;
   const basePath = sourceType === 'personal' ? 'calendar' : 'shared-user-calendar';
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -101,13 +108,13 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
 
   const loadSchedule = useCallback(
     async (date: Date, showRefresh = false) => {
-      if (!calendarId) return;
+      if (!routeId) return;
       if (showRefresh) setRefreshing(true);
       if (!showRefresh) setScheduleLoading(true);
       setError(null);
 
       try {
-        const result = await source.fetchSchedule(calendarId, toISO(date)) as CalendarScheduleResult;
+        const result = await source.fetchSchedule(routeId, toISO(date)) as CalendarScheduleResult;
 
         if (result.success) {
           const nextEvents = result.schedule ?? [];
@@ -134,11 +141,11 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
         if (!showRefresh) setScheduleLoading(false);
       }
     },
-    [calendarId, source, t],
+    [routeId, source, t],
   );
 
   const loadCalendar = useCallback(async () => {
-    if (!calendarId) {
+    if (!routeId) {
       setLoading(false);
       return;
     }
@@ -147,7 +154,7 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     setError(null);
 
     try {
-      if (mode === 'daily') {
+      if (mode === 'daily' || !source.fetchStockDecrementMethod) {
         const initialDate = getInitialSelectedDateForDailyRoute(date);
         setStockDecrementMethod('');
         setSelectedDate(initialDate);
@@ -155,7 +162,7 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
         return;
       }
 
-      const stockResult = await source.fetchStockDecrementMethod(calendarId) as StockMethodResult;
+      const stockResult = await source.fetchStockDecrementMethod(routeId) as StockMethodResult;
       const method = stockResult.success ? stockResult.method ?? '' : '';
       const initialDate = getInitialSelectedDateForStockMethod(method);
 
@@ -171,7 +178,7 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     } finally {
       setLoading(false);
     }
-  }, [calendarId, date, loadSchedule, mode, source, t]);
+  }, [date, loadSchedule, mode, routeId, source, t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -226,25 +233,28 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
   };
 
   const backToCalendars = () => {
-    router.dismissTo('/calendars' as never);
+    dismissToCalendars(router);
   };
 
   const goToPillbox = () => {
-    if (!calendarId) return;
-    navigateToHref(`/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate || new Date())}`);
+    if (!routeId) return;
+    navigateToHref(`/${lng}/${basePath}/${routeId}/pillbox?date=${toISO(selectedDate || new Date())}`);
   };
 
   const goToBoxes = () => {
-    if (!calendarId) return;
-    navigateToHref(`/${lng}/${basePath}/${calendarId}/boxes`);
+    if (!routeId) return;
+    navigateToHref(`/${lng}/${basePath}/${routeId}/boxes`);
   };
 
   const goToStockAlerts = () => {
-    if (!calendarId) return;
-    navigateToHref(`/${lng}/${basePath}/${calendarId}/stock-alerts`);
+    if (!routeId) return;
+    navigateToHref(`/${lng}/${basePath}/${routeId}/stock-alerts`);
   };
 
   const handleDelete = () => {
+    if (!routeId || !source.deleteCalendar) return;
+    const deleteCalendar = source.deleteCalendar;
+
     Alert.alert(
       String(t(sourceType === 'personal' ? 'calendar.delete_title' : 'calendar.delete_shared_title')),
       String(t(sourceType === 'personal' ? 'calendar.delete_description' : 'calendar.delete_shared_description')),
@@ -254,8 +264,7 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
           text: String(t('delete')),
           style: 'destructive',
           onPress: () => {
-            if (!calendarId) return;
-            void source.deleteCalendar(calendarId).then((result) => {
+            void deleteCalendar(routeId).then((result) => {
               if (result.success) {
                 backToCalendars();
                 return;
@@ -269,15 +278,15 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
   };
 
   const handleExportPdf = () => {
-    if (!calendarId) return;
+    if (!routeId || !source.getPdfUrl) return;
     setIncludeInactive(false);
     setPdfDialogOpen(true);
   };
 
   const handleDownloadPdf = async () => {
-    if (!calendarId) return;
+    if (!routeId || !source.getPdfUrl) return;
     try {
-      await openPdfUrl(source.getPdfUrl(calendarId, includeInactive));
+      await openPdfUrl(source.getPdfUrl(routeId, includeInactive));
       setPdfDialogOpen(false);
     } catch {
       Alert.alert(String(t('api.calendar.pdf_download_error')), String(t('api.calendar.pdf_download_error')));
@@ -286,9 +295,9 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
 
   const actions = useMemo(() => {
     if (mode === 'daily') return [];
-    if (!calendarId) return [];
+    if (!routeId) return [];
 
-    const context = { calendarId, lng, basePath, selectedDate };
+    const context = { calendarId: routeId, lng, basePath, selectedDate };
     const handlers = {
       onDelete: handleDelete,
       onExportPdf: handleExportPdf,
@@ -302,7 +311,7 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
       : buildSharedCalendarActions(context, handlers, ['rename', 'medicines']);
 
     return toActionSheetItems(items, translate);
-  }, [basePath, calendarId, lng, mode, selectedDate, sourceType, translate]);
+  }, [basePath, lng, mode, routeId, selectedDate, sourceType, translate]);
 
   const hasCalendarItems = calendarTableHasItems(calendarTable);
   const isDailyRoute = mode === 'daily';
@@ -334,7 +343,8 @@ export function useCalendarDetail(sourceType: CalendarDetailSourceType, mode: Ca
     setPdfDialogOpen,
     includeInactive,
     setIncludeInactive,
-    showOverviewControls: !isDailyRoute,
+    showMedicinesButton: !isDailyRoute,
+    showWeekSelector: !isDailyRoute,
     showBackendLoading: scheduleLoading && !loading,
     showCalendarContent: isDailyRoute || hasCalendarItems || scheduleLoading,
     showDailyContent: isDailyRoute || stockDecrementMethod === STOCK_DECREMENT_METHODS.DAILY_MIDNIGHT,
