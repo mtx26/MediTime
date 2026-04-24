@@ -136,41 +136,77 @@ export function MedicineBoxCard({
         ) : null}
       </XStack>
 
-      <XStack style={{ gap: 12 }}>
-        <YStack style={{ flex: 1, gap: 2 }}>
-          <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
-            {t('boxes.capacity')}
-          </Text>
-          <Text style={{ color: ios.foreground, fontSize: 16, lineHeight: 22, fontWeight: '800' }}>
-            {box.box_capacity}
-          </Text>
-        </YStack>
+      <YStack style={{ gap: 12 }}>
+        <XStack style={{ gap: 12 }}>
+          <YStack style={{ flex: 1, gap: 2 }}>
+            <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
+              {t('boxes.capacity')}
+            </Text>
+            <Text style={{ color: ios.foreground, fontSize: 16, lineHeight: 22, fontWeight: '800' }}>
+              {box.box_capacity}
+            </Text>
+          </YStack>
 
-        <YStack style={{ flex: 1, gap: 2 }}>
-          <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
-            {t('boxes.alert_threshold')}
-          </Text>
-          <Text style={{ color: ios.foreground, fontSize: 16, lineHeight: 22, fontWeight: '800' }}>
-            {box.stock_alert_threshold}
-          </Text>
-        </YStack>
+          <YStack style={{ flex: 1, gap: 2 }}>
+            <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
+              {t('boxes.alert_threshold')}
+            </Text>
+            <Text style={{ color: ios.foreground, fontSize: 16, lineHeight: 22, fontWeight: '800' }}>
+              {box.stock_alert_threshold}
+            </Text>
+          </YStack>
+        </XStack>
 
-        <YStack style={{ flex: 1, gap: 2 }}>
-          <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
-            {t('boxes.remaining_qty')}
-          </Text>
-          <Text
-            style={{
-              color: isCritical ? ios.destructive : ios.foreground,
-              fontSize: 16,
-              lineHeight: 22,
-              fontWeight: '900',
-            }}
-          >
-            {box.stock_quantity}
-          </Text>
-        </YStack>
-      </XStack>
+        <XStack style={{ alignItems: 'stretch', gap: 12 }}>
+          <YStack style={{ flex: 1, gap: 2, justifyContent: 'center' }}>
+            <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
+              {t('boxes.remaining_qty')}
+            </Text>
+            <Text
+              style={{
+                color: isCritical ? ios.destructive : ios.foreground,
+                fontSize: 16,
+                lineHeight: 22,
+                fontWeight: '900',
+              }}
+            >
+              {box.stock_quantity}
+            </Text>
+          </YStack>
+
+          {canRestock ? (
+            <Pressable
+              onPress={() => onRestock?.(box.id)}
+              disabled={disabled || box.box_capacity === 0}
+              accessibilityRole="button"
+              accessibilityLabel={String(t('boxes.restock'))}
+              style={{ flex: 1 }}
+            >
+              {({ pressed }) => (
+                <GlassSurface
+                  glassEffectStyle="clear"
+                  style={{
+                    minHeight: 46,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 14,
+                    borderColor: pressed ? ios.primary : ios.border,
+                    opacity: disabled || box.box_capacity === 0 ? 0.5 : 1,
+                    paddingHorizontal: 12,
+                  }}
+                >
+                  <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    <Ionicons name="add-circle-outline" size={18} color={ios.primary} />
+                    <Text style={{ color: ios.primary, fontSize: 15, lineHeight: 20, fontWeight: '800' }}>
+                      {t('boxes.restock')}
+                    </Text>
+                  </XStack>
+                </GlassSurface>
+              )}
+            </Pressable>
+          ) : null}
+        </XStack>
+      </YStack>
 
       <XStack style={{ flexWrap: 'wrap', gap: 8 }}>
         {statuses.map((status) => {
@@ -249,67 +285,35 @@ export function MedicineBoxCard({
         </Pressable>
       ) : null}
 
-      {canRestock || showMissingPillbox ? (
+      {showMissingPillbox ? (
         <YStack style={{ gap: 8 }}>
-          {canRestock ? (
-            <Pressable
-              onPress={() => onRestock?.(box.id)}
-              disabled={disabled || box.box_capacity === 0}
-              accessibilityRole="button"
-              accessibilityLabel={String(t('boxes.restock'))}
-            >
-              {({ pressed }) => (
-                <GlassSurface
-                  tintColor={ios.blueInfoBg}
-                  style={{
-                    minHeight: 46,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8,
-                    borderRadius: 14,
-                    borderColor: pressed ? ios.primary : ios.blueInfoBorder,
-                    opacity: disabled || box.box_capacity === 0 ? 0.5 : 1,
-                    paddingHorizontal: 14,
-                  }}
-                >
-                  <Ionicons name="add-circle-outline" size={18} color={ios.primary} />
-                  <Text style={{ color: ios.primary, fontSize: 15, lineHeight: 20, fontWeight: '800' }}>
-                    {t('boxes.restock')}
-                  </Text>
-                </GlassSurface>
-              )}
-            </Pressable>
-          ) : null}
-
-          {showMissingPillbox ? (
-            <Pressable
-              onPress={() => onMissingPillbox?.(box.id)}
-              disabled={disabled}
-              accessibilityRole="button"
-              accessibilityLabel={String(t('boxes.missing_pillbox'))}
-            >
-              {({ pressed }) => (
-                <GlassSurface
-                  glassEffectStyle="clear"
-                  style={{
-                    minHeight: 46,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8,
-                    borderRadius: 14,
-                    borderColor: pressed ? ios.primary : ios.border,
-                    opacity: disabled ? 0.5 : 1,
-                    paddingHorizontal: 14,
-                  }}
-                >
-                  <Ionicons name="grid-outline" size={18} color={ios.primary} />
-                  <Text style={{ color: ios.foreground, fontSize: 15, lineHeight: 20, fontWeight: '800' }}>
-                    {t('boxes.missing_pillbox')}
-                  </Text>
-                </GlassSurface>
-              )}
-            </Pressable>
-          ) : null}
+          <Pressable
+            onPress={() => onMissingPillbox?.(box.id)}
+            disabled={disabled}
+            accessibilityRole="button"
+            accessibilityLabel={String(t('boxes.missing_pillbox'))}
+          >
+            {({ pressed }) => (
+              <GlassSurface
+                glassEffectStyle="clear"
+                style={{
+                  minHeight: 46,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  borderRadius: 14,
+                  borderColor: pressed ? ios.primary : ios.border,
+                  opacity: disabled ? 0.5 : 1,
+                  paddingHorizontal: 14,
+                }}
+              >
+                <Ionicons name="grid-outline" size={18} color={ios.primary} />
+                <Text style={{ color: ios.foreground, fontSize: 15, lineHeight: 20, fontWeight: '800' }}>
+                  {t('boxes.missing_pillbox')}
+                </Text>
+              </GlassSurface>
+            )}
+          </Pressable>
         </YStack>
       ) : null}
     </GlassSurface>
