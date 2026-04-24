@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import { getWeekSelectionState, toISO } from '@meditime/utils';
 import type { WeeklyEventItem } from '@meditime/types';
+import { GlassSurface } from '../common/GlassSurface';
 import { LoadingIndicator } from '../common/LoadingIndicator';
 import { useIosTheme } from '../../theme/ios';
 
@@ -55,52 +56,91 @@ export function MobileWeeklyEventContent({
             return (
               <Pressable key={iso} onPress={() => onSelectDate(date)} accessibilityRole="button">
                 {({ pressed }) => (
-                  <YStack
-                    style={{
-                      width: 44,
-                      minHeight: 64,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: 16,
-                      backgroundColor: selected ? ios.primary : pressed ? ios.accentHover : ios.card,
-                      borderWidth: selected ? 0 : 1,
-                      borderColor: isToday ? ios.primary : ios.border,
-                      gap: 3,
-                    }}
-                  >
-                    <Text
+                  selected ? (
+                    <GlassSurface
+                      tintColor={ios.primary}
                       style={{
-                        color: selected ? ios.primaryForeground : ios.mutedForeground,
-                        fontSize: 11,
-                        lineHeight: 14,
-                        fontWeight: '800',
+                        width: 44,
+                        minHeight: 64,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 16,
+                        borderColor: ios.primary,
+                        gap: 3,
                       }}
                     >
-                      {date.toLocaleDateString(i18n.language, { weekday: 'short' }).replace('.', '').slice(0, 2)}
-                    </Text>
-                    <Text
+                      <Text
+                        style={{
+                          color: ios.primaryForeground,
+                          fontSize: 11,
+                          lineHeight: 14,
+                          fontWeight: '800',
+                        }}
+                      >
+                        {date.toLocaleDateString(i18n.language, { weekday: 'short' }).replace('.', '').slice(0, 2)}
+                      </Text>
+                      <Text
+                        style={{
+                          color: ios.primaryForeground,
+                          fontSize: 18,
+                          lineHeight: 22,
+                          fontWeight: '900',
+                        }}
+                      >
+                        {date.getDate()}
+                      </Text>
+                      <YStack
+                        style={{
+                          width: 5,
+                          height: 5,
+                          borderRadius: 999,
+                          backgroundColor: isToday ? ios.primaryForeground : 'transparent',
+                        }}
+                      />
+                    </GlassSurface>
+                  ) : (
+                    <GlassSurface
+                      glassEffectStyle="clear"
                       style={{
-                        color: selected ? ios.primaryForeground : ios.foreground,
-                        fontSize: 18,
-                        lineHeight: 22,
-                        fontWeight: '900',
+                        width: 44,
+                        minHeight: 64,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 16,
+                        borderColor: pressed || isToday ? ios.primary : ios.border,
+                        gap: 3,
                       }}
                     >
-                      {date.getDate()}
-                    </Text>
-                    <YStack
-                      style={{
-                        width: 5,
-                        height: 5,
-                        borderRadius: 999,
-                        backgroundColor: isToday
-                          ? selected
-                            ? ios.primaryForeground
-                            : ios.primary
-                          : 'transparent',
-                      }}
-                    />
-                  </YStack>
+                      <Text
+                        style={{
+                          color: ios.mutedForeground,
+                          fontSize: 11,
+                          lineHeight: 14,
+                          fontWeight: '800',
+                        }}
+                      >
+                        {date.toLocaleDateString(i18n.language, { weekday: 'short' }).replace('.', '').slice(0, 2)}
+                      </Text>
+                      <Text
+                        style={{
+                          color: ios.foreground,
+                          fontSize: 18,
+                          lineHeight: 22,
+                          fontWeight: '900',
+                        }}
+                      >
+                        {date.getDate()}
+                      </Text>
+                      <YStack
+                        style={{
+                          width: 5,
+                          height: 5,
+                          borderRadius: 999,
+                          backgroundColor: isToday ? ios.primary : 'transparent',
+                        }}
+                      />
+                    </GlassSurface>
+                  )
                 )}
               </Pressable>
             );
@@ -118,20 +158,19 @@ export function MobileWeeklyEventContent({
       >
         <Pressable onPress={goPrev} accessibilityRole="button">
           {({ pressed }) => (
-            <YStack
+            <GlassSurface
+              glassEffectStyle="clear"
               style={{
                 width: 40,
                 height: 40,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 999,
-                backgroundColor: pressed ? ios.accentHover : ios.card,
-                borderWidth: 1,
-                borderColor: ios.border,
+                borderColor: pressed ? ios.primary : ios.border,
               }}
             >
               <Ionicons name="chevron-back" size={20} color={ios.primary} />
-            </YStack>
+            </GlassSurface>
           )}
         </Pressable>
 
@@ -149,37 +188,33 @@ export function MobileWeeklyEventContent({
 
         <Pressable onPress={goNext} accessibilityRole="button">
           {({ pressed }) => (
-            <YStack
+            <GlassSurface
+              glassEffectStyle="clear"
               style={{
                 width: 40,
                 height: 40,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 999,
-                backgroundColor: pressed ? ios.accentHover : ios.card,
-                borderWidth: 1,
-                borderColor: ios.border,
+                borderColor: pressed ? ios.primary : ios.border,
               }}
             >
               <Ionicons name="chevron-forward" size={20} color={ios.primary} />
-            </YStack>
+            </GlassSurface>
           )}
         </Pressable>
       </XStack>
 
       {isLoading ? (
-        <YStack
+        <GlassSurface
           style={{
             paddingHorizontal: 18,
             paddingVertical: 22,
             borderRadius: 18,
-            borderWidth: 1,
-            borderColor: ios.border,
-            backgroundColor: ios.card,
           }}
         >
           <LoadingIndicator label={String(t('loading_calendar'))} />
-        </YStack>
+        </GlassSurface>
       ) : eventsForDay.length > 0 ? (
         <YStack style={{ gap: 10 }}>
           {eventsForDay.map((event) => {
@@ -189,94 +224,89 @@ export function MobileWeeklyEventContent({
             });
 
             return (
-              <XStack
+              <GlassSurface
                 key={`${event.start}-${event.title}`}
                 style={{
-                  alignItems: 'center',
-                  gap: 12,
                   paddingHorizontal: 14,
                   paddingVertical: 14,
                   borderRadius: 18,
-                  backgroundColor: ios.card,
-                  borderWidth: 1,
-                  borderColor: ios.border,
                 }}
               >
-                <YStack
-                  style={{
-                    width: 56,
-                    minHeight: 56,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 16,
-                    backgroundColor: ios.blueInfoBg,
-                    borderWidth: 1,
-                    borderColor: ios.blueInfoBorder,
-                  }}
-                >
-                  <Text style={{ color: ios.primary, fontWeight: '900', fontSize: 14, lineHeight: 18 }}>{time}</Text>
-                </YStack>
-
-                <YStack style={{ flex: 1, gap: 4 }}>
-                  <XStack style={{ alignItems: 'center', gap: 8 }}>
-                    <YStack
-                      style={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: 999,
-                        backgroundColor: event.color || ios.primary,
-                      }}
-                    />
-                    <Text style={{ flex: 1, color: ios.foreground, fontSize: 16, lineHeight: 22, fontWeight: '800' }}>
-                      {event.title}
-                    </Text>
-                  </XStack>
-                  {event.dose != null ? (
-                    <Text style={{ color: ios.mutedForeground, fontSize: 13, lineHeight: 18, fontWeight: '700' }}>
-                      {event.dose} mg
-                    </Text>
-                  ) : null}
-                  {event.notes ? (
-                    <Text style={{ color: ios.mutedForeground, fontSize: 13, lineHeight: 18 }}>
-                      {event.notes}
-                    </Text>
-                  ) : null}
-                </YStack>
-
-                {event.tablet_count != null ? (
+                <XStack style={{ alignItems: 'center', gap: 12 }}>
                   <YStack
                     style={{
-                      minWidth: 44,
-                      minHeight: 44,
+                      width: 56,
+                      minHeight: 56,
                       alignItems: 'center',
                       justifyContent: 'center',
-                      borderRadius: 14,
-                      backgroundColor: ios.background,
+                      borderRadius: 16,
+                      backgroundColor: ios.blueInfoBg,
+                      borderWidth: 1,
+                      borderColor: ios.blueInfoBorder,
                     }}
                   >
-                    <Text style={{ color: ios.foreground, fontWeight: '900', fontSize: 16, lineHeight: 20 }}>
-                      {event.tablet_count}
-                    </Text>
-                    <Text style={{ color: ios.mutedForeground, fontSize: 10, lineHeight: 12, fontWeight: '700' }}>
-                      {Number(event.tablet_count) > 1 ? t('tablets') : t('tablet')}
-                    </Text>
+                    <Text style={{ color: ios.primary, fontWeight: '900', fontSize: 14, lineHeight: 18 }}>{time}</Text>
                   </YStack>
-                ) : null}
-              </XStack>
+
+                  <YStack style={{ flex: 1, gap: 4 }}>
+                    <XStack style={{ alignItems: 'center', gap: 8 }}>
+                      <YStack
+                        style={{
+                          width: 10,
+                          height: 10,
+                          borderRadius: 999,
+                          backgroundColor: event.color || ios.primary,
+                        }}
+                      />
+                      <Text style={{ flex: 1, color: ios.foreground, fontSize: 16, lineHeight: 22, fontWeight: '800' }}>
+                        {event.title}
+                      </Text>
+                    </XStack>
+                    {event.dose != null ? (
+                      <Text style={{ color: ios.mutedForeground, fontSize: 13, lineHeight: 18, fontWeight: '700' }}>
+                        {event.dose} mg
+                      </Text>
+                    ) : null}
+                    {event.notes ? (
+                      <Text style={{ color: ios.mutedForeground, fontSize: 13, lineHeight: 18 }}>
+                        {event.notes}
+                      </Text>
+                    ) : null}
+                  </YStack>
+
+                  {event.tablet_count != null ? (
+                    <GlassSurface
+                      glassEffectStyle="clear"
+                      style={{
+                        minWidth: 44,
+                        minHeight: 44,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 14,
+                        borderColor: ios.border,
+                      }}
+                    >
+                      <Text style={{ color: ios.foreground, fontWeight: '900', fontSize: 16, lineHeight: 20 }}>
+                        {event.tablet_count}
+                      </Text>
+                      <Text style={{ color: ios.mutedForeground, fontSize: 10, lineHeight: 12, fontWeight: '700' }}>
+                        {Number(event.tablet_count) > 1 ? t('tablets') : t('tablet')}
+                      </Text>
+                    </GlassSurface>
+                  ) : null}
+                </XStack>
+              </GlassSurface>
             );
           })}
         </YStack>
       ) : (
-        <YStack
+        <GlassSurface
           style={{
             alignItems: 'center',
             gap: 8,
             paddingHorizontal: 18,
             paddingVertical: 22,
             borderRadius: 18,
-            borderWidth: 1,
-            borderColor: ios.border,
-            backgroundColor: ios.card,
           }}
         >
           <Ionicons name="moon-outline" size={22} color={ios.mutedForeground} />
@@ -289,7 +319,7 @@ export function MobileWeeklyEventContent({
               month: 'long',
             })}
           </Text>
-        </YStack>
+        </GlassSurface>
       )}
     </YStack>
   );

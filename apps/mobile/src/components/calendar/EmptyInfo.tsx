@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack } from 'tamagui';
+import { GlassSurface } from '../common/GlassSurface';
 import { useIosTheme } from '../../theme/ios';
 
 type EmptyInfoProps = {
@@ -10,16 +11,15 @@ export function EmptyInfo({ text }: EmptyInfoProps) {
   const ios = useIosTheme();
 
   return (
-    <XStack
+    <GlassSurface
+      tintColor={ios.blueInfoBg}
       style={{
         alignItems: 'center',
         width: '100%',
         paddingHorizontal: 12,
         paddingVertical: 10,
         borderRadius: 12,
-        borderWidth: 1,
         borderColor: ios.blueInfoBorder,
-        backgroundColor: ios.blueInfoBg,
         gap: 8,
       }}
     >
@@ -27,6 +27,6 @@ export function EmptyInfo({ text }: EmptyInfoProps) {
       <Text style={{ flex: 1, color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '500' }}>
         {text}
       </Text>
-    </XStack>
+    </GlassSurface>
   );
 }

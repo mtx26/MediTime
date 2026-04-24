@@ -4,7 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import type { CalendarDetailSourceType } from '@meditime/types';
+import { CalendarAmbientBackground } from '../../components/calendar/CalendarAmbientBackground';
 import { CalendarNotFoundState, IcsTokenCard } from '../../components/calendar';
+import { GlassSurface } from '../../components/common/GlassSurface';
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { OutlineButton } from '../../components/common/OutlineButton';
@@ -47,6 +49,7 @@ export default function IcsTokensScreen({ sourceType }: IcsTokensScreenProps) {
 
   return (
     <Page
+      backgroundDecoration={<CalendarAmbientBackground />}
       screen={<Stack.Screen options={headerOptions} />}
       refreshControl={(
         <RefreshControl
@@ -97,26 +100,24 @@ export default function IcsTokensScreen({ sourceType }: IcsTokensScreenProps) {
         accessibilityLabel={String(t('ics.add_token'))}
       >
         {({ pressed }) => (
-          <XStack
+          <GlassSurface
             style={{
               minHeight: 52,
               alignItems: 'center',
-              gap: 10,
               paddingHorizontal: 14,
               paddingVertical: 12,
               borderRadius: 16,
-              borderWidth: 1,
-              borderColor: ios.border,
-              backgroundColor: pressed ? ios.accentHover : ios.card,
-              opacity: ics.isMutating ? 0.55 : 1,
+              borderColor: pressed ? ios.primary : ios.border,
             }}
           >
-            <Ionicons name="add-circle-outline" size={18} color={ios.primary} />
-            <Text style={{ flex: 1, color: ios.primary, fontSize: 15, fontWeight: '800' }}>
-              {t('ics.add_token')}
-            </Text>
-            <Ionicons name="chevron-forward" size={18} color={ios.mutedForeground} />
-          </XStack>
+            <XStack style={{ alignItems: 'center', gap: 10, opacity: ics.isMutating ? 0.55 : 1 }}>
+              <Ionicons name="add-circle-outline" size={18} color={ios.primary} />
+              <Text style={{ flex: 1, color: ios.primary, fontSize: 15, fontWeight: '800' }}>
+                {t('ics.add_token')}
+              </Text>
+              <Ionicons name="chevron-forward" size={18} color={ios.mutedForeground} />
+            </XStack>
+          </GlassSurface>
         )}
       </Pressable>
     </Page>

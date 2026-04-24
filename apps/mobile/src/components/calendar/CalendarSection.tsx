@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView, type GlassStyle } from 'expo-glass-effect';
 import { Text, XStack, YStack } from 'tamagui';
 import type { CalendarItem } from '@meditime/types';
 import type { MobileActionSheetAction } from '../common/ActionSheet';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 import { CalendarRow } from './CalendarRow';
 import { EmptyInfo } from './EmptyInfo';
 
@@ -14,6 +16,8 @@ type CalendarSectionProps = {
   emptyText?: string;
   showInfoEmpty?: boolean;
   addFooter?: ReactNode;
+  glassEffectStyle?: GlassStyle;
+  glassStyle?: StyleProp<ViewStyle>;
   getActions: (calendar: CalendarItem) => MobileActionSheetAction[];
   onOpen: (calendar: CalendarItem) => void;
   onNavigate: (href: string) => void;
@@ -32,6 +36,8 @@ export function CalendarSection({
   emptyText,
   showInfoEmpty = false,
   addFooter,
+  glassEffectStyle = 'clear',
+  glassStyle,
   getActions,
   onOpen,
   onNavigate,
@@ -43,10 +49,11 @@ export function CalendarSection({
   onRenameCancel,
 }: CalendarSectionProps) {
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
 
   return (
-    <YStack style={{ width: '100%', maxWidth: 672, gap: 16 }}>
-      <XStack style={{ alignItems: 'center', gap: 8, marginBottom: 0 }}>
+    <YStack style={{ width: '100%', maxWidth: 672, gap: 14 }}>
+      <XStack style={{ alignItems: 'center', gap: 8 }}>
         <Ionicons name={iconName} size={24} color={ios.primary} />
         <Text style={{ color: ios.foreground, fontSize: 20, lineHeight: 28, fontWeight: '800' }}>
           {title}
@@ -56,14 +63,15 @@ export function CalendarSection({
       {showInfoEmpty && calendars.length === 0 && emptyText ? (
         <EmptyInfo text={emptyText} />
       ) : (
-        <YStack
-          style={{
-            overflow: 'hidden',
-            borderWidth: 1,
-            borderColor: ios.border,
-            borderRadius: 14,
-            backgroundColor: ios.card,
-          }}
+        <GlassView
+          colorScheme={colorScheme}
+          glassEffectStyle={glassEffectStyle}
+          style={[
+            {
+              borderRadius: 24,
+            },
+            glassStyle,
+          ]}
         >
           {calendars.map((calendar, index) => (
             <CalendarRow
@@ -82,7 +90,7 @@ export function CalendarSection({
             />
           ))}
           {addFooter}
-        </YStack>
+        </GlassView>
       )}
     </YStack>
   );

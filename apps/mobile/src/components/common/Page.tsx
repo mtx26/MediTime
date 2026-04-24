@@ -6,6 +6,7 @@ import { ScrollView, Text, XStack, YStack } from 'tamagui';
 import { useIosTheme } from '../../theme/ios';
 
 type PageProps = {
+  backgroundDecoration?: ReactNode;
   children: ReactNode;
   contentContainerStyle?: ViewStyle;
   gap?: number;
@@ -48,6 +49,7 @@ type PageHeaderOptionsInput = {
 };
 
 export function Page({
+  backgroundDecoration,
   children,
   contentContainerStyle,
   gap = 16,
@@ -75,7 +77,7 @@ export function Page({
     paddingHorizontal: horizontalPadding,
     paddingTop: resolvedPaddingTop,
     paddingBottom: resolvedPaddingBottom,
-    backgroundColor: ios.background,
+    backgroundColor: backgroundDecoration ? 'transparent' : ios.background,
     ...contentContainerStyle,
   };
 
@@ -83,8 +85,11 @@ export function Page({
     return (
       <>
         {screen}
-        <YStack style={containerStyle}>
-          {children}
+        <YStack style={{ flex: 1, backgroundColor: ios.background }}>
+          {backgroundDecoration}
+          <YStack style={containerStyle}>
+            {children}
+          </YStack>
         </YStack>
       </>
     );
@@ -99,6 +104,7 @@ export function Page({
         style={{ flex: 1, backgroundColor: ios.background }}
         refreshControl={refreshControl}
       >
+        {backgroundDecoration}
         <YStack style={containerStyle}>
           {children}
         </YStack>

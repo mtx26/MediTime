@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { YStack } from 'tamagui';
 import type { CalendarDetailSourceType } from '@meditime/types';
+import { CalendarAmbientBackground } from '../../components/calendar/CalendarAmbientBackground';
 import { CalendarNotFoundState, PillboxUseRow } from '../../components/calendar';
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
@@ -46,6 +47,7 @@ export default function PillboxUsesScreen({ sourceType }: PillboxUsesScreenProps
 
   return (
     <Page
+      backgroundDecoration={<CalendarAmbientBackground />}
       screen={<Stack.Screen options={headerOptions} />}
       refreshControl={(
         <RefreshControl

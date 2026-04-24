@@ -9,6 +9,7 @@ import type {
 } from '@meditime/types';
 import type { MobileActionSheetAction } from '../common/ActionSheet';
 import ActionSheet from '../common/ActionSheet';
+import { GlassSurface } from '../common/GlassSurface';
 import { useIosTheme } from '../../theme/ios';
 
 function isFullBox(box: BoxesViewBoxItem | CalendarBoxAlertItem): box is BoxesViewBoxItem {
@@ -109,13 +110,11 @@ export function MedicineBoxCard({
       : ios.border;
 
   return (
-    <YStack
+    <GlassSurface
+      borderColor={cardBorderColor}
       style={{
         gap: 12,
         borderRadius: 18,
-        borderWidth: 1,
-        borderColor: cardBorderColor,
-        backgroundColor: ios.card,
         paddingHorizontal: 14,
         paddingVertical: 14,
       }}
@@ -211,13 +210,12 @@ export function MedicineBoxCard({
           accessibilityRole="button"
         >
           {({ pressed }) => (
-            <YStack
+            <GlassSurface
+              glassEffectStyle="clear"
               style={{
                 gap: 8,
                 borderRadius: 14,
-                borderWidth: 1,
                 borderColor: ios.border,
-                backgroundColor: pressed ? ios.accentHover : ios.background,
                 paddingHorizontal: 12,
                 paddingVertical: 12,
                 opacity: !onToggleExpanded && !onEdit ? 0.7 : 1,
@@ -246,7 +244,7 @@ export function MedicineBoxCard({
                   ))}
                 </YStack>
               ) : null}
-            </YStack>
+            </GlassSurface>
           )}
         </Pressable>
       ) : null}
@@ -261,14 +259,15 @@ export function MedicineBoxCard({
               accessibilityLabel={String(t('boxes.restock'))}
             >
               {({ pressed }) => (
-                <XStack
+                <GlassSurface
+                  tintColor={ios.blueInfoBg}
                   style={{
                     minHeight: 46,
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 8,
                     borderRadius: 14,
-                    backgroundColor: pressed ? ios.accentHover : ios.blueInfoBg,
+                    borderColor: pressed ? ios.primary : ios.blueInfoBorder,
                     opacity: disabled || box.box_capacity === 0 ? 0.5 : 1,
                     paddingHorizontal: 14,
                   }}
@@ -277,7 +276,7 @@ export function MedicineBoxCard({
                   <Text style={{ color: ios.primary, fontSize: 15, lineHeight: 20, fontWeight: '800' }}>
                     {t('boxes.restock')}
                   </Text>
-                </XStack>
+                </GlassSurface>
               )}
             </Pressable>
           ) : null}
@@ -290,16 +289,15 @@ export function MedicineBoxCard({
               accessibilityLabel={String(t('boxes.missing_pillbox'))}
             >
               {({ pressed }) => (
-                <XStack
+                <GlassSurface
+                  glassEffectStyle="clear"
                   style={{
                     minHeight: 46,
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 8,
                     borderRadius: 14,
-                    borderWidth: 1,
-                    borderColor: ios.border,
-                    backgroundColor: pressed ? ios.accentHover : ios.background,
+                    borderColor: pressed ? ios.primary : ios.border,
                     opacity: disabled ? 0.5 : 1,
                     paddingHorizontal: 14,
                   }}
@@ -308,12 +306,12 @@ export function MedicineBoxCard({
                   <Text style={{ color: ios.foreground, fontSize: 15, lineHeight: 20, fontWeight: '800' }}>
                     {t('boxes.missing_pillbox')}
                   </Text>
-                </XStack>
+                </GlassSurface>
               )}
             </Pressable>
           ) : null}
         </YStack>
       ) : null}
-    </YStack>
+    </GlassSurface>
   );
 }

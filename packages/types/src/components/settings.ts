@@ -53,6 +53,7 @@ export interface SettingsPanelSectionProps<TIconName = string, TNode = unknown> 
 
 export interface SettingsPageShellProps<TTabId extends string = string> {
   activeTab?: TTabId;
+  backgroundDecoration?: ReactNode;
   children: ReactNode;
   error?: string | null;
   footer?: ReactNode;

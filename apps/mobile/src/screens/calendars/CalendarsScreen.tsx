@@ -229,10 +229,16 @@ export default function CalendarsScreen() {
           </YStack>
         )}
 
+        <YStack style={{ width: '100%', maxWidth: 672, alignSelf: 'center' }}>
+          <OutlineButton label="Open Glass Test" onPress={() => router.push('/glass-test' as never)} />
+        </YStack>
+
         <CalendarSection
           title={String(t('my_calendars'))}
           iconName="calendar-outline"
           calendars={personalCalendars}
+          glassEffectStyle="clear"
+          glassStyle={{ borderRadius: 24, padding: 8 }}
           getActions={getPersonalActions}
           onOpen={openPersonalCalendar}
           onNavigate={navigateToHref}
@@ -251,6 +257,8 @@ export default function CalendarsScreen() {
           title={String(t('shared_calendars'))}
           iconName="people-outline"
           calendars={sharedCalendars}
+          glassEffectStyle="clear"
+          glassStyle={{ borderRadius: 24, padding: 8 }}
           emptyText={String(t('no_shared_calendars'))}
           showInfoEmpty
           getActions={getSharedActions}

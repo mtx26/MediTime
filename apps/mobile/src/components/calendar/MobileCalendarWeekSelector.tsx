@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import { calendarTableHasItems, getWeekDates, getWeekSelectionState, toISO } from '@meditime/utils';
 import type { CalendarTable } from '@meditime/types';
+import { GlassSurface } from '../common/GlassSurface';
 import { useIosTheme } from '../../theme/ios';
 import { IosWeekCalendar } from './IosWeekCalendar';
 
@@ -97,14 +98,11 @@ export function MobileCalendarWeekSelector({
 
   if (Platform.OS === 'ios') {
     return (
-      <YStack
+      <GlassSurface
         style={{
           gap: 10,
           padding: 12,
           borderRadius: 14,
-          backgroundColor: ios.card,
-          borderWidth: 1,
-          borderColor: ios.border,
         }}
       >
         <Text style={{ color: ios.foreground, fontSize: 17, lineHeight: 22, fontWeight: '700' }}>
@@ -119,36 +117,34 @@ export function MobileCalendarWeekSelector({
           locale={i18n.language}
           todayIso={todayIso}
         />
-      </YStack>
+      </GlassSurface>
     );
   }
 
   return (
     <YStack style={{ gap: 10 }}>
-      <YStack
+      <GlassSurface
         style={{
           gap: 12,
           padding: 12,
           borderRadius: 14,
-          backgroundColor: ios.card,
-          borderWidth: 1,
-          borderColor: ios.border,
         }}
       >
         <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
           <Pressable onPress={() => shiftMonth(-1)} accessibilityRole="button">
-            <YStack
+            <GlassSurface
+              glassEffectStyle="clear"
               style={{
                 width: 32,
                 height: 32,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 10,
-                backgroundColor: 'transparent',
+                borderColor: ios.border,
               }}
             >
               <Ionicons name="chevron-back" size={18} color={ios.primary} />
-            </YStack>
+            </GlassSurface>
           </Pressable>
 
           <YStack style={{ flex: 1, alignItems: 'center' }}>
@@ -161,18 +157,19 @@ export function MobileCalendarWeekSelector({
           </YStack>
 
           <Pressable onPress={() => shiftMonth(1)} accessibilityRole="button">
-            <YStack
+            <GlassSurface
+              glassEffectStyle="clear"
               style={{
                 width: 32,
                 height: 32,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 10,
-                backgroundColor: 'transparent',
+                borderColor: ios.border,
               }}
             >
               <Ionicons name="chevron-forward" size={18} color={ios.primary} />
-            </YStack>
+            </GlassSurface>
           </Pressable>
         </XStack>
 
@@ -229,36 +226,63 @@ export function MobileCalendarWeekSelector({
 
                 return (
                   <Pressable key={iso} onPress={() => onWeekSelect(date)} accessibilityRole="button">
-                    <YStack
-                      style={{
-                        width: 38,
-                        height: 36,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: 10,
-                        backgroundColor,
-                        borderWidth: isSelectedDate || isToday || inSelectedWeek ? 1 : 0,
-                        borderColor,
-                      }}
-                    >
-                      <Text
+                    {isSelectedDate ? (
+                      <GlassSurface
+                        tintColor={ios.primary}
                         style={{
-                          color: textColor,
-                          opacity: outsideMonth && !isSelectedDate ? 0.55 : 1,
-                          fontSize: 15,
-                          fontWeight: isSelectedDate ? '700' : '600',
+                          width: 38,
+                          height: 36,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 10,
+                          borderColor,
                         }}
                       >
-                        {date.getDate()}
-                      </Text>
-                    </YStack>
+                        <Text
+                          style={{
+                            color: textColor,
+                            opacity: outsideMonth && !isSelectedDate ? 0.55 : 1,
+                            fontSize: 15,
+                            fontWeight: '700',
+                          }}
+                        >
+                          {date.getDate()}
+                        </Text>
+                      </GlassSurface>
+                    ) : (
+                      <GlassSurface
+                        glassEffectStyle="clear"
+                        style={{
+                          width: 38,
+                          height: 36,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 10,
+                          borderWidth: isToday || inSelectedWeek ? 1 : 0,
+                          borderColor,
+                          opacity: backgroundColor === 'transparent' ? 0.92 : 1,
+                        }}
+                        tintColor={backgroundColor === 'transparent' ? undefined : backgroundColor}
+                      >
+                        <Text
+                          style={{
+                            color: textColor,
+                            opacity: outsideMonth && !isSelectedDate ? 0.55 : 1,
+                            fontSize: 15,
+                            fontWeight: '600',
+                          }}
+                        >
+                          {date.getDate()}
+                        </Text>
+                      </GlassSurface>
+                    )}
                   </Pressable>
                 );
               })}
             </XStack>
           ))}
         </YStack>
-      </YStack>
+      </GlassSurface>
     </YStack>
   );
 }

@@ -3,6 +3,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import type { IcsTokenCardProps } from '@meditime/types';
+import { GlassSurface } from '../common/GlassSurface';
+import { useGlassEffectEnabled } from '../common/GlassSurface';
 import { useIosTheme } from '../../theme/ios';
 
 function getShortToken(token: string) {
@@ -26,6 +28,7 @@ function ActionIconButton({
   tone = 'default',
 }: ActionIconButtonProps) {
   const ios = useIosTheme();
+  const glassEnabled = useGlassEffectEnabled();
   const isDestructive = tone === 'destructive';
 
   return (
@@ -36,16 +39,18 @@ function ActionIconButton({
       accessibilityLabel={label}
     >
       {({ pressed }) => (
-        <YStack
+        <GlassSurface
+          glassEffectStyle="clear"
+          tintColor={isDestructive ? ios.destructiveBg : undefined}
           style={{
             width: 40,
             height: 40,
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 12,
-            backgroundColor: isDestructive
-              ? ios.destructiveBg
-              : pressed ? ios.accentHover : 'transparent',
+            borderColor: isDestructive
+              ? ios.destructiveBorder
+              : pressed && glassEnabled ? ios.primary : 'transparent',
             opacity: disabled ? 0.55 : pressed ? 0.75 : 1,
           }}
         >
@@ -54,7 +59,7 @@ function ActionIconButton({
             size={18}
             color={isDestructive ? ios.destructive : ios.primary}
           />
-        </YStack>
+        </GlassSurface>
       )}
     </Pressable>
   );
@@ -83,7 +88,8 @@ function PrimaryActionButton({
       accessibilityLabel={label}
     >
       {({ pressed }) => (
-        <XStack
+        <GlassSurface
+          tintColor={ios.blueInfoBg}
           style={{
             minHeight: 44,
             flex: 1,
@@ -91,7 +97,7 @@ function PrimaryActionButton({
             justifyContent: 'center',
             gap: 8,
             borderRadius: 12,
-            backgroundColor: pressed ? ios.accentHover : ios.blueInfoBg,
+            borderColor: pressed ? ios.primary : ios.blueInfoBorder,
             paddingHorizontal: 14,
             opacity: disabled ? 0.55 : 1,
           }}
@@ -100,7 +106,7 @@ function PrimaryActionButton({
           <Text style={{ color: ios.primary, fontSize: 15, fontWeight: '800' }}>
             {label}
           </Text>
-        </XStack>
+        </GlassSurface>
       )}
     </Pressable>
   );
@@ -121,13 +127,10 @@ export function IcsTokenCard({
   const subtitle = ownerLabel !== '-' ? ownerLabel : String(t('ics.calendar_ics'));
 
   return (
-    <YStack
+    <GlassSurface
       style={{
         gap: 12,
         borderRadius: 16,
-        borderWidth: 1,
-        borderColor: ios.border,
-        backgroundColor: ios.card,
         paddingHorizontal: 14,
         paddingVertical: 14,
       }}
@@ -179,6 +182,6 @@ export function IcsTokenCard({
         label={String(t('ics.sync_calendar'))}
         onPress={() => onSubscribe(webcalUrl)}
       />
-    </YStack>
+    </GlassSurface>
   );
 }

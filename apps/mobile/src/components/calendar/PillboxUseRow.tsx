@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 import type { PillboxUseRowProps } from '@meditime/types';
+import { GlassSurface } from '../common/GlassSurface';
 import { useIosTheme } from '../../theme/ios';
 
 export function PillboxUseRow({
@@ -16,13 +17,10 @@ export function PillboxUseRow({
   const preparedBy = use.prepared_by.display_name || use.prepared_by.email || '-';
 
   return (
-    <YStack
+    <GlassSurface
       style={{
         overflow: 'hidden',
         borderRadius: 16,
-        borderWidth: 1,
-        borderColor: ios.border,
-        backgroundColor: ios.card,
       }}
     >
       <XStack style={{ alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 14 }}>
@@ -77,6 +75,6 @@ export function PillboxUseRow({
           </XStack>
         )}
       </Pressable>
-    </YStack>
+    </GlassSurface>
   );
 }

@@ -2,14 +2,16 @@ import { Pressable, RefreshControl } from 'react-native';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import type { CalendarDetailMode, CalendarDetailSourceType } from '@meditime/types';
+import { CalendarAmbientBackground } from '../../components/calendar/CalendarAmbientBackground';
 import { CalendarHeaderTitle } from '../../components/calendar/CalendarHeaderTitle';
 import { CalendarNotFoundState } from '../../components/calendar/CalendarNotFoundState';
 import { MobileCalendarWeekSelector } from '../../components/calendar/MobileCalendarWeekSelector';
 import { MobileWeeklyEventContent } from '../../components/calendar/MobileWeeklyEventContent';
 import { PdfDialog } from '../../components/calendar/PdfDialog';
 import ActionSheet from '../../components/common/ActionSheet';
+import { GlassSurface } from '../../components/common/GlassSurface';
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { Page, usePageHeaderOptions } from '../../components/common/Page';
@@ -71,6 +73,7 @@ export default function CalendarDetailScreen({
   return (
     <>
       <Page
+        backgroundDecoration={<CalendarAmbientBackground />}
         screen={<Stack.Screen options={headerOptions} />}
         refreshControl={(
           <RefreshControl
@@ -85,21 +88,30 @@ export default function CalendarDetailScreen({
         withBottomTabInset
       >
         {detail.showMedicinesButton && (
-          <Button
+          <Pressable
             onPress={detail.goToBoxes}
-            style={{
-              minHeight: 44,
-              borderRadius: 8,
-              backgroundColor: ios.card,
-              borderWidth: 1,
-              borderColor: ios.border,
-            }}
+            accessibilityRole="button"
+            accessibilityLabel={String(t('medicines.label'))}
           >
-            <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              <Ionicons name="medkit-outline" size={18} color={ios.primary} />
-              <Text style={{ color: ios.foreground, fontWeight: '800' }}>{t('medicines.label')}</Text>
-            </XStack>
-          </Button>
+            {({ pressed }) => (
+              <GlassSurface
+                style={{
+                  minHeight: 48,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 14,
+                  borderColor: pressed ? ios.primary : ios.border,
+                  paddingHorizontal: 14,
+                  paddingVertical: 12,
+                }}
+              >
+                <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <Ionicons name="medkit-outline" size={18} color={ios.primary} />
+                  <Text style={{ color: ios.foreground, fontWeight: '800' }}>{t('medicines.label')}</Text>
+                </XStack>
+              </GlassSurface>
+            )}
+          </Pressable>
         )}
 
         {detail.error && (
@@ -128,19 +140,31 @@ export default function CalendarDetailScreen({
                 {t('pillbox.title')}
               </Text>
             </XStack>
-            <Button
+            <Pressable
               onPress={detail.goToPillbox}
-              style={{
-                minHeight: 44,
-                borderRadius: 8,
-                backgroundColor: ios.blueInfoBg,
-              }}
+              accessibilityRole="button"
+              accessibilityLabel={String(t('pillbox.fill'))}
             >
-              <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <Ionicons name="grid-outline" size={18} color={ios.primary} />
-                <Text style={{ color: ios.primary, fontWeight: '900' }}>{t('pillbox.fill')}</Text>
-              </XStack>
-            </Button>
+              {({ pressed }) => (
+                <GlassSurface
+                  style={{
+                    minHeight: 48,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 14,
+                    borderColor: pressed ? ios.primary : ios.blueInfoBorder,
+                    paddingHorizontal: 14,
+                    paddingVertical: 12,
+                  }}
+                  tintColor={ios.blueInfoBg}
+                >
+                  <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    <Ionicons name="grid-outline" size={18} color={ios.primary} />
+                    <Text style={{ color: ios.primary, fontWeight: '900' }}>{t('pillbox.fill')}</Text>
+                  </XStack>
+                </GlassSurface>
+              )}
+            </Pressable>
           </YStack>
         )}
 

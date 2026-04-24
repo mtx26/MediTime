@@ -23,7 +23,7 @@ export function AddCalendarFooter({ onPress }: AddCalendarFooterProps) {
             gap: 8,
             borderTopWidth: 1,
             borderTopColor: ios.border,
-            backgroundColor: pressed ? ios.accentHover : ios.card,
+            backgroundColor: pressed ? ios.accentHover : 'transparent',
           }}
         >
           <Ionicons name="add-circle-outline" size={19} color={ios.primary} />

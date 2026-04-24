@@ -2,6 +2,7 @@ import { RefreshControl } from 'react-native';
 import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import type { CalendarDetailSourceType } from '@meditime/types';
+import { CalendarAmbientBackground } from '../../components/calendar/CalendarAmbientBackground';
 import { CalendarNotFoundState, MedicineBoxCard } from '../../components/calendar';
 import ActionSheet from '../../components/common/ActionSheet';
 import { InfoBanner } from '../../components/common/InfoBanner';
@@ -56,6 +57,7 @@ export default function StockAlertsScreen({ sourceType }: StockAlertsScreenProps
 
   return (
     <Page
+      backgroundDecoration={<CalendarAmbientBackground />}
       screen={<Stack.Screen options={headerOptions} />}
       refreshControl={(
         <RefreshControl

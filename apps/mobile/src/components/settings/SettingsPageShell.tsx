@@ -9,6 +9,7 @@ import { SettingsTabBar } from './SettingsTabBar';
 
 export function SettingsPageShell<TTabId extends string = string>({
   activeTab,
+  backgroundDecoration,
   children,
   error,
   footer,
@@ -46,6 +47,7 @@ export function SettingsPageShell<TTabId extends string = string>({
 
   return (
     <Page
+      backgroundDecoration={backgroundDecoration}
       screen={screen}
       refreshControl={refreshControl}
       gap={gap}

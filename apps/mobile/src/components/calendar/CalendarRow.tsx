@@ -46,10 +46,10 @@ export function CalendarRow({
     >
       <YStack
         style={{
-          padding: 12,
+          padding: 14,
           borderBottomWidth: isLast ? 0 : 1,
           borderBottomColor: ios.border,
-          backgroundColor: ios.card,
+          backgroundColor: 'transparent',
         }}
       >
         <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>

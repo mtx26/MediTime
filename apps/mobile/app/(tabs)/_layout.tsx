@@ -1,19 +1,27 @@
 import { Redirect, Tabs } from 'expo-router';
+import { ThemeProvider, DarkTheme, DefaultTheme } from '@react-navigation/native';
+import { Icon, Label, NativeTabs, VectorIcon } from 'expo-router/unstable-native-tabs';
 import { useTranslation } from 'react-i18next';
-import { Platform } from 'react-native';
+import { DynamicColorIOS, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Spinner, YStack } from 'tamagui';
 import { TabIcon } from '../../src/components/common/TabIcon';
 import { useAuth } from '../../src/hooks/auth/useAuth';
-import { useIosTheme } from '../../src/theme/ios';
+import { useAppTheme, useIosTheme } from '../../src/theme/ios';
 
 export default function TabsLayout() {
   const { userInfo, isLoading } = useAuth();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
   const tabBarHeight = 56 + insets.bottom;
   const tabBarPaddingBottom = Math.max(insets.bottom, 5);
+  const nativeTintColor = Platform.OS === 'ios'
+    ? DynamicColorIOS({ dark: 'white', light: 'black' })
+    : ios.primary;
+  const nativeTheme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
 
   if (isLoading) {
     return (
@@ -27,12 +35,64 @@ export default function TabsLayout() {
     return <Redirect href="/(auth)/login" />;
   }
 
+  if (Platform.OS !== 'web') {
+    return (
+      <ThemeProvider value={nativeTheme}>
+        <NativeTabs
+          disableTransparentOnScrollEdge
+          labelStyle={{
+            color: nativeTintColor,
+            fontSize: 12,
+            fontWeight: '700',
+          }}
+          tintColor={nativeTintColor}
+        >
+          <NativeTabs.Trigger name="calendars">
+            <Icon
+              sf={{ default: 'calendar', selected: 'calendar' }}
+              androidSrc={<VectorIcon family={Ionicons} name="calendar-outline" />}
+              selectedColor={nativeTintColor}
+            />
+            <Label hidden>{t('calendars')}</Label>
+          </NativeTabs.Trigger>
+
+          <NativeTabs.Trigger name="shared-calendars">
+            <Icon
+              sf={{ default: 'person.2', selected: 'person.2.fill' }}
+              androidSrc={<VectorIcon family={Ionicons} name="people-outline" />}
+              selectedColor={nativeTintColor}
+            />
+            <Label hidden>{t('shared_calendars')}</Label>
+          </NativeTabs.Trigger>
+
+          <NativeTabs.Trigger name="notifications">
+            <Icon
+              sf={{ default: 'bell', selected: 'bell.fill' }}
+              androidSrc={<VectorIcon family={Ionicons} name="notifications-outline" />}
+              selectedColor={nativeTintColor}
+            />
+            <Label hidden>{t('notification.label')}</Label>
+          </NativeTabs.Trigger>
+
+          <NativeTabs.Trigger name="settings">
+            <Icon
+              sf={{ default: 'gearshape', selected: 'gearshape.fill' }}
+              androidSrc={<VectorIcon family={Ionicons} name="settings-outline" />}
+              selectedColor={nativeTintColor}
+            />
+            <Label hidden>{t('settings.label')}</Label>
+          </NativeTabs.Trigger>
+        </NativeTabs>
+      </ThemeProvider>
+    );
+  }
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
-        tabBarShowLabel: true,
+        tabBarShowLabel: false,
         tabBarActiveTintColor: ios.primary,
         tabBarInactiveTintColor: ios.mutedForeground,
         tabBarStyle: {
@@ -73,20 +133,12 @@ export default function TabsLayout() {
           height: 25,
           marginBottom: 0,
         },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '700',
-          letterSpacing: 0,
-          lineHeight: 15,
-          marginTop: 1,
-        },
       }}
     >
       <Tabs.Screen
         name="calendars"
         options={{
           title: t('calendars'),
-          tabBarLabel: t('calendars'),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon color={color} focused={focused} iconName="calendar-outline" focusedIconName="calendar" />
           ),
@@ -96,7 +148,6 @@ export default function TabsLayout() {
         name="shared-calendars"
         options={{
           title: t('shared_calendars'),
-          tabBarLabel: t('shared_calendars'),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon color={color} focused={focused} iconName="people-outline" focusedIconName="people" />
           ),
@@ -106,7 +157,6 @@ export default function TabsLayout() {
         name="notifications"
         options={{
           title: t('notification.label'),
-          tabBarLabel: t('notification.label'),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon color={color} focused={focused} iconName="notifications-outline" focusedIconName="notifications" />
           ),
@@ -116,7 +166,6 @@ export default function TabsLayout() {
         name="settings"
         options={{
           title: t('settings.label'),
-          tabBarLabel: t('settings.label'),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon color={color} focused={focused} iconName="settings-outline" focusedIconName="settings" />
           ),
