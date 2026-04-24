@@ -1,10 +1,10 @@
 import { useRef, type ElementRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
-import { Button, Input, Text, XStack, YStack } from 'tamagui';
+import { Input, Text, XStack, YStack } from 'tamagui';
 import type { MedicineReviewMedicineInput } from '@meditime/types';
 import { IconButton } from '../../common/IconButton';
 import { InfoBanner } from '../../common/InfoBanner';
+import { LiquidButton } from '../../common/LiquidButton';
 import { MobileForm } from '../../common/MobileForm';
 import { OutlineButton } from '../../common/OutlineButton';
 import { useIosTheme } from '../../../theme/ios';
@@ -138,25 +138,13 @@ export function MedicineReviewPanel({
               onPress={() => onIndexChange(index - 1)}
             />
             <OutlineButton label={t('previous')} onPress={onBack} />
-            <Button
-              size="$3"
+            <LiquidButton
+              label={canGoNext ? t('next') : t('medicine_review.finish')}
+              iconName={canGoNext ? 'chevron-forward' : 'checkmark-circle-outline'}
+              tone={canGoNext ? 'primary' : 'success'}
               onPress={form.submit}
               disabled={disabled || !canSubmit}
-              style={{
-                minHeight: 40,
-                paddingHorizontal: 16,
-                borderRadius: 14,
-                backgroundColor: canGoNext ? ios.primary : ios.success,
-                opacity: disabled || !canSubmit ? 0.55 : 1,
-              }}
-            >
-              <XStack style={{ alignItems: 'center', gap: 8 }}>
-                <Ionicons name={canGoNext ? 'chevron-forward' : 'checkmark-circle-outline'} size={16} color={ios.primaryForeground} />
-                <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
-                  {canGoNext ? t('next') : t('medicine_review.finish')}
-                </Text>
-              </XStack>
-            </Button>
+            />
           </XStack>
         </>
       )}

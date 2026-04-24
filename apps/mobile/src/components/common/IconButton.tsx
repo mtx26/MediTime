@@ -1,7 +1,8 @@
 import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { YStack } from 'tamagui';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 type IconButtonProps = {
   label: string;
@@ -19,6 +20,7 @@ export function IconButton({
   disabled = false,
 }: IconButtonProps) {
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
   const isDefault = variant === 'default';
 
   return (
@@ -29,19 +31,21 @@ export function IconButton({
       accessibilityLabel={label}
     >
       {({ pressed }) => (
-        <YStack
+        <GlassView
+          colorScheme={colorScheme}
+          glassEffectStyle={isDefault ? 'regular' : 'clear'}
+          tintColor={isDefault ? ios.primary : undefined}
           style={{
             width: isDefault ? 40 : 32,
             height: isDefault ? 40 : 32,
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: isDefault ? 12 : 8,
-            backgroundColor: isDefault ? ios.primary : 'transparent',
             opacity: disabled ? 0.6 : pressed ? 0.75 : 1,
           }}
         >
           <Ionicons name={iconName} size={18} color={isDefault ? ios.primaryForeground : ios.primary} />
-        </YStack>
+        </GlassView>
       )}
     </Pressable>
   );

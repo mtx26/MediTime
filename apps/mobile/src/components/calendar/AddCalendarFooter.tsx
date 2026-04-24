@@ -1,8 +1,9 @@
 import { Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { Text, XStack } from 'tamagui';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 type AddCalendarFooterProps = {
   onPress: () => void;
@@ -11,26 +12,34 @@ type AddCalendarFooterProps = {
 export function AddCalendarFooter({ onPress }: AddCalendarFooterProps) {
   const { t } = useTranslation();
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
 
   return (
     <Pressable onPress={onPress} accessibilityRole="button">
       {({ pressed }) => (
-        <XStack
+        <GlassView
+          colorScheme={colorScheme}
+          glassEffectStyle="clear"
           style={{
-            minHeight: 48,
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            borderTopWidth: 1,
-            borderTopColor: ios.border,
-            backgroundColor: pressed ? ios.accentHover : 'transparent',
+            borderRadius: 18,
+            padding: 8,
+            opacity: pressed ? 0.84 : 1,
           }}
         >
-          <Ionicons name="add-circle-outline" size={19} color={ios.primary} />
-          <Text style={{ color: ios.primary, fontSize: 16, fontWeight: '700' }}>
-            {t('calendar.add_calendar')}
-          </Text>
-        </XStack>
+          <XStack
+            style={{
+              minHeight: 34,
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }}
+          >
+            <Ionicons name="add-circle-outline" size={19} color={ios.primary} />
+            <Text style={{ color: ios.primary, fontSize: 16, fontWeight: '700' }}>
+              {t('calendar.add_calendar')}
+            </Text>
+          </XStack>
+        </GlassView>
       )}
     </Pressable>
   );

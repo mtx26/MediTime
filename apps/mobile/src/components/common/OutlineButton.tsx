@@ -1,5 +1,4 @@
-import { Button, Text } from 'tamagui';
-import { useIosTheme } from '../../theme/ios';
+import { LiquidButton } from './LiquidButton';
 
 type OutlineButtonProps = {
   label: string;
@@ -7,24 +6,5 @@ type OutlineButtonProps = {
 };
 
 export function OutlineButton({ label, onPress }: OutlineButtonProps) {
-  const ios = useIosTheme();
-
-  return (
-    <Button
-      size="$3"
-      onPress={onPress}
-      chromeless
-      style={{
-        minHeight: 34,
-        alignSelf: 'flex-start',
-        paddingHorizontal: 0,
-        borderRadius: 0,
-        borderWidth: 0,
-        borderColor: 'transparent',
-        backgroundColor: 'transparent',
-      }}
-    >
-      <Text style={{ color: ios.primary, fontSize: 15, fontWeight: '700' }}>{label}</Text>
-    </Button>
-  );
+  return <LiquidButton label={label} onPress={onPress} />;
 }

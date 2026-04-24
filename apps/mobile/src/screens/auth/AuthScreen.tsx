@@ -1,6 +1,7 @@
 import { useRef, type ElementRef } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
 import { Button, H2, Input, ScrollView, Separator, Text, XStack, YStack } from 'tamagui';
 import type { AuthScreenProps } from '@meditime/types';
@@ -8,11 +9,12 @@ import { AuthModeToggle, PasswordInput, SocialProviderButton } from '../../compo
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { MobileForm } from '../../components/common/MobileForm';
 import { useAuthForm } from '../../hooks/auth/useAuthForm';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 export default function AuthScreen({ initialMode }: AuthScreenProps) {
   const { t } = useTranslation();
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
   const auth = useAuthForm(initialMode);
   const isLogin = auth.activeMode === 'login';
   const nameInputRef = useRef<ElementRef<typeof Input>>(null);
@@ -71,19 +73,18 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
             backgroundColor: ios.background,
           }}
         >
-          <YStack
+          <GlassView
+            colorScheme={colorScheme}
+            glassEffectStyle="clear"
             style={{
               width: '100%',
               maxWidth: 460,
               alignSelf: 'center',
-              gap: 18,
-              padding: 18,
-              borderRadius: 8,
-              borderWidth: 1,
-              borderColor: ios.border,
-              backgroundColor: ios.card,
+              borderRadius: 24,
+              padding: 8,
             }}
           >
+            <YStack style={{ gap: 18, padding: 10 }}>
             <YStack style={{ alignItems: 'center', gap: 10 }}>
               <YStack
                 style={{
@@ -269,7 +270,8 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
                 </>
               )}
             </MobileForm>
-          </YStack>
+            </YStack>
+          </GlassView>
         </YStack>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -1,8 +1,9 @@
 import { Image, Pressable, type GestureResponderEvent } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { Text, YStack } from 'tamagui';
-import { useIosTheme } from '../../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../../theme/ios';
 
 type ImageImportPanelProps = {
   fileName: string | null;
@@ -21,6 +22,7 @@ export function ImageImportPanel({
 }: ImageImportPanelProps) {
   const { t } = useTranslation();
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
 
   const handleRemoveImage = (event: GestureResponderEvent) => {
     event.stopPropagation();
@@ -36,25 +38,26 @@ export function ImageImportPanel({
         accessibilityLabel={String(t('image_upload.click_to_change'))}
       >
         {({ pressed }) => (
-          <YStack
-            style={{
-              minHeight: 180,
-              overflow: 'hidden',
-              borderRadius: 8,
-              borderWidth: 1,
-              borderColor: ios.blueInfoBorder,
-              backgroundColor: ios.background,
-              opacity: disabled ? 0.55 : pressed ? 0.85 : 1,
-            }}
-          >
-            <Image
-              source={{ uri: imageUri }}
-              resizeMode="cover"
-              style={{
-                width: '100%',
-                height: 180,
-              }}
-            />
+        <GlassView
+          colorScheme={colorScheme}
+          glassEffectStyle="clear"
+          style={{
+            minHeight: 180,
+            borderRadius: 24,
+            padding: 8,
+            opacity: disabled ? 0.55 : pressed ? 0.85 : 1,
+          }}
+        >
+            <YStack style={{ minHeight: 180, overflow: 'hidden', borderRadius: 16 }}>
+              <Image
+                source={{ uri: imageUri }}
+                resizeMode="cover"
+                style={{
+                  width: '100%',
+                  height: 180,
+                }}
+              />
+            </YStack>
             <YStack
               style={{
                 position: 'absolute',
@@ -100,7 +103,7 @@ export function ImageImportPanel({
                 </YStack>
               )}
             </Pressable>
-          </YStack>
+          </GlassView>
         )}
       </Pressable>
     );
@@ -109,32 +112,39 @@ export function ImageImportPanel({
   return (
     <Pressable onPress={onChooseSource} disabled={disabled} accessibilityRole="button">
       {({ pressed }) => (
-        <YStack
+        <GlassView
+          colorScheme={colorScheme}
+          glassEffectStyle="clear"
           style={{
             minHeight: 132,
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 10,
-            padding: 18,
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: ios.border,
-            backgroundColor: pressed ? ios.accentHover : ios.background,
+            borderRadius: 24,
+            padding: 8,
             opacity: disabled ? 0.55 : 1,
           }}
         >
-          <Ionicons
-            name="cloud-upload-outline"
-            size={32}
-            color={ios.mutedForeground}
-          />
-          <Text style={{ color: ios.foreground, textAlign: 'center', fontSize: 16, fontWeight: '800' }}>
-            {t('calendar.choose_image')}
-          </Text>
-          <Text style={{ color: ios.mutedForeground, textAlign: 'center', fontSize: 13, fontWeight: '600' }}>
-            {t('image_upload.file_types')}
-          </Text>
-        </YStack>
+          <YStack
+            style={{
+              minHeight: 116,
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              padding: 10,
+              opacity: pressed ? 0.82 : 1,
+            }}
+          >
+            <Ionicons
+              name="cloud-upload-outline"
+              size={32}
+              color={ios.mutedForeground}
+            />
+            <Text style={{ color: ios.foreground, textAlign: 'center', fontSize: 16, fontWeight: '800' }}>
+              {t('calendar.choose_image')}
+            </Text>
+            <Text style={{ color: ios.mutedForeground, textAlign: 'center', fontSize: 13, fontWeight: '600' }}>
+              {t('image_upload.file_types')}
+            </Text>
+          </YStack>
+        </GlassView>
       )}
     </Pressable>
   );

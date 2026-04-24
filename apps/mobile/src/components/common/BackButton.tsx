@@ -15,6 +15,7 @@ export function BackButton({ fallbackHref = '/', variant = 'pill' }: BackButtonP
   const router = useRouter();
   const ios = useIosTheme();
   const isHeader = variant === 'header';
+  const contentColor = isHeader ? ios.foreground : ios.primary;
 
   const handlePress = () => {
     if (router.canGoBack()) {
@@ -46,8 +47,8 @@ export function BackButton({ fallbackHref = '/', variant = 'pill' }: BackButtonP
             opacity: pressed ? 0.75 : 1,
           }}
         >
-          <Ionicons name="chevron-back-outline" size={isHeader ? 24 : 18} color={ios.primary} />
-          <Text style={{ color: ios.primary, fontSize: isHeader ? 16 : 14, lineHeight: 20, fontWeight: '800' }}>
+          <Ionicons name="chevron-back-outline" size={isHeader ? 24 : 18} color={contentColor} />
+          <Text style={{ color: contentColor, fontSize: isHeader ? 16 : 14, lineHeight: 20, fontWeight: '800' }}>
             {t('back')}
           </Text>
         </XStack>

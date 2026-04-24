@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Alert, RefreshControl } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -18,14 +18,8 @@ import {
   PdfDialog,
 } from '../../components/calendar';
 import { useIosTheme } from '../../theme/ios';
-import { useAddCalendar, useCalendars } from '../../hooks/calendars';
+import { useCalendars } from '../../hooks/calendars';
 import { openPdfUrl, toActionSheetItems, toMobileHref } from '../../utils';
-
-const AddCalendarModal = lazy(() =>
-  import('../../components/calendar/AddCalendarModal').then((module) => ({
-    default: module.AddCalendarModal,
-  })),
-);
 
 export default function CalendarsScreen() {
   const { t, i18n } = useTranslation();
@@ -55,15 +49,6 @@ export default function CalendarsScreen() {
     deleteSharedCalendar,
     getPersonalCalendarPdfUrl,
   } = calendars;
-
-  const addCalendarFlow = useAddCalendar({
-    addCalendar: calendars.addCalendar,
-    analyzeImageBase64: calendars.analyzeImageBase64,
-    createPersonalBox: calendars.createPersonalBox,
-    isMutating,
-    loadCalendars,
-    saveAnalysisResult: calendars.saveAnalysisResult,
-  });
 
   useEffect(() => {
     void loadCalendars();
@@ -229,10 +214,6 @@ export default function CalendarsScreen() {
           </YStack>
         )}
 
-        <YStack style={{ width: '100%', maxWidth: 672, alignSelf: 'center' }}>
-          <OutlineButton label="Open Glass Test" onPress={() => router.push('/glass-test' as never)} />
-        </YStack>
-
         <CalendarSection
           title={String(t('my_calendars'))}
           iconName="calendar-outline"
@@ -250,8 +231,11 @@ export default function CalendarsScreen() {
           }
           onRenameSubmit={handleRenameSubmit}
           onRenameCancel={cancelRename}
-          addFooter={<AddCalendarFooter onPress={addCalendarFlow.openModal} />}
         />
+
+        <YStack style={{ width: '100%', maxWidth: 672, alignSelf: 'center', marginTop: -14 }}>
+          <AddCalendarFooter onPress={() => router.push('/add-calendar' as never)} />
+        </YStack>
 
         <CalendarSection
           title={String(t('shared_calendars'))}
@@ -266,37 +250,6 @@ export default function CalendarsScreen() {
           onNavigate={navigateToHref}
         />
       </Page>
-
-      <Suspense fallback={null}>
-        <AddCalendarModal
-          open={addCalendarFlow.open}
-          name={addCalendarFlow.calendarName}
-          importType={addCalendarFlow.importType}
-          step={addCalendarFlow.step}
-          disabled={addCalendarFlow.isBusy}
-          qrMedicines={addCalendarFlow.qrMedicines}
-          qrLoadingGtin={addCalendarFlow.qrLoadingGtin}
-          imageAssetUri={addCalendarFlow.imageAssetUri}
-          imageFileName={addCalendarFlow.imageFileName}
-          importedMedicines={addCalendarFlow.importedMedicines}
-          medicineReviewIndex={addCalendarFlow.medicineReviewIndex}
-          onNameChange={addCalendarFlow.setCalendarName}
-          onImportTypeChange={addCalendarFlow.changeImportType}
-          onQrBarcodeScanned={addCalendarFlow.handleQrBarcodeScanned}
-          onRemoveQrMedicine={addCalendarFlow.removeQrMedicine}
-          onChooseCamera={addCalendarFlow.chooseCamera}
-          onChooseFile={addCalendarFlow.chooseFile}
-          onChooseLibrary={addCalendarFlow.chooseLibrary}
-          onRemoveImage={addCalendarFlow.removeImage}
-          onMedicineReviewIndexChange={addCalendarFlow.setMedicineReviewIndex}
-          onMedicineReviewFieldChange={addCalendarFlow.changeReviewField}
-          onRemoveImportedMedicine={addCalendarFlow.removeImportedMedicine}
-          onBackToImport={addCalendarFlow.backToImport}
-          onSaveImportedMedicines={() => void addCalendarFlow.saveImportedMedicines()}
-          onCancel={addCalendarFlow.cancel}
-          onSubmit={() => void addCalendarFlow.submit()}
-        />
-      </Suspense>
 
       <PdfDialog
         open={pdfDialogOpen}

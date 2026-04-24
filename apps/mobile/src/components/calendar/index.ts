@@ -1,5 +1,4 @@
 export * from './AddCalendarFooter';
-export * from './AddCalendarModal';
 export * from './CalendarAmbientBackground';
 export * from './CalendarNotFoundState';
 export * from './CalendarSection';

@@ -9,17 +9,19 @@ apps/mobile/app
 
   (auth)
     ✅ _layout.tsx
-    ✅ login.tsx
-    ✅ register.tsx
-    ✅ reset-password.tsx
-    ✅ reset-password-confirm.tsx
-    ✅ verify-email.tsx
+    ✅🪟 login.tsx
+    ✅🪟 register.tsx
+    ✅🪟 reset-password.tsx
+    ✅🪟 reset-password-confirm.tsx
+    ✅🪟 verify-email.tsx
 
   auth
     ✅ callback.tsx
 
   accept-invite
     ✅ index.tsx
+
+  ✅🪟 add-calendar.tsx
 
   (tabs)
     calendars

@@ -1,16 +1,18 @@
 import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Text, XStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import { useIosTheme } from '../../../theme/ios';
 
 type ImportTypeOptionProps = {
-  label: string;
+  description: string;
   iconName: keyof typeof Ionicons.glyphMap;
+  label: string;
   selected: boolean;
   onPress: () => void;
 };
 
 export function ImportTypeOption({
+  description,
   label,
   iconName,
   selected,
@@ -19,32 +21,49 @@ export function ImportTypeOption({
   const ios = useIosTheme();
 
   return (
-    <Pressable onPress={onPress} accessibilityRole="button">
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="radio"
+      accessibilityState={{ checked: selected }}
+    >
       {({ pressed }) => (
         <XStack
           style={{
-            minHeight: 44,
-            alignItems: 'center',
-            gap: 10,
+            alignItems: 'flex-start',
+            gap: 12,
             paddingHorizontal: 12,
+            paddingVertical: 12,
             borderRadius: 12,
+            borderWidth: 1,
+            borderColor: selected ? ios.primary : ios.border,
             backgroundColor: selected ? ios.blueInfoBg : pressed ? ios.accentHover : ios.background,
-            borderWidth: selected ? 1 : 0,
-            borderColor: selected ? ios.blueInfoBorder : 'transparent',
+            opacity: pressed ? 0.86 : 1,
           }}
         >
-          <Ionicons name={iconName} size={19} color={selected ? ios.primary : ios.mutedForeground} />
-          <Text
-            style={{
-              flex: 1,
-              color: selected ? ios.primary : ios.foreground,
-              fontSize: 15,
-              fontWeight: '700',
-            }}
-          >
-            {label}
-          </Text>
-          {selected && <Ionicons name="checkmark-circle" size={18} color={ios.primary} />}
+          <Ionicons
+            name={selected ? 'radio-button-on' : 'radio-button-off'}
+            size={20}
+            color={selected ? ios.primary : ios.mutedForeground}
+          />
+          <YStack style={{ flex: 1, gap: 4 }}>
+            <XStack style={{ alignItems: 'center', gap: 8 }}>
+              <Ionicons name={iconName} size={18} color={selected ? ios.primary : ios.mutedForeground} />
+              <Text
+                style={{
+                  flex: 1,
+                  color: ios.foreground,
+                  fontSize: 15,
+                  lineHeight: 21,
+                  fontWeight: '800',
+                }}
+              >
+                {label}
+              </Text>
+            </XStack>
+            <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 18 }}>
+              {description}
+            </Text>
+          </YStack>
         </XStack>
       )}
     </Pressable>

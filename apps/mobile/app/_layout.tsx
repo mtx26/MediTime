@@ -69,6 +69,14 @@ function ThemedApp() {
             <Stack.Screen name="index" />
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen
+              name="add-calendar"
+              options={{
+                title: t('calendar.add_calendar'),
+                headerShown: true,
+                headerLeft: () => <BackButton fallbackHref="/calendars" variant="header" />,
+              }}
+            />
             <Stack.Screen name="auth/callback" />
             <Stack.Screen
               name="privacy"

@@ -30,12 +30,14 @@ Le rendu attendu vient de `GlassView` directement, pas d'un fond blanc, pas d'un
 2. Reperer une route creee avec `✅` mais pas encore marquee glass avec `🪟`.
 3. Ouvrir le fichier route dans `apps/mobile/app`.
 4. Depuis ce fichier route, trouver l'ecran reel dans `apps/mobile/src/screens`.
-5. Modifier les surfaces principales de cet ecran ou de ses composants directs.
+5. Modifier les surfaces principales de cet ecran et tous les composants lies
+   visibles dans le workflow de la page.
 6. Ne pas changer le fond global de la page: il doit rester celui du theme iOS
    (`ios.background`), donc blanc en theme clair et noir en theme sombre.
 7. Lancer le type-check mobile.
-8. Quand la page est vraiment convertie, ajouter `🪟` a cote de la route dans
-   `ROUTER_SCHEMA.md`.
+8. Quand toute la page est vraiment convertie, y compris modales, footers,
+   panneaux, et sous-composants du workflow, ajouter `🪟` a cote de la route
+   dans `ROUTER_SCHEMA.md`.
 
 Exemple de marquage:
 
@@ -66,6 +68,8 @@ Apple glass.
   le glass plus visible. Le fond de page doit rester noir/blanc via le theme.
 - Ne pas marquer une route avec `🪟` tant que l'ecran reel de cette route n'a pas
   ete modifie.
+- Ne pas oublier les composants ouverts depuis la page: modales, bottom sheets,
+  menus, panneaux d'import, et etats de review font partie de la meme route.
 
 ## Pattern recommande
 
@@ -125,6 +129,8 @@ Puis dans l'ecran:
 ## Checklist avant de finir
 
 - Verifier `ROUTER_SCHEMA.md` et confirmer que seule la route convertie a `🪟`.
+- Verifier les composants lies a la route: aucune surface importante du workflow
+  ne doit rester en carte classique si la route est marquee `🪟`.
 - Comparer avec `app/glass-test.tsx`.
 - Verifier qu'il n'y a pas de `backgroundColor` sur la surface glass.
 - Verifier qu'il n'y a pas de `borderWidth` ou `borderColor` manuel.

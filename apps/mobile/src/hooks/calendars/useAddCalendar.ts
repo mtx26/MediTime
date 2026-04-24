@@ -259,7 +259,7 @@ export function useAddCalendar({
 
   const saveImportedMedicines = useCallback(async () => {
     const name = calendarName.trim();
-    if (!name || importedMedicines.length === 0) return;
+    if (!name || importedMedicines.length === 0) return false;
 
     setIsImporting(true);
     try {
@@ -267,13 +267,14 @@ export function useAddCalendar({
       if (result.success && result.calendar_id) {
         reset();
         setOpen(false);
-        return;
+        return true;
       }
 
       Alert.alert(
         String(t('image_upload.analysis_error')),
         getApiErrorMessage(result, String(t('image_upload.analysis_error'))),
       );
+      return false;
     } finally {
       setIsImporting(false);
     }
@@ -281,7 +282,7 @@ export function useAddCalendar({
 
   const submit = useCallback(async () => {
     const name = calendarName.trim();
-    if (!name) return;
+    if (!name) return false;
 
     setIsImporting(true);
 
@@ -291,23 +292,23 @@ export function useAddCalendar({
         if (result.success) {
           reset();
           setOpen(false);
-          return;
+          return true;
         }
 
         Alert.alert(String(t('calendar.error_calendar_creation')), getApiErrorMessage(result, String(t('calendar.error_calendar_creation'))));
-        return;
+        return false;
       }
 
       if (importType === ADD_CALENDAR_IMPORT_TYPES.QR) {
         if (qrMedicines.length === 0) {
           Alert.alert(String(t('calendar.error_no_medicines')), String(t('calendar.error_no_medicines')));
-          return;
+          return false;
         }
 
         const calendarResult = await addCalendar(name) as { success: boolean; calendarId?: string; error?: string };
         if (!calendarResult.success || !calendarResult.calendarId) {
           Alert.alert(String(t('calendar.error_calendar_creation')), calendarResult.error ?? String(t('calendar.error_calendar_creation')));
-          return;
+          return false;
         }
 
         let errorCount = 0;
@@ -334,13 +335,13 @@ export function useAddCalendar({
         if (errorCount > 0) {
           Alert.alert(String(t('calendar.error_partial_success', { count: errorCount })));
         }
-        return;
+        return true;
       }
 
       if (importType === ADD_CALENDAR_IMPORT_TYPES.FILE) {
         if (!imageAssetUri) {
           Alert.alert(String(t('image_upload.select_file_error')), String(t('image_upload.select_file_error')));
-          return;
+          return false;
         }
 
         const base64 = await FileSystem.readAsStringAsync(imageAssetUri, {
@@ -352,14 +353,16 @@ export function useAddCalendar({
           setImportedMedicines(result.medicines.map(normalizeMedicineReviewInput));
           setMedicineReviewIndex(0);
           setStep('review');
-          return;
+          return false;
         }
 
         Alert.alert(
           String(result.success ? t('image_upload.no_medicines_found') : t('image_upload.analysis_error')),
           getApiErrorMessage(result, ''),
         );
+        return false;
       }
+      return false;
     } finally {
       setIsImporting(false);
     }
