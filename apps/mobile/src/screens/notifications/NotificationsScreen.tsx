@@ -58,6 +58,7 @@ export default function NotificationsScreen() {
         />
       )}
       gap={14}
+      contentContainerStyle={{ width: '100%', maxWidth: 672, alignSelf: 'center' }}
       withBottomTabInset
     >
       {notifications.error && (

@@ -32,6 +32,7 @@ export function AccountSettingsPanel({
       </YStack>
 
       <SettingsPanelSection
+        glass
         iconName="camera-outline"
         title={String(t('account.profile_photo.title'))}
         description={String(t('account.profile_photo.description'))}
@@ -83,6 +84,7 @@ export function AccountSettingsPanel({
       </SettingsPanelSection>
 
       <SettingsPanelSection
+        glass
         iconName="person-circle-outline"
         title={String(t('account.personal_info.title'))}
         description={String(t('account.personal_info.description'))}

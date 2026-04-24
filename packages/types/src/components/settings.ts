@@ -47,6 +47,7 @@ export interface SettingsTabBarProps<TIconName = string, TId = string> {
 export interface SettingsPanelSectionProps<TIconName = string, TNode = unknown> {
   title: string;
   description?: string;
+  glass?: boolean;
   iconName: TIconName;
   children: TNode;
 }

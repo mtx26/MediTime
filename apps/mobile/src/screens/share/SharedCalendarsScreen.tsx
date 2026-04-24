@@ -50,7 +50,7 @@ export default function SharedCalendarsScreen() {
 
   return (
     <>
-        <Page
+      <Page
         screen={<Stack.Screen options={headerOptions} />}
         refreshControl={(
           <RefreshControl
@@ -62,6 +62,7 @@ export default function SharedCalendarsScreen() {
           />
         )}
         gap={14}
+        contentContainerStyle={{ width: '100%', maxWidth: 672, alignSelf: 'center' }}
         withBottomTabInset
       >
         {shared.error && (

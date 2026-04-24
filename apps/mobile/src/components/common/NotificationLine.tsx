@@ -1,11 +1,12 @@
 import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { GlassView } from 'expo-glass-effect';
 import { Trans, useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import { formatDateTime } from '@meditime/utils';
 import type { NotificationLineProps } from '@meditime/types';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 type NotificationPresentation = {
   actionLabel: string | null;
@@ -20,6 +21,7 @@ export default function NotificationLine({ notif, onRead }: NotificationLineProp
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
   const timestamp = formatDateTime(notif.timestamp, i18n.language);
   const isUnread = !notif.read;
 
@@ -178,78 +180,83 @@ export default function NotificationLine({ notif, onRead }: NotificationLineProp
       accessibilityLabel={presentation.actionLabel ?? String(t('notification.label'))}
     >
       {({ pressed }) => (
-        <XStack
+        <GlassView
+          colorScheme={colorScheme}
+          glassEffectStyle="clear"
           style={{
-            gap: 12,
-            padding: 12,
-            alignItems: 'flex-start',
-            borderRadius: 14,
-            borderWidth: 1,
-            borderColor: isUnread ? ios.blueInfoBorder : ios.border,
-            backgroundColor: ios.card,
+            borderRadius: 24,
+            padding: 8,
             opacity: pressed ? 0.88 : 1,
           }}
         >
-          <YStack
+          <XStack
             style={{
-              width: 32,
-              height: 32,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 10,
-              backgroundColor: presentation.iconBackground,
+              gap: 12,
+              padding: 4,
+              alignItems: 'flex-start',
             }}
           >
-            <Ionicons
-              name={presentation.iconName}
-              size={20}
-              color={presentation.iconColor}
-            />
-          </YStack>
-
-          <YStack style={{ flex: 1, gap: 8 }}>
-            <Text
+            <YStack
               style={{
-                color: ios.foreground,
-                fontSize: 14,
-                lineHeight: 20,
-                fontWeight: '500',
+                width: 32,
+                height: 32,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 10,
+                backgroundColor: presentation.iconBackground,
               }}
             >
-              {presentation.message}
-            </Text>
+              <Ionicons
+                name={presentation.iconName}
+                size={20}
+                color={presentation.iconColor}
+              />
+            </YStack>
 
-            <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+            <YStack style={{ flex: 1, gap: 8 }}>
               <Text
                 style={{
-                  flex: 1,
-                  color: ios.mutedForeground,
-                  fontSize: 12,
-                  lineHeight: 16,
-                  fontWeight: '600',
+                  color: ios.foreground,
+                  fontSize: 14,
+                  lineHeight: 20,
+                  fontWeight: '500',
                 }}
               >
-                {timestamp}
+                {presentation.message}
               </Text>
 
-              <XStack style={{ alignItems: 'center', gap: 6 }}>
-                {isUnread ? (
-                  <YStack
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 4,
-                      backgroundColor: ios.primary,
-                    }}
-                  />
-                ) : null}
-                {presentation.actionLabel || presentation.href ? (
-                  <Ionicons name="chevron-forward" size={18} color={ios.mutedForeground} />
-                ) : null}
+              <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                <Text
+                  style={{
+                    flex: 1,
+                    color: ios.mutedForeground,
+                    fontSize: 12,
+                    lineHeight: 16,
+                    fontWeight: '600',
+                  }}
+                >
+                  {timestamp}
+                </Text>
+
+                <XStack style={{ alignItems: 'center', gap: 6 }}>
+                  {isUnread ? (
+                    <YStack
+                      style={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: 4,
+                        backgroundColor: ios.primary,
+                      }}
+                    />
+                  ) : null}
+                  {presentation.actionLabel || presentation.href ? (
+                    <Ionicons name="chevron-forward" size={18} color={ios.mutedForeground} />
+                  ) : null}
+                </XStack>
               </XStack>
-            </XStack>
-          </YStack>
-        </XStack>
+            </YStack>
+          </XStack>
+        </GlassView>
       )}
     </Pressable>
   );

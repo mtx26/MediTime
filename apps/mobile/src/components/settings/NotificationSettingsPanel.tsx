@@ -70,6 +70,7 @@ export function NotificationSettingsPanel({
       </YStack>
 
       <SettingsPanelSection
+        glass
         iconName="notifications-outline"
         title={String(t('notification.preferences.title'))}
         description={String(t('notification.preferences.description'))}
@@ -112,6 +113,7 @@ export function NotificationSettingsPanel({
       </SettingsPanelSection>
 
       <SettingsPanelSection
+        glass
         iconName="time-outline"
         title={String(t('settings.notification_time'))}
         description={String(t('settings.notification_time_desc'))}

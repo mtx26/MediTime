@@ -1,5 +1,6 @@
 Legend:
   ✅ = route created in mobile app
+  🪟 = page converted to Apple glass
 
 apps/mobile/app
   ✅ _layout.tsx
@@ -22,7 +23,7 @@ apps/mobile/app
 
   (tabs)
     calendars
-      ✅ index.tsx
+      ✅🪟 index.tsx
 
       calendar
         [calendarId]
@@ -55,13 +56,13 @@ apps/mobile/app
             recap.tsx
 
     shared-calendars
-      ✅ index.tsx
-      
+      ✅🪟 index.tsx
+
     notifications
-      ✅ index.tsx
+      ✅🪟 index.tsx
 
     settings
-      ✅ index.tsx
+      ✅🪟 index.tsx
 
   ✅ privacy.tsx
   ✅ terms.tsx

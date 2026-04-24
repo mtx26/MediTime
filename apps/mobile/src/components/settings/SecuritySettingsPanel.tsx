@@ -44,6 +44,7 @@ export function SecuritySettingsPanel({
       </YStack>
 
       <SettingsPanelSection
+        glass
         iconName="mail-outline"
         title={String(t('security.email_auth.title'))}
         description={String(t('security.email_auth.description'))}
@@ -151,6 +152,7 @@ export function SecuritySettingsPanel({
       </SettingsPanelSection>
 
       <SettingsPanelSection
+        glass
         iconName="lock-closed-outline"
         title={String(t('security.password_section.title'))}
         description={String(t('security.password_section.description'))}

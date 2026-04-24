@@ -38,6 +38,7 @@ export function PreferencesSettingsPanel({
       </YStack>
 
       <SettingsPanelSection
+        glass
         iconName="language-outline"
         title={String(t('settings.language'))}
         description={String(t('settings.language_note'))}
@@ -104,6 +105,7 @@ export function PreferencesSettingsPanel({
       </SettingsPanelSection>
 
       <SettingsPanelSection
+        glass
         iconName="color-palette-outline"
         title={String(t('settings.theme'))}
         description={String(t('settings.theme_description'))}
