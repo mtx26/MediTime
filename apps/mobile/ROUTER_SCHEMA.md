@@ -65,4 +65,4 @@ apps/mobile/app
       ✅🪟 index.tsx
 
   ✅🪟 privacy.tsx
-  ✅ terms.tsx
+  ✅🪟 terms.tsx

@@ -1,15 +1,17 @@
 import { Linking, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, XStack, YStack } from 'tamagui';
 import { TermsSection } from '../../components/common/TermsSection';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 export default function TermsScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
 
   return (
     <ScrollView flex={1} style={{ flex: 1, backgroundColor: ios.background }}>
@@ -99,63 +101,72 @@ export default function TermsScreen() {
           paragraphs={['terms.section7.content']}
         />
 
-        <YStack style={{ gap: 12 }}>
-          <XStack style={{ alignItems: 'center', gap: 8 }}>
-            <Ionicons name="information-circle-outline" size={20} color={ios.primary} />
-            <Text
-              style={{
-                flex: 1,
-                color: ios.foreground,
-                fontSize: 20,
-                lineHeight: 26,
-                fontWeight: '800',
-              }}
-            >
-              {t('terms.section8.title')}
+        <GlassView
+          colorScheme={colorScheme}
+          glassEffectStyle="clear"
+          style={{
+            borderRadius: 24,
+            padding: 8,
+          }}
+        >
+          <YStack style={{ gap: 12, padding: 6 }}>
+            <XStack style={{ alignItems: 'center', gap: 8 }}>
+              <Ionicons name="information-circle-outline" size={20} color={ios.primary} />
+              <Text
+                style={{
+                  flex: 1,
+                  color: ios.foreground,
+                  fontSize: 20,
+                  lineHeight: 26,
+                  fontWeight: '800',
+                }}
+              >
+                {t('terms.section8.title')}
+              </Text>
+            </XStack>
+            <Text style={{ color: ios.mutedForeground, fontSize: 15, lineHeight: 22 }}>
+              {t('terms.section8.intro')}
             </Text>
-          </XStack>
-          <Text style={{ color: ios.mutedForeground, fontSize: 15, lineHeight: 22 }}>
-            {t('terms.section8.intro')}
-          </Text>
-          <Text style={{ color: ios.foreground, fontSize: 16, lineHeight: 22, fontWeight: '800' }}>
-            Matis Gillet
-          </Text>
-          <YStack style={{ gap: 10 }}>
-            <Pressable
-              accessibilityRole="link"
-              onPress={() => void Linking.openURL('mailto:mtx_26@outlook.be')}
-            >
-              <XStack style={{ alignItems: 'center', gap: 8 }}>
-                <Ionicons name="mail-outline" size={18} color={ios.primary} />
-                <Text style={{ flex: 1, color: ios.primary, fontSize: 15, lineHeight: 22, fontWeight: '700' }}>
-                  mtx_26@outlook.be
-                </Text>
-              </XStack>
-            </Pressable>
-            <Pressable
-              accessibilityRole="link"
-              onPress={() => void Linking.openURL('https://meditime-app.com')}
-            >
-              <XStack style={{ alignItems: 'center', gap: 8 }}>
-                <Ionicons name="globe-outline" size={18} color={ios.primary} />
-                <Text style={{ flex: 1, color: ios.primary, fontSize: 15, lineHeight: 22, fontWeight: '700' }}>
-                  meditime-app.com
-                </Text>
-              </XStack>
-            </Pressable>
-            <Pressable
-              accessibilityRole="link"
-              onPress={() => void Linking.openURL('https://github.com/mtx26')}
-            >
-              <XStack style={{ alignItems: 'center', gap: 8 }}>
-                <Ionicons name="logo-github" size={18} color={ios.primary} />
-                <Text style={{ flex: 1, color: ios.primary, fontSize: 15, lineHeight: 22, fontWeight: '700' }}>
-                  GitHub - mtx26
-                </Text>
-              </XStack>
-            </Pressable>
+            <Text style={{ color: ios.foreground, fontSize: 16, lineHeight: 22, fontWeight: '800' }}>
+              Matis Gillet
+            </Text>
+            <YStack style={{ gap: 10 }}>
+              <Pressable
+                accessibilityRole="link"
+                onPress={() => void Linking.openURL('mailto:mtx_26@outlook.be')}
+              >
+                <XStack style={{ alignItems: 'center', gap: 8 }}>
+                  <Ionicons name="mail-outline" size={18} color={ios.primary} />
+                  <Text style={{ flex: 1, color: ios.primary, fontSize: 15, lineHeight: 22, fontWeight: '700' }}>
+                    mtx_26@outlook.be
+                  </Text>
+                </XStack>
+              </Pressable>
+              <Pressable
+                accessibilityRole="link"
+                onPress={() => void Linking.openURL('https://meditime-app.com')}
+              >
+                <XStack style={{ alignItems: 'center', gap: 8 }}>
+                  <Ionicons name="globe-outline" size={18} color={ios.primary} />
+                  <Text style={{ flex: 1, color: ios.primary, fontSize: 15, lineHeight: 22, fontWeight: '700' }}>
+                    meditime-app.com
+                  </Text>
+                </XStack>
+              </Pressable>
+              <Pressable
+                accessibilityRole="link"
+                onPress={() => void Linking.openURL('https://github.com/mtx26')}
+              >
+                <XStack style={{ alignItems: 'center', gap: 8 }}>
+                  <Ionicons name="logo-github" size={18} color={ios.primary} />
+                  <Text style={{ flex: 1, color: ios.primary, fontSize: 15, lineHeight: 22, fontWeight: '700' }}>
+                    GitHub - mtx26
+                  </Text>
+                </XStack>
+              </Pressable>
+            </YStack>
           </YStack>
-        </YStack>
+        </GlassView>
       </YStack>
     </ScrollView>
   );
