@@ -38,6 +38,18 @@ export interface InputDropdownProps {
   fetchSuggestions: (name: string, dose?: number | null) => Promise<MedicineReviewSuggestion[]>;
 }
 
+export interface MobileMedicineBoxCardProps<TAction = unknown> {
+  box: BoxesViewBoxItem | CalendarBoxAlertItem;
+  actions?: TAction[];
+  disabled?: boolean;
+  mode?: 'alerts' | 'full';
+  expanded?: boolean;
+  onEdit?: (() => void) | null;
+  onMissingPillbox?: ((boxId: string) => void) | null;
+  onRestock?: ((boxId: string) => void) | null;
+  onToggleExpanded?: (() => void) | null;
+}
+
 // ─── Condition Editing Types ─────────────────────────────────────────────────
 
 export type EditableCondition = MedicineReviewConditionInput & { id: string };

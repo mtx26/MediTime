@@ -135,6 +135,32 @@ function handlePillbox(url: string, method: string): MockSuccess | null {
 }
 
 function handleBoxes(url: string, method: string): MockSuccess | null {
+  if (method === 'GET') {
+    return {
+      success: true,
+      boxes: [
+        {
+          id: 'demo-box-1',
+          name: 'Doliprane',
+          dose: 1000,
+          stock_quantity: 2,
+          stock_alert_threshold: 5,
+          box_capacity: 10,
+          conditions: [],
+        },
+        {
+          id: 'demo-box-2',
+          name: 'Vitamin C',
+          dose: 500,
+          stock_quantity: -1,
+          stock_alert_threshold: 3,
+          box_capacity: 20,
+          conditions: [],
+        },
+      ],
+      message: 'Demo boxes loaded',
+    };
+  }
   if (url.includes('/restock') && method === 'POST') return { success: true, message: 'Demo box restocked' };
   if (method === 'POST') return { success: true, box_id: 'demo-new-box', message: 'Demo box created', code: 200 };
   if (method === 'PUT') return { success: true, message: 'Demo box updated' };

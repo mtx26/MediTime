@@ -1,5 +1,5 @@
 import type { DateLike, WeeklyEventItem } from '../models';
-import type { IcsTokenEntry, PillboxUseItem } from './calendar-pages';
+import type { CalendarBoxAlertItem, IcsTokenEntry, PillboxUseItem } from './calendar-pages';
 
 export interface WeekDayCirclesProps {
   selectedDate: Exclude<DateLike, number>;
@@ -51,4 +51,11 @@ export interface PillboxUseRowProps {
   weekLabel: string;
   disabled?: boolean;
   onCancel: (useId: string) => void;
+}
+
+export interface StockAlertCardProps {
+  box: CalendarBoxAlertItem;
+  disabled?: boolean;
+  onMissingPillbox?: (boxId: string) => void;
+  onRestock: (boxId: string) => void;
 }

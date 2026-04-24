@@ -112,16 +112,12 @@ export default function CalendarDetailScreen({
           </Pressable>
         )}
 
-        {detail.showWeekSelector && (
+        {detail.showWeekSelector && !detail.showDailyContent && (
           <MobileCalendarWeekSelector
             calendarTable={detail.calendarTable}
             selectedDate={detail.selectedDate}
             onWeekSelect={(date) => void detail.selectWeek(date)}
           />
-        )}
-
-        {detail.showBackendLoading && (
-          <LoadingIndicator label={String(t('loading_calendar'))} />
         )}
 
         {detail.showPillboxShortcut && (
@@ -150,26 +146,17 @@ export default function CalendarDetailScreen({
 
         {detail.showCalendarContent ? (
           detail.showDailyContent && (
-            <YStack
-              style={{
-                gap: 12,
-                padding: 12,
-                borderRadius: 8,
-                borderWidth: 1,
-                borderColor: ios.border,
-                backgroundColor: ios.card,
-              }}
-            >
-              <MobileWeeklyEventContent
-                selectedDate={detail.selectedDate}
-                eventsForDay={detail.eventsForDay}
-                onSelectDate={detail.selectDate}
-                onPrev={() => detail.navigateDay(-1)}
-                onNext={() => detail.navigateDay(1)}
-                getPastWeek={() => detail.navigateWeek(-1)}
-                getNextWeek={() => detail.navigateWeek(1)}
-              />
-            </YStack>
+            <MobileWeeklyEventContent
+              selectedDate={detail.selectedDate}
+              eventsForDay={detail.eventsForDay}
+              onSelectDate={detail.selectDate}
+              onPrev={() => detail.navigateDay(-1)}
+              onNext={() => detail.navigateDay(1)}
+              getPastWeek={() => detail.navigateWeek(-1)}
+              getNextWeek={() => detail.navigateWeek(1)}
+              isLoading={detail.showDailyContent && detail.showBackendLoading}
+              showInlineWeekStrip={!isDailyRoute && !detail.showWeekSelector}
+            />
           )
         ) : (
           <InfoBanner iconName="pin-outline" text={String(t('no_medicines'))} />

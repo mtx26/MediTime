@@ -164,6 +164,18 @@ export function createSharedUserCalendarsApi({ apiUrl, uid, showAlert, performAp
       });
     },
 
+    fetchSharedUserBoxes: async (calendarId: CalendarId) => {
+      return performApiCall({
+        url: `${apiUrl}/api/shared/users/calendars/${calendarId}/boxes`,
+        method: 'GET',
+        origin: 'SHARED_USER_CALENDAR_BOXES_FETCH',
+        uid,
+        analyticsEvent: 'fetch_shared_calendar_medicine_boxes',
+        analyticsData: { calendarId, uid },
+        showAlert,
+      });
+    },
+
     updateSharedUserBox: async (calendarId: CalendarId, boxId: BoxId, box: Partial<CalendarBoxInput>) => {
       return performApiCall({
         url: `${apiUrl}/api/shared/users/calendars/${calendarId}/boxes/${boxId}`,

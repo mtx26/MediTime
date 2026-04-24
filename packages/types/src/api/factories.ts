@@ -12,6 +12,7 @@ export interface PersonalCalendarsApi {
   deleteCalendar: (calendarId: CalendarId) => Promise<ApiResult>;
   renameCalendar: (calendarId: CalendarId, newCalendarName: string) => Promise<ApiResult>;
   fetchPersonalCalendarSchedule: (calendarId: CalendarId, startDate?: string | null) => Promise<ApiResult>;
+  fetchPersonalBoxes: (calendarId: CalendarId) => Promise<ApiResult>;
   updatePersonalBox: (calendarId: CalendarId, boxId: BoxId, box: Partial<CalendarBoxInput>) => Promise<ApiResult>;
   createPersonalBox: (
     calendarId: CalendarId,
@@ -55,6 +56,7 @@ export interface SharedUserCalendarsApi {
   deleteSharedCalendar: (calendarId: CalendarId) => Promise<ApiResult>;
   fetchGroupedSharedCalendars: () => Promise<ApiResult>;
   fetchSharedUserCalendarSchedule: (calendarId: CalendarId, startDate?: string | null) => Promise<ApiResult>;
+  fetchSharedUserBoxes: (calendarId: CalendarId) => Promise<ApiResult>;
   updateSharedUserBox: (calendarId: CalendarId, boxId: BoxId, box: Partial<CalendarBoxInput>) => Promise<ApiResult>;
   createSharedUserBox: (
     calendarId: CalendarId,

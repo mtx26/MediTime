@@ -1,6 +1,7 @@
 import React, {
   useEffect,
   createContext,
+  useCallback,
   useContext,
   useMemo,
   useState,
@@ -9,9 +10,11 @@ import React, {
   type SetStateAction,
 } from 'react';
 import { Appearance, useColorScheme } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 
 export type AppThemeName = 'light' | 'dark';
 export type AppThemePreference = AppThemeName | 'system';
+export const MOBILE_THEME_STORAGE_KEY = 'meditime.mobile.theme';
 
 const iosThemes = {
   light: {
@@ -84,14 +87,33 @@ export function getIosTheme(colorScheme: AppThemeName) {
 
 export function AppThemeProvider({ children }: { children: ReactNode }) {
   const systemColorScheme = useColorScheme();
-  const [themePreference, setThemePreference] = useState<AppThemePreference>('system');
+  const [themePreference, setThemePreferenceState] = useState<AppThemePreference>('system');
   const colorScheme: AppThemeName = themePreference === 'system'
     ? systemColorScheme === 'dark' ? 'dark' : 'light'
     : themePreference;
 
   useEffect(() => {
+    void SecureStore.getItemAsync(MOBILE_THEME_STORAGE_KEY).then((storedTheme) => {
+      if (storedTheme === 'system' || storedTheme === 'light' || storedTheme === 'dark') {
+        setThemePreferenceState(storedTheme);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     Appearance.setColorScheme(themePreference === 'system' ? null : themePreference);
   }, [themePreference]);
+
+  const setThemePreference = useCallback<Dispatch<SetStateAction<AppThemePreference>>>((value) => {
+    setThemePreferenceState((current) => {
+      const nextTheme = typeof value === 'function'
+        ? value(current)
+        : value;
+
+      void SecureStore.setItemAsync(MOBILE_THEME_STORAGE_KEY, nextTheme);
+      return nextTheme;
+    });
+  }, []);
 
   const value = useMemo<AppThemeContextValue>(() => ({
     colorScheme,
@@ -99,7 +121,7 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
     isDark: colorScheme === 'dark',
     setThemePreference,
     themePreference,
-  }), [colorScheme, themePreference]);
+  }), [colorScheme, setThemePreference, themePreference]);
 
   return React.createElement(AppThemeContext.Provider, { value }, children);
 }

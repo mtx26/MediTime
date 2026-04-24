@@ -68,6 +68,17 @@ export function createPersonalCalendarsApi({ apiUrl, uid, showAlert, performApiC
       });
     },
 
+    fetchPersonalBoxes: async (calendarId: CalendarId): Promise<ApiResult> => {
+      return performApiCall({
+        url: `${apiUrl}/api/calendars/${calendarId}/boxes`,
+        method: 'GET',
+        origin: 'PERSONAL_CALENDAR_BOXES_FETCH',
+        uid,
+        analyticsEvent: 'fetch_personal_calendar_medicine_boxes',
+        analyticsData: { calendarId, uid },
+      });
+    },
+
     updatePersonalBox: async (
       calendarId: CalendarId,
       boxId: BoxId,
