@@ -15,6 +15,7 @@ export function CalendarNotificationSettingsPanel({
 
   return (
     <SettingsPanelSection
+      glass
       iconName="notifications-outline"
       title={String(t('calendar_settings.notifications.label'))}
       description={String(t('calendar_settings.notifications.description'))}

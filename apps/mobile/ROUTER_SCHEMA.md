@@ -34,7 +34,7 @@ apps/mobile/app
           boxes.tsx
           pillbox.tsx
           ✅ daily.tsx
-          ✅ settings.tsx
+          ✅🪟 settings.tsx
           ✅ stock-alerts.tsx
           ✅ pillbox-uses.tsx
           ✅ ics-tokens.tsx
@@ -49,7 +49,7 @@ apps/mobile/app
           boxes.tsx
           pillbox.tsx
           ✅ daily.tsx
-          ✅ settings.tsx
+          ✅🪟 settings.tsx
           ✅ stock-alerts.tsx
           ✅ pillbox-uses.tsx
           ✅ ics-tokens.tsx

@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { CALENDAR_SETTINGS_TABS } from '@meditime/constants';
 import { Text } from 'tamagui';
 import type { CalendarSettingsTab } from '@meditime/types';
-import { CalendarAmbientBackground } from '../../components/calendar/CalendarAmbientBackground';
 import { CalendarNotificationSettingsPanel } from '../../components/calendar/CalendarNotificationSettingsPanel';
 import { CalendarNotFoundState } from '../../components/calendar/CalendarNotFoundState';
 import { CalendarStockSettingsPanel } from '../../components/calendar/CalendarStockSettingsPanel';
@@ -53,7 +52,6 @@ export default function CalendarSettingsScreen({ sourceType }: CalendarSettingsS
 
   return (
     <SettingsPageShell
-      backgroundDecoration={<CalendarAmbientBackground />}
       loading={settings.loading}
       loadingLabel={String(t('calendar_settings.label'))}
       notFound={settings.notFound}

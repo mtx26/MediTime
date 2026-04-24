@@ -36,6 +36,7 @@ export function CalendarStockSettingsPanel({
 
   return (
     <SettingsPanelSection
+      glass
       iconName="cube-outline"
       title={String(t('calendar_settings.stock.label'))}
       description={String(t('calendar_settings.stock.description'))}
