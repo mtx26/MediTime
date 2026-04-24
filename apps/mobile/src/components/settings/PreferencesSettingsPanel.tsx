@@ -14,6 +14,19 @@ const THEME_ICONS: Record<AppThemePreference, keyof typeof Ionicons.glyphMap> = 
   dark: 'moon-outline',
 };
 
+function getFlagEmoji(flagCode: string) {
+  const normalizedCode = flagCode.toUpperCase();
+
+  if (!/^[A-Z]{2}$/.test(normalizedCode)) {
+    return flagCode;
+  }
+
+  return normalizedCode
+    .split('')
+    .map((char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
+    .join('');
+}
+
 export function PreferencesSettingsPanel({
   language,
   languages,
@@ -46,6 +59,7 @@ export function PreferencesSettingsPanel({
         <YStack style={{ gap: 8 }}>
           {languages.map((item) => {
             const active = language.startsWith(item.code);
+            const flag = getFlagEmoji(item.flag ?? item.code);
 
             return (
               <Pressable
@@ -82,8 +96,8 @@ export function PreferencesSettingsPanel({
                           borderColor: ios.border,
                         }}
                       >
-                        <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16, fontWeight: '800' }}>
-                          {(item.flag ?? item.code).toUpperCase()}
+                        <Text style={{ color: ios.foreground, fontSize: 18, lineHeight: 22, fontWeight: '800' }}>
+                          {flag}
                         </Text>
                       </YStack>
                       <Text
