@@ -64,5 +64,5 @@ apps/mobile/app
     settings
       ✅🪟 index.tsx
 
-  ✅ privacy.tsx
+  ✅🪟 privacy.tsx
   ✅ terms.tsx

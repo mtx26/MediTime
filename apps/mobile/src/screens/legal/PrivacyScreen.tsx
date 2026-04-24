@@ -1,16 +1,18 @@
 import { Linking, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, XStack, YStack } from 'tamagui';
 import { PrivacyDataGroup } from '../../components/common/PrivacyDataGroup';
 import { PrivacySection } from '../../components/common/PrivacySection';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 export default function PrivacyScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
 
   return (
     <ScrollView flex={1} style={{ flex: 1, backgroundColor: ios.background }}>
@@ -49,50 +51,52 @@ export default function PrivacyScreen() {
           paragraphs={['privacy.section1.content']}
         />
 
-        <YStack
+        <GlassView
+          colorScheme={colorScheme}
+          glassEffectStyle="clear"
           style={{
-            gap: 16,
-            paddingBottom: 22,
-            borderBottomWidth: 1,
-            borderBottomColor: ios.border,
+            borderRadius: 24,
+            padding: 8,
           }}
         >
-          <Text
-            style={{
-              color: ios.foreground,
-              fontSize: 20,
-              lineHeight: 26,
-              fontWeight: '800',
-            }}
-          >
-            {t('privacy.section2.title')}
-          </Text>
-          <PrivacyDataGroup
-            iconName="person-circle-outline"
-            titleKey="privacy.section2.personal_data.title"
-            itemKeys={[
-              'privacy.section2.personal_data.email',
-              'privacy.section2.personal_data.uid',
-            ]}
-          />
-          <PrivacyDataGroup
-            iconName="medical-outline"
-            titleKey="privacy.section2.treatment_data.title"
-            itemKeys={[
-              'privacy.section2.treatment_data.medicines',
-              'privacy.section2.treatment_data.boxes',
-              'privacy.section2.treatment_data.history',
-            ]}
-          />
-          <PrivacyDataGroup
-            iconName="phone-portrait-outline"
-            titleKey="privacy.section2.tech_data.title"
-            itemKeys={[
-              'privacy.section2.tech_data.tokens',
-              'privacy.section2.tech_data.device',
-            ]}
-          />
-        </YStack>
+          <YStack style={{ gap: 16, padding: 6 }}>
+            <Text
+              style={{
+                color: ios.foreground,
+                fontSize: 20,
+                lineHeight: 26,
+                fontWeight: '800',
+              }}
+            >
+              {t('privacy.section2.title')}
+            </Text>
+            <PrivacyDataGroup
+              iconName="person-circle-outline"
+              titleKey="privacy.section2.personal_data.title"
+              itemKeys={[
+                'privacy.section2.personal_data.email',
+                'privacy.section2.personal_data.uid',
+              ]}
+            />
+            <PrivacyDataGroup
+              iconName="medical-outline"
+              titleKey="privacy.section2.treatment_data.title"
+              itemKeys={[
+                'privacy.section2.treatment_data.medicines',
+                'privacy.section2.treatment_data.boxes',
+                'privacy.section2.treatment_data.history',
+              ]}
+            />
+            <PrivacyDataGroup
+              iconName="phone-portrait-outline"
+              titleKey="privacy.section2.tech_data.title"
+              itemKeys={[
+                'privacy.section2.tech_data.tokens',
+                'privacy.section2.tech_data.device',
+              ]}
+            />
+          </YStack>
+        </GlassView>
 
         <PrivacySection
           titleKey="privacy.section3.title"
@@ -123,14 +127,7 @@ export default function PrivacyScreen() {
           ]}
         />
 
-        <YStack
-          style={{
-            gap: 12,
-            paddingBottom: 22,
-            borderBottomWidth: 1,
-            borderBottomColor: ios.border,
-          }}
-        >
+        <YStack style={{ gap: 12 }}>
           <PrivacySection
             titleKey="privacy.section6.title"
             paragraphs={['privacy.section6.intro']}
@@ -158,56 +155,65 @@ export default function PrivacyScreen() {
           </Pressable>
         </YStack>
 
-        <YStack style={{ gap: 12 }}>
-          <Text
-            style={{
-              color: ios.foreground,
-              fontSize: 20,
-              lineHeight: 26,
-              fontWeight: '800',
-            }}
-          >
-            {t('privacy.section7.title')}
-          </Text>
-          <Text style={{ color: ios.mutedForeground, fontSize: 15, lineHeight: 22 }}>
-            {t('privacy.section7.developer')}
-          </Text>
-          <YStack style={{ gap: 10 }}>
-            <Pressable
-              accessibilityRole="link"
-              onPress={() => void Linking.openURL('mailto:mtx_26@outlook.be')}
+        <GlassView
+          colorScheme={colorScheme}
+          glassEffectStyle="clear"
+          style={{
+            borderRadius: 24,
+            padding: 8,
+          }}
+        >
+          <YStack style={{ gap: 12, padding: 6 }}>
+            <Text
+              style={{
+                color: ios.foreground,
+                fontSize: 20,
+                lineHeight: 26,
+                fontWeight: '800',
+              }}
             >
-              <XStack style={{ alignItems: 'center', gap: 8 }}>
-                <Ionicons name="mail-outline" size={18} color={ios.primary} />
-                <Text style={{ flex: 1, color: ios.primary, fontSize: 15, lineHeight: 22, fontWeight: '700' }}>
-                  mtx_26@outlook.be
-                </Text>
-              </XStack>
-            </Pressable>
-            <Pressable
-              accessibilityRole="link"
-              onPress={() => void Linking.openURL('https://meditime-app.com')}
-            >
-              <XStack style={{ alignItems: 'center', gap: 8 }}>
-                <Ionicons name="globe-outline" size={18} color={ios.primary} />
-                <Text style={{ flex: 1, color: ios.primary, fontSize: 15, lineHeight: 22, fontWeight: '700' }}>
-                  meditime-app.com
-                </Text>
-              </XStack>
-            </Pressable>
-            <Pressable
-              accessibilityRole="link"
-              onPress={() => void Linking.openURL('https://github.com/mtx26')}
-            >
-              <XStack style={{ alignItems: 'center', gap: 8 }}>
-                <Ionicons name="logo-github" size={18} color={ios.primary} />
-                <Text style={{ flex: 1, color: ios.primary, fontSize: 15, lineHeight: 22, fontWeight: '700' }}>
-                  GitHub - mtx26
-                </Text>
-              </XStack>
-            </Pressable>
+              {t('privacy.section7.title')}
+            </Text>
+            <Text style={{ color: ios.mutedForeground, fontSize: 15, lineHeight: 22 }}>
+              {t('privacy.section7.developer')}
+            </Text>
+            <YStack style={{ gap: 10 }}>
+              <Pressable
+                accessibilityRole="link"
+                onPress={() => void Linking.openURL('mailto:mtx_26@outlook.be')}
+              >
+                <XStack style={{ alignItems: 'center', gap: 8 }}>
+                  <Ionicons name="mail-outline" size={18} color={ios.primary} />
+                  <Text style={{ flex: 1, color: ios.primary, fontSize: 15, lineHeight: 22, fontWeight: '700' }}>
+                    mtx_26@outlook.be
+                  </Text>
+                </XStack>
+              </Pressable>
+              <Pressable
+                accessibilityRole="link"
+                onPress={() => void Linking.openURL('https://meditime-app.com')}
+              >
+                <XStack style={{ alignItems: 'center', gap: 8 }}>
+                  <Ionicons name="globe-outline" size={18} color={ios.primary} />
+                  <Text style={{ flex: 1, color: ios.primary, fontSize: 15, lineHeight: 22, fontWeight: '700' }}>
+                    meditime-app.com
+                  </Text>
+                </XStack>
+              </Pressable>
+              <Pressable
+                accessibilityRole="link"
+                onPress={() => void Linking.openURL('https://github.com/mtx26')}
+              >
+                <XStack style={{ alignItems: 'center', gap: 8 }}>
+                  <Ionicons name="logo-github" size={18} color={ios.primary} />
+                  <Text style={{ flex: 1, color: ios.primary, fontSize: 15, lineHeight: 22, fontWeight: '700' }}>
+                    GitHub - mtx26
+                  </Text>
+                </XStack>
+              </Pressable>
+            </YStack>
           </YStack>
-        </YStack>
+        </GlassView>
       </YStack>
     </ScrollView>
   );
