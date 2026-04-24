@@ -18,12 +18,13 @@ export function PillboxUseRow({
 
   return (
     <GlassSurface
+      glassEffectStyle="clear"
       style={{
-        overflow: 'hidden',
-        borderRadius: 16,
+        borderRadius: 24,
+        padding: 8,
       }}
     >
-      <XStack style={{ alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 14 }}>
+      <XStack style={{ alignItems: 'center', gap: 12, paddingHorizontal: 6, paddingVertical: 6 }}>
         <YStack
           style={{
             width: 34,
@@ -44,37 +45,33 @@ export function PillboxUseRow({
             {t('prepared_by')}: {preparedBy}
           </Text>
         </YStack>
-        <Ionicons name="chevron-forward" size={18} color={ios.mutedForeground} />
+        <Pressable
+          disabled={disabled}
+          onPress={() => onCancel(use.id)}
+          accessibilityRole="button"
+          accessibilityLabel={String(t('restore'))}
+        >
+          {({ pressed }) => (
+            <XStack
+              style={{
+                minHeight: 38,
+                alignItems: 'center',
+                gap: 6,
+                paddingHorizontal: 10,
+                paddingVertical: 8,
+                borderRadius: 14,
+                backgroundColor: pressed ? ios.accentHover : 'transparent',
+                opacity: disabled ? 0.55 : 1,
+              }}
+            >
+              <Ionicons name="refresh-outline" size={17} color={ios.primary} />
+              <Text style={{ color: ios.primary, fontSize: 14, fontWeight: '800' }}>
+                {t('restore')}
+              </Text>
+            </XStack>
+          )}
+        </Pressable>
       </XStack>
-
-      <Pressable
-        disabled={disabled}
-        onPress={() => onCancel(use.id)}
-        accessibilityRole="button"
-        accessibilityLabel={String(t('restore'))}
-      >
-        {({ pressed }) => (
-          <XStack
-            style={{
-              minHeight: 50,
-              alignItems: 'center',
-              gap: 10,
-              paddingHorizontal: 14,
-              paddingVertical: 12,
-              borderTopWidth: 1,
-              borderTopColor: ios.border,
-              backgroundColor: pressed ? ios.accentHover : ios.card,
-              opacity: disabled ? 0.55 : 1,
-            }}
-          >
-            <Ionicons name="refresh-outline" size={18} color={ios.primary} />
-            <Text style={{ flex: 1, color: ios.primary, fontSize: 15, fontWeight: '800' }}>
-              {t('restore')}
-            </Text>
-            <Ionicons name="chevron-forward" size={18} color={ios.mutedForeground} />
-          </XStack>
-        )}
-      </Pressable>
     </GlassSurface>
   );
 }
