@@ -99,10 +99,11 @@ export function MobileCalendarWeekSelector({
   if (Platform.OS === 'ios') {
     return (
       <GlassSurface
+        glassEffectStyle="clear"
         style={{
           gap: 10,
           padding: 12,
-          borderRadius: 14,
+          borderRadius: 24,
         }}
       >
         <Text style={{ color: ios.foreground, fontSize: 17, lineHeight: 22, fontWeight: '700' }}>
@@ -124,10 +125,11 @@ export function MobileCalendarWeekSelector({
   return (
     <YStack style={{ gap: 10 }}>
       <GlassSurface
+        glassEffectStyle="clear"
         style={{
           gap: 12,
           padding: 12,
-          borderRadius: 14,
+          borderRadius: 24,
         }}
       >
         <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>

@@ -207,10 +207,11 @@ export function MobileWeeklyEventContent({
 
       {isLoading ? (
         <GlassSurface
+          glassEffectStyle="clear"
           style={{
             paddingHorizontal: 18,
             paddingVertical: 22,
-            borderRadius: 18,
+            borderRadius: 24,
           }}
         >
           <LoadingIndicator label={String(t('loading_calendar'))} />
@@ -226,10 +227,11 @@ export function MobileWeeklyEventContent({
             return (
               <GlassSurface
                 key={`${event.start}-${event.title}`}
+                glassEffectStyle="clear"
                 style={{
                   paddingHorizontal: 14,
                   paddingVertical: 14,
-                  borderRadius: 18,
+                  borderRadius: 24,
                 }}
               >
                 <XStack style={{ alignItems: 'center', gap: 12 }}>
@@ -301,12 +303,13 @@ export function MobileWeeklyEventContent({
         </YStack>
       ) : (
         <GlassSurface
+          glassEffectStyle="clear"
           style={{
             alignItems: 'center',
             gap: 8,
             paddingHorizontal: 18,
             paddingVertical: 22,
-            borderRadius: 18,
+            borderRadius: 24,
           }}
         >
           <Ionicons name="moon-outline" size={22} color={ios.mutedForeground} />

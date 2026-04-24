@@ -30,10 +30,10 @@ apps/mobile/app
       calendar
         [calendarId]
           _layout.tsx
-          ✅ index.tsx
+          ✅🪟 index.tsx
           boxes.tsx
           pillbox.tsx
-          ✅ daily.tsx
+          ✅🪟 daily.tsx
           ✅🪟 settings.tsx
           ✅🪟 stock-alerts.tsx
           ✅🪟 pillbox-uses.tsx
@@ -45,10 +45,10 @@ apps/mobile/app
       shared-user-calendar
         [calendarId]
           _layout.tsx
-          ✅ index.tsx
+          ✅🪟 index.tsx
           boxes.tsx
           pillbox.tsx
-          ✅ daily.tsx
+          ✅🪟 daily.tsx
           ✅🪟 settings.tsx
           ✅🪟 stock-alerts.tsx
           ✅🪟 pillbox-uses.tsx
