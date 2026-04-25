@@ -16,7 +16,7 @@ apps/mobile/app
     ✅🪟 verify-email.tsx
 
   auth
-    ✅ callback.tsx
+    ✅🪟 callback.tsx
 
   accept-invite
     ✅🪟 index.tsx

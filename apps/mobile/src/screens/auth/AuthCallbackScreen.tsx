@@ -1,12 +1,15 @@
+import { Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
-import { Button, Text, YStack } from 'tamagui';
-import { InfoBanner } from '../../components/common/InfoBanner';
+import { Text, XStack, YStack } from 'tamagui';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { useAuthCallback } from '../../hooks/auth/useAuthCallback';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 export default function AuthCallbackScreen() {
   const { t } = useTranslation();
+  const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
   const callback = useAuthCallback();
 
@@ -24,23 +27,80 @@ export default function AuthCallbackScreen() {
         backgroundColor: ios.background,
       }}
     >
-      <InfoBanner
-        iconName="warning-outline"
-        text={callback.error ?? String(t('auth_callback.session_error'))}
-        tone="warning"
-      />
-      {callback.isRecovery && (
-        <Button size="$4" theme="blue" onPress={callback.requestNewResetLink}>
-          <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
-            {t('reset_password_confirm.request_new_link')}
+      <GlassView
+        colorScheme={colorScheme}
+        glassEffectStyle="clear"
+        style={{
+          borderRadius: 24,
+          padding: 14,
+        }}
+      >
+        <XStack style={{ alignItems: 'center', gap: 10 }}>
+          <Ionicons name="warning-outline" size={20} color={ios.warningText} />
+          <Text
+            style={{
+              flex: 1,
+              color: ios.foreground,
+              fontSize: 14,
+              lineHeight: 20,
+              fontWeight: '500',
+            }}
+          >
+            {callback.error ?? t('auth_callback.session_error')}
           </Text>
-        </Button>
+        </XStack>
+      </GlassView>
+
+      {callback.isRecovery && (
+        <Pressable
+          accessibilityRole="button"
+          onPress={callback.requestNewResetLink}
+        >
+          {({ pressed }) => (
+            <GlassView
+              colorScheme={colorScheme}
+              glassEffectStyle="clear"
+              style={{
+                minHeight: 48,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 18,
+                paddingHorizontal: 16,
+                paddingVertical: 10,
+                opacity: pressed ? 0.82 : 1,
+              }}
+            >
+              <Text style={{ color: ios.primary, fontWeight: '800', textAlign: 'center' }}>
+                {t('reset_password_confirm.request_new_link')}
+              </Text>
+            </GlassView>
+          )}
+        </Pressable>
       )}
-      <Button size="$4" theme="blue" onPress={callback.backToLogin}>
-        <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
-          {t('auth.back_to_login')}
-        </Text>
-      </Button>
+      <Pressable
+        accessibilityRole="button"
+        onPress={callback.backToLogin}
+      >
+        {({ pressed }) => (
+          <GlassView
+            colorScheme={colorScheme}
+            glassEffectStyle="clear"
+            style={{
+              minHeight: 48,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 18,
+              paddingHorizontal: 16,
+              paddingVertical: 10,
+              opacity: pressed ? 0.82 : 1,
+            }}
+          >
+            <Text style={{ color: ios.primary, fontWeight: '800', textAlign: 'center' }}>
+              {t('auth.back_to_login')}
+            </Text>
+          </GlassView>
+        )}
+      </Pressable>
     </YStack>
   );
 }
