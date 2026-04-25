@@ -1,9 +1,10 @@
-import { Image } from 'react-native';
+import { Image, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
-import { Button, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import type { AcceptInviteSummaryProps } from '@meditime/types';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 export function AcceptInviteSummary({
   invitation,
@@ -12,34 +13,35 @@ export function AcceptInviteSummary({
   onReject,
 }: AcceptInviteSummaryProps) {
   const { t } = useTranslation();
+  const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
   const ownerName = invitation.owner_display_name || invitation.owner_email;
   const hasOwnerPhoto = Boolean(invitation.owner_photo_url);
 
   return (
-    <YStack
+    <GlassView
+      colorScheme={colorScheme}
+      glassEffectStyle="clear"
       style={{
         gap: 18,
-        padding: 16,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: ios.border,
-        backgroundColor: ios.card,
+        padding: 8,
+        borderRadius: 24,
       }}
     >
       <YStack style={{ alignItems: 'center', gap: 10 }}>
-        <YStack
+        <GlassView
+          colorScheme={colorScheme}
+          glassEffectStyle="clear"
           style={{
             width: 56,
             height: 56,
             alignItems: 'center',
             justifyContent: 'center',
-            borderRadius: 8,
-            backgroundColor: ios.blueInfoBg,
+            borderRadius: 18,
           }}
         >
           <Ionicons name="mail-outline" size={28} color={ios.primary} />
-        </YStack>
+        </GlassView>
 
         <Text style={{ color: ios.foreground, fontSize: 24, lineHeight: 30, fontWeight: '900' }}>
           {t('invitation.title')}
@@ -47,15 +49,14 @@ export function AcceptInviteSummary({
       </YStack>
 
       <YStack style={{ gap: 12 }}>
-        <YStack
+        <GlassView
+          colorScheme={colorScheme}
+          glassEffectStyle="clear"
           style={{
             flex: 1,
             gap: 10,
             padding: 14,
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: ios.border,
-            backgroundColor: ios.background,
+            borderRadius: 18,
           }}
         >
           <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16, fontWeight: '800' }}>
@@ -67,17 +68,16 @@ export function AcceptInviteSummary({
               {invitation.calendar_name}
             </Text>
           </XStack>
-        </YStack>
+        </GlassView>
 
-        <YStack
+        <GlassView
+          colorScheme={colorScheme}
+          glassEffectStyle="clear"
           style={{
             flex: 1,
             gap: 10,
             padding: 14,
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: ios.border,
-            backgroundColor: ios.background,
+            borderRadius: 18,
           }}
         >
           <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16, fontWeight: '800' }}>
@@ -91,22 +91,22 @@ export function AcceptInviteSummary({
                   width: 36,
                   height: 36,
                   borderRadius: 18,
-                  backgroundColor: ios.blueInfoBg,
                 }}
               />
             ) : (
-              <YStack
+              <GlassView
+                colorScheme={colorScheme}
+                glassEffectStyle="clear"
                 style={{
                   width: 36,
                   height: 36,
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderRadius: 18,
-                  backgroundColor: ios.blueInfoBg,
                 }}
               >
                 <Ionicons name="person-outline" size={17} color={ios.primary} />
-              </YStack>
+              </GlassView>
             )}
             <YStack style={{ flex: 1 }}>
               <Text style={{ color: ios.foreground, fontSize: 15, lineHeight: 20, fontWeight: '800' }}>
@@ -117,46 +117,70 @@ export function AcceptInviteSummary({
               </Text>
             </YStack>
           </XStack>
-        </YStack>
+        </GlassView>
       </YStack>
 
       <XStack style={{ gap: 10 }}>
-        <Button
-          flex={1}
+        <Pressable
+          accessibilityRole="button"
           onPress={onAccept}
           disabled={loading}
-          style={{
-            minHeight: 46,
-            borderRadius: 8,
-            backgroundColor: ios.primary,
-          }}
+          style={{ flex: 1 }}
         >
-          <XStack style={{ alignItems: 'center', gap: 8 }}>
-            <Ionicons name="checkmark-outline" size={18} color={ios.primaryForeground} />
-            <Text style={{ color: ios.primaryForeground, fontWeight: '900' }}>
-              {t('accept')}
-            </Text>
-          </XStack>
-        </Button>
+          {({ pressed }) => (
+            <GlassView
+              colorScheme={colorScheme}
+              glassEffectStyle="clear"
+              style={{
+                minHeight: 46,
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 18,
+                paddingHorizontal: 12,
+                opacity: loading ? 0.5 : pressed ? 0.82 : 1,
+              }}
+            >
+              <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <Ionicons name="checkmark-outline" size={18} color={ios.primary} />
+                <Text style={{ color: ios.primary, fontWeight: '900' }}>
+                  {t('accept')}
+                </Text>
+              </XStack>
+            </GlassView>
+          )}
+        </Pressable>
 
-        <Button
-          flex={1}
+        <Pressable
+          accessibilityRole="button"
           onPress={onReject}
           disabled={loading}
-          style={{
-            minHeight: 46,
-            borderRadius: 8,
-            backgroundColor: ios.destructiveBg,
-          }}
+          style={{ flex: 1 }}
         >
-          <XStack style={{ alignItems: 'center', gap: 8 }}>
-            <Ionicons name="close-outline" size={18} color={ios.destructive} />
-            <Text style={{ color: ios.destructive, fontWeight: '900' }}>
-              {t('reject')}
-            </Text>
-          </XStack>
-        </Button>
+          {({ pressed }) => (
+            <GlassView
+              colorScheme={colorScheme}
+              glassEffectStyle="clear"
+              style={{
+                minHeight: 46,
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 18,
+                paddingHorizontal: 12,
+                opacity: loading ? 0.5 : pressed ? 0.82 : 1,
+              }}
+            >
+              <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <Ionicons name="close-outline" size={18} color={ios.destructive} />
+                <Text style={{ color: ios.destructive, fontWeight: '900' }}>
+                  {t('reject')}
+                </Text>
+              </XStack>
+            </GlassView>
+          )}
+        </Pressable>
       </XStack>
-    </YStack>
+    </GlassView>
   );
 }
