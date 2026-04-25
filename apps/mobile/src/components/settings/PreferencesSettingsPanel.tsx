@@ -1,5 +1,6 @@
 import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
@@ -69,48 +70,58 @@ export function PreferencesSettingsPanel({
                 onPress={() => onLanguageChange(item.code)}
               >
                 {({ pressed }) => (
-                  <XStack
+                  <GlassView
+                    colorScheme={colorScheme}
+                    glassEffectStyle="clear"
                     style={{
                       minHeight: 42,
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      borderRadius: 18,
                       paddingHorizontal: 12,
-                      borderRadius: 8,
-                      borderWidth: 1,
-                      borderColor: active ? ios.primary : ios.border,
-                      backgroundColor: active ? ios.blueInfoBg : ios.background,
+                      paddingVertical: 8,
                       opacity: pressed ? 0.75 : 1,
                     }}
                   >
-                    <XStack style={{ alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
-                      <YStack
-                        style={{
-                          minWidth: 36,
-                          minHeight: 28,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          paddingHorizontal: 8,
-                          borderRadius: 8,
-                          backgroundColor: ios.card,
-                          borderWidth: 1,
-                          borderColor: ios.border,
-                        }}
-                      >
-                        <Text style={{ color: ios.foreground, fontSize: 18, lineHeight: 22, fontWeight: '800' }}>
-                          {flag}
+                    <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                      <XStack style={{ alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+                        <GlassView
+                          colorScheme={colorScheme}
+                          glassEffectStyle="clear"
+                          style={{
+                            minWidth: 36,
+                            minHeight: 28,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            paddingHorizontal: 8,
+                            borderRadius: 14,
+                          }}
+                        >
+                          <Text style={{ color: ios.foreground, fontSize: 18, lineHeight: 22, fontWeight: '800' }}>
+                            {flag}
+                          </Text>
+                        </GlassView>
+                        <Text
+                          numberOfLines={1}
+                          style={{ flex: 1, color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}
+                        >
+                          {item.label}
                         </Text>
-                      </YStack>
-                      <Text
-                        numberOfLines={1}
-                        style={{ flex: 1, color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}
-                      >
-                        {item.label}
-                      </Text>
+                      </XStack>
+                      {active ? (
+                        <Ionicons name="checkmark-circle-outline" size={18} color={ios.primary} />
+                      ) : (
+                        <Text
+                          style={{
+                            color: ios.mutedForeground,
+                            fontSize: 12,
+                            lineHeight: 18,
+                            fontWeight: '800',
+                          }}
+                        >
+                          {item.code.toUpperCase()}
+                        </Text>
+                      )}
                     </XStack>
-                    <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 18, fontWeight: '800' }}>
-                      {item.code.toUpperCase()}
-                    </Text>
-                  </XStack>
+                  </GlassView>
                 )}
               </Pressable>
             );

@@ -1,12 +1,13 @@
 import { useRef, type ElementRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, Text, XStack, YStack } from 'tamagui';
 import type { MobileSecuritySettingsProps } from '@meditime/types';
 import { PasswordInput } from '../auth';
 import { MobileForm } from '../common/MobileForm';
 import { SettingsPanelSection } from './SettingsPanelSection';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 export function SecuritySettingsPanel({
   email,
@@ -28,6 +29,7 @@ export function SecuritySettingsPanel({
   onConnectProvider,
 }: MobileSecuritySettingsProps<keyof typeof Ionicons.glyphMap>) {
   const { t } = useTranslation();
+  const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
   const oldPasswordInputRef = useRef<ElementRef<typeof Input>>(null);
   const newPasswordInputRef = useRef<ElementRef<typeof Input>>(null);
@@ -82,68 +84,67 @@ export function SecuritySettingsPanel({
                 const isConnecting = connectingProvider === provider.id;
 
                 return (
-                  <XStack
+                  <GlassView
                     key={provider.id}
+                    colorScheme={colorScheme}
+                    glassEffectStyle="clear"
                     style={{
-                      alignItems: 'center',
-                      gap: 12,
                       padding: 12,
-                      borderWidth: 1,
-                      borderColor: ios.border,
-                      borderRadius: 8,
-                      backgroundColor: ios.background,
+                      borderRadius: 18,
                     }}
                   >
-                    <YStack
-                      style={{
-                        width: 36,
-                        height: 36,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: 8,
-                        borderWidth: 1,
-                        borderColor: ios.border,
-                        backgroundColor: ios.card,
-                      }}
-                    >
-                      <Ionicons name={provider.iconName} size={20} color={provider.color} />
-                    </YStack>
-                    <Text
-                      numberOfLines={1}
-                      style={{ flex: 1, color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}
-                    >
-                      {provider.name}
-                    </Text>
-
-                    {isLinked ? (
-                      <XStack
+                    <XStack style={{ alignItems: 'center', gap: 12 }}>
+                      <GlassView
+                        colorScheme={colorScheme}
+                        glassEffectStyle="clear"
                         style={{
+                          width: 36,
+                          height: 36,
                           alignItems: 'center',
-                          gap: 5,
-                          paddingHorizontal: 9,
-                          paddingVertical: 6,
-                          borderRadius: 8,
-                          backgroundColor: ios.successBg,
+                          justifyContent: 'center',
+                          borderRadius: 18,
                         }}
                       >
-                        <Ionicons name="checkmark-circle-outline" size={15} color={ios.success} />
-                        <Text style={{ color: ios.success, fontSize: 12, fontWeight: '900' }}>
-                          {t('security.providers.connected')}
-                        </Text>
-                      </XStack>
-                    ) : (
-                      <Button
-                        size="$3"
-                        disabled={Boolean(connectingProvider)}
-                        opacity={isConnecting ? 0.7 : 1}
-                        onPress={() => onConnectProvider(provider.id)}
+                        <Ionicons name={provider.iconName} size={20} color={provider.color} />
+                      </GlassView>
+                      <Text
+                        numberOfLines={1}
+                        style={{ flex: 1, color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}
                       >
-                        <Text style={{ color: ios.primary, fontSize: 12, fontWeight: '900' }}>
-                          {isConnecting ? t('security.providers.connecting') : t('security.providers.connect')}
-                        </Text>
-                      </Button>
-                    )}
-                  </XStack>
+                        {provider.name}
+                      </Text>
+
+                      {isLinked ? (
+                        <GlassView
+                          colorScheme={colorScheme}
+                          glassEffectStyle="clear"
+                          style={{
+                            borderRadius: 16,
+                            paddingHorizontal: 9,
+                            paddingVertical: 6,
+                          }}
+                        >
+                          <XStack style={{ alignItems: 'center', gap: 5 }}>
+                            <Ionicons name="checkmark-circle-outline" size={15} color={ios.success} />
+                            <Text style={{ color: ios.success, fontSize: 12, fontWeight: '900' }}>
+                              {t('security.providers.connected')}
+                            </Text>
+                          </XStack>
+                        </GlassView>
+                      ) : (
+                        <Button
+                          size="$3"
+                          disabled={Boolean(connectingProvider)}
+                          opacity={isConnecting ? 0.7 : 1}
+                          onPress={() => onConnectProvider(provider.id)}
+                        >
+                          <Text style={{ color: ios.primary, fontSize: 12, fontWeight: '900' }}>
+                            {isConnecting ? t('security.providers.connecting') : t('security.providers.connect')}
+                          </Text>
+                        </Button>
+                      )}
+                    </XStack>
+                  </GlassView>
                 );
               })}
             </YStack>

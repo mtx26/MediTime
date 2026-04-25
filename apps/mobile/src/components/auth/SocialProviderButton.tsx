@@ -1,8 +1,9 @@
 import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { Text, YStack } from 'tamagui';
 import type { SocialProviderButtonProps } from '@meditime/types';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 export function SocialProviderButton({
   label,
@@ -11,6 +12,7 @@ export function SocialProviderButton({
   disabled = false,
   onPress,
 }: SocialProviderButtonProps<keyof typeof Ionicons.glyphMap>) {
+  const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
 
   return (
@@ -23,20 +25,19 @@ export function SocialProviderButton({
     >
       {({ pressed }) => (
         <YStack style={{ alignItems: 'center', gap: 6, opacity: disabled ? 0.55 : pressed ? 0.72 : 1 }}>
-          <YStack
+          <GlassView
+            colorScheme={colorScheme}
+            glassEffectStyle="clear"
             style={{
               width: 48,
               height: 48,
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: 8,
-              borderWidth: 1,
-              borderColor: ios.border,
-              backgroundColor: ios.card,
+              borderRadius: 18,
             }}
           >
             <Ionicons name={iconName} size={26} color={color} />
-          </YStack>
+          </GlassView>
           <Text
             numberOfLines={1}
             style={{

@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { Text, XStack } from 'tamagui';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 type InfoBannerProps = {
   iconName: keyof typeof Ionicons.glyphMap;
@@ -9,37 +10,37 @@ type InfoBannerProps = {
 };
 
 export function InfoBanner({ iconName, text, tone = 'info' }: InfoBannerProps) {
+  const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
   const isInfo = tone === 'info';
 
   return (
-    <XStack
+    <GlassView
+      colorScheme={colorScheme}
+      glassEffectStyle="clear"
       style={{
-        alignItems: 'center',
-        gap: 10,
+        borderRadius: 18,
         padding: 12,
-        borderRadius: 14,
-        borderWidth: 1,
-        borderColor: isInfo ? ios.blueInfoBorder : ios.border,
-        backgroundColor: isInfo ? ios.blueInfoBg : ios.warningBg,
       }}
     >
-      <Ionicons
-        name={iconName}
-        size={20}
-        color={isInfo ? ios.blueText : ios.warningText}
-      />
-      <Text
-        style={{
-          flex: 1,
-          color: ios.foreground,
-          fontSize: 14,
-          lineHeight: 20,
-          fontWeight: '500',
-        }}
-      >
-        {text}
-      </Text>
-    </XStack>
+      <XStack style={{ alignItems: 'center', gap: 10 }}>
+        <Ionicons
+          name={iconName}
+          size={20}
+          color={isInfo ? ios.blueText : ios.warningText}
+        />
+        <Text
+          style={{
+            flex: 1,
+            color: ios.foreground,
+            fontSize: 14,
+            lineHeight: 20,
+            fontWeight: '500',
+          }}
+        >
+          {text}
+        </Text>
+      </XStack>
+    </GlassView>
   );
 }

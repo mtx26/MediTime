@@ -1,11 +1,12 @@
 import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import { STOCK_DECREMENT_METHODS } from '@meditime/constants';
 import type { MobileCalendarStockSettingsProps, StockDecrementMethod } from '@meditime/types';
 import { SettingsPanelSection } from '../settings';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 type StockOption = {
   id: StockDecrementMethod;
@@ -19,6 +20,7 @@ export function CalendarStockSettingsPanel({
   onSelectMethod,
 }: MobileCalendarStockSettingsProps) {
   const { t } = useTranslation();
+  const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
 
   const options: StockOption[] = [
@@ -54,37 +56,32 @@ export function CalendarStockSettingsPanel({
               accessibilityState={{ checked: selected, disabled: isSaving }}
             >
               {({ pressed }) => (
-                <XStack
+                <GlassView
+                  colorScheme={colorScheme}
+                  glassEffectStyle="clear"
                   style={{
-                    alignItems: 'flex-start',
-                    gap: 12,
+                    borderRadius: 18,
                     paddingHorizontal: 12,
                     paddingVertical: 12,
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: selected ? ios.primary : ios.border,
-                    backgroundColor: selected
-                      ? ios.blueInfoBg
-                      : pressed
-                        ? ios.accentHover
-                        : ios.background,
                     opacity: isSaving ? 0.65 : 1,
                   }}
                 >
-                  <Ionicons
-                    name={selected ? 'radio-button-on' : 'radio-button-off'}
-                    size={20}
-                    color={selected ? ios.primary : ios.mutedForeground}
-                  />
-                  <YStack style={{ flex: 1, gap: 4 }}>
-                    <Text style={{ color: ios.foreground, fontSize: 15, lineHeight: 21, fontWeight: '800' }}>
-                      {option.label}
-                    </Text>
-                    <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 18 }}>
-                      {option.description}
-                    </Text>
-                  </YStack>
-                </XStack>
+                  <XStack style={{ alignItems: 'flex-start', gap: 12, opacity: pressed ? 0.75 : 1 }}>
+                    <Ionicons
+                      name={selected ? 'radio-button-on' : 'radio-button-off'}
+                      size={20}
+                      color={selected ? ios.primary : ios.mutedForeground}
+                    />
+                    <YStack style={{ flex: 1, gap: 4 }}>
+                      <Text style={{ color: ios.foreground, fontSize: 15, lineHeight: 21, fontWeight: '800' }}>
+                        {option.label}
+                      </Text>
+                      <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 18 }}>
+                        {option.description}
+                      </Text>
+                    </YStack>
+                  </XStack>
+                </GlassView>
               )}
             </Pressable>
           );
