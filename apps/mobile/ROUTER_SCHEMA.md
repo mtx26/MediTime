@@ -4,7 +4,7 @@ Legend:
 
 apps/mobile/app
   ✅ _layout.tsx
-  ✅ index.tsx
+  ✅🪟 index.tsx
   ✅🪟 +not-found.tsx
 
   (auth)
