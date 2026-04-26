@@ -1209,5 +1209,9 @@
     "tablets": "comprimé(s)",
     "total": "Total à réajouter"
   },
-  "unexpected_error": "unexpected error"
+  "unexpected_error": "unexpected error",
+  "edit": "編集",
+  "loading_stock_alerts": "在庫アラートを読み込んでいます",
+  "tablet": "錠剤",
+  "tablets": "錠剤"
 }

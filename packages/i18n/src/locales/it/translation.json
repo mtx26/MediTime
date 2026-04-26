@@ -1179,7 +1179,7 @@
   "confirm_calendar_refill": "Verificare che il portapillole sia pieno",
   "pillbox_refill_description": "Il portapillole si riempirà con eventuali farmaci mancanti (scorte negative) per questa settimana. Questa azione è irreversibile.",
   "error": "errore",
-  "notifications": "notifiche",
+  "notifications": "Notifiche",
   "missed_intakes": {
     "affected_meds": "Médicaments concernés",
     "apply": "Appliquer",
@@ -1209,5 +1209,9 @@
     "tablets": "comprimé(s)",
     "total": "Total à réajouter"
   },
-  "unexpected_error": "unexpected error"
+  "unexpected_error": "unexpected error",
+  "edit": "modificare",
+  "loading_stock_alerts": "caricamento avvisi di magazzino",
+  "tablet": "tablet",
+  "tablets": "compresse"
 }

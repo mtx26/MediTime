@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable } from 'react-native';
+import { Animated, Easing, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack, YStack } from 'tamagui';
 import { getWeekDates, toISO } from '@meditime/utils';
@@ -44,6 +44,11 @@ export function IosWeekCalendar({
 }: IosWeekCalendarProps) {
   const ios = useIosTheme();
   const selectedIso = toISO(selectedDate);
+  const monthAnimation = React.useRef(new Animated.Value(1)).current;
+  const didMount = React.useRef(false);
+  const transitionDirection = React.useRef(1);
+  const previousMonthIndex = React.useRef(monthDate.getFullYear() * 12 + monthDate.getMonth());
+  const monthKey = `${monthDate.getFullYear()}-${monthDate.getMonth()}`;
   const monthWeeks = React.useMemo(() => buildMonthWeeks(monthDate), [monthDate]);
   const monthLabel = React.useMemo(
     () => monthDate.toLocaleDateString(locale, { month: 'long', year: 'numeric' }),
@@ -60,6 +65,44 @@ export function IosWeekCalendar({
       ),
     [locale],
   );
+
+  React.useEffect(() => {
+    const currentMonthIndex = monthDate.getFullYear() * 12 + monthDate.getMonth();
+
+    if (!didMount.current) {
+      didMount.current = true;
+      previousMonthIndex.current = currentMonthIndex;
+      return;
+    }
+
+    if (currentMonthIndex !== previousMonthIndex.current) {
+      transitionDirection.current = currentMonthIndex > previousMonthIndex.current ? 1 : -1;
+      previousMonthIndex.current = currentMonthIndex;
+    }
+
+    monthAnimation.setValue(0);
+    Animated.timing(monthAnimation, {
+      toValue: 1,
+      duration: 280,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [monthAnimation, monthDate, monthKey]);
+
+  const animatedMonthStyle = {
+    opacity: monthAnimation.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.72, 1],
+    }),
+    transform: [
+      {
+        translateX: monthAnimation.interpolate({
+          inputRange: [0, 1],
+          outputRange: [transitionDirection.current * 26, 0],
+        }),
+      },
+    ],
+  };
 
   return (
     <YStack
@@ -84,7 +127,13 @@ export function IosWeekCalendar({
         </Text>
 
         <XStack style={{ alignItems: 'center', gap: 12 }}>
-          <Pressable onPress={() => onMonthChange(-1)} accessibilityRole="button">
+          <Pressable
+            onPress={() => {
+              transitionDirection.current = -1;
+              onMonthChange(-1);
+            }}
+            accessibilityRole="button"
+          >
             <YStack
               style={{
                 width: 32,
@@ -97,7 +146,13 @@ export function IosWeekCalendar({
             </YStack>
           </Pressable>
 
-          <Pressable onPress={() => onMonthChange(1)} accessibilityRole="button">
+          <Pressable
+            onPress={() => {
+              transitionDirection.current = 1;
+              onMonthChange(1);
+            }}
+            accessibilityRole="button"
+          >
             <YStack
               style={{
                 width: 32,
@@ -112,86 +167,88 @@ export function IosWeekCalendar({
         </XStack>
       </XStack>
 
-      <XStack style={{ justifyContent: 'space-between', paddingHorizontal: 2 }}>
-        {weekdayLabels.map((label) => (
-          <Text
-            key={label}
-            style={{
-              width: 44,
-              color: ios.mutedForeground,
-              fontSize: 10,
-              lineHeight: 12,
-              fontWeight: '600',
-              textAlign: 'center',
-            }}
-          >
-            {label}
-          </Text>
-        ))}
-      </XStack>
+      <Animated.View style={animatedMonthStyle}>
+        <XStack style={{ justifyContent: 'space-between', paddingHorizontal: 2 }}>
+          {weekdayLabels.map((label) => (
+            <Text
+              key={label}
+              style={{
+                width: 44,
+                color: ios.mutedForeground,
+                fontSize: 10,
+                lineHeight: 12,
+                fontWeight: '600',
+                textAlign: 'center',
+              }}
+            >
+              {label}
+            </Text>
+          ))}
+        </XStack>
 
-      <YStack style={{ gap: 2 }}>
-        {monthWeeks.map((weekDates) => (
-          <XStack key={toISO(weekDates[0])} style={{ justifyContent: 'space-between', gap: 0 }}>
-            {weekDates.map((date, index) => {
-              const iso = toISO(date);
-              const isSelectedDate = iso === selectedIso;
-              const isToday = iso === todayIso;
-              const inSelectedWeek = selectedWeekIsos.has(iso);
-              const outsideMonth = date.getMonth() !== monthDate.getMonth();
-              const isWeekStart = index === 0;
-              const isWeekEnd = index === 6;
+        <YStack style={{ gap: 2, marginTop: 14 }}>
+          {monthWeeks.map((weekDates) => (
+            <XStack key={toISO(weekDates[0])} style={{ justifyContent: 'space-between', gap: 0 }}>
+              {weekDates.map((date, index) => {
+                const iso = toISO(date);
+                const isSelectedDate = iso === selectedIso;
+                const isToday = iso === todayIso;
+                const inSelectedWeek = selectedWeekIsos.has(iso);
+                const outsideMonth = date.getMonth() !== monthDate.getMonth();
+                const isWeekStart = index === 0;
+                const isWeekEnd = index === 6;
 
-              return (
-                <Pressable key={iso} onPress={() => onSelectDate(date)} accessibilityRole="button">
-                  <YStack
-                    style={{
-                      width: 44,
-                      height: 44,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderTopLeftRadius: inSelectedWeek && isWeekStart ? 18 : 0,
-                      borderBottomLeftRadius: inSelectedWeek && isWeekStart ? 18 : 0,
-                      borderTopRightRadius: inSelectedWeek && isWeekEnd ? 18 : 0,
-                      borderBottomRightRadius: inSelectedWeek && isWeekEnd ? 18 : 0,
-                      backgroundColor: inSelectedWeek ? ios.accentHover : 'transparent',
-                    }}
-                  >
+                return (
+                  <Pressable key={iso} onPress={() => onSelectDate(date)} accessibilityRole="button">
                     <YStack
                       style={{
-                        width: 36,
-                        height: 36,
+                        width: 44,
+                        height: 44,
                         alignItems: 'center',
                         justifyContent: 'center',
-                        borderRadius: 18,
-                        backgroundColor: isSelectedDate ? ios.blueInfoBg : 'transparent',
+                        borderTopLeftRadius: inSelectedWeek && isWeekStart ? 18 : 0,
+                        borderBottomLeftRadius: inSelectedWeek && isWeekStart ? 18 : 0,
+                        borderTopRightRadius: inSelectedWeek && isWeekEnd ? 18 : 0,
+                        borderBottomRightRadius: inSelectedWeek && isWeekEnd ? 18 : 0,
+                        backgroundColor: inSelectedWeek ? ios.accentHover : 'transparent',
                       }}
                     >
-                      <Text
+                      <YStack
                         style={{
-                          color: isSelectedDate
-                            ? ios.primary
-                            : isToday
-                              ? ios.primary
-                            : outsideMonth
-                              ? ios.mutedForeground
-                              : ios.foreground,
-                          opacity: outsideMonth && !isSelectedDate ? 0.35 : 1,
-                          fontSize: 18,
-                          lineHeight: 22,
-                          fontWeight: isSelectedDate ? '700' : '400',
+                          width: 36,
+                          height: 36,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 18,
+                          backgroundColor: isSelectedDate ? ios.blueInfoBg : 'transparent',
                         }}
                       >
-                        {date.getDate()}
-                      </Text>
+                        <Text
+                          style={{
+                            color: isSelectedDate
+                              ? ios.primary
+                              : isToday
+                                ? ios.primary
+                              : outsideMonth
+                                ? ios.mutedForeground
+                                : ios.foreground,
+                            opacity: outsideMonth && !isSelectedDate ? 0.35 : 1,
+                            fontSize: 18,
+                            lineHeight: 22,
+                            fontWeight: isSelectedDate ? '700' : '400',
+                          }}
+                        >
+                          {date.getDate()}
+                        </Text>
+                      </YStack>
                     </YStack>
-                  </YStack>
-                </Pressable>
-              );
-            })}
-          </XStack>
-        ))}
-      </YStack>
+                  </Pressable>
+                );
+              })}
+            </XStack>
+          ))}
+        </YStack>
+      </Animated.View>
     </YStack>
   );
 }

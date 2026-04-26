@@ -90,27 +90,27 @@ export function SecuritySettingsPanel({
                     colorScheme={colorScheme}
                     glassEffectStyle="clear"
                     style={{
-                      padding: 12,
-                      borderRadius: 18,
+                      padding: 9,
+                      borderRadius: 16,
                     }}
                   >
-                    <XStack style={{ alignItems: 'center', gap: 12 }}>
+                    <XStack style={{ alignItems: 'center', gap: 9 }}>
                       <GlassView
                         colorScheme={colorScheme}
                         glassEffectStyle="clear"
                         style={{
-                          width: 36,
-                          height: 36,
+                          width: 30,
+                          height: 30,
                           alignItems: 'center',
                           justifyContent: 'center',
-                          borderRadius: 18,
+                          borderRadius: 15,
                         }}
                       >
-                        <Ionicons name={provider.iconName} size={20} color={provider.color} />
+                        <Ionicons name={provider.iconName} size={17} color={provider.color} />
                       </GlassView>
                       <Text
                         numberOfLines={1}
-                        style={{ flex: 1, color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}
+                        style={{ flex: 1, color: ios.foreground, fontSize: 13, lineHeight: 18, fontWeight: '800' }}
                       >
                         {provider.name}
                       </Text>
@@ -120,14 +120,14 @@ export function SecuritySettingsPanel({
                           colorScheme={colorScheme}
                           glassEffectStyle="clear"
                           style={{
-                            borderRadius: 16,
-                            paddingHorizontal: 9,
-                            paddingVertical: 6,
+                            borderRadius: 14,
+                            paddingHorizontal: 8,
+                            paddingVertical: 5,
                           }}
                         >
-                          <XStack style={{ alignItems: 'center', gap: 5 }}>
-                            <Ionicons name="checkmark-circle-outline" size={15} color={ios.success} />
-                            <Text style={{ color: ios.success, fontSize: 12, fontWeight: '900' }}>
+                          <XStack style={{ alignItems: 'center', gap: 4 }}>
+                            <Ionicons name="checkmark-circle-outline" size={13} color={ios.success} />
+                            <Text style={{ color: ios.success, fontSize: 11, fontWeight: '900' }}>
                               {t('security.providers.connected')}
                             </Text>
                           </XStack>
@@ -138,6 +138,7 @@ export function SecuritySettingsPanel({
                           loading={isConnecting}
                           label={isConnecting ? t('security.providers.connecting') : t('security.providers.connect')}
                           onPress={() => onConnectProvider(provider.id)}
+                          size="sm"
                         />
                       )}
                     </XStack>

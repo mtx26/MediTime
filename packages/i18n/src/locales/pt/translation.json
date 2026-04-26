@@ -1179,7 +1179,7 @@
   "confirm_calendar_refill": "Confirme se o porta-comprimidos está cheio.",
   "pillbox_refill_description": "O organizador de comprimidos será reabastecido com qualquer medicamento em falta (estoque negativo) desta semana. Esta ação é irreversível.",
   "error": "erro",
-  "notifications": "notificações",
+  "notifications": "Notificações",
   "missed_intakes": {
     "affected_meds": "Médicaments concernés",
     "apply": "Appliquer",
@@ -1209,5 +1209,9 @@
     "tablets": "comprimé(s)",
     "total": "Total à réajouter"
   },
-  "unexpected_error": "unexpected error"
+  "unexpected_error": "unexpected error",
+  "edit": "editar",
+  "loading_stock_alerts": "Carregando alertas de estoque",
+  "tablet": "comprimido",
+  "tablets": "comprimidos"
 }

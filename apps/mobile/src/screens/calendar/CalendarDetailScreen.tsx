@@ -1,6 +1,7 @@
 import { Pressable, RefreshControl } from 'react-native';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import type { CalendarDetailMode, CalendarDetailSourceType } from '@meditime/types';
@@ -10,12 +11,11 @@ import { MobileCalendarWeekSelector } from '../../components/calendar/MobileCale
 import { MobileWeeklyEventContent } from '../../components/calendar/MobileWeeklyEventContent';
 import { PdfDialog } from '../../components/calendar/PdfDialog';
 import ActionSheet from '../../components/common/ActionSheet';
-import { GlassSurface } from '../../components/common/GlassSurface';
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { Page, usePageHeaderOptions } from '../../components/common/Page';
 import { useCalendarDetail } from '../../hooks/calendar';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 type MobileCalendarDetailSourceType = Exclude<CalendarDetailSourceType, 'token'>;
 
@@ -30,6 +30,7 @@ export default function CalendarDetailScreen({
 }: CalendarDetailScreenProps) {
   const { t } = useTranslation();
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
   const detail = useCalendarDetail(sourceType, mode);
   const isDailyRoute = mode === 'daily';
 
@@ -92,23 +93,24 @@ export default function CalendarDetailScreen({
             accessibilityLabel={String(t('medicines.label'))}
           >
             {({ pressed }) => (
-              <GlassSurface
+              <GlassView
+                colorScheme={colorScheme}
                 glassEffectStyle="clear"
                 style={{
                   minHeight: 48,
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderRadius: 14,
-                  borderColor: pressed ? ios.primary : ios.border,
                   paddingHorizontal: 14,
                   paddingVertical: 12,
+                  opacity: pressed ? 0.84 : 1,
                 }}
               >
                 <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                   <Ionicons name="medkit-outline" size={18} color={ios.primary} />
                   <Text style={{ color: ios.foreground, fontWeight: '800' }}>{t('medicines.label')}</Text>
                 </XStack>
-              </GlassSurface>
+              </GlassView>
             )}
           </Pressable>
         )}
@@ -139,23 +141,24 @@ export default function CalendarDetailScreen({
               accessibilityLabel={String(t('pillbox.fill'))}
             >
               {({ pressed }) => (
-                <GlassSurface
+                <GlassView
+                  colorScheme={colorScheme}
                   glassEffectStyle="clear"
                   style={{
                     minHeight: 48,
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderRadius: 14,
-                    borderColor: pressed ? ios.foreground : ios.border,
                     paddingHorizontal: 14,
                     paddingVertical: 12,
+                    opacity: pressed ? 0.84 : 1,
                   }}
                 >
                   <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     <Ionicons name="grid-outline" size={18} color={ios.foreground} />
                     <Text style={{ color: ios.foreground, fontWeight: '900' }}>{t('pillbox.fill')}</Text>
                   </XStack>
-                </GlassSurface>
+                </GlassView>
               )}
             </Pressable>
           </YStack>

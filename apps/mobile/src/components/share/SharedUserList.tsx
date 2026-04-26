@@ -1,6 +1,5 @@
-import { Pressable, TextInput } from 'react-native';
+import { Pressable, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import type { SharedUserListProps } from '@meditime/types';
@@ -22,12 +21,13 @@ export function SharedUserList({
   const canInvite = emailToInvite.trim().length > 0;
 
   return (
-    <GlassView
-      colorScheme={colorScheme}
-      glassEffectStyle="clear"
+    <View
       style={{
         borderRadius: 24,
         padding: 8,
+        backgroundColor: ios.card,
+        borderWidth: 1,
+        borderColor: ios.border,
       }}
     >
       <YStack style={{ gap: 12, padding: 6 }}>
@@ -68,15 +68,14 @@ export function SharedUserList({
             gap: 8,
           }}
         >
-          <GlassView
-            colorScheme={colorScheme}
-            glassEffectStyle="clear"
+          <View
             style={{
               flex: 1,
               minHeight: 44,
               justifyContent: 'center',
               borderRadius: 18,
               paddingHorizontal: 12,
+              backgroundColor: ios.background,
             }}
           >
             <TextInput
@@ -101,19 +100,18 @@ export function SharedUserList({
                 color: ios.foreground,
               }}
             />
-          </GlassView>
+          </View>
 
           <Pressable onPress={onInvite} disabled={!canInvite} accessibilityRole="button">
             {({ pressed }) => (
-              <GlassView
-                colorScheme={colorScheme}
-                glassEffectStyle="clear"
+              <View
                 style={{
                   width: 44,
                   height: 44,
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderRadius: 18,
+                  backgroundColor: ios.background,
                   opacity: pressed ? 0.8 : canInvite ? 1 : 0.7,
                 }}
               >
@@ -122,11 +120,11 @@ export function SharedUserList({
                   size={18}
                   color={canInvite ? ios.primary : ios.mutedForeground}
                 />
-              </GlassView>
+              </View>
             )}
           </Pressable>
         </XStack>
       </YStack>
-    </GlassView>
+    </View>
   );
 }

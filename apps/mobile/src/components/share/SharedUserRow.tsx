@@ -1,9 +1,8 @@
-import { Image, Pressable } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { GlassView } from 'expo-glass-effect';
 import { Text, XStack, YStack } from 'tamagui';
 import type { SharedUserRowProps } from '@meditime/types';
-import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { useIosTheme } from '../../theme/ios';
 
 export function SharedUserRow({
   label,
@@ -11,19 +10,17 @@ export function SharedUserRow({
   status,
   onDelete,
 }: SharedUserRowProps) {
-  const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
   const hasPhoto = typeof photoUrl === 'string' && photoUrl.trim().length > 0;
 
   return (
-    <GlassView
-      colorScheme={colorScheme}
-      glassEffectStyle="clear"
+    <View
       style={{
         minHeight: 52,
         borderRadius: 18,
         paddingHorizontal: 12,
         paddingVertical: 10,
+        backgroundColor: ios.background,
       }}
     >
       <XStack style={{ alignItems: 'center', gap: 10 }}>
@@ -37,19 +34,18 @@ export function SharedUserRow({
             }}
           />
         ) : (
-          <GlassView
-            colorScheme={colorScheme}
-            glassEffectStyle="clear"
+          <View
             style={{
               width: 38,
               height: 38,
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: 19,
+              backgroundColor: ios.card,
             }}
           >
             <Ionicons name="person-outline" size={18} color={ios.primary} />
-          </GlassView>
+          </View>
         )}
 
         <YStack style={{ flex: 1, gap: 4 }}>
@@ -63,23 +59,22 @@ export function SharedUserRow({
 
         <Pressable onPress={onDelete} accessibilityRole="button">
           {({ pressed }) => (
-            <GlassView
-              colorScheme={colorScheme}
-              glassEffectStyle="clear"
+            <View
               style={{
                 width: 40,
                 height: 40,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 18,
+                backgroundColor: ios.card,
                 opacity: pressed ? 0.8 : 1,
               }}
             >
               <Ionicons name="trash-outline" size={16} color={ios.destructive} />
-            </GlassView>
+            </View>
           )}
         </Pressable>
       </XStack>
-    </GlassView>
+    </View>
   );
 }

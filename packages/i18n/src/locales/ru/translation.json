@@ -1179,7 +1179,7 @@
   "confirm_calendar_refill": "Убедитесь, что бункер заполнен.",
   "pillbox_refill_description": "В органайзер для таблеток будут внесены недостающие лекарства (отсутствующие запасы) на эту неделю. Это действие необратимо.",
   "error": "ошибка",
-  "notifications": "уведомления",
+  "notifications": "Уведомления",
   "missed_intakes": {
     "affected_meds": "Médicaments concernés",
     "apply": "Appliquer",
@@ -1209,5 +1209,9 @@
     "tablets": "comprimé(s)",
     "total": "Total à réajouter"
   },
-  "unexpected_error": "unexpected error"
+  "unexpected_error": "unexpected error",
+  "edit": "редактировать",
+  "loading_stock_alerts": "Загрузка уведомлений о наличии товара",
+  "tablet": "планшет",
+  "tablets": "таблетки"
 }

@@ -1209,5 +1209,9 @@
     "tablets": "comprimé(s)",
     "total": "Total à réajouter"
   },
-  "unexpected_error": "unexpected error"
+  "unexpected_error": "unexpected error",
+  "edit": "bearbeiten",
+  "loading_stock_alerts": "Laden von Aktienbenachrichtigungen",
+  "tablet": "Tablette",
+  "tablets": "Tabletten"
 }

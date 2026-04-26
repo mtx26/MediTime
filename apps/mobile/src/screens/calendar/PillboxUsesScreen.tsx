@@ -7,7 +7,7 @@ import { CalendarNotFoundState, PillboxUseRow } from '../../components/calendar'
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { OutlineButton } from '../../components/common/OutlineButton';
-import { Page, PageTitle, usePageHeaderOptions } from '../../components/common/Page';
+import { Page, usePageHeaderOptions } from '../../components/common/Page';
 import { usePillboxUses } from '../../hooks/calendar';
 import { useIosTheme } from '../../theme/ios';
 
@@ -59,8 +59,6 @@ export default function PillboxUsesScreen({ sourceType }: PillboxUsesScreenProps
       gap={14}
       withBottomTabInset
     >
-      <PageTitle iconName="time-outline" title={String(t('pillbox_uses'))} />
-
       {pillboxUses.error && (
         <YStack style={{ gap: 10 }}>
           <InfoBanner iconName="warning-outline" text={pillboxUses.error} tone="warning" />

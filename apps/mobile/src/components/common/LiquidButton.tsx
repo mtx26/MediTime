@@ -11,6 +11,7 @@ type LiquidButtonProps = {
   label: ReactNode;
   loading?: boolean;
   onPress: () => void;
+  size?: 'default' | 'sm';
   tone?: 'primary' | 'success' | 'plain';
 };
 
@@ -20,11 +21,13 @@ export function LiquidButton({
   label,
   loading = false,
   onPress,
+  size = 'default',
   tone = 'plain',
 }: LiquidButtonProps) {
   const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
   const contentColor = tone === 'success' ? ios.success : ios.primary;
+  const isSmall = size === 'sm';
 
   return (
     <Pressable
@@ -37,22 +40,22 @@ export function LiquidButton({
           colorScheme={colorScheme}
           glassEffectStyle="clear"
           style={{
-            minHeight: 48,
+            minHeight: isSmall ? 36 : 48,
             alignItems: 'center',
             justifyContent: 'center',
-            borderRadius: 18,
-            paddingHorizontal: 16,
-            paddingVertical: 10,
+            borderRadius: isSmall ? 14 : 18,
+            paddingHorizontal: isSmall ? 12 : 16,
+            paddingVertical: isSmall ? 7 : 10,
             opacity: disabled ? 0.5 : pressed ? 0.82 : 1,
           }}
         >
-          <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: isSmall ? 6 : 8 }}>
             {loading ? (
               <Spinner size="small" color={contentColor} />
             ) : iconName ? (
-              <Ionicons name={iconName} size={18} color={contentColor} />
+              <Ionicons name={iconName} size={isSmall ? 15 : 18} color={contentColor} />
             ) : null}
-            <Text style={{ color: contentColor, fontSize: 16, fontWeight: '900' }}>
+            <Text style={{ color: contentColor, fontSize: isSmall ? 13 : 16, fontWeight: '900' }}>
               {label}
             </Text>
           </XStack>

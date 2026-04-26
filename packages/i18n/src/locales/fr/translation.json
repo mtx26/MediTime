@@ -40,7 +40,7 @@
       "title": "Photo de profil"
     },
     "profile_updated": "Profil mis à jour avec succès",
-    "save_changes": "Enregistrer les modifications"
+    "save_changes": "Enregistrer"
   },
   "accounts": "Comptes",
   "actions": "Actions",
@@ -1208,6 +1208,10 @@
   },
   "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier.",
   "error": "error",
-  "notifications": "notifications",
-  "unexpected_error": "unexpected error"
+  "notifications": "Notifications",
+  "unexpected_error": "unexpected error",
+  "edit": "edit",
+  "loading_stock_alerts": "loading stock alerts",
+  "tablet": "tablet",
+  "tablets": "tablets"
 }

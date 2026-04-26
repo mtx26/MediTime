@@ -1209,5 +1209,9 @@
     "tablets": "comprimé(s)",
     "total": "Total à réajouter"
   },
-  "unexpected_error": "unexpected error"
+  "unexpected_error": "unexpected error",
+  "edit": "编辑",
+  "loading_stock_alerts": "加载库存警报",
+  "tablet": "药片",
+  "tablets": "片剂"
 }

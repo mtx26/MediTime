@@ -1,12 +1,13 @@
 import React from 'react';
 import { Platform, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import { calendarTableHasItems, getWeekDates, getWeekSelectionState, toISO } from '@meditime/utils';
 import type { CalendarTable } from '@meditime/types';
 import { GlassSurface } from '../common/GlassSurface';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 import { IosWeekCalendar } from './IosWeekCalendar';
 
 type MobileCalendarWeekSelectorProps = {
@@ -36,8 +37,9 @@ export function MobileCalendarWeekSelector({
   onWeekSelect,
   selectedDate,
 }: MobileCalendarWeekSelectorProps) {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const ios = useIosTheme();
+  const { colorScheme } = useAppTheme();
   const { weekDates, selectedDate: normalizedSelectedDate } = getWeekSelectionState(selectedDate);
   const selectedIso = toISO(normalizedSelectedDate);
   const todayIso = toISO(new Date());
@@ -98,17 +100,14 @@ export function MobileCalendarWeekSelector({
 
   if (Platform.OS === 'ios') {
     return (
-      <GlassSurface
+      <GlassView
+        colorScheme={colorScheme}
         glassEffectStyle="clear"
         style={{
-          gap: 10,
           padding: 12,
           borderRadius: 24,
         }}
       >
-        <Text style={{ color: ios.foreground, fontSize: 17, lineHeight: 22, fontWeight: '700' }}>
-          {t('calendar.reference_week')}
-        </Text>
         <IosWeekCalendar
           monthDate={monthDate}
           onMonthChange={shiftMonth}
@@ -118,7 +117,7 @@ export function MobileCalendarWeekSelector({
           locale={i18n.language}
           todayIso={todayIso}
         />
-      </GlassSurface>
+      </GlassView>
     );
   }
 

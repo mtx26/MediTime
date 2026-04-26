@@ -1179,7 +1179,7 @@
   "confirm_calendar_refill": "Confirme que el pastillero esté lleno",
   "pillbox_refill_description": "El pastillero se reabastecerá con cualquier medicamento faltante (stock negativo) para esta semana. Esta acción es irreversible.",
   "error": "error",
-  "notifications": "notificaciones",
+  "notifications": "Notificaciones",
   "missed_intakes": {
     "affected_meds": "Médicaments concernés",
     "apply": "Appliquer",
@@ -1209,5 +1209,9 @@
     "tablets": "comprimé(s)",
     "total": "Total à réajouter"
   },
-  "unexpected_error": "unexpected error"
+  "unexpected_error": "unexpected error",
+  "edit": "editar",
+  "loading_stock_alerts": "Cargando alertas de stock",
+  "tablet": "tableta",
+  "tablets": "tabletas"
 }

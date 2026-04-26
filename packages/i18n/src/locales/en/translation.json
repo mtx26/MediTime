@@ -1208,6 +1208,10 @@
   "confirm_calendar_refill": "Confirm that the pillbox is full",
   "pillbox_refill_description": "The pill organizer will refill with any missing medication (negative stock) for this week. This action is irreversible.",
   "error": "error",
-  "notifications": "notifications",
-  "unexpected_error": "unexpected error"
+  "notifications": "Notifications",
+  "unexpected_error": "unexpected error",
+  "edit": "edit",
+  "loading_stock_alerts": "loading stock alerts",
+  "tablet": "tablet",
+  "tablets": "tablets"
 }
