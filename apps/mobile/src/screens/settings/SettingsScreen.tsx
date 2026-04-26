@@ -1,7 +1,8 @@
 import { Redirect, Stack } from 'expo-router';
-import { RefreshControl } from 'react-native';
+import { Pressable, RefreshControl } from 'react-native';
+import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
-import { Button, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import { Ionicons } from '@expo/vector-icons';
 import { SETTINGS_TABS } from '@meditime/constants';
 import { usePageHeaderOptions } from '../../components/common/Page';
@@ -13,10 +14,11 @@ import {
   SettingsPageShell,
 } from '../../components/settings';
 import { useSettings } from '../../hooks/settings';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
+  const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
   const settings = useSettings();
   const headerOptions = usePageHeaderOptions({
@@ -54,14 +56,30 @@ export default function SettingsScreen() {
             borderTopColor: ios.border,
           }}
         >
-          <Button size="$4" onPress={settings.confirmLogout}>
-            <XStack style={{ alignItems: 'center', gap: 8 }}>
-              <Ionicons name="log-out-outline" size={18} color={ios.destructive} />
-              <Text style={{ color: ios.destructive, fontWeight: '800' }}>
-                {t('logout')}
-              </Text>
-            </XStack>
-          </Button>
+          <Pressable accessibilityRole="button" onPress={settings.confirmLogout}>
+            {({ pressed }) => (
+              <GlassView
+                colorScheme={colorScheme}
+                glassEffectStyle="clear"
+                style={{
+                  minHeight: 48,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 18,
+                  paddingHorizontal: 16,
+                  paddingVertical: 10,
+                  opacity: pressed ? 0.82 : 1,
+                }}
+              >
+                <XStack style={{ alignItems: 'center', gap: 8 }}>
+                  <Ionicons name="log-out-outline" size={18} color={ios.destructive} />
+                  <Text style={{ color: ios.destructive, fontWeight: '800' }}>
+                    {t('logout')}
+                  </Text>
+                </XStack>
+              </GlassView>
+            )}
+          </Pressable>
         </YStack>
       )}
     >

@@ -2,7 +2,8 @@ import { Modal, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { GlassView } from 'expo-glass-effect';
-import { Button, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
+import { LiquidButton } from '../common/LiquidButton';
 import { OutlineButton } from '../common/OutlineButton';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
 
@@ -70,21 +71,11 @@ export function PdfDialog({
 
               <XStack style={{ justifyContent: 'flex-end', gap: 8 }}>
                 <OutlineButton label={t('cancel')} onPress={onCancel} />
-                <Button
-                  size="$3"
+                <LiquidButton
+                  iconName="download-outline"
+                  label={t('boxes.export_pdf')}
                   onPress={onDownload}
-                  style={{
-                    minHeight: 40,
-                    paddingHorizontal: 16,
-                    borderRadius: 14,
-                    backgroundColor: ios.primary,
-                  }}
-                >
-                  <XStack style={{ alignItems: 'center', gap: 8 }}>
-                    <Ionicons name="download-outline" size={16} color={ios.primaryForeground} />
-                    <Text style={{ color: ios.primaryForeground, fontWeight: '700' }}>{t('boxes.export_pdf')}</Text>
-                  </XStack>
-                </Button>
+                />
               </XStack>
             </YStack>
           </GlassView>

@@ -247,7 +247,6 @@ export function BottomActionMenu({
                 const color = item.danger ? ios.destructive : ios.foreground;
                 const iconColor = item.danger ? ios.destructive : ios.primary;
                 const iconBackground = item.danger ? ios.destructiveBg : ios.blueInfoBg;
-
                 return (
                   <Pressable
                     key={`${label}-${index}`}

@@ -3,10 +3,11 @@ import { Image, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
-import { Button, H2, Input, ScrollView, Separator, Text, XStack, YStack } from 'tamagui';
+import { H2, Input, ScrollView, Separator, Text, XStack, YStack } from 'tamagui';
 import type { AuthScreenProps } from '@meditime/types';
 import { AuthModeToggle, PasswordInput, SocialProviderButton } from '../../components/auth';
 import { InfoBanner } from '../../components/common/InfoBanner';
+import { LiquidButton } from '../../components/common/LiquidButton';
 import { MobileForm } from '../../components/common/MobileForm';
 import { useAuthForm } from '../../hooks/auth/useAuthForm';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
@@ -29,18 +30,19 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
         style={{ justifyContent: 'center', padding: 20, backgroundColor: ios.background }}
       >
         <YStack style={{ alignItems: 'center', gap: 12 }}>
-          <YStack
+          <GlassView
+            colorScheme={colorScheme}
+            glassEffectStyle="clear"
             style={{
               width: 64,
               height: 64,
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: 32,
-              backgroundColor: ios.blueInfoBg,
             }}
           >
             <Ionicons name="mail-outline" size={34} color={ios.primary} />
-          </YStack>
+          </GlassView>
           <H2 style={{ textAlign: 'center', color: ios.foreground }}>
             {t('auth.verification_sent')}
           </H2>
@@ -48,11 +50,7 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
             {t('auth.check_email')}
           </Text>
         </YStack>
-        <Button size="$4" theme="blue" onPress={auth.goToLogin}>
-          <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
-            {t('auth.back_to_login')}
-          </Text>
-        </Button>
+        <LiquidButton label={t('auth.back_to_login')} onPress={auth.goToLogin} />
       </YStack>
     );
   }
@@ -86,14 +84,15 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
           >
             <YStack style={{ gap: 18, padding: 10 }}>
             <YStack style={{ alignItems: 'center', gap: 10 }}>
-              <YStack
+              <GlassView
+                colorScheme={colorScheme}
+                glassEffectStyle="clear"
                 style={{
                   width: 58,
                   height: 58,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  borderRadius: 8,
-                  backgroundColor: ios.blueInfoBg,
+                  borderRadius: 18,
                 }}
               >
                 <Image
@@ -101,7 +100,7 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
                   style={{ width: 48, height: 48 }}
                   resizeMode="contain"
                 />
-              </YStack>
+              </GlassView>
               <H2 style={{ textAlign: 'center', color: ios.foreground }}>
                 {t('app.shortName')}
               </H2>
@@ -203,11 +202,28 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
                   </YStack>
 
                   {isLogin && (
-                    <Button size="$3" chromeless style={{ alignSelf: 'flex-end' }} onPress={auth.goToResetPassword}>
-                      <Text style={{ color: ios.primary, fontSize: 13, fontWeight: '800' }}>
-                        {t('auth.forgot_password')}
-                      </Text>
-                    </Button>
+                    <Pressable
+                      accessibilityRole="button"
+                      onPress={auth.goToResetPassword}
+                      style={{ alignSelf: 'flex-end' }}
+                    >
+                      {({ pressed }) => (
+                        <GlassView
+                          colorScheme={colorScheme}
+                          glassEffectStyle="clear"
+                          style={{
+                            borderRadius: 18,
+                            paddingHorizontal: 12,
+                            paddingVertical: 8,
+                            opacity: pressed ? 0.75 : 1,
+                          }}
+                        >
+                          <Text style={{ color: ios.primary, fontSize: 13, fontWeight: '800' }}>
+                            {t('auth.forgot_password')}
+                          </Text>
+                        </GlassView>
+                      )}
+                    </Pressable>
                   )}
 
                   {!isLogin && (
@@ -218,22 +234,21 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
                     >
                       {({ pressed }) => (
                         <XStack style={{ alignItems: 'flex-start', gap: 10, opacity: pressed ? 0.75 : 1 }}>
-                          <YStack
+                          <GlassView
+                            colorScheme={colorScheme}
+                            glassEffectStyle="clear"
                             style={{
                               width: 22,
                               height: 22,
                               alignItems: 'center',
                               justifyContent: 'center',
-                              borderRadius: 6,
-                              borderWidth: 1,
-                              borderColor: auth.termsAccepted ? ios.primary : ios.border,
-                              backgroundColor: auth.termsAccepted ? ios.primary : ios.card,
+                              borderRadius: 8,
                             }}
                           >
                             {auth.termsAccepted && (
-                              <Ionicons name="checkmark" size={16} color={ios.primaryForeground} />
+                              <Ionicons name="checkmark" size={16} color={ios.primary} />
                             )}
-                          </YStack>
+                          </GlassView>
                           <Text style={{ flex: 1, color: ios.foreground, fontSize: 13, lineHeight: 19 }}>
                             {t('auth.accept_terms')}
                             <Text style={{ color: ios.destructive }}> *</Text>
@@ -249,24 +264,13 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
                     </Pressable>
                   )}
 
-                  <Button
-                    size="$4"
-                    theme="blue"
+                  <LiquidButton
+                    iconName={isLogin ? 'log-in-outline' : 'person-add-outline'}
+                    label={auth.loading ? t('loading') : isLogin ? t('auth.login') : t('auth.register')}
                     disabled={auth.loading || !auth.canSubmit}
-                    opacity={auth.loading ? 0.7 : 1}
+                    loading={auth.loading}
                     onPress={form.submit}
-                  >
-                    <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                      <Ionicons
-                        name={isLogin ? 'log-in-outline' : 'person-add-outline'}
-                        size={18}
-                        color={ios.primaryForeground}
-                      />
-                      <Text style={{ color: ios.primaryForeground, fontWeight: '900' }}>
-                        {auth.loading ? t('loading') : isLogin ? t('auth.login') : t('auth.register')}
-                      </Text>
-                    </XStack>
-                  </Button>
+                  />
                 </>
               )}
             </MobileForm>

@@ -1,11 +1,13 @@
 import { Image, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
-import { Button, Input, Text, XStack, YStack } from 'tamagui';
+import { Input, Text, XStack, YStack } from 'tamagui';
 import type { MobileAccountSettingsProps } from '@meditime/types';
+import { LiquidButton } from '../common/LiquidButton';
 import { MobileForm } from '../common/MobileForm';
 import { SettingsPanelSection } from './SettingsPanelSection';
-import { useIosTheme } from '../../theme/ios';
+import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 export function AccountSettingsPanel({
   displayName,
@@ -18,6 +20,7 @@ export function AccountSettingsPanel({
   onResetDisplayName,
 }: MobileAccountSettingsProps) {
   const { t } = useTranslation();
+  const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
 
   return (
@@ -45,28 +48,40 @@ export function AccountSettingsPanel({
             onPress={onChangePhoto}
           >
             {({ pressed }) => (
-              <YStack
-                style={{
-                  width: 86,
-                  height: 86,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 43,
-                  overflow: 'hidden',
-                  backgroundColor: ios.blueInfoBg,
-                  opacity: pressed ? 0.75 : 1,
-                }}
-              >
-                {photoUrl ? (
+              photoUrl ? (
+                <YStack
+                  style={{
+                    width: 86,
+                    height: 86,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 43,
+                    overflow: 'hidden',
+                    opacity: pressed ? 0.75 : 1,
+                  }}
+                >
                   <Image
                     source={{ uri: photoUrl }}
                     style={{ width: 86, height: 86 }}
                     resizeMode="cover"
                   />
-                ) : (
+                </YStack>
+              ) : (
+                <GlassView
+                  colorScheme={colorScheme}
+                  glassEffectStyle="clear"
+                  style={{
+                    width: 86,
+                    height: 86,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 43,
+                    opacity: pressed ? 0.75 : 1,
+                  }}
+                >
                   <Ionicons name="person-circle-outline" size={60} color={ios.primary} />
-                )}
-              </YStack>
+                </GlassView>
+              )
             )}
           </Pressable>
           <YStack style={{ flex: 1, gap: 5 }}>
@@ -76,9 +91,12 @@ export function AccountSettingsPanel({
             <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 18 }}>
               {t('account.profile_photo.size_limit')}
             </Text>
-            <Button size="$3" disabled={isSaving} onPress={onChangePhoto}>
-              {t('account.change_photo')}
-            </Button>
+            <LiquidButton
+              disabled={isSaving}
+              iconName="camera-outline"
+              label={t('account.change_photo')}
+              onPress={onChangePhoto}
+            />
           </YStack>
         </XStack>
       </SettingsPanelSection>
@@ -119,19 +137,18 @@ export function AccountSettingsPanel({
               </YStack>
 
               <XStack style={{ gap: 10 }}>
-                <Button
-                  flex={1}
-                  size="$4"
-                  theme="blue"
-                  disabled={isSaving}
-                  opacity={isSaving ? 0.7 : 1}
-                  onPress={form.submit}
-                >
-                  {t('account.save_changes')}
-                </Button>
-                <Button flex={1} size="$4" onPress={onResetDisplayName}>
-                  {t('cancel')}
-                </Button>
+                <YStack style={{ flex: 1 }}>
+                  <LiquidButton
+                    disabled={isSaving}
+                    loading={isSaving}
+                    iconName="save-outline"
+                    label={t('account.save_changes')}
+                    onPress={form.submit}
+                  />
+                </YStack>
+                <YStack style={{ flex: 1 }}>
+                  <LiquidButton label={t('cancel')} onPress={onResetDisplayName} />
+                </YStack>
               </XStack>
             </>
           )}

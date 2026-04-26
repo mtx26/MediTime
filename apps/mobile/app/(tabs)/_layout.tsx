@@ -1,7 +1,6 @@
 import { Redirect, Tabs } from 'expo-router';
 import { ThemeProvider, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { Icon, Label, NativeTabs, VectorIcon } from 'expo-router/unstable-native-tabs';
-import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
 import { DynamicColorIOS, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,19 +26,7 @@ export default function TabsLayout() {
   if (isLoading) {
     return (
       <YStack style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: ios.background }}>
-        <GlassView
-          colorScheme={colorScheme}
-          glassEffectStyle="clear"
-          style={{
-            width: 82,
-            height: 82,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 24,
-          }}
-        >
-          <Spinner size="large" color={ios.primary} />
-        </GlassView>
+        <Spinner size="large" color={ios.primary} />
       </YStack>
     );
   }

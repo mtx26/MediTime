@@ -1,16 +1,14 @@
 import { useMemo, useRef, useState, type ElementRef, type ReactNode } from 'react';
 import {
-  ActionSheetIOS,
   Animated,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
-  findNodeHandle,
   useWindowDimensions,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack, YStack } from 'tamagui';
 import { useAppTheme } from '../../theme/ios';
@@ -60,8 +58,9 @@ function ActionSheet({
     [actions],
   );
   const isWideLayout = width >= 720;
-  const maxSheetHeight = Math.max(280, Math.min(height - insets.top - 24, 560));
-  const sheetBottomPadding = Math.max(insets.bottom, 12);
+  const maxSheetHeight = Math.max(240, Math.min(height - insets.top - 28, 480));
+  const panelWidth = Math.min(width - 56, 280);
+  const panelTop = Math.max(insets.top + 40, isWideLayout ? 92 : 74);
 
   const animateLongPressIn = () => {
     Animated.spring(longPressScale, {
@@ -92,36 +91,6 @@ function ActionSheet({
 
   const openActionSheet = () => {
     if (visibleActionCount === 0) return;
-
-    if (Platform.OS === 'ios') {
-      const visibleActions = actions.filter((action) => !action.separator);
-      const options = visibleActions.map((action) => action.label ?? action.title ?? '');
-      const cancelButtonIndex = options.length;
-      const destructiveButtonIndex = visibleActions
-        .map((action, index) => action.danger ? index : -1)
-        .filter((index) => index >= 0);
-      const anchor = findNodeHandle(triggerRef.current);
-
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          anchor: anchor ?? undefined,
-          cancelButtonIndex,
-          destructiveButtonIndex,
-          options: [...options, String(t('cancel'))],
-          tintColor: ios.primary,
-          userInterfaceStyle: isDark ? 'dark' : 'light',
-        },
-        (buttonIndex) => {
-          if (buttonIndex === cancelButtonIndex) return;
-
-          const action = visibleActions[buttonIndex];
-          if (!action) return;
-          runAction(action);
-        },
-      );
-      return;
-    }
-
     setOpen(true);
   };
 
@@ -146,11 +115,9 @@ function ActionSheet({
       <YStack
         style={{
           flex: 1,
-          justifyContent: 'flex-end',
-          paddingHorizontal: isWideLayout ? 24 : 0,
-          paddingTop: 24,
-          paddingBottom: isWideLayout ? 24 : 0,
-          backgroundColor: ios.overlay,
+          alignItems: 'center',
+          paddingTop: panelTop,
+          backgroundColor: 'transparent',
         }}
       >
         <Pressable
@@ -166,43 +133,27 @@ function ActionSheet({
           }}
         />
 
-        <YStack
+        <GlassView
+          colorScheme="dark"
+          glassEffectStyle="regular"
           style={{
-            width: '100%',
-            maxWidth: 520,
+            width: panelWidth,
             maxHeight: maxSheetHeight,
-            alignSelf: 'center',
-            paddingHorizontal: 12,
-            paddingTop: 10,
-            paddingBottom: sheetBottomPadding,
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
-            borderBottomLeftRadius: isWideLayout ? 8 : 0,
-            borderBottomRightRadius: isWideLayout ? 8 : 0,
-            backgroundColor: ios.card,
+            borderRadius: 24,
+            paddingHorizontal: 14,
+            paddingVertical: 10,
             shadowColor: ios.shadow,
-            shadowOpacity: isDark ? 0.45 : 0.16,
-            shadowRadius: 24,
-            shadowOffset: { width: 0, height: -8 },
-            elevation: 16,
+            shadowOpacity: isDark ? 0.55 : 0.28,
+            shadowRadius: 32,
+            shadowOffset: { width: 0, height: 18 },
+            elevation: 20,
           }}
         >
-          <YStack style={{ alignItems: 'center', paddingBottom: 10 }}>
-            <YStack
-              style={{
-                width: 42,
-                height: 5,
-                borderRadius: 3,
-                backgroundColor: ios.border,
-              }}
-            />
-          </YStack>
-
           <ScrollView
-            style={{ maxHeight: Math.max(160, maxSheetHeight - 96) }}
-            contentContainerStyle={{ gap: 4 }}
+            style={{ maxHeight: maxSheetHeight - 20 }}
+            contentContainerStyle={{ paddingVertical: 2 }}
             showsVerticalScrollIndicator={visibleActionCount > 7}
-            indicatorStyle={isDark ? 'white' : 'black'}
+            indicatorStyle="white"
           >
             {actions.map((action, index) => {
               if (action.separator) {
@@ -211,9 +162,9 @@ function ActionSheet({
                     key={`separator-${index}`}
                     style={{
                       height: 1,
-                      marginVertical: 6,
-                      marginHorizontal: 8,
-                      backgroundColor: ios.border,
+                      marginVertical: 7,
+                      marginLeft: 36,
+                      backgroundColor: 'rgba(255, 255, 255, 0.16)',
                     }}
                   />
                 );
@@ -221,10 +172,8 @@ function ActionSheet({
 
               const label = action.label ?? action.title ?? '';
               const description = action.title && action.title !== label ? action.title : null;
-              const color = action.danger ? ios.destructive : ios.foreground;
-              const iconColor = action.danger ? ios.destructive : ios.primary;
-              const iconBackground = action.danger ? ios.destructiveBg : ios.blueInfoBg;
-
+              const color = action.danger ? '#ff5f57' : '#f5f5f7';
+              const iconColor = action.danger ? '#ff5f57' : '#f5f5f7';
               return (
                 <Pressable
                   key={`${label}-${index}`}
@@ -236,40 +185,35 @@ function ActionSheet({
                   {({ pressed }) => (
                     <XStack
                       style={{
-                        minHeight: 54,
+                        minHeight: 44,
                         alignItems: 'center',
-                        gap: 12,
-                        paddingHorizontal: 10,
-                        paddingVertical: 8,
-                        borderRadius: 8,
-                        backgroundColor: pressed ? ios.accentHover : 'transparent',
+                        gap: 10,
+                        borderRadius: 14,
+                        opacity: pressed ? 0.62 : 1,
                       }}
                     >
-                      <YStack
+                      <XStack
                         style={{
-                          width: 36,
-                          height: 36,
+                          width: 26,
                           alignItems: 'center',
                           justifyContent: 'center',
-                          borderRadius: 8,
-                          backgroundColor: iconBackground,
                         }}
                       >
                         <Ionicons
                           name={action.iconName ?? 'chevron-forward-outline'}
-                          size={19}
+                          size={20}
                           color={iconColor}
                         />
-                      </YStack>
+                      </XStack>
 
                       <YStack style={{ flex: 1, minWidth: 0 }}>
                         <Text
-                          numberOfLines={1}
+                          numberOfLines={2}
                           style={{
                             color,
-                            fontSize: 16,
+                            fontSize: 17,
                             lineHeight: 22,
-                            fontWeight: '800',
+                            fontWeight: '500',
                           }}
                         >
                           {label}
@@ -278,10 +222,10 @@ function ActionSheet({
                           <Text
                             numberOfLines={2}
                             style={{
-                              color: ios.mutedForeground,
-                              fontSize: 13,
-                              lineHeight: 18,
-                              fontWeight: '600',
+                              color: 'rgba(245, 245, 247, 0.72)',
+                              fontSize: 12,
+                              lineHeight: 16,
+                              fontWeight: '500',
                             }}
                           >
                             {description}
@@ -294,30 +238,7 @@ function ActionSheet({
               );
             })}
           </ScrollView>
-
-          <Pressable
-            onPress={closeActionSheet}
-            accessibilityRole="button"
-            accessibilityLabel={String(t('cancel'))}
-            style={{ marginTop: 10 }}
-          >
-            {({ pressed }) => (
-              <YStack
-                style={{
-                  minHeight: 48,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 8,
-                  backgroundColor: pressed ? ios.blueInfoBorder : ios.blueInfoBg,
-                }}
-              >
-                <Text style={{ color: ios.primary, fontSize: 16, fontWeight: '900' }}>
-                  {t('cancel')}
-                </Text>
-              </YStack>
-            )}
-          </Pressable>
-        </YStack>
+        </GlassView>
       </YStack>
     </Modal>
   );

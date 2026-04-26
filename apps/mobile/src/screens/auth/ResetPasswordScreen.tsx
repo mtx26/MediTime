@@ -1,9 +1,10 @@
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, Input, Text, XStack, YStack } from 'tamagui';
+import { Input, Text, XStack, YStack } from 'tamagui';
 import { AuthPageShell } from '../../components/auth';
 import { InfoBanner } from '../../components/common/InfoBanner';
+import { LiquidButton } from '../../components/common/LiquidButton';
 import { MobileForm } from '../../components/common/MobileForm';
 import { useResetPassword } from '../../hooks/auth/useResetPassword';
 import { useIosTheme } from '../../theme/ios';
@@ -55,33 +56,18 @@ export default function ResetPasswordScreen() {
                 />
               </XStack>
 
-              <Button
-                size="$4"
-                theme="blue"
+              <LiquidButton
+                iconName="mail-outline"
+                label={resetPassword.isSubmitting ? t('loading') : t('reset_password.send_link')}
                 onPress={form.submit}
                 disabled={resetPassword.isSubmitting || !resetPassword.email.trim()}
-                opacity={resetPassword.isSubmitting ? 0.7 : 1}
-              >
-                <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <Ionicons name="mail-outline" size={18} color={ios.primaryForeground} />
-                  <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
-                    {resetPassword.isSubmitting ? t('loading') : t('reset_password.send_link')}
-                  </Text>
-                </XStack>
-              </Button>
+                loading={resetPassword.isSubmitting}
+              />
             </>
           )}
         </MobileForm>
 
-        <Button
-          size="$3"
-          chromeless
-          onPress={() => router.replace('/(auth)/login')}
-        >
-          <Text color="$blue10" fontSize="$3" fontWeight="700">
-            {t('auth.back_to_login')}
-          </Text>
-        </Button>
+        <LiquidButton label={t('auth.back_to_login')} onPress={() => router.replace('/(auth)/login')} />
       </YStack>
     </AuthPageShell>
   );

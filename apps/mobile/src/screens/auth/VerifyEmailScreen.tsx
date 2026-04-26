@@ -1,14 +1,12 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, Text, XStack, YStack } from 'tamagui';
+import { Text, YStack } from 'tamagui';
 import { AuthPageShell } from '../../components/auth';
 import { InfoBanner } from '../../components/common/InfoBanner';
+import { LiquidButton } from '../../components/common/LiquidButton';
 import { useVerifyEmail } from '../../hooks/auth/useVerifyEmail';
-import { useIosTheme } from '../../theme/ios';
 
 export default function VerifyEmailScreen() {
   const { t } = useTranslation();
-  const ios = useIosTheme();
   const verifyEmail = useVerifyEmail();
 
   return (
@@ -32,27 +30,16 @@ export default function VerifyEmailScreen() {
           <InfoBanner iconName="warning-outline" text={verifyEmail.error} tone="warning" />
         )}
 
-        <Button
-          size="$4"
-          theme="blue"
+        <LiquidButton
+          iconName="mail-outline"
+          label={verifyEmail.isSubmitting ? t('loading') : t('verify_email.resend_link')}
           onPress={() => void verifyEmail.handleSendVerification()}
           disabled={verifyEmail.isSubmitting || !verifyEmail.email}
-          opacity={verifyEmail.isSubmitting ? 0.7 : 1}
-        >
-          <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            <Ionicons name="mail-outline" size={18} color={ios.primaryForeground} />
-            <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
-              {verifyEmail.isSubmitting ? t('loading') : t('verify_email.resend_link')}
-            </Text>
-          </XStack>
-        </Button>
+          loading={verifyEmail.isSubmitting}
+        />
 
         {!verifyEmail.email && (
-          <Button size="$3" chromeless onPress={verifyEmail.backToLogin}>
-            <Text color="$blue10" fontSize="$3" fontWeight="700">
-              {t('auth.back_to_login')}
-            </Text>
-          </Button>
+          <LiquidButton label={t('auth.back_to_login')} onPress={verifyEmail.backToLogin} />
         )}
       </YStack>
     </AuthPageShell>

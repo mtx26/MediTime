@@ -62,18 +62,19 @@ export function AuthPageShell({
             >
               <YStack style={{ gap: 18, padding: 10 }}>
                 <YStack style={{ alignItems: 'center', gap: 10 }}>
-                  <YStack
+                  <GlassView
+                    colorScheme={colorScheme}
+                    glassEffectStyle="clear"
                     style={{
                       width: 58,
                       height: 58,
                       alignItems: 'center',
                       justifyContent: 'center',
-                      borderRadius: 8,
-                      backgroundColor: ios.blueInfoBg,
+                      borderRadius: 18,
                     }}
                   >
                     <Ionicons name={iconName} size={30} color={ios.primary} />
-                  </YStack>
+                  </GlassView>
                   <H2 style={{ textAlign: 'center', color: ios.foreground }}>
                     {title}
                   </H2>

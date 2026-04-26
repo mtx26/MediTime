@@ -2,9 +2,10 @@ import { useRef, type ElementRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
-import { Button, Input, Text, XStack, YStack } from 'tamagui';
+import { Input, Text, XStack, YStack } from 'tamagui';
 import type { MobileSecuritySettingsProps } from '@meditime/types';
 import { PasswordInput } from '../auth';
+import { LiquidButton } from '../common/LiquidButton';
 import { MobileForm } from '../common/MobileForm';
 import { SettingsPanelSection } from './SettingsPanelSection';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
@@ -132,16 +133,12 @@ export function SecuritySettingsPanel({
                           </XStack>
                         </GlassView>
                       ) : (
-                        <Button
-                          size="$3"
+                        <LiquidButton
                           disabled={Boolean(connectingProvider)}
-                          opacity={isConnecting ? 0.7 : 1}
+                          loading={isConnecting}
+                          label={isConnecting ? t('security.providers.connecting') : t('security.providers.connect')}
                           onPress={() => onConnectProvider(provider.id)}
-                        >
-                          <Text style={{ color: ios.primary, fontSize: 12, fontWeight: '900' }}>
-                            {isConnecting ? t('security.providers.connecting') : t('security.providers.connect')}
-                          </Text>
-                        </Button>
+                        />
                       )}
                     </XStack>
                   </GlassView>
@@ -197,27 +194,18 @@ export function SecuritySettingsPanel({
                 </Text>
               </YStack>
 
-              <Button
-                size="$4"
-                theme="blue"
+              <LiquidButton
+                iconName="lock-closed-outline"
+                label={t('security.update_password')}
                 disabled={isSaving || !oldPassword || !newPassword}
-                opacity={isSaving ? 0.7 : 1}
+                loading={isSaving}
                 onPress={form.submit}
-              >
-                {t('security.update_password')}
-              </Button>
+              />
             </>
           )}
         </MobileForm>
 
-        <Button size="$4" onPress={onResetPassword}>
-          <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            <Ionicons name="mail-outline" size={18} color={ios.primary} />
-            <Text style={{ color: ios.primary, fontWeight: '800' }}>
-              {t('reset_password.title')}
-            </Text>
-          </XStack>
-        </Button>
+        <LiquidButton iconName="mail-outline" label={t('reset_password.title')} onPress={onResetPassword} />
       </SettingsPanelSection>
     </YStack>
   );

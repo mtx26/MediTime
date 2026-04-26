@@ -38,23 +38,9 @@ export function SharedUserList({
           </Text>
         </XStack>
 
-        <YStack
-          style={{
-            overflow: 'hidden',
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: ios.border,
-            backgroundColor: ios.background,
-          }}
-        >
-          {users.map((user, index) => (
-            <YStack
-              key={user.token}
-              style={{
-                borderBottomWidth: index === users.length - 1 && invitations.length === 0 ? 0 : 1,
-                borderBottomColor: ios.border,
-              }}
-            >
+        <YStack style={{ gap: 8 }}>
+          {users.map((user) => (
+            <YStack key={user.token}>
               <SharedUserRow
                 label={user.receiver_name || user.email}
                 photoUrl={user.receiver_photo_url}
@@ -64,14 +50,8 @@ export function SharedUserList({
             </YStack>
           ))}
 
-          {invitations.map((invitation, index) => (
-            <YStack
-              key={invitation.token}
-              style={{
-                borderBottomWidth: index === invitations.length - 1 ? 0 : 1,
-                borderBottomColor: ios.border,
-              }}
-            >
+          {invitations.map((invitation) => (
+            <YStack key={invitation.token}>
               <SharedUserRow
                 label={invitation.invited_email}
                 photoUrl={invitation.receiver_photo_url}
@@ -88,53 +68,61 @@ export function SharedUserList({
             gap: 8,
           }}
         >
-          <TextInput
-            value={emailToInvite}
-            onChangeText={onEmailChange}
-            placeholder={String(t('recipient_email'))}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoComplete="email"
-            textContentType="emailAddress"
-            keyboardAppearance={colorScheme}
-            returnKeyType="send"
-            onSubmitEditing={() => {
-              if (canInvite) {
-                onInvite();
-              }
-            }}
+          <GlassView
+            colorScheme={colorScheme}
+            glassEffectStyle="clear"
             style={{
               flex: 1,
               minHeight: 44,
+              justifyContent: 'center',
+              borderRadius: 18,
               paddingHorizontal: 12,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: ios.border,
-              backgroundColor: ios.background,
-              color: ios.foreground,
             }}
-          />
+          >
+            <TextInput
+              value={emailToInvite}
+              onChangeText={onEmailChange}
+              placeholder={String(t('recipient_email'))}
+              placeholderTextColor={ios.mutedForeground}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              textContentType="emailAddress"
+              keyboardAppearance={colorScheme}
+              returnKeyType="send"
+              onSubmitEditing={() => {
+                if (canInvite) {
+                  onInvite();
+                }
+                }}
+              style={{
+                minHeight: 44,
+                color: ios.foreground,
+              }}
+            />
+          </GlassView>
 
           <Pressable onPress={onInvite} disabled={!canInvite} accessibilityRole="button">
             {({ pressed }) => (
-              <XStack
+              <GlassView
+                colorScheme={colorScheme}
+                glassEffectStyle="clear"
                 style={{
                   width: 44,
                   height: 44,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  borderRadius: 12,
-                  backgroundColor: canInvite ? ios.primary : ios.accentHover,
+                  borderRadius: 18,
                   opacity: pressed ? 0.8 : canInvite ? 1 : 0.7,
                 }}
               >
                 <Ionicons
                   name="mail-outline"
                   size={18}
-                  color={canInvite ? ios.primaryForeground : ios.mutedForeground}
+                  color={canInvite ? ios.primary : ios.mutedForeground}
                 />
-              </XStack>
+              </GlassView>
             )}
           </Pressable>
         </XStack>

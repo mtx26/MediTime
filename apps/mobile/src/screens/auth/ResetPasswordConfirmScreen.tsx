@@ -1,8 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, Text, XStack, YStack } from 'tamagui';
+import { Text, YStack } from 'tamagui';
 import { AuthPageShell, PasswordInput } from '../../components/auth';
 import { InfoBanner } from '../../components/common/InfoBanner';
+import { LiquidButton } from '../../components/common/LiquidButton';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { MobileForm } from '../../components/common/MobileForm';
 import { useResetPasswordConfirm } from '../../hooks/auth/useResetPasswordConfirm';
@@ -57,26 +57,19 @@ export default function ResetPasswordConfirmScreen() {
                 returnKeyType="done"
               />
 
-              <Button
-                size="$4"
-                theme="blue"
+              <LiquidButton
+                iconName="lock-closed-outline"
+                label={resetPasswordConfirm.loading
+                  ? t('reset_password_confirm.saving')
+                  : t('reset_password_confirm.save_password')}
                 onPress={form.submit}
                 disabled={
                   resetPasswordConfirm.loading ||
                   !resetPasswordConfirm.sessionReady ||
                   !resetPasswordConfirm.password
                 }
-                opacity={resetPasswordConfirm.loading ? 0.7 : 1}
-              >
-                <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <Ionicons name="lock-closed-outline" size={18} color={ios.primaryForeground} />
-                  <Text style={{ color: ios.primaryForeground, fontWeight: '800' }}>
-                    {resetPasswordConfirm.loading
-                      ? t('reset_password_confirm.saving')
-                      : t('reset_password_confirm.save_password')}
-                  </Text>
-                </XStack>
-              </Button>
+                loading={resetPasswordConfirm.loading}
+              />
             </>
           )}
         </MobileForm>
