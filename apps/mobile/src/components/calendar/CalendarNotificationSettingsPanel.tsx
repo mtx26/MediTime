@@ -4,6 +4,7 @@ import { Text, XStack, YStack } from 'tamagui';
 import type { MobileCalendarNotificationSettingsProps } from '@meditime/types';
 import { SettingsPanelSection } from '../settings';
 import { useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 export function CalendarNotificationSettingsPanel({
   enabled,
@@ -34,7 +35,10 @@ export function CalendarNotificationSettingsPanel({
         <Switch
           value={enabled}
           disabled={isSaving}
-          onValueChange={() => onToggle()}
+          onValueChange={() => {
+            hapticSelection();
+            onToggle();
+          }}
           trackColor={{ false: ios.border, true: ios.primary }}
           ios_backgroundColor={Platform.OS === 'ios' ? ios.border : undefined}
         />

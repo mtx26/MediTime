@@ -6,6 +6,7 @@ import { Text, XStack, YStack } from 'tamagui';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { useAuthCallback } from '../../hooks/auth/useAuthCallback';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 export default function AuthCallbackScreen() {
   const { t } = useTranslation();
@@ -54,7 +55,10 @@ export default function AuthCallbackScreen() {
       {callback.isRecovery && (
         <Pressable
           accessibilityRole="button"
-          onPress={callback.requestNewResetLink}
+          onPress={() => {
+            hapticSelection();
+            callback.requestNewResetLink();
+          }}
         >
           {({ pressed }) => (
             <GlassView
@@ -79,7 +83,10 @@ export default function AuthCallbackScreen() {
       )}
       <Pressable
         accessibilityRole="button"
-        onPress={callback.backToLogin}
+        onPress={() => {
+          hapticSelection();
+          callback.backToLogin();
+        }}
       >
         {({ pressed }) => (
           <GlassView

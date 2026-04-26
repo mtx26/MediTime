@@ -5,12 +5,17 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 export function AcceptInviteEmptyState() {
   const { t } = useTranslation();
   const router = useRouter();
   const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
+  const goHome = () => {
+    hapticSelection();
+    router.replace('/');
+  };
 
   return (
     <YStack
@@ -49,7 +54,7 @@ export function AcceptInviteEmptyState() {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={String(t('home'))}
-        onPress={() => router.replace('/')}
+        onPress={goHome}
         style={{ alignSelf: 'flex-start' }}
       >
         {({ pressed }) => (

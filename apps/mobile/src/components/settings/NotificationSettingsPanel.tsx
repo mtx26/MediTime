@@ -6,6 +6,7 @@ import { Text, XStack, YStack } from 'tamagui';
 import type { MobileNotificationSettingsProps } from '@meditime/types';
 import { SettingsPanelSection } from './SettingsPanelSection';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 export function NotificationSettingsPanel({
   emailEnabled,
@@ -47,6 +48,7 @@ export function NotificationSettingsPanel({
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const nextTime = `${hours}:${minutes}`;
+    if (nextTime !== notificationTime) hapticSelection();
 
     if (Platform.OS === 'android') {
       onNotificationTimeChange(nextTime);
@@ -87,7 +89,10 @@ export function NotificationSettingsPanel({
           <Switch
             value={emailEnabled}
             disabled={isSaving}
-            onValueChange={onEmailEnabledChange}
+            onValueChange={(value) => {
+              hapticSelection();
+              onEmailEnabledChange(value);
+            }}
             trackColor={{ false: ios.border, true: ios.primary }}
             ios_backgroundColor={Platform.OS === 'ios' ? ios.border : undefined}
           />
@@ -105,7 +110,10 @@ export function NotificationSettingsPanel({
           <Switch
             value={pushEnabled}
             disabled={isSaving}
-            onValueChange={onPushEnabledChange}
+            onValueChange={(value) => {
+              hapticSelection();
+              onPushEnabledChange(value);
+            }}
             trackColor={{ false: ios.border, true: ios.primary }}
             ios_backgroundColor={Platform.OS === 'ios' ? ios.border : undefined}
           />
@@ -153,7 +161,10 @@ export function NotificationSettingsPanel({
               }}
             >
               <Pressable
-                onPress={() => setShowTimePicker(true)}
+                onPress={() => {
+                  hapticSelection();
+                  setShowTimePicker(true);
+                }}
                 accessibilityRole="button"
                 accessibilityLabel={String(t('settings.notification_time_label'))}
               >

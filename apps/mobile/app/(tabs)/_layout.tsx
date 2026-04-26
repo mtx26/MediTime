@@ -1,4 +1,6 @@
+import { useEffect, useRef } from 'react';
 import { Redirect, Tabs } from 'expo-router';
+import { usePathname } from 'expo-router';
 import { ThemeProvider, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { Icon, Label, NativeTabs, VectorIcon } from 'expo-router/unstable-native-tabs';
 import { useTranslation } from 'react-i18next';
@@ -9,19 +11,39 @@ import { Spinner, YStack } from 'tamagui';
 import { TabIcon } from '../../src/components/common/TabIcon';
 import { useAuth } from '../../src/hooks/auth/useAuth';
 import { useAppTheme, useIosTheme } from '../../src/theme/ios';
+import { hapticSelection } from '../../src/utils/haptics';
+
+const TAB_SEGMENTS = new Set(['calendars', 'shared-calendars', 'notifications', 'settings']);
+
+function getActiveTabSegment(pathname: string) {
+  const segment = pathname.split('/').filter(Boolean)[0];
+  return segment && TAB_SEGMENTS.has(segment) ? segment : null;
+}
 
 export default function TabsLayout() {
   const { userInfo, isLoading } = useAuth();
   const { t } = useTranslation();
+  const pathname = usePathname();
   const insets = useSafeAreaInsets();
   const ios = useIosTheme();
   const { colorScheme } = useAppTheme();
+  const previousTabSegment = useRef<string | null>(getActiveTabSegment(pathname));
   const tabBarHeight = 56 + insets.bottom;
   const tabBarPaddingBottom = Math.max(insets.bottom, 5);
   const nativeTintColor = Platform.OS === 'ios'
     ? DynamicColorIOS({ dark: 'white', light: 'black' })
     : ios.primary;
   const nativeTheme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
+
+  useEffect(() => {
+    const activeTabSegment = getActiveTabSegment(pathname);
+
+    if (activeTabSegment && previousTabSegment.current && activeTabSegment !== previousTabSegment.current) {
+      hapticSelection();
+    }
+
+    previousTabSegment.current = activeTabSegment;
+  }, [pathname]);
 
   if (isLoading) {
     return (

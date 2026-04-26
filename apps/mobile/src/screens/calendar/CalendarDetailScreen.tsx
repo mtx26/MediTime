@@ -16,6 +16,7 @@ import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { Page, usePageHeaderOptions } from '../../components/common/Page';
 import { useCalendarDetail } from '../../hooks/calendar';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 type MobileCalendarDetailSourceType = Exclude<CalendarDetailSourceType, 'token'>;
 
@@ -88,7 +89,10 @@ export default function CalendarDetailScreen({
       >
         {detail.showMedicinesButton && (
           <Pressable
-            onPress={detail.goToBoxes}
+            onPress={() => {
+              hapticSelection();
+              detail.goToBoxes();
+            }}
             accessibilityRole="button"
             accessibilityLabel={String(t('medicines.label'))}
           >
@@ -120,7 +124,13 @@ export default function CalendarDetailScreen({
         )}
 
         {detail.isLowStock && (
-          <Pressable onPress={detail.goToStockAlerts} accessibilityRole="button">
+          <Pressable
+            onPress={() => {
+              hapticSelection();
+              detail.goToStockAlerts();
+            }}
+            accessibilityRole="button"
+          >
             <InfoBanner iconName="warning-outline" text={String(t('stock_alert'))} tone="warning" />
           </Pressable>
         )}
@@ -136,7 +146,10 @@ export default function CalendarDetailScreen({
         {detail.showPillboxShortcut && (
           <YStack style={{ gap: 10 }}>
             <Pressable
-              onPress={detail.goToPillbox}
+              onPress={() => {
+                hapticSelection();
+                detail.goToPillbox();
+              }}
               accessibilityRole="button"
               accessibilityLabel={String(t('pillbox.fill'))}
             >

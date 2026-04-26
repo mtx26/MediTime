@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 export default function NotFoundScreen() {
   const { t } = useTranslation();
@@ -13,6 +14,10 @@ export default function NotFoundScreen() {
   const insets = useSafeAreaInsets();
   const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
+  const goHome = () => {
+    hapticSelection();
+    router.replace('/');
+  };
 
   return (
     <>
@@ -70,7 +75,7 @@ export default function NotFoundScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={String(t('home'))}
-            onPress={() => router.replace('/')}
+            onPress={goHome}
           >
             {({ pressed }) => (
               <GlassView

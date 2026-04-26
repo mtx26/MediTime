@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack, YStack } from 'tamagui';
 import type { SharedUserRowProps } from '@meditime/types';
 import { useIosTheme } from '../../theme/ios';
+import { hapticImpact } from '../../utils/haptics';
 
 export function SharedUserRow({
   label,
@@ -57,7 +58,13 @@ export function SharedUserRow({
           </Text>
         </YStack>
 
-        <Pressable onPress={onDelete} accessibilityRole="button">
+        <Pressable
+          onPress={() => {
+            hapticImpact();
+            onDelete();
+          }}
+          accessibilityRole="button"
+        >
           {({ pressed }) => (
             <View
               style={{

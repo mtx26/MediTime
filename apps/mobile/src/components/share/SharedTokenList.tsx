@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import type { SharedTokenListProps } from '@meditime/types';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticImpact } from '../../utils/haptics';
 
 export function SharedTokenList({
   tokens,
@@ -37,7 +38,13 @@ export function SharedTokenList({
         </XStack>
 
         {tokens.length === 0 ? (
-          <Pressable onPress={onCreateToken} accessibilityRole="button">
+          <Pressable
+            onPress={() => {
+              hapticImpact();
+              onCreateToken();
+            }}
+            accessibilityRole="button"
+          >
             {({ pressed }) => (
               <GlassView
                 colorScheme={colorScheme}
@@ -65,7 +72,10 @@ export function SharedTokenList({
             {tokens.map((token) => (
               <Pressable
                 key={token.id}
-                onPress={() => onShareToken(token)}
+                onPress={() => {
+                  hapticImpact();
+                  onShareToken(token);
+                }}
                 accessibilityRole="button"
               >
               {({ pressed }) => (
@@ -107,6 +117,7 @@ export function SharedTokenList({
                     <Pressable
                       onPress={(event) => {
                         event.stopPropagation();
+                        hapticImpact();
                         onDeleteToken(token.id);
                       }}
                       accessibilityRole="button"

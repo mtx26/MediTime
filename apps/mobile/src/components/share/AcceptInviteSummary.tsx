@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import type { AcceptInviteSummaryProps } from '@meditime/types';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticImpact } from '../../utils/haptics';
 
 export function AcceptInviteSummary({
   invitation,
@@ -123,7 +124,10 @@ export function AcceptInviteSummary({
       <XStack style={{ gap: 10 }}>
         <Pressable
           accessibilityRole="button"
-          onPress={onAccept}
+          onPress={() => {
+            hapticImpact();
+            onAccept();
+          }}
           disabled={loading}
           style={{ flex: 1 }}
         >
@@ -153,7 +157,10 @@ export function AcceptInviteSummary({
 
         <Pressable
           accessibilityRole="button"
-          onPress={onReject}
+          onPress={() => {
+            hapticImpact();
+            onReject();
+          }}
           disabled={loading}
           style={{ flex: 1 }}
         >

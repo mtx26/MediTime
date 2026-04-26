@@ -5,18 +5,23 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack } from 'tamagui';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 export function HomeReturnButton() {
   const { t } = useTranslation();
   const router = useRouter();
   const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
+  const handlePress = () => {
+    hapticSelection();
+    router.replace('/');
+  };
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={String(t('home'))}
-      onPress={() => router.replace('/')}
+      onPress={handlePress}
       style={{ alignSelf: 'flex-start' }}
     >
       {({ pressed }) => (

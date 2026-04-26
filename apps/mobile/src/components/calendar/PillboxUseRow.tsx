@@ -5,6 +5,7 @@ import { Text, XStack, YStack } from 'tamagui';
 import type { PillboxUseRowProps } from '@meditime/types';
 import { GlassSurface } from '../common/GlassSurface';
 import { useIosTheme } from '../../theme/ios';
+import { hapticImpact } from '../../utils/haptics';
 
 export function PillboxUseRow({
   use,
@@ -47,7 +48,10 @@ export function PillboxUseRow({
         </YStack>
         <Pressable
           disabled={disabled}
-          onPress={() => onCancel(use.id)}
+          onPress={() => {
+            hapticImpact();
+            onCancel(use.id);
+          }}
           accessibilityRole="button"
           accessibilityLabel={String(t('restore'))}
         >

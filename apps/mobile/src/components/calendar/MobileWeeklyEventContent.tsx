@@ -7,6 +7,7 @@ import type { WeeklyEventItem } from '@meditime/types';
 import { GlassSurface } from '../common/GlassSurface';
 import { LoadingIndicator } from '../common/LoadingIndicator';
 import { useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 type MobileWeeklyEventContentProps = {
   selectedDate: Date | null;
@@ -54,7 +55,14 @@ export function MobileWeeklyEventContent({
             const isToday = iso === toISO(new Date());
 
             return (
-              <Pressable key={iso} onPress={() => onSelectDate(date)} accessibilityRole="button">
+              <Pressable
+                key={iso}
+                onPress={() => {
+                  if (!selected) hapticSelection();
+                  onSelectDate(date);
+                }}
+                accessibilityRole="button"
+              >
                 {({ pressed }) => (
                   selected ? (
                     <GlassSurface
@@ -156,7 +164,13 @@ export function MobileWeeklyEventContent({
           paddingHorizontal: 4,
         }}
       >
-        <Pressable onPress={goPrev} accessibilityRole="button">
+        <Pressable
+          onPress={() => {
+            hapticSelection();
+            goPrev();
+          }}
+          accessibilityRole="button"
+        >
           {({ pressed }) => (
             <GlassSurface
               glassEffectStyle="clear"
@@ -186,7 +200,13 @@ export function MobileWeeklyEventContent({
           </Text>
         </YStack>
 
-        <Pressable onPress={goNext} accessibilityRole="button">
+        <Pressable
+          onPress={() => {
+            hapticSelection();
+            goNext();
+          }}
+          accessibilityRole="button"
+        >
           {({ pressed }) => (
             <GlassSurface
               glassEffectStyle="clear"

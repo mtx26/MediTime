@@ -8,10 +8,12 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { GlassView } from 'expo-glass-effect';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack, YStack } from 'tamagui';
 import { useAppTheme } from '../../theme/ios';
+import { hapticImpact, hapticSelection } from '../../utils/haptics';
 
 export type MobileActionSheetAction = {
   label?: string;
@@ -91,15 +93,18 @@ function ActionSheet({
 
   const openActionSheet = () => {
     if (visibleActionCount === 0) return;
+    hapticImpact(Haptics.ImpactFeedbackStyle.Light);
     setOpen(true);
   };
 
-  const closeActionSheet = () => {
+  const closeActionSheet = (withFeedback = true) => {
+    if (open && withFeedback) hapticSelection();
     setOpen(false);
   };
 
   const handleActionPress = (action: MobileActionSheetAction) => {
-    closeActionSheet();
+    hapticImpact(action.danger ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light);
+    closeActionSheet(false);
     setTimeout(() => {
       runAction(action);
     }, 120);
@@ -110,7 +115,7 @@ function ActionSheet({
       visible={open}
       transparent
       animationType="fade"
-      onRequestClose={closeActionSheet}
+      onRequestClose={() => closeActionSheet()}
     >
       <YStack
         style={{
@@ -121,7 +126,7 @@ function ActionSheet({
         }}
       >
         <Pressable
-          onPress={closeActionSheet}
+          onPress={() => closeActionSheet()}
           accessibilityRole="button"
           accessibilityLabel={String(t('cancel'))}
           style={{
@@ -255,6 +260,7 @@ function ActionSheet({
               longPressTriggered.current = false;
               return;
             }
+            if (onPress) hapticSelection();
             onPress?.();
           }}
           onLongPress={() => {

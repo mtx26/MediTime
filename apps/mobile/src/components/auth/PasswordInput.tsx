@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Input, YStack, XStack } from 'tamagui';
 import { useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 type TamaguiInputProps = ComponentProps<typeof Input>;
 
@@ -50,7 +51,10 @@ export const PasswordInput = forwardRef<ElementRef<typeof Input>, PasswordInputP
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={String(t(visible ? 'auth.hide_password' : 'auth.show_password'))}
-          onPress={() => onVisibleChange(!visible)}
+          onPress={() => {
+            hapticSelection();
+            onVisibleChange(!visible);
+          }}
           style={{
             position: 'absolute',
             top: 0,

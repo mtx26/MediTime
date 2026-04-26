@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { YStack } from 'tamagui';
 import type { SharedCalendarPickerProps } from '@meditime/types';
 import { useAppTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 function truncateName(name: string) {
   return name.length > 20 ? `${name.slice(0, 17)}...` : name;
@@ -23,12 +24,14 @@ export function SharedCalendarPicker({
         appearance={colorScheme}
         values={calendars.map((calendar) => truncateName(calendar.name || String(t('calendar.label'))))}
         selectedIndex={selectedIndex}
-        onChange={(event) => {
-          const nextCalendar = calendars[event.nativeEvent.selectedSegmentIndex];
-          if (nextCalendar) {
-            onSelectCalendar(nextCalendar.id);
-          }
-        }}
+      onChange={(event) => {
+        const nextIndex = event.nativeEvent.selectedSegmentIndex;
+        const nextCalendar = calendars[nextIndex];
+        if (nextCalendar) {
+          if (nextIndex !== selectedIndex) hapticSelection();
+          onSelectCalendar(nextCalendar.id);
+        }
+      }}
         style={{
           minHeight: 34,
         }}

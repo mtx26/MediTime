@@ -8,6 +8,7 @@ import { calendarTableHasItems, getWeekDates, getWeekSelectionState, toISO } fro
 import type { CalendarTable } from '@meditime/types';
 import { GlassSurface } from '../common/GlassSurface';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 import { IosWeekCalendar } from './IosWeekCalendar';
 
 type MobileCalendarWeekSelectorProps = {
@@ -89,6 +90,7 @@ export function MobileCalendarWeekSelector({
   );
 
   const shiftMonth = (direction: number) => {
+    hapticSelection();
     setMonthDate((current) => {
       const next = new Date(current);
       next.setMonth(current.getMonth() + direction);
@@ -226,7 +228,14 @@ export function MobileCalendarWeekSelector({
                       : ios.foreground;
 
                 return (
-                  <Pressable key={iso} onPress={() => onWeekSelect(date)} accessibilityRole="button">
+                  <Pressable
+                    key={iso}
+                    onPress={() => {
+                      if (iso !== selectedIso) hapticSelection();
+                      onWeekSelect(date);
+                    }}
+                    accessibilityRole="button"
+                  >
                     {isSelectedDate ? (
                       <GlassSurface
                         tintColor={ios.primary}

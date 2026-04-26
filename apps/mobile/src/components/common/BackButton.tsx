@@ -4,6 +4,7 @@ import { useRouter, type Href } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack } from 'tamagui';
 import { useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 type BackButtonProps = {
   fallbackHref?: Href;
@@ -18,6 +19,7 @@ export function BackButton({ fallbackHref = '/', variant = 'pill' }: BackButtonP
   const contentColor = isHeader ? ios.foreground : ios.primary;
 
   const handlePress = () => {
+    hapticSelection();
     if (router.canGoBack()) {
       router.back();
       return;

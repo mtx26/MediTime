@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { GlassView } from 'expo-glass-effect';
 import { YStack } from 'tamagui';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 type IconButtonProps = {
   label: string;
@@ -22,10 +23,14 @@ export function IconButton({
   const ios = useIosTheme();
   const { colorScheme } = useAppTheme();
   const isDefault = variant === 'default';
+  const handlePress = () => {
+    hapticSelection();
+    onPress();
+  };
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={label}

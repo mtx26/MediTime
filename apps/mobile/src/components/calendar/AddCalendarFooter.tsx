@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { GlassView } from 'expo-glass-effect';
 import { Text, XStack } from 'tamagui';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticImpact } from '../../utils/haptics';
 
 type AddCalendarFooterProps = {
   onPress: () => void;
@@ -13,9 +14,13 @@ export function AddCalendarFooter({ onPress }: AddCalendarFooterProps) {
   const { t } = useTranslation();
   const ios = useIosTheme();
   const { colorScheme } = useAppTheme();
+  const handlePress = () => {
+    hapticImpact();
+    onPress();
+  };
 
   return (
-    <Pressable onPress={onPress} accessibilityRole="button">
+    <Pressable onPress={handlePress} accessibilityRole="button">
       {({ pressed }) => (
         <GlassView
           colorScheme={colorScheme}

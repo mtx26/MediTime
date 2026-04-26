@@ -6,6 +6,7 @@ import { Text, XStack, YStack } from 'tamagui';
 import { LiquidButton } from '../common/LiquidButton';
 import { OutlineButton } from '../common/OutlineButton';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 type PdfDialogProps = {
   open: boolean;
@@ -25,11 +26,15 @@ export function PdfDialog({
   const { t } = useTranslation();
   const ios = useIosTheme();
   const { colorScheme } = useAppTheme();
+  const handleCancel = () => {
+    hapticSelection();
+    onCancel();
+  };
 
   return (
-    <Modal visible={open} transparent animationType="fade" onRequestClose={onCancel}>
+    <Modal visible={open} transparent animationType="fade" onRequestClose={handleCancel}>
       <Pressable
-        onPress={onCancel}
+        onPress={handleCancel}
         style={{
           flex: 1,
           justifyContent: 'center',
@@ -40,7 +45,7 @@ export function PdfDialog({
         <Pressable>
           <GlassView
             colorScheme={colorScheme}
-            glassEffectStyle="clear"
+            glassEffectStyle="regular"
             style={{
               borderRadius: 24,
               padding: 8,
@@ -56,7 +61,12 @@ export function PdfDialog({
                 </Text>
               </YStack>
 
-              <Pressable onPress={() => onIncludeInactiveChange(!includeInactive)}>
+              <Pressable
+                onPress={() => {
+                  hapticSelection();
+                  onIncludeInactiveChange(!includeInactive);
+                }}
+              >
                 <XStack style={{ alignItems: 'center', gap: 10, paddingVertical: 8 }}>
                   <Ionicons
                     name={includeInactive ? 'checkbox-outline' : 'square-outline'}

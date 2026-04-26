@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActionSheetIOS, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { Redirect, Stack, useRouter } from 'expo-router';
 import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
 import { Input, Text, XStack, YStack } from 'tamagui';
 import { ADD_CALENDAR_IMPORT_TYPES } from '@meditime/constants';
-import { InfoBanner } from '../../components/common/InfoBanner';
 import { BackButton } from '../../components/common/BackButton';
 import { LiquidButton } from '../../components/common/LiquidButton';
 import { MobileForm } from '../../components/common/MobileForm';
@@ -21,6 +21,7 @@ import {
 import { useAddCalendar, useCalendars } from '../../hooks/calendars';
 import { useAuth } from '../../hooks/auth/useAuth';
 import { useAppTheme } from '../../theme/ios';
+import { hapticImpact, hapticSelection } from '../../utils/haptics';
 
 export default function AddCalendarScreen() {
   const { t } = useTranslation();
@@ -59,6 +60,7 @@ export default function AddCalendarScreen() {
   useEffect(() => {
     if (Platform.OS !== 'ios' || !imageSourceMenuOpen) return;
 
+    hapticImpact(Haptics.ImpactFeedbackStyle.Light);
     const options = [
       String(t('image_upload.take_photo')),
       String(t('image_upload.choose_from_library')),
@@ -77,6 +79,12 @@ export default function AddCalendarScreen() {
       (buttonIndex) => {
         setImageSourceMenuOpen(false);
 
+        if (buttonIndex === cancelButtonIndex) {
+          hapticSelection();
+          return;
+        }
+
+        hapticImpact(Haptics.ImpactFeedbackStyle.Light);
         if (buttonIndex === 0) addCalendar.chooseCamera();
         if (buttonIndex === 1) addCalendar.chooseLibrary();
         if (buttonIndex === 2) addCalendar.chooseFile();
@@ -206,11 +214,6 @@ export default function AddCalendarScreen() {
                       />
                     </YStack>
                   </YStack>
-
-                  <InfoBanner
-                    iconName={isManual ? 'information-circle-outline' : isQr ? 'qr-code-outline' : 'image-outline'}
-                    text={importDescription}
-                  />
 
                   {isQr && (
                     <QRImportPanel

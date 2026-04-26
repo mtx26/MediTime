@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { GlassView } from 'expo-glass-effect';
 import { Spinner, Text, XStack } from 'tamagui';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticImpact } from '../../utils/haptics';
 
 type LiquidButtonProps = {
   disabled?: boolean;
@@ -28,12 +29,16 @@ export function LiquidButton({
   const ios = useIosTheme();
   const contentColor = tone === 'success' ? ios.success : ios.primary;
   const isSmall = size === 'sm';
+  const handlePress = () => {
+    hapticImpact();
+    onPress();
+  };
 
   return (
     <Pressable
       accessibilityRole="button"
       disabled={disabled}
-      onPress={onPress}
+      onPress={handlePress}
     >
       {({ pressed }) => (
         <GlassView

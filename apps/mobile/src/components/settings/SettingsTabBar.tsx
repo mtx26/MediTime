@@ -1,6 +1,7 @@
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import type { SettingsTabBarProps } from '@meditime/types';
 import { useAppTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 export function SettingsTabBar<TId extends string>({
   tabs,
@@ -16,8 +17,10 @@ export function SettingsTabBar<TId extends string>({
       values={tabs.map((tab) => tab.label)}
       selectedIndex={selectedIndex}
       onChange={(event) => {
-        const nextTab = tabs[event.nativeEvent.selectedSegmentIndex];
+        const nextIndex = event.nativeEvent.selectedSegmentIndex;
+        const nextTab = tabs[nextIndex];
         if (nextTab) {
+          if (nextIndex !== selectedIndex) hapticSelection();
           onTabChange(nextTab.id);
         }
       }}

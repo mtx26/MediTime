@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack, YStack } from 'tamagui';
 import { getWeekDates, toISO } from '@meditime/utils';
 import { useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 type IosWeekCalendarProps = {
   monthDate: Date;
@@ -199,7 +200,14 @@ export function IosWeekCalendar({
                 const isWeekEnd = index === 6;
 
                 return (
-                  <Pressable key={iso} onPress={() => onSelectDate(date)} accessibilityRole="button">
+                  <Pressable
+                    key={iso}
+                    onPress={() => {
+                      if (iso !== selectedIso) hapticSelection();
+                      onSelectDate(date);
+                    }}
+                    accessibilityRole="button"
+                  >
                     <YStack
                       style={{
                         width: 44,

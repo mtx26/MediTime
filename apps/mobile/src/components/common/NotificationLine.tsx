@@ -7,6 +7,7 @@ import { Text, XStack, YStack } from 'tamagui';
 import { formatDateTime } from '@meditime/utils';
 import type { NotificationLineProps } from '@meditime/types';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 type NotificationPresentation = {
   actionLabel: string | null;
@@ -164,6 +165,8 @@ export default function NotificationLine({ notif, onRead }: NotificationLineProp
   }
 
   const handlePress = () => {
+    hapticSelection();
+
     if (isUnread) {
       onRead(notif.notification_id);
     }

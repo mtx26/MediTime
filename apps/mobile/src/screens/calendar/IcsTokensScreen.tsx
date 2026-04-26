@@ -12,6 +12,7 @@ import { OutlineButton } from '../../components/common/OutlineButton';
 import { Page, usePageHeaderOptions } from '../../components/common/Page';
 import { useIcsTokens } from '../../hooks/calendar';
 import { useIosTheme } from '../../theme/ios';
+import { hapticImpact } from '../../utils/haptics';
 
 type IcsTokensScreenProps = {
   sourceType: CalendarDetailSourceType;
@@ -92,7 +93,10 @@ export default function IcsTokensScreen({ sourceType }: IcsTokensScreenProps) {
       )}
 
       <Pressable
-        onPress={() => void ics.createToken()}
+        onPress={() => {
+          hapticImpact();
+          void ics.createToken();
+        }}
         disabled={ics.isMutating}
         accessibilityRole="button"
         accessibilityLabel={String(t('ics.add_token'))}

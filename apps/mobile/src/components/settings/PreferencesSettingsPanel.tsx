@@ -8,6 +8,7 @@ import type { MobilePreferencesSettingsProps } from '@meditime/types';
 import type { AppThemePreference } from '../../theme/ios';
 import { SettingsPanelSection } from './SettingsPanelSection';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 const THEME_ICONS: Record<AppThemePreference, keyof typeof Ionicons.glyphMap> = {
   system: 'contrast-outline',
@@ -67,7 +68,10 @@ export function PreferencesSettingsPanel({
                 key={item.code}
                 accessibilityRole="button"
                 accessibilityState={{ selected: active }}
-                onPress={() => onLanguageChange(item.code)}
+                onPress={() => {
+                  if (!active) hapticSelection();
+                  onLanguageChange(item.code);
+                }}
               >
                 {({ pressed }) => (
                   <GlassView
@@ -140,8 +144,10 @@ export function PreferencesSettingsPanel({
           values={themeOptions.map((item) => item === 'system' ? 'System' : String(t(`theme.${item}`)))}
           selectedIndex={Math.max(0, themeOptions.indexOf(themePreference))}
           onChange={(event) => {
-            const nextTheme = themeOptions[event.nativeEvent.selectedSegmentIndex];
+            const nextIndex = event.nativeEvent.selectedSegmentIndex;
+            const nextTheme = themeOptions[nextIndex];
             if (nextTheme) {
+              if (nextTheme !== themePreference) hapticSelection();
               onThemePreferenceChange(nextTheme);
             }
           }}

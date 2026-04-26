@@ -4,6 +4,7 @@ import { GlassView } from 'expo-glass-effect';
 import { Text, YStack } from 'tamagui';
 import type { SocialProviderButtonProps } from '@meditime/types';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticImpact } from '../../utils/haptics';
 
 export function SocialProviderButton({
   label,
@@ -14,13 +15,17 @@ export function SocialProviderButton({
 }: SocialProviderButtonProps<keyof typeof Ionicons.glyphMap>) {
   const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
+  const handlePress = () => {
+    hapticImpact();
+    onPress();
+  };
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
       disabled={disabled}
-      onPress={onPress}
+      onPress={handlePress}
       style={{ flex: 1, minWidth: 74 }}
     >
       {({ pressed }) => (

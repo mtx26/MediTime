@@ -2,6 +2,7 @@ import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack, YStack } from 'tamagui';
 import { useIosTheme } from '../../../theme/ios';
+import { hapticSelection } from '../../../utils/haptics';
 
 type ImportTypeOptionProps = {
   description: string;
@@ -22,7 +23,10 @@ export function ImportTypeOption({
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        if (!selected) hapticSelection();
+        onPress();
+      }}
       accessibilityRole="radio"
       accessibilityState={{ checked: selected }}
     >

@@ -7,6 +7,7 @@ import { STOCK_DECREMENT_METHODS } from '@meditime/constants';
 import type { MobileCalendarStockSettingsProps, StockDecrementMethod } from '@meditime/types';
 import { SettingsPanelSection } from '../settings';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 type StockOption = {
   id: StockDecrementMethod;
@@ -50,7 +51,10 @@ export function CalendarStockSettingsPanel({
           return (
             <Pressable
               key={option.id}
-              onPress={() => onSelectMethod(option.id)}
+              onPress={() => {
+                if (!selected) hapticSelection();
+                onSelectMethod(option.id);
+              }}
               disabled={isSaving}
               accessibilityRole="radio"
               accessibilityState={{ checked: selected, disabled: isSaving }}

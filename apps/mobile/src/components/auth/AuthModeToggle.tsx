@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { YStack } from 'tamagui';
 import type { AuthModeToggleProps } from '@meditime/types';
 import { useAppTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 const modeKeys = ['auth.login', 'auth.register'] as const;
 
@@ -18,6 +19,7 @@ export function AuthModeToggle({ activeMode, onModeChange }: AuthModeToggleProps
         selectedIndex={selectedIndex}
         onChange={(event) => {
           const nextIndex = event.nativeEvent.selectedSegmentIndex;
+          if (nextIndex !== selectedIndex) hapticSelection();
           onModeChange(nextIndex === 1 ? 'register' : 'login');
         }}
         appearance={colorScheme}

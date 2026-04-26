@@ -11,6 +11,7 @@ import { LiquidButton } from '../../components/common/LiquidButton';
 import { MobileForm } from '../../components/common/MobileForm';
 import { useAuthForm } from '../../hooks/auth/useAuthForm';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 export default function AuthScreen({ initialMode }: AuthScreenProps) {
   const { t } = useTranslation();
@@ -204,7 +205,10 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
                   {isLogin && (
                     <Pressable
                       accessibilityRole="button"
-                      onPress={auth.goToResetPassword}
+                      onPress={() => {
+                        hapticSelection();
+                        auth.goToResetPassword();
+                      }}
                       style={{ alignSelf: 'flex-end' }}
                     >
                       {({ pressed }) => (
@@ -230,7 +234,10 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
                     <Pressable
                       accessibilityRole="checkbox"
                       accessibilityState={{ checked: auth.termsAccepted }}
-                      onPress={() => auth.setTermsAccepted(!auth.termsAccepted)}
+                      onPress={() => {
+                        hapticSelection();
+                        auth.setTermsAccepted(!auth.termsAccepted);
+                      }}
                     >
                       {({ pressed }) => (
                         <XStack style={{ alignItems: 'flex-start', gap: 10, opacity: pressed ? 0.75 : 1 }}>

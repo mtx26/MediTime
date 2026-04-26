@@ -6,6 +6,7 @@ import type { IcsTokenCardProps } from '@meditime/types';
 import { GlassSurface } from '../common/GlassSurface';
 import { useGlassEffectEnabled } from '../common/GlassSurface';
 import { useIosTheme } from '../../theme/ios';
+import { hapticImpact } from '../../utils/haptics';
 
 function getShortToken(token: string) {
   if (token.length <= 8) return token.toUpperCase();
@@ -30,10 +31,14 @@ function ActionIconButton({
   const ios = useIosTheme();
   const glassEnabled = useGlassEffectEnabled();
   const isDestructive = tone === 'destructive';
+  const handlePress = () => {
+    hapticImpact();
+    onPress();
+  };
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={label}
@@ -78,10 +83,14 @@ function PrimaryActionButton({
   onPress,
 }: PrimaryActionButtonProps) {
   const ios = useIosTheme();
+  const handlePress = () => {
+    hapticImpact();
+    onPress();
+  };
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={label}

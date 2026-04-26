@@ -11,6 +11,7 @@ import type { MobileActionSheetAction } from '../common/ActionSheet';
 import ActionSheet from '../common/ActionSheet';
 import { GlassSurface } from '../common/GlassSurface';
 import { useIosTheme } from '../../theme/ios';
+import { hapticImpact, hapticSelection } from '../../utils/haptics';
 
 function isFullBox(box: BoxesViewBoxItem | CalendarBoxAlertItem): box is BoxesViewBoxItem {
   return Array.isArray((box as BoxesViewBoxItem).conditions);
@@ -176,7 +177,10 @@ export function MedicineBoxCard({
 
           {canRestock ? (
             <Pressable
-              onPress={() => onRestock?.(box.id)}
+              onPress={() => {
+                hapticImpact();
+                onRestock?.(box.id);
+              }}
               disabled={disabled || box.box_capacity === 0}
               accessibilityRole="button"
               accessibilityLabel={String(t('boxes.restock'))}
@@ -241,7 +245,10 @@ export function MedicineBoxCard({
 
       {isFullBox(box) && !isAlertMode ? (
         <Pressable
-          onPress={onToggleExpanded ?? onEdit ?? undefined}
+          onPress={() => {
+            hapticSelection();
+            (onToggleExpanded ?? onEdit)?.();
+          }}
           disabled={!onToggleExpanded && !onEdit}
           accessibilityRole="button"
         >
@@ -288,7 +295,10 @@ export function MedicineBoxCard({
       {showMissingPillbox ? (
         <YStack style={{ gap: 8 }}>
           <Pressable
-            onPress={() => onMissingPillbox?.(box.id)}
+            onPress={() => {
+              hapticImpact();
+              onMissingPillbox?.(box.id);
+            }}
             disabled={disabled}
             accessibilityRole="button"
             accessibilityLabel={String(t('boxes.missing_pillbox'))}

@@ -16,6 +16,7 @@ import {
 } from '@meditime/utils';
 import type { useCalendars } from './useCalendars';
 import type { AddCalendarStep, MedicineReviewField } from '../../components/calendar/import/types';
+import { hapticImpact } from '../../utils/haptics';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
@@ -220,6 +221,7 @@ export function useAddCalendar({
           code_fmd: gtin,
         },
       ]);
+      hapticImpact();
     } catch (err) {
       setQrScannedCodes((prev) => prev.filter((code) => code !== gtin));
       Alert.alert(

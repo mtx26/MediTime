@@ -5,6 +5,7 @@ import { Text, XStack, YStack } from 'tamagui';
 import type { SharedUserListProps } from '@meditime/types';
 import { SharedUserRow } from './SharedUserRow';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticImpact } from '../../utils/haptics';
 
 export function SharedUserList({
   emailToInvite,
@@ -92,6 +93,7 @@ export function SharedUserList({
               returnKeyType="send"
               onSubmitEditing={() => {
                 if (canInvite) {
+                  hapticImpact();
                   onInvite();
                 }
                 }}
@@ -102,7 +104,14 @@ export function SharedUserList({
             />
           </View>
 
-          <Pressable onPress={onInvite} disabled={!canInvite} accessibilityRole="button">
+          <Pressable
+            onPress={() => {
+              hapticImpact();
+              onInvite();
+            }}
+            disabled={!canInvite}
+            accessibilityRole="button"
+          >
             {({ pressed }) => (
               <View
                 style={{

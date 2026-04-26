@@ -15,6 +15,7 @@ import {
 } from '../../components/settings';
 import { useSettings } from '../../hooks/settings';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticImpact } from '../../utils/haptics';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
@@ -56,7 +57,13 @@ export default function SettingsScreen() {
             borderTopColor: ios.border,
           }}
         >
-          <Pressable accessibilityRole="button" onPress={settings.confirmLogout}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => {
+              hapticImpact();
+              settings.confirmLogout();
+            }}
+          >
             {({ pressed }) => (
               <GlassView
                 colorScheme={colorScheme}

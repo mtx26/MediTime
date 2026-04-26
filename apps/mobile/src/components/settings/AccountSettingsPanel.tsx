@@ -8,6 +8,7 @@ import { LiquidButton } from '../common/LiquidButton';
 import { MobileForm } from '../common/MobileForm';
 import { SettingsPanelSection } from './SettingsPanelSection';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { hapticSelection } from '../../utils/haptics';
 
 export function AccountSettingsPanel({
   displayName,
@@ -22,6 +23,10 @@ export function AccountSettingsPanel({
   const { t } = useTranslation();
   const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
+  const handleChangePhoto = () => {
+    hapticSelection();
+    onChangePhoto();
+  };
 
   return (
     <YStack style={{ gap: 14 }}>
@@ -45,7 +50,7 @@ export function AccountSettingsPanel({
             accessibilityRole="button"
             accessibilityLabel={String(t('account.change_photo'))}
             disabled={isSaving}
-            onPress={onChangePhoto}
+            onPress={handleChangePhoto}
           >
             {({ pressed }) => (
               photoUrl ? (

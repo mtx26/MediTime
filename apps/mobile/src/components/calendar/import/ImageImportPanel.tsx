@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { GlassView } from 'expo-glass-effect';
 import { Text, YStack } from 'tamagui';
 import { useAppTheme, useIosTheme } from '../../../theme/ios';
+import { hapticImpact, hapticSelection } from '../../../utils/haptics';
 
 type ImageImportPanelProps = {
   fileName: string | null;
@@ -26,13 +27,17 @@ export function ImageImportPanel({
 
   const handleRemoveImage = (event: GestureResponderEvent) => {
     event.stopPropagation();
+    hapticImpact();
     onRemoveImage();
   };
 
   if (imageUri) {
     return (
       <Pressable
-        onPress={onChooseSource}
+        onPress={() => {
+          hapticSelection();
+          onChooseSource();
+        }}
         disabled={disabled}
         accessibilityRole="button"
         accessibilityLabel={String(t('image_upload.click_to_change'))}
@@ -110,7 +115,14 @@ export function ImageImportPanel({
   }
 
   return (
-    <Pressable onPress={onChooseSource} disabled={disabled} accessibilityRole="button">
+    <Pressable
+      onPress={() => {
+        hapticSelection();
+        onChooseSource();
+      }}
+      disabled={disabled}
+      accessibilityRole="button"
+    >
       {({ pressed }) => (
         <GlassView
           colorScheme={colorScheme}

@@ -12,9 +12,11 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack, YStack } from 'tamagui';
 import { useAppTheme } from '../../theme/ios';
+import { hapticImpact, hapticSelection } from '../../utils/haptics';
 
 export type BottomActionMenuItem = {
   label?: string;
@@ -65,6 +67,7 @@ export function BottomActionMenu({
         return;
       }
 
+      hapticImpact(Haptics.ImpactFeedbackStyle.Light);
       const options = iosActionItems.map((item) => item.label ?? '');
       const cancelButtonIndex = options.length;
       const destructiveButtonIndex = iosActionItems.findIndex((item) => item.danger);
@@ -81,9 +84,15 @@ export function BottomActionMenu({
           onClose();
 
           if (buttonIndex === cancelButtonIndex) {
+            hapticSelection();
             return;
           }
 
+          hapticImpact(
+            iosActionItems[buttonIndex]?.danger
+              ? Haptics.ImpactFeedbackStyle.Medium
+              : Haptics.ImpactFeedbackStyle.Light,
+          );
           iosActionItems[buttonIndex]?.onPress?.();
         },
       );
@@ -92,6 +101,7 @@ export function BottomActionMenu({
     }
 
     if (visible) {
+      hapticImpact(Haptics.ImpactFeedbackStyle.Light);
       setMounted(true);
       Animated.timing(animation, {
         toValue: 1,
@@ -113,8 +123,14 @@ export function BottomActionMenu({
   }, [animation, visible]);
 
   const handleItemPress = (item: BottomActionMenuItem) => {
+    hapticImpact(item.danger ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light);
     onClose();
     setTimeout(() => item.onPress?.(), 120);
+  };
+
+  const handleClosePress = () => {
+    hapticSelection();
+    onClose();
   };
 
   if (Platform.OS === 'ios' || !mounted) return null;
@@ -147,7 +163,7 @@ export function BottomActionMenu({
           ]}
         />
         <Pressable
-          onPress={onClose}
+          onPress={handleClosePress}
           accessibilityRole="button"
           accessibilityLabel={String(t('cancel'))}
           style={StyleSheet.absoluteFillObject}
@@ -318,7 +334,7 @@ export function BottomActionMenu({
             </ScrollView>
 
             <Pressable
-              onPress={onClose}
+              onPress={handleClosePress}
               accessibilityRole="button"
               accessibilityLabel={String(t('cancel'))}
               style={{ marginTop: 10 }}
