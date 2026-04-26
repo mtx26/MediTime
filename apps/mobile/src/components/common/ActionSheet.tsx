@@ -58,7 +58,7 @@ function ActionSheet({
     [actions],
   );
   const isWideLayout = width >= 720;
-  const maxSheetHeight = Math.max(240, Math.min(height - insets.top - 28, 480));
+  const maxSheetHeight = Math.max(260, Math.min(height - insets.top - 28, 560));
   const panelWidth = Math.min(width - 56, 280);
   const panelTop = Math.max(insets.top + 40, isWideLayout ? 92 : 74);
 
