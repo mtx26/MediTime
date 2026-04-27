@@ -46,7 +46,7 @@ export default function CalendarDetailScreen({
         <ActionSheet
           actions={detail.actions}
           buttonSize="sm"
-          variant="plain"
+          variant="clear"
           onNavigate={detail.navigateToHref}
         />
       ) : null

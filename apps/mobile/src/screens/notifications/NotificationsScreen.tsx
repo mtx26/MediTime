@@ -30,7 +30,7 @@ export default function NotificationsScreen() {
       <ActionSheet
         actions={notifications.actions}
         buttonSize="sm"
-        variant="plain"
+        variant="clear"
         onNavigate={notifications.navigateToHref}
       />
     ),

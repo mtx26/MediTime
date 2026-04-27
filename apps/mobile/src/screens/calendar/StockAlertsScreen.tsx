@@ -29,7 +29,7 @@ export default function StockAlertsScreen({ sourceType }: StockAlertsScreenProps
         <ActionSheet
           actions={stockAlerts.actions}
           buttonSize="sm"
-          variant="plain"
+          variant="clear"
           onNavigate={stockAlerts.navigateToHref}
         />
       ) : null

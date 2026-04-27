@@ -10,7 +10,6 @@ import { ADD_CALENDAR_IMPORT_TYPES } from '@meditime/constants';
 import { BackButton } from '../../components/common/BackButton';
 import { LiquidButton } from '../../components/common/LiquidButton';
 import { MobileForm } from '../../components/common/MobileForm';
-import { OutlineButton } from '../../components/common/OutlineButton';
 import { Page, usePageHeaderOptions } from '../../components/common/Page';
 import {
   ImageImportPanel,
@@ -250,7 +249,6 @@ export default function AddCalendarScreen() {
                       onPress={form.submit}
                       disabled={addCalendar.isBusy || !canSubmit}
                     />
-                    <OutlineButton label={t('cancel')} onPress={close} />
                   </YStack>
                 </>
               )}

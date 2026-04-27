@@ -32,7 +32,7 @@ export default function SharedCalendarsScreen() {
         <ActionSheet
           actions={shared.actions}
           buttonSize="sm"
-          variant="plain"
+          variant="clear"
           onNavigate={shared.navigateToHref}
         />
       ) : null

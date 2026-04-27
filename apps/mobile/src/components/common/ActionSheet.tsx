@@ -33,7 +33,7 @@ type ActionSheetProps = {
   dataTour?: string;
   onPress?: () => void;
   onNavigate?: (href: string) => void;
-  variant?: 'filled' | 'plain';
+  variant?: 'clear' | 'plain';
   triggerMode?: 'button' | 'longPress';
 };
 
@@ -48,7 +48,7 @@ function ActionSheet({
   triggerMode = 'button',
 }: ActionSheetProps) {
   const { t } = useTranslation();
-  const { ios, isDark } = useAppTheme();
+  const { ios, isDark, colorScheme } = useAppTheme();
   const insets = useSafeAreaInsets();
   const { height, width } = useWindowDimensions();
   const [open, setOpen] = useState(false);
@@ -280,11 +280,37 @@ function ActionSheet({
     );
   }
 
-  const isPlain = variant === 'plain';
-  const size = isPlain ? 36 : buttonSize === 'sm' ? 36 : 40;
-  const iconSize = isPlain ? 24 : 18;
-  const triggerShadowOpacity = isPlain ? 0 : (isDark ? 0.22 : 0.08);
-
+  if (variant === 'clear') {
+    return (
+      <>
+        <Pressable
+          ref={triggerRef}
+          onPress={openActionSheet}
+          accessibilityRole="button"
+          accessibilityLabel={t('Actions')}
+          testID={dataTour}
+        >
+          {({ pressed }) => (
+            <XStack
+              style={{
+                width: 32,
+                height: 32,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 16,
+                opacity: pressed ? 0.72 : 1,
+              }}
+            >
+              <Ionicons name="ellipsis-horizontal" size={18} color={ios.primary} />
+            </XStack>
+          )}
+        </Pressable>
+        {renderActionSheetModal()}
+      </>
+    );
+  }
+  const size = buttonSize === 'sm' ? 32 : 36;
+  const iconSize = buttonSize === 'sm' ? 18 : 20;
   return (
     <>
       <Pressable
@@ -295,26 +321,23 @@ function ActionSheet({
         testID={dataTour}
       >
         {({ pressed }) => (
-          <YStack
+          <GlassView
+            colorScheme={colorScheme}
+            glassEffectStyle="regular"
             style={{
               width: size,
               height: size,
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: isPlain ? 8 : size / 2,
-              backgroundColor: isPlain
-                ? 'transparent'
-                : pressed ? ios.blueInfoBorder : ios.blueInfoBg,
-              opacity: pressed ? 0.75 : 1,
-              shadowColor: ios.shadow,
-              shadowOpacity: triggerShadowOpacity,
-              shadowRadius: 10,
-              shadowOffset: { width: 0, height: 3 },
-              elevation: isPlain ? 0 : 1,
+              borderRadius: size / 2,
+              borderWidth: 0.5,
+              borderColor: ios.border,
+              overflow: 'hidden',
+              opacity: pressed ? 0.72 : 1,
             }}
           >
             <Ionicons name="ellipsis-horizontal" size={iconSize} color={ios.primary} />
-          </YStack>
+          </GlassView>
         )}
       </Pressable>
       {renderActionSheetModal()}

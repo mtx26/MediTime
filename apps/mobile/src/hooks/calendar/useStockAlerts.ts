@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Alert, Linking } from 'react-native';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { buildStockAlertActions } from '@meditime/utils';
+import { buildStockAlertActions, isStockAlertBox, isBoxMissingPillbox } from '@meditime/utils';
 import type {
   ApiResult,
   CalendarBoxAlertItem,
@@ -21,16 +21,6 @@ type BoxesResult = ApiResult & {
   boxes?: CalendarBoxAlertItem[];
   status?: number;
 };
-
-function isAlertBox(box: CalendarBoxAlertItem) {
-  return box.stock_alert_threshold > 0
-    && box.stock_quantity <= box.stock_alert_threshold
-    && box.box_capacity > 0
-    && (box.conditions ?? []).every((condition) => {
-      if (!condition?.max_date) return true;
-      return new Date() <= new Date(condition.max_date);
-    });
-}
 
 function sortAlerts(a: CalendarBoxAlertItem, b: CalendarBoxAlertItem) {
   if (a.stock_quantity !== b.stock_quantity) {
@@ -110,14 +100,14 @@ export function useStockAlerts(sourceType: Exclude<CalendarDetailSourceType, 'to
   );
 
   const alerts = useMemo(
-    () => boxes.filter(isAlertBox),
+    () => boxes.filter(isStockAlertBox),
     [boxes],
   );
 
   const sendSms = useCallback(() => {
     const title = String(t('boxes.stock.alerts.title'));
     const lines = alerts.map((box) => (
-      box.stock_quantity < 0
+      isBoxMissingPillbox(box)
         ? String(t('boxes.stock.alerts.line_negative', {
             count: box.stock_quantity,
             dose: box.dose ?? 0,

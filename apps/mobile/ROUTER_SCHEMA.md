@@ -31,7 +31,7 @@ apps/mobile/app
         [calendarId]
           _layout.tsx
           ✅🪟 index.tsx
-          boxes.tsx
+          ✅🪟 boxes.tsx
           pillbox.tsx
           ✅🪟 daily.tsx
           ✅🪟 settings.tsx
@@ -46,7 +46,7 @@ apps/mobile/app
         [calendarId]
           _layout.tsx
           ✅🪟 index.tsx
-          boxes.tsx
+          ✅🪟 boxes.tsx
           pillbox.tsx
           ✅🪟 daily.tsx
           ✅🪟 settings.tsx

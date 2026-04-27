@@ -1,20 +1,21 @@
-import { forwardRef, type ComponentProps, type ElementRef } from 'react';
-import { Text, Input, YStack } from 'tamagui';
+import { forwardRef } from 'react';
+import { TextInput, type TextInputProps } from 'react-native';
+import { Text, YStack } from 'tamagui';
 import { useIosTheme } from '../../../theme/ios';
-
-type TamaguiInputProps = ComponentProps<typeof Input>;
 
 type ReviewFieldProps = {
   label: string;
-  onSubmitEditing?: TamaguiInputProps['onSubmitEditing'];
+  onSubmitEditing?: TextInputProps['onSubmitEditing'];
   value: string;
   onChangeText: (value: string) => void;
-  keyboardType?: 'default' | 'numeric';
+  keyboardType?: TextInputProps['keyboardType'];
   required?: boolean;
-  returnKeyType?: TamaguiInputProps['returnKeyType'];
+  returnKeyType?: TextInputProps['returnKeyType'];
+  size?: 'default' | 'sm';
+  muted?: boolean;
 };
 
-export const ReviewField = forwardRef<ElementRef<typeof Input>, ReviewFieldProps>(function ReviewField({
+export const ReviewField = forwardRef<TextInput, ReviewFieldProps>(function ReviewField({
   label,
   onSubmitEditing,
   value,
@@ -22,28 +23,34 @@ export const ReviewField = forwardRef<ElementRef<typeof Input>, ReviewFieldProps
   keyboardType = 'default',
   required = false,
   returnKeyType,
+  size = 'default',
+  muted = false,
 }, ref) {
   const ios = useIosTheme();
+  const isSmall = size === 'sm';
 
   return (
-    <YStack style={{ gap: 7 }}>
-      <Text style={{ color: ios.foreground, fontSize: 14, fontWeight: '700' }}>
+    <YStack style={{ gap: 5 }}>
+      <Text style={{ color: ios.foreground, fontSize: isSmall ? 12 : 14, fontWeight: '700' }}>
         {label}{required ? <Text style={{ color: ios.destructive }}> *</Text> : null}
       </Text>
-      <Input
+      <TextInput
         ref={ref}
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
         onSubmitEditing={onSubmitEditing}
         returnKeyType={returnKeyType}
+        autoCorrect={false}
+        autoCapitalize="none"
         style={{
-          minHeight: 44,
-          borderWidth: 0,
-          borderRadius: 12,
-          backgroundColor: ios.background,
+          minHeight: isSmall ? 36 : 44,
+          borderRadius: 10,
+          backgroundColor: muted ? ios.accentHover : ios.card,
           color: ios.foreground,
-          fontSize: 16,
+          fontSize: isSmall ? 14 : 16,
+          paddingHorizontal: isSmall ? 10 : 12,
+          paddingVertical: isSmall ? 6 : 10,
         }}
       />
     </YStack>

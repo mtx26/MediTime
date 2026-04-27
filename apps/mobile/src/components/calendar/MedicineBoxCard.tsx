@@ -9,6 +9,7 @@ import type {
 } from '@meditime/types';
 import type { MobileActionSheetAction } from '../common/ActionSheet';
 import ActionSheet from '../common/ActionSheet';
+import { getBoxDisplayFlags, getBoxStatusItems, type BoxStatusItemKey } from '@meditime/utils';
 import { GlassSurface } from '../common/GlassSurface';
 import { useIosTheme } from '../../theme/ios';
 import { hapticImpact, hapticSelection } from '../../utils/haptics';
@@ -17,55 +18,15 @@ function isFullBox(box: BoxesViewBoxItem | CalendarBoxAlertItem): box is BoxesVi
   return Array.isArray((box as BoxesViewBoxItem).conditions);
 }
 
-function hasOnlyExpiredConditions(box: BoxesViewBoxItem) {
-  return box.conditions.length > 0 && box.conditions.every((condition) => {
-    if (!condition?.max_date) return false;
-    return new Date() > new Date(condition.max_date);
-  });
-}
-
-function hasSomeExpiredConditions(box: BoxesViewBoxItem) {
-  return box.conditions.some((condition) => {
-    if (!condition?.max_date) return false;
-    return new Date() > new Date(condition.max_date);
-  });
-}
-
-function getStatusItems(
-  box: BoxesViewBoxItem | CalendarBoxAlertItem,
-  t: (key: string) => string,
-) {
-  const statuses: Array<{
-    icon: keyof typeof Ionicons.glyphMap;
-    text: string;
-    tone: 'warning' | 'danger' | 'success' | 'info';
-  }> = [];
-
-  if (isFullBox(box)) {
-    if (box.conditions.filter(Boolean).length === 0) {
-      statuses.push({ icon: 'information-circle-outline', tone: 'warning', text: t('boxes.condition.none') });
-    } else if (hasOnlyExpiredConditions(box)) {
-      statuses.push({ icon: 'pause-circle-outline', tone: 'info', text: t('boxes.condition.inactive') });
-    } else if (hasSomeExpiredConditions(box)) {
-      statuses.push({ icon: 'alert-circle-outline', tone: 'info', text: t('boxes.condition.expired') });
-    }
-  }
-
-  if (box.box_capacity <= 0 || box.stock_alert_threshold <= 0) {
-    statuses.push({ icon: 'notifications-off-outline', tone: 'info', text: t('boxes.stock.badge.alerts_disabled') });
-    return statuses;
-  }
-
-  if (box.stock_quantity <= 0) {
-    statuses.push({ icon: 'warning-outline', tone: 'danger', text: t('boxes.stock.badge.out') });
-  } else if (box.stock_quantity <= box.stock_alert_threshold) {
-    statuses.push({ icon: 'warning-outline', tone: 'warning', text: t('boxes.stock.badge.low') });
-  } else {
-    statuses.push({ icon: 'checkmark-circle-outline', tone: 'success', text: t('boxes.stock.badge.high') });
-  }
-
-  return statuses;
-}
+const STATUS_ICON_MAP: Record<BoxStatusItemKey, keyof typeof Ionicons.glyphMap> = {
+  condition_none: 'information-circle-outline',
+  condition_inactive: 'pause-circle-outline',
+  condition_expired: 'alert-circle-outline',
+  stock_out: 'warning-outline',
+  stock_low: 'warning-outline',
+  stock_ok: 'checkmark-circle-outline',
+  alerts_disabled: 'notifications-off-outline',
+};
 
 function formatConditionSummary(box: BoxesViewBoxItem, t: (key: string) => string) {
   return `${t('boxes.intake_conditions')}: ${box.conditions.filter(Boolean).length}`;
@@ -77,10 +38,13 @@ function formatConditionLine(box: BoxesViewBoxItem, index: number, t: (key: stri
 
   const tabletCount = Number(condition.tablet_count ?? 1);
   const intervalDays = Number(condition.interval_days ?? 1);
+  const timeOfDay = condition.time_of_day && ['morning', 'noon', 'evening'].includes(condition.time_of_day)
+    ? t(condition.time_of_day)
+    : condition.time_of_day ?? '-';
 
   return [
     `${tabletCount} ${tabletCount > 1 ? t('boxes.tablets') : t('boxes.tablet')}`,
-    condition.time_of_day ?? '-',
+    timeOfDay,
     `${t('boxes.every')} ${intervalDays} ${intervalDays > 1 ? t('boxes.days') : t('boxes.day')}`,
   ].join(' - ');
 }
@@ -99,20 +63,23 @@ export function MedicineBoxCard({
   const { t } = useTranslation();
   const ios = useIosTheme();
   const translate = (key: string) => String(t(key));
-  const isCritical = box.stock_quantity <= 0;
+  const { isCritical, isLow, allExpired, isMissingPillbox } = getBoxDisplayFlags(box);
   const isAlertMode = mode === 'alerts';
   const canRestock = typeof onRestock === 'function';
-  const showMissingPillbox = box.stock_quantity < 0 && typeof onMissingPillbox === 'function';
-  const statuses = getStatusItems(box, translate);
+  const showMissingPillbox = isMissingPillbox && typeof onMissingPillbox === 'function';
   const cardBorderColor = isCritical
     ? ios.destructiveBorder
-    : !isAlertMode && isFullBox(box) && hasOnlyExpiredConditions(box)
-      ? ios.primary
-      : ios.border;
+    : isLow
+      ? ios.warningText
+      : !isAlertMode && allExpired
+        ? ios.primary
+        : ios.border;
 
   return (
     <GlassSurface
       borderColor={cardBorderColor}
+      glassEffectStyle="clear"
+      surfaceTone="subtle"
       style={{
         gap: 12,
         borderRadius: 18,
@@ -165,7 +132,7 @@ export function MedicineBoxCard({
             </Text>
             <Text
               style={{
-                color: isCritical ? ios.destructive : ios.foreground,
+              color: isCritical ? ios.destructive : ios.foreground,
                 fontSize: 16,
                 lineHeight: 22,
                 fontWeight: '900',
@@ -213,18 +180,18 @@ export function MedicineBoxCard({
       </YStack>
 
       <XStack style={{ flexWrap: 'wrap', gap: 8 }}>
-        {statuses.map((status) => {
-          const palette = status.tone === 'danger'
+        {getBoxStatusItems(box).map((item) => {
+          const palette = item.variant === 'danger'
             ? { background: ios.destructiveBg, color: ios.destructive }
-            : status.tone === 'success'
+            : item.variant === 'success'
               ? { background: ios.successBg, color: ios.success }
-              : status.tone === 'info'
+              : item.variant === 'info'
                 ? { background: ios.accentHover, color: ios.mutedForeground }
                 : { background: ios.warningBg, color: ios.warningText };
 
           return (
             <XStack
-              key={status.text}
+              key={item.key}
               style={{
                 alignItems: 'center',
                 gap: 6,
@@ -234,9 +201,9 @@ export function MedicineBoxCard({
                 backgroundColor: palette.background,
               }}
             >
-              <Ionicons name={status.icon} size={14} color={palette.color} />
+              <Ionicons name={STATUS_ICON_MAP[item.key]} size={14} color={palette.color} />
               <Text style={{ color: palette.color, fontSize: 12, lineHeight: 16, fontWeight: '800' }}>
-                {status.text}
+                {t(item.i18nKey)}
               </Text>
             </XStack>
           );

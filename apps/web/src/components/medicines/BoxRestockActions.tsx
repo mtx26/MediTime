@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { isBoxMissingPillbox } from '@meditime/utils';
 import IconButton from '@/components/common/UtilityComponents';
 import { PlusCircle, Package } from 'lucide-react';
 
@@ -6,12 +7,14 @@ interface BoxRestockActionsProps {
   boxId: string;
   stockQuantity: number;
   boxCapacity: number;
+  stockAlertThreshold?: number;
   onRestock: (id: string) => void;
   onMissingPillbox?: (id: string) => void;
 }
 
-function BoxRestockActions({ boxId, stockQuantity, boxCapacity, onRestock, onMissingPillbox }: BoxRestockActionsProps) {
+function BoxRestockActions({ boxId, stockQuantity, boxCapacity, stockAlertThreshold = 0, onRestock, onMissingPillbox }: BoxRestockActionsProps) {
   const { t } = useTranslation();
+  const box = { stock_quantity: stockQuantity, box_capacity: boxCapacity, stock_alert_threshold: stockAlertThreshold };
 
   return (
     <div className="flex-1 flex flex-col gap-2">
@@ -25,7 +28,7 @@ function BoxRestockActions({ boxId, stockQuantity, boxCapacity, onRestock, onMis
           helpDisabled={t('boxes.restock_disabled_tooltip')}
         />
       </div>
-      {stockQuantity < 0 && onMissingPillbox && (
+      {isBoxMissingPillbox(box) && onMissingPillbox && (
         <div className="flex-1">
           <IconButton
             className="w-full border-blue-500 text-blue-600 hover:bg-blue-50"

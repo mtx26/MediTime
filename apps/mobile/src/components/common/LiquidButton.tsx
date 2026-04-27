@@ -9,7 +9,7 @@ import { hapticImpact } from '../../utils/haptics';
 type LiquidButtonProps = {
   disabled?: boolean;
   iconName?: keyof typeof Ionicons.glyphMap;
-  label: ReactNode;
+  label?: ReactNode;
   loading?: boolean;
   onPress: () => void;
   size?: 'default' | 'sm';
@@ -29,6 +29,7 @@ export function LiquidButton({
   const ios = useIosTheme();
   const contentColor = tone === 'success' ? ios.success : ios.primary;
   const isSmall = size === 'sm';
+  const iconOnly = !label;
   const handlePress = () => {
     hapticImpact();
     onPress();
@@ -49,7 +50,7 @@ export function LiquidButton({
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: isSmall ? 14 : 18,
-            paddingHorizontal: isSmall ? 12 : 16,
+            paddingHorizontal: iconOnly ? (isSmall ? 7 : 10) : (isSmall ? 12 : 16),
             paddingVertical: isSmall ? 7 : 10,
             opacity: disabled ? 0.5 : pressed ? 0.82 : 1,
           }}
@@ -60,9 +61,11 @@ export function LiquidButton({
             ) : iconName ? (
               <Ionicons name={iconName} size={isSmall ? 15 : 18} color={contentColor} />
             ) : null}
-            <Text style={{ color: contentColor, fontSize: isSmall ? 13 : 16, fontWeight: '900' }}>
-              {label}
-            </Text>
+            {label ? (
+              <Text style={{ color: contentColor, fontSize: isSmall ? 13 : 16, fontWeight: '900' }}>
+                {label}
+              </Text>
+            ) : null}
           </XStack>
         </GlassView>
       )}
