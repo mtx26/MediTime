@@ -59,9 +59,10 @@ export function CalendarSection({
           {title}
         </Text>
       </XStack>
-
-      {showInfoEmpty && calendars.length === 0 && emptyText ? (
-        <EmptyInfo text={emptyText} />
+      {calendars.length === 0 ? (
+        showInfoEmpty && emptyText ? (
+          <EmptyInfo text={emptyText} />
+        ) : null
       ) : (
         <GlassView
           colorScheme={colorScheme}

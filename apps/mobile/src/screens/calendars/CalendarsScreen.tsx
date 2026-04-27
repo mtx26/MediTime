@@ -244,7 +244,7 @@ export default function CalendarsScreen() {
           glassEffectStyle="clear"
           glassStyle={{ borderRadius: 24, padding: 8 }}
           emptyText={String(t('no_shared_calendars'))}
-          showInfoEmpty
+          showInfoEmpty={true}
           getActions={getSharedActions}
           onOpen={openSharedCalendar}
           onNavigate={navigateToHref}

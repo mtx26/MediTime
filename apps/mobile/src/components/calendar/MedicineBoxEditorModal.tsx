@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Modal,
@@ -6,6 +6,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   TextInput,
 } from 'react-native';
 import NativeSegmentedControl from '@react-native-segmented-control/segmented-control';
@@ -20,6 +21,7 @@ import { LiquidButton } from '../common/LiquidButton';
 import { MobileForm } from '../common/MobileForm';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
 import { ReviewField } from './import/ReviewField';
+import { MedicineSearchInput } from './MedicineSearchInput';
 
 type MedicineBoxEditorModalProps = {
   disabled?: boolean;
@@ -291,12 +293,18 @@ export function MedicineBoxEditorModal({
   const capacityInputRef = useRef<TextInput>(null);
   const stockInputRef = useRef<TextInput>(null);
   const thresholdInputRef = useRef<TextInput>(null);
+  const [showThresholdInput, setShowThresholdInput] = useState(false);
 
   const isNew = Boolean(editingBoxId?.startsWith('temp-'));
 
   const setField = <Key extends keyof EditingBoxState>(field: Key, value: EditingBoxState[Key]) => {
     if (!editingBox) return;
     onChange({ ...editingBox, [field]: value });
+  };
+
+  const setFields = (updates: Partial<EditingBoxState>) => {
+    if (!editingBox) return;
+    onChange({ ...editingBox, ...updates });
   };
 
   const conditions = editingBox
@@ -409,14 +417,13 @@ export function MedicineBoxEditorModal({
                         </Pressable>
                       </XStack>
 
-                      {/* Name */}
-                      <ReviewField
-                        label={String(t('boxes.name'))}
-                        value={editingBox.name}
-                        required
-                        onChangeText={(value) => setField('name', value)}
-                        returnKeyType="next"
-                        onSubmitEditing={() => doseInputRef.current?.focus()}
+                      {/* Name + Dose (avec autocomplétion) */}
+                      <MedicineSearchInput
+                        name={editingBox.name}
+                        dose={editingBox.dose ?? null}
+                        onChangeName={(value) => setField('name', value)}
+                        onApplySuggestion={(updates) => setFields(updates)}
+                        nextRef={capacityInputRef}
                       />
 
                       {/* Dose */}
@@ -430,29 +437,16 @@ export function MedicineBoxEditorModal({
                         onSubmitEditing={() => capacityInputRef.current?.focus()}
                       />
 
-                      {/* Capacity + Alert Threshold */}
-                      <XStack style={{ gap: 12 }}>
-                        <YStack style={{ flex: 1 }}>
-                          <ReviewField
-                            ref={capacityInputRef}
-                            label={String(t('boxes.capacity'))}
-                            value={String(editingBox.box_capacity ?? '')}
-                            keyboardType="numeric"
-                            onChangeText={(value) => setField('box_capacity', setNumberText(value))}
-                            returnKeyType="next"
-                            onSubmitEditing={() => stockInputRef.current?.focus()}
-                          />
-                        </YStack>
-                        <YStack style={{ flex: 1 }}>
-                          <ReviewField
-                            ref={thresholdInputRef}
-                            label={String(t('boxes.alert_threshold'))}
-                            value={String(editingBox.stock_alert_threshold ?? '')}
-                            keyboardType="numeric"
-                            onChangeText={(value) => setField('stock_alert_threshold', setNumberText(value))}
-                          />
-                        </YStack>
-                      </XStack>
+                      {/* Capacity */}
+                      <ReviewField
+                        ref={capacityInputRef}
+                        label={String(t('boxes.capacity'))}
+                        value={String(editingBox.box_capacity ?? '')}
+                        keyboardType="numeric"
+                        onChangeText={(value) => setField('box_capacity', setNumberText(value))}
+                        returnKeyType="next"
+                        onSubmitEditing={() => stockInputRef.current?.focus()}
+                      />
 
                       {/* Stock Quantity */}
                       <ReviewField
@@ -461,7 +455,57 @@ export function MedicineBoxEditorModal({
                         value={String(editingBox.stock_quantity ?? '')}
                         keyboardType="numeric"
                         onChangeText={(value) => setField('stock_quantity', setNumberText(value))}
+                        returnKeyType="done"
                       />
+
+                      {/* Alert Threshold Switch */}
+                      <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                        <XStack style={{ flex: 1, alignItems: 'center', gap: 6 }}>
+                          {showThresholdInput ? (
+                            <YStack style={{ flex: 1 }}>
+                              <ReviewField
+                                ref={thresholdInputRef}
+                                size="sm"
+                                muted
+                                label={String(t('boxes.alert_threshold'))}
+                                value={String(editingBox.stock_alert_threshold ?? '')}
+                                keyboardType="numeric"
+                                onChangeText={(value) => setField('stock_alert_threshold', setNumberText(value))}
+                                returnKeyType="done"
+                                onSubmitEditing={() => setShowThresholdInput(false)}
+                              />
+                            </YStack>
+                          ) : (
+                            <XStack style={{ flex: 1, alignItems: 'center', gap: 6 }}>
+                              <Ionicons name="notifications-outline" size={14} color={ios.mutedForeground} />
+                              <Text style={{ color: ios.mutedForeground, fontSize: 13 }}>
+                                {`${t('boxes.alert_threshold')} : ${editingBox.stock_alert_threshold ?? 10}`}
+                              </Text>
+                            </XStack>
+                          )}
+                        </XStack>
+                        <Pressable onPress={() => setShowThresholdInput((v) => !v)}>
+                          {({ pressed }) => (
+                            <GlassView
+                              colorScheme={colorScheme}
+                              glassEffectStyle="regular"
+                              style={{
+                                width: 32,
+                                height: 32,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: 16,
+                                borderWidth: 0.5,
+                                borderColor: ios.border,
+                                overflow: 'hidden',
+                                opacity: pressed ? 0.72 : 1,
+                              }}
+                            >
+                              <Ionicons name={showThresholdInput ? 'close' : 'pencil-outline'} size={16} color={ios.primary} />
+                            </GlassView>
+                          )}
+                        </Pressable>
+                      </XStack>
 
                       {/* Conditions */}
                       <YStack style={{ gap: 10 }}>
