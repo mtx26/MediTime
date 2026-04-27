@@ -46,7 +46,7 @@ def get_connection(uid: str = None, skip_rls: bool = False):
     conn = connection_pool.getconn()
 
     try:
-        # Si on demande explicitement de sauter le RLS, on retourne la connexion telle quelle (Admin)
+        # Si on demande explicitement de sauter le RLS, on remet le rôle par défaut (Admin)
         if not skip_rls:
             # Déterminer l'UID à utiliser (paramètre explicite ou contexte global)
             target_uid = uid
@@ -59,6 +59,10 @@ def get_connection(uid: str = None, skip_rls: bool = False):
                     cursor.execute("SET request.jwt.claim.sub = %s", (target_uid,))
                     # Bascule vers le rôle 'authenticated' pour que RLS s'applique
                     cursor.execute("SET ROLE authenticated")
+        else:
+            # Réinitialise le rôle au cas où la connexion proviendrait du pool avec un rôle actif
+            with conn.cursor() as cursor:
+                cursor.execute("RESET ROLE")
         
         yield conn
         # Commit automatique si tout s'est bien passé
