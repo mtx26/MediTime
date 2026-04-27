@@ -39,11 +39,6 @@ services:
     deploy:
       restart_policy:
         condition: any
-      update_config:
-        order: stop-first
-        failure_action: rollback
-      rollback_config:
-        order: stop-first
 
 
   backend-scheduler:
@@ -57,8 +52,3 @@ services:
     deploy:
       restart_policy:
         condition: any
-      update_config:
-        order: stop-first
-        failure_action: rollback
-      rollback_config:
-        order: stop-first
