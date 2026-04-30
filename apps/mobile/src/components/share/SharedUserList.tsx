@@ -1,5 +1,6 @@
 import { Pressable, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import type { SharedUserListProps } from '@meditime/types';
@@ -22,13 +23,12 @@ export function SharedUserList({
   const canInvite = emailToInvite.trim().length > 0;
 
   return (
-    <View
+    <GlassView
+      colorScheme={colorScheme}
+      glassEffectStyle="clear"
       style={{
         borderRadius: 24,
         padding: 8,
-        backgroundColor: ios.card,
-        borderWidth: 1,
-        borderColor: ios.border,
       }}
     >
       <YStack style={{ gap: 12, padding: 6 }}>
@@ -76,7 +76,7 @@ export function SharedUserList({
               justifyContent: 'center',
               borderRadius: 18,
               paddingHorizontal: 12,
-              backgroundColor: ios.background,
+              backgroundColor: ios.card,
             }}
           >
             <TextInput
@@ -120,20 +120,20 @@ export function SharedUserList({
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderRadius: 18,
-                  backgroundColor: ios.background,
-                  opacity: pressed ? 0.8 : canInvite ? 1 : 0.7,
+                  backgroundColor: canInvite ? ios.primary : ios.accentHover,
+                  opacity: pressed ? 0.8 : 1,
                 }}
               >
                 <Ionicons
                   name="mail-outline"
                   size={18}
-                  color={canInvite ? ios.primary : ios.mutedForeground}
+                  color={canInvite ? ios.primaryForeground : ios.mutedForeground}
                 />
               </View>
             )}
           </Pressable>
         </XStack>
       </YStack>
-    </View>
+    </GlassView>
   );
 }

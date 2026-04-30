@@ -139,7 +139,7 @@ function ActionSheet({
         />
 
         <GlassView
-          colorScheme="dark"
+          colorScheme={colorScheme}
           glassEffectStyle="regular"
           style={{
             width: panelWidth,
@@ -169,7 +169,7 @@ function ActionSheet({
                       height: 1,
                       marginVertical: 7,
                       marginLeft: 36,
-                      backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                      backgroundColor: ios.border,
                     }}
                   />
                 );
@@ -177,8 +177,8 @@ function ActionSheet({
 
               const label = action.label ?? action.title ?? '';
               const description = action.title && action.title !== label ? action.title : null;
-              const color = action.danger ? '#ff5f57' : '#f5f5f7';
-              const iconColor = action.danger ? '#ff5f57' : '#f5f5f7';
+              const color = action.danger ? ios.destructive : ios.foreground;
+              const iconColor = action.danger ? ios.destructive : ios.foreground;
               return (
                 <Pressable
                   key={`${label}-${index}`}
@@ -227,7 +227,7 @@ function ActionSheet({
                           <Text
                             numberOfLines={2}
                             style={{
-                              color: 'rgba(245, 245, 247, 0.72)',
+                            color: ios.mutedForeground,
                               fontSize: 12,
                               lineHeight: 16,
                               fontWeight: '500',

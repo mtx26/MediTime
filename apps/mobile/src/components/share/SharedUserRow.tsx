@@ -21,7 +21,7 @@ export function SharedUserRow({
         borderRadius: 18,
         paddingHorizontal: 12,
         paddingVertical: 10,
-        backgroundColor: ios.background,
+        backgroundColor: ios.card,
       }}
     >
       <XStack style={{ alignItems: 'center', gap: 10 }}>
@@ -42,7 +42,7 @@ export function SharedUserRow({
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: 19,
-              backgroundColor: ios.card,
+              backgroundColor: ios.accentHover,
             }}
           >
             <Ionicons name="person-outline" size={18} color={ios.primary} />
@@ -73,7 +73,7 @@ export function SharedUserRow({
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 18,
-                backgroundColor: ios.card,
+              backgroundColor: ios.accentHover,
                 opacity: pressed ? 0.8 : 1,
               }}
             >
