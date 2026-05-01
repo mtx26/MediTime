@@ -109,6 +109,43 @@ Reusable UI goes in:
 
 If a component needs props, define the prop type in `packages/types`, not locally, unless it is truly private and temporary.
 
+## Glass Effect
+
+Toute nouvelle page mobile doit utiliser le glass effect pour ses surfaces principales (cards, sections, panneaux, modales, footers).
+
+Ne pas utiliser de `backgroundColor` blanc/gris sur les surfaces. Utiliser `GlassView` à la place.
+
+Règles à respecter (voir `GLASS_EFFECT_GUIDE.md` pour le détail complet) :
+
+- Utiliser `GlassView` depuis `expo-glass-effect`.
+- Passer `colorScheme` depuis `useAppTheme()`.
+- Utiliser `glassEffectStyle="clear"` comme référence visuelle.
+- Ne pas ajouter `borderWidth`, `borderColor`, ni `overflow: 'hidden'` sur le `GlassView`.
+- Ne pas mettre de `backgroundColor` sur la surface glass.
+- Garder le fond global de page en couleur iOS (`ios.background`), pas en glass.
+- Si un composant doit être configurable, exposer `glassEffectStyle` et `glassStyle` en props.
+
+Pattern de base :
+
+```tsx
+import { GlassView } from 'expo-glass-effect';
+import { useAppTheme } from '../../theme/ios';
+
+const { colorScheme } = useAppTheme();
+
+<GlassView
+  colorScheme={colorScheme}
+  glassEffectStyle="clear"
+  style={{ borderRadius: 24, padding: 8 }}
+>
+  {/* contenu */}
+</GlassView>
+```
+
+La référence visuelle à suivre est la card `Etat runtime` dans `apps/mobile/app/glass-test.tsx`.
+
+Une fois la page terminée, marquer la route avec `🪟` dans `ROUTER_SCHEMA.md`.
+
 ## Form Pattern
 
 When a mobile page contains inputs that belong to the same action, build them as one coherent form.
