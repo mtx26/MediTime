@@ -140,6 +140,7 @@ export default function CalendarDetailScreen({
             calendarTable={detail.calendarTable}
             selectedDate={detail.selectedDate}
             onWeekSelect={(date) => void detail.selectWeek(date)}
+            preparedWeekMondayIsos={detail.preparedWeekMondayIsos}
           />
         )}
 

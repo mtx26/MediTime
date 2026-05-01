@@ -10,6 +10,7 @@ import {
   filterEventsForDate,
   getFirstRouteParam,
   getInitialSelectedDateForStockMethod,
+  getMondayDate,
   toISO,
 } from '@meditime/utils';
 import type {
@@ -18,6 +19,7 @@ import type {
   CalendarDetailSourceType,
   CalendarScheduleResult,
   CalendarTable,
+  PillboxUsesResult,
   StockMethodResult,
   WeeklyEventItem,
 } from '@meditime/types';
@@ -28,6 +30,7 @@ import { openPdfUrl, toActionSheetItems, toMobileHref } from '../../utils';
 type CalendarSource = {
   fetchSchedule: (calendarId: string, startDate?: string | null) => Promise<ApiResult>;
   fetchStockDecrementMethod?: (calendarId: string) => Promise<ApiResult>;
+  fetchPillboxUses?: (calendarId: string) => Promise<ApiResult>;
   deleteCalendar?: (calendarId: string) => Promise<ApiResult>;
   getPdfUrl?: (calendarId: string, includeInactive: boolean) => string;
 };
@@ -87,12 +90,14 @@ export function useCalendarDetail(sourceType: MobileCalendarDetailSourceType, mo
   const [error, setError] = useState<string | null>(null);
   const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
   const [includeInactive, setIncludeInactive] = useState(false);
+  const [preparedWeekMondayIsos, setPreparedWeekMondayIsos] = useState<Set<string>>(new Set());
 
   const source: CalendarSource = useMemo(() => {
     if (sourceType === 'personal') {
       return {
         fetchSchedule: personalCalendarsApi.fetchPersonalCalendarSchedule,
         fetchStockDecrementMethod: personalCalendarsApi.fetchPersonalStockDecrementMethod,
+        fetchPillboxUses: personalCalendarsApi.fetchPersonalPillboxUses,
         deleteCalendar: personalCalendarsApi.deleteCalendar,
         getPdfUrl: personalCalendarsApi.getPersonalCalendarPdfUrl,
       };
@@ -101,6 +106,7 @@ export function useCalendarDetail(sourceType: MobileCalendarDetailSourceType, mo
     return {
       fetchSchedule: sharedUserCalendarsApi.fetchSharedUserCalendarSchedule,
       fetchStockDecrementMethod: sharedUserCalendarsApi.fetchSharedUserStockDecrementMethod,
+      fetchPillboxUses: sharedUserCalendarsApi.fetchSharedUserPillboxUses,
       deleteCalendar: sharedUserCalendarsApi.deleteSharedCalendar,
       getPdfUrl: personalCalendarsApi.getPersonalCalendarPdfUrl,
     };
@@ -172,6 +178,21 @@ export function useCalendarDetail(sourceType: MobileCalendarDetailSourceType, mo
 
       setStockDecrementMethod(method);
       setSelectedDate(initialDate);
+
+      if (method === STOCK_DECREMENT_METHODS.WEEKLY_PILLBOX && source.fetchPillboxUses) {
+        void source.fetchPillboxUses(routeId).then((result) => {
+          const usesResult = result as PillboxUsesResult;
+          if (usesResult.success && usesResult.pillbox_uses) {
+            setPreparedWeekMondayIsos(new Set(
+              usesResult.pillbox_uses
+                .map((use) => getMondayDate(use.prepared_at))
+                .filter((d): d is Date => d !== null)
+                .map(toISO),
+            ));
+          }
+        });
+      }
+
       await loadSchedule(initialDate);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(t('error')));
@@ -350,5 +371,6 @@ export function useCalendarDetail(sourceType: MobileCalendarDetailSourceType, mo
     showDailyContent: isDailyRoute || stockDecrementMethod === STOCK_DECREMENT_METHODS.DAILY_MIDNIGHT,
     showPillboxShortcut: !isDailyRoute && hasCalendarItems && stockDecrementMethod === STOCK_DECREMENT_METHODS.WEEKLY_PILLBOX,
     hasCalendarItems,
+    preparedWeekMondayIsos,
   };
 }

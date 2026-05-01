@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
-import { calendarTableHasItems, getWeekDates, getWeekSelectionState, toISO } from '@meditime/utils';
+import { calendarTableHasItems, getWeekDates, getMondayDate, getWeekSelectionState, toISO } from '@meditime/utils';
 import type { CalendarTable } from '@meditime/types';
 import { GlassSurface } from '../common/GlassSurface';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
@@ -15,6 +15,7 @@ type MobileCalendarWeekSelectorProps = {
   calendarTable: CalendarTable;
   onWeekSelect: (date: Date) => void;
   selectedDate: Date | null;
+  preparedWeekMondayIsos?: Set<string>;
 };
 
 function formatWeekRange(dates: Date[], locale: string) {
@@ -37,6 +38,7 @@ export function MobileCalendarWeekSelector({
   calendarTable,
   onWeekSelect,
   selectedDate,
+  preparedWeekMondayIsos,
 }: MobileCalendarWeekSelectorProps) {
   const { i18n } = useTranslation();
   const ios = useIosTheme();
@@ -116,6 +118,7 @@ export function MobileCalendarWeekSelector({
           onSelectDate={onWeekSelect}
           selectedDate={normalizedSelectedDate}
           selectedWeekIsos={selectedWeekIsos}
+          preparedWeekMondayIsos={preparedWeekMondayIsos}
           locale={i18n.language}
           todayIso={todayIso}
         />
@@ -202,10 +205,11 @@ export function MobileCalendarWeekSelector({
                 const isSelectedDate = iso === selectedIso;
                 const inSelectedWeek = selectedWeekIsos.has(iso);
                 const outsideMonth = date.getMonth() !== monthDate.getMonth();
+                const isPreparedWeek = preparedWeekMondayIsos?.has(toISO(getMondayDate(date)!)) ?? false;
 
                 const backgroundColor = isSelectedDate
                   ? ios.primary
-                  : isToday
+                  : isPreparedWeek || isToday
                     ? ios.successBg
                     : inSelectedWeek
                       ? ios.accentHover
@@ -217,7 +221,9 @@ export function MobileCalendarWeekSelector({
                     ? ios.success
                     : inSelectedWeek
                       ? ios.border
-                      : 'transparent';
+                      : isPreparedWeek
+                        ? ios.success
+                        : 'transparent';
 
                 const textColor = isSelectedDate
                   ? ios.primaryForeground

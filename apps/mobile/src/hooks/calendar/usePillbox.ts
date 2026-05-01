@@ -22,14 +22,28 @@ type ScheduleResult = ApiResult & { table?: PillboxTable; status?: number };
 type UsedResult = ApiResult & { if_pillbox_used?: boolean };
 
 export function usePillbox(sourceType: Exclude<CalendarDetailSourceType, 'token'>) {
-  const { calendarId } = useLocalSearchParams<{ calendarId?: string }>();
+  const { calendarId, date } = useLocalSearchParams<{ calendarId?: string; date?: string }>();
   const { t } = useTranslation();
   const router = useRouter();
   const { personalCalendarsApi, sharedUserCalendarsApi } = useCalendarApis();
 
+  const selectedDate = useMemo(() => {
+    const d = date ? new Date(date) : new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, [date]);
+
+  const weekDates = useMemo(() => {
+    const monday = getMondayDate(selectedDate)!;
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return d;
+    });
+  }, [selectedDate]);
+
   const [orderedMeds, setOrderedMeds] = useState<PillboxOrderedMed[]>([]);
   const [selectedMedIndex, setSelectedMedIndex] = useState(0);
-  const [weekDates, setWeekDates] = useState<Date[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [notFound, setNotFound] = useState(false);
@@ -58,17 +72,6 @@ export function usePillbox(sourceType: Exclude<CalendarDetailSourceType, 'token'
       return;
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const mondayDate = getMondayDate(today);
-    const base = new Date(mondayDate!);
-    const dates = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(base);
-      d.setDate(base.getDate() + i);
-      return d;
-    });
-    setWeekDates(dates);
-
     if (mode === 'refresh') {
       setRefreshing(true);
     } else {
@@ -77,9 +80,10 @@ export function usePillbox(sourceType: Exclude<CalendarDetailSourceType, 'token'
     setError(null);
 
     try {
+      const dateISO = toISO(selectedDate);
       const [scheduleResult, usedResult] = await Promise.all([
-        source.fetchSchedule(calendarId, toISO(today)) as Promise<ScheduleResult>,
-        source.fetchIfPillboxUsed(calendarId, toISO(today)) as Promise<UsedResult>,
+        source.fetchSchedule(calendarId, dateISO) as Promise<ScheduleResult>,
+        source.fetchIfPillboxUsed(calendarId, dateISO) as Promise<UsedResult>,
       ]);
 
       if (scheduleResult.success) {
@@ -110,12 +114,12 @@ export function usePillbox(sourceType: Exclude<CalendarDetailSourceType, 'token'
       setLoading(false);
       setRefreshing(false);
     }
-  }, [calendarId, source, t]);
+  }, [calendarId, selectedDate, source, t]);
 
   useEffect(() => {
     void loadPillbox('initial');
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [calendarId]);
+  }, [calendarId, date]);
 
   const handleComplete = async () => {
     Alert.alert(
@@ -127,11 +131,9 @@ export function usePillbox(sourceType: Exclude<CalendarDetailSourceType, 'token'
           text: String(t('confirm')),
           onPress: async () => {
             if (!calendarId) return;
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
             setIsCompleting(true);
             try {
-              const result = await source.decreaseStock(calendarId, toISO(today));
+              const result = await source.decreaseStock(calendarId, toISO(selectedDate));
               if (result.success) {
                 router.back();
               } else {

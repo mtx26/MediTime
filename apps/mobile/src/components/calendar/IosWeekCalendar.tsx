@@ -2,7 +2,7 @@ import React from 'react';
 import { Animated, Easing, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack, YStack } from 'tamagui';
-import { getWeekDates, toISO } from '@meditime/utils';
+import { getWeekDates, getMondayDate, toISO } from '@meditime/utils';
 import { useIosTheme } from '../../theme/ios';
 import { hapticSelection } from '../../utils/haptics';
 
@@ -12,6 +12,7 @@ type IosWeekCalendarProps = {
   onSelectDate: (date: Date) => void;
   selectedDate: Date;
   selectedWeekIsos: Set<string>;
+  preparedWeekMondayIsos?: Set<string>;
   locale: string;
   todayIso: string;
 };
@@ -40,6 +41,7 @@ export function IosWeekCalendar({
   onSelectDate,
   selectedDate,
   selectedWeekIsos,
+  preparedWeekMondayIsos,
   locale,
   todayIso,
 }: IosWeekCalendarProps) {
@@ -198,6 +200,9 @@ export function IosWeekCalendar({
                 const outsideMonth = date.getMonth() !== monthDate.getMonth();
                 const isWeekStart = index === 0;
                 const isWeekEnd = index === 6;
+                const isPreparedWeek = preparedWeekMondayIsos?.has(toISO(getMondayDate(date)!)) ?? false;
+                const highlightWeek = inSelectedWeek || isPreparedWeek;
+                const weekBg = isPreparedWeek ? ios.successBg : inSelectedWeek ? ios.accentHover : 'transparent';
 
                 return (
                   <Pressable
@@ -214,11 +219,11 @@ export function IosWeekCalendar({
                         height: 44,
                         alignItems: 'center',
                         justifyContent: 'center',
-                        borderTopLeftRadius: inSelectedWeek && isWeekStart ? 18 : 0,
-                        borderBottomLeftRadius: inSelectedWeek && isWeekStart ? 18 : 0,
-                        borderTopRightRadius: inSelectedWeek && isWeekEnd ? 18 : 0,
-                        borderBottomRightRadius: inSelectedWeek && isWeekEnd ? 18 : 0,
-                        backgroundColor: inSelectedWeek ? ios.accentHover : 'transparent',
+                        borderTopLeftRadius: highlightWeek && isWeekStart ? 18 : 0,
+                        borderBottomLeftRadius: highlightWeek && isWeekStart ? 18 : 0,
+                        borderTopRightRadius: highlightWeek && isWeekEnd ? 18 : 0,
+                        borderBottomRightRadius: highlightWeek && isWeekEnd ? 18 : 0,
+                        backgroundColor: weekBg,
                       }}
                     >
                       <YStack
