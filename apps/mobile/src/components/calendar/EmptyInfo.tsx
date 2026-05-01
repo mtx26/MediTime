@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Text, XStack } from 'tamagui';
+import { Text } from 'tamagui';
 import { GlassSurface } from '../common/GlassSurface';
 import { useIosTheme } from '../../theme/ios';
 

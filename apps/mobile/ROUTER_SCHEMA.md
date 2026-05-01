@@ -38,9 +38,10 @@ apps/mobile/app
           ✅🪟 stock-alerts.tsx
           ✅🪟 pillbox-uses.tsx
           ✅🪟 ics-tokens.tsx
+          ✅🪟 pillbox.tsx
           missed-intakes
-            index.tsx
-            recap.tsx
+            ✅🪟 index.tsx
+            ✅🪟 recap.tsx
 
       shared-user-calendar
         [calendarId]
@@ -53,9 +54,10 @@ apps/mobile/app
           ✅🪟 stock-alerts.tsx
           ✅🪟 pillbox-uses.tsx
           ✅🪟 ics-tokens.tsx
+          ✅🪟 pillbox.tsx
           missed-intakes
-            index.tsx
-            recap.tsx
+            ✅🪟 index.tsx
+            ✅🪟 recap.tsx
 
     shared-calendars
       ✅🪟 index.tsx

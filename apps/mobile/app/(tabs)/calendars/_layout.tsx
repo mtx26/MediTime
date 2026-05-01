@@ -45,11 +45,17 @@ export default function CalendarsLayout() {
       <Stack.Screen name="calendar/[calendarId]/ics-tokens" />
       <Stack.Screen name="calendar/[calendarId]/pillbox-uses" />
       <Stack.Screen name="calendar/[calendarId]/settings" />
+      <Stack.Screen name="calendar/[calendarId]/pillbox" options={{ presentation: 'fullScreenModal', headerShown: false, orientation: 'landscape', contentStyle: { backgroundColor: ios.background } }} />
+      <Stack.Screen name="calendar/[calendarId]/missed-intakes/index" />
+      <Stack.Screen name="calendar/[calendarId]/missed-intakes/recap" />
       <Stack.Screen name="shared-user-calendar/[calendarId]" />
       <Stack.Screen name="shared-user-calendar/[calendarId]/daily" />
       <Stack.Screen name="shared-user-calendar/[calendarId]/ics-tokens" />
       <Stack.Screen name="shared-user-calendar/[calendarId]/pillbox-uses" />
       <Stack.Screen name="shared-user-calendar/[calendarId]/settings" />
+      <Stack.Screen name="shared-user-calendar/[calendarId]/pillbox" options={{ presentation: 'fullScreenModal', headerShown: false, orientation: 'landscape', contentStyle: { backgroundColor: ios.background } }} />
+      <Stack.Screen name="shared-user-calendar/[calendarId]/missed-intakes/index" />
+      <Stack.Screen name="shared-user-calendar/[calendarId]/missed-intakes/recap" />
     </Stack>
   );
 }
