@@ -1,6 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import type { ActionItem } from '@meditime/types';
-import type { MobileActionSheetAction } from '../components/common/ActionSheet';
+import type { ActionList } from '@meditime/types';
+import type {
+  MobileContextMenuAction,
+  MobileContextMenuActionList,
+} from '../components/common/ContextMenu';
 
 const ICON_MAP: Partial<Record<string, keyof typeof Ionicons.glyphMap>> = {
   eye: 'eye-outline',
@@ -23,15 +26,13 @@ const ICON_MAP: Partial<Record<string, keyof typeof Ionicons.glyphMap>> = {
 };
 
 export function toActionSheetItems(
-  items: ActionItem[],
+  groups: ActionList,
   t: (key: string) => string,
-): MobileActionSheetAction[] {
-  return items.map((item) => {
-    if ('separator' in item) {
-      return { separator: true };
-    }
+): MobileContextMenuActionList {
+  return groups.map((group) => {
+    if ('separator' in group) return group;
 
-    return {
+    return group.map((item) => ({
       label: t(item.labelKey),
       title: t(item.titleKey),
       iconName: ICON_MAP[item.icon],
@@ -39,6 +40,6 @@ export function toActionSheetItems(
       onClick: item.onClick,
       danger: item.danger,
       dataTour: item.dataTour,
-    };
-  });
+    }));
+  }).filter((group) => 'separator' in group || group.length > 0);
 }

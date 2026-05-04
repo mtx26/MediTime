@@ -3,7 +3,7 @@ import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import type { CalendarDetailSourceType } from '@meditime/types';
 import { CalendarNotFoundState, MedicineBoxCard } from '../../components/calendar';
-import ActionSheet from '../../components/common/ActionSheet';
+import ContextMenu from '../../components/common/ContextMenu';
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { OutlineButton } from '../../components/common/OutlineButton';
@@ -26,7 +26,7 @@ export default function StockAlertsScreen({ sourceType }: StockAlertsScreenProps
     headerBackTitle: String(t('back')),
     headerRight: () => (
       stockAlerts.actions.length > 0 ? (
-        <ActionSheet
+        <ContextMenu
           actions={stockAlerts.actions}
           buttonSize="sm"
           variant="clear"

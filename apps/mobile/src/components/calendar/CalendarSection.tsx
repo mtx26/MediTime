@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { GlassView, type GlassStyle } from 'expo-glass-effect';
 import { Text, XStack, YStack } from 'tamagui';
 import type { CalendarItem } from '@meditime/types';
-import type { MobileActionSheetAction } from '../common/ActionSheet';
+import type { MobileContextMenuActionList } from '../common/ContextMenu';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
 import { CalendarRow } from './CalendarRow';
 import { EmptyInfo } from './EmptyInfo';
@@ -18,7 +18,7 @@ type CalendarSectionProps = {
   addFooter?: ReactNode;
   glassEffectStyle?: GlassStyle;
   glassStyle?: StyleProp<ViewStyle>;
-  getActions: (calendar: CalendarItem) => MobileActionSheetAction[];
+  getActions: (calendar: CalendarItem) => MobileContextMenuActionList;
   onOpen: (calendar: CalendarItem) => void;
   onNavigate: (href: string) => void;
   renameMode?: string | null;

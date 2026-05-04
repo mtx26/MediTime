@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Input, Text, XStack, YStack } from 'tamagui';
@@ -11,7 +10,6 @@ import { useIosTheme } from '../../theme/ios';
 
 export default function ResetPasswordScreen() {
   const { t } = useTranslation();
-  const router = useRouter();
   const ios = useIosTheme();
   const resetPassword = useResetPassword();
 
@@ -66,8 +64,6 @@ export default function ResetPasswordScreen() {
             </>
           )}
         </MobileForm>
-
-        <LiquidButton label={t('auth.back_to_login')} onPress={() => router.replace('/(auth)/login')} />
       </YStack>
     </AuthPageShell>
   );

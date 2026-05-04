@@ -7,8 +7,7 @@ import type {
   CalendarBoxAlertItem,
   MobileMedicineBoxCardProps,
 } from '@meditime/types';
-import type { MobileActionSheetAction } from '../common/ActionSheet';
-import ActionSheet from '../common/ActionSheet';
+import ContextMenu, { type MobileContextMenuActionList } from '../common/ContextMenu';
 import { getBoxDisplayFlags, getBoxStatusItems, type BoxStatusItemKey } from '@meditime/utils';
 import { GlassSurface } from '../common/GlassSurface';
 import { useIosTheme } from '../../theme/ios';
@@ -59,7 +58,7 @@ export function MedicineBoxCard({
   onMissingPillbox,
   onRestock,
   onToggleExpanded,
-}: MobileMedicineBoxCardProps<MobileActionSheetAction>) {
+}: MobileMedicineBoxCardProps<MobileContextMenuActionList[number]>) {
   const { t } = useTranslation();
   const ios = useIosTheme();
   const translate = (key: string) => String(t(key));
@@ -100,7 +99,7 @@ export function MedicineBoxCard({
         </YStack>
 
         {actions && actions.length > 0 ? (
-          <ActionSheet actions={actions} buttonSize="sm" variant="plain" />
+          <ContextMenu actions={actions} buttonSize="sm" variant="plain" />
         ) : null}
       </XStack>
 

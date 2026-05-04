@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, XStack, YStack } from 'tamagui';
 import type { CalendarItem } from '@meditime/types';
-import ActionSheet, { type MobileActionSheetAction } from '../common/ActionSheet';
+import ContextMenu, { type MobileContextMenuActionList } from '../common/ContextMenu';
 import { useIosTheme } from '../../theme/ios';
 import { RenameForm } from './RenameForm';
 import { StatusBadge } from './StatusBadge';
@@ -10,7 +10,7 @@ import { StatusBadge } from './StatusBadge';
 type CalendarRowProps = {
   calendar: CalendarItem;
   isLast: boolean;
-  actions: MobileActionSheetAction[];
+  actions: MobileContextMenuActionList;
   onOpen: (calendar: CalendarItem) => void;
   onNavigate: (href: string) => void;
   isRenaming?: boolean;
@@ -38,7 +38,7 @@ export function CalendarRow({
   const ios = useIosTheme();
 
   return (
-    <ActionSheet
+    <ContextMenu
       actions={actions}
       onNavigate={onNavigate}
       triggerMode="longPress"
@@ -107,6 +107,6 @@ export function CalendarRow({
 
         {calendar.ifLowStock && <StatusBadge text={t('stock_alert')} />}
       </YStack>
-    </ActionSheet>
+    </ContextMenu>
   );
 }

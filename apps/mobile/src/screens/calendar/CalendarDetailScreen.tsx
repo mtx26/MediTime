@@ -10,7 +10,7 @@ import { CalendarNotFoundState } from '../../components/calendar/CalendarNotFoun
 import { MobileCalendarWeekSelector } from '../../components/calendar/MobileCalendarWeekSelector';
 import { MobileWeeklyEventContent } from '../../components/calendar/MobileWeeklyEventContent';
 import { PdfDialog } from '../../components/calendar/PdfDialog';
-import ActionSheet from '../../components/common/ActionSheet';
+import ContextMenu from '../../components/common/ContextMenu';
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { Page, usePageHeaderOptions } from '../../components/common/Page';
@@ -43,7 +43,7 @@ export default function CalendarDetailScreen({
     headerTitle: () => <CalendarHeaderTitle title={detail.headerTitle} />,
     headerRight: () => (
       detail.actions.length > 0 ? (
-        <ActionSheet
+        <ContextMenu
           actions={detail.actions}
           buttonSize="sm"
           variant="clear"

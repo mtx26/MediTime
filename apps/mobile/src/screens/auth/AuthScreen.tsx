@@ -85,29 +85,9 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
           >
             <YStack style={{ gap: 18, padding: 10 }}>
             <YStack style={{ alignItems: 'center', gap: 10 }}>
-              <GlassView
-                colorScheme={colorScheme}
-                glassEffectStyle="clear"
-                style={{
-                  width: 58,
-                  height: 58,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 18,
-                }}
-              >
-                <Image
-                  source={require('../../../assets/icons/og-image.png')}
-                  style={{ width: 48, height: 48 }}
-                  resizeMode="contain"
-                />
-              </GlassView>
               <H2 style={{ textAlign: 'center', color: ios.foreground }}>
                 {t('app.shortName')}
               </H2>
-              <Text style={{ textAlign: 'center', color: ios.mutedForeground, fontSize: 14, lineHeight: 20 }}>
-                {isLogin ? t('auth.login') : t('auth.register')}
-              </Text>
             </YStack>
 
             <AuthModeToggle activeMode={auth.activeMode} onModeChange={auth.switchMode} />
@@ -120,7 +100,7 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
               <Text style={{ textAlign: 'center', color: ios.mutedForeground, fontSize: 14, lineHeight: 20 }}>
                 {isLogin ? t('auth.login_with') : t('auth.register_with')}
               </Text>
-              <XStack style={{ flexWrap: 'wrap', justifyContent: 'center', gap: 12 }}>
+              <XStack style={{ flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
                 {auth.providers.map((provider) => (
                   <SocialProviderButton
                     key={provider.id}
@@ -132,12 +112,12 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
                   />
                 ))}
               </XStack>
-              <Text style={{ textAlign: 'center', color: ios.mutedForeground, fontSize: 13, lineHeight: 18 }}>
-                {t('auth.or_with_email')}
-              </Text>
             </YStack>
 
             <Separator />
+            <Text style={{ textAlign: 'center', color: ios.mutedForeground, fontSize: 13, lineHeight: 18 }}>
+              {t('auth.or_with_email')}
+            </Text>
 
             <MobileForm onSubmit={auth.handleSubmit} disabled={auth.loading || !auth.canSubmit} style={{ gap: 13 }}>
               {(form) => (
@@ -212,20 +192,9 @@ export default function AuthScreen({ initialMode }: AuthScreenProps) {
                       style={{ alignSelf: 'flex-end' }}
                     >
                       {({ pressed }) => (
-                        <GlassView
-                          colorScheme={colorScheme}
-                          glassEffectStyle="clear"
-                          style={{
-                            borderRadius: 18,
-                            paddingHorizontal: 12,
-                            paddingVertical: 8,
-                            opacity: pressed ? 0.75 : 1,
-                          }}
-                        >
-                          <Text style={{ color: ios.primary, fontSize: 13, fontWeight: '800' }}>
-                            {t('auth.forgot_password')}
-                          </Text>
-                        </GlassView>
+                        <Text style={{ color: ios.primary, fontSize: 13, fontWeight: '800', opacity: pressed ? 0.75 : 1 }}>
+                          {t('auth.forgot_password')}
+                        </Text>
                       )}
                     </Pressable>
                   )}

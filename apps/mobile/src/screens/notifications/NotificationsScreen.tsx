@@ -2,7 +2,7 @@ import { Redirect, Stack } from 'expo-router';
 import { RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { YStack } from 'tamagui';
-import ActionSheet from '../../components/common/ActionSheet';
+import ContextMenu from '../../components/common/ContextMenu';
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { OutlineButton } from '../../components/common/OutlineButton';
@@ -27,7 +27,7 @@ export default function NotificationsScreen() {
   const headerOptions = usePageHeaderOptions({
     title: String(t('notification.label')),
     headerRight: () => (
-      <ActionSheet
+      <ContextMenu
         actions={notifications.actions}
         buttonSize="sm"
         variant="clear"

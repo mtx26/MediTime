@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { YStack } from 'tamagui';
 import { SharedCalendarPanel, SharedCalendarPicker } from '../../components/share';
 import { PdfDialog } from '../../components/calendar';
-import ActionSheet from '../../components/common/ActionSheet';
+import ContextMenu from '../../components/common/ContextMenu';
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { OutlineButton } from '../../components/common/OutlineButton';
@@ -29,7 +29,7 @@ export default function SharedCalendarsScreen() {
     title: String(t('shared_calendars')),
     headerRight: () => (
       shared.actions.length > 0 ? (
-        <ActionSheet
+        <ContextMenu
           actions={shared.actions}
           buttonSize="sm"
           variant="clear"

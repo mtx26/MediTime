@@ -26,8 +26,6 @@ export default function CalendarsScreen() {
   const router = useRouter();
   const ios = useIosTheme();
   const lng = i18n.language || 'fr';
-  const [renameValues, setRenameValues] = useState<Record<string, string>>({});
-  const [renameMode, setRenameMode] = useState<string | null>(null);
   const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
   const [pdfCalendarId, setPdfCalendarId] = useState<string | null>(null);
   const [includeInactive, setIncludeInactive] = useState(false);
@@ -69,15 +67,6 @@ export default function CalendarsScreen() {
     setPdfDialogOpen(true);
   };
 
-  const startRename = useCallback((calendar: CalendarItem) => {
-    setRenameValues((prev) => ({ ...prev, [calendar.id]: calendar.name }));
-    setRenameMode(calendar.id);
-  }, []);
-
-  const cancelRename = useCallback(() => {
-    setRenameMode(null);
-  }, []);
-
   const openCalendarPdf = async () => {
     if (!pdfCalendarId) return;
 
@@ -90,31 +79,33 @@ export default function CalendarsScreen() {
     }
   };
 
-  const handleRenameSubmit = (calendar: CalendarItem) => {
-    const nextName = (renameValues[calendar.id] ?? '').trim();
+  const submitRename = useCallback((calendar: CalendarItem, value?: string) => {
+    const nextName = (value ?? '').trim();
     if (!nextName) return;
 
-    Alert.alert(
+    void renameCalendar(calendar.id, nextName).then((result) => {
+      if (result.success) return;
+
+      Alert.alert(String(t('api.calendar.rename_error')), result.error ?? String(t('api.calendar.rename_error')));
+    });
+  }, [renameCalendar, t]);
+
+  const startRename = useCallback((calendar: CalendarItem) => {
+    Alert.prompt(
       String(t('calendar.rename_title')),
       String(t('calendar.rename_description')),
       [
         { text: String(t('cancel')), style: 'cancel' },
         {
           text: String(t('rename')),
-          onPress: () => {
-            void renameCalendar(calendar.id, nextName).then((result) => {
-              if (result.success) {
-                setRenameValues((prev) => ({ ...prev, [calendar.id]: '' }));
-                setRenameMode(null);
-                return;
-              }
-              Alert.alert(String(t('api.calendar.rename_error')), result.error ?? String(t('api.calendar.rename_error')));
-            });
-          },
+          onPress: (value?: string) => submitRename(calendar, value),
         },
       ],
+      'plain-text',
+      calendar.name,
+      'default',
     );
-  };
+  }, [submitRename, t]);
 
   const handleDeleteCalendarClick = (calendarId: string) => {
     Alert.alert(
@@ -223,14 +214,7 @@ export default function CalendarsScreen() {
           getActions={getPersonalActions}
           onOpen={openPersonalCalendar}
           onNavigate={navigateToHref}
-          renameMode={renameMode}
-          renameValues={renameValues}
           isMutating={isMutating}
-          onRenameChange={(calendarId, value) =>
-            setRenameValues((prev) => ({ ...prev, [calendarId]: value }))
-          }
-          onRenameSubmit={handleRenameSubmit}
-          onRenameCancel={cancelRename}
         />
 
         <YStack style={{ width: '100%', maxWidth: 672, alignSelf: 'center', marginTop: -14 }}>
