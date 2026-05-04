@@ -14,7 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.meditime.mobile"
+      "bundleIdentifier": "app.meditime.mobile",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -29,6 +32,11 @@
       "expo-router",
       "expo-secure-store",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "63750ac8-b272-4912-b6cf-ce229dd63182"
+      }
+    }
   }
 }
