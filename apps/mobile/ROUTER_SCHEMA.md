@@ -32,6 +32,7 @@ apps/mobile/app
           _layout.tsx
           ✅🪟 index.tsx
           ✅🪟 boxes.tsx
+          ✅🪟 edit-box.tsx
           pillbox.tsx
           ✅🪟 daily.tsx
           ✅🪟 settings.tsx
@@ -48,6 +49,7 @@ apps/mobile/app
           _layout.tsx
           ✅🪟 index.tsx
           ✅🪟 boxes.tsx
+          ✅🪟 edit-box.tsx
           pillbox.tsx
           ✅🪟 daily.tsx
           ✅🪟 settings.tsx

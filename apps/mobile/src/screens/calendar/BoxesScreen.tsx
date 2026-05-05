@@ -8,7 +8,6 @@ import type { CalendarDetailSourceType } from '@meditime/types';
 import {
   CalendarNotFoundState,
   MedicineBoxCard,
-  MedicineBoxEditorModal,
   MedicineBoxQrScannerModal,
 } from '../../components/calendar';
 import { InfoBanner } from '../../components/common/InfoBanner';
@@ -175,14 +174,6 @@ export default function BoxesScreen({ sourceType }: BoxesScreenProps) {
         </YStack>
       </Page>
 
-      <MedicineBoxEditorModal
-        disabled={Boolean(boxesView.mutatingBoxId)}
-        editingBox={boxesView.editingBox}
-        editingBoxId={boxesView.editingBoxId}
-        onCancel={boxesView.cancelEdit}
-        onChange={boxesView.setEditingBox}
-        onSave={boxesView.saveEditingBox}
-      />
       <MedicineBoxQrScannerModal
         disabled={Boolean(boxesView.mutatingBoxId)}
         loadingGtin={boxesView.qrLoadingGtin}

@@ -20,6 +20,7 @@ import type {
 import { useCalendarApis } from './useCalendarApis';
 import { dismissToCalendars } from './navigation';
 import { openPdfUrl, toActionSheetItems } from '../../utils';
+import { editBoxStore } from '../../stores/editBoxStore';
 
 type BoxesSource = {
   createBox: (
@@ -85,8 +86,6 @@ export function useBoxes(sourceType: Exclude<CalendarDetailSourceType, 'token'>)
   const [mutatingBoxId, setMutatingBoxId] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [editingBoxId, setEditingBoxId] = useState<string | null>(null);
-  const [editingBox, setEditingBox] = useState<EditingBoxState | null>(null);
   const [qrScannerOpen, setQrScannerOpen] = useState(false);
   const [qrMedicines, setQrMedicines] = useState<QRScannedMedicine[]>([]);
   const [qrScannedCodes, setQrScannedCodes] = useState<string[]>([]);
@@ -153,30 +152,12 @@ export function useBoxes(sourceType: Exclude<CalendarDetailSourceType, 'token'>)
     }, [loadBoxes]),
   );
 
-  const startEdit = useCallback((box: BoxesViewBoxItem) => {
-    setEditingBoxId(box.id);
-    setEditingBox(toEditingBox(box));
-  }, []);
-
-  const startCreate = useCallback((medicineData: Partial<BoxesViewBoxItem | QRScannedMedicine> = {}) => {
-    setEditingBoxId(`temp-${Date.now()}`);
-    setEditingBox({
-      name: medicineData.name ?? '',
-      dose: medicineData.dose ?? 0,
-      box_capacity: medicineData.box_capacity ?? 0,
-      stock_alert_threshold: medicineData.stock_alert_threshold ?? 10,
-      stock_quantity: medicineData.stock_quantity ?? 0,
-      code_fmd: medicineData.code_fmd ?? null,
-      conditions: {},
-    });
-  }, []);
-
   const cancelEdit = useCallback(() => {
-    setEditingBoxId(null);
-    setEditingBox(null);
+    // EditBoxScreen gère router.back() et editBoxStore.clear()
   }, []);
 
   const saveEditingBox = useCallback(async () => {
+    const { boxId: editingBoxId, editingBox } = editBoxStore;
     if (!calendarId || !editingBox || !editingBoxId) return;
 
     const name = editingBox.name.trim();
@@ -212,7 +193,6 @@ export function useBoxes(sourceType: Exclude<CalendarDetailSourceType, 'token'>)
         : await source.updateBox(calendarId, editingBoxId, payload);
 
       if (result.success) {
-        cancelEdit();
         await loadBoxes('refresh');
         return;
       }
@@ -221,7 +201,34 @@ export function useBoxes(sourceType: Exclude<CalendarDetailSourceType, 'token'>)
     } finally {
       setMutatingBoxId(null);
     }
-  }, [calendarId, cancelEdit, editingBox, editingBoxId, loadBoxes, source, t]);
+  }, [calendarId, loadBoxes, source, t]);
+
+  const startEdit = useCallback((box: BoxesViewBoxItem) => {
+    if (!calendarId) return;
+    editBoxStore.open(box.id, toEditingBox(box), {
+      onSave: saveEditingBox,
+      onCancel: cancelEdit,
+    });
+    router.push(`/calendars/${basePath}/${calendarId}/edit-box` as never);
+  }, [basePath, calendarId, cancelEdit, router, saveEditingBox]);
+
+  const startCreate = useCallback((medicineData: Partial<BoxesViewBoxItem | QRScannedMedicine> = {}) => {
+    if (!calendarId) return;
+    const tempId = `temp-${Date.now()}`;
+    editBoxStore.open(tempId, {
+      name: medicineData.name ?? '',
+      dose: medicineData.dose ?? 0,
+      box_capacity: medicineData.box_capacity ?? 0,
+      stock_alert_threshold: medicineData.stock_alert_threshold ?? 10,
+      stock_quantity: medicineData.stock_quantity ?? 0,
+      code_fmd: medicineData.code_fmd ?? null,
+      conditions: {},
+    }, {
+      onSave: saveEditingBox,
+      onCancel: cancelEdit,
+    });
+    router.push(`/calendars/${basePath}/${calendarId}/edit-box` as never);
+  }, [basePath, calendarId, cancelEdit, router, saveEditingBox]);
 
   const restockBox = useCallback(async (boxId: string) => {
     if (!calendarId) return;
@@ -433,8 +440,6 @@ export function useBoxes(sourceType: Exclude<CalendarDetailSourceType, 'token'>)
     backToCalendars: () => dismissToCalendars(router),
     boxes,
     cancelEdit,
-    editingBox,
-    editingBoxId,
     error,
     expandedBoxes,
     getBoxActions,
@@ -455,7 +460,6 @@ export function useBoxes(sourceType: Exclude<CalendarDetailSourceType, 'token'>)
     restockBox,
     saveEditingBox,
     saveQrMedicines,
-    setEditingBox,
     closeQrScanner,
     startCreate,
     toggleExpanded,

@@ -93,6 +93,9 @@ export function MedicineSearchInput({
       <TextInput
         ref={inputRef}
         value={name}
+        onFocus={() => {
+          if (suggestions.length > 0) setShowDropdown(true);
+        }}
         onChangeText={(v) => {
           onChangeName(v);
           setShowDropdown(true);
