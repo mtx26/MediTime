@@ -186,8 +186,15 @@ export default function EditBoxScreen() {
             <LiquidButton iconName="add-circle-outline" label={String(t('boxes.condition.add'))} onPress={addCondition} tone="primary" />
           </View>
 
-          {/* Enregistrer */}
-          <LiquidButton disabled={saving || !canSubmit} loading={saving} iconName="checkmark-circle-outline" label={String(t('boxes.save'))} onPress={() => { void handleSave(); }} tone="success" />
+          {/* Actions */}
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View style={{ flex: 1 }}>
+              <LiquidButton iconName="close-circle-outline" label={String(t('cancel'))} onPress={handleCancel} tone="plain" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <LiquidButton disabled={saving || !canSubmit} loading={saving} iconName="checkmark-circle-outline" label={String(t('boxes.save'))} onPress={() => { void handleSave(); }} tone="success" />
+            </View>
+          </View>
         </View>
       </ScrollView>
     </View>

@@ -18,9 +18,18 @@ const config = {
   ],
   ios: {
     ...appJson.expo.ios,
+    icon: {
+      light: './assets/icon.png',
+      dark: './assets/icon-dark.png',
+      tinted: './assets/icon-dark.png',
+    },
   },
   android: {
     ...appJson.expo.android,
+    adaptiveIcon: {
+      foregroundImage: './assets/adaptive-icon.png',
+      monochromeImage: './assets/adaptive-icon-dark.png',
+    },
     intentFilters: [
       {
         action: 'VIEW',

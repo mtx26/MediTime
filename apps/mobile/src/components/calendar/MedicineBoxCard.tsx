@@ -96,12 +96,6 @@ export function MedicineBoxCard({
               {isCritical ? t('critical_stock') : t('low_stock')}
             </Text>
           ) : null}
-          <XStack style={{ alignItems: 'center', gap: 4 }}>
-            <Ionicons name="notifications-outline" size={12} color={ios.mutedForeground} />
-            <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
-              {`${t('boxes.alert_threshold')} : ${box.stock_alert_threshold}`}
-            </Text>
-          </XStack>
         </YStack>
 
         {actions && actions.length > 0 ? (
@@ -110,14 +104,23 @@ export function MedicineBoxCard({
       </XStack>
 
       <YStack style={{ gap: 12 }}>
-        <XStack style={{ alignItems: 'stretch', gap: 12 }}>
-          <YStack style={{ flex: 1, gap: 2, justifyContent: 'center' }}>
+        <XStack style={{ gap: 12 }}>
+          <YStack style={{ flex: 1, gap: 2 }}>
+            <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
+              {t('boxes.capacity')}
+            </Text>
+            <Text style={{ color: ios.foreground, fontSize: 16, lineHeight: 22, fontWeight: '800' }}>
+              {box.box_capacity}
+            </Text>
+          </YStack>
+
+          <YStack style={{ flex: 1, gap: 2 }}>
             <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
               {t('boxes.remaining_qty')}
             </Text>
             <Text
               style={{
-              color: isCritical ? ios.destructive : ios.foreground,
+                color: isCritical ? ios.destructive : ios.foreground,
                 fontSize: 16,
                 lineHeight: 22,
                 fontWeight: '900',
@@ -126,9 +129,17 @@ export function MedicineBoxCard({
               {box.stock_quantity}
             </Text>
           </YStack>
+        </XStack>
 
-          {canRestock ? (
-            <Pressable
+        <XStack style={{ alignItems: 'center', gap: 4 }}>
+          <Ionicons name="notifications-outline" size={12} color={ios.mutedForeground} />
+          <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
+            {`${t('boxes.alert_threshold')} : ${box.stock_alert_threshold}`}
+          </Text>
+        </XStack>
+
+        {canRestock ? (
+          <Pressable
               onPress={() => {
                 hapticImpact();
                 onRestock?.(box.id);
@@ -161,7 +172,6 @@ export function MedicineBoxCard({
               )}
             </Pressable>
           ) : null}
-        </XStack>
       </YStack>
 
       <XStack style={{ flexWrap: 'wrap', gap: 8 }}>
