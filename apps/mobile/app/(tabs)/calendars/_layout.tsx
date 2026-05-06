@@ -34,6 +34,7 @@ export default function CalendarsLayout() {
         },
         headerTintColor: ios.primary,
         headerShadowVisible: false,
+        orientation: 'portrait',
         contentStyle: {
           backgroundColor: ios.background,
         },
