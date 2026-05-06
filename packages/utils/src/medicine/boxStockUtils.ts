@@ -131,8 +131,6 @@ export function getBoxStatusItems(box: BoxForStatus): BoxStatusItem[] {
       items.push({ key: 'condition_none', variant: 'info', i18nKey: 'boxes.condition.none' });
     } else if (hasOnlyExpiredConditions({ conditions: valid })) {
       items.push({ key: 'condition_inactive', variant: 'info', i18nKey: 'boxes.condition.inactive' });
-    } else if (hasSomeExpiredConditions({ conditions: valid })) {
-      items.push({ key: 'condition_expired', variant: 'info', i18nKey: 'boxes.condition.expired' });
     }
   }
 

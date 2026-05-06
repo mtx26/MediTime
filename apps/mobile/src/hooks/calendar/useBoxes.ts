@@ -53,6 +53,13 @@ function toNumber(value: number | string | null | undefined, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function toEditableCondition(condition: EditableCondition): EditableCondition {
+  return {
+    ...condition,
+    max_date_mode: condition.max_date ? 'until_date' : 'none',
+  };
+}
+
 function toEditingBox(box: BoxesViewBoxItem): EditingBoxState {
   return {
     name: box.name,
@@ -62,7 +69,7 @@ function toEditingBox(box: BoxesViewBoxItem): EditingBoxState {
     stock_quantity: box.stock_quantity,
     code_fmd: box.code_fmd ?? null,
     conditions: (box.conditions ?? []).reduce<Record<string, EditableCondition | undefined>>((acc, condition) => {
-      acc[condition.id] = condition;
+      acc[condition.id] = toEditableCondition(condition);
       return acc;
     }, {}),
   };

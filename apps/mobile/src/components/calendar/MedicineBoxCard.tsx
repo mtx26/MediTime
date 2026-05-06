@@ -40,12 +40,27 @@ function formatConditionLine(box: BoxesViewBoxItem, index: number, t: (key: stri
   const timeOfDay = condition.time_of_day && ['morning', 'noon', 'evening'].includes(condition.time_of_day)
     ? t(condition.time_of_day)
     : condition.time_of_day ?? '-';
+  const formatDate = (value?: string | null) => (
+    value ? new Date(value).toLocaleDateString() : null
+  );
+  const startDate = formatDate(condition.start_date);
+  const maxDate = formatDate(condition.max_date);
 
-  return [
+  const parts = [
     `${tabletCount} ${tabletCount > 1 ? t('boxes.tablets') : t('boxes.tablet')}`,
     timeOfDay,
     `${t('boxes.every')} ${intervalDays} ${intervalDays > 1 ? t('boxes.days') : t('boxes.day')}`,
-  ].join(' - ');
+  ];
+
+  if (startDate && maxDate) {
+    parts.push(`du ${startDate} au ${maxDate}`);
+  } else if (startDate) {
+    parts.push(`à partir de ${startDate}`);
+  } else if (maxDate) {
+    parts.push(`jusqu'à ${maxDate}`);
+  }
+
+  return parts.join(' - ');
 }
 
 export function MedicineBoxCard({
