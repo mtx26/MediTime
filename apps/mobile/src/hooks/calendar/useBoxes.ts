@@ -57,7 +57,7 @@ function toEditingBox(box: BoxesViewBoxItem): EditingBoxState {
     name: box.name,
     dose: box.dose ?? null,
     box_capacity: box.box_capacity,
-    stock_alert_threshold: box.stock_alert_threshold,
+    stock_alert_threshold: box.stock_alert_threshold || 10,
     stock_quantity: box.stock_quantity,
     code_fmd: box.code_fmd ?? null,
     conditions: (box.conditions ?? []).reduce<Record<string, EditableCondition | undefined>>((acc, condition) => {
