@@ -686,7 +686,10 @@
       "title": "通知設定"
     },
     "push_description": "デバイスでプッシュ通知を受信します。",
-    "push_toggle": "ウェブプッシュ通知を有効にする"
+    "push_toggle": "ウェブプッシュ通知を有効にする",
+    "system_settings": "システム設定",
+    "system_settings_desc": "デバイスの設定で通知の権限を管理します。",
+    "open_system_settings": "設定を開く"
   },
   "open": "開ける",
   "open_notifications": "通知を開く",

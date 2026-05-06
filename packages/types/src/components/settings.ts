@@ -84,9 +84,7 @@ export interface MobileAccountSettingsProps {
   photoUrl: string | null;
   isSaving: boolean;
   onChangePhoto: () => void;
-  onDisplayNameChange: (value: string) => void;
-  onSaveDisplayName: () => void;
-  onResetDisplayName: () => void;
+  onPromptDisplayName: () => void;
 }
 
 export interface MobileSecuritySettingsProps<TIconName = string> {

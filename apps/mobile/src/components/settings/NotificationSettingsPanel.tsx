@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { Platform, Pressable, Switch } from 'react-native';
+import { Linking, Platform, Pressable, Switch } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
 import type { MobileNotificationSettingsProps } from '@meditime/types';
@@ -202,6 +203,35 @@ export function NotificationSettingsPanel({
             </YStack>
           )}
         </YStack>
+      </SettingsPanelSection>
+
+      <SettingsPanelSection
+        glass
+        iconName="phone-portrait-outline"
+        title={String(t('notification.system_settings'))}
+        description={String(t('notification.system_settings_desc'))}
+      >
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => void Linking.openSettings()}
+        >
+          {({ pressed }) => (
+            <XStack
+              style={{
+                minHeight: 44,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingHorizontal: 4,
+                opacity: pressed ? 0.7 : 1,
+              }}
+            >
+              <Text style={{ color: ios.primary, fontSize: 15, fontWeight: '600' }}>
+                {t('notification.open_system_settings')}
+              </Text>
+              <Ionicons name="chevron-forward" size={16} color={ios.primary} />
+            </XStack>
+          )}
+        </Pressable>
       </SettingsPanelSection>
     </YStack>
   );

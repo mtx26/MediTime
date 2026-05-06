@@ -686,7 +686,10 @@
       "title": "Preferências de notificação"
     },
     "push_description": "Receba notificações push em seus dispositivos.",
-    "push_toggle": "Habilitar notificações push da web"
+    "push_toggle": "Habilitar notificações push da web",
+    "system_settings": "Configurações do sistema",
+    "system_settings_desc": "Gerencie as permissões de notificações nas configurações do dispositivo.",
+    "open_system_settings": "Abrir configurações"
   },
   "open": "Abrir",
   "open_notifications": "Abrir notificações",

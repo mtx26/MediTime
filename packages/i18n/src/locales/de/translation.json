@@ -686,7 +686,10 @@
       "title": "Benachrichtigungseinstellungen"
     },
     "push_description": "Empfangen Sie Push-Benachrichtigungen auf Ihren Geräten.",
-    "push_toggle": "Aktivieren Sie Web-Push-Benachrichtigungen"
+    "push_toggle": "Aktivieren Sie Web-Push-Benachrichtigungen",
+    "system_settings": "Systemeinstellungen",
+    "system_settings_desc": "Verwalten Sie Benachrichtigungsrechte in den Geräteeinstellungen.",
+    "open_system_settings": "Einstellungen öffnen"
   },
   "open": "Offen",
   "open_notifications": "Offene Benachrichtigungen",

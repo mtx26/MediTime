@@ -168,6 +168,30 @@ export function useSettings() {
     setDisplayName(userInfo?.displayName ?? '');
   }, [userInfo?.displayName]);
 
+  const promptDisplayName = useCallback(() => {
+    Alert.prompt(
+      String(t('account.display_name.label')),
+      String(t('account.display_name.hint')),
+      [
+        { text: String(t('cancel')), style: 'cancel' },
+        {
+          text: String(t('account.save_changes')),
+          onPress: (value?: string) => {
+            const trimmed = (value ?? '').trim();
+            setDisplayName(trimmed);
+            void runSavingAction(async () => {
+              await updateUserInfo(buildUserUpdatePayload({ display_name: trimmed || null }));
+              await reloadUser();
+            });
+          },
+        },
+      ],
+      'plain-text',
+      displayName,
+      'default',
+    );
+  }, [displayName, reloadUser, runSavingAction, t, updateUserInfo]);
+
   const changePhoto = useCallback(async () => {
     if (!userInfo?.uid) return;
 
@@ -416,6 +440,7 @@ export function useSettings() {
     changePhoto,
     saveDisplayName,
     resetDisplayName,
+    promptDisplayName,
     setOldPassword,
     setNewPassword,
     setOldPasswordVisible,

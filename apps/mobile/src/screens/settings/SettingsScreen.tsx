@@ -143,9 +143,7 @@ export default function SettingsScreen() {
           photoUrl={settings.userInfo.photoUrl}
           isSaving={settings.isSaving}
           onChangePhoto={settings.changePhoto}
-          onDisplayNameChange={settings.setDisplayName}
-          onSaveDisplayName={settings.saveDisplayName}
-          onResetDisplayName={settings.resetDisplayName}
+          onPromptDisplayName={settings.promptDisplayName}
         />
       )}
     </SettingsPageShell>

@@ -133,7 +133,11 @@ export function MedicineSearchInput({
                 onPress={() => handleSelect(item)}
                 style={({ pressed }) => [
                   styles.suggestionItem,
-                  { backgroundColor: pressed ? ios.accentHover : 'transparent' },
+                  {
+                    backgroundColor: pressed ? ios.accentHover : 'transparent',
+                    borderTopWidth: i === 0 ? 0 : StyleSheet.hairlineWidth,
+                    borderTopColor: ios.border,
+                  },
                 ]}
               >
                 <Text
@@ -142,9 +146,29 @@ export function MedicineSearchInput({
                 >
                   {item.name}
                 </Text>
-                <Text style={{ color: ios.mutedForeground, fontSize: 12 }} numberOfLines={1}>
-                  {item.dose}{item.conditionnement ? ` · ${item.conditionnement}` : ''}{item.forme_pharmaceutique ? ` · ${item.forme_pharmaceutique}` : ''}
-                </Text>
+                <View style={styles.badgeRow}>
+                  {!!item.dose && (
+                    <View style={[styles.badge, { backgroundColor: ios.accentHover }]}>
+                      <Text style={{ color: ios.primary, fontSize: 11, fontWeight: '700' }}>
+                        {item.dose}
+                      </Text>
+                    </View>
+                  )}
+                  {!!item.conditionnement && (
+                    <View style={[styles.badge, { backgroundColor: ios.accentHover }]}>
+                      <Text style={{ color: ios.mutedForeground, fontSize: 11, fontWeight: '600' }}>
+                        {item.conditionnement}
+                      </Text>
+                    </View>
+                  )}
+                  {!!item.forme_pharmaceutique && (
+                    <View style={[styles.badge, { backgroundColor: ios.accentHover }]}>
+                      <Text style={{ color: ios.mutedForeground, fontSize: 11, fontWeight: '600' }}>
+                        {item.forme_pharmaceutique}
+                      </Text>
+                    </View>
+                  )}
+                </View>
               </Pressable>
             ))}
           </ScrollView>
@@ -163,6 +187,16 @@ const styles = StyleSheet.create({
   suggestionItem: {
     paddingHorizontal: 14,
     paddingVertical: 10,
-    gap: 2,
+    gap: 6,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 5,
+  },
+  badge: {
+    borderRadius: 6,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
   },
 });

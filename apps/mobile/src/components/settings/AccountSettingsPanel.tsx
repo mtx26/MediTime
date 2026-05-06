@@ -1,13 +1,9 @@
-import { Image, Pressable, TextInput } from 'react-native';
-import { useState, useRef, useEffect } from 'react';
+import { Image, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
-import { Input, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import type { MobileAccountSettingsProps } from '@meditime/types';
-import { LiquidButton } from '../common/LiquidButton';
-import { MobileForm } from '../common/MobileForm';
-import { SettingsPanelSection } from './SettingsPanelSection';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
 import { hapticSelection } from '../../utils/haptics';
 
@@ -17,22 +13,11 @@ export function AccountSettingsPanel({
   photoUrl,
   isSaving,
   onChangePhoto,
-  onDisplayNameChange,
-  onSaveDisplayName,
-  onResetDisplayName,
+  onPromptDisplayName,
 }: MobileAccountSettingsProps) {
   const { t } = useTranslation();
   const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
-  const [isEditing, setIsEditing] = useState(false);
-  const inputRef = useRef<TextInput>(null);
-
-  useEffect(() => {
-    if (isEditing) {
-      const timeout = setTimeout(() => inputRef.current?.focus(), 50);
-      return () => clearTimeout(timeout);
-    }
-  }, [isEditing]);
 
   return (
     <YStack style={{ gap: 20 }}>
@@ -112,7 +97,7 @@ export function AccountSettingsPanel({
               <Pressable
                 accessibilityRole="button"
                 hitSlop={12}
-                onPress={() => { hapticSelection(); setIsEditing(true); }}
+                onPress={() => { hapticSelection(); onPromptDisplayName(); }}
               >
                 <Ionicons name="pencil-outline" size={17} color={ios.primary} />
               </Pressable>
@@ -123,52 +108,6 @@ export function AccountSettingsPanel({
           </YStack>
         </XStack>
       </GlassView>
-
-      {/* Section édition nom */}
-      {isEditing && (
-        <SettingsPanelSection
-          glass
-          iconName="person-outline"
-          title={String(t('account.display_name.label'))}
-        >
-          <MobileForm onSubmit={onSaveDisplayName} disabled={isSaving} gap="$3">
-            {(form) => (
-              <>
-                <Input
-                  ref={inputRef as React.Ref<TextInput>}
-                  size="$4"
-                  value={displayName}
-                  placeholder={t('account.display_name.placeholder')}
-                  onChangeText={onDisplayNameChange}
-                  autoCapitalize="words"
-                  {...form.getInputProps()}
-                />
-                <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 18 }}>
-                  {t('account.display_name.hint')}
-                </Text>
-                <XStack style={{ gap: 10 }}>
-                  <YStack style={{ flex: 1 }}>
-                    <LiquidButton
-                      tone="primary"
-                      disabled={isSaving}
-                      loading={isSaving}
-                      iconName="save-outline"
-                      label={t('account.save_changes')}
-                      onPress={() => { form.submit(); setIsEditing(false); }}
-                    />
-                  </YStack>
-                  <YStack style={{ flex: 1 }}>
-                    <LiquidButton
-                      label={t('cancel')}
-                      onPress={() => { onResetDisplayName(); setIsEditing(false); }}
-                    />
-                  </YStack>
-                </XStack>
-              </>
-            )}
-          </MobileForm>
-        </SettingsPanelSection>
-      )}
     </YStack>
   );
 }

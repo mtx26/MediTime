@@ -686,7 +686,10 @@
       "title": "Notification preferences"
     },
     "push_description": "Receive push notifications on your devices.",
-    "push_toggle": "Enable web push notifications"
+    "push_toggle": "Enable web push notifications",
+    "system_settings": "System Settings",
+    "system_settings_desc": "Manage notification permissions in your device settings.",
+    "open_system_settings": "Open Settings"
   },
   "open": "Open",
   "open_notifications": "Open notifications",

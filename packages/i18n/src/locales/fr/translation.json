@@ -686,7 +686,10 @@
       "title": "Préférences de notification"
     },
     "push_description": "Recevez des notifications push sur vos appareils.",
-    "push_toggle": "Notifications push"
+    "push_toggle": "Notifications push",
+    "system_settings": "Paramètres système",
+    "system_settings_desc": "Gérez les autorisations de notifications dans les réglages de votre appareil.",
+    "open_system_settings": "Ouvrir les réglages"
   },
   "open": "Ouvrir",
   "open_notifications": "Ouvrir les notifications",
