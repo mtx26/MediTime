@@ -10,7 +10,7 @@ import type {
 } from '@meditime/types';
 import { useCalendarApis } from './useCalendarApis';
 import { dismissToCalendars } from './navigation';
-import { toActionSheetItems, toMobileHref } from '../../utils';
+import { toActionSheetItems } from '../../utils';
 
 type StockAlertsSource = {
   fetchBoxes: (calendarId: string) => Promise<ApiResult>;
@@ -128,7 +128,7 @@ export function useStockAlerts(sourceType: Exclude<CalendarDetailSourceType, 'to
 
   const navigateToHref = useCallback(
     (href: string) => {
-      router.push(toMobileHref(href) as never);
+      router.push(href as never);
     },
     [router],
   );

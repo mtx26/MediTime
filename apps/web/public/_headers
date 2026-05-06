@@ -24,8 +24,13 @@
   Cache-Control: no-cache, no-store, must-revalidate
   Service-Worker-Allowed: /
 
-# Apple Universal Links
+# Apple Universal Links (iOS)
 /.well-known/apple-app-site-association
+  Content-Type: application/json
+  Cache-Control: public, max-age=3600, must-revalidate
+
+# Android App Links
+/.well-known/assetlinks.json
   Content-Type: application/json
   Cache-Control: public, max-age=3600, must-revalidate
 

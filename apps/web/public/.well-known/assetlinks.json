@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.meditime.mobile",
+      "sha256_cert_fingerprints": [
+        "5B:F0:64:EE:BE:E6:59:09:2C:B3:46:56:08:BB:15:74:D6:21:56:28:7E:E0:84:93:DF:5F:59:A1:1D:31:0C:75"
+      ]
+    }
+  }
+]

@@ -19,7 +19,7 @@ import {
 } from '../../components/calendar';
 import { useIosTheme } from '../../theme/ios';
 import { useCalendars } from '../../hooks/calendars';
-import { openPdfUrl, toActionSheetItems, toMobileHref } from '../../utils';
+import { openPdfUrl, toActionSheetItems } from '../../utils';
 
 export default function CalendarsScreen() {
   const { t, i18n } = useTranslation();
@@ -56,7 +56,7 @@ export default function CalendarsScreen() {
 
   const navigateToHref = useCallback(
     (href: string) => {
-      router.push(toMobileHref(href) as never);
+      router.push(href as never);
     },
     [router],
   );

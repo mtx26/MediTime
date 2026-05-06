@@ -19,10 +19,30 @@ const config = {
   ios: {
     ...appJson.expo.ios,
   },
+  android: {
+    ...appJson.expo.android,
+    intentFilters: [
+      {
+        action: 'VIEW',
+        autoVerify: true,
+        data: [
+          {
+            scheme: 'https',
+            host: 'meditime-app.com',
+            pathPrefix: '/',
+          },
+        ],
+        category: ['BROWSABLE', 'DEFAULT'],
+      },
+    ],
+  },
 };
 
 if (appleTeamId) {
-  config.ios.associatedDomains = ['applinks:meditime-app.com'];
+  config.ios.associatedDomains = [
+    'applinks:meditime-app.com',
+    'applinks:dev.meditime-app.com',
+  ];
 }
 
 module.exports = {

@@ -6,7 +6,7 @@ import { getFirstRouteParams, getValidRedirect, log } from '@meditime/utils';
 import type { SessionLike } from '@meditime/types';
 import { useAuth } from './useAuth';
 import { supabase } from '../../services/supabase';
-import { applySupabaseAuthParams, collectAuthCallbackParams, toMobileHref } from '../../utils';
+import { applySupabaseAuthParams, collectAuthCallbackParams } from '../../utils';
 
 type RouteParamValue = string | string[] | undefined;
 type CallbackParams = Record<string, string | undefined>;
@@ -42,7 +42,7 @@ function getRedirectPath(type: string | undefined, redirect: string | undefined)
   const validRedirect = getValidRedirect(redirect);
 
   if (validRedirect?.startsWith('/')) {
-    return toMobileHref(validRedirect);
+    return validRedirect;
   }
 
   return REDIRECT_BY_TYPE.get(String(type)) ?? DEFAULT_REDIRECT;

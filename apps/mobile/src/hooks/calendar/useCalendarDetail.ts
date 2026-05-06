@@ -25,7 +25,7 @@ import type {
 } from '@meditime/types';
 import { useCalendarApis } from './useCalendarApis';
 import { dismissToCalendars } from './navigation';
-import { openPdfUrl, toActionSheetItems, toMobileHref } from '../../utils';
+import { openPdfUrl, toActionSheetItems } from '../../utils';
 
 type CalendarSource = {
   fetchSchedule: (calendarId: string, startDate?: string | null) => Promise<ApiResult>;
@@ -216,7 +216,7 @@ export function useCalendarDetail(sourceType: MobileCalendarDetailSourceType, mo
 
   const navigateToHref = useCallback(
     (href: string) => {
-      router.push(toMobileHref(href) as never);
+      router.push(href as never);
     },
     [router],
   );

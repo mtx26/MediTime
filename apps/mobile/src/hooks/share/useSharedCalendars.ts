@@ -16,7 +16,7 @@ import type {
   GroupedSharedCalendarsResult,
 } from '@meditime/types';
 import { useAuth } from '../auth/useAuth';
-import { openPdfUrl, toActionSheetItems, toMobileHref } from '../../utils';
+import { openPdfUrl, toActionSheetItems } from '../../utils';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
 const isActiveDefault = () => true;
@@ -131,7 +131,7 @@ export function useSharedCalendars() {
   );
 
   const navigateToHref = useCallback((href: string) => {
-    router.push(toMobileHref(href) as never);
+    router.push(href as never);
   }, [router]);
 
   const setSelectedCalendarId = useCallback((calendarId: string) => {

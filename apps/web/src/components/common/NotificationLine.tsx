@@ -152,7 +152,7 @@ export default function NotificationLine({
           components={[<strong />]}
         />
       );
-      link =  `/${lng}/calendar/${notif.calendar_id}/stock-alerts`;
+      link = `/${lng}/calendar/${notif.calendar_id}/stock-alerts`;
       break;
 
     default:

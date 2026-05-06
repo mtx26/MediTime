@@ -103,6 +103,8 @@ def security_template(title: str, body: str) -> str:
 
 def build_payload() -> dict[str, object]:
     return {
+        "site_url": "https://meditime-app.com",
+        "uri_allow_list": "https://meditime-app.com/**,https://dev.meditime-app.com/**",
         "mailer_subjects_confirmation": "Confirmez votre inscription MediTime",
         "mailer_templates_confirmation_content": linked_template(
             "Confirmez votre inscription",

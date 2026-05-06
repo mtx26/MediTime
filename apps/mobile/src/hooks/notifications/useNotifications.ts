@@ -12,7 +12,7 @@ import type {
 } from '@meditime/types';
 import { useAuth } from '../auth/useAuth';
 import { supabase } from '../../services/supabase';
-import { toActionSheetItems, toMobileHref } from '../../utils';
+import { toActionSheetItems } from '../../utils';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
 
@@ -111,7 +111,7 @@ export function useNotifications() {
   }, [isAuthLoading, loadNotifications]);
 
   const navigateToHref = useCallback((href: string) => {
-    router.push(toMobileHref(href) as never);
+    router.push(href as never);
   }, [router]);
 
   const readNotification = useCallback((notificationId: string) => {

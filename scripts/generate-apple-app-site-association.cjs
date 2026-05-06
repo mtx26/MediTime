@@ -24,7 +24,7 @@ const details = appleTeamId
   ? [
       {
         appID: `${appleTeamId}.${bundleId}`,
-        paths: ['/auth/callback', '/auth/callback/*'],
+        paths: ['*'],
       },
     ]
   : [];
