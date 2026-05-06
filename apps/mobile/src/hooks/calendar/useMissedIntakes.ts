@@ -157,9 +157,9 @@ export function useMissedIntakes(sourceType: Exclude<CalendarDetailSourceType, '
         ? `/(tabs)/calendars/calendar/${calendarId}/missed-intakes/recap`
         : `/(tabs)/calendars/shared-user-calendar/${calendarId}/missed-intakes/recap`;
     router.push({
-      pathname: basePath as Parameters<typeof router.push>[0],
+      pathname: basePath,
       params: { payload: JSON.stringify(payload) },
-    });
+    } as never);
   };
 
   return {

@@ -16,7 +16,23 @@ import { editBoxStore } from '../../stores/editBoxStore';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
 
 function toNumber(value: string) {
-  return value.trim() === '' ? null : Number(value);
+  const normalized = value.trim().replace(',', '.');
+  if (
+    normalized === ''
+    || normalized === '-'
+    || normalized === '+'
+    || normalized === '.'
+    || normalized === '-.'
+    || normalized === '+.'
+  ) {
+    return null;
+  }
+  const next = Number(normalized);
+  return Number.isFinite(next) ? next : null;
+}
+
+function toInputValue(value: number | null | undefined) {
+  return value == null || !Number.isFinite(value) ? '' : String(value);
 }
 
 export default function EditBoxScreen() {
@@ -33,6 +49,15 @@ export default function EditBoxScreen() {
   const [showThreshold, setShowThreshold] = useState(false);
   const [saving, setSaving] = useState(false);
   const [box, setBox] = useState<EditingBoxState | null>(() => editBoxStore.editingBox);
+  const [numberInputs, setNumberInputs] = useState(() => {
+    const initial = editBoxStore.editingBox;
+    return {
+      dose: toInputValue(initial?.dose),
+      box_capacity: toInputValue(initial?.box_capacity),
+      stock_quantity: toInputValue(initial?.stock_quantity),
+      stock_alert_threshold: toInputValue(initial?.stock_alert_threshold),
+    };
+  });
 
   const isNew = editBoxStore.boxId?.startsWith('temp-') ?? false;
 
@@ -51,6 +76,11 @@ export default function EditBoxScreen() {
   function set<K extends keyof EditingBoxState>(field: K, value: EditingBoxState[K]) {
     if (!box) return;
     update({ ...box, [field]: value });
+  }
+
+  function setNumberField(field: keyof typeof numberInputs, value: string) {
+    setNumberInputs((prev) => ({ ...prev, [field]: value }));
+    set(field as keyof EditingBoxState, toNumber(value) as never);
   }
 
   function addCondition() {
@@ -114,11 +144,31 @@ export default function EditBoxScreen() {
       <Stack.Screen
         options={{
           ...headerOptions,
-          headerRight: () => (
+          headerLeft: () => (
             <Pressable onPress={handleCancel} accessibilityRole="button">
               {({ pressed }) => (
                 <Text style={{ color: ios.primary, fontSize: 17, opacity: pressed ? 0.6 : 1 }}>
                   {t('cancel')}
+                </Text>
+              )}
+            </Pressable>
+          ),
+          headerRight: () => (
+            <Pressable
+              onPress={() => { void handleSave(); }}
+              accessibilityRole="button"
+              disabled={saving || !canSubmit}
+            >
+              {({ pressed }) => (
+                <Text
+                  style={{
+                    color: ios.primary,
+                    fontSize: 17,
+                    fontWeight: '700',
+                    opacity: saving || !canSubmit ? 0.35 : pressed ? 0.6 : 1,
+                  }}
+                >
+                  {t('boxes.save')}
                 </Text>
               )}
             </Pressable>
@@ -143,19 +193,28 @@ export default function EditBoxScreen() {
             <MedicineSearchInput
               name={box.name}
               dose={box.dose ?? null}
+              doseInputValue={numberInputs.dose}
               onChangeName={(v) => set('name', v)}
-              onChangeDose={(v) => set('dose', toNumber(v))}
-              onApplySuggestion={(updates) => update({ ...box, ...updates })}
+              onChangeDose={(v) => setNumberField('dose', v)}
+              onApplySuggestion={(updates) => {
+                setNumberInputs((prev) => ({
+                  ...prev,
+                  dose: toInputValue(updates.dose),
+                  box_capacity: toInputValue(updates.box_capacity),
+                  stock_quantity: toInputValue(updates.stock_quantity),
+                }));
+                update({ ...box, ...updates });
+              }}
               nextRef={capacityRef}
             />
-            <ReviewField ref={capacityRef} label={String(t('boxes.capacity'))} value={String(box.box_capacity ?? '')} keyboardType="numeric" onChangeText={(v) => set('box_capacity', toNumber(v))} returnKeyType="next" onSubmitEditing={() => stockRef.current?.focus()} />
-            <ReviewField ref={stockRef} label={String(t('boxes.remaining_qty'))} value={String(box.stock_quantity ?? '')} keyboardType="numeric" onChangeText={(v) => set('stock_quantity', toNumber(v))} returnKeyType="done" />
+            <ReviewField ref={capacityRef} label={String(t('boxes.capacity'))} value={numberInputs.box_capacity} keyboardType="numeric" onChangeText={(v) => setNumberField('box_capacity', v)} returnKeyType="next" onSubmitEditing={() => stockRef.current?.focus()} />
+            <ReviewField ref={stockRef} label={String(t('boxes.remaining_qty'))} value={numberInputs.stock_quantity} keyboardType="numeric" onChangeText={(v) => setNumberField('stock_quantity', v)} returnKeyType="done" />
 
             {/* Seuil d'alerte */}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
               <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 {showThreshold ? (
-                  <ReviewField ref={thresholdRef} size="sm" muted label={String(t('boxes.alert_threshold'))} value={String(box.stock_alert_threshold ?? '')} keyboardType="numeric" onChangeText={(v) => set('stock_alert_threshold', toNumber(v))} returnKeyType="done" onSubmitEditing={() => setShowThreshold(false)} />
+                  <ReviewField ref={thresholdRef} size="sm" muted label={String(t('boxes.alert_threshold'))} value={numberInputs.stock_alert_threshold} keyboardType="numeric" onChangeText={(v) => setNumberField('stock_alert_threshold', v)} returnKeyType="done" onSubmitEditing={() => setShowThreshold(false)} />
                 ) : (
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                     <Ionicons name="notifications-outline" size={14} color={ios.mutedForeground} />
@@ -186,15 +245,6 @@ export default function EditBoxScreen() {
             <LiquidButton iconName="add-circle-outline" label={String(t('boxes.condition.add'))} onPress={addCondition} tone="primary" />
           </View>
 
-          {/* Actions */}
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            <View style={{ flex: 1 }}>
-              <LiquidButton iconName="close-circle-outline" label={String(t('cancel'))} onPress={handleCancel} tone="plain" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <LiquidButton disabled={saving || !canSubmit} loading={saving} iconName="checkmark-circle-outline" label={String(t('boxes.save'))} onPress={() => { void handleSave(); }} tone="success" />
-            </View>
-          </View>
         </View>
       </ScrollView>
     </View>

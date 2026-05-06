@@ -18,6 +18,7 @@ const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
 type MedicineSearchInputProps = {
   name: string;
   dose: number | null;
+  doseInputValue?: string;
   onChangeName: (value: string) => void;
   onChangeDose: (value: string) => void;
   onApplySuggestion: (updates: {
@@ -34,6 +35,7 @@ type MedicineSearchInputProps = {
 export function MedicineSearchInput({
   name,
   dose,
+  doseInputValue,
   onChangeName,
   onChangeDose,
   onApplySuggestion,
@@ -128,9 +130,9 @@ export function MedicineSearchInput({
           <XStack style={{ alignItems: 'center', gap: 4 }}>
             <TextInput
               ref={nextRef}
-              value={dose != null && dose !== 0 ? String(dose) : ''}
+              value={doseInputValue ?? (dose != null && dose !== 0 ? String(dose) : '')}
               onChangeText={onChangeDose}
-              keyboardType="numeric"
+              keyboardType="numbers-and-punctuation"
               returnKeyType="next"
               placeholder="0"
               placeholderTextColor={ios.mutedForeground}

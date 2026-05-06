@@ -10,7 +10,9 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspace=apps/web",
-    "build": "npm run build --workspace=apps/web",
+    "build": "npm run build --workspace=apps/web && npm run build --workspace=apps/mobile",
+    "build:web": "npm run build --workspace=apps/web",
+    "build:mobile": "npm run build --workspace=apps/mobile",
     "preview": "npm run preview --workspace=apps/web",
     "i18n:sync": "node scripts/i18n/run.js",
     "i18n:sync:dry": "node scripts/i18n/run.js --dry-run",

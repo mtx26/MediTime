@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Pressable } from 'react-native';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import NativeSegmentedControl from '@react-native-segmented-control/segmented-control';
@@ -45,6 +46,30 @@ function DateField({
 // ─── SegmentedControl ─────────────────────────────────────────────────────────
 
 type SegmentedOption = { value: string; label: string };
+
+function toInputValue(value: unknown) {
+  if (value == null || value === '') return '';
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? String(value) : '';
+}
+
+function parseDraftNumber(value: string) {
+  const normalized = value.trim().replace(',', '.');
+  if (normalized === '') return { kind: 'empty' as const };
+  if (
+    normalized === '-'
+    || normalized === '+'
+    || normalized === '.'
+    || normalized === '-.'
+    || normalized === '+.'
+  ) {
+    return { kind: 'partial' as const };
+  }
+  const next = Number(normalized);
+  return Number.isFinite(next)
+    ? { kind: 'number' as const, value: next }
+    : { kind: 'partial' as const };
+}
 
 function SegmentedControl({
   label,
@@ -94,12 +119,18 @@ export function ConditionItem({
 }) {
   const { t } = useTranslation();
   const ios = useIosTheme();
+  const [tabletCountInput, setTabletCountInput] = useState(() => toInputValue(condition.tablet_count));
+  const [intervalDaysInput, setIntervalDaysInput] = useState(() => toInputValue(condition.interval_days));
+  const [maxDateDaysInput, setMaxDateDaysInput] = useState(() => toInputValue(condition.max_date_days));
 
   const intervalDays = Number(condition.interval_days ?? 1);
   const maxDateMode = condition.max_date_mode ?? 'none';
 
   const handleIntervalDaysChange = (value: string) => {
-    const num = value.trim() === '' ? null : Number(value);
+    setIntervalDaysInput(value);
+    const parsed = parseDraftNumber(value);
+    if (parsed.kind === 'partial') return;
+    const num = parsed.kind === 'empty' ? null : parsed.value;
     if ((num ?? 0) <= 1) {
       onUpdate({ interval_days: num ?? undefined, start_date: null });
     } else {
@@ -116,11 +147,14 @@ export function ConditionItem({
   };
 
   const handleMaxDateDaysChange = (value: string) => {
-    if (!value || value.trim() === '') {
+    setMaxDateDaysInput(value);
+    const parsed = parseDraftNumber(value);
+    if (parsed.kind === 'partial') return;
+    if (parsed.kind === 'empty') {
       onUpdate({ max_date: null, max_date_days: null });
       return;
     }
-    const daysValue = parseInt(value, 10);
+    const daysValue = parsed.value;
     const now = new Date();
     const target = new Date(now);
     const hourByTime: Record<string, number> = { morning: 8, noon: 12, evening: 18 };
@@ -131,6 +165,13 @@ export function ConditionItem({
     endDate.setDate(endDate.getDate() + (includeToday ? daysValue - 1 : daysValue));
     endDate.setHours(23, 59, 59, 999);
     onUpdate({ max_date: endDate.toISOString(), max_date_days: daysValue });
+  };
+
+  const handleTabletCountChange = (value: string) => {
+    setTabletCountInput(value);
+    const parsed = parseDraftNumber(value);
+    if (parsed.kind === 'partial') return;
+    onUpdate({ tablet_count: parsed.kind === 'empty' ? undefined : parsed.value });
   };
 
   const handleUntilDateChange = (date: Date | null) => {
@@ -172,12 +213,12 @@ export function ConditionItem({
       {/* Tablet count */}
       <ReviewField
         label={String(t('boxes.condition.tablet_count'))}
-        value={String(condition.tablet_count ?? '')}
+        value={tabletCountInput}
         keyboardType="numeric"
         required
         size="sm"
         muted
-        onChangeText={(v) => onUpdate({ tablet_count: v.trim() === '' ? undefined : parseFloat(v) })}
+        onChangeText={handleTabletCountChange}
       />
 
       {/* Time of day */}
@@ -195,7 +236,7 @@ export function ConditionItem({
       {/* Interval days */}
       <ReviewField
         label={String(t('boxes.condition.interval_days'))}
-        value={String(condition.interval_days ?? '')}
+        value={intervalDaysInput}
         keyboardType="numeric"
         required
         size="sm"
@@ -227,7 +268,7 @@ export function ConditionItem({
       {maxDateMode === 'for_days' ? (
         <ReviewField
           label={String(t('boxes.condition.duration_days'))}
-          value={String(condition.max_date_days ?? '')}
+          value={maxDateDaysInput}
           keyboardType="numeric"
           required
           size="sm"

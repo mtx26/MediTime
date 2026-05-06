@@ -28,6 +28,7 @@ export const ReviewField = forwardRef<TextInput, ReviewFieldProps>(function Revi
 }, ref) {
   const ios = useIosTheme();
   const isSmall = size === 'sm';
+  const resolvedKeyboardType = keyboardType === 'numeric' ? 'numbers-and-punctuation' : keyboardType;
 
   return (
     <YStack style={{ gap: 5 }}>
@@ -38,7 +39,7 @@ export const ReviewField = forwardRef<TextInput, ReviewFieldProps>(function Revi
         ref={ref}
         value={value}
         onChangeText={onChangeText}
-        keyboardType={keyboardType}
+        keyboardType={resolvedKeyboardType}
         onSubmitEditing={onSubmitEditing}
         returnKeyType={returnKeyType}
         autoCorrect={false}

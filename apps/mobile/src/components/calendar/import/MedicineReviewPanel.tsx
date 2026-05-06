@@ -1,6 +1,7 @@
-import { useRef, type ElementRef } from 'react';
+import { useRef } from 'react';
+import { TextInput } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Input, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import type { MedicineReviewMedicineInput } from '@meditime/types';
 import { IconButton } from '../../common/IconButton';
 import { InfoBanner } from '../../common/InfoBanner';
@@ -35,11 +36,11 @@ export function MedicineReviewPanel({
   const { t } = useTranslation();
   const ios = useIosTheme();
   const current = medicines[index];
-  const nameInputRef = useRef<ElementRef<typeof Input>>(null);
-  const doseInputRef = useRef<ElementRef<typeof Input>>(null);
-  const stockQuantityInputRef = useRef<ElementRef<typeof Input>>(null);
-  const stockMaxInputRef = useRef<ElementRef<typeof Input>>(null);
-  const stockAlertInputRef = useRef<ElementRef<typeof Input>>(null);
+  const nameInputRef = useRef<TextInput>(null);
+  const doseInputRef = useRef<TextInput>(null);
+  const stockQuantityInputRef = useRef<TextInput>(null);
+  const stockMaxInputRef = useRef<TextInput>(null);
+  const stockAlertInputRef = useRef<TextInput>(null);
 
   if (!current) {
     return (

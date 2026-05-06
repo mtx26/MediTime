@@ -138,43 +138,85 @@ export function MedicineBoxCard({
           </Text>
         </XStack>
 
-        {canRestock ? (
-          <Pressable
-              onPress={() => {
-                hapticImpact();
-                onRestock?.(box.id);
-              }}
-              disabled={disabled || box.box_capacity === 0}
-              accessibilityRole="button"
-              accessibilityLabel={String(t('boxes.restock'))}
-              style={{ flex: 1 }}
-            >
-              {({ pressed }) => (
-                <GlassSurface
-                  glassEffectStyle="clear"
-                  style={{
-                    minHeight: 46,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 14,
-                    borderColor: pressed ? ios.primary : ios.border,
-                    opacity: disabled || box.box_capacity === 0 ? 0.5 : 1,
-                    paddingHorizontal: 12,
-                  }}
-                >
-                  <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                    <Ionicons name="add-circle-outline" size={18} color={ios.primary} />
-                    <Text style={{ color: ios.primary, fontSize: 15, lineHeight: 20, fontWeight: '800' }}>
-                      {t('boxes.restock')}
-                    </Text>
-                  </XStack>
-                </GlassSurface>
-              )}
-            </Pressable>
-          ) : null}
+        {canRestock || showMissingPillbox ? (
+          <XStack style={{ gap: 10 }}>
+            {canRestock ? (
+              <Pressable
+                onPress={() => {
+                  hapticImpact();
+                  onRestock?.(box.id);
+                }}
+                disabled={disabled || box.box_capacity === 0}
+                accessibilityRole="button"
+                accessibilityLabel={String(t('boxes.restock'))}
+                style={{ flex: 1 }}
+              >
+                {({ pressed }) => (
+                  <GlassSurface
+                    glassEffectStyle="clear"
+                    style={{
+                      minHeight: 46,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 14,
+                      borderColor: pressed ? ios.primary : ios.border,
+                      opacity: disabled || box.box_capacity === 0 ? 0.5 : 1,
+                      paddingHorizontal: 12,
+                    }}
+                  >
+                    <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                      <Ionicons name="add-circle-outline" size={18} color={ios.primary} />
+                      <Text style={{ color: ios.primary, fontSize: 15, lineHeight: 20, fontWeight: '800' }}>
+                        {t('boxes.restock')}
+                      </Text>
+                    </XStack>
+                  </GlassSurface>
+                )}
+              </Pressable>
+            ) : null}
+
+            {showMissingPillbox ? (
+              <Pressable
+                onPress={() => {
+                  hapticImpact();
+                  onMissingPillbox?.(box.id);
+                }}
+                disabled={disabled}
+                accessibilityRole="button"
+                accessibilityLabel={String(t('boxes.missing_pillbox'))}
+                style={{ flex: 1 }}
+              >
+                {({ pressed }) => (
+                  <GlassSurface
+                    glassEffectStyle="clear"
+                    style={{
+                      minHeight: 46,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 14,
+                      borderColor: pressed ? ios.primary : ios.border,
+                      opacity: disabled ? 0.5 : 1,
+                      paddingHorizontal: 12,
+                    }}
+                  >
+                    <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                      <Ionicons name="grid-outline" size={18} color={ios.primary} />
+                      <Text
+                        numberOfLines={1}
+                        style={{ flexShrink: 1, color: ios.primary, fontSize: 15, lineHeight: 20, fontWeight: '800' }}
+                      >
+                        {t('boxes.missing_pillbox')}
+                      </Text>
+                    </XStack>
+                  </GlassSurface>
+                )}
+              </Pressable>
+            ) : null}
+          </XStack>
+        ) : null}
       </YStack>
 
-      <XStack style={{ flexWrap: 'wrap', gap: 8 }}>
+      <XStack style={{ flexWrap: 'wrap', gap: 6 }}>
         {getBoxStatusItems(box).map((item) => {
           const palette = item.variant === 'danger'
             ? { background: ios.destructiveBg, color: ios.destructive }
@@ -189,15 +231,15 @@ export function MedicineBoxCard({
               key={item.key}
               style={{
                 alignItems: 'center',
-                gap: 6,
-                paddingHorizontal: 10,
-                paddingVertical: 6,
+                gap: 4,
+                paddingHorizontal: 8,
+                paddingVertical: 4,
                 borderRadius: 999,
                 backgroundColor: palette.background,
               }}
             >
-              <Ionicons name={STATUS_ICON_MAP[item.key]} size={14} color={palette.color} />
-              <Text style={{ color: palette.color, fontSize: 12, lineHeight: 16, fontWeight: '800' }}>
+              <Ionicons name={STATUS_ICON_MAP[item.key]} size={12} color={palette.color} />
+              <Text style={{ color: palette.color, fontSize: 11, lineHeight: 14, fontWeight: '800' }}>
                 {t(item.i18nKey)}
               </Text>
             </XStack>
@@ -218,31 +260,31 @@ export function MedicineBoxCard({
             <GlassSurface
               glassEffectStyle="clear"
               style={{
-                gap: 8,
-                borderRadius: 14,
+                gap: 6,
+                borderRadius: 12,
                 borderColor: ios.border,
-                paddingHorizontal: 12,
-                paddingVertical: 12,
+                paddingHorizontal: 10,
+                paddingVertical: 8,
                 opacity: !onToggleExpanded && !onEdit ? 0.7 : 1,
               }}
             >
-              <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                <Text style={{ flex: 1, color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '700' }}>
+              <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <Text style={{ flex: 1, color: ios.foreground, fontSize: 13, lineHeight: 17, fontWeight: '700' }}>
                   {formatConditionSummary(box, translate)}
                 </Text>
                 <Ionicons
                   name={expanded ? 'chevron-up-outline' : 'chevron-down-outline'}
-                  size={18}
+                  size={16}
                   color={ios.mutedForeground}
                 />
               </XStack>
 
               {expanded ? (
-                <YStack style={{ gap: 6 }}>
+                <YStack style={{ gap: 4 }}>
                   {box.conditions.filter(Boolean).map((condition, index) => (
                     <Text
                       key={`${condition.id ?? index}-${condition.time_of_day ?? 'time'}`}
-                      style={{ color: ios.mutedForeground, fontSize: 13, lineHeight: 18 }}
+                      style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}
                     >
                       {formatConditionLine(box, index, translate)}
                     </Text>
@@ -252,41 +294,6 @@ export function MedicineBoxCard({
             </GlassSurface>
           )}
         </Pressable>
-      ) : null}
-
-      {showMissingPillbox ? (
-        <YStack style={{ gap: 8 }}>
-          <Pressable
-            onPress={() => {
-              hapticImpact();
-              onMissingPillbox?.(box.id);
-            }}
-            disabled={disabled}
-            accessibilityRole="button"
-            accessibilityLabel={String(t('boxes.missing_pillbox'))}
-          >
-            {({ pressed }) => (
-              <GlassSurface
-                glassEffectStyle="clear"
-                style={{
-                  minHeight: 46,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  borderRadius: 14,
-                  borderColor: pressed ? ios.primary : ios.border,
-                  opacity: disabled ? 0.5 : 1,
-                  paddingHorizontal: 14,
-                }}
-              >
-                <Ionicons name="grid-outline" size={18} color={ios.primary} />
-                <Text style={{ color: ios.foreground, fontSize: 15, lineHeight: 20, fontWeight: '800' }}>
-                  {t('boxes.missing_pillbox')}
-                </Text>
-              </GlassSurface>
-            )}
-          </Pressable>
-        </YStack>
       ) : null}
     </GlassSurface>
   );
