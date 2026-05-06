@@ -150,7 +150,7 @@ export function useAuthForm(initialMode: AuthMode) {
 
     try {
       const options = {
-        ...getOAuthSignInOptions(provider, buildMobileAuthCallbackUrl('oauth')),
+        ...getOAuthSignInOptions(provider, buildMobileAuthCallbackUrl(undefined, 'oauth')),
         skipBrowserRedirect: true,
       };
       const { data, error: oauthError } = await supabase.auth.signInWithOAuth({

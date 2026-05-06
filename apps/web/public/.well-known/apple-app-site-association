@@ -1,6 +1,11 @@
 {
   "applinks": {
     "apps": [],
-    "details": []
+    "details": [
+      {
+        "appID": "VCLF9HXC5M.app.meditime.mobile",
+        "paths": ["*"]
+      }
+    ]
   }
 }

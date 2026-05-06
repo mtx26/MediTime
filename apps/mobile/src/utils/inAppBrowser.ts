@@ -5,21 +5,11 @@ import { buildAuthCallbackUrl } from '@meditime/utils';
 
 const configuredWebUrl = process.env.EXPO_PUBLIC_WEB_URL?.trim()?.replace(/\/+$/, '');
 
-export const MOBILE_AUTH_CALLBACK_URL = `${configuredWebUrl}/auth/callback`;
-
-export function buildMobileAuthCallbackUrl(type?: string, redirect?: string) {
+export function buildMobileAuthCallbackUrl(redirect?: string, type?: string) {
   if (!configuredWebUrl) {
     throw new Error('Missing EXPO_PUBLIC_WEB_URL');
   }
   return buildAuthCallbackUrl(configuredWebUrl, redirect, '/auth/callback', type);
-}
-
-export function buildWebResetPasswordCallbackUrl() {
-  if (!configuredWebUrl) {
-    throw new Error('Missing EXPO_PUBLIC_WEB_URL');
-  }
-
-  return buildAuthCallbackUrl(configuredWebUrl, undefined, '/auth/callback', 'recovery');
 }
 
 WebBrowser.maybeCompleteAuthSession();
@@ -83,9 +73,12 @@ export async function applySupabaseAuthParams(
 }
 
 export async function openAuthUrlInApp(url: string) {
+  if (!configuredWebUrl) {
+    throw new Error('Missing EXPO_PUBLIC_WEB_URL');
+  }
   const result = await WebBrowser.openAuthSessionAsync(
     url,
-    MOBILE_AUTH_CALLBACK_URL,
+    `${configuredWebUrl}/auth/callback`,
     {
       dismissButtonStyle: 'close',
       presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,

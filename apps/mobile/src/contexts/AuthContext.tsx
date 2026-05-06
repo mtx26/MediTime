@@ -9,7 +9,7 @@ const USER_SYNC_TIMEOUT_MS = 8000;
 
 const authService = createAuthService(
   supabase,
-  (redirect?: string, type?: string) => buildMobileAuthCallbackUrl(type, redirect),
+  buildMobileAuthCallbackUrl,
 );
 
 export { authService };

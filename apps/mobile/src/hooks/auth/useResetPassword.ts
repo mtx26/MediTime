@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, useWatch } from 'react-hook-form';
 import { authService } from '../../contexts/AuthContext';
-import { buildWebResetPasswordCallbackUrl } from '../../utils';
 
 export function useResetPassword() {
   const { t } = useTranslation();
@@ -38,7 +37,7 @@ export function useResetPassword() {
     setError(null);
     setIsSubmitting(true);
     try {
-      await authService.resetPassword(trimmedEmail, buildWebResetPasswordCallbackUrl());
+      await authService.resetPassword(trimmedEmail);
       setSent(true);
     } catch {
       setError(String(t('unexpected_error')));

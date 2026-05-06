@@ -17,7 +17,6 @@ import { MOBILE_LANGUAGE_STORAGE_KEY } from '../../i18n';
 import {
   applySupabaseAuthCallback,
   buildMobileAuthCallbackUrl,
-  buildWebResetPasswordCallbackUrl,
   openAuthUrlInApp,
 } from '../../utils';
 
@@ -263,7 +262,7 @@ export function useSettings() {
       const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          ...getOAuthSignInOptions(provider, buildMobileAuthCallbackUrl('oauth')),
+          ...getOAuthSignInOptions(provider, buildMobileAuthCallbackUrl(undefined, 'oauth')),
           skipBrowserRedirect: true,
         },
       });
@@ -362,7 +361,7 @@ export function useSettings() {
     if (!userInfo?.email) return;
 
     try {
-      await authService.resetPassword(userInfo.email, buildWebResetPasswordCallbackUrl());
+      await authService.resetPassword(userInfo.email);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(t('unexpected_error'));
       Alert.alert(String(t('error')), message);
