@@ -1,28 +1,17 @@
 import * as WebBrowser from 'expo-web-browser';
-import * as Linking from 'expo-linking';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { buildAuthCallbackUrl } from '@meditime/utils';
 
 
-// Utilise la variable d'env unifiée pour le callback auth mobile
-const configuredAuthRedirectUrl = process.env.EXPO_PUBLIC_AUTH_REDIRECT_URL?.trim();
-const configuredWebUrl = process.env.EXPO_PUBLIC_WEB_URL?.trim();
+const configuredWebUrl = process.env.EXPO_PUBLIC_WEB_URL?.trim()?.replace(/\/+$/, '');
 
-export const MOBILE_AUTH_CALLBACK_URL =
-  configuredAuthRedirectUrl || Linking.createURL('auth/callback');
+export const MOBILE_AUTH_CALLBACK_URL = `${configuredWebUrl}/auth/callback`;
 
 export function buildMobileAuthCallbackUrl(type?: string, redirect?: string) {
-  try {
-    const callbackUrl = new URL(MOBILE_AUTH_CALLBACK_URL);
-    return buildAuthCallbackUrl(
-      `${callbackUrl.protocol}//${callbackUrl.host}`,
-      redirect,
-      callbackUrl.pathname || '/auth/callback',
-      type,
-    );
-  } catch {
-    return buildAuthCallbackUrl(MOBILE_AUTH_CALLBACK_URL, redirect, '', type);
+  if (!configuredWebUrl) {
+    throw new Error('Missing EXPO_PUBLIC_WEB_URL');
   }
+  return buildAuthCallbackUrl(configuredWebUrl, redirect, '/auth/callback', type);
 }
 
 export function buildWebResetPasswordCallbackUrl() {
@@ -30,12 +19,7 @@ export function buildWebResetPasswordCallbackUrl() {
     throw new Error('Missing EXPO_PUBLIC_WEB_URL');
   }
 
-  return buildAuthCallbackUrl(
-    configuredWebUrl.replace(/\/+$/, ''),
-    undefined,
-    '/auth/callback',
-    'recovery',
-  );
+  return buildAuthCallbackUrl(configuredWebUrl, undefined, '/auth/callback', 'recovery');
 }
 
 WebBrowser.maybeCompleteAuthSession();
