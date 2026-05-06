@@ -14,6 +14,7 @@ import ContextMenu from '../../components/common/ContextMenu';
 import { InfoBanner } from '../../components/common/InfoBanner';
 import { LoadingIndicator } from '../../components/common/LoadingIndicator';
 import { Page, usePageHeaderOptions } from '../../components/common/Page';
+import { BackButton } from '../../components/common/BackButton';
 import { useCalendarDetail } from '../../hooks/calendar';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
 import { hapticSelection } from '../../utils/haptics';
@@ -41,6 +42,7 @@ export default function CalendarDetailScreen({
     headerBackTitleVisible: isDailyRoute,
     headerTitleAlign: 'center' as const,
     headerTitle: () => <CalendarHeaderTitle title={detail.headerTitle} />,
+    headerLeft: isDailyRoute ? () => <BackButton fallbackHref="/calendars" variant="header" /> : undefined,
     headerRight: () => (
       detail.actions.length > 0 ? (
         <ContextMenu

@@ -10,7 +10,9 @@ function buildCalendarActionsBase(
   handlers: Partial<CalendarActionHandlers>,
   exclude: string[],
 ): ActionList {
-  const { calendarId, lng, basePath, selectedDate } = ctx;
+  const { calendarId, basePath, selectedDate } = ctx;
+  const firstSegment = basePath.split('/')[0];
+  const localePrefix = /^[a-z]{2}$/.test(firstSegment) ? `/${firstSegment}` : '';
   const todayIso = toISO(new Date(new Date().setHours(0, 0, 0, 0)));
 
   const actions: ActionList = [
@@ -20,14 +22,15 @@ function buildCalendarActionsBase(
         icon: 'grid-3x3',
         labelKey: 'pillbox.title',
         titleKey: 'pillbox.title',
-        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate || new Date())}`,
+        linkTo: `/${basePath}/${calendarId}/pillbox?date=${toISO(selectedDate || new Date())}`,
+
       },
       {
         id: 'day_view',
         icon: 'calendar-days',
         labelKey: 'day_view.title',
         titleKey: 'day_view.title',
-        linkTo: `/${lng}/${basePath}/${calendarId}/daily?date=${todayIso}`,
+        linkTo: `/${basePath}/${calendarId}/daily?date=${todayIso}`,
       },
     ],
     { separator: true },
@@ -44,7 +47,7 @@ function buildCalendarActionsBase(
         icon: 'share-2',
         labelKey: 'share',
         titleKey: 'share',
-        linkTo: `/${lng}/shared-calendars?calendar=${calendarId}`,
+        linkTo: `${localePrefix}/shared-calendars?calendar=${calendarId}`,
         dataTour: 'share-calendar-btn',
       },
     ],
@@ -55,7 +58,7 @@ function buildCalendarActionsBase(
         icon: 'pill',
         labelKey: 'medicines.label',
         titleKey: 'medicines.label',
-        linkTo: `/${lng}/${basePath}/${calendarId}/boxes`,
+        linkTo: `/${basePath}/${calendarId}/boxes`,
       },
       {
         id: 'export_pdf',
@@ -70,7 +73,7 @@ function buildCalendarActionsBase(
         icon: 'alert-triangle',
         labelKey: 'stock',
         titleKey: 'stock',
-        linkTo: `/${lng}/${basePath}/${calendarId}/stock-alerts`,
+        linkTo: `/${basePath}/${calendarId}/stock-alerts`,
         dataTour: 'stock-alerts-btn',
       },
       {
@@ -78,14 +81,14 @@ function buildCalendarActionsBase(
         icon: 'calendar',
         labelKey: 'ics.calendar_ics',
         titleKey: 'ics.calendar_ics',
-        linkTo: `/${lng}/${basePath}/${calendarId}/ics-tokens`,
+        linkTo: `/${basePath}/${calendarId}/ics-tokens`,
       },
       {
         id: 'pillbox_history',
         icon: 'clock',
         labelKey: 'pillbox_uses',
         titleKey: 'pillbox_uses',
-        linkTo: `/${lng}/${basePath}/${calendarId}/pillbox-uses`,
+        linkTo: `/${basePath}/${calendarId}/pillbox-uses`,
         dataTour: 'pillbox-history-btn',
       },
       {
@@ -93,7 +96,7 @@ function buildCalendarActionsBase(
         icon: 'calendar-off',
         labelKey: 'missed_intakes.title',
         titleKey: 'missed_intakes.title',
-        linkTo: `/${lng}/${basePath}/${calendarId}/missed-intakes`,
+        linkTo: `/${basePath}/${calendarId}/missed-intakes`,
       },
     ],
     { separator: true },
@@ -103,7 +106,7 @@ function buildCalendarActionsBase(
         icon: 'settings',
         labelKey: 'settings.label',
         titleKey: 'settings.label',
-        linkTo: `/${lng}/${basePath}/${calendarId}/settings`,
+        linkTo: `/${basePath}/${calendarId}/settings`,
         dataTour: 'calendar-settings-btn',
       },
     ],

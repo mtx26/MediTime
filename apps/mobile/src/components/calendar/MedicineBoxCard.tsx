@@ -96,6 +96,12 @@ export function MedicineBoxCard({
               {isCritical ? t('critical_stock') : t('low_stock')}
             </Text>
           ) : null}
+          <XStack style={{ alignItems: 'center', gap: 4 }}>
+            <Ionicons name="notifications-outline" size={12} color={ios.mutedForeground} />
+            <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
+              {`${t('boxes.alert_threshold')} : ${box.stock_alert_threshold}`}
+            </Text>
+          </XStack>
         </YStack>
 
         {actions && actions.length > 0 ? (
@@ -104,26 +110,6 @@ export function MedicineBoxCard({
       </XStack>
 
       <YStack style={{ gap: 12 }}>
-        <XStack style={{ gap: 12 }}>
-          <YStack style={{ flex: 1, gap: 2 }}>
-            <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
-              {t('boxes.capacity')}
-            </Text>
-            <Text style={{ color: ios.foreground, fontSize: 16, lineHeight: 22, fontWeight: '800' }}>
-              {box.box_capacity}
-            </Text>
-          </YStack>
-
-          <YStack style={{ flex: 1, gap: 2 }}>
-            <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>
-              {t('boxes.alert_threshold')}
-            </Text>
-            <Text style={{ color: ios.foreground, fontSize: 16, lineHeight: 22, fontWeight: '800' }}>
-              {box.stock_alert_threshold}
-            </Text>
-          </YStack>
-        </XStack>
-
         <XStack style={{ alignItems: 'stretch', gap: 12 }}>
           <YStack style={{ flex: 1, gap: 2, justifyContent: 'center' }}>
             <Text style={{ color: ios.mutedForeground, fontSize: 12, lineHeight: 16 }}>

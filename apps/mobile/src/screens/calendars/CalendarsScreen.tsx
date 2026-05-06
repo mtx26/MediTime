@@ -22,10 +22,9 @@ import { useCalendars } from '../../hooks/calendars';
 import { openPdfUrl, toActionSheetItems } from '../../utils';
 
 export default function CalendarsScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const router = useRouter();
   const ios = useIosTheme();
-  const lng = i18n.language || 'fr';
   const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
   const [pdfCalendarId, setPdfCalendarId] = useState<string | null>(null);
   const [includeInactive, setIncludeInactive] = useState(false);
@@ -144,7 +143,7 @@ export default function CalendarsScreen() {
   const getPersonalActions = (calendar: CalendarItem) => {
     return toActionSheetItems(
       buildPersonalCalendarActions(
-        { calendarId: calendar.id, lng, basePath: 'calendar', selectedDate: null },
+        { calendarId: calendar.id, basePath: 'calendars/calendar', selectedDate: null },
         {
           onRename: () => startRename(calendar),
           onDelete: () => handleDeleteCalendarClick(calendar.id),
@@ -159,7 +158,7 @@ export default function CalendarsScreen() {
   const getSharedActions = (calendar: CalendarItem) => {
     return toActionSheetItems(
       buildSharedCalendarActions(
-        { calendarId: calendar.id, lng, basePath: 'shared-user-calendar', selectedDate: null },
+        { calendarId: calendar.id, basePath: 'calendars/shared-user-calendar', selectedDate: null },
         {
           onDelete: () => handleDeleteSharedCalendarClick(calendar.id),
           onExportPdf: () => openPdfDialog(calendar.id),

@@ -6,7 +6,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Text, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import { useTranslation } from 'react-i18next';
 import { fetchSuggestionsFromSupabase } from '@meditime/utils';
 import type { MedicineReviewSuggestion } from '@meditime/types';
@@ -19,6 +19,7 @@ type MedicineSearchInputProps = {
   name: string;
   dose: number | null;
   onChangeName: (value: string) => void;
+  onChangeDose: (value: string) => void;
   onApplySuggestion: (updates: {
     name: string;
     dose: number | null;
@@ -34,6 +35,7 @@ export function MedicineSearchInput({
   name,
   dose,
   onChangeName,
+  onChangeDose,
   onApplySuggestion,
   onAfterSelect,
   nextRef,
@@ -87,35 +89,67 @@ export function MedicineSearchInput({
 
   return (
     <YStack style={{ gap: 7 }}>
-      <Text style={{ color: ios.foreground, fontSize: 13, fontWeight: '700' }}>
-        {t('boxes.name')} <Text style={{ color: ios.destructive }}>*</Text>
-      </Text>
-      <TextInput
-        ref={inputRef}
-        value={name}
-        onFocus={() => {
-          if (suggestions.length > 0) setShowDropdown(true);
-        }}
-        onChangeText={(v) => {
-          onChangeName(v);
-          setShowDropdown(true);
-        }}
-        placeholder={String(t('boxes.start_typing'))}
-        placeholderTextColor={ios.mutedForeground}
-        returnKeyType="next"
-        autoCorrect={false}
-        autoCapitalize="none"
-        onSubmitEditing={() => nextRef?.current?.focus()}
-        style={{
-          backgroundColor: ios.card,
-          color: ios.foreground,
-          borderRadius: 10,
-          minHeight: 44,
-          paddingHorizontal: 12,
-          paddingVertical: 10,
-          fontSize: 16,
-        }}
-      />
+      <XStack style={{ gap: 8, alignItems: 'flex-end' }}>
+        <YStack style={{ flex: 1, gap: 5 }}>
+          <Text style={{ color: ios.foreground, fontSize: 13, fontWeight: '700' }}>
+            {t('boxes.name')} <Text style={{ color: ios.destructive }}>*</Text>
+          </Text>
+          <TextInput
+            ref={inputRef}
+            value={name}
+            onFocus={() => {
+              if (suggestions.length > 0) setShowDropdown(true);
+            }}
+            onChangeText={(v) => {
+              onChangeName(v);
+              setShowDropdown(true);
+            }}
+            placeholder={String(t('boxes.start_typing'))}
+            placeholderTextColor={ios.mutedForeground}
+            returnKeyType="next"
+            autoCorrect={false}
+            autoCapitalize="none"
+            onSubmitEditing={() => nextRef?.current?.focus()}
+            style={{
+              backgroundColor: ios.card,
+              color: ios.foreground,
+              borderRadius: 10,
+              minHeight: 44,
+              paddingHorizontal: 12,
+              paddingVertical: 10,
+              fontSize: 16,
+            }}
+          />
+        </YStack>
+        <YStack style={{ width: 80, gap: 5 }}>
+          <Text style={{ color: ios.foreground, fontSize: 13, fontWeight: '700' }}>
+            {t('boxes.dose')}
+          </Text>
+          <XStack style={{ alignItems: 'center', gap: 4 }}>
+            <TextInput
+              ref={nextRef}
+              value={dose != null && dose !== 0 ? String(dose) : ''}
+              onChangeText={onChangeDose}
+              keyboardType="numeric"
+              returnKeyType="next"
+              placeholder="0"
+              placeholderTextColor={ios.mutedForeground}
+              autoCorrect={false}
+              style={{
+                flex: 1,
+                backgroundColor: ios.card,
+                color: ios.foreground,
+                borderRadius: 10,
+                minHeight: 44,
+                paddingHorizontal: 10,
+                paddingVertical: 10,
+                fontSize: 16,
+              }}
+            />
+            <Text style={{ color: ios.mutedForeground, fontSize: 12, fontWeight: '600' }}>mg</Text>
+          </XStack>
+        </YStack>
+      </XStack>
       {showDropdown && suggestions.length > 0 && (
         <View
           style={[
@@ -146,29 +180,31 @@ export function MedicineSearchInput({
                 >
                   {item.name}
                 </Text>
-                <View style={styles.badgeRow}>
-                  {!!item.dose && (
-                    <View style={[styles.badge, { backgroundColor: ios.accentHover }]}>
-                      <Text style={{ color: ios.primary, fontSize: 11, fontWeight: '700' }}>
-                        {item.dose}
-                      </Text>
-                    </View>
-                  )}
-                  {!!item.conditionnement && (
-                    <View style={[styles.badge, { backgroundColor: ios.accentHover }]}>
-                      <Text style={{ color: ios.mutedForeground, fontSize: 11, fontWeight: '600' }}>
-                        {item.conditionnement}
-                      </Text>
-                    </View>
-                  )}
-                  {!!item.forme_pharmaceutique && (
-                    <View style={[styles.badge, { backgroundColor: ios.accentHover }]}>
-                      <Text style={{ color: ios.mutedForeground, fontSize: 11, fontWeight: '600' }}>
-                        {item.forme_pharmaceutique}
-                      </Text>
-                    </View>
-                  )}
-                </View>
+                {(!!item.dose || !!item.conditionnement || !!item.forme_pharmaceutique) && (
+                  <XStack style={{ flexWrap: 'wrap', gap: 5 }}>
+                    {!!item.dose && (
+                      <View style={[styles.badge, { backgroundColor: ios.accentHover }]}>
+                        <Text style={{ color: ios.primary, fontSize: 11, fontWeight: '700' }}>
+                          {item.dose} mg
+                        </Text>
+                      </View>
+                    )}
+                    {!!item.conditionnement && (
+                      <View style={[styles.badge, { backgroundColor: ios.accentHover }]}>
+                        <Text style={{ color: ios.mutedForeground, fontSize: 11, fontWeight: '600' }}>
+                          {item.conditionnement} cp
+                        </Text>
+                      </View>
+                    )}
+                    {!!item.forme_pharmaceutique && (
+                      <View style={[styles.badge, { backgroundColor: ios.accentHover }]}>
+                        <Text style={{ color: ios.mutedForeground, fontSize: 11, fontWeight: '600' }}>
+                          {item.forme_pharmaceutique}
+                        </Text>
+                      </View>
+                    )}
+                  </XStack>
+                )}
               </Pressable>
             ))}
           </ScrollView>
@@ -188,11 +224,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     gap: 6,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 5,
   },
   badge: {
     borderRadius: 6,

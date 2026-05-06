@@ -69,10 +69,9 @@ export function useCalendarDetail(sourceType: MobileCalendarDetailSourceType, mo
     calendarId,
     date,
   } = useLocalSearchParams<{ calendarId?: string; date?: string | string[] }>();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const router = useRouter();
   const { personalCalendarsApi, sharedUserCalendarsApi } = useCalendarApis();
-  const lng = i18n.language || 'fr';
   const routeId = calendarId;
   const basePath = sourceType === 'personal' ? 'calendar' : 'shared-user-calendar';
 
@@ -216,7 +215,8 @@ export function useCalendarDetail(sourceType: MobileCalendarDetailSourceType, mo
 
   const navigateToHref = useCallback(
     (href: string) => {
-      router.push(href as never);
+      const path = href.replace(/^\/(calendar|shared-user-calendar)\//, '/calendars/$1/');
+      router.push(path as never);
     },
     [router],
   );
@@ -259,17 +259,17 @@ export function useCalendarDetail(sourceType: MobileCalendarDetailSourceType, mo
 
   const goToPillbox = () => {
     if (!routeId) return;
-    navigateToHref(`/${lng}/${basePath}/${routeId}/pillbox?date=${toISO(selectedDate || new Date())}`);
+    router.push(`/calendars/${basePath}/${routeId}/pillbox?date=${toISO(selectedDate || new Date())}` as never);
   };
 
   const goToBoxes = () => {
     if (!routeId) return;
-    navigateToHref(`/${lng}/${basePath}/${routeId}/boxes`);
+    router.push(`/calendars/${basePath}/${routeId}/boxes` as never);
   };
 
   const goToStockAlerts = () => {
     if (!routeId) return;
-    navigateToHref(`/${lng}/${basePath}/${routeId}/stock-alerts`);
+    router.push(`/calendars/${basePath}/${routeId}/stock-alerts` as never);
   };
 
   const handleDelete = () => {
@@ -318,7 +318,7 @@ export function useCalendarDetail(sourceType: MobileCalendarDetailSourceType, mo
     if (mode === 'daily') return [];
     if (!routeId) return [];
 
-    const context = { calendarId: routeId, lng, basePath, selectedDate };
+    const context = { calendarId: routeId, basePath, selectedDate };
     const handlers = {
       onDelete: handleDelete,
       onExportPdf: handleExportPdf,
@@ -332,7 +332,7 @@ export function useCalendarDetail(sourceType: MobileCalendarDetailSourceType, mo
       : buildSharedCalendarActions(context, handlers, ['rename', 'medicines']);
 
     return toActionSheetItems(items, translate);
-  }, [basePath, lng, mode, routeId, selectedDate, sourceType, translate]);
+  }, [basePath, mode, routeId, selectedDate, sourceType, translate]);
 
   const hasCalendarItems = calendarTableHasItems(calendarTable);
   const isDailyRoute = mode === 'daily';

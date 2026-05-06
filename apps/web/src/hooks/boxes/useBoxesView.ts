@@ -171,7 +171,7 @@ export function useBoxesView({ personalCalendars, sharedUserCalendars, tokenCale
   const getCommonActions = () => {
     const builder = calendarType === 'personal'
       ? buildPersonalCalendarActions(
-          { calendarId: calendarId!, lng: lng!, basePath, selectedDate: null },
+          { calendarId: calendarId!, basePath: `${lng}/${basePath}`, selectedDate: null },
           {
             onRename: undefined,
             onDelete: handleDeleteCalendar,
@@ -180,7 +180,7 @@ export function useBoxesView({ personalCalendars, sharedUserCalendars, tokenCale
           ['rename', 'medicines'],
         )
       : buildSharedCalendarActions(
-          { calendarId: calendarId!, lng: lng!, basePath, selectedDate: null },
+          { calendarId: calendarId!, basePath: `${lng}/${basePath}`, selectedDate: null },
           {
             onDelete: handleDeleteSharedCalendar,
             onExportPdf: () => calendarSource.downloadCalendarPdf!(calendarId!, false),

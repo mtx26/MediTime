@@ -33,7 +33,7 @@ export default function CalendarCard({
 
   const actions = toActionSheetItems(
     buildPersonalCalendarActions(
-      { calendarId, lng: lng ?? '', basePath: 'calendar', selectedDate: null },
+      { calendarId, basePath: `${lng ?? 'fr'}/calendar`, selectedDate: null },
       {
         onDelete: promptDeleteCalendar,
         onExportPdf: () => personalCalendars.downloadPersonalCalendarPdf(calendarId, false),

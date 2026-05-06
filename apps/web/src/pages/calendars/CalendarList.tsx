@@ -66,7 +66,7 @@ function SelectCalendar(props: CalendarListPageProps) {
                   <ActionSheet
                     actions={toActionSheetItems(
                       buildPersonalCalendarActions(
-                        { calendarId: calendarData.id, lng: lng!, basePath: 'calendar', selectedDate: null },
+                        { calendarId: calendarData.id, basePath: `${lng}/calendar`, selectedDate: null },
                         {
                           onRename: () => setRenameMode(calendarData.id),
                           onDelete: () => handleDeleteCalendarClick(calendarData.id),
@@ -198,7 +198,7 @@ function SelectCalendar(props: CalendarListPageProps) {
                     <ActionSheet
                       actions={toActionSheetItems(
                         buildSharedCalendarActions(
-                          { calendarId: calendarData.id, lng: lng!, basePath: 'shared-user-calendar', selectedDate: null },
+                          { calendarId: calendarData.id, basePath: `${lng}/shared-user-calendar`, selectedDate: null },
                           {
                             onDelete: () => handleDeleteSharedCalendarClick(calendarData.id),
                             onExportPdf: () => openPdfDialog(calendarData.id),

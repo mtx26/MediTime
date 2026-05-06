@@ -48,7 +48,6 @@ export function MedicineBoxEditorModal({
   const { t } = useTranslation();
   const ios = useIosTheme();
   const { colorScheme } = useAppTheme();
-  const doseInputRef = useRef<TextInput>(null);
   const capacityInputRef = useRef<TextInput>(null);
   const stockInputRef = useRef<TextInput>(null);
   const thresholdInputRef = useRef<TextInput>(null);
@@ -181,19 +180,9 @@ export function MedicineBoxEditorModal({
                         name={editingBox.name}
                         dose={editingBox.dose ?? null}
                         onChangeName={(value) => setField('name', value)}
+                        onChangeDose={(value) => setField('dose', setNumberText(value))}
                         onApplySuggestion={(updates) => setFields(updates)}
                         nextRef={capacityInputRef}
-                      />
-
-                      {/* Dose */}
-                      <ReviewField
-                        ref={doseInputRef}
-                        label={String(t('boxes.dose'))}
-                        value={String(editingBox.dose ?? '')}
-                        keyboardType="numeric"
-                        onChangeText={(value) => setField('dose', setNumberText(value))}
-                        returnKeyType="next"
-                        onSubmitEditing={() => capacityInputRef.current?.focus()}
                       />
 
                       {/* Capacity */}
@@ -290,13 +279,25 @@ export function MedicineBoxEditorModal({
                       </YStack>
 
                       {/* Actions */}
-                      <LiquidButton
-                        disabled={disabled || !canSubmit}
-                        iconName="checkmark-circle-outline"
-                        label={String(t('boxes.save'))}
-                        onPress={form.submit}
-                        tone="success"
-                      />
+                      <XStack style={{ gap: 10 }}>
+                        <YStack style={{ flex: 1 }}>
+                          <LiquidButton
+                            iconName="close-circle-outline"
+                            label={String(t('cancel'))}
+                            onPress={onCancel}
+                            tone="plain"
+                          />
+                        </YStack>
+                        <YStack style={{ flex: 1 }}>
+                          <LiquidButton
+                            disabled={disabled || !canSubmit}
+                            iconName="checkmark-circle-outline"
+                            label={String(t('boxes.save'))}
+                            onPress={form.submit}
+                            tone="success"
+                          />
+                        </YStack>
+                      </XStack>
                     </>
                   )}
                 </MobileForm>

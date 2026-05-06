@@ -257,7 +257,7 @@ export function MobileWeeklyEventContent({
                 <XStack style={{ alignItems: 'center', gap: 12 }}>
                   <YStack
                     style={{
-                      width: 56,
+                      width: 68,
                       minHeight: 56,
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -267,7 +267,7 @@ export function MobileWeeklyEventContent({
                       borderColor: ios.blueInfoBorder,
                     }}
                   >
-                    <Text style={{ color: ios.primary, fontWeight: '900', fontSize: 14, lineHeight: 18 }}>{time}</Text>
+                    <Text style={{ color: ios.primary, fontWeight: '900', fontSize: 13, lineHeight: 18 }}>{time}</Text>
                   </YStack>
 
                   <YStack style={{ flex: 1, gap: 4 }}>

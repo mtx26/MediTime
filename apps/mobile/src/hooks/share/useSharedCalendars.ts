@@ -22,7 +22,7 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
 const isActiveDefault = () => true;
 
 export function useSharedCalendars() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ calendar?: string | string[] }>();
   const calendarFromParams = getFirstRouteParam(params.calendar);
@@ -253,8 +253,7 @@ export function useSharedCalendars() {
       buildPersonalCalendarActions(
         {
           calendarId: selectedCalendarId,
-          lng: (i18n.language || 'fr').slice(0, 2),
-          basePath: 'calendar',
+          basePath: 'calendars/calendar',
           selectedDate: null,
         },
         {
@@ -266,7 +265,7 @@ export function useSharedCalendars() {
       ),
       (key) => String(t(key)),
     );
-  }, [deleteCalendar, i18n.language, openPdfDialog, selectedCalendarId, t]);
+  }, [deleteCalendar, openPdfDialog, selectedCalendarId, t]);
 
   return {
     actions,

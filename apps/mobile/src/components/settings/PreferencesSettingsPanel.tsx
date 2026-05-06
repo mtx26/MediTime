@@ -1,4 +1,4 @@
-import { Pressable } from 'react-native';
+import { ActionSheetIOS, Platform, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GlassView } from 'expo-glass-effect';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
@@ -38,8 +38,35 @@ export function PreferencesSettingsPanel({
 }: MobilePreferencesSettingsProps) {
   const { t } = useTranslation();
   const ios = useIosTheme();
-  const { colorScheme } = useAppTheme();
+  const { colorScheme, isDark } = useAppTheme();
   const themeOptions: AppThemePreference[] = ['system', 'light', 'dark'];
+
+  const activeLanguage = languages.find((l) => language.startsWith(l.code)) ?? languages[0];
+
+  function openLanguagePicker() {
+    hapticSelection();
+
+    if (Platform.OS === 'ios') {
+      const options = languages.map((l) => `${getFlagEmoji(l.flag ?? l.code)}  ${l.label}`);
+      const cancelIndex = options.length;
+
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: [...options, String(t('cancel'))],
+          cancelButtonIndex: cancelIndex,
+          userInterfaceStyle: isDark ? 'dark' : 'light',
+        },
+        (index) => {
+          if (index === cancelIndex) return;
+          const picked = languages[index];
+          if (picked && !language.startsWith(picked.code)) {
+            hapticSelection();
+            onLanguageChange(picked.code);
+          }
+        },
+      );
+    }
+  }
 
   return (
     <YStack style={{ gap: 14 }}>
@@ -58,79 +85,49 @@ export function PreferencesSettingsPanel({
         title={String(t('settings.language'))}
         description={String(t('settings.language_note'))}
       >
-        <YStack style={{ gap: 8 }}>
-          {languages.map((item) => {
-            const active = language.startsWith(item.code);
-            const flag = getFlagEmoji(item.flag ?? item.code);
-
-            return (
-              <Pressable
-                key={item.code}
-                accessibilityRole="button"
-                accessibilityState={{ selected: active }}
-                onPress={() => {
-                  if (!active) hapticSelection();
-                  onLanguageChange(item.code);
-                }}
-              >
-                {({ pressed }) => (
+        <Pressable accessibilityRole="button" onPress={openLanguagePicker}>
+          {({ pressed }) => (
+            <GlassView
+              colorScheme={colorScheme}
+              glassEffectStyle="clear"
+              style={{
+                minHeight: 48,
+                borderRadius: 18,
+                paddingHorizontal: 14,
+                paddingVertical: 10,
+                opacity: pressed ? 0.7 : 1,
+              }}
+            >
+              <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <XStack style={{ alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
                   <GlassView
                     colorScheme={colorScheme}
                     glassEffectStyle="clear"
                     style={{
-                      minHeight: 42,
-                      borderRadius: 18,
-                      paddingHorizontal: 12,
-                      paddingVertical: 8,
-                      opacity: pressed ? 0.75 : 1,
+                      minWidth: 36,
+                      minHeight: 28,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingHorizontal: 8,
+                      borderRadius: 14,
                     }}
                   >
-                    <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                      <XStack style={{ alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
-                        <GlassView
-                          colorScheme={colorScheme}
-                          glassEffectStyle="clear"
-                          style={{
-                            minWidth: 36,
-                            minHeight: 28,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            paddingHorizontal: 8,
-                            borderRadius: 14,
-                          }}
-                        >
-                          <Text style={{ color: ios.foreground, fontSize: 18, lineHeight: 22, fontWeight: '800' }}>
-                            {flag}
-                          </Text>
-                        </GlassView>
-                        <Text
-                          numberOfLines={1}
-                          style={{ flex: 1, color: ios.foreground, fontSize: 14, lineHeight: 20, fontWeight: '800' }}
-                        >
-                          {item.label}
-                        </Text>
-                      </XStack>
-                      {active ? (
-                        <Ionicons name="checkmark-circle-outline" size={18} color={ios.primary} />
-                      ) : (
-                        <Text
-                          style={{
-                            color: ios.mutedForeground,
-                            fontSize: 12,
-                            lineHeight: 18,
-                            fontWeight: '800',
-                          }}
-                        >
-                          {item.code.toUpperCase()}
-                        </Text>
-                      )}
-                    </XStack>
+                    <Text style={{ fontSize: 20, lineHeight: 24 }}>
+                      {activeLanguage ? getFlagEmoji(activeLanguage.flag ?? activeLanguage.code) : '🌐'}
+                    </Text>
                   </GlassView>
-                )}
-              </Pressable>
-            );
-          })}
-        </YStack>
+                  <Text
+                    numberOfLines={1}
+                    style={{ flex: 1, color: ios.foreground, fontSize: 15, lineHeight: 22, fontWeight: '600' }}
+                  >
+                    {activeLanguage?.label ?? language}
+                  </Text>
+                </XStack>
+                <Ionicons name="chevron-forward" size={16} color={ios.mutedForeground} />
+              </XStack>
+            </GlassView>
+          )}
+        </Pressable>
       </SettingsPanelSection>
 
       <SettingsPanelSection

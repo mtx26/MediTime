@@ -75,7 +75,7 @@ function CalendarPage({
                     dataTour="calendar-actions-btn"
                     actions={toActionSheetItems(
                       buildPersonalCalendarActions(
-                        { calendarId: calendarId!, lng: lng!, basePath, selectedDate },
+                        { calendarId: calendarId!, basePath: `${lng}/${basePath}`, selectedDate },
                         {
                           onDelete: handleDeleteCalendar,
                           onExportPdf: () => calendarSource.downloadCalendarPdf(calendarId),
@@ -90,7 +90,7 @@ function CalendarPage({
                   <ActionSheet
                     actions={toActionSheetItems(
                       buildSharedCalendarActions(
-                        { calendarId: calendarId!, lng: lng!, basePath, selectedDate },
+                        { calendarId: calendarId!, basePath: `${lng}/${basePath}`, selectedDate },
                         {
                           onDelete: handleDeleteSharedCalendar,
                           onExportPdf: () => calendarSource.downloadCalendarPdf(calendarId),

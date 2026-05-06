@@ -44,7 +44,6 @@ export function isActionSeparator(item: ActionGroup | ActionSeparator): item is 
 /** Route context shared by all calendar action builders */
 export interface CalendarActionContext {
   calendarId: string;
-  lng: string;
   basePath: string;
   selectedDate?: Date | null;
 }

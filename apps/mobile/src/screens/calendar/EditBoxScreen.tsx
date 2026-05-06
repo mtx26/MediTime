@@ -144,10 +144,10 @@ export default function EditBoxScreen() {
               name={box.name}
               dose={box.dose ?? null}
               onChangeName={(v) => set('name', v)}
+              onChangeDose={(v) => set('dose', toNumber(v))}
               onApplySuggestion={(updates) => update({ ...box, ...updates })}
               nextRef={capacityRef}
             />
-            <ReviewField label={String(t('boxes.dose'))} value={String(box.dose ?? '')} keyboardType="numeric" onChangeText={(v) => set('dose', toNumber(v))} returnKeyType="next" onSubmitEditing={() => capacityRef.current?.focus()} />
             <ReviewField ref={capacityRef} label={String(t('boxes.capacity'))} value={String(box.box_capacity ?? '')} keyboardType="numeric" onChangeText={(v) => set('box_capacity', toNumber(v))} returnKeyType="next" onSubmitEditing={() => stockRef.current?.focus()} />
             <ReviewField ref={stockRef} label={String(t('boxes.remaining_qty'))} value={String(box.stock_quantity ?? '')} keyboardType="numeric" onChangeText={(v) => set('stock_quantity', toNumber(v))} returnKeyType="done" />
 
