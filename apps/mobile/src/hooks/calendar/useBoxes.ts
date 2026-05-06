@@ -7,6 +7,7 @@ import {
   buildBoxActions,
   extractGTIN01,
   fetchMedicamentsFromSupabase,
+  isStockAlertBox,
 } from '@meditime/utils';
 import type {
   ApiResult,
@@ -432,7 +433,7 @@ export function useBoxes(sourceType: Exclude<CalendarDetailSourceType, 'token'>)
   ), [confirmDeleteBox, openNotice, startEdit, translate]);
 
   const hasLowStock = useMemo(
-    () => boxes.some((box) => box.stock_alert_threshold > 0 && box.stock_quantity <= box.stock_alert_threshold),
+    () => boxes.some(isStockAlertBox),
     [boxes],
   );
 

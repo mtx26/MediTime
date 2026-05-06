@@ -50,7 +50,7 @@ export function getBoxStockStatus(box: StockBox): BoxStockStatus {
 
 // ─── Condition Expiry Helpers ─────────────────────────────────────────────────
 
-type ConditionWithDate = { max_date?: string | null };
+type ConditionWithDate = { max_date?: string | null; start_date?: string | null };
 
 /**
  * Returns true if the condition has a max_date that is in the past.
@@ -58,6 +58,17 @@ type ConditionWithDate = { max_date?: string | null };
 export function isConditionExpired(condition: ConditionWithDate | null | undefined): boolean {
   if (!condition?.max_date) return false;
   return new Date() > new Date(condition.max_date);
+}
+
+/**
+ * Returns true if the condition can currently generate intakes.
+ */
+export function isConditionActive(condition: ConditionWithDate | null | undefined): boolean {
+  if (!condition) return false;
+  const now = new Date();
+  if (condition.start_date && new Date(condition.start_date) > now) return false;
+  if (condition.max_date && new Date(condition.max_date) < now) return false;
+  return true;
 }
 
 /**
@@ -72,6 +83,13 @@ export function hasOnlyExpiredConditions(box: { conditions: ConditionWithDate[] 
  */
 export function hasSomeExpiredConditions(box: { conditions: ConditionWithDate[] }): boolean {
   return box.conditions.some(isConditionExpired);
+}
+
+/**
+ * Returns true if at least one condition is active right now.
+ */
+export function hasSomeActiveConditions(box: { conditions: ConditionWithDate[] }): boolean {
+  return box.conditions.some(isConditionActive);
 }
 
 // ─── Status Item Helpers ──────────────────────────────────────────────────────
@@ -110,7 +128,7 @@ export function getBoxStatusItems(box: BoxForStatus): BoxStatusItem[] {
   if (box.conditions !== undefined) {
     const valid = box.conditions.filter(Boolean) as ConditionWithDate[];
     if (valid.length === 0) {
-      items.push({ key: 'condition_none', variant: 'warning', i18nKey: 'boxes.condition.none' });
+      items.push({ key: 'condition_none', variant: 'info', i18nKey: 'boxes.condition.none' });
     } else if (hasOnlyExpiredConditions({ conditions: valid })) {
       items.push({ key: 'condition_inactive', variant: 'info', i18nKey: 'boxes.condition.inactive' });
     } else if (hasSomeExpiredConditions({ conditions: valid })) {
@@ -179,11 +197,11 @@ export function getBoxDisplayFlags(box: BoxForStatus): BoxDisplayFlags {
  * Returns true if a box should appear in stock alerts:
  * - alerts are configured (capacity > 0, threshold > 0)
  * - stock is at or below the threshold (critical or low)
- * - no condition is currently expired
+ * - at least one condition is active right now
  */
 export function isStockAlertBox(box: BoxForStatus): boolean {
   const status = getBoxStockStatus(box);
   if (status !== 'critical' && status !== 'low') return false;
   const conditions = (box.conditions ?? []).filter(Boolean) as ConditionWithDate[];
-  return !hasSomeExpiredConditions({ conditions });
+  return hasSomeActiveConditions({ conditions });
 }

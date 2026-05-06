@@ -62,16 +62,16 @@ export function MedicineBoxCard({
   const { t } = useTranslation();
   const ios = useIosTheme();
   const translate = (key: string) => String(t(key));
-  const { isCritical, isLow, allExpired, isMissingPillbox } = getBoxDisplayFlags(box);
+  const { isCritical, isLow, allExpired, noCondition, isMissingPillbox } = getBoxDisplayFlags(box);
   const isAlertMode = mode === 'alerts';
   const canRestock = typeof onRestock === 'function';
   const showMissingPillbox = isMissingPillbox && typeof onMissingPillbox === 'function';
-  const cardBorderColor = isCritical
-    ? ios.destructiveBorder
+  const cardBorderColor = allExpired || noCondition
+    ? ios.blueInfoBorder
+    : isCritical
+      ? ios.destructiveBorder
     : isLow
-      ? ios.warningText
-      : !isAlertMode && allExpired
-        ? ios.primary
+        ? ios.warningText
         : ios.border;
 
   return (
@@ -218,13 +218,17 @@ export function MedicineBoxCard({
 
       <XStack style={{ flexWrap: 'wrap', gap: 6 }}>
         {getBoxStatusItems(box).map((item) => {
-          const palette = item.variant === 'danger'
-            ? { background: ios.destructiveBg, color: ios.destructive }
-            : item.variant === 'success'
-              ? { background: ios.successBg, color: ios.success }
-              : item.variant === 'info'
-                ? { background: ios.accentHover, color: ios.mutedForeground }
-                : { background: ios.warningBg, color: ios.warningText };
+          const palette = item.key === 'condition_none' || item.key === 'condition_inactive'
+            ? { background: ios.blueInfoBg, color: ios.blueText }
+            : item.key === 'stock_low'
+              ? { background: ios.warningBg, color: ios.warningText }
+              : item.variant === 'danger'
+                ? { background: ios.destructiveBg, color: ios.destructive }
+                : item.variant === 'success'
+                  ? { background: ios.successBg, color: ios.success }
+                  : item.variant === 'info'
+                    ? { background: ios.accentHover, color: ios.mutedForeground }
+                    : { background: ios.warningBg, color: ios.warningText };
 
           return (
             <XStack

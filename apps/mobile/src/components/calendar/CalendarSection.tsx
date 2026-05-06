@@ -19,6 +19,7 @@ type CalendarSectionProps = {
   glassEffectStyle?: GlassStyle;
   glassStyle?: StyleProp<ViewStyle>;
   getActions: (calendar: CalendarItem) => MobileContextMenuActionList;
+  getStockAlertHref?: (calendar: CalendarItem) => string;
   onOpen: (calendar: CalendarItem) => void;
   onNavigate: (href: string) => void;
   renameMode?: string | null;
@@ -39,6 +40,7 @@ export function CalendarSection({
   glassEffectStyle = 'clear',
   glassStyle,
   getActions,
+  getStockAlertHref,
   onOpen,
   onNavigate,
   renameMode,
@@ -80,6 +82,7 @@ export function CalendarSection({
               calendar={calendar}
               isLast={index === calendars.length - 1 && !addFooter}
               actions={getActions(calendar)}
+              getStockAlertHref={getStockAlertHref}
               onOpen={onOpen}
               onNavigate={onNavigate}
               isRenaming={renameMode === calendar.id}

@@ -177,6 +177,14 @@ export default function CalendarsScreen() {
     router.push(`/calendars/shared-user-calendar/${calendar.id}` as never);
   };
 
+  const getPersonalStockAlertHref = (calendar: CalendarItem) => (
+    `/calendars/calendar/${calendar.id}/stock-alerts`
+  );
+
+  const getSharedStockAlertHref = (calendar: CalendarItem) => (
+    `/calendars/shared-user-calendar/${calendar.id}/stock-alerts`
+  );
+
   if (isLoading && personalCalendars.length === 0 && sharedCalendars.length === 0) {
     return <LoadingIndicator label={String(t('loading_calendars'))} variant="screen" />;
   }
@@ -211,6 +219,7 @@ export default function CalendarsScreen() {
           glassEffectStyle="clear"
           glassStyle={{ borderRadius: 24, padding: 8 }}
           getActions={getPersonalActions}
+          getStockAlertHref={getPersonalStockAlertHref}
           onOpen={openPersonalCalendar}
           onNavigate={navigateToHref}
           isMutating={isMutating}
@@ -229,6 +238,7 @@ export default function CalendarsScreen() {
           emptyText={String(t('no_shared_calendars'))}
           showInfoEmpty={true}
           getActions={getSharedActions}
+          getStockAlertHref={getSharedStockAlertHref}
           onOpen={openSharedCalendar}
           onNavigate={navigateToHref}
         />

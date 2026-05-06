@@ -11,6 +11,7 @@ type CalendarRowProps = {
   calendar: CalendarItem;
   isLast: boolean;
   actions: MobileContextMenuActionList;
+  getStockAlertHref?: (calendar: CalendarItem) => string;
   onOpen: (calendar: CalendarItem) => void;
   onNavigate: (href: string) => void;
   isRenaming?: boolean;
@@ -25,6 +26,7 @@ export function CalendarRow({
   calendar,
   isLast,
   actions,
+  getStockAlertHref,
   onOpen,
   onNavigate,
   isRenaming,
@@ -105,7 +107,12 @@ export function CalendarRow({
           )}
         </XStack>
 
-        {calendar.ifLowStock && <StatusBadge text={t('stock_alert')} />}
+        {calendar.ifLowStock && (
+          <StatusBadge
+            text={t('stock_alert')}
+            onPress={getStockAlertHref ? () => onNavigate(getStockAlertHref(calendar)) : undefined}
+          />
+        )}
       </YStack>
     </ContextMenu>
   );

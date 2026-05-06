@@ -45,6 +45,7 @@ export default function CalendarsLayout() {
       <Stack.Screen name="calendar/[calendarId]/daily" />
       <Stack.Screen name="calendar/[calendarId]/ics-tokens" />
       <Stack.Screen name="calendar/[calendarId]/pillbox-uses" />
+      <Stack.Screen name="calendar/[calendarId]/stock-alerts" />
       <Stack.Screen name="calendar/[calendarId]/settings" />
       <Stack.Screen name="calendar/[calendarId]/pillbox" options={{ presentation: 'fullScreenModal', headerShown: false, orientation: 'landscape', contentStyle: { backgroundColor: ios.background } }} />
       <Stack.Screen name="calendar/[calendarId]/edit-box" options={{ presentation: 'formSheet', headerShown: true, sheetExpandsWhenScrolledToEdge: false }} />
@@ -54,6 +55,7 @@ export default function CalendarsLayout() {
       <Stack.Screen name="shared-user-calendar/[calendarId]/daily" />
       <Stack.Screen name="shared-user-calendar/[calendarId]/ics-tokens" />
       <Stack.Screen name="shared-user-calendar/[calendarId]/pillbox-uses" />
+      <Stack.Screen name="shared-user-calendar/[calendarId]/stock-alerts" />
       <Stack.Screen name="shared-user-calendar/[calendarId]/settings" />
       <Stack.Screen name="shared-user-calendar/[calendarId]/pillbox" options={{ presentation: 'fullScreenModal', headerShown: false, orientation: 'landscape', contentStyle: { backgroundColor: ios.background } }} />
       <Stack.Screen name="shared-user-calendar/[calendarId]/edit-box" options={{ presentation: 'formSheet', headerShown: true, sheetExpandsWhenScrolledToEdge: false }} />
