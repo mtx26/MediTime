@@ -21,7 +21,7 @@ const config = {
     icon: {
       light: './assets/icon.png',
       dark: './assets/icon-dark.png',
-      tinted: './assets/icon-dark.png',
+      tinted: './assets/icon-tinted.png',
     },
   },
   android: {
