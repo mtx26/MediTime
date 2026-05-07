@@ -41,5 +41,5 @@ fs.writeFileSync(outputPath, `${JSON.stringify(association, null, 2)}\n`);
 if (appleTeamId) {
   console.log(`AASA generated for ${appleTeamId}.${bundleId}`);
 } else {
-  console.log('AASA generated without appID because EXPO_PUBLIC_APPLE_TEAM_ID is not set');
+  console.log('AASA generated without appID because VITE_APPLE_TEAM_ID is not set');
 }
