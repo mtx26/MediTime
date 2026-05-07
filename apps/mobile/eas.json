@@ -17,25 +17,7 @@
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production",
-      "runtimeVersion": {
-        "policy": "sdkVersion"
-      }
-    }
-  },
-  "submit": {
-    "production": {
-      "ios": {
-        "appleId": "",
-        "ascAppId": "",
-        "appleTeamId": "",
-        "language": "en-US"
-      },
-      "android": {
-        "serviceAccountKeyPath": "",
-        "track": "production",
-        "releaseStatus": "completed"
-      }
+      "channel": "production"
     }
   }
 }
