@@ -2308,11 +2308,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /notifications/fcm-token:
+  /notifications/push-token:
     post:
       tags: [Notifications]
-      summary: Enregistrer un token FCM
-      operationId: registerFCMToken
+      summary: Enregistrer un token push
+      operationId: registerPushToken
       requestBody:
         required: true
         content:
@@ -2323,7 +2323,17 @@ paths:
               properties:
                 token:
                   type: string
-                  description: Token FCM du device
+                  description: Token push du device
+                deviceName:
+                  type: string
+                provider:
+                  type: string
+                  enum: [expo, fcm]
+                platform:
+                  type: string
+                  enum: [ios, android, web]
+                projectId:
+                  type: string
       responses:
         '200':
           description: Token enregistré
@@ -2332,8 +2342,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Success'
               example:
-                message: "Token FCM enregistré"
-                code: "FCM_REGISTERED"
+                message: "Token push enregistré"
+                code: "PUSH_TOKEN_REGISTERED"
         '400':
           description: Token manquant
           content:

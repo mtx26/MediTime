@@ -282,12 +282,20 @@
     "with_github": "与 Github 连接",
     "with_google": "使用 Google 登录",
     "with_microsoft": "使用 Microsoft 登录",
-    "with_twitter": "与 Twitter 建立联系"
+    "with_twitter": "与 Twitter 建立联系",
+    "already_have_account": "Vous avez déjà un compte ?",
+    "back_to_login": "Retour à la connexion",
+    "check_email": "Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.",
+    "login_error": "Impossible de se connecter.",
+    "no_account": "Pas encore de compte ?",
+    "register_error": "Impossible de créer votre compte."
   },
   "auth_callback": {
     "loading": "正在连接...",
     "session_error": "OAuth 后会话恢复失败",
-    "success": "通过回调成功连接"
+    "success": "通过回调成功连接",
+    "missing_payload": "Le lien s'est ouvert sans les informations de session. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
+    "session_unavailable": "Le lien a été ouvert, mais la session n'a pas pu être créée. Rouvrez le dernier email reçu ou demandez un nouveau lien."
   },
   "back": "后退",
   "boxes": {
@@ -537,10 +545,13 @@
     "delete_success": "ICS链接已成功移除。",
     "delete_title": "移除ICS链接？",
     "fetch_error": "链接加载错误。",
-    "info_description": "这些链接可让您将用药时间表与个人日历（Google 日历、Outlook、Apple 日历等）同步。复制链接并将其作为“日历订阅”添加到您常用的应用程序中。",
+    "info_description": "这些链接可让您将用药时间表与个人日历（Google 日历、Outlook、Apple 日历等）同步。点击同步可直接打开日历订阅；如果您的应用不支持，请分享该链接。",
     "info_title": "关于ICS链接",
     "loading_ics_tokens": "正在加载ICS链接……",
     "no_tokens": "未创建ICS链接。",
+    "sync_calendar": "同步日历",
+    "sync_error": "无法同步",
+    "sync_error_description": "您的设备未找到兼容的日历应用。请分享或复制此链接，并将其添加为日历订阅：{{url}}",
     "title": "ICS链接列表",
     "token_label": "留置权 ICS"
   },
@@ -557,7 +568,10 @@
     "preview_error": "显示预览时出错",
     "remove_image": "删除图片",
     "select_file_error": "请选择一个图像文件。",
-    "title": "选择并预览文件"
+    "title": "选择并预览文件",
+    "choose_file": "Choisir un fichier",
+    "choose_from_library": "Photothèque",
+    "take_photo": "Prendre une photo"
   },
   "invalid_or_expired_link": "此共享日历链接无效或已过期。",
   "invitation": {
@@ -649,8 +663,8 @@
   "no_shared_calendars": "您没有共享日历。",
   "noon": "中午",
   "not_found": {
-    "message": "未找到页面。",
-    "title": "错误 404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> 邀请您加入日历 <1>{{name} </1>",
@@ -672,7 +686,10 @@
       "title": "通知偏好设置"
     },
     "push_description": "在您的设备上接收推送通知。",
-    "push_toggle": "启用 Web 推送通知"
+    "push_toggle": "启用 Web 推送通知",
+    "system_settings": "系统设置",
+    "system_settings_desc": "在设备设置中管理通知权限。",
+    "open_system_settings": "打开设置"
   },
   "open": "打开",
   "open_notifications": "打开通知",
@@ -778,7 +795,8 @@
     "save_password": "保存密码",
     "saving": "登记...",
     "success": "您的密码已成功更改。",
-    "title": "新密码"
+    "title": "新密码",
+    "request_new_link": "Demander un nouveau lien"
   },
   "restore": "恢复",
   "restore_error": "恢复过程中出错",
@@ -836,7 +854,8 @@
       "description": "请更改密码以加强账户安全。",
       "hint": "请使用至少 8 个字符，包括字母、数字和符号。",
       "same_password_error": "新密码必须与旧密码不同。",
-      "title": "密码"
+      "title": "密码",
+      "error": "更新密码时出错。"
     },
     "password_updated": "密码已成功更新。",
     "providers": {
@@ -1187,6 +1206,15 @@
     "stock": "Stock",
     "subtitle": "Déclarez les jours où vous n'avez pas pris vos médicaments pour ajuster votre stock.",
     "success": "{{count}} comprimé(s) réajouté(s) au stock.",
-    "title": "Prise oubliée"
-  }
+    "title": "Prise oubliée",
+    "back": "Retour",
+    "summary": "Récapitulatif",
+    "tablets": "comprimé(s)",
+    "total": "Total à réajouter"
+  },
+  "unexpected_error": "unexpected error",
+  "edit": "编辑",
+  "loading_stock_alerts": "加载库存警报",
+  "tablet": "药片",
+  "tablets": "片剂"
 }

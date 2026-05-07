@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { getBoxDisplayFlags } from '@meditime/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
@@ -13,7 +14,6 @@ import type {
   BoxesViewBoxItem,
   CalendarBoxAlertItem,
   ActionSheetAction,
-  MedicineReviewConditionInput,
 } from '@meditime/types';
 
 interface MedicineCardProps {
@@ -37,20 +37,13 @@ function MedicineCard({
 }: MedicineCardProps) {
   const { t } = useTranslation();
   const isFullMode = !!onEdit;
+  const { isCritical, isLow, allExpired } = getBoxDisplayFlags(box);
 
   const getBorderClass = () => {
-    if (isFullMode) {
-      const allExpired = (box as BoxesViewBoxItem).conditions?.every(
-        (c: MedicineReviewConditionInput) => {
-          if (!c?.max_date) return false;
-          return new Date() > new Date(c.max_date);
-        },
-      );
-      if (allExpired) return 'border-blue-500';
-    }
+    if (isFullMode && allExpired) return 'border-blue-500';
     if (box.box_capacity === 0) return '';
-    if (box.stock_quantity <= 0) return 'border-destructive';
-    if (box.stock_quantity <= box.stock_alert_threshold) return 'border-amber-500';
+    if (isCritical) return 'border-destructive';
+    if (isLow) return 'border-amber-500';
     return '';
   };
 
@@ -86,7 +79,7 @@ function MedicineCard({
         <div className="flex gap-4 mb-3">
           <div className="flex-1">
             <Label className="text-muted-foreground text-xs">{t('boxes.remaining_qty')}</Label>
-            <p className={cn('font-semibold', box.stock_quantity <= 0 && 'text-destructive')}>
+            <p className={cn('font-semibold', isCritical && 'text-destructive')}>
               {box.stock_quantity}
             </p>
           </div>
@@ -104,9 +97,9 @@ function MedicineCard({
           <MedicineStatusBadges box={box as BoxesViewBoxItem} onEdit={onEdit!} t={t} />
         ) : (
           <StatusBadge
-            variant={box.stock_quantity <= 0 ? 'danger' : 'warning'}
+            variant={isCritical ? 'danger' : 'warning'}
             icon={AlertTriangle}
-            text={box.stock_quantity <= 0 ? t('critical_stock') : t('low_stock')}
+            text={isCritical ? t('critical_stock') : t('low_stock')}
           />
         )}
 

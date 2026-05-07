@@ -1,5 +1,5 @@
 import type { ApiResult, ApiSuccess } from '../api';
-import type { SharedCalendarAccess } from '../models/realtime';
+import type { CalendarItem, SharedCalendarAccess } from '../models/realtime';
 import type { AppPersonalCalendars, AppSharedUserCalendars, AppTokenCalendars } from '../app';
 
 // ─── Grouped Shared Calendar Data ────────────────────────────────────
@@ -70,6 +70,49 @@ export interface UserListProps {
   onRefresh: () => void;
 }
 
+export interface SharedUserRowProps {
+  label: string;
+  photoUrl?: string;
+  status: string;
+  onDelete: () => void;
+}
+
+export interface SharedCalendarPickerProps {
+  calendars: CalendarItem[];
+  selectedCalendarId: string | null;
+  onSelectCalendar: (calendarId: string) => void;
+}
+
+export interface SharedTokenListProps {
+  tokens: SharedCalendarToken[];
+  onCreateToken: () => void;
+  onDeleteToken: (tokenId: string) => void;
+  onShareToken: (token: SharedCalendarToken) => void;
+}
+
+export interface SharedUserListProps {
+  emailToInvite: string;
+  invitations?: SharedCalendarPendingInvite[];
+  users: SharedCalendarUser[];
+  onDeleteInvitation: (token: string) => void;
+  onDeleteUser: (token: string) => void;
+  onEmailChange: (value: string) => void;
+  onInvite: () => void;
+}
+
+export interface SharedCalendarPanelProps {
+  calendarId: string;
+  data: GroupedSharedCalendar;
+  emailToInvite: string;
+  onCreateToken: () => void;
+  onDeleteInvitation: (token: string) => void;
+  onDeleteToken: (tokenId: string) => void;
+  onDeleteUser: (token: string) => void;
+  onEmailChange: (value: string) => void;
+  onInvite: () => void;
+  onShareToken: (token: SharedCalendarToken) => void;
+}
+
 // ─── Accept Invite Flow ──────────────────────────────────────────────
 
 export interface SharedInvitation {
@@ -77,6 +120,13 @@ export interface SharedInvitation {
   owner_photo_url: string;
   owner_display_name: string;
   owner_email: string;
+}
+
+export interface AcceptInviteSummaryProps {
+  invitation: SharedInvitation;
+  loading: boolean;
+  onAccept: () => void;
+  onReject: () => void;
 }
 
 export type SharedInvitationResult = ApiResult & {

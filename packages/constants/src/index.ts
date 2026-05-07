@@ -1,7 +1,10 @@
-import { fr, enUS, es, de, it, ja, zhCN, ptBR, ru } from 'date-fns/locale';
-import type { Locale as DateLocale } from 'date-fns';
+/// <reference path="./date-fns-locale-zh-cn.d.ts" />
+
+import { fr, enUS, es, de, it, ja, ptBR, ru } from 'date-fns/locale';
+import { zhCN } from 'date-fns/locale/zh-CN';
 import type { Language, MedicineReviewConditionInput } from '@meditime/types';
-import * as Flags from 'country-flag-icons/react/3x2';
+
+type DateLocale = typeof fr;
 
 // ============================================================================
 //  Pillbox Display Constants
@@ -40,16 +43,16 @@ export const DEFAULT_THEME = 'light';
 // Language Constants
 // ============================================================================
 
-export const LANGUAGES: Language<DateLocale, typeof Flags.FR>[] = [
-  { flag: 'FR', code: 'fr', locale: 'fr-FR', label: 'Français', dateLocale: fr, FlagComponent: Flags.FR },
-  { flag: 'US', code: 'en', locale: 'en-US', label: 'English', dateLocale: enUS, FlagComponent: Flags.US },
-  { flag: 'ES', code: 'es', locale: 'es-ES', label: 'Español', dateLocale: es, FlagComponent: Flags.ES },
-  { flag: 'DE', code: 'de', locale: 'de-DE', label: 'Deutsch', dateLocale: de, FlagComponent: Flags.DE },
-  { flag: 'IT', code: 'it', locale: 'it-IT', label: 'Italiano', dateLocale: it, FlagComponent: Flags.IT },
-  { flag: 'JP', code: 'ja', locale: 'ja-JP', label: '日本語', dateLocale: ja, FlagComponent: Flags.JP },
-  { flag: 'CN', code: 'zh', locale: 'zh-CN', label: '中文', dateLocale: zhCN, FlagComponent: Flags.CN },
-  { flag: 'PT', code: 'pt', locale: 'pt-BR', label: 'Português', dateLocale: ptBR, FlagComponent: Flags.PT },
-  { flag: 'RU', code: 'ru', locale: 'ru-RU', label: 'Русский', dateLocale: ru, FlagComponent: Flags.RU }
+export const LANGUAGES: Language<DateLocale>[] = [
+  { flag: 'FR', code: 'fr', locale: 'fr-FR', label: 'Français', dateLocale: fr, FlagComponent: null },
+  { flag: 'US', code: 'en', locale: 'en-US', label: 'English', dateLocale: enUS, FlagComponent: null },
+  { flag: 'ES', code: 'es', locale: 'es-ES', label: 'Español', dateLocale: es, FlagComponent: null },
+  { flag: 'DE', code: 'de', locale: 'de-DE', label: 'Deutsch', dateLocale: de, FlagComponent: null },
+  { flag: 'IT', code: 'it', locale: 'it-IT', label: 'Italiano', dateLocale: it, FlagComponent: null },
+  { flag: 'JP', code: 'ja', locale: 'ja-JP', label: '日本語', dateLocale: ja, FlagComponent: null },
+  { flag: 'CN', code: 'zh', locale: 'zh-CN', label: '中文', dateLocale: zhCN, FlagComponent: null },
+  { flag: 'PT', code: 'pt', locale: 'pt-BR', label: 'Português', dateLocale: ptBR, FlagComponent: null },
+  { flag: 'RU', code: 'ru', locale: 'ru-RU', label: 'Русский', dateLocale: ru, FlagComponent: null }
 ];
 
 export const DEFAULT_LANG: string = 'en';

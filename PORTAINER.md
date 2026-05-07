@@ -40,10 +40,9 @@ Renseigne au minimum:
 
 Si tu utilises email/SMS:
 
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `NOTIFICATION_EMAIL_ADDRESS`
-- `NOTIFICATION_EMAIL_PASSWORD`
+- `RESEND_API` (ou `RESEND_API_KEY`)
+- `RESEND_FROM_EMAIL` (adresse verifiee dans Resend)
+- `RESEND_FROM_NAME` (optionnel, par defaut `MediTime`)
 - `TWILIO_API_KEY_SID`
 - `TWILIO_API_KEY_SECRET`
 - `TWILIO_MESSAGING_SERVICE_SID`
@@ -55,6 +54,7 @@ Variables optionnelles utiles:
 - `GUNICORN_WORKERS=4`
 - `GUNICORN_THREADS=2`
 - `GUNICORN_TIMEOUT=120`
+- `NOTIFICATION_EMAIL_ADDRESS` (fallback legacy si `RESEND_FROM_EMAIL` est absent)
 
 Format attendu pour `GOOGLE_APPLICATION_CREDENTIALS`:
 
@@ -70,6 +70,24 @@ Format attendu pour `GOOGLE_APPLICATION_CREDENTIALS`:
 - Dans Portainer, ouvre les logs du conteneur `meditime-backend`.
 - Verifie que Gunicorn demarre sans erreur.
 - Teste l'endpoint de statut de l'API (route status du backend).
+
+## 5.1) Templates email Supabase
+
+Les emails Supabase Auth utilisent le meme style MediTime que les emails backend Resend.
+Pour appliquer les templates via la Supabase Management API:
+
+```powershell
+$env:SUPABASE_ACCESS_TOKEN="ton_token_supabase"
+$env:PROJECT_REF="ton_project_ref"
+python scripts\apply-supabase-email-templates.py
+```
+
+Le token se cree depuis `https://supabase.com/dashboard/account/tokens`.
+Pour verifier le payload sans modifier Supabase:
+
+```powershell
+python scripts\apply-supabase-email-templates.py --dry-run
+```
 
 ## 6) Important sur le scheduler
 

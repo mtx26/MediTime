@@ -8,8 +8,12 @@ import { LoadingProvider as LoadingProviderRaw } from '@/components/ui/loading';
 import { Toaster } from '@/components/ui/sonner';
 import './i18n';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import { initLogger } from '@meditime/utils';
+import { initLogger, configureApi } from '@meditime/utils';
 import { DEFAULT_THEME } from '@meditime/constants';
+import { getToken } from './services/supabase/tokenUtils';
+import i18n from './i18n';
+import { analyticsPromise } from './services/firebase/firebase';
+import { logEvent } from 'firebase/analytics';
 
 const LoadingProvider = LoadingProviderRaw as unknown as ComponentType<{ children: ReactNode }>;
 
@@ -18,6 +22,16 @@ initLogger(
   import.meta.env.DEV,
   import.meta.env.VITE_ENABLE_REMOTE_LOGGING === 'true'
 );
+
+configureApi({
+  getToken,
+  translate: (key: string) => i18n.t(key),
+  trackAnalytics: (event, data) => {
+    analyticsPromise.then((analytics) => {
+      if (analytics) logEvent(analytics, event, data);
+    });
+  },
+});
 
 const savedTheme = localStorage.getItem('theme') || DEFAULT_THEME;
 if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {

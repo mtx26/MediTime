@@ -20,17 +20,23 @@ export interface ActionDefinition {
   onClick?: () => void;
 }
 
+/** A group of related actions, displayed together on mobile */
+export type ActionGroup = ActionDefinition[];
+
 /** A visual separator between action groups */
 export interface ActionSeparator {
   separator: true;
 }
 
-/** Union type for items in an action list */
-export type ActionItem = ActionDefinition | ActionSeparator;
+/** Action builders return grouped actions directly */
+export type ActionList = (ActionGroup | ActionSeparator)[];
 
-/** Type guard: checks if an ActionItem is a separator */
-export function isActionSeparator(item: ActionItem): item is ActionSeparator {
-  return 'separator' in item && (item as ActionSeparator).separator === true;
+/** Backward-compatible alias for a concrete action entry */
+export type ActionItem = ActionDefinition;
+
+/** Type guard: checks if an action list entry is a separator */
+export function isActionSeparator(item: ActionGroup | ActionSeparator): item is ActionSeparator {
+  return 'separator' in item && item.separator === true;
 }
 
 // ─── Builder Parameter Types ─────────────────────────────────────────────────
@@ -38,7 +44,6 @@ export function isActionSeparator(item: ActionItem): item is ActionSeparator {
 /** Route context shared by all calendar action builders */
 export interface CalendarActionContext {
   calendarId: string;
-  lng: string;
   basePath: string;
   selectedDate?: Date | null;
 }

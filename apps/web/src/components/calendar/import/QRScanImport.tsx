@@ -38,7 +38,7 @@ const QRScanImport = forwardRef<QRCodeScannerHandle, QRScanImportProps>(({ calen
       const calendarResult = await personalCalendars.addCalendar(calendarName);
       
       if (!calendarResult.success || !calendarResult.calendarId) {
-        return { success: false };
+        return { success: false, error: String(t('calendar.error_calendar_creation')), code: null, status: null };
       }
 
       const calendarId = calendarResult.calendarId;
@@ -55,7 +55,9 @@ const QRScanImport = forwardRef<QRCodeScannerHandle, QRScanImportProps>(({ calen
             medicine.box_capacity, // boxCapacity
             medicine.stock_alert_threshold,
             medicine.stock_quantity, // stockQuantity
-            medicine.dose // dose
+            medicine.dose, // dose
+            [],
+            medicine.code_fmd ?? null
           );
 
           if (boxResult.success) {
@@ -84,7 +86,12 @@ const QRScanImport = forwardRef<QRCodeScannerHandle, QRScanImportProps>(({ calen
 
     } catch (error) {
       console.error('Erreur lors de la création:', error);
-      return { success: false };
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(t('calendar.error_calendar_creation')),
+        code: null,
+        status: null,
+      };
     } finally {
       setIsCreating(false);
     }

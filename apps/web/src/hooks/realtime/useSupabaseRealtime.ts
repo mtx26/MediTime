@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { supabase } from '../../services/supabase/supabaseClient';
-import { log } from '@meditime/utils';
-import type { RealtimeChannelConfig, RealtimeOptions, SubscribedChannel } from '@meditime/types';
+import { log, subscribeRealtimeChannels, unsubscribeRealtimeChannels } from '@meditime/utils';
+import type { RealtimeOptions, SubscribedChannel } from '@meditime/types';
 
 export const useSupabaseRealtime = ({ enabled, fetchData, channels, deps = [] }: RealtimeOptions): void => {
   const channelRef = useRef<SubscribedChannel[]>([]);
@@ -11,31 +11,20 @@ export const useSupabaseRealtime = ({ enabled, fetchData, channels, deps = [] }:
 
     void fetchData();
 
-    channelRef.current = channels.map(({ channelName, event = '*', schema = 'public', table, filter }) => {
-      const channel = (supabase.channel(channelName) as unknown as {
-        on: (type: string, config: Record<string, unknown>, callback: () => void | Promise<void>) => {
-          subscribe: () => SubscribedChannel;
-        };
-      })
-        .on('postgres_changes', { event, schema, table, filter }, () => {
-          void fetchData();
-        })
-        .subscribe();
-
-      return channel;
-    });
+    channelRef.current = subscribeRealtimeChannels(
+      supabase as Parameters<typeof subscribeRealtimeChannels>[0],
+      channels,
+      fetchData,
+    );
 
     return () => {
-      channelRef.current.forEach((ch) => {
-        try {
-          ch.unsubscribe();
-        } catch (err) {
-          log.error('Erreur lors de la désinscription des canaux Supabase', err, {
-            origin: 'REALTIME_CLEANUP_ERROR',
-          });
-        }
+      unsubscribeRealtimeChannels(channelRef.current, (err) => {
+        log.error('Erreur lors de la désinscription des canaux Supabase', err, {
+          origin: 'REALTIME_CLEANUP_ERROR',
+        });
       });
       channelRef.current = [];
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, ...deps]);
 };

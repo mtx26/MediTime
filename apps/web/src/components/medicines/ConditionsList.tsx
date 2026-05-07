@@ -1,4 +1,5 @@
 import { ChevronUp, ChevronDown, AlertCircle } from 'lucide-react';
+import { isConditionExpired } from '@meditime/utils';
 import StatusBadge from '@/components/common/StatusBadge';
 import type { EditableCondition } from '@meditime/types';
 
@@ -64,7 +65,7 @@ const ConditionsList = ({ conditions, expanded, onToggle, t }: ConditionsListPro
                       {t('boxes.until')} {new Date(cond.max_date).toLocaleDateString()}
                     </p>
                   )}
-                  {cond.max_date && new Date() > new Date(cond.max_date) && (
+                  {isConditionExpired(cond) && (
                     <div className="mt-2">
                       <StatusBadge
                         variant="info"

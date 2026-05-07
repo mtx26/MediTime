@@ -1,4 +1,5 @@
-import type { BoxesViewBoxItem, MedicineReviewConditionInput } from '@meditime/types';
+import type { BoxesViewBoxItem } from '@meditime/types';
+import type { LucideIcon } from 'lucide-react';
 import {
   AlertTriangle,
   CheckCircle,
@@ -8,6 +9,7 @@ import {
   Info,
 } from 'lucide-react';
 import StatusBadge from '@/components/common/StatusBadge';
+import { getBoxStatusItems, type BoxStatusItemKey } from '@meditime/utils';
 
 interface MedicineStatusBadgesProps {
   box: BoxesViewBoxItem;
@@ -15,91 +17,60 @@ interface MedicineStatusBadgesProps {
   t: (key: string) => string;
 }
 
+const ICON_MAP: Record<BoxStatusItemKey, LucideIcon> = {
+  condition_none: Info,
+  condition_inactive: PauseCircle,
+  condition_expired: AlertCircle,
+  stock_out: AlertTriangle,
+  stock_low: AlertTriangle,
+  stock_ok: CheckCircle,
+  alerts_disabled: BellOff,
+};
+
+const TOOLTIP_I18N_MAP: Record<BoxStatusItemKey, string> = {
+  condition_none: 'boxes.condition_none_tooltip',
+  condition_inactive: 'boxes.condition.inactive_tooltip',
+  condition_expired: 'boxes.condition.expired_tooltip',
+  stock_out: 'boxes.stock.badge.tooltip.out',
+  stock_low: 'boxes.stock.badge.tooltip.low',
+  stock_ok: 'boxes.stock.badge.tooltip.high',
+  alerts_disabled: 'boxes.stock.badge.tooltip.alerts_disabled',
+};
+
 const MedicineStatusBadges = ({ box, onEdit, t }: MedicineStatusBadgesProps) => {
+  const items = getBoxStatusItems(box);
+
   return (
     <div className="flex flex-wrap gap-2 mb-3">
-      {box.conditions.filter((c: MedicineReviewConditionInput) => c !== undefined).length === 0 && (
-        <button
-          className="p-0 border-0 bg-transparent"
-          onClick={onEdit}
-          aria-label={t('boxes.condition.add')}
-        >
+      {items.map((item) => {
+        const badge = (
           <StatusBadge
-            variant="warning"
-            icon={Info}
-            text={t('boxes.condition.none')}
-            tooltip={t('boxes.condition_none_tooltip')}
+            variant={item.variant}
+            icon={ICON_MAP[item.key]}
+            text={t(item.i18nKey)}
+            tooltip={t(TOOLTIP_I18N_MAP[item.key])}
           />
-        </button>
-      )}
+        );
 
-      {box.conditions?.every((c: MedicineReviewConditionInput) => {
-        if (!c?.max_date) return false;
-        return new Date() > new Date(c.max_date);
-      }) ? (
-        <StatusBadge
-          variant="info"
-          icon={PauseCircle}
-          text={t('boxes.condition.inactive')}
-          tooltip={t('boxes.condition.inactive_tooltip')}
-        />
-      ) : (
-        box.conditions?.some((c: MedicineReviewConditionInput) => {
-          if (!c?.max_date) return false;
-          return new Date() > new Date(c.max_date);
-        }) ? (
-          <StatusBadge
-            variant="info"
-            icon={AlertCircle}
-            text={t('boxes.condition.expired')}
-            tooltip={t('boxes.condition.expired_tooltip')}
-          />
-        ) : (
-          <>
-            {box.box_capacity !== 0 && (
-              <StatusBadge
-                variant={
-                  box.stock_quantity <= 0
-                    ? 'danger'
-                    : box.stock_quantity <= box.stock_alert_threshold
-                    ? 'warning'
-                    : 'success'
-                }
-                icon={
-                  box.stock_quantity <= 0
-                    ? AlertTriangle
-                    : box.stock_quantity <= box.stock_alert_threshold
-                    ? AlertTriangle
-                    : CheckCircle
-                }
-                text={
-                  box.stock_quantity <= 0
-                    ? t('boxes.stock.badge.out')
-                    : box.stock_quantity <= box.stock_alert_threshold
-                    ? t('boxes.stock.badge.low')
-                    : t('boxes.stock.badge.high')
-                }
-                tooltip={
-                  box.stock_quantity <= 0
-                    ? t('boxes.stock.badge.tooltip.out')
-                    : box.stock_quantity <= box.stock_alert_threshold
-                    ? t('boxes.stock.badge.tooltip.low')
-                    : t('boxes.stock.badge.tooltip.high')
-                }
-              />
-            )}
-          </>
-        )
-      )}
+        if (item.key === 'condition_none') {
+          return (
+            <button
+              key={item.key}
+              className="p-0 border-0 bg-transparent"
+              onClick={onEdit}
+              aria-label={t('boxes.condition.add')}
+            >
+              {badge}
+            </button>
+          );
+        }
 
-      {(box.box_capacity <= 0 || box.stock_alert_threshold <= 0) && (
-        <StatusBadge
-          variant="info"
-          icon={BellOff}
-          text={t('boxes.stock.badge.alerts_disabled')}
-          tooltip={t('boxes.stock.badge.tooltip.alerts_disabled')}
-        />
-      )}
+        return (
+          <span key={item.key}>
+            {badge}
+          </span>
+        );
+      })}
     </div>
   );
 };

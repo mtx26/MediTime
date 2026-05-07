@@ -1,9 +1,6 @@
 // apiUtils.js
-import { log } from '@meditime/utils';
-// @ts-ignore imported from app workspace at runtime
-import { getToken } from '../../../../apps/web/src/services/supabase/tokenUtils.js';
-// @ts-ignore imported from app workspace at runtime
-import i18n from '../../../../apps/web/src/i18n.js';
+import { log } from '../log/logger';
+import { getApiDeps } from './apiConfig';
 import type { ApiError, ApiResult, ApiSuccess, PerformApiCallOptions } from '@meditime/types';
 
 interface BackendPayload {
@@ -30,7 +27,7 @@ interface DemoScheduleEvent {
   taken: boolean;
 }
 
-interface DemoScheduleResponse {
+interface DemoScheduleResponse extends Record<string, unknown> {
   success: true;
   message: string;
   code: number;
@@ -54,7 +51,8 @@ function translateBackendMessage(data: BackendPayload | null | undefined): Backe
   
   // Si une clé i18n est fournie, traduire le message
   if (data.i18n_key) {
-    const translated = i18n.t(data.i18n_key);
+    const { translate } = getApiDeps();
+    const translated = translate(data.i18n_key);
     // Si la traduction existe et est différente de la clé, l'utiliser
     if (translated !== data.i18n_key) {
       if (data.message) {
@@ -74,7 +72,8 @@ function withQuery(url: string, params: Record<string, string | number | boolean
     Object.entries(params || {}).filter(([, v]) => v !== undefined && v !== null && v !== '')
   );
   if (Object.keys(clean).length === 0) return url;
-  const u = new URL(url, window.location.origin);
+  const base = typeof window !== 'undefined' && window.location ? window.location.origin : 'http://localhost';
+  const u = new URL(url, base);
   Object.entries(clean).forEach(([k, v]) => u.searchParams.set(k, String(v)));
   return u.toString();
 }
@@ -136,6 +135,32 @@ function handlePillbox(url: string, method: string): MockSuccess | null {
 }
 
 function handleBoxes(url: string, method: string): MockSuccess | null {
+  if (method === 'GET') {
+    return {
+      success: true,
+      boxes: [
+        {
+          id: 'demo-box-1',
+          name: 'Doliprane',
+          dose: 1000,
+          stock_quantity: 2,
+          stock_alert_threshold: 5,
+          box_capacity: 10,
+          conditions: [],
+        },
+        {
+          id: 'demo-box-2',
+          name: 'Vitamin C',
+          dose: 500,
+          stock_quantity: -1,
+          stock_alert_threshold: 3,
+          box_capacity: 20,
+          conditions: [],
+        },
+      ],
+      message: 'Demo boxes loaded',
+    };
+  }
   if (url.includes('/restock') && method === 'POST') return { success: true, message: 'Demo box restocked' };
   if (method === 'POST') return { success: true, box_id: 'demo-new-box', message: 'Demo box created', code: 200 };
   if (method === 'PUT') return { success: true, message: 'Demo box updated' };
@@ -192,6 +217,7 @@ export async function performApiCall({
   // --- MOCK DEMO END ---
 
   try {
+    const { getToken } = getApiDeps();
     const token = await getToken();
     headers = headers ?? {
       Authorization: `Bearer ${token}`,
@@ -220,15 +246,10 @@ export async function performApiCall({
 
     // Analytics optionnels
     if (analyticsEvent) {
-      const [{ analyticsPromise }, { logEvent }] = await Promise.all([
-        // @ts-ignore imported from app workspace at runtime
-        import('../../../../apps/web/src/services/firebase/firebase.js'),
-        // @ts-ignore resolved at runtime
-        import('firebase/analytics'),
-      ]);
-      analyticsPromise.then((analytics: unknown) => {
-        if (analytics) logEvent(analytics, analyticsEvent, { ...analyticsData });
-      });
+      const { trackAnalytics } = getApiDeps();
+      if (trackAnalytics) {
+        trackAnalytics(analyticsEvent, { ...analyticsData });
+      }
     }
 
     // Traduire automatiquement les messages backend

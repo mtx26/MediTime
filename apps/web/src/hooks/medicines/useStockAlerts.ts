@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getCalendarSourceMap, buildStockAlertActions, detectCalendarType } from '@meditime/utils';
+import { getCalendarSourceMap, buildStockAlertActions, detectCalendarType, isStockAlertBox, isBoxMissingPillbox } from '@meditime/utils';
 import { useRealtimeBoxesSwitcher } from '@/hooks/realtime/useRealtimeBoxesSwitcher';
 import { useLoading } from '@/components/ui/loading';
 import type {
@@ -79,16 +79,7 @@ export function useStockAlerts({
   }, [rep]);
 
   const alerts = useMemo(() =>
-    boxes.filter(
-      (box) =>
-        box.stock_alert_threshold > 0 &&
-        box.stock_quantity <= box.stock_alert_threshold &&
-        box.box_capacity > 0 &&
-        box.conditions?.every((c) => {
-          if (!c?.max_date) return true;
-          return new Date() <= new Date(c.max_date);
-        })
-    ), [boxes]);
+    boxes.filter(isStockAlertBox), [boxes]);
 
   const restockBox = (boxId: string) => {
     void calendarSource.restockBox(calendarId, boxId);
@@ -101,7 +92,7 @@ export function useStockAlerts({
       '\n' +
       alerts
         .map(box => {
-          if (box.stock_quantity < 0) {
+          if (isBoxMissingPillbox(box)) {
             return t('boxes.stock.alerts.line_negative', {
               name: box.name,
               dose: box.dose,

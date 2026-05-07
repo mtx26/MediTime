@@ -15,7 +15,7 @@ import traceback
 from typing import List, Tuple, Dict, Any
 from psycopg2 import sql
 
-from app.services.notifications.messaging import send_fcm_notification  # Envoi de notifications push via Firebase
+from app.services.notifications.messaging import send_expo_notification, send_fcm_notification, is_expo_push_token
 from app.db.connection import get_connection    # Connexion à la base de données
 from app.services.calendar import fetch_calendar, fetch_medicine_name  # Récupération calendrier/médicament
 from app.services.notifications.messaging import send_email, send_sms  # Envoi email/SMS
@@ -359,25 +359,39 @@ def save_notifications(user_id: str, notification_type: str, items: List[Dict]):
 
 
 # ========= Envois par canal =========
-def get_fcm_tokens(user_id: str) -> List[str]:
+def get_push_tokens(user_id: str) -> List[Dict[str, str | None]]:
     """
-    Récupère la liste des tokens FCM pour un utilisateur (pour notifications push).
+    Récupère les tokens push et leurs metadonnees pour un utilisateur.
 
     Paramètres:
     - user_id (str): Identifiant de l'utilisateur.
 
     Retour:
-    - List[str]: Liste des tokens FCM.
+    - List[Dict[str, str | None]]: Liste des tokens push avec provider et plateforme.
     """
     with get_connection() as conn, conn.cursor() as cur:
-        cur.execute("SELECT token FROM get_fcm_tokens_for_user(%s)", (user_id,))
-        return [r["token"] for r in cur.fetchall()]
+        cur.execute(
+            """
+            SELECT token, provider, platform, project_id
+            FROM push_tokens
+            WHERE uid = %s
+            """,
+            (user_id,),
+        )
+        return [
+            {
+                "token": row["token"],
+                "provider": row["provider"],
+                "platform": row["platform"],
+                "project_id": row["project_id"],
+            }
+            for row in cur.fetchall()
+        ]
 
 
 def send_push_notification(user: Dict, context: Dict, notification_type: str):
     """
-    Envoie une notification push via FCM à l'utilisateur (si tokens disponibles).
-    Le corps est converti en texte brut pour compatibilité mobile.
+    Envoie une notification push à l'utilisateur via Expo Push ou FCM selon le type de token.
 
     Paramètres:
     - user (Dict): Dictionnaire utilisateur contenant au moins l'ID.
@@ -385,11 +399,32 @@ def send_push_notification(user: Dict, context: Dict, notification_type: str):
     - notification_type (str): Type de notification.
     """
     title, _, fcm_body, _ = build_notification_text(notification_type, context)
-    tokens = get_fcm_tokens(user.get("id"))
-    if tokens:
-        send_fcm_notification(tokens, title, fcm_body, context)
-    else:
-        log_backend.warning("Aucun token FCM trouvé", {"origin": "FCM", "code": "NO_FCM_TOKEN", "uid": user.get("id")})
+    tokens = get_push_tokens(user.get("id"))
+    if not tokens:
+        log_backend.warning("Aucun token push trouve", {"origin": "PUSH", "code": "NO_PUSH_TOKEN", "uid": user.get("id")})
+        return
+
+    expo_tokens = [item["token"] for item in tokens if item["provider"] == "expo"]
+    fcm_tokens = [
+        item["token"]
+        for item in tokens
+        if item["provider"] == "fcm" or (item["provider"] is None and not is_expo_push_token(item["token"]))
+    ]
+    legacy_expo_tokens = [
+        item["token"]
+        for item in tokens
+        if item["provider"] is None and is_expo_push_token(item["token"])
+    ]
+    if legacy_expo_tokens:
+        expo_tokens.extend(legacy_expo_tokens)
+
+    context = {**context, "notification_type": notification_type}
+
+    if expo_tokens:
+        send_expo_notification(expo_tokens, title, fcm_body, context)
+
+    if fcm_tokens:
+        send_fcm_notification(fcm_tokens, title, fcm_body, context)
 
 
 def send_email_notification(user: Dict, context: Dict, notification_type: str):

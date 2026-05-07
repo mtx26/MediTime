@@ -56,11 +56,11 @@ class Config:
     CORS_ALLOW_HEADERS = ("Authorization", "Content-Type")
     CORS_METHODS = ("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 
-    # Email
-    SMTP_HOST = os.getenv("SMTP_HOST")
-    SMTP_PORT = os.getenv("SMTP_PORT")
+    # Email (Resend)
+    RESEND_API = os.getenv("RESEND_API") or os.getenv("RESEND_API_KEY")
+    RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL")
+    RESEND_FROM_NAME = os.getenv("RESEND_FROM_NAME", "MediTime")
     NOTIFICATION_EMAIL_ADDRESS = os.getenv("NOTIFICATION_EMAIL_ADDRESS")
-    NOTIFICATION_EMAIL_PASSWORD = os.getenv("NOTIFICATION_EMAIL_PASSWORD")
 
     # SMS
     TWILIO_API_KEY_SID = os.getenv("TWILIO_API_KEY_SID")

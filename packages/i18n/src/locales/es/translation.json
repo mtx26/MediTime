@@ -282,12 +282,20 @@
     "with_github": "Conectando con Github",
     "with_google": "Iniciar sesión con Google",
     "with_microsoft": "Iniciar sesión con Microsoft",
-    "with_twitter": "Conectarse con Twitter"
+    "with_twitter": "Conectarse con Twitter",
+    "already_have_account": "Vous avez déjà un compte ?",
+    "back_to_login": "Retour à la connexion",
+    "check_email": "Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.",
+    "login_error": "Impossible de se connecter.",
+    "no_account": "Pas encore de compte ?",
+    "register_error": "Impossible de créer votre compte."
   },
   "auth_callback": {
     "loading": "Conectando...",
     "session_error": "La recuperación de la sesión falló después de OAuth",
-    "success": "Conexión exitosa mediante devolución de llamada"
+    "success": "Conexión exitosa mediante devolución de llamada",
+    "missing_payload": "Le lien s'est ouvert sans les informations de session. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
+    "session_unavailable": "Le lien a été ouvert, mais la session n'a pas pu être créée. Rouvrez le dernier email reçu ou demandez un nouveau lien."
   },
   "back": "Atrás",
   "boxes": {
@@ -537,10 +545,13 @@
     "delete_success": "Enlace ICS eliminado exitosamente",
     "delete_title": "¿Quitar el enlace ICS?",
     "fetch_error": "Error al cargar enlaces.",
-    "info_description": "Estos enlaces le permiten sincronizar su horario de medicación con su calendario personal (Google Calendar, Outlook, Apple Calendar, etc.). Copie el enlace y agréguelo como \"Suscripción al Calendario\" en su aplicación preferida.",
+    "info_description": "Estos enlaces le permiten sincronizar su horario de medicación con su calendario personal (Google Calendar, Outlook, Apple Calendar, etc.). Toque Sincronizar para abrir directamente la suscripción al calendario, o comparta el enlace si su aplicación no lo admite.",
     "info_title": "Acerca de los enlaces de ICS",
     "loading_ics_tokens": "Cargando enlaces ICS...",
     "no_tokens": "No se creó ningún enlace ICS.",
+    "sync_calendar": "Sincronizar calendario",
+    "sync_error": "No se puede sincronizar",
+    "sync_error_description": "Su dispositivo no encontró una aplicación de calendario compatible. Comparta o copie este enlace y agréguelo como suscripción de calendario: {{url}}",
     "title": "Listas de enlaces de ICS",
     "token_label": "Derecho de retención"
   },
@@ -557,7 +568,10 @@
     "preview_error": "Error al mostrar la vista previa",
     "remove_image": "Eliminar imagen",
     "select_file_error": "Seleccione un archivo de imagen.",
-    "title": "Seleccionar y obtener una vista previa de un archivo"
+    "title": "Seleccionar y obtener una vista previa de un archivo",
+    "choose_file": "Choisir un fichier",
+    "choose_from_library": "Photothèque",
+    "take_photo": "Prendre une photo"
   },
   "invalid_or_expired_link": "Este enlace de calendario compartido no es válido o ha expirado.",
   "invitation": {
@@ -649,8 +663,8 @@
   "no_shared_calendars": "No tienes un calendario compartido.",
   "noon": "Mediodía",
   "not_found": {
-    "message": "Página no encontrada.",
-    "title": "Error 404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> te invita a unirte al calendario <1>{{name}}</1>",
@@ -672,7 +686,10 @@
       "title": "Preferencias de notificación"
     },
     "push_description": "Recibe notificaciones push en tus dispositivos.",
-    "push_toggle": "Habilitar notificaciones push web"
+    "push_toggle": "Habilitar notificaciones push web",
+    "system_settings": "Ajustes del sistema",
+    "system_settings_desc": "Gestiona los permisos de notificaciones en los ajustes de tu dispositivo.",
+    "open_system_settings": "Abrir ajustes"
   },
   "open": "Abierto",
   "open_notifications": "Notificaciones abiertas",
@@ -778,7 +795,8 @@
     "save_password": "Guardar contraseña",
     "saving": "Registro...",
     "success": "Su contraseña ha sido cambiada exitosamente",
-    "title": "Nueva contraseña"
+    "title": "Nueva contraseña",
+    "request_new_link": "Demander un nouveau lien"
   },
   "restore": "Restaurar",
   "restore_error": "Error durante la restauración",
@@ -836,7 +854,8 @@
       "description": "Cambie su contraseña para fortalecer la seguridad de su cuenta.",
       "hint": "Utilice al menos 8 caracteres con letras, números y símbolos.",
       "same_password_error": "La nueva contraseña debe ser diferente de la anterior.",
-      "title": "Contraseña"
+      "title": "Contraseña",
+      "error": "Error al actualizar la contraseña."
     },
     "password_updated": "Contraseña actualizada exitosamente.",
     "providers": {
@@ -1163,7 +1182,7 @@
   "confirm_calendar_refill": "Confirme que el pastillero esté lleno",
   "pillbox_refill_description": "El pastillero se reabastecerá con cualquier medicamento faltante (stock negativo) para esta semana. Esta acción es irreversible.",
   "error": "error",
-  "notifications": "notificaciones",
+  "notifications": "Notificaciones",
   "missed_intakes": {
     "affected_meds": "Médicaments concernés",
     "apply": "Appliquer",
@@ -1187,6 +1206,15 @@
     "stock": "Stock",
     "subtitle": "Déclarez les jours où vous n'avez pas pris vos médicaments pour ajuster votre stock.",
     "success": "{{count}} comprimé(s) réajouté(s) au stock.",
-    "title": "Prise oubliée"
-  }
+    "title": "Prise oubliée",
+    "back": "Retour",
+    "summary": "Récapitulatif",
+    "tablets": "comprimé(s)",
+    "total": "Total à réajouter"
+  },
+  "unexpected_error": "unexpected error",
+  "edit": "editar",
+  "loading_stock_alerts": "Cargando alertas de stock",
+  "tablet": "tableta",
+  "tablets": "tabletas"
 }

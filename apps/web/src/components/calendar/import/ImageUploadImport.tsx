@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAlert } from '../../../contexts/AlertContext';
 import type { ImageUploadImportProps, ImageUploadImportRef } from '@meditime/types';
-import { isValidImageFile, isValidImagePreviewUrl } from '@meditime/utils';
+import { isValidImageFile, isValidImagePreviewUrl } from '@meditime/utils/src/files/imageValidation';
 import { Button } from '@/components/ui/button';
 import { CloudUpload, CheckCircle, X } from 'lucide-react';
 

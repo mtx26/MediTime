@@ -1,0 +1,256 @@
+import { useCallback, useEffect, useState } from 'react';
+import { Alert, RefreshControl } from 'react-native';
+import { Stack, useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
+import { YStack } from 'tamagui';
+import type { CalendarItem } from '@meditime/types';
+import {
+  buildPersonalCalendarActions,
+  buildSharedCalendarActions,
+} from '@meditime/utils';
+import { OutlineButton } from '../../components/common/OutlineButton';
+import { InfoBanner } from '../../components/common/InfoBanner';
+import { LoadingIndicator } from '../../components/common/LoadingIndicator';
+import { Page, usePageHeaderOptions } from '../../components/common/Page';
+import {
+  AddCalendarFooter,
+  CalendarSection,
+  PdfDialog,
+} from '../../components/calendar';
+import { useIosTheme } from '../../theme/ios';
+import { useCalendars } from '../../hooks/calendars';
+import { openPdfUrl, toActionSheetItems } from '../../utils';
+
+export default function CalendarsScreen() {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const ios = useIosTheme();
+  const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
+  const [pdfCalendarId, setPdfCalendarId] = useState<string | null>(null);
+  const [includeInactive, setIncludeInactive] = useState(false);
+  const headerOptions = usePageHeaderOptions({
+    title: String(t('calendars')),
+  });
+
+  const calendars = useCalendars();
+  const {
+    personalCalendars,
+    sharedCalendars,
+    isLoading,
+    isRefreshing,
+    isMutating,
+    error,
+    loadCalendars,
+    deleteCalendar,
+    renameCalendar,
+    deleteSharedCalendar,
+    getPersonalCalendarPdfUrl,
+  } = calendars;
+
+  useEffect(() => {
+    void loadCalendars();
+  }, [loadCalendars]);
+
+  const translate = useCallback((key: string) => String(t(key)), [t]);
+
+  const navigateToHref = useCallback(
+    (href: string) => {
+      router.push(href as never);
+    },
+    [router],
+  );
+
+  const openPdfDialog = (calendarId: string) => {
+    setPdfCalendarId(calendarId);
+    setIncludeInactive(false);
+    setPdfDialogOpen(true);
+  };
+
+  const openCalendarPdf = async () => {
+    if (!pdfCalendarId) return;
+
+    const url = getPersonalCalendarPdfUrl(pdfCalendarId, includeInactive);
+    try {
+      await openPdfUrl(url);
+      setPdfDialogOpen(false);
+    } catch {
+      Alert.alert(String(t('api.calendar.pdf_download_error')), String(t('api.calendar.pdf_download_error')));
+    }
+  };
+
+  const submitRename = useCallback((calendar: CalendarItem, value?: string) => {
+    const nextName = (value ?? '').trim();
+    if (!nextName) return;
+
+    void renameCalendar(calendar.id, nextName).then((result) => {
+      if (result.success) return;
+
+      Alert.alert(String(t('api.calendar.rename_error')), result.error ?? String(t('api.calendar.rename_error')));
+    });
+  }, [renameCalendar, t]);
+
+  const startRename = useCallback((calendar: CalendarItem) => {
+    Alert.prompt(
+      String(t('calendar.rename_title')),
+      String(t('calendar.rename_description')),
+      [
+        { text: String(t('cancel')), style: 'cancel' },
+        {
+          text: String(t('rename')),
+          onPress: (value?: string) => submitRename(calendar, value),
+        },
+      ],
+      'plain-text',
+      calendar.name,
+      'default',
+    );
+  }, [submitRename, t]);
+
+  const handleDeleteCalendarClick = (calendarId: string) => {
+    Alert.alert(
+      String(t('calendar.delete_title')),
+      String(t('calendar.delete_description')),
+      [
+        { text: String(t('cancel')), style: 'cancel' },
+        {
+          text: String(t('delete')),
+          style: 'destructive',
+          onPress: () => {
+            void deleteCalendar(calendarId);
+          },
+        },
+      ],
+    );
+  };
+
+  const handleDeleteSharedCalendarClick = (calendarId: string) => {
+    Alert.alert(
+      String(t('calendar.delete_shared_title')),
+      String(t('calendar.delete_shared_description')),
+      [
+        { text: String(t('cancel')), style: 'cancel' },
+        {
+          text: String(t('delete')),
+          style: 'destructive',
+          onPress: () => {
+            void deleteSharedCalendar(calendarId);
+          },
+        },
+      ],
+    );
+  };
+
+  const getPersonalActions = (calendar: CalendarItem) => {
+    return toActionSheetItems(
+      buildPersonalCalendarActions(
+        { calendarId: calendar.id, basePath: 'calendars/calendar', selectedDate: null },
+        {
+          onRename: () => startRename(calendar),
+          onDelete: () => handleDeleteCalendarClick(calendar.id),
+          onExportPdf: () => openPdfDialog(calendar.id),
+        },
+        ['pillbox', 'day_view'],
+      ),
+      translate,
+    );
+  };
+
+  const getSharedActions = (calendar: CalendarItem) => {
+    return toActionSheetItems(
+      buildSharedCalendarActions(
+        { calendarId: calendar.id, basePath: 'calendars/shared-user-calendar', selectedDate: null },
+        {
+          onDelete: () => handleDeleteSharedCalendarClick(calendar.id),
+          onExportPdf: () => openPdfDialog(calendar.id),
+        },
+        ['pillbox', 'day_view'],
+      ),
+      translate,
+    );
+  };
+
+  const openPersonalCalendar = (calendar: CalendarItem) => {
+    router.push(`/calendars/calendar/${calendar.id}` as never);
+  };
+
+  const openSharedCalendar = (calendar: CalendarItem) => {
+    router.push(`/calendars/shared-user-calendar/${calendar.id}` as never);
+  };
+
+  const getPersonalStockAlertHref = (calendar: CalendarItem) => (
+    `/calendars/calendar/${calendar.id}/stock-alerts`
+  );
+
+  const getSharedStockAlertHref = (calendar: CalendarItem) => (
+    `/calendars/shared-user-calendar/${calendar.id}/stock-alerts`
+  );
+
+  if (isLoading && personalCalendars.length === 0 && sharedCalendars.length === 0) {
+    return <LoadingIndicator label={String(t('loading_calendars'))} variant="screen" />;
+  }
+
+  return (
+    <>
+      <Page
+        screen={<Stack.Screen options={headerOptions} />}
+        refreshControl={(
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={() => void loadCalendars('refresh')}
+            tintColor={ios.primary}
+            colors={[ios.primary]}
+            progressBackgroundColor={ios.card}
+          />
+        )}
+        gap={24}
+        withBottomTabInset
+      >
+        {error && (
+          <YStack style={{ width: '100%', maxWidth: 672, gap: 10, alignSelf: 'center' }}>
+            <InfoBanner iconName="warning-outline" text={error} tone="warning" />
+            <OutlineButton label={String(t('retry'))} onPress={loadCalendars} />
+          </YStack>
+        )}
+
+        <CalendarSection
+          title={String(t('my_calendars'))}
+          iconName="calendar-outline"
+          calendars={personalCalendars}
+          glassEffectStyle="clear"
+          glassStyle={{ borderRadius: 24, padding: 8 }}
+          getActions={getPersonalActions}
+          getStockAlertHref={getPersonalStockAlertHref}
+          onOpen={openPersonalCalendar}
+          onNavigate={navigateToHref}
+          isMutating={isMutating}
+        />
+
+        <YStack style={{ width: '100%', maxWidth: 672, alignSelf: 'center', marginTop: -14 }}>
+          <AddCalendarFooter onPress={() => router.push('/add-calendar' as never)} />
+        </YStack>
+
+        <CalendarSection
+          title={String(t('shared_calendars'))}
+          iconName="people-outline"
+          calendars={sharedCalendars}
+          glassEffectStyle="clear"
+          glassStyle={{ borderRadius: 24, padding: 8 }}
+          emptyText={String(t('no_shared_calendars'))}
+          showInfoEmpty={true}
+          getActions={getSharedActions}
+          getStockAlertHref={getSharedStockAlertHref}
+          onOpen={openSharedCalendar}
+          onNavigate={navigateToHref}
+        />
+      </Page>
+
+      <PdfDialog
+        open={pdfDialogOpen}
+        includeInactive={includeInactive}
+        onIncludeInactiveChange={setIncludeInactive}
+        onCancel={() => setPdfDialogOpen(false)}
+        onDownload={() => void openCalendarPdf()}
+      />
+    </>
+  );
+}

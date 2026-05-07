@@ -5,10 +5,11 @@
   "type": "module",
   "dependencies": {
     "@meditime/constants": "file:../constants",
-    "firebase": "^12.4.0",
     "@meditime/types": "file:../types"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./src/files/cropImage": "./src/files/cropImage.ts",
+    "./src/files/imageValidation": "./src/files/imageValidation.ts"
   }
 }

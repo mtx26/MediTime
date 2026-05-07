@@ -1,0 +1,134 @@
+import { Pressable, RefreshControl } from 'react-native';
+import { Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+import { Text, XStack, YStack } from 'tamagui';
+import type { CalendarDetailSourceType } from '@meditime/types';
+import { CalendarNotFoundState, IcsTokenCard } from '../../components/calendar';
+import { GlassSurface } from '../../components/common/GlassSurface';
+import { InfoBanner } from '../../components/common/InfoBanner';
+import { LoadingIndicator } from '../../components/common/LoadingIndicator';
+import { OutlineButton } from '../../components/common/OutlineButton';
+import { Page, usePageHeaderOptions } from '../../components/common/Page';
+import { useIcsTokens } from '../../hooks/calendar';
+import { useIosTheme } from '../../theme/ios';
+import { hapticImpact } from '../../utils/haptics';
+
+type IcsTokensScreenProps = {
+  sourceType: CalendarDetailSourceType;
+};
+
+export default function IcsTokensScreen({ sourceType }: IcsTokensScreenProps) {
+  const { t } = useTranslation();
+  const ios = useIosTheme();
+  const ics = useIcsTokens(sourceType);
+
+  const headerOptions = usePageHeaderOptions({
+    title: String(t('ics.calendar_ics')),
+    headerBackButtonDisplayMode: 'generic' as const,
+    headerBackTitle: String(t('back')),
+  });
+
+  if (ics.loading && ics.tokens.length === 0) {
+    return (
+      <>
+        <Stack.Screen options={headerOptions} />
+        <LoadingIndicator label={String(t('ics.loading_ics_tokens'))} variant="screen" />
+      </>
+    );
+  }
+
+  if (ics.notFound) {
+    return (
+      <>
+        <Stack.Screen options={headerOptions} />
+        <CalendarNotFoundState onBackToCalendars={ics.backToCalendars} />
+      </>
+    );
+  }
+
+  return (
+    <Page
+      screen={<Stack.Screen options={headerOptions} />}
+      refreshControl={(
+        <RefreshControl
+          refreshing={ics.refreshing}
+          onRefresh={() => void ics.loadTokens('refresh')}
+          tintColor={ios.primary}
+          colors={[ios.primary]}
+          progressBackgroundColor={ios.card}
+        />
+      )}
+      gap={14}
+      withBottomTabInset
+    >
+      {ics.error && (
+        <YStack style={{ gap: 10 }}>
+          <InfoBanner iconName="warning-outline" text={ics.error} tone="warning" />
+          <OutlineButton label={String(t('retry'))} onPress={() => void ics.loadTokens('refresh')} />
+        </YStack>
+      )}
+
+      <InfoBanner
+        iconName="information-circle-outline"
+        text={String(t('ics.info_description'))}
+      />
+
+      {ics.tokens.length === 0 ? (
+        <InfoBanner iconName="calendar-outline" text={String(t('ics.no_tokens'))} />
+      ) : (
+        <YStack style={{ gap: 10 }}>
+          {ics.tokens.map((token) => (
+            <IcsTokenCard
+              key={token.id}
+              token={token}
+              webcalUrl={ics.getTokenUrl(token.token)}
+              disabled={ics.isMutating}
+              onDelete={ics.confirmDeleteToken}
+              onShare={ics.shareToken}
+              onSubscribe={ics.subscribeToken}
+            />
+          ))}
+        </YStack>
+      )}
+
+      <Pressable
+        onPress={() => {
+          hapticImpact();
+          void ics.createToken();
+        }}
+        disabled={ics.isMutating}
+        accessibilityRole="button"
+        accessibilityLabel={String(t('ics.add_token'))}
+      >
+        {({ pressed }) => (
+          <GlassSurface
+            glassEffectStyle="clear"
+            style={{
+              minHeight: 52,
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingHorizontal: 14,
+              borderRadius: 18,
+              borderColor: pressed ? ios.primary : ios.border,
+            }}
+          >
+            <XStack
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+                opacity: ics.isMutating ? 0.55 : 1,
+              }}
+            >
+              <Ionicons name="add-circle-outline" size={18} color={ios.primary} />
+              <Text style={{ color: ios.primary, fontSize: 15, lineHeight: 20, fontWeight: '800' }}>
+                {t('ics.add_token')}
+              </Text>
+            </XStack>
+          </GlassSurface>
+        )}
+      </Pressable>
+    </Page>
+  );
+}

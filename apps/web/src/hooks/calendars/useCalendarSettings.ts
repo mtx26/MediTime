@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { detectCalendarType, getCalendarSourceMap } from '@meditime/utils';
+import { detectCalendarType } from '@meditime/utils';
 import { CALENDAR_SETTINGS_TABS } from '@meditime/constants';
 import type { CalendarSettingsPageProps, CalendarSettingsTab } from '@meditime/types';
 

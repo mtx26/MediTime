@@ -40,7 +40,7 @@
       "title": "Photo de profil"
     },
     "profile_updated": "Profil mis à jour avec succès",
-    "save_changes": "Enregistrer les modifications"
+    "save_changes": "Enregistrer"
   },
   "accounts": "Comptes",
   "actions": "Actions",
@@ -256,12 +256,17 @@
   "auth": {
     "accept_terms": "J’accepte les ",
     "accept_terms_aria": "Accepter les conditions générales",
+    "already_have_account": "Vous avez déjà un compte ?",
+    "back_to_login": "Retour à la connexion",
+    "check_email": "Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.",
     "email": "Adresse e-mail",
     "forgot_password": "Mot de passe oublié ?",
     "hide_password": "Masquer le mot de passe",
     "login": "Connexion",
+    "login_error": "Impossible de se connecter.",
     "login_with": "Se connecter avec :",
     "name": "Nom complet",
+    "no_account": "Pas encore de compte ?",
     "or_with_email": "ou avec email :",
     "password": "Mot de passe",
     "provider": {
@@ -273,6 +278,7 @@
       "twitter": "Twitter"
     },
     "register": "Inscription",
+    "register_error": "Impossible de créer votre compte.",
     "register_with": "S'inscrire avec :",
     "show_password": "Afficher le mot de passe",
     "terms_link": "conditions générales",
@@ -286,7 +292,9 @@
   },
   "auth_callback": {
     "loading": "Connexion en cours...",
-    "session_error": "Échec de récupération de session après OAuth",
+    "missing_payload": "Le lien s'est ouvert sans les informations de session. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
+    "session_error": "Échec de récupération de session",
+    "session_unavailable": "Le lien a été ouvert, mais la session n'a pas pu être créée. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
     "success": "Connexion réussie via callback"
   },
   "back": "Retour",
@@ -537,10 +545,13 @@
     "delete_success": "Lien ICS supprimé avec succès.",
     "delete_title": "Supprimer le lien ICS ?",
     "fetch_error": "Erreur lors du chargement des liens.",
-    "info_description": "Ces liens vous permettent de synchroniser votre prise de médicaments avec votre calendrier personnel (Google Calendar, Outlook, Apple Calendar, etc.). Copiez le lien et ajoutez-le comme 'Abonnement à un calendrier' dans votre application préférée.",
+    "info_description": "Ces liens vous permettent de synchroniser votre prise de médicaments avec votre calendrier personnel (Google Calendar, Outlook, Apple Calendar, etc.). Appuyez sur Synchroniser pour ouvrir directement l'abonnement calendrier, ou partagez le lien si votre application ne le prend pas en charge.",
     "info_title": "À propos des liens ICS",
     "loading_ics_tokens": "Chargement des liens ICS...",
     "no_tokens": "Aucun lien ICS créé.",
+    "sync_calendar": "Synchroniser le calendrier",
+    "sync_error": "Synchronisation impossible",
+    "sync_error_description": "Votre appareil n'a pas trouvé d'application calendrier compatible. Partagez ou copiez ce lien puis ajoutez-le comme abonnement calendrier : {{url}}",
     "title": "Listes de liens ICS",
     "token_label": "Lien"
   },
@@ -548,6 +559,8 @@
     "analysis_error": "Erreur lors de l'analyse de l'image.",
     "click_to_change": "Cliquez pour changer de fichier",
     "click_to_select_file": "Cliquez ou glissez-déposez pour sélectionner un fichier",
+    "choose_file": "Choisir un fichier",
+    "choose_from_library": "Photothèque",
     "file_analysis_error": "Erreur lors de l'analyse du fichier",
     "file_selected": "Fichier sélectionné",
     "file_type_error": "Seuls les fichiers image sont acceptés (jpg, png, webp, gif).",
@@ -557,6 +570,7 @@
     "preview_error": "Erreur lors de l'affichage de la prévisualisation",
     "remove_image": "Supprimer l'image",
     "select_file_error": "Veuillez sélectionner un fichier image.",
+    "take_photo": "Prendre une photo",
     "title": "Sélectionner et prévisualiser un fichier"
   },
   "invalid_or_expired_link": "Ce lien de calendrier partagé est invalide ou a expiré.",
@@ -649,8 +663,8 @@
   "no_shared_calendars": "Vous n'avez pas de calendrier partagé.",
   "noon": "Midi",
   "not_found": {
-    "message": "Page introuvable.",
-    "title": "Erreur 404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> vous invite à rejoindre le calendrier <1>{{name}}</1>",
@@ -672,7 +686,10 @@
       "title": "Préférences de notification"
     },
     "push_description": "Recevez des notifications push sur vos appareils.",
-    "push_toggle": "Notifications push"
+    "push_toggle": "Notifications push",
+    "system_settings": "Paramètres système",
+    "system_settings_desc": "Gérez les autorisations de notifications dans les réglages de votre appareil.",
+    "open_system_settings": "Ouvrir les réglages"
   },
   "open": "Ouvrir",
   "open_notifications": "Ouvrir les notifications",
@@ -777,6 +794,7 @@
     "invalid_link": "Lien de réinitialisation invalide ou expiré.",
     "invalid_session": "Session invalide. Merci de redemander un lien.",
     "new_password_label": "Nouveau mot de passe",
+    "request_new_link": "Demander un nouveau lien",
     "save_password": "Enregistrer le mot de passe",
     "saving": "Enregistrement...",
     "success": "Votre mot de passe a bien été modifié.",
@@ -836,6 +854,7 @@
     },
     "password_section": {
       "description": "Modifiez votre mot de passe pour renforcer la sécurité de votre compte.",
+      "error": "Erreur lors de la mise à jour du mot de passe.",
       "hint": "Utilisez au moins 8 caractères avec des lettres, chiffres et symboles.",
       "same_password_error": "Le nouveau mot de passe doit être différent de l'ancien.",
       "title": "Mot de passe"
@@ -1192,5 +1211,10 @@
   },
   "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier.",
   "error": "error",
-  "notifications": "notifications"
+  "notifications": "Notifications",
+  "unexpected_error": "unexpected error",
+  "edit": "edit",
+  "loading_stock_alerts": "loading stock alerts",
+  "tablet": "tablet",
+  "tablets": "tablets"
 }

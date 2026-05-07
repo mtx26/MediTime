@@ -1,5 +1,5 @@
 import type {
-  ActionItem,
+  ActionList,
   NotificationActionContext,
   NotificationActionHandlers,
 } from '@meditime/types';
@@ -10,22 +10,26 @@ import type {
 export function buildNotificationActions(
   ctx: NotificationActionContext,
   handlers: NotificationActionHandlers,
-): ActionItem[] {
+): ActionList {
   return [
-    {
-      id: 'mark_all_read',
-      icon: 'bell',
-      labelKey: 'notification.mark_all_read',
-      titleKey: 'notification.mark_all_read',
-      onClick: handlers.onMarkAllRead,
-    },
+    [
+      {
+        id: 'mark_all_read',
+        icon: 'bell',
+        labelKey: 'notification.mark_all_read',
+        titleKey: 'notification.mark_all_read',
+        onClick: handlers.onMarkAllRead,
+      },
+    ],
     { separator: true },
-    {
-      id: 'settings',
-      icon: 'settings',
-      labelKey: 'settings.label',
-      titleKey: 'settings.label',
-      linkTo: `/${ctx.lng}/settings?tab=notifications`,
-    },
+    [
+      {
+        id: 'settings',
+        icon: 'settings',
+        labelKey: 'settings.label',
+        titleKey: 'settings.label',
+        linkTo: `/${ctx.lng}/settings?tab=notifications`,
+      },
+    ],
   ];
 }
