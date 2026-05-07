@@ -22,6 +22,16 @@ const config = {
       color: '#0A84FF',
       defaultChannel: 'default',
     }],
+    ['expo-camera', {
+      cameraPermission: 'MediTime uses the camera to scan QR codes and take photos for your calendars.',
+      microphonePermission: false,
+      recordAudioAndroid: false,
+    }],
+    ['expo-image-picker', {
+      photosPermission: 'MediTime accesses your photo library to let you choose images for your calendars.',
+      cameraPermission: 'MediTime uses the camera to take photos for your calendars.',
+      microphonePermission: false,
+    }],
   ],
   ios: {
     ...appJson.expo.ios,
@@ -33,6 +43,32 @@ const config = {
     infoPlist: {
       ...appJson.expo.ios.infoPlist,
       UIBackgroundModes: ['remote-notification'],
+      CFBundleLocalizations: ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'ru', 'zh'],
+      CFBundleDevelopmentRegion: 'en',
+      NSCameraUsageDescription: 'MediTime uses the camera to scan QR codes and take photos for your calendars.',
+      NSPhotoLibraryUsageDescription: 'MediTime accesses your photo library to let you choose images for your calendars.',
+      NSPhotoLibraryAddUsageDescription: 'MediTime may save images to your photo library.',
+      NSMicrophoneUsageDescription: 'MediTime requires microphone access as part of camera usage.',
+    },
+    privacyManifests: {
+      NSPrivacyAccessedAPITypes: [
+        {
+          NSPrivacyAccessedAPIType: 'NSPrivacyAccessedAPICategoryUserDefaults',
+          NSPrivacyAccessedAPITypeReasons: ['CA92.1'],
+        },
+        {
+          NSPrivacyAccessedAPIType: 'NSPrivacyAccessedAPICategoryFileTimestamp',
+          NSPrivacyAccessedAPITypeReasons: ['C617.1'],
+        },
+        {
+          NSPrivacyAccessedAPIType: 'NSPrivacyAccessedAPICategorySystemBootTime',
+          NSPrivacyAccessedAPITypeReasons: ['35F9.1'],
+        },
+        {
+          NSPrivacyAccessedAPIType: 'NSPrivacyAccessedAPICategoryDiskSpace',
+          NSPrivacyAccessedAPITypeReasons: ['E174.1'],
+        },
+      ],
     },
     icon: {
       light: './assets/icon.png',
@@ -43,6 +79,14 @@ const config = {
   android: {
     ...appJson.expo.android,
     googleServicesFile: googleServicesJsonPath,
+    permissions: [
+      'android.permission.CAMERA',
+      'android.permission.READ_MEDIA_IMAGES',
+      'android.permission.READ_EXTERNAL_STORAGE',
+      'android.permission.WRITE_EXTERNAL_STORAGE',
+      'android.permission.RECEIVE_BOOT_COMPLETED',
+      'android.permission.VIBRATE',
+    ],
     notification: {
       color: '#0A84FF',
       icon: './assets/adaptive-icon-dark.png',

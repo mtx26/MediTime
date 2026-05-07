@@ -7,9 +7,16 @@
     "scheme": "meditime",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "assetBundlePatterns": ["**/*"],
+    "androidStatusBar": {
+      "style": "auto",
+      "translucent": true
+    },
     "splash": {
       "image": "./assets/splash-icon.png",
-      "resizeMode": "contain"
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
