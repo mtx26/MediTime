@@ -12,7 +12,7 @@ for (const envFile of ['.env', '.env.local', '.env.prod', '.env.dev']) {
   }
 }
 
-const appleTeamId = (process.env.EXPO_PUBLIC_APPLE_TEAM_ID || '').trim();
+const appleTeamId = (process.env.VITE_APPLE_TEAM_ID || '').trim();
 const bundleId = (process.env.IOS_BUNDLE_ID || 'app.meditime.mobile').trim();
 
 const details = appleTeamId
