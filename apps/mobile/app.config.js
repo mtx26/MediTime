@@ -9,8 +9,8 @@ try {
 const appJson = require('./app.json');
 
 const appleTeamId = (process.env.EXPO_PUBLIC_APPLE_TEAM_ID || '').trim();
-const googleServicesJsonPath = './google-services.json';
-const googleServicesInfoPlistPath = './GoogleService-Info.plist';
+const googleServicesJsonPath = process.env.GOOGLE_SERVICES_JSON || './google-services.json';
+const googleServicesInfoPlistPath = process.env.GOOGLE_SERVICES_INFO_PLIST || './GoogleService-Info.plist';
 
 const config = {
   ...appJson.expo,
