@@ -19,5 +19,12 @@
       "autoIncrement": true,
       "channel": "production"
     }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "language": "en-US"
+      }
+    }
   }
 }

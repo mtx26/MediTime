@@ -1,18 +1,15 @@
+import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { buildAuthCallbackUrl } from '@meditime/utils';
-
-
-const configuredWebUrl = process.env.EXPO_PUBLIC_WEB_URL?.trim()?.replace(/\/+$/, '');
-
-export function buildMobileAuthCallbackUrl(redirect?: string, type?: string) {
-  if (!configuredWebUrl) {
-    throw new Error('Missing EXPO_PUBLIC_WEB_URL');
-  }
-  return buildAuthCallbackUrl(configuredWebUrl, redirect, '/auth/callback', type);
-}
 
 WebBrowser.maybeCompleteAuthSession();
+
+export function buildMobileAuthCallbackUrl(redirect?: string, type?: string) {
+  const queryParams: Record<string, string> = {};
+  if (type) queryParams.type = type;
+  if (redirect) queryParams.redirect = redirect;
+  return Linking.createURL('/auth/callback', { queryParams });
+}
 
 export function collectAuthCallbackParams(input: string | null | undefined) {
   const collected: Record<string, string | undefined> = {};
@@ -73,12 +70,10 @@ export async function applySupabaseAuthParams(
 }
 
 export async function openAuthUrlInApp(url: string) {
-  if (!configuredWebUrl) {
-    throw new Error('Missing EXPO_PUBLIC_WEB_URL');
-  }
+  const redirectUrl = Linking.createURL('/auth/callback');
   const result = await WebBrowser.openAuthSessionAsync(
     url,
-    `${configuredWebUrl}/auth/callback`,
+    redirectUrl,
     {
       dismissButtonStyle: 'close',
       presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
