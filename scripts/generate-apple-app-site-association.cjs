@@ -12,12 +12,7 @@ for (const envFile of ['.env', '.env.local', '.env.prod', '.env.dev']) {
   }
 }
 
-const appleTeamId = (
-  process.env.APPLE_TEAM_ID ||
-  process.env.EXPO_PUBLIC_APPLE_TEAM_ID ||
-  process.env.VITE_APPLE_TEAM_ID ||
-  ''
-).trim();
+const appleTeamId = (process.env.EXPO_PUBLIC_APPLE_TEAM_ID || '').trim();
 const bundleId = (process.env.IOS_BUNDLE_ID || 'app.meditime.mobile').trim();
 
 const details = appleTeamId
@@ -42,5 +37,5 @@ fs.writeFileSync(outputPath, `${JSON.stringify(association, null, 2)}\n`);
 if (appleTeamId) {
   console.log(`AASA generated for ${appleTeamId}.${bundleId}`);
 } else {
-  console.log('AASA generated without appID because APPLE_TEAM_ID is not set');
+  console.log('AASA generated without appID because EXPO_PUBLIC_APPLE_TEAM_ID is not set');
 }

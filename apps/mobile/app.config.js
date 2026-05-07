@@ -8,16 +8,32 @@ try {
 
 const appJson = require('./app.json');
 
-const appleTeamId = (process.env.EXPO_PUBLIC_APPLE_TEAM_ID || process.env.APPLE_TEAM_ID || '').trim();
+const appleTeamId = (process.env.EXPO_PUBLIC_APPLE_TEAM_ID || '').trim();
+const googleServicesJsonPath = './google-services.json';
+const googleServicesInfoPlistPath = './GoogleService-Info.plist';
 
 const config = {
   ...appJson.expo,
   plugins: [
     ...(appJson.expo.plugins ?? []),
     '@react-native-community/datetimepicker',
+    ['expo-notifications', {
+      icon: './assets/adaptive-icon-dark.png',
+      color: '#0A84FF',
+      defaultChannel: 'default',
+    }],
   ],
   ios: {
     ...appJson.expo.ios,
+    googleServicesFile: googleServicesInfoPlistPath,
+    entitlements: {
+      ...appJson.expo.ios.entitlements,
+      'aps-environment': 'production',
+    },
+    infoPlist: {
+      ...appJson.expo.ios.infoPlist,
+      UIBackgroundModes: ['remote-notification'],
+    },
     icon: {
       light: './assets/icon.png',
       dark: './assets/icon-dark.png',
@@ -26,6 +42,11 @@ const config = {
   },
   android: {
     ...appJson.expo.android,
+    googleServicesFile: googleServicesJsonPath,
+    notification: {
+      color: '#0A84FF',
+      icon: './assets/adaptive-icon-dark.png',
+    },
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
       monochromeImage: './assets/adaptive-icon-dark.png',

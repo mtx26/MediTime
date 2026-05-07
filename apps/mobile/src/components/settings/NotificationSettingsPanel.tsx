@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { Linking, Platform, Pressable, Switch } from 'react-native';
+import { ActivityIndicator, Linking, Platform, Pressable, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Text, XStack, YStack } from 'tamagui';
@@ -14,10 +14,12 @@ export function NotificationSettingsPanel({
   pushEnabled,
   notificationTime,
   isSaving,
+  isTestingPush = false,
   onEmailEnabledChange,
   onPushEnabledChange,
   onNotificationTimeChange,
   onSaveNotificationTime,
+  onTestPushNotification,
 }: MobileNotificationSettingsProps) {
   const { t } = useTranslation();
   const ios = useIosTheme();
@@ -204,6 +206,45 @@ export function NotificationSettingsPanel({
           )}
         </YStack>
       </SettingsPanelSection>
+
+      {onTestPushNotification ? (
+        <SettingsPanelSection
+          glass
+          iconName="flask-outline"
+          title="Tester notification"
+          description="Envoyer une notification push de test a cet appareil"
+        >
+          <Pressable
+            accessibilityRole="button"
+            disabled={isTestingPush}
+            onPress={() => {
+              hapticSelection();
+              onTestPushNotification();
+            }}
+          >
+            {({ pressed }) => (
+              <XStack
+                style={{
+                  minHeight: 44,
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 4,
+                  opacity: pressed || isTestingPush ? 0.7 : 1,
+                }}
+              >
+                <Text style={{ color: ios.primary, fontSize: 15, fontWeight: '600' }}>
+                  {isTestingPush ? 'Envoi en cours...' : 'Envoyer une notification de test'}
+                </Text>
+                {isTestingPush ? (
+                  <ActivityIndicator size="small" color={ios.primary} />
+                ) : (
+                  <Ionicons name="send" size={16} color={ios.primary} />
+                )}
+              </XStack>
+            )}
+          </Pressable>
+        </SettingsPanelSection>
+      ) : null}
 
       <SettingsPanelSection
         glass

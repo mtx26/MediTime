@@ -2,6 +2,7 @@ from flask import request, g
 from . import api
 from app.db.connection import get_connection
 from app.services.user import fetch_user
+from app.services.notifications import get_push_tokens, send_push_notification
 from app.utils.responses import success_response, error_response, warning_response
 from app.utils.decorators import require_auth, measure_time, with_query_origin
 from app.config import Config
@@ -267,16 +268,26 @@ def mark_all_notifications_read():
         )
 
 
-# Route pour enregistrer un token FCM
+# Route pour enregistrer un token push (Expo ou FCM)
+@api.route("/notifications/push-token", methods=["POST"])
 @api.route("/notifications/fcm-token", methods=["POST"])
 @measure_time()
 @require_auth
-@with_query_origin(default_origin="FCM_TOKEN_SEND")
+@with_query_origin(default_origin="PUSH_TOKEN_SEND")
 def register_token():
     data = request.json
     token = data.get("token")
     device_name = data.get("deviceName")
+    platform = data.get("platform")
+    provider = data.get("provider")
+    project_id = data.get("projectId")
     uid = g.uid
+
+    inferred_provider = provider
+    if inferred_provider not in {"expo", "fcm"}:
+        inferred_provider = "expo" if isinstance(token, str) and token.startswith(("ExpoPushToken[", "ExponentPushToken[")) else "fcm"
+
+    normalized_platform = platform if platform in {"ios", "android", "web"} else None
 
     if not token or not uid:
         return error_response(
@@ -290,24 +301,77 @@ def register_token():
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
-                    INSERT INTO fcm_tokens (uid, token, device_name)
-                    VALUES (%s, %s, %s)
-                    ON CONFLICT (token) DO NOTHING;
-                """, (uid, token, device_name))
+                    INSERT INTO push_tokens (uid, token, device_name, provider, platform, project_id)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (token) DO UPDATE
+                    SET uid = EXCLUDED.uid,
+                        device_name = COALESCE(EXCLUDED.device_name, push_tokens.device_name),
+                        provider = EXCLUDED.provider,
+                        platform = COALESCE(EXCLUDED.platform, push_tokens.platform),
+                        project_id = COALESCE(EXCLUDED.project_id, push_tokens.project_id),
+                        updated_at = now();
+                """, (uid, token, device_name, inferred_provider, normalized_platform, project_id))
                 conn.commit()
 
         return success_response(
-            message="token registered", 
-            code="FCM_REGISTERED",
+            message="push token registered", 
+            code="PUSH_TOKEN_REGISTERED",
             i18n_key="api.notifications.token_saved",
             log_extra={"token": token}
         )
 
     except Exception as e:
         return error_response(
-            message="error during token registration", 
-            code="FCM_REGISTER_ERROR",
+            message="error during push token registration", 
+            code="PUSH_TOKEN_REGISTER_ERROR",
             i18n_key="api.notifications.token_save_error",
             status_code=500,
             error=str(e)
+        )
+
+
+@api.route("/notifications/test-push", methods=["POST"])
+@measure_time()
+@require_auth
+@with_query_origin(default_origin="TEST_PUSH_SEND")
+def send_test_push_notification():
+    uid = g.uid if hasattr(g, "uid") else None
+
+    if not uid:
+        return error_response(
+            message="missing user",
+            code="MISSING_USER",
+            status_code=401,
+        )
+
+    try:
+        tokens = get_push_tokens(uid)
+        if not tokens:
+            return warning_response(
+                message="no push token found",
+                code="NO_PUSH_TOKEN",
+                status_code=404,
+            )
+
+        send_push_notification(
+            {"id": uid},
+            {
+                "sender_name": "MediTime",
+                "notification_count": 1,
+                "link": "/notifications",
+            },
+            "test_push",
+        )
+
+        return success_response(
+            message="test push sent",
+            code="TEST_PUSH_SENT",
+            data={"tokens_count": len(tokens)},
+        )
+    except Exception as e:
+        return error_response(
+            message="error sending test push",
+            code="TEST_PUSH_SEND_ERROR",
+            status_code=500,
+            error=str(e),
         )

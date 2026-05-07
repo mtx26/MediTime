@@ -10,6 +10,7 @@ import { supabase } from '../src/services/supabase';
 import { configureApi, initLogger } from '@meditime/utils';
 import i18n from '../src/i18n';
 import { BackButton } from '../src/components/common/BackButton';
+import { PushNotificationsBootstrap } from '../src/hooks/notifications';
 import { AppThemeProvider, useAppTheme } from '../src/theme/ios';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL!;
@@ -49,6 +50,7 @@ function ThemedApp() {
     <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme}>
       <Theme name={colorScheme}>
         <AuthProvider>
+          <PushNotificationsBootstrap />
           <Stack
             screenOptions={{
               headerShown: false,

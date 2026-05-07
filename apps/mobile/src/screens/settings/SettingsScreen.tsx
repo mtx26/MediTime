@@ -119,10 +119,12 @@ export default function SettingsScreen() {
           pushEnabled={settings.pushEnabled}
           notificationTime={settings.notificationTime}
           isSaving={settings.isSaving}
+          isTestingPush={settings.isTestingPush}
           onEmailEnabledChange={settings.updateEmailNotifications}
           onPushEnabledChange={settings.updatePushNotifications}
           onNotificationTimeChange={settings.updateNotificationTime}
           onSaveNotificationTime={settings.saveNotificationTime}
+          onTestPushNotification={settings.testPushNotification}
         />
       )}
 

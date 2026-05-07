@@ -112,10 +112,12 @@ export interface MobileNotificationSettingsProps {
   pushEnabled: boolean;
   notificationTime: string;
   isSaving: boolean;
+  isTestingPush?: boolean;
   onEmailEnabledChange: (value: boolean) => void;
   onPushEnabledChange: (value: boolean) => void;
   onNotificationTimeChange: (value: string) => void;
   onSaveNotificationTime: (value?: string) => void;
+  onTestPushNotification?: () => void;
 }
 
 export interface MobilePreferencesSettingsProps {

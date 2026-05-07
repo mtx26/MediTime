@@ -45,6 +45,7 @@ export function useSettings() {
   const [notificationTime, setNotificationTime] = useState('');
   const [emailEnabled, setEmailEnabled] = useState(Boolean(userInfo?.emailEnabled));
   const [pushEnabled, setPushEnabled] = useState(Boolean(userInfo?.pushEnabled));
+  const [isTestingPush, setIsTestingPush] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [linkedProviders, setLinkedProviders] = useState<string[]>([]);
@@ -381,6 +382,29 @@ export function useSettings() {
     });
   }, [notificationTime, refreshNotificationTime, runSavingAction, t, userInfo?.uid]);
 
+  const testPushNotification = useCallback(async () => {
+    if (!userInfo?.uid) return;
+
+    setIsTestingPush(true);
+    try {
+      const result = await performApiCall({
+        url: `${API_URL}/api/notifications/test-push`,
+        method: 'POST',
+        origin: 'TEST_PUSH_SEND',
+        uid: userInfo.uid,
+      });
+
+      if (!result.success) {
+        Alert.alert(String(t('error')), String(result.error ?? 'Impossible d\'envoyer la notification de test.'));
+        return;
+      }
+
+      Alert.alert(String(t('notification.label')), 'Notification de test envoyee.');
+    } finally {
+      setIsTestingPush(false);
+    }
+  }, [t, userInfo?.uid]);
+
   const resetPassword = useCallback(async () => {
     if (!userInfo?.email) return;
 
@@ -427,6 +451,7 @@ export function useSettings() {
     oldPasswordVisible,
     newPasswordVisible,
     notificationTime,
+    isTestingPush,
     isSaving,
     availableProviders,
     linkedProviders,
@@ -451,6 +476,7 @@ export function useSettings() {
     updatePushNotifications: (value: boolean) => void updateNotificationFlag('push_enabled', value),
     updateNotificationTime,
     saveNotificationTime,
+    testPushNotification,
     changeLanguage,
     setThemePreference,
     resetPassword,
