@@ -1,11 +1,13 @@
 {
   "applinks": {
-    "apps": [],
     "details": [
       {
-        "appID": "VCLF9HXC5M.app.meditime.mobile",
-        "paths": [
-          "*"
+        "appIDs": ["VCLF9HXC5M.app.meditime.mobile"],
+        "components": [
+          {
+            "/": "/*",
+            "comment": "Matches all paths"
+          }
         ]
       }
     ]

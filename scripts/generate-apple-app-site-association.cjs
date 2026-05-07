@@ -18,15 +18,19 @@ const bundleId = (process.env.IOS_BUNDLE_ID || 'app.meditime.mobile').trim();
 const details = appleTeamId
   ? [
       {
-        appID: `${appleTeamId}.${bundleId}`,
-        paths: ['*'],
+        appIDs: [`${appleTeamId}.${bundleId}`],
+        components: [
+          {
+            '/': '/*',
+            comment: 'Matches all paths',
+          },
+        ],
       },
     ]
   : [];
 
 const association = {
   applinks: {
-    apps: [],
     details,
   },
 };
