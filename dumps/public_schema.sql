@@ -232,9 +232,7 @@ $$;
 CREATE FUNCTION public.get_fcm_tokens_for_user(target_uid uuid) RETURNS TABLE(token text)
     LANGUAGE sql SECURITY DEFINER
     SET search_path TO 'public'
-    AS $$
-  SELECT token FROM public.fcm_tokens WHERE uid = target_uid;
-$$;
+    AS $$ SELECT token FROM public.fcm_tokens WHERE uid = target_uid; $$;
 
 
 --
