@@ -1,5 +1,5 @@
 import type {
-  ActionItem,
+  ActionList,
   StockAlertActionContext,
   StockAlertActionHandlers,
 } from '@meditime/types';
@@ -10,23 +10,25 @@ import type {
 export function buildStockAlertActions(
   ctx: StockAlertActionContext,
   handlers: StockAlertActionHandlers,
-): ActionItem[] {
+): ActionList {
   return [
-    {
-      id: 'send_sms',
-      icon: 'message-square',
-      labelKey: 'send_sms',
-      titleKey: 'send_sms',
-      onClick: handlers.onSendSms,
-      dataTour: 'send-sms-btn',
-    },
-    {
-      id: 'ics_calendar',
-      icon: 'calendar',
-      labelKey: 'ics.calendar_ics',
-      titleKey: 'ics.calendar_ics',
-      linkTo: `/${ctx.lng}/${ctx.basePath}/${ctx.calendarId}/ics-tokens`,
-      dataTour: 'ics-calendar-btn',
-    },
+    [
+      {
+        id: 'send_sms',
+        icon: 'message-square',
+        labelKey: 'send_sms',
+        titleKey: 'send_sms',
+        onClick: handlers.onSendSms,
+        dataTour: 'send-sms-btn',
+      },
+      {
+        id: 'ics_calendar',
+        icon: 'calendar',
+        labelKey: 'ics.calendar_ics',
+        titleKey: 'ics.calendar_ics',
+        linkTo: `/${ctx.lng}/${ctx.basePath}/${ctx.calendarId}/ics-tokens`,
+        dataTour: 'ics-calendar-btn',
+      },
+    ],
   ];
 }

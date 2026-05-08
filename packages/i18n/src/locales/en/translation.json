@@ -256,12 +256,17 @@
   "auth": {
     "accept_terms": "I accept the",
     "accept_terms_aria": "Accept the terms and conditions",
+    "already_have_account": "Already have an account?",
+    "back_to_login": "Back to login",
+    "check_email": "Check your inbox and confirm your email before logging in.",
     "email": "E-mail address",
     "forgot_password": "Forgot your password?",
     "hide_password": "Hide password",
     "login": "Login",
+    "login_error": "Unable to log in.",
     "login_with": "Connect with:",
     "name": "Full name",
+    "no_account": "No account yet?",
     "or_with_email": "or with email:",
     "password": "Password",
     "provider": {
@@ -273,6 +278,7 @@
       "twitter": "Twitter"
     },
     "register": "Registration",
+    "register_error": "Unable to create your account.",
     "register_with": "Register with:",
     "show_password": "Show password",
     "terms_link": "general conditions",
@@ -286,7 +292,9 @@
   },
   "auth_callback": {
     "loading": "Connecting...",
-    "session_error": "Session recovery failed after OAuth",
+    "missing_payload": "The link opened without session information. Reopen the latest email or request a new link.",
+    "session_error": "Session recovery failed",
+    "session_unavailable": "The link opened, but the session could not be created. Reopen the latest email or request a new link.",
     "success": "Successful connection via callback"
   },
   "back": "Back",
@@ -537,10 +545,13 @@
     "delete_success": "ICS link successfully removed.",
     "delete_title": "Remove the ICS link?",
     "fetch_error": "Error loading links.",
-    "info_description": "These links allow you to synchronize your medication schedule with your personal calendar (Google Calendar, Outlook, Apple Calendar, etc.). Copy the link and add it as a 'Calendar Subscription' in your preferred application.",
+    "info_description": "These links allow you to synchronize your medication schedule with your personal calendar (Google Calendar, Outlook, Apple Calendar, etc.). Tap Sync to open the calendar subscription directly, or share the link if your app does not support it.",
     "info_title": "About ICS links",
     "loading_ics_tokens": "Loading ICS links...",
     "no_tokens": "No ICS link created.",
+    "sync_calendar": "Sync calendar",
+    "sync_error": "Unable to sync",
+    "sync_error_description": "Your device did not find a compatible calendar app. Share or copy this link, then add it as a calendar subscription: {{url}}",
     "title": "ICS Link Lists",
     "token_label": "Link"
   },
@@ -548,6 +559,8 @@
     "analysis_error": "Error parsing image.",
     "click_to_change": "Click to change file",
     "click_to_select_file": "Click or drag and drop to select a file",
+    "choose_file": "Choose File",
+    "choose_from_library": "Photo Library",
     "file_analysis_error": "Error parsing file",
     "file_selected": "Selected file",
     "file_type_error": "Only image files are accepted (jpg, png, webp, gif).",
@@ -557,6 +570,7 @@
     "preview_error": "Error displaying preview",
     "remove_image": "Delete image",
     "select_file_error": "Please select an image file.",
+    "take_photo": "Take Photo",
     "title": "Select and preview a file"
   },
   "invalid_or_expired_link": "This shared calendar link is invalid or has expired.",
@@ -649,8 +663,8 @@
   "no_shared_calendars": "You don't have a shared calendar.",
   "noon": "Noon",
   "not_found": {
-    "message": "Page not found.",
-    "title": "Error 404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> invites you to join the calendar <1>{{name}}</1>",
@@ -672,7 +686,10 @@
       "title": "Notification preferences"
     },
     "push_description": "Receive push notifications on your devices.",
-    "push_toggle": "Enable web push notifications"
+    "push_toggle": "Enable web push notifications",
+    "system_settings": "System Settings",
+    "system_settings_desc": "Manage notification permissions in your device settings.",
+    "open_system_settings": "Open Settings"
   },
   "open": "Open",
   "open_notifications": "Open notifications",
@@ -775,6 +792,7 @@
     "invalid_link": "Invalid or expired reset link.",
     "invalid_session": "Invalid session. Please request a link again.",
     "new_password_label": "New Password",
+    "request_new_link": "Request a new link",
     "save_password": "Save password",
     "saving": "Registration...",
     "success": "Your password has been changed successfully.",
@@ -834,6 +852,7 @@
     },
     "password_section": {
       "description": "Change your password to strengthen the security of your account.",
+      "error": "Error updating password.",
       "hint": "Use at least 8 characters with letters, numbers and symbols.",
       "same_password_error": "The new password must be different from the old one.",
       "title": "Password"
@@ -1192,5 +1211,10 @@
   "confirm_calendar_refill": "Confirm that the pillbox is full",
   "pillbox_refill_description": "The pill organizer will refill with any missing medication (negative stock) for this week. This action is irreversible.",
   "error": "error",
-  "notifications": "notifications"
+  "notifications": "Notifications",
+  "unexpected_error": "unexpected error",
+  "edit": "edit",
+  "loading_stock_alerts": "loading stock alerts",
+  "tablet": "tablet",
+  "tablets": "tablets"
 }

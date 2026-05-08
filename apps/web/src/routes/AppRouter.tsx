@@ -1,8 +1,10 @@
-import { useContext, lazy, Suspense, useEffect, type ReactElement } from 'react';
-import { Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
-import { useLoading } from '@/components/ui/loading';
-import { useTranslation } from 'react-i18next';
+import { useContext, lazy, Suspense, type ReactElement } from 'react';
+import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
+import PrivateRoute from './PrivateRoute';
+import SuspenseFallback from './SuspenseFallback';
+import RouteWithLoader from './RouteWithLoader';
+import PrivateCalendarSubRoutes from './PrivateCalendarSubRoutes';
 import type { AppSharedProps } from '@meditime/types';
 
 const HomePage = lazy(() => import('../pages/general/HomePage'));
@@ -20,16 +22,9 @@ const AcceptInvitePage = lazy(() => import('../pages/calendars/calendar/share/Ac
 
 const CalendarView = lazy(() => import('../pages/calendars/calendar/CalendarView'));
 const PillboxPage = lazy(() => import('../pages/calendars/calendar/pillbox/Pillbox'));
-const DailyCalendarPage = lazy(() => import('../pages/calendars/calendar/DailyCalendarPage'));
 const CalendarList = lazy(() => import('../pages/calendars/CalendarList'));
 const SharedList = lazy(() => import('../pages/calendars/calendar/share/SharedList'));
-const StockAlertsPage = lazy(() => import('../pages/calendars/calendar/medicines/StockAlertsPage'));
-const PillboxUses = lazy(() => import('../pages/calendars/calendar/pillbox/PillboxUses'));
-const MissedIntakesPage = lazy(() => import('../pages/calendars/calendar/medicines/MissedIntakesPage'));
-const MissedIntakesRecapPage = lazy(() => import('../pages/calendars/calendar/medicines/MissedIntakesRecapPage'));
-const MedicinesList = lazy(() => import('../pages/calendars/calendar/medicines/MedicinesList'));
-const BoxesView = lazy(() => import('../pages/calendars/calendar/medicines/BoxesView'));
-const IcsList = lazy(() => import('../pages/calendars/calendar/medicines/IcsList'));
+// TODO: MedicinesList page removed — recreate or replace
 const NotFound = lazy(() => import('../pages/general/NotFound'));
 
 const PrivacyPage = lazy(() => import('../pages/general/PrivacyPage'));
@@ -38,144 +33,10 @@ const TermsPage = lazy(() => import('../pages/general/TermsPage'));
 const AuthCallback = lazy(async () => ({
   default: (await import('../pages/auth/AuthCallback')).default as unknown as React.ComponentType,
 }));
-const CalendarSettingsPage = lazy(() => import('../pages/calendars/calendar/settings/CalendarSettingsPage'));
-
-function buildFullPath(loc: { pathname?: string; search?: string; hash?: string }): string {
-  const path = loc.pathname || '/';
-  const qs = loc.search || '';
-  const hash = loc.hash || '';
-  return `${path}${qs}${hash}`;
-}
-
-function PrivateRoute({ element }: { element: ReactElement }): ReactElement {
-  const context = useContext(UserContext) as unknown as { userInfo?: unknown } | null;
-  const userInfo = context?.userInfo;
-  const location = useLocation();
-  const { lng } = useParams();
-
-  if (!userInfo) {
-    const full = buildFullPath(location);
-    return <Navigate to={`/${lng}/login?redirect=${encodeURIComponent(full)}`} replace />;
-  }
-  return element;
-}
-
-function SuspenseFallback(): null {
-  const { showLoading } = useLoading() as { showLoading: (condition: boolean, message?: string) => void };
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    showLoading(true, t('loading'));
-    return () => showLoading(false, '');
-  }, [showLoading, t]);
-
-  return null;
-}
-
-function RouteWithLoader({ element, isLoading }: { element: ReactElement; isLoading: boolean }): ReactElement | null {
-  const { showLoading } = useLoading() as { showLoading: (condition: boolean, message?: string) => void };
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    showLoading(isLoading, t('loading'));
-  }, [isLoading, showLoading, t]);
-
-  if (isLoading) return null;
-  return element;
-}
-
-function PrivateCalendarSubRoutes({ sharedProps, isInitialLoading }: { sharedProps: AppSharedProps; isInitialLoading: boolean }): ReactElement {
-  return (
-    <>
-      <Route
-        index
-        element={
-          <PrivateRoute
-            element={<RouteWithLoader element={<CalendarView {...sharedProps} />} isLoading={isInitialLoading} />}
-          />
-        }
-      />
-      <Route
-        path="boxes"
-        element={
-          <PrivateRoute
-            element={<RouteWithLoader element={<BoxesView {...sharedProps} />} isLoading={isInitialLoading} />}
-          />
-        }
-      />
-      <Route
-        path="pillbox"
-        element={
-          <PrivateRoute
-            element={<RouteWithLoader element={<PillboxPage {...sharedProps} />} isLoading={isInitialLoading} />}
-          />
-        }
-      />
-      <Route
-        path="daily"
-        element={
-          <PrivateRoute
-            element={<RouteWithLoader element={<DailyCalendarPage {...sharedProps} />} isLoading={isInitialLoading} />}
-          />
-        }
-      />
-      <Route
-        path="settings"
-        element={
-          <PrivateRoute
-            element={<RouteWithLoader element={<CalendarSettingsPage {...sharedProps} />} isLoading={isInitialLoading} />}
-          />
-        }
-      />
-      <Route
-        path="stock-alerts"
-        element={
-          <PrivateRoute
-            element={<RouteWithLoader element={<StockAlertsPage {...sharedProps} />} isLoading={isInitialLoading} />}
-          />
-        }
-      />
-      <Route
-        path="pillbox-uses"
-        element={
-          <PrivateRoute
-            element={<RouteWithLoader element={<PillboxUses {...sharedProps} />} isLoading={isInitialLoading} />}
-          />
-        }
-      />
-      <Route
-        path="ics-tokens"
-        element={
-          <PrivateRoute
-            element={<RouteWithLoader element={<IcsList {...sharedProps} />} isLoading={isInitialLoading} />}
-          />
-        }
-      />
-      <Route path="missed-intakes">
-        <Route
-          index
-          element={
-            <PrivateRoute
-              element={<RouteWithLoader element={<MissedIntakesPage {...sharedProps} />} isLoading={isInitialLoading} />}
-            />
-          }
-        />
-        <Route
-          path="recap"
-          element={
-            <PrivateRoute
-              element={<RouteWithLoader element={<MissedIntakesRecapPage {...sharedProps} />} isLoading={isInitialLoading} />}
-            />
-          }
-        />
-      </Route>
-    </>
-  );
-}
 
 export default function AppRoutes({ sharedProps }: { sharedProps: AppSharedProps }): ReactElement {
-  const context = useContext(UserContext) as unknown as { userInfo?: unknown | null } | null;
-  const userInfo = context?.userInfo || null;
+  const context = useContext(UserContext);
+  const userInfo = context?.userInfo ?? null;
   const { lng } = useParams();
   const isInitialLoading = Boolean(sharedProps.loadingStates?.isInitialLoading);
 
@@ -238,7 +99,7 @@ export default function AppRoutes({ sharedProps }: { sharedProps: AppSharedProps
 
         <Route path="shared-token-calendar/:sharedToken">
           <Route index element={<CalendarView {...sharedProps} />} />
-          <Route path="boxes" element={<MedicinesList />} />
+          {/* TODO: MedicinesList page removed — recreate or replace */}
           <Route path="pillbox" element={<PillboxPage {...sharedProps} />} />
         </Route>
 

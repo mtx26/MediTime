@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { ActionItem, ActionSheetAction } from '@meditime/types';
+import type { ActionDefinition, ActionList, ActionSheetAction } from '@meditime/types';
 import {
   Eye, Pencil, Grid3X3, CalendarDays, Share2, Pill, Download,
   AlertTriangle, Calendar, CalendarOff, Clock, Settings, Trash2, ScanLine,
@@ -42,30 +42,37 @@ const ICON_MAP: Partial<Record<string, React.ComponentType<{ className?: string 
  * @param items  – action definitions from a builder function
  * @param t      – i18next `t` function for translating keys
  */
+function toActionSheetItem(
+  item: ActionDefinition,
+  t: (key: string) => string,
+): ActionSheetAction<ReactNode> {
+  const Icon = ICON_MAP[item.icon];
+  const label: ReactNode = (
+    <div className="flex items-center gap-2">
+      {Icon && <Icon className="h-4 w-4" />}
+      {t(item.labelKey)}
+    </div>
+  );
+
+  return {
+    label,
+    title: t(item.titleKey),
+    linkTo: item.linkTo,
+    onClick: item.onClick,
+    danger: item.danger,
+    dataTour: item.dataTour,
+  };
+}
+
 export function toActionSheetItems(
-  items: ActionItem[],
+  items: ActionList,
   t: (key: string) => string,
 ): ActionSheetAction<ReactNode>[] {
-  return items.map((item) => {
+  return items.flatMap((item) => {
     if ('separator' in item) {
       return { separator: true };
     }
 
-    const Icon = ICON_MAP[item.icon];
-    const label: ReactNode = (
-      <div className="flex items-center gap-2">
-        {Icon && <Icon className="h-4 w-4" />}
-        {t(item.labelKey)}
-      </div>
-    );
-
-    return {
-      label,
-      title: t(item.titleKey),
-      linkTo: item.linkTo,
-      onClick: item.onClick,
-      danger: item.danger,
-      dataTour: item.dataTour,
-    };
+    return item.map((action) => toActionSheetItem(action, t));
   });
 }

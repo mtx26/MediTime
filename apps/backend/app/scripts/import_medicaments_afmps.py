@@ -327,7 +327,7 @@ def upsert_data_chunks(df_sql: pd.DataFrame, table_name: str,
 
 def import_afmps_to_bis(
     csv_path: Optional[str] = None,
-    table_name: str = "public.temp_medicaments_afmps",
+    table_name: str = "public.medicaments_afmps",
     sep: Optional[str] = None,
     chunk_size: int = 5000,
     auto_download: bool = True,

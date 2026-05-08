@@ -1,104 +1,29 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useLoading } from '@/components/ui/loading';
+import { Link } from 'react-router-dom';
 import HoveredUserProfile from '@/components/common/HoveredUserProfile';
 import ActionSheet from '@/components/common/ActionSheet';
-import { useTranslation } from 'react-i18next';
-import { useAlert } from '@/contexts/AlertContext';
+import { useCalendarListActions } from '@/hooks/calendar/useCalendarListActions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Calendar, Users, Pencil, Download, AlertTriangle, Plus, X, Info } from 'lucide-react';
 import { buildPersonalCalendarActions, buildSharedCalendarActions } from '@meditime/utils';
 import { toActionSheetItems } from '@/utils/actionSheetAdapter';
+import StatusBadge from '@/components/common/StatusBadge';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import type { CalendarListItem, CalendarListPageProps } from '@meditime/types';
 
 
-function SelectCalendar({
-  personalCalendars,
-  sharedUserCalendars
-}: CalendarListPageProps) {
-  const { lng } = useParams();
-  const { t } = useTranslation();
-  const { showConfirm } = useAlert();
-
-  // 📅 Gestion des calendriers
-  const [renameValues, setRenameValues] = useState<Record<string, string>>({}); // État pour les valeurs de renommage de calendrier
-  const [renameMode, setRenameMode] = useState<string | null>(null); // État pour le mode de renommage
-
-  // 📄 Export PDF
-  const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
-  const [pdfCalendarId, setPdfCalendarId] = useState<string | null>(null);
-  const [includeInactive, setIncludeInactive] = useState(false);
-
-  const openPdfDialog = (calendarId: string) => {
-    setPdfCalendarId(calendarId);
-    setIncludeInactive(false);
-    setPdfDialogOpen(true);
-  };
-
-  const handleDownloadPdf = () => {
-    if (pdfCalendarId) {
-      personalCalendars.downloadPersonalCalendarPdf(pdfCalendarId, includeInactive);
-    }
-    setPdfDialogOpen(false);
-  };
-
-  const renameConfirmAction = async (calendarId: string) => {
-    const rep = await personalCalendars.renameCalendar(
-      calendarId,
-      renameValues[String(calendarId)]
-    );
-    if (rep.success) {
-      setRenameValues((prev) => ({ ...prev, [String(calendarId)]: '' }));
-    }
-  };
-
-  // 🔄 Renommage d'un calendrier
-  const handleRenameClick = (calendarId: string) => {
-    showConfirm(
-      'confirm-safe',
-      t('calendar.rename_title'),
-      t('calendar.rename_description'),
-      () => renameConfirmAction(calendarId)
-    );
-  };
-
-  const deleteConfirmAction = async (calendarId: string) => {
-    await personalCalendars.deleteCalendar(calendarId);
-  };
-
-  const handleDeleteCalendarClick = (calendarId: string) => {
-    showConfirm(
-      'confirm-danger',
-      t('calendar.delete_title'),
-      t('calendar.delete_description'),
-      () => deleteConfirmAction(calendarId)
-    );
-  };
-
-  const deleteSharedCalendarConfirmAction = async (calendarId: string) => {
-    await sharedUserCalendars.deleteSharedCalendar(calendarId);
-  };
-
-  const handleDeleteSharedCalendarClick = (calendarId: string) => {
-    showConfirm(
-      'confirm-danger',
-      t('calendar.delete_shared_title'),
-      t('calendar.delete_shared_description'),
-      () => deleteSharedCalendarConfirmAction(calendarId)
-    );
-  };
-
-  const { showLoading } = useLoading();
-
-  useEffect(() => {
-    showLoading(personalCalendars.calendarsData === null, t('loading_calendars'));
-  }, [personalCalendars.calendarsData, showLoading, t]);
+function SelectCalendar(props: CalendarListPageProps) {
+  const {
+    t, lng,
+    renameValues, setRenameValues, renameMode, setRenameMode,
+    pdfDialogOpen, setPdfDialogOpen, includeInactive, setIncludeInactive,
+    openPdfDialog, handleDownloadPdf, handleRenameClick,
+    handleDeleteCalendarClick, handleDeleteSharedCalendarClick,
+    personalCalendars, sharedUserCalendars,
+  } = useCalendarListActions(props);
 
   if (personalCalendars.calendarsData === null) {
     return null;
@@ -141,7 +66,7 @@ function SelectCalendar({
                   <ActionSheet
                     actions={toActionSheetItems(
                       buildPersonalCalendarActions(
-                        { calendarId: calendarData.id, lng: lng!, basePath: 'calendar', selectedDate: null },
+                        { calendarId: calendarData.id, basePath: `${lng}/calendar`, selectedDate: null },
                         {
                           onRename: () => setRenameMode(calendarData.id),
                           onDelete: () => handleDeleteCalendarClick(calendarData.id),
@@ -155,10 +80,7 @@ function SelectCalendar({
                 </div>
                 {calendarData.ifLowStock && (
                   <Link to={`/${lng}/calendar/${calendarData.id}/stock-alerts`}>
-                    <Badge variant="outline" className="mt-2 gap-1 bg-yellow-500/15 text-foreground border-yellow-500/50">
-                      <AlertTriangle className="h-3 w-3 text-yellow-600" />
-                      {t('stock_alert')}
-                    </Badge>
+                    <StatusBadge variant="warning" icon={AlertTriangle} text={t('stock_alert')} />
                   </Link>
                 )}
                 {/* afficher la form si on est en mode renommage */}
@@ -276,7 +198,7 @@ function SelectCalendar({
                     <ActionSheet
                       actions={toActionSheetItems(
                         buildSharedCalendarActions(
-                          { calendarId: calendarData.id, lng: lng!, basePath: 'shared-user-calendar', selectedDate: null },
+                          { calendarId: calendarData.id, basePath: `${lng}/shared-user-calendar`, selectedDate: null },
                           {
                             onDelete: () => handleDeleteSharedCalendarClick(calendarData.id),
                             onExportPdf: () => openPdfDialog(calendarData.id),
@@ -289,10 +211,7 @@ function SelectCalendar({
                   </div>
                   {calendarData.ifLowStock && (
                     <Link to={`/${lng}/shared-user-calendar/${calendarData.id}/stock-alerts`}>
-                      <Badge variant="outline" className="mt-2 gap-1 bg-yellow-500/15 text-foreground border-yellow-500/50">
-                        <AlertTriangle className="h-3 w-3 text-yellow-600" />
-                        {t('stock_alert')}
-                      </Badge>
+                      <StatusBadge variant="warning" icon={AlertTriangle} text={t('stock_alert')} />
                     </Link>
                   )}
                 </div>

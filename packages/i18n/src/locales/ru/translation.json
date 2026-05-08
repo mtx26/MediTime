@@ -282,12 +282,20 @@
     "with_github": "Подключение к Github",
     "with_google": "Войти через Google",
     "with_microsoft": "Войти через Microsoft",
-    "with_twitter": "Подключиться к Twitter"
+    "with_twitter": "Подключиться к Twitter",
+    "already_have_account": "Vous avez déjà un compte ?",
+    "back_to_login": "Retour à la connexion",
+    "check_email": "Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.",
+    "login_error": "Impossible de se connecter.",
+    "no_account": "Pas encore de compte ?",
+    "register_error": "Impossible de créer votre compte."
   },
   "auth_callback": {
     "loading": "Подключение...",
     "session_error": "Восстановление сеанса не удалось после OAuth",
-    "success": "Успешное подключение через обратный звонок"
+    "success": "Успешное подключение через обратный звонок",
+    "missing_payload": "Le lien s'est ouvert sans les informations de session. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
+    "session_unavailable": "Le lien a été ouvert, mais la session n'a pas pu être créée. Rouvrez le dernier email reçu ou demandez un nouveau lien."
   },
   "back": "Назад",
   "boxes": {
@@ -537,10 +545,13 @@
     "delete_success": "Ссылка ICS успешно удалена.",
     "delete_title": "Удалить ссылку на ICS?",
     "fetch_error": "Ошибка загрузки ссылок.",
-    "info_description": "Эти ссылки позволяют синхронизировать график приёма лекарств с вашим личным календарём (Google Calendar, Outlook, Apple Calendar и т. д.). Скопируйте ссылку и добавьте её как «Подписку на календарь» в предпочитаемом вами приложении.",
+    "info_description": "Эти ссылки позволяют синхронизировать график приёма лекарств с вашим личным календарём (Google Calendar, Outlook, Apple Calendar и т. д.). Нажмите Синхронизировать, чтобы открыть подписку календаря напрямую, или поделитесь ссылкой, если приложение её не поддерживает.",
     "info_title": "О ссылках ICS",
     "loading_ics_tokens": "Загрузка ссылок ICS...",
     "no_tokens": "Ссылка ICS не создана.",
+    "sync_calendar": "Синхронизировать календарь",
+    "sync_error": "Не удалось синхронизировать",
+    "sync_error_description": "На устройстве не найдено совместимое приложение календаря. Поделитесь этой ссылкой или скопируйте её, затем добавьте как подписку календаря: {{url}}",
     "title": "Списки ссылок ICS",
     "token_label": "Залог ICS"
   },
@@ -557,7 +568,10 @@
     "preview_error": "Ошибка отображения предварительного просмотра",
     "remove_image": "Удалить изображение",
     "select_file_error": "Пожалуйста, выберите файл изображения.",
-    "title": "Выберите и просмотрите файл"
+    "title": "Выберите и просмотрите файл",
+    "choose_file": "Choisir un fichier",
+    "choose_from_library": "Photothèque",
+    "take_photo": "Prendre une photo"
   },
   "invalid_or_expired_link": "Эта ссылка на общий календарь недействительна или устарела.",
   "invitation": {
@@ -649,8 +663,8 @@
   "no_shared_calendars": "У вас нет общего календаря.",
   "noon": "Полдень",
   "not_found": {
-    "message": "Страница не найдена.",
-    "title": "Ошибка 404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> приглашает вас присоединиться к календарю <1>{{name}}</1>",
@@ -672,7 +686,10 @@
       "title": "Настройки уведомлений"
     },
     "push_description": "Получайте push-уведомления на свои устройства.",
-    "push_toggle": "Включить push-уведомления через Интернет"
+    "push_toggle": "Включить push-уведомления через Интернет",
+    "system_settings": "Системные настройки",
+    "system_settings_desc": "Управляйте разрешениями уведомлений в настройках устройства.",
+    "open_system_settings": "Открыть настройки"
   },
   "open": "Открыть",
   "open_notifications": "Открытые уведомления",
@@ -778,7 +795,8 @@
     "save_password": "Сохранить пароль",
     "saving": "Регистрация...",
     "success": "Ваш пароль был успешно изменен.",
-    "title": "Новый пароль"
+    "title": "Новый пароль",
+    "request_new_link": "Demander un nouveau lien"
   },
   "restore": "Восстановить",
   "restore_error": "Ошибка во время восстановления",
@@ -836,7 +854,8 @@
       "description": "Смените пароль, чтобы повысить безопасность своей учетной записи.",
       "hint": "Используйте не менее 8 символов, включающих буквы, цифры и знаки препинания.",
       "same_password_error": "Новый пароль должен отличаться от старого.",
-      "title": "Пароль"
+      "title": "Пароль",
+      "error": "Ошибка при обновлении пароля."
     },
     "password_updated": "Пароль успешно обновлен.",
     "providers": {
@@ -1163,7 +1182,7 @@
   "confirm_calendar_refill": "Убедитесь, что бункер заполнен.",
   "pillbox_refill_description": "В органайзер для таблеток будут внесены недостающие лекарства (отсутствующие запасы) на эту неделю. Это действие необратимо.",
   "error": "ошибка",
-  "notifications": "уведомления",
+  "notifications": "Уведомления",
   "missed_intakes": {
     "affected_meds": "Médicaments concernés",
     "apply": "Appliquer",
@@ -1187,6 +1206,15 @@
     "stock": "Stock",
     "subtitle": "Déclarez les jours où vous n'avez pas pris vos médicaments pour ajuster votre stock.",
     "success": "{{count}} comprimé(s) réajouté(s) au stock.",
-    "title": "Prise oubliée"
-  }
+    "title": "Prise oubliée",
+    "back": "Retour",
+    "summary": "Récapitulatif",
+    "tablets": "comprimé(s)",
+    "total": "Total à réajouter"
+  },
+  "unexpected_error": "unexpected error",
+  "edit": "редактировать",
+  "loading_stock_alerts": "Загрузка уведомлений о наличии товара",
+  "tablet": "планшет",
+  "tablets": "таблетки"
 }

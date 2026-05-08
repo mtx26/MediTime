@@ -229,10 +229,12 @@ $$;
 -- Name: get_fcm_tokens_for_user(uuid); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.get_fcm_tokens_for_user(target_uid uuid) RETURNS TABLE(token text)
+CREATE FUNCTION public.get_fcm_tokens_for_user(target_uid uuid) RETURNS TABLE(token text, provider text, platform text, project_id text)
     LANGUAGE sql SECURITY DEFINER
     SET search_path TO 'public'
-    AS $$ SELECT token FROM public.fcm_tokens WHERE uid = target_uid; $$;
+    AS $$
+  SELECT token, provider, platform, project_id FROM public.fcm_tokens WHERE uid = target_uid;
+$$;
 
 
 --
@@ -415,7 +417,12 @@ CREATE TABLE public.fcm_tokens (
     token text NOT NULL,
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now(),
-    device_name text
+  device_name text,
+  provider text DEFAULT 'fcm'::text NOT NULL,
+  platform text,
+  project_id text,
+  CONSTRAINT fcm_tokens_platform_check CHECK ((platform = ANY (ARRAY['ios'::text, 'android'::text, 'web'::text]))),
+  CONSTRAINT fcm_tokens_provider_check CHECK ((provider = ANY (ARRAY['expo'::text, 'fcm'::text])))
 );
 
 
@@ -1608,5 +1615,4 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 --
 -- PostgreSQL database dump complete
 --
-
 

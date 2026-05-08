@@ -282,12 +282,20 @@
     "with_github": "Verbindung mit Github",
     "with_google": "Mit Google anmelden",
     "with_microsoft": "Mit Microsoft anmelden",
-    "with_twitter": "Verbinden Sie sich mit Twitter"
+    "with_twitter": "Verbinden Sie sich mit Twitter",
+    "already_have_account": "Vous avez déjà un compte ?",
+    "back_to_login": "Retour à la connexion",
+    "check_email": "Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.",
+    "login_error": "Impossible de se connecter.",
+    "no_account": "Pas encore de compte ?",
+    "register_error": "Impossible de créer votre compte."
   },
   "auth_callback": {
     "loading": "Verbinden...",
     "session_error": "Die Sitzungswiederherstellung ist nach OAuth fehlgeschlagen",
-    "success": "Erfolgreiche Verbindung per Callback"
+    "success": "Erfolgreiche Verbindung per Callback",
+    "missing_payload": "Le lien s'est ouvert sans les informations de session. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
+    "session_unavailable": "Le lien a été ouvert, mais la session n'a pas pu être créée. Rouvrez le dernier email reçu ou demandez un nouveau lien."
   },
   "back": "Zurück",
   "boxes": {
@@ -537,10 +545,13 @@
     "delete_success": "ICS-Verbindung erfolgreich entfernt.",
     "delete_title": "ICS-Link entfernen?",
     "fetch_error": "Fehler beim Laden der Links.",
-    "info_description": "Mithilfe dieser Links können Sie Ihren Medikamentenplan mit Ihrem persönlichen Kalender (Google Kalender, Outlook, Apple Kalender usw.) synchronisieren. Kopieren Sie den Link und fügen Sie ihn in Ihrer bevorzugten Anwendung als „Kalenderabonnement“ hinzu.",
+    "info_description": "Mithilfe dieser Links können Sie Ihren Medikamentenplan mit Ihrem persönlichen Kalender (Google Kalender, Outlook, Apple Kalender usw.) synchronisieren. Tippen Sie auf Synchronisieren, um das Kalenderabonnement direkt zu öffnen, oder teilen Sie den Link, falls Ihre App dies nicht unterstützt.",
     "info_title": "Über ICS-Links",
     "loading_ics_tokens": "ICS-Links werden geladen...",
     "no_tokens": "Es wurde keine ICS-Verbindung hergestellt.",
+    "sync_calendar": "Kalender synchronisieren",
+    "sync_error": "Synchronisierung nicht möglich",
+    "sync_error_description": "Ihr Gerät hat keine kompatible Kalender-App gefunden. Teilen oder kopieren Sie diesen Link und fügen Sie ihn als Kalenderabonnement hinzu: {{url}}",
     "title": "ICS-Linklisten",
     "token_label": "Pfandrecht"
   },
@@ -557,7 +568,10 @@
     "preview_error": "Fehler beim Anzeigen der Vorschau",
     "remove_image": "Bild löschen",
     "select_file_error": "Bitte wählen Sie eine Bilddatei aus.",
-    "title": "Auswählen und Vorschau einer Datei"
+    "title": "Auswählen und Vorschau einer Datei",
+    "choose_file": "Choisir un fichier",
+    "choose_from_library": "Photothèque",
+    "take_photo": "Prendre une photo"
   },
   "invalid_or_expired_link": "Dieser freigegebene Kalenderlink ist ungültig oder abgelaufen.",
   "invitation": {
@@ -649,8 +663,8 @@
   "no_shared_calendars": "Sie haben keinen freigegebenen Kalender.",
   "noon": "Mittag",
   "not_found": {
-    "message": "Seite nicht gefunden.",
-    "title": "Fehler 404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> lädt Sie ein, dem Kalender <1>{{name}}</1> beizutreten",
@@ -672,7 +686,10 @@
       "title": "Benachrichtigungseinstellungen"
     },
     "push_description": "Empfangen Sie Push-Benachrichtigungen auf Ihren Geräten.",
-    "push_toggle": "Aktivieren Sie Web-Push-Benachrichtigungen"
+    "push_toggle": "Aktivieren Sie Web-Push-Benachrichtigungen",
+    "system_settings": "Systemeinstellungen",
+    "system_settings_desc": "Verwalten Sie Benachrichtigungsrechte in den Geräteeinstellungen.",
+    "open_system_settings": "Einstellungen öffnen"
   },
   "open": "Offen",
   "open_notifications": "Offene Benachrichtigungen",
@@ -778,7 +795,8 @@
     "save_password": "Passwort speichern",
     "saving": "Anmeldung...",
     "success": "Ihr Passwort wurde erfolgreich geändert.",
-    "title": "Neues Passwort"
+    "title": "Neues Passwort",
+    "request_new_link": "Demander un nouveau lien"
   },
   "restore": "Wiederherstellen",
   "restore_error": "Fehler bei der Wiederherstellung",
@@ -836,7 +854,8 @@
       "description": "Ändern Sie Ihr Passwort, um die Sicherheit Ihres Kontos zu erhöhen.",
       "hint": "Verwenden Sie mindestens 8 Zeichen mit Buchstaben, Zahlen und Symbolen.",
       "same_password_error": "Das neue Passwort muss sich vom alten unterscheiden.",
-      "title": "Passwort"
+      "title": "Passwort",
+      "error": "Fehler beim Aktualisieren des Passworts."
     },
     "password_updated": "Passwort erfolgreich aktualisiert.",
     "providers": {
@@ -1187,6 +1206,15 @@
     "stock": "Stock",
     "subtitle": "Déclarez les jours où vous n'avez pas pris vos médicaments pour ajuster votre stock.",
     "success": "{{count}} comprimé(s) réajouté(s) au stock.",
-    "title": "Prise oubliée"
-  }
+    "title": "Prise oubliée",
+    "back": "Retour",
+    "summary": "Récapitulatif",
+    "tablets": "comprimé(s)",
+    "total": "Total à réajouter"
+  },
+  "unexpected_error": "unexpected error",
+  "edit": "bearbeiten",
+  "loading_stock_alerts": "Laden von Aktienbenachrichtigungen",
+  "tablet": "Tablette",
+  "tablets": "Tabletten"
 }

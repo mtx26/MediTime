@@ -6,7 +6,8 @@ export const getValidRedirect = (redirect: string | null | undefined): string | 
       return redirect;
     }
     const url = new URL(redirect);
-    if (url.origin === window.location.origin) {
+    const origin = typeof window !== 'undefined' && window.location ? window.location.origin : '';
+    if (origin && url.origin === origin) {
       return url.pathname + url.search + url.hash;
     }
   } catch (_err) {

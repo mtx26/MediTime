@@ -1,7 +1,5 @@
-import { useState } from 'react';
-import { resetPassword } from '../../services/auth/authService';
-import { useAlert } from '../../contexts/AlertContext';
 import { useTranslation } from 'react-i18next';
+import { useResetPasswordForm } from '@/hooks/auth/useResetPasswordForm';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -9,23 +7,7 @@ import { Mail } from 'lucide-react';
 
 function ResetPassword() {
   const { t } = useTranslation();
-  const { showAlert } = useAlert();
-  const [email, setEmail] = useState(''); // État pour l'adresse e-mail
-  const [formValid, setFormValid] = useState(true);
-
-  // 🔄 Réinitialisation du mot de passe
-  const handleReset = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const isFormValid =
-      typeof email === 'string' && email.includes('@') && email.includes('.');
-    setFormValid(isFormValid);
-    if (isFormValid) {
-      try {
-        await resetPassword(email);
-      } catch (error) {}
-      showAlert('success', t('reset_password.success'));
-    }
-  };
+  const { email, setEmail, formValid, handleReset } = useResetPasswordForm();
 
   return (
     <div className="container mx-auto flex justify-center items-center my-10">

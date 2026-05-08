@@ -282,12 +282,20 @@
     "with_github": "Githubとの接続",
     "with_google": "Googleでログイン",
     "with_microsoft": "Microsoftでサインイン",
-    "with_twitter": "Twitterでつながる"
+    "with_twitter": "Twitterでつながる",
+    "already_have_account": "Vous avez déjà un compte ?",
+    "back_to_login": "Retour à la connexion",
+    "check_email": "Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.",
+    "login_error": "Impossible de se connecter.",
+    "no_account": "Pas encore de compte ?",
+    "register_error": "Impossible de créer votre compte."
   },
   "auth_callback": {
     "loading": "接続中...",
     "session_error": "OAuth後のセッション回復に失敗しました",
-    "success": "コールバックによる接続成功"
+    "success": "コールバックによる接続成功",
+    "missing_payload": "Le lien s'est ouvert sans les informations de session. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
+    "session_unavailable": "Le lien a été ouvert, mais la session n'a pas pu être créée. Rouvrez le dernier email reçu ou demandez un nouveau lien."
   },
   "back": "戻る",
   "boxes": {
@@ -537,10 +545,13 @@
     "delete_success": "ICS リンクが正常に削除されました。",
     "delete_title": "ICS リンクを削除しますか?",
     "fetch_error": "リンクの読み込み中にエラーが発生しました。",
-    "info_description": "これらのリンクを使用すると、服薬スケジュールを個人用カレンダー（Googleカレンダー、Outlook、Appleカレンダーなど）と同期できます。リンクをコピーし、お好みのアプリケーションで「カレンダーサブスクリプション」として追加してください。",
+    "info_description": "これらのリンクを使用すると、服薬スケジュールを個人用カレンダー（Googleカレンダー、Outlook、Appleカレンダーなど）と同期できます。同期をタップしてカレンダー購読を直接開くか、アプリが対応していない場合はリンクを共有してください。",
     "info_title": "ICSリンクについて",
     "loading_ics_tokens": "ICS リンクを読み込んでいます...",
     "no_tokens": "ICS リンクは作成されませんでした。",
+    "sync_calendar": "カレンダーを同期",
+    "sync_error": "同期できません",
+    "sync_error_description": "対応するカレンダーアプリが見つかりませんでした。このリンクを共有またはコピーし、カレンダー購読として追加してください: {{url}}",
     "title": "ICSリンクリスト",
     "token_label": "先取特権ICS"
   },
@@ -557,7 +568,10 @@
     "preview_error": "プレビューの表示中にエラーが発生しました",
     "remove_image": "画像を削除",
     "select_file_error": "画像ファイルを選択してください。",
-    "title": "ファイルを選択してプレビューする"
+    "title": "ファイルを選択してプレビューする",
+    "choose_file": "Choisir un fichier",
+    "choose_from_library": "Photothèque",
+    "take_photo": "Prendre une photo"
   },
   "invalid_or_expired_link": "この共有カレンダーのリンクは無効か期限が切れています。",
   "invitation": {
@@ -649,8 +663,8 @@
   "no_shared_calendars": "共有カレンダーがありません。",
   "noon": "正午",
   "not_found": {
-    "message": "ページが見つかりません。",
-    "title": "エラー404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> さんがカレンダー <1>{{name}></1> に参加するよう招待しています",
@@ -672,7 +686,10 @@
       "title": "通知設定"
     },
     "push_description": "デバイスでプッシュ通知を受信します。",
-    "push_toggle": "ウェブプッシュ通知を有効にする"
+    "push_toggle": "ウェブプッシュ通知を有効にする",
+    "system_settings": "システム設定",
+    "system_settings_desc": "デバイスの設定で通知の権限を管理します。",
+    "open_system_settings": "設定を開く"
   },
   "open": "開ける",
   "open_notifications": "通知を開く",
@@ -778,7 +795,8 @@
     "save_password": "パスワードを保存",
     "saving": "登録...",
     "success": "パスワードが正常に変更されました。",
-    "title": "新しいパスワード"
+    "title": "新しいパスワード",
+    "request_new_link": "Demander un nouveau lien"
   },
   "restore": "復元する",
   "restore_error": "復元中にエラーが発生しました",
@@ -836,7 +854,8 @@
       "description": "アカウントのセキュリティを強化するためにパスワードを変更してください。",
       "hint": "文字、数字、記号を含む 8 文字以上を使用してください。",
       "same_password_error": "新しいパスワードは古いパスワードとは異なる必要があります。",
-      "title": "パスワード"
+      "title": "パスワード",
+      "error": "パスワードの更新中にエラーが発生しました。"
     },
     "password_updated": "パスワードが正常に更新されました。",
     "providers": {
@@ -1187,6 +1206,15 @@
     "stock": "Stock",
     "subtitle": "Déclarez les jours où vous n'avez pas pris vos médicaments pour ajuster votre stock.",
     "success": "{{count}} comprimé(s) réajouté(s) au stock.",
-    "title": "Prise oubliée"
-  }
+    "title": "Prise oubliée",
+    "back": "Retour",
+    "summary": "Récapitulatif",
+    "tablets": "comprimé(s)",
+    "total": "Total à réajouter"
+  },
+  "unexpected_error": "unexpected error",
+  "edit": "編集",
+  "loading_stock_alerts": "在庫アラートを読み込んでいます",
+  "tablet": "錠剤",
+  "tablets": "錠剤"
 }

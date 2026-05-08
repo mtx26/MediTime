@@ -8,28 +8,28 @@ import type { BoxItem, BoxesResponse, SourceType, UserContextValue } from '@medi
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-type SetBoxes = Dispatch<SetStateAction<BoxItem[]>>;
+type SetBoxes<T extends { name: string } = BoxItem> = Dispatch<SetStateAction<T[]>>;
 type SetLoadingBoxes = Dispatch<SetStateAction<boolean | undefined>>;
 type SetRep = Dispatch<SetStateAction<Response | null>>;
 
-type FetchBoxesParams = {
+type FetchBoxesParams<T extends { name: string } = BoxItem> = {
   uid: string;
   calendarId: string;
-  setBoxes: SetBoxes;
+  setBoxes: SetBoxes<T>;
   setLoadingBoxes: SetLoadingBoxes;
   sourceType: SourceType;
   setRep: SetRep;
 };
 
 
-const fetchBoxes = async ({
+const fetchBoxes = async <T extends { name: string } = BoxItem>({
   uid,
   calendarId,
   setBoxes,
   setLoadingBoxes,
   sourceType,
   setRep
-}: FetchBoxesParams): Promise<void> => {
+}: FetchBoxesParams<T>): Promise<void> => {
   try {
     const {
       data: { session },
@@ -51,7 +51,7 @@ const fetchBoxes = async ({
     if (!res.ok) throw new Error(data.error);
 
     const sorted = data.boxes.sort((a: BoxItem, b: BoxItem) => a.name.localeCompare(b.name));
-    setBoxes(sorted);
+    setBoxes(sorted as unknown as T[]);
     setLoadingBoxes(true);
 
     const eventName =
@@ -89,10 +89,10 @@ const fetchBoxes = async ({
   }
 };
 
-const useRealtimeBoxes = (
+const useRealtimeBoxes = <T extends { name: string } = BoxItem>(
   sourceType: SourceType,
   calendarId: string | null,
-  setBoxes: SetBoxes,
+  setBoxes: SetBoxes<T>,
   setLoadingBoxes: SetLoadingBoxes,
   setRep: SetRep
 ): void => {
@@ -109,7 +109,7 @@ const useRealtimeBoxes = (
 
   const fetchData = useCallback(() => {
     if (!uid || !calendarId) return;
-    fetchBoxes({ uid, calendarId, setBoxes, setLoadingBoxes, sourceType, setRep });
+    fetchBoxes<T>({ uid, calendarId, setBoxes, setLoadingBoxes, sourceType, setRep });
   }, [uid, calendarId, setBoxes, setLoadingBoxes, sourceType, setRep]);
 
   const baseChannel =
@@ -137,20 +137,20 @@ const useRealtimeBoxes = (
   });
 };
 
-export const useRealtimePersonalBoxes = (
+export const useRealtimePersonalBoxes = <T extends { name: string } = BoxItem>(
   calendarId: string | null,
-  setBoxes: SetBoxes,
+  setBoxes: SetBoxes<T>,
   setLoadingBoxes: SetLoadingBoxes,
   setRep: SetRep
 ): void => {
-  useRealtimeBoxes('personal', calendarId, setBoxes, setLoadingBoxes, setRep);
+  useRealtimeBoxes<T>('personal', calendarId, setBoxes, setLoadingBoxes, setRep);
 };
 
-export const useRealtimeSharedBoxes = (
+export const useRealtimeSharedBoxes = <T extends { name: string } = BoxItem>(
   calendarId: string | null,
-  setBoxes: SetBoxes,
+  setBoxes: SetBoxes<T>,
   setLoadingBoxes: SetLoadingBoxes,
   setRep: SetRep
 ): void => {
-  useRealtimeBoxes('shared', calendarId, setBoxes, setLoadingBoxes, setRep);
+  useRealtimeBoxes<T>('shared', calendarId, setBoxes, setLoadingBoxes, setRep);
 };

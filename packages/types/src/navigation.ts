@@ -11,5 +11,3 @@ export interface ReturnToCalendarList {
   sharedUserCalendar: boolean;
   addCalendar: boolean;
 }
-
-export type ReturnToCalendarState = CalendarLocationList;

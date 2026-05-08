@@ -7,13 +7,17 @@ Sources supportées:
 - France (BDPM)
 """
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+
 from typing import Dict, Any, List
 from app.scripts.import_medicaments_afmps import import_afmps_to_bis
 from app.scripts.import_medicaments_france import import_france_to_bis
 
 
 def import_all_sources(
-    table_name: str = "public.temp_medicaments_afmps",
+    table_name: str = "public.medicaments_afmps",
     sources: List[str] = ["belgique", "france"],
     chunk_size: int = 5000
 ) -> Dict[str, Any]:
@@ -51,12 +55,12 @@ def import_all_sources(
     print("🔧 Nettoyage des doublons code_fmd...")
     with get_connection(skip_rls=True) as conn:
         with conn.cursor() as cur:
-            # Supprimer les doublons en gardant le plus récent (id le plus élevé)
+            # Supprimer les doublons en gardant une occurrence (ctid = plus petit)
             cur.execute(sql.SQL("""
                 DELETE FROM {table}
-                WHERE id IN (
-                    SELECT id FROM (
-                        SELECT id, ROW_NUMBER() OVER (PARTITION BY code_fmd ORDER BY id DESC) as rn
+                WHERE ctid IN (
+                    SELECT ctid FROM (
+                        SELECT ctid, ROW_NUMBER() OVER (PARTITION BY code_fmd ORDER BY ctid) as rn
                         FROM {table}
                         WHERE code_fmd IS NOT NULL
                     ) t
@@ -66,24 +70,6 @@ def import_all_sources(
             dups_removed = cur.rowcount
             conn.commit()
     print(f"✓ {dups_removed} doublons supprimés\n")
-    
-    # ÉTAPE 2: Créer l'index UNIQUE
-    print("🔧 Création de l'index UNIQUE sur code_fmd...")
-    with get_connection(skip_rls=True) as conn:
-        with conn.cursor() as cur:
-            # Supprimer l'ancien index s'il existe
-            cur.execute(sql.SQL("DROP INDEX IF EXISTS {index}").format(
-                index=sql.Identifier(index_name)
-            ))
-            # Créer le nouvel index unique partiel
-            cur.execute(sql.SQL(
-                "CREATE UNIQUE INDEX {index} ON {table}(code_fmd) WHERE code_fmd IS NOT NULL"
-            ).format(
-                index=sql.Identifier(index_name),
-                table=table_identifier
-            ))
-            conn.commit()
-    print(f"✓ Index UNIQUE créé\n")
     
     # ÉTAPE 2: Supprimer tous les enregistrements sans code FMD
     print("🗑️  Suppression des anciens médicaments sans code FMD...")
@@ -156,12 +142,12 @@ def import_all_sources(
     }
 
 
-def import_belgique_only(table_name: str = "public.temp_medicaments_afmps") -> Dict[str, Any]:
+def import_belgique_only(table_name: str = "public.medicaments_afmps") -> Dict[str, Any]:
     """Import uniquement depuis la Belgique"""
     return import_all_sources(table_name=table_name, sources=["belgique"])
 
 
-def import_france_only(table_name: str = "public.temp_medicaments_afmps") -> Dict[str, Any]:
+def import_france_only(table_name: str = "public.medicaments_afmps") -> Dict[str, Any]:
     """Import uniquement depuis la France"""
     return import_all_sources(table_name=table_name, sources=["france"])
 

@@ -7,18 +7,29 @@ export interface CalendarTypeInfo {
 }
 
 /**
- * Strip the language prefix from a pathname (e.g. "/fr/calendar/123" → "/calendar/123").
+ * Strip the language prefix from a pathname (e.g. "/fr/calendar/123" -> "/calendar/123").
  */
 export function stripLangPrefix(pathname: string): string {
   return pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
 }
 
 /**
- * Detect the calendar type and base path from a pathname (without lang prefix).
- * Duplicated in 8+ files — this is the single source of truth.
+ * Mobile routes keep calendar detail pages under "/calendars/*" while the web
+ * keeps them at the root. Normalize both shapes before detecting the source.
+ */
+export function stripCalendarListPrefix(pathname: string): string {
+  const pathWithoutLang = stripLangPrefix(pathname);
+  return pathWithoutLang.replace(
+    /^\/calendars(?=\/(?:calendar|shared-user-calendar|shared-token-calendar)(?:\/|$))/,
+    '',
+  ) || '/';
+}
+
+/**
+ * Detect the calendar type and base path from a pathname.
  */
 export function detectCalendarType(pathname: string): CalendarTypeInfo {
-  const pathWithoutLang = stripLangPrefix(pathname);
+  const pathWithoutLang = stripCalendarListPrefix(pathname);
 
   if (pathWithoutLang.startsWith(CALENDAR_ROUTE_PREFIXES.SHARED_USER)) {
     return { calendarType: 'sharedUser', basePath: 'shared-user-calendar' };

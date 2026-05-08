@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 const RE_PROTECT = /{{([^{}]*)}}/g;
-const RE_RESTORE = /__NP__([^_]*)___/g;
+const RE_RESTORE = /__NP__(.*?)___/g;
 
 function protectPlaceholders(str) {
   return str.replace(RE_PROTECT, (_, inner) => `__NP__${inner}___`);
@@ -17,7 +17,7 @@ export function readJson(filePath) {
 }
 
 export function writeJson(filePath, data) {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+  fs.writeFileSync(filePath, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
 }
 
 export function getByKeyPath(obj, dottedPath) {
@@ -35,13 +35,20 @@ export function setByKeyPath(obj, dottedPath, value) {
 
   for (let i = 0; i < parts.length - 1; i += 1) {
     const part = parts[i];
-    if (!current[part] || typeof current[part] !== 'object' || Array.isArray(current[part])) {
+    if (current[part] === undefined) {
       current[part] = {};
+    } else if (!current[part] || typeof current[part] !== 'object' || Array.isArray(current[part])) {
+      throw new Error(`Translation key conflict: "${parts.slice(0, i + 1).join('.')}" already contains a value`);
     }
     current = current[part];
   }
 
-  current[parts[parts.length - 1]] = value;
+  const leafKey = parts[parts.length - 1];
+  if (current[leafKey] && typeof current[leafKey] === 'object') {
+    throw new Error(`Translation key conflict: "${dottedPath}" already contains nested keys`);
+  }
+
+  current[leafKey] = value;
 }
 
 export function isValidTranslationValue(value) {
@@ -50,6 +57,25 @@ export function isValidTranslationValue(value) {
 
 export function keyToFallbackText(key) {
   return key.split('.').pop().replace(/_/g, ' ');
+}
+
+export function flattenTranslationKeys(obj, prefix = '') {
+  const keys = [];
+
+  for (const [key, value] of Object.entries(obj)) {
+    const keyPath = prefix ? `${prefix}.${key}` : key;
+
+    if (isValidTranslationValue(value)) {
+      keys.push(keyPath);
+      continue;
+    }
+
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      keys.push(...flattenTranslationKeys(value, keyPath));
+    }
+  }
+
+  return keys;
 }
 
 export async function translateTextSafe(text, lang, translateClient) {

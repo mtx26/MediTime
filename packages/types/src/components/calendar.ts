@@ -1,4 +1,5 @@
 import type { DateLike, WeeklyEventItem } from '../models';
+import type { CalendarBoxAlertItem, IcsTokenEntry, PillboxUseItem } from './calendar-pages';
 
 export interface WeekDayCirclesProps {
   selectedDate: Exclude<DateLike, number>;
@@ -26,4 +27,35 @@ export type DateModalProps = Omit<WeeklyEventContentProps, 'ifModal'>;
 export interface DateModalRef {
   open: () => void;
   close: () => void;
+}
+
+export interface CalendarHeaderTitleProps {
+  title: string;
+}
+
+export interface CalendarNotFoundStateProps {
+  onBackToCalendars: () => void;
+}
+
+export interface IcsTokenCardProps {
+  token: IcsTokenEntry;
+  webcalUrl: string;
+  disabled?: boolean;
+  onDelete: (token: IcsTokenEntry) => void;
+  onShare: (url: string) => void;
+  onSubscribe: (url: string) => void;
+}
+
+export interface PillboxUseRowProps {
+  use: PillboxUseItem;
+  weekLabel: string;
+  disabled?: boolean;
+  onCancel: (useId: string) => void;
+}
+
+export interface StockAlertCardProps {
+  box: CalendarBoxAlertItem;
+  disabled?: boolean;
+  onMissingPillbox?: (boxId: string) => void;
+  onRestock: (boxId: string) => void;
 }

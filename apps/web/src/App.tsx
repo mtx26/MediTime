@@ -4,8 +4,6 @@ import {
   useContext,
   useCallback,
   useMemo,
-  type Dispatch,
-  type SetStateAction,
   type ReactElement,
 } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
@@ -26,7 +24,7 @@ import {
   createUserApi,
 } from '@meditime/utils';
 import { useTranslation } from 'react-i18next';
-import useSEO from './hooks/useSEO';
+import useSEO from './hooks/seo/useSEO';
 import OnboardingTour from './components/onboarding/OnboardingTour';
 import { requestPermissionAndGetToken } from './services/firebase/firebase';
 import { useAlert } from './contexts/AlertContext';
@@ -251,13 +249,13 @@ export default function App(): ReactElement {
         <main className="flex flex-col min-h-0 grow">
           {userInfo && (
             <RealtimeManager
-              setCalendarsData={setCalendarsData as Dispatch<SetStateAction<unknown>>}
-              setSharedCalendarsData={setSharedCalendarsData as Dispatch<SetStateAction<unknown>>}
-              setNotificationsData={setNotificationsData as Dispatch<SetStateAction<unknown>>}
-              setTokensList={setTokensList as Dispatch<SetStateAction<unknown[]>>}
-              setLoadingStates={setLoadingStates as Dispatch<SetStateAction<LoadingStates>>}
-              calendarsData={calendarsData as CalendarInfo[] | null}
-              sharedCalendarsData={sharedCalendarsData as CalendarInfo[] | null}
+              setCalendarsData={setCalendarsData}
+              setSharedCalendarsData={setSharedCalendarsData}
+              setNotificationsData={setNotificationsData}
+              setTokensList={setTokensList}
+              setLoadingStates={setLoadingStates}
+              calendarsData={calendarsData}
+              sharedCalendarsData={sharedCalendarsData}
             />
           )}
 

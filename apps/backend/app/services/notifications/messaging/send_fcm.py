@@ -17,7 +17,7 @@ def delete_fcm_token(token: str):
     """
     with get_connection(skip_rls=True) as conn:
         with conn.cursor() as cursor:
-            cursor.execute("DELETE FROM fcm_tokens WHERE token = %s", (token,))
+            cursor.execute("DELETE FROM push_tokens WHERE token = %s", (token,))
             conn.commit()
 
 def _create_fcm_payload(token: str, title: str, body: str, context: dict) -> dict:

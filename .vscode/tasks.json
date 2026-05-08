@@ -1,0 +1,163 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "MediTime: Web frontend",
+      "type": "shell",
+      "command": "start \"MediTime Web\" cmd /k \"cd /d \"\"${workspaceFolder}\"\" && npm run build --workspace=apps/web && npm run dev --workspace=apps/web\"",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      },
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "MediTime: Mobile Expo",
+      "type": "shell",
+      "command": "start \"MediTime Mobile\" cmd /k \"cd /d \"\"${workspaceFolder}\"\" && npm run build --workspace=apps/mobile && npm run start --workspace=apps/mobile\"",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      },
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "MediTime: Build web frontend",
+      "type": "shell",
+      "command": "start \"MediTime Build Web\" cmd /k \"cd /d \"\"${workspaceFolder}\"\" && npm run build --workspace=apps/web\"",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      },
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "MediTime: Build mobile frontend",
+      "type": "shell",
+      "command": "start \"MediTime Build Mobile\" cmd /k \"cd /d \"\"${workspaceFolder}\"\" && npm run build --workspace=apps/mobile\"",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      },
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "MediTime: Build frontends",
+      "dependsOn": [
+        "MediTime: Build web frontend",
+        "MediTime: Build mobile frontend"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "MediTime: Backend API",
+      "type": "shell",
+      "command": "start \"MediTime Backend API\" cmd /k \"cd /d \"\"${workspaceFolder}\\apps\\backend\"\" && .venv\\Scripts\\python.exe -m app.main\"",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      },
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "MediTime: Scheduler",
+      "type": "shell",
+      "command": "start \"MediTime Scheduler\" cmd /k \"cd /d \"\"${workspaceFolder}\\apps\\backend\"\" && .venv\\Scripts\\python.exe scheduler.py\"",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      },
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "MediTime: Backend + Scheduler",
+      "dependsOn": [
+        "MediTime: Backend API",
+        "MediTime: Scheduler"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "MediTime: i18n translations",
+      "type": "shell",
+      "command": "start \"MediTime i18n\" cmd /k \"cd /d \"\"${workspaceFolder}\"\" && npm run i18n:sync\"",
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+          }
+        }
+      },
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "MediTime: All dev apps",
+      "dependsOn": [
+        "MediTime: Backend API",
+        "MediTime: Scheduler",
+        "MediTime: Web frontend",
+        "MediTime: Mobile Expo"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "group": "build"
+    }
+  ]
+}

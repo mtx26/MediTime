@@ -17,5 +17,5 @@ export interface Language<TDateLocale = unknown, TFlagComponent = unknown> {
   locale: string;
   label: string;
   dateLocale: TDateLocale;
-  FlagComponent: TFlagComponent;
+  FlagComponent: TFlagComponent | null;
 }

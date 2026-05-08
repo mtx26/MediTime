@@ -306,7 +306,7 @@ def insert_data_without_code(df: pd.DataFrame, table_name: str,
 
 
 def import_france_to_bis(
-    table_name: str = "public.temp_medicaments_afmps",
+    table_name: str = "public.medicaments_afmps",
     chunk_size: int = 5000,
 ) -> Dict[str, Any]:
     """

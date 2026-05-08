@@ -1,33 +1,26 @@
-// CalendarPage.jsx
-import { useEffect, useContext, useRef, useState, useMemo } from 'react';
-import { useNavigate, useParams, useLocation, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { useTranslation } from 'react-i18next';
-import { UserContext } from '@/contexts/UserContext';
-import { useLoading } from '@/components/ui/loading';
-import { toISO, getCalendarSourceMap, buildPersonalCalendarActions, buildSharedCalendarActions, detectCalendarType } from '@meditime/utils';
-import { useAlert } from '@/contexts/AlertContext';
+import { toISO, buildPersonalCalendarActions, buildSharedCalendarActions } from '@meditime/utils';
+import { STOCK_DECREMENT_METHODS } from '@meditime/constants';
 import { toActionSheetItems } from '@/utils/actionSheetAdapter';
-import { useFilteredEventsForDay } from '@/hooks/useCalendarNavigation';
+import { useCalendarData } from '@/hooks/calendar/useCalendarData';
 import DateModal from '@/components/calendar/DateModal';
-import WeekCalendarSelector from '@/components/calendar/WeekCalendarSelector';
 import WeeklyEventContent from '@/components/calendar/WeeklyEventContent';
+import CalendarWeekSelector from '@/components/calendar/CalendarWeekSelector';
 import PillboxDisplay from '@/components/calendar/PillboxDisplay';
 import ActionSheet from '@/components/common/ActionSheet';
 import NotFound from '@/pages/general/NotFound';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Pill, AlertTriangle, CalendarDays, ChevronRight, Pin } from 'lucide-react';
+import { Pill, AlertTriangle, CalendarDays, Pin } from 'lucide-react';
+import AlertBanner from '@/components/common/AlertBanner';
 import '@/styles/fullcalendar-custom.css';
 import { getLocale } from '@meditime/config';
 import type {
-  CalendarTable,
-  CalendarViewSource,
-  DateModalRef,
-  WeeklyEventItem,
   DailyCalendarPageProps as CalendarViewProps,
 } from '@meditime/types';
 
@@ -37,194 +30,17 @@ function CalendarPage({
   sharedUserCalendars,
   tokenCalendars,
 }: CalendarViewProps) {
-  // 📍 Paramètres d'URL et navigation
-  const navigate = useNavigate(); // Hook de navigation
-  const location = useLocation();
-  const params = useParams<{ lng?: string; calendarId?: string; sharedToken?: string }>();
-  const { lng } = params;
   const { t } = useTranslation();
 
-  // 🔐 Contexte d'authentification
-  const userContext = useContext(UserContext);
-  const userInfo = userContext?.userInfo; // Contexte de l'utilisateur connecté
-  const { showLoading } = useLoading(); // Gestion du spinner global
+  const {
+    lng, calendarType, basePath, calendarId, calendarSource,
+    calendarRef, dateModalRef,
+    selectedDate, eventsForDay, calendarTable, isLowStock, stockDecrementMethod,
+    notFound, setNotFound, memoizedEvents,
+    onSelectDate, onWeekSelect, handleDateClick, navigateDay, navigateWeek,
+    handleDeleteCalendar, handleDeleteSharedCalendar,
+  } = useCalendarData({ personalCalendars, sharedUserCalendars, tokenCalendars });
 
-  const calendarRef = useRef<any>(null);
-  // garder selectedDate comme objet Date pour manipulations faciles
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Date JS
-  const [eventsForDay, setEventsForDay] = useState<WeeklyEventItem[]>([]); // Événements filtrés pour un jour spécifique
-  const [calendarEvents, setCalendarEvents] = useState<WeeklyEventItem[]>([]); // Événements du calendrier
-  const [calendarTable, setCalendarTable] = useState<CalendarTable>({}); // Événements du calendrier
-  const [isLowStock, setIsLowStock] = useState(false); // Indicateur de stock faible
-  const { showConfirm } = useAlert();
-
-  // Méthode de décrémentation du stock (pour affichage différencié)
-  const [stockDecrementMethod, setStockDecrementMethod] = useState('');
-  const [loadingStockMethod, setLoadingStockMethod] = useState(false);
-
-  // 🔄 Références et chargement
-  const dateModalRef = useRef<DateModalRef | null>(null);
-  const [loading, setLoading] = useState(true); // État de chargement du calendrier
-  const [notFound, setNotFound] = useState(false);
-  const initialNextDate = useMemo(() => new Date(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).setHours(0,0,0,0)), []);
-
-  const { calendarType, basePath } = detectCalendarType(location.pathname);
-  const calendarId = calendarType === 'token' ? params.sharedToken : params.calendarId;
-
-  const calendarSource = getCalendarSourceMap(
-    personalCalendars,
-    sharedUserCalendars,
-    tokenCalendars
-  )[calendarType] as unknown as CalendarViewSource;
-
-  // Fonction pour naviguer vers une date
-  const onSelectDate = (dateInput: string | number | Date) => {
-    // accepte Date ou ISO string
-    const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
-    setSelectedDate(d);
-    setEventsForDay(calendarEvents.filter((e) => e.start.startsWith(toISO(d))));
-  };
-
-  // Fonction pour naviguer vers la semaine suivante ou precedente
-  const onWeekSelect = async (newSelectedDate: Date) => {
-    onSelectDate(newSelectedDate);
-    const isoDate = toISO(newSelectedDate);
-    const rep = await calendarSource.fetchSchedule(calendarId, isoDate);
-    if (rep.success) {
-      setCalendarEvents((rep.schedule || []) as WeeklyEventItem[]);
-      setCalendarTable((rep.table || {}) as CalendarTable);
-      calendarRef.current?.getApi().gotoDate(isoDate);
-    }
-  };
-
-  // Fonction pour gérer le clic sur une date
-  const handleDateClick = (info: { dateStr: string }) => {
-    const clickedDate = info.dateStr; // YYYY-MM-DD
-    setSelectedDate(new Date(clickedDate));
-    dateModalRef.current?.open();
-  };
-
-  // Fonction pour naviguer vers la date suivante ou precedente
-  const navigateDay = (direction: number) => {
-    if (!selectedDate) return;
-    const current = new Date(selectedDate);
-    current.setDate(current.getDate() + direction);
-    setSelectedDate(current);
-  };
-
-  const navigateWeek = (direction: number) => {
-    if (!selectedDate) return;
-    const current = new Date(selectedDate);
-    current.setDate(current.getDate() + direction);
-    const newSelectedDate = current;
-    void onWeekSelect(newSelectedDate);
-  };
-
-  // Fonction pour charger le calendrier lorsque l'utilisateur est connecté ou que le calendrier est un token
-  useEffect(() => {
-    if (!calendarId) return setLoading(false);
-    if (!selectedDate) return 
-    if (calendarType === 'personal' || calendarType === 'sharedUser') {
-      if (!userInfo) return setLoading(true);
-    }
-    const load = async () => {
-      const rep = await calendarSource.fetchSchedule(calendarId, toISO(selectedDate));
-      if (rep.success) {
-        const nextSchedule = (rep.schedule || []) as WeeklyEventItem[];
-        setCalendarEvents(prev => JSON.stringify(nextSchedule) !== JSON.stringify(prev) ? nextSchedule : prev);
-        const nextTable = (rep.table || {}) as CalendarTable;
-        setCalendarTable(prev => JSON.stringify(nextTable) !== JSON.stringify(prev) ? nextTable : prev);
-        setIsLowStock(prev => rep.ifLowStock !== undefined && rep.ifLowStock !== prev ? rep.ifLowStock : prev);
-      } else {;
-        // Si l'API retourne un 404, le calendrier n'existe pas
-        if (rep.status === 404) {
-          setNotFound(true);
-        }
-      }
-      setLoading(false);
-    };
-
-    void load();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [calendarId, calendarType, userInfo, selectedDate]);
-
-  // Gérer l'affichage du spinner global
-  useEffect(() => {
-    showLoading(Boolean((loading === true || loadingStockMethod === true) && calendarId), t('loading_calendar'));
-  }, [loading, loadingStockMethod, calendarId, showLoading, t]);
-
-  // Charger la méthode de décrémentation du stock (si disponible)
-  useEffect(() => {
-    const fetchMethod = async () => {
-      if (!calendarId) return setLoadingStockMethod(false);
-      if (calendarType === 'personal' || calendarType === 'sharedUser') {
-        if (!userInfo) return setLoadingStockMethod(true);
-      }
-      // On tente pour les calendriers personal et sharedUser en appelant l'API exposée
-      const rep = await calendarSource.fetchStockDecrementMethod(calendarId);
-      if (rep.success) {
-        const method = rep.method || '';
-        setStockDecrementMethod(method);
-        if (method === 'weekly_pillbox') {
-          setSelectedDate(new Date(initialNextDate));
-        } else {
-          setSelectedDate(new Date(new Date().setHours(0,0,0,0)));
-        }
-      } else if (rep.status === 404) {
-        setNotFound(true);
-        setSelectedDate(new Date(new Date().setHours(0,0,0,0)));
-      }
-      setLoadingStockMethod(false);
-    };
-    void fetchMethod();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [calendarId, calendarType, userInfo]);
-
-  // Fonction pour supprimer le calendrier avec confirmation
-  const handleDeleteCalendar = () => {
-    showConfirm(
-      'confirm-danger',
-      t('calendar.delete_title'),
-      t('calendar.delete_description'),
-      async () => {
-        if (!calendarId) return;
-        const rep = await personalCalendars.deleteCalendar(calendarId);
-        if (rep.success) {
-          navigate(`/${lng}/calendars`);
-        }
-      }
-    );
-  };
-
-  // Fonction pour supprimer un calendrier partagé avec confirmation
-  const handleDeleteSharedCalendar = () => {
-    showConfirm(
-      'confirm-danger',
-      t('calendar.delete_shared_title'),
-      t('calendar.delete_shared_description'),
-      async () => {
-        const rep = await sharedUserCalendars.deleteSharedCalendar(calendarId!);
-        if (rep.success) {
-          navigate(`/${lng}/calendars`);
-        }
-      }
-    );
-  };
-
-
-  // 📍 Filtrage des événements pour un jour spécifique et tri par ordre alphabétique
-  useFilteredEventsForDay(selectedDate, calendarEvents, setEventsForDay);
-
-  // 📍 Mémoisation des événements pour le calendrier
-  const memoizedEvents = useMemo(() => {
-    return calendarEvents.map((event) => ({
-      title: `${event.title} ${event.dose != null ? `${event.dose} mg` : ''} (${event.tablet_count})`,
-      start: event.start,
-      color: event.color,
-    }));
-  }, [calendarEvents]);
-
-  // Affichage de la page 404 si le calendrier n'existe pas
   if (notFound) {
     return <NotFound />;
   }
@@ -259,7 +75,7 @@ function CalendarPage({
                     dataTour="calendar-actions-btn"
                     actions={toActionSheetItems(
                       buildPersonalCalendarActions(
-                        { calendarId: calendarId!, lng: lng!, basePath, selectedDate },
+                        { calendarId: calendarId!, basePath: `${lng}/${basePath}`, selectedDate },
                         {
                           onDelete: handleDeleteCalendar,
                           onExportPdf: () => calendarSource.downloadCalendarPdf(calendarId),
@@ -274,7 +90,7 @@ function CalendarPage({
                   <ActionSheet
                     actions={toActionSheetItems(
                       buildSharedCalendarActions(
-                        { calendarId: calendarId!, lng: lng!, basePath, selectedDate },
+                        { calendarId: calendarId!, basePath: `${lng}/${basePath}`, selectedDate },
                         {
                           onDelete: handleDeleteSharedCalendar,
                           onExportPdf: () => calendarSource.downloadCalendarPdf(calendarId),
@@ -288,29 +104,23 @@ function CalendarPage({
               </div>
               {/* Affichage alert stock */}
               {isLowStock && (
-                <Link
-                  className="flex items-center justify-between w-full px-3 py-2 rounded-md bg-yellow-500/15 border border-yellow-500/50 text-foreground no-underline shadow"
+                <AlertBanner
                   to={`/${lng}/${basePath}/${calendarId}/stock-alerts`}
-                  title={t('stock_alert_tooltip')}
-                  aria-label={t('stock_alert')}
-                >
-                  <div className="flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-yellow-600" />
-                    <span className="font-semibold">{t('stock_alert')}</span>
-                  </div>
-                  <ChevronRight className="h-4 w-4 ml-2" />
-                </Link>
+                  icon={AlertTriangle}
+                  text={t('stock_alert')}
+                  tooltip={t('stock_alert_tooltip')}
+                  variant="warning"
+                />
               )}
 
             </div>
             {/* Bouton pour naviguer vers la semaine suivante ou precedente */}
-            {stockDecrementMethod === "weekly_pillbox" && (
+            {stockDecrementMethod === STOCK_DECREMENT_METHODS.WEEKLY_PILLBOX && (
               <div className='flex lg:hidden justify-center items-center' data-tour="calendar-week-selector">
                 <CalendarWeekSelector
                   calendarTable={calendarTable}
                   onWeekSelect={onWeekSelect}
                   selectedDate={selectedDate}
-                  t={t}
                 />
               </div>
             )}
@@ -319,7 +129,6 @@ function CalendarPage({
                 calendarTable={calendarTable}
                 onWeekSelect={onWeekSelect}
                 selectedDate={selectedDate}
-                t={t}
               />
             </div>
           </div>
@@ -329,7 +138,7 @@ function CalendarPage({
           .length > 0 && (
             <>
               {/* Pilulier - Vue mobile */}
-              {stockDecrementMethod === "weekly_pillbox" && (
+              {stockDecrementMethod === STOCK_DECREMENT_METHODS.WEEKLY_PILLBOX && (
                 <div className="block lg:hidden w-full lg:w-2/3 lg:px-2">
                   <div>
                     <h4 className="mb-3 font-bold flex items-center gap-2">
@@ -375,77 +184,6 @@ function CalendarPage({
             </>
           )}
 
-          {/* Tableau hebdomadaire */}
-          {/*
-          {Object.keys(calendarTable).filter(
-            (key) => calendarTable[key].length > 0
-          ).length > 0 && (
-            <div className="col-12 col-lg-8 mb-4">
-              <div className="mb-2">
-                <h4 className="mb-3 fw-bold">
-                  <i className="bi bi-table"></i> Tableau hebdomadaire
-                </h4>
-                {/*trier matin, midi, soir et supprimer les moments non présents
-                {Object.keys(calendarTable)
-                  .sort((a, b) => {
-                    const order = ['morning', 'noon', 'evening'];
-                    return order.indexOf(a) - order.indexOf(b);
-                  })
-                  .filter((moment) => calendarTable[moment].length > 0)
-                  .map((moment, index) => (
-                    <div key={moment}>
-                      <h5 className="mb-3 fw-semibold">
-                        <i className="bi bi-clock-fill"></i>{' '}
-                        {moment_map[moment]}
-                      </h5>
-                      {calendarTable[moment].map((table, index) => (
-                        <div
-                          className="card border border-secondary-subtle mb-2 shadow-sm"
-                          key={index}
-                        >
-                          <div className="card-header bg-light fw-semibold text-dark">
-                            <i className="bi bi-capsule me-2"></i>
-                            {table.title}{' '}
-                            {table.dose != null ? `${table.dose} mg` : ''}
-                          </div>
-                          <div className="card-body p-0">
-                            <div className="table-responsive">
-                              <table className="table table-sm table-bordered text-center align-middle mb-0 table-striped">
-                                <thead className="table-light">
-                                  <tr>
-                                    {days.map((day) => (
-                                      <th key={day}>{days_map[day]}</th>
-                                    ))}
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    {days.map((day) => (
-                                      <td key={day}>
-                                        {table.cells[day] && (
-                                          <span className="text-muted small px-2 py-1 rounded d-inline-block">
-                                            {table.cells[day]}
-                                          </span>
-                                        )}
-                                      </td>
-                                    ))}
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {index <
-                        Object.keys(calendarTable).filter(
-                          (key) => calendarTable[key].length > 0
-                        ).length -
-                          1 && <hr className="mt-4 shadow-sm" />}
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}*/}
         </div>
       </div>
 
@@ -512,7 +250,7 @@ function CalendarPage({
           </div>
 
           {/* Calendrier - Vue mobile uniquement */}
-          {stockDecrementMethod  === "daily_midnight" && (
+          {stockDecrementMethod === STOCK_DECREMENT_METHODS.DAILY_MIDNIGHT && (
             <div className="block lg:hidden">
               <h4 className="mb-3 font-bold flex items-center gap-2">
                 <CalendarDays className="h-5 w-5" /> {t('calendar.daily_view')}
@@ -543,37 +281,6 @@ function CalendarPage({
       )}
     </>
   );
-}
-
-function CalendarWeekSelector({
-  calendarTable,
-  onWeekSelect,
-  selectedDate,
-  t
-}: {
-  calendarTable: CalendarTable;
-  onWeekSelect: (date: Date) => void;
-  selectedDate: Date | null;
-  t: (key: string) => string;
-}) {
-  return (
-    Object.keys(calendarTable).filter(
-      (key) => calendarTable[key].length > 0
-    ).length > 0 && (
-      <div className="mb-2 w-full max-w-100">
-        <h4 className="mb-3 font-bold flex items-center gap-2">
-          <CalendarDays className="h-5 w-5" /> {t('calendar.reference_week')}
-        </h4>
-        <Card className="shadow rounded-lg w-full items-center p-0">
-          <CardContent className="p-0">
-            <div className="h-full w-full">
-              <WeekCalendarSelector onWeekSelect={onWeekSelect} selectedDate={selectedDate} />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  )
 }
 
 export default CalendarPage;

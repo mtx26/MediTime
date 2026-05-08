@@ -163,7 +163,7 @@ def create_box(calendar_id: str, box: dict) -> str:
                 cursor.execute("""
                   INSERT INTO medicine_box_conditions (id, box_id, tablet_count, interval_days, start_date, time_of_day, max_date)
                   SELECT
-                    COALESCE((c->>'id')::uuid, gen_random_uuid())        AS id,
+                    gen_random_uuid()                                    AS id,
                     %s::uuid                                             AS box_id,
                     (c->>'tablet_count')::float8                         AS tablet_count,
                     (c->>'interval_days')::int                           AS interval_days,

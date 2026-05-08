@@ -1,5 +1,6 @@
 import { LANGUAGES, DEFAULT_LANG } from '@meditime/constants';
-import type { Locale as DateLocale } from 'date-fns';
+
+type DateLocale = (typeof LANGUAGES)[number]['dateLocale'];
 
 export const getLocale = (code: string): string => {
   return LANGUAGES.find((lang) => lang.code === code)?.locale || code;
@@ -7,6 +8,10 @@ export const getLocale = (code: string): string => {
 
 export const getLabel = (code: string): string => {
   return LANGUAGES.find((lang) => lang.code === code)?.label || code;
+};
+
+export const getFlag = (code: string): string => {
+  return LANGUAGES.find((lang) => lang.code === code)?.flag || code.toUpperCase();
 };
 
 export const enabledLanguageCodes: string[] = LANGUAGES.map(lang => lang.code);

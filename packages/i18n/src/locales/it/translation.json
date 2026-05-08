@@ -282,12 +282,20 @@
     "with_github": "Connessione con Github",
     "with_google": "Accedi con Google",
     "with_microsoft": "Accedi con Microsoft",
-    "with_twitter": "Connettiti con Twitter"
+    "with_twitter": "Connettiti con Twitter",
+    "already_have_account": "Vous avez déjà un compte ?",
+    "back_to_login": "Retour à la connexion",
+    "check_email": "Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.",
+    "login_error": "Impossible de se connecter.",
+    "no_account": "Pas encore de compte ?",
+    "register_error": "Impossible de créer votre compte."
   },
   "auth_callback": {
     "loading": "Connessione in corso...",
     "session_error": "Il ripristino della sessione non è riuscito dopo OAuth",
-    "success": "Connessione riuscita tramite callback"
+    "success": "Connessione riuscita tramite callback",
+    "missing_payload": "Le lien s'est ouvert sans les informations de session. Rouvrez le dernier email reçu ou demandez un nouveau lien.",
+    "session_unavailable": "Le lien a été ouvert, mais la session n'a pas pu être créée. Rouvrez le dernier email reçu ou demandez un nouveau lien."
   },
   "back": "Indietro",
   "boxes": {
@@ -537,10 +545,13 @@
     "delete_success": "Collegamento ICS rimosso correttamente.",
     "delete_title": "Rimuovere il collegamento ICS?",
     "fetch_error": "Errore durante il caricamento dei link.",
-    "info_description": "Questi link ti consentono di sincronizzare il tuo programma di assunzione dei farmaci con il tuo calendario personale (Google Calendar, Outlook, Apple Calendar, ecc.). Copia il link e aggiungilo come \"Abbonamento al calendario\" nella tua applicazione preferita.",
+    "info_description": "Questi link ti consentono di sincronizzare il tuo programma di assunzione dei farmaci con il tuo calendario personale (Google Calendar, Outlook, Apple Calendar, ecc.). Tocca Sincronizza per aprire direttamente l'abbonamento al calendario, oppure condividi il link se la tua app non lo supporta.",
     "info_title": "Informazioni sui collegamenti ICS",
     "loading_ics_tokens": "Caricamento dei link ICS...",
     "no_tokens": "Nessun collegamento ICS creato.",
+    "sync_calendar": "Sincronizza calendario",
+    "sync_error": "Impossibile sincronizzare",
+    "sync_error_description": "Il dispositivo non ha trovato un'app calendario compatibile. Condividi o copia questo link e aggiungilo come abbonamento calendario: {{url}}",
     "title": "Elenchi di link ICS",
     "token_label": "Collegamento"
   },
@@ -557,7 +568,10 @@
     "preview_error": "Errore durante la visualizzazione dell'anteprima",
     "remove_image": "Elimina immagine",
     "select_file_error": "Seleziona un file immagine.",
-    "title": "Seleziona e visualizza in anteprima un file"
+    "title": "Seleziona e visualizza in anteprima un file",
+    "choose_file": "Choisir un fichier",
+    "choose_from_library": "Photothèque",
+    "take_photo": "Prendre une photo"
   },
   "invalid_or_expired_link": "Questo collegamento al calendario condiviso non è valido o è scaduto.",
   "invitation": {
@@ -649,8 +663,8 @@
   "no_shared_calendars": "Non hai un calendario condiviso.",
   "noon": "Mezzogiorno",
   "not_found": {
-    "message": "Pagina non trovata.",
-    "title": "Errore 404"
+    "message": "message",
+    "title": "title"
   },
   "notif": {
     "calendar_invite": "<0></0> ti invita a unirti al calendario <1>{{name}}</1>",
@@ -672,7 +686,10 @@
       "title": "Preferenze di notifica"
     },
     "push_description": "Ricevi notifiche push sui tuoi dispositivi.",
-    "push_toggle": "Abilita le notifiche push web"
+    "push_toggle": "Abilita le notifiche push web",
+    "system_settings": "Impostazioni di sistema",
+    "system_settings_desc": "Gestisci le autorizzazioni notifiche nelle impostazioni del dispositivo.",
+    "open_system_settings": "Apri impostazioni"
   },
   "open": "Aprire",
   "open_notifications": "Apri notifiche",
@@ -778,7 +795,8 @@
     "save_password": "Salva la password",
     "saving": "Registrazione...",
     "success": "La tua password è stata modificata con successo.",
-    "title": "Nuova password"
+    "title": "Nuova password",
+    "request_new_link": "Demander un nouveau lien"
   },
   "restore": "Ripristinare",
   "restore_error": "Errore durante il ripristino",
@@ -836,7 +854,8 @@
       "description": "Cambia la tua password per rafforzare la sicurezza del tuo account.",
       "hint": "Utilizzare almeno 8 caratteri con lettere, numeri e simboli.",
       "same_password_error": "La nuova password deve essere diversa da quella vecchia.",
-      "title": "Password"
+      "title": "Password",
+      "error": "Errore durante l'aggiornamento della password."
     },
     "password_updated": "Password aggiornata con successo.",
     "providers": {
@@ -1163,7 +1182,7 @@
   "confirm_calendar_refill": "Verificare che il portapillole sia pieno",
   "pillbox_refill_description": "Il portapillole si riempirà con eventuali farmaci mancanti (scorte negative) per questa settimana. Questa azione è irreversibile.",
   "error": "errore",
-  "notifications": "notifiche",
+  "notifications": "Notifiche",
   "missed_intakes": {
     "affected_meds": "Médicaments concernés",
     "apply": "Appliquer",
@@ -1187,6 +1206,15 @@
     "stock": "Stock",
     "subtitle": "Déclarez les jours où vous n'avez pas pris vos médicaments pour ajuster votre stock.",
     "success": "{{count}} comprimé(s) réajouté(s) au stock.",
-    "title": "Prise oubliée"
-  }
+    "title": "Prise oubliée",
+    "back": "Retour",
+    "summary": "Récapitulatif",
+    "tablets": "comprimé(s)",
+    "total": "Total à réajouter"
+  },
+  "unexpected_error": "unexpected error",
+  "edit": "modificare",
+  "loading_stock_alerts": "caricamento avvisi di magazzino",
+  "tablet": "tablet",
+  "tablets": "compresse"
 }

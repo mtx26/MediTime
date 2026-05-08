@@ -8,7 +8,7 @@ import type { LoadingStates, NotificationItem, NotificationsResponse, UserContex
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-type SetNotificationsData = Dispatch<SetStateAction<NotificationItem[]>>;
+type SetNotificationsData = Dispatch<SetStateAction<NotificationItem[] | null>>;
 type SetLoadingStates = Dispatch<SetStateAction<LoadingStates>>;
 
 

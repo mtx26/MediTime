@@ -4,6 +4,7 @@ import type { BoxItem, IcsTokenItem, MedicineItem, StockDecrementMethod } from '
 import type { WeeklyEventItem, CalendarTable } from '../models/schedule';
 import type { PersonalCalendarsApi } from '../api/factories';
 import type { AppPersonalCalendars, AppSharedUserCalendars, AppTokenCalendars } from '../app';
+import type { QRScanImportPersonalCalendars, ImageUploadImportPersonalCalendars } from './document-import';
 
 
 
@@ -17,6 +18,19 @@ export interface CalendarDataSourceProps {
 }
 
 export type CalendarPageSourceType = 'personal' | 'sharedUser' | 'token';
+
+export type CalendarSettingsTab = 'stock' | 'notifications';
+
+export type CalendarDetailSourceType = CalendarPageSourceType;
+export type CalendarDetailMode = 'overview' | 'daily';
+
+// ─── Sub-component Props ─────────────────────────────────────────────
+
+export interface CalendarWeekSelectorProps {
+  calendarTable: CalendarTable;
+  onWeekSelect: (date: Date) => void;
+  selectedDate: Date | null;
+}
 
 // ─── API Results ─────────────────────────────────────────────────────
 
@@ -128,12 +142,36 @@ export type DailyCalendarPageProps = CalendarDataSourceProps;
 export type StockAlertsPageProps = CalendarDataSourceProps;
 export type MissedIntakesPageProps = CalendarDataSourceProps;
 export type SharedListPageProps = CalendarDataSourceProps;
+
+export type MissedSelectionMode = 'individual' | 'range';
+
+export interface DateSelectionCalendarProps {
+  selectionMode: MissedSelectionMode;
+  onSelectionModeChange: (mode: MissedSelectionMode) => void;
+  selectedDays: Date[];
+  onSelectedDaysChange: (days: Date[]) => void;
+  dateRange: { from: Date; to?: Date } | undefined;
+  onDateRangeChange: (range: { from: Date; to?: Date } | undefined) => void;
+  effectiveDays: Date[];
+}
 export type BoxesViewPageProps = CalendarDataSourceProps;
 
 export interface CalendarNotificationsProps extends CalendarDataSourceProps, CalendarNotFoundProps {}
 
 export interface CalendarStockProps extends CalendarNotFoundProps {
   personalCalendars: CalendarStockPersonalCalendars;
+}
+
+export interface MobileCalendarNotificationSettingsProps {
+  enabled: boolean;
+  isSaving: boolean;
+  onToggle: () => void;
+}
+
+export interface MobileCalendarStockSettingsProps {
+  selectedMethod: StockDecrementMethod | '';
+  isSaving: boolean;
+  onSelectMethod: (method: StockDecrementMethod) => void;
 }
 
 export type PillboxDisplayType = 'pillbox' | 'calendar';
@@ -163,4 +201,14 @@ export interface CalendarListSharedUserCalendars {
 export interface CalendarListPageProps {
   personalCalendars: CalendarListPersonalCalendars;
   sharedUserCalendars: CalendarListSharedUserCalendars;
+}
+
+// ─── Add Calendar Page Props ─────────────────────────────────────────
+
+export interface AddCalendarPagePersonalCalendars
+  extends QRScanImportPersonalCalendars,
+    ImageUploadImportPersonalCalendars {}
+
+export interface AddCalendarPageProps {
+  personalCalendars: AddCalendarPagePersonalCalendars;
 }
