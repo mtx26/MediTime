@@ -40,7 +40,7 @@ DROP POLICY IF EXISTS "Users can update own or shared calendars" ON public.calen
 DROP POLICY IF EXISTS "Users can update own notifications" ON public.notifications;
 DROP POLICY IF EXISTS "Users can update boxes of accessible calendars" ON public.medicine_boxes;
 DROP POLICY IF EXISTS "Users can manage own ics tokens" ON public.ics_tokens;
-DROP POLICY IF EXISTS "Users can manage own fcm tokens" ON public.fcm_tokens;
+DROP POLICY IF EXISTS "Users can manage own fcm tokens" ON public.push_tokens;
 DROP POLICY IF EXISTS "Users can insert shared tokens" ON public.shared_tokens;
 DROP POLICY IF EXISTS "Users can insert shared calendars" ON public.shared_calendars;
 DROP POLICY IF EXISTS "Users can insert shared calendar settings" ON public.shared_calendar_settings;
@@ -86,7 +86,7 @@ ALTER TABLE IF EXISTS ONLY public.invitations DROP CONSTRAINT IF EXISTS invitati
 ALTER TABLE IF EXISTS ONLY public.ics_tokens DROP CONSTRAINT IF EXISTS ics_tokens_owner_uid_fkey;
 ALTER TABLE IF EXISTS ONLY public.ics_tokens DROP CONSTRAINT IF EXISTS ics_tokens_calendar_id_fkey;
 ALTER TABLE IF EXISTS ONLY public.medicine_boxes DROP CONSTRAINT IF EXISTS fk_medicine_boxes_code_fmd;
-ALTER TABLE IF EXISTS ONLY public.fcm_tokens DROP CONSTRAINT IF EXISTS fcm_tokens_uid_fkey;
+ALTER TABLE IF EXISTS ONLY public.push_tokens DROP CONSTRAINT IF EXISTS fcm_tokens_uid_fkey;
 ALTER TABLE IF EXISTS ONLY public.calendars DROP CONSTRAINT IF EXISTS calendars_owner_uid_fkey;
 ALTER TABLE IF EXISTS ONLY public.shared_calendars DROP CONSTRAINT IF EXISTS calendar_shared_users_receiver_uid_fkey;
 ALTER TABLE IF EXISTS ONLY public.shared_calendars DROP CONSTRAINT IF EXISTS calendar_shared_users_calendar_id_fkey;
@@ -101,7 +101,7 @@ DROP TRIGGER IF EXISTS trg_touch_updated_at_medicine_boxes ON public.medicine_bo
 DROP TRIGGER IF EXISTS trg_touch_updated_at_medicine_box_conditions ON public.medicine_box_conditions;
 DROP TRIGGER IF EXISTS trg_touch_updated_at_invitations ON public.invitations;
 DROP TRIGGER IF EXISTS trg_touch_updated_at_ics_tokens ON public.ics_tokens;
-DROP TRIGGER IF EXISTS trg_touch_updated_at_fcm_tokens ON public.fcm_tokens;
+DROP TRIGGER IF EXISTS trg_touch_updated_at_fcm_tokens ON public.push_tokens;
 DROP TRIGGER IF EXISTS trg_touch_updated_at_calendars ON public.calendars;
 DROP TRIGGER IF EXISTS trg_touch_updated_at_calendar_settings ON public.calendar_settings;
 DROP TRIGGER IF EXISTS trg_touch_updated_at_bis_medicaments_afmps ON public.medicaments_afmps;
@@ -123,14 +123,15 @@ ALTER TABLE IF EXISTS ONLY public.invitations DROP CONSTRAINT IF EXISTS invitati
 ALTER TABLE IF EXISTS ONLY public.invitations DROP CONSTRAINT IF EXISTS invitations_pkey;
 ALTER TABLE IF EXISTS ONLY public.ics_tokens DROP CONSTRAINT IF EXISTS ics_tokens_token_key;
 ALTER TABLE IF EXISTS ONLY public.ics_tokens DROP CONSTRAINT IF EXISTS ics_tokens_pkey;
-ALTER TABLE IF EXISTS ONLY public.fcm_tokens DROP CONSTRAINT IF EXISTS fcm_tokens_uid_token_unique;
-ALTER TABLE IF EXISTS ONLY public.fcm_tokens DROP CONSTRAINT IF EXISTS fcm_tokens_token_pkey;
+ALTER TABLE IF EXISTS ONLY public.push_tokens DROP CONSTRAINT IF EXISTS fcm_tokens_uid_token_unique;
+ALTER TABLE IF EXISTS ONLY public.push_tokens DROP CONSTRAINT IF EXISTS fcm_tokens_token_pkey;
 ALTER TABLE IF EXISTS ONLY public.calendars DROP CONSTRAINT IF EXISTS calendars_pkey;
 ALTER TABLE IF EXISTS ONLY public.shared_calendars DROP CONSTRAINT IF EXISTS calendar_shared_users_pkey;
 ALTER TABLE IF EXISTS ONLY public.calendar_settings DROP CONSTRAINT IF EXISTS calendar_settings_pkey;
 DROP TABLE IF EXISTS public.shared_tokens;
 DROP TABLE IF EXISTS public.shared_calendars;
 DROP TABLE IF EXISTS public.shared_calendar_settings;
+DROP TABLE IF EXISTS public.push_tokens;
 DROP TABLE IF EXISTS public.pillbox_uses;
 DROP TABLE IF EXISTS public.notifications;
 DROP TABLE IF EXISTS public.medicine_boxes;
@@ -138,7 +139,6 @@ DROP TABLE IF EXISTS public.medicine_box_conditions;
 DROP TABLE IF EXISTS public.medicaments_afmps;
 DROP TABLE IF EXISTS public.invitations;
 DROP TABLE IF EXISTS public.ics_tokens;
-DROP TABLE IF EXISTS public.fcm_tokens;
 DROP TABLE IF EXISTS public.calendars;
 DROP TABLE IF EXISTS public.calendar_settings;
 DROP FUNCTION IF EXISTS public.touch_updated_at();
@@ -149,8 +149,8 @@ DROP FUNCTION IF EXISTS public.is_calendar_receiver(cal_id uuid);
 DROP FUNCTION IF EXISTS public.is_calendar_owner(cal_id uuid);
 DROP FUNCTION IF EXISTS public.get_user_by_email(lookup_email text);
 DROP TABLE IF EXISTS public.users;
+DROP FUNCTION IF EXISTS public.get_push_tokens_for_user(target_uid uuid);
 DROP FUNCTION IF EXISTS public.get_public_user_info(target_uid uuid);
-DROP FUNCTION IF EXISTS public.get_fcm_tokens_for_user(target_uid uuid);
 DROP FUNCTION IF EXISTS public.get_current_user_email();
 DROP FUNCTION IF EXISTS public.get_auth_email();
 DROP FUNCTION IF EXISTS public.ensure_shared_calendar_settings();
@@ -226,18 +226,6 @@ $$;
 
 
 --
--- Name: get_fcm_tokens_for_user(uuid); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION public.get_fcm_tokens_for_user(target_uid uuid) RETURNS TABLE(token text, provider text, platform text, project_id text)
-    LANGUAGE sql SECURITY DEFINER
-    SET search_path TO 'public'
-    AS $$
-  SELECT token, provider, platform, project_id FROM public.fcm_tokens WHERE uid = target_uid;
-$$;
-
-
---
 -- Name: get_public_user_info(uuid); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -247,6 +235,20 @@ CREATE FUNCTION public.get_public_user_info(target_uid uuid) RETURNS TABLE(displ
     AS $$
   SELECT display_name, photo_url FROM public.users WHERE id = target_uid;
 $$;
+
+
+--
+-- Name: get_push_tokens_for_user(uuid); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.get_push_tokens_for_user(target_uid uuid) RETURNS TABLE(token text, provider text, platform text, project_id text)
+    LANGUAGE sql SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+    SELECT token, provider, platform, project_id
+    FROM public.push_tokens
+    WHERE uid = target_uid;
+  $$;
 
 
 SET default_tablespace = '';
@@ -409,24 +411,6 @@ CREATE TABLE public.calendars (
 
 
 --
--- Name: fcm_tokens; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.fcm_tokens (
-    uid uuid NOT NULL,
-    token text NOT NULL,
-    created_at timestamp with time zone DEFAULT now(),
-    updated_at timestamp with time zone DEFAULT now(),
-  device_name text,
-  provider text DEFAULT 'fcm'::text NOT NULL,
-  platform text,
-  project_id text,
-  CONSTRAINT fcm_tokens_platform_check CHECK ((platform = ANY (ARRAY['ios'::text, 'android'::text, 'web'::text]))),
-  CONSTRAINT fcm_tokens_provider_check CHECK ((provider = ANY (ARRAY['expo'::text, 'fcm'::text])))
-);
-
-
---
 -- Name: ics_tokens; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -570,6 +554,24 @@ CREATE TABLE public.pillbox_uses (
 
 
 --
+-- Name: push_tokens; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.push_tokens (
+    uid uuid NOT NULL,
+    token text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now(),
+    device_name text,
+    provider text DEFAULT 'fcm'::text NOT NULL,
+    platform text,
+    project_id text,
+    CONSTRAINT fcm_tokens_platform_check CHECK ((platform = ANY (ARRAY['ios'::text, 'android'::text, 'web'::text]))),
+    CONSTRAINT fcm_tokens_provider_check CHECK ((provider = ANY (ARRAY['expo'::text, 'fcm'::text])))
+);
+
+
+--
 -- Name: shared_calendar_settings; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -638,18 +640,18 @@ ALTER TABLE ONLY public.calendars
 
 
 --
--- Name: fcm_tokens fcm_tokens_token_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: push_tokens fcm_tokens_token_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.fcm_tokens
+ALTER TABLE ONLY public.push_tokens
     ADD CONSTRAINT fcm_tokens_token_pkey PRIMARY KEY (token);
 
 
 --
--- Name: fcm_tokens fcm_tokens_uid_token_unique; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: push_tokens fcm_tokens_uid_token_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.fcm_tokens
+ALTER TABLE ONLY public.push_tokens
     ADD CONSTRAINT fcm_tokens_uid_token_unique UNIQUE (uid, token);
 
 
@@ -814,10 +816,10 @@ CREATE TRIGGER trg_touch_updated_at_calendars BEFORE UPDATE ON public.calendars 
 
 
 --
--- Name: fcm_tokens trg_touch_updated_at_fcm_tokens; Type: TRIGGER; Schema: public; Owner: -
+-- Name: push_tokens trg_touch_updated_at_fcm_tokens; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER trg_touch_updated_at_fcm_tokens BEFORE UPDATE ON public.fcm_tokens FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
+CREATE TRIGGER trg_touch_updated_at_fcm_tokens BEFORE UPDATE ON public.push_tokens FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
 
 
 --
@@ -923,10 +925,10 @@ ALTER TABLE ONLY public.calendars
 
 
 --
--- Name: fcm_tokens fcm_tokens_uid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: push_tokens fcm_tokens_uid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.fcm_tokens
+ALTER TABLE ONLY public.push_tokens
     ADD CONSTRAINT fcm_tokens_uid_fkey FOREIGN KEY (uid) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
@@ -1309,10 +1311,10 @@ CREATE POLICY "Users can insert shared tokens" ON public.shared_tokens FOR INSER
 
 
 --
--- Name: fcm_tokens Users can manage own fcm tokens; Type: POLICY; Schema: public; Owner: -
+-- Name: push_tokens Users can manage own fcm tokens; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY "Users can manage own fcm tokens" ON public.fcm_tokens USING ((auth.uid() = uid));
+CREATE POLICY "Users can manage own fcm tokens" ON public.push_tokens USING ((auth.uid() = uid));
 
 
 --
@@ -1541,12 +1543,6 @@ ALTER TABLE public.calendar_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.calendars ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: fcm_tokens; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.fcm_tokens ENABLE ROW LEVEL SECURITY;
-
---
 -- Name: ics_tokens; Type: ROW SECURITY; Schema: public; Owner: -
 --
 
@@ -1589,6 +1585,12 @@ ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pillbox_uses ENABLE ROW LEVEL SECURITY;
 
 --
+-- Name: push_tokens; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.push_tokens ENABLE ROW LEVEL SECURITY;
+
+--
 -- Name: shared_calendar_settings; Type: ROW SECURITY; Schema: public; Owner: -
 --
 
@@ -1615,4 +1617,5 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 --
 -- PostgreSQL database dump complete
 --
+
 
