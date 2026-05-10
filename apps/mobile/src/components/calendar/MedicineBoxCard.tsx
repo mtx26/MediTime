@@ -80,7 +80,7 @@ export function MedicineBoxCard({
   const { isCritical, isLow, allExpired, noCondition, isMissingPillbox } = getBoxDisplayFlags(box);
   const isAlertMode = mode === 'alerts';
   const canRestock = typeof onRestock === 'function';
-  const showMissingPillbox = isMissingPillbox && typeof onMissingPillbox === 'function';
+  const showMissingPillbox = isMissingPillbox && !allExpired && !noCondition && typeof onMissingPillbox === 'function';
   const cardBorderColor = allExpired || noCondition
     ? ios.blueInfoBorder
     : isCritical

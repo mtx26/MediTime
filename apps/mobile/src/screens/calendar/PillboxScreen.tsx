@@ -75,6 +75,7 @@ function PillboxScreenContent({ sourceType }: PillboxScreenProps) {
 
   const current = pillbox.orderedMeds[pillbox.selectedMedIndex];
   const momentColor = MOMENT_BG[current?.moment ?? 'morning'] ?? MOMENT_BG.morning;
+  const isRefillMode = pillbox.medsId?.length > 0;
 
   const gridPadding = 16;
   const colGap = 6;
