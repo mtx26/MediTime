@@ -1,6 +1,7 @@
-import { Spinner, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import type { LoadingIndicatorProps } from '@meditime/types';
 import { useIosTheme } from '../../theme/ios';
+import { NativeLoadingSpinner } from './NativeLoadingSpinner';
 
 export function LoadingIndicator({
   label,
@@ -19,7 +20,7 @@ export function LoadingIndicator({
           backgroundColor: ios.background,
         }}
       >
-        <Spinner size="large" color={ios.primary} />
+        <NativeLoadingSpinner size="large" />
         <Text style={{ color: ios.mutedForeground, fontWeight: '700', textAlign: 'center' }}>
           {label}
         </Text>
@@ -36,7 +37,7 @@ export function LoadingIndicator({
         paddingVertical: 8,
       }}
     >
-      <Spinner size="small" color={ios.primary} />
+      <NativeLoadingSpinner size="small" />
       <Text style={{ color: ios.mutedForeground, fontSize: 13, fontWeight: '700' }}>
         {label}
       </Text>

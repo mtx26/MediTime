@@ -2,9 +2,10 @@ import { useTranslation } from 'react-i18next';
 import { CameraView, useCameraPermissions, type BarcodeScanningResult } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { GlassView } from 'expo-glass-effect';
-import { Text, Spinner, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import type { QRScannedMedicine } from '@meditime/types';
 import { IconButton } from '../../common/IconButton';
+import { NativeLoadingSpinner } from '../../common/NativeLoadingSpinner';
 import { OutlineButton } from '../../common/OutlineButton';
 import { useAppTheme, useIosTheme } from '../../../theme/ios';
 
@@ -70,7 +71,7 @@ export function QRImportPanel({
 
       {loadingGtin && (
         <XStack style={{ alignItems: 'center', gap: 8 }}>
-          <Spinner size="small" color={ios.primary} />
+          <NativeLoadingSpinner size="small" />
           <Text style={{ color: ios.mutedForeground, fontWeight: '700' }}>
             {loadingGtin}
           </Text>

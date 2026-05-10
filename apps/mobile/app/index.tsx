@@ -1,7 +1,8 @@
 import { Redirect } from 'expo-router';
 import { useAuth } from '../src/hooks/auth/useAuth';
-import { YStack, Spinner } from 'tamagui';
+import { YStack } from 'tamagui';
 import { useIosTheme } from '../src/theme/ios';
+import { NativeLoadingSpinner } from '../src/components/common/NativeLoadingSpinner';
 
 export default function Index() {
   const { userInfo, isLoading } = useAuth();
@@ -10,7 +11,7 @@ export default function Index() {
   if (isLoading) {
     return (
       <YStack flex={1} style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: ios.background }}>
-        <Spinner size="large" color={ios.primary} />
+        <NativeLoadingSpinner size="large" />
       </YStack>
     );
   }
