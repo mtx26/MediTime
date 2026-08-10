@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import type { BarcodeScanningResult } from 'expo-camera';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { hapticSelection } from '../../utils/haptics';
 import {
   buildBoxActions,
   extractGTIN01,

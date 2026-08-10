@@ -1,24 +1,44 @@
-# Git and editor
+# Contexte de build = racine du dépôt (MediTime/), utilisé par ./Dockerfile.
+# Le build depuis apps/backend/ utilise apps/backend/.dockerignore.
+#
+# Les motifs doivent être préfixés par **/ pour s'appliquer aux sous-dossiers :
+# un `.env` seul ne filtre que le .env de la racine, pas apps/backend/.env.
+
+# Secrets — ne jamais embarquer dans une image
+**/.env
+**/.env.*
+**/serviceAccountKey.json
+**/*.pem
+**/*.key
+**/*.p12
+**/pils.json
+.vercel
+
+# Git et éditeurs
 .git
 .gitignore
 .vscode
+.cursor
 
-# Python cache and virtual environments
+# Caches et environnements Python
 **/__pycache__
 **/*.pyc
 **/*.pyo
 **/*.pyd
-backend/.venv
+**/.venv
+**/venv
+**/.pytest_cache
+**/.mypy_cache
 
-# Node modules (frontend not needed for backend image)
-frontend/node_modules
+# Node : inutile pour l'image backend
+**/node_modules
+**/dist
+**/.expo
 
-# Logs and local artifacts
-logs
-backend/logs
-*.log
+# Logs et artefacts locaux
+**/logs
+**/*.log
 
-# Secrets (never bake into image)
-backend/serviceAccountKey.json
-.env
-.env.*
+# Tests
+**/app/test
+**/tests

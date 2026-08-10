@@ -2,7 +2,7 @@
 
 from flask import Flask, request
 from flask_compress import Compress
-from app.config.config import Config
+from app.config.config import Config, validate_config
 from app.routes import register_routes
 from app.core.firebase_init import init_firebase
 from app.core.vertex_init import init_vertex_ai
@@ -16,6 +16,15 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     Compress(app)
+
+    # Échoue au démarrage plutôt qu'au premier appel en production.
+    # En développement, on se contente d'avertir pour ne pas bloquer le travail local.
+    for problem in validate_config():
+        log_backend.warning("Configuration incomplète", {
+            "origin": "APP_INIT",
+            "code": "CONFIG_INCOMPLETE",
+            "problem": problem
+        })
 
     # L'API utilise des jetons Bearer Supabase, pas des cookies de session Flask.
     # On restreint donc CORS aux origines frontend explicites sans activer les credentialed requests.

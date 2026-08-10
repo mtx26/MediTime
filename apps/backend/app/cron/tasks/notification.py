@@ -1,10 +1,15 @@
-from app.db.connection import get_connection
+from app.db.connection import get_connection, system_context
 from app.utils.logging import log_backend
 from app.services.medication import check_low_stock_and_notify_for_calendar
 from datetime import timedelta, datetime
 
+@system_context()
 def send_notifications_for_all_users():
-    """Parcourt tous les calendriers et notifie les utilisateurs (propriétaires et partagés) dont l'heure de notification est proche."""
+    """Parcourt tous les calendriers et notifie les utilisateurs (propriétaires et partagés) dont l'heure de notification est proche.
+
+    Tâche système : elle traverse volontairement tous les comptes, donc elle s'exécute
+    en contexte admin (hors RLS) via system_context.
+    """
     try:
         now = datetime.now()
         start_time = (now - timedelta(minutes=2, seconds=30)).time()

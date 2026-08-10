@@ -28,7 +28,22 @@ tests
 .env
 .env.dev
 .env.prod
+# Les fichiers d'exemple documentent les variables et doivent rester versionnés.
+!.env.example
+!**/.env.example
+
+# Identifiants — à n'importe quelle profondeur
 serviceAccountKey.json
+**/serviceAccountKey.json
+google-services.json
+**/google-services.json
+GoogleService-Info.plist
+**/GoogleService-Info.plist
+*.p8
+*.p12
+*.keystore
+*.jks
+
 .venv/
 *.log
 apps/backend/pils.json

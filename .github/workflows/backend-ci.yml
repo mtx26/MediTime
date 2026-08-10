@@ -7,9 +7,11 @@ on:
   push:
     paths:
       - 'apps/backend/**'
+      - '.github/workflows/backend-ci.yml'
   pull_request:
     paths:
       - 'apps/backend/**'
+      - '.github/workflows/backend-ci.yml'
 
 jobs:
   test-backend:
@@ -18,7 +20,11 @@ jobs:
       run:
         working-directory: apps/backend
 
+    # Les variables sont lues directement par os.getenv dans app/config/config.py.
+    # Inutile d'écrire un fichier .env : load_dotenv() n'écrase pas l'environnement
+    # déjà défini, et matérialiser les secrets sur disque ne fait qu'élargir la surface.
     env:
+      ENVIRONMENT: ci
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       SUPABASE_DB_HOST: ${{ secrets.SUPABASE_DB_HOST }}
       SUPABASE_DB_NAME: ${{ secrets.SUPABASE_DB_NAME }}
@@ -32,52 +38,31 @@ jobs:
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
       SYSTEM_UID: ${{ secrets.SYSTEM_UID }}
       FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
-      SMTP_HOST: ${{ secrets.SMTP_HOST }}
-      SMTP_PORT: ${{ secrets.SMTP_PORT }}
       NOTIFICATION_EMAIL_ADDRESS: ${{ secrets.NOTIFICATION_EMAIL_ADDRESS }}
-      NOTIFICATION_EMAIL_PASSWORD: ${{ secrets.NOTIFICATION_EMAIL_PASSWORD }}
+      RESEND_API: ${{ secrets.RESEND_API }}
+      RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
       TWILIO_API_KEY_SID: ${{ secrets.TWILIO_API_KEY_SID }}
       TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}
       TWILIO_MESSAGING_SERVICE_SID: ${{ secrets.TWILIO_MESSAGING_SERVICE_SID }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
+      # 3.11 pour correspondre à l'image de production (apps/backend/Dockerfile).
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
-          python-version: '3.10'
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: apps/backend/requirements.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Create .env file
-        run: |
-          echo "GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}" >> .env
-          echo "SUPABASE_DB_HOST=${SUPABASE_DB_HOST}" >> .env
-          echo "SUPABASE_DB_NAME=${SUPABASE_DB_NAME}" >> .env
-          echo "SUPABASE_DB_USER=${SUPABASE_DB_USER}" >> .env
-          echo "SUPABASE_DB_PASSWORD=${SUPABASE_DB_PASSWORD}" >> .env
-          echo "SUPABASE_DB_PORT=${SUPABASE_DB_PORT}" >> .env
-          echo "SUPABASE_URL=${SUPABASE_URL}" >> .env
-          echo "SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}" >> .env
-          echo "CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}" >> .env
-          echo "CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}" >> .env
-          echo "CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}" >> .env
-          echo "SYSTEM_UID=${SYSTEM_UID}" >> .env
-          echo "FRONTEND_URL=${FRONTEND_URL}" >> .env
-          echo "SMTP_HOST=${SMTP_HOST}" >> .env
-          echo "SMTP_PORT=${SMTP_PORT}" >> .env
-          echo "NOTIFICATION_EMAIL_ADDRESS=${NOTIFICATION_EMAIL_ADDRESS}" >> .env
-          echo "NOTIFICATION_EMAIL_PASSWORD=${NOTIFICATION_EMAIL_PASSWORD}" >> .env
-          echo "TWILIO_API_KEY_SID=${TWILIO_API_KEY_SID}" >> .env
-          echo "TWILIO_API_KEY_SECRET=${TWILIO_API_KEY_SECRET}" >> .env
-          echo "TWILIO_MESSAGING_SERVICE_SID=${TWILIO_MESSAGING_SERVICE_SID}" >> .env
-
-      - name: Debug .env
-        run: cat .env
+      - name: Byte-compile sources
+        run: python -m compileall -q app scheduler.py
 
       - name: Check if Flask launches properly
         run: python -m app.main --check

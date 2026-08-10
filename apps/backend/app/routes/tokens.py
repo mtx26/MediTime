@@ -191,15 +191,14 @@ def handle_get_token_metadata(token):
     try:
         calendar_id = g.calendar_id
 
-        with get_connection() as conn:
+        # Le token est injecté en GUC transaction-local par get_connection pour activer
+        # la policy "Public access via shared token" sur shared_tokens.
+        with get_connection(share_token=token) as conn:
             with conn.cursor() as cursor:
-                # On injecte le token dans la session DB via une CTE pour que la politique RLS puisse le vérifier
-                cursor.execute("""
-                    WITH set_session AS (
-                        SELECT set_config('app.current_token', %s, true)
-                    )
-                    SELECT owner_uid FROM set_session, shared_tokens WHERE id = %s AND deleted_at IS NULL
-                """, (token, token))
+                cursor.execute(
+                    "SELECT owner_uid FROM shared_tokens WHERE id = %s AND deleted_at IS NULL",
+                    (token,)
+                )
                 token_data = cursor.fetchone()
                 if not token_data:
                     return warning_response(

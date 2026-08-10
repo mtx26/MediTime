@@ -1,0 +1,38 @@
+# Contexte de build = apps/backend (voir docker-compose.yml et backend-image.yml).
+# La .dockerignore de la racine ne s'applique PAS ici : sans ce fichier, le
+# `COPY . /app` du Dockerfile embarque les secrets dans l'image publiée sur GHCR.
+
+# Secrets — ne jamais embarquer dans une image
+.env
+.env.*
+serviceAccountKey.json
+*.pem
+*.key
+*.p12
+pils.json
+
+# Environnements virtuels et caches Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Git et outillage
+.git
+.gitignore
+.dockerignore
+
+# Tests et artefacts locaux
+app/test/
+tests/
+*.log
+logs/
+
+# Documentation non nécessaire au runtime
+*.md
+openapi.yaml

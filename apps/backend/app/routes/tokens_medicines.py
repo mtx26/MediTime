@@ -12,25 +12,29 @@ from app.utils.decorators import measure_time, with_query_origin, verify_token
 @with_query_origin(default_origin="REALTIME_TOKEN_MEDICINES")
 def handle_token_medicines(token):
     try:
-        with get_connection() as conn:
+        # verify_token a déjà validé le token et résolu le calendrier associé.
+        calendar_id = g.calendar_id
+
+        # Le token est injecté en GUC transaction-local par get_connection, ce qui active
+        # la policy "Public access via shared token". Le filtre sur calendar_id ci-dessous
+        # est volontairement redondant : il cloisonne la requête même si la RLS venait à
+        # ne pas s'appliquer (rôle propriétaire des tables, FORCE RLS absent, etc.).
+        with get_connection(share_token=token) as conn:
             with conn.cursor() as cursor:
-                # On injecte le token dans la session DB via une CTE pour que la politique RLS puisse le vérifier
                 cursor.execute("""
-                    WITH set_session AS (
-                        SELECT set_config('app.current_token', %s, true)
-                    )
                     SELECT
-                        cond.*, 
+                        cond.*,
                         box.name,
                         box.dose,
                         box.box_capacity,
                         box.stock_quantity,
                         box.stock_alert_threshold
-                    FROM set_session, medicine_box_conditions cond
+                    FROM medicine_box_conditions cond
                     JOIN medicine_boxes box ON cond.box_id = box.id
-                    WHERE cond.deleted_at IS NULL
+                    WHERE box.calendar_id = %s
+                        AND cond.deleted_at IS NULL
                         AND box.deleted_at IS NULL
-                """, (token,))
+                """, (calendar_id,))
                 medicines = cursor.fetchall()
 
         return success_response(

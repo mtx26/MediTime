@@ -41,7 +41,7 @@
     "expo-web-browser": "~15.0.10",
     "i18next": "^26.0.6",
     "react": "19.1.0",
-    "react-dom": "^19.1.0",
+    "react-dom": "19.1.0",
     "react-hook-form": "^7.73.1",
     "react-i18next": "^17.0.4",
     "react-native": "0.81.5",
@@ -53,6 +53,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "dotenv": "^17.0.1",
     "typescript": "~5.9.2"
   },
   "private": true

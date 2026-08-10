@@ -1,3 +1,14 @@
+# Image backend construite depuis la RACINE du dépôt (contexte = MediTime/).
+#
+# Pour un build depuis apps/backend/ (contexte = apps/backend), utiliser
+# apps/backend/Dockerfile — c'est celui qu'utilisent docker-compose.yml et
+# le workflow backend-image.yml.
+#
+#   docker build -f Dockerfile -t meditime-backend .
+#
+# Ce fichier référençait backend/, qui ne contient plus que des .env depuis la
+# migration vers apps/ : le build échouait sur le COPY des requirements.
+
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -15,14 +26,12 @@ RUN apt-get update \
 RUN groupadd --system app \
     && useradd --system --gid app --create-home app
 
-COPY backend/requirements.txt /app/backend/requirements.txt
-RUN pip install --no-cache-dir -r /app/backend/requirements.txt
+COPY apps/backend/requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-COPY backend /app/backend
+COPY apps/backend /app
 
 RUN chown -R app:app /app
-
-WORKDIR /app/backend
 
 USER app
 

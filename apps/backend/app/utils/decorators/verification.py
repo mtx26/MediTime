@@ -57,23 +57,23 @@ def _verify_calendar_share(calendar_id: str, receiver_uid: str) -> bool:
     - bool: True si l'utilisateur a accès au calendrier partagé, False sinon.
     """
     try:
-        with get_connection() as conn:
+        # L'uid est passé explicitement à get_connection, qui pose le claim en
+        # GUC transaction-local avant la requête. Le poser dans une CTE laissait
+        # l'ordre d'évaluation décider si la RLS voyait le claim ou non.
+        with get_connection(uid=receiver_uid) as conn:
             with conn.cursor() as cursor:
                 cursor.execute("""
-                    WITH set_user AS (
-                        SELECT set_config('request.jwt.claim.sub', %s, true)
-                    )
                     SELECT
-                        EXISTS (SELECT 1 FROM calendars, set_user WHERE id = %s AND deleted_at IS NULL) AS calendar_exists,
+                        EXISTS (SELECT 1 FROM calendars WHERE id = %s AND deleted_at IS NULL) AS calendar_exists,
                         EXISTS (
                             SELECT 1
-                            FROM shared_calendars, set_user
+                            FROM shared_calendars
                             WHERE calendar_id = %s
                               AND receiver_uid = %s
                               AND deleted_at IS NULL
                               AND accepted_at IS NOT NULL
                         ) AS share_exists
-                """, (receiver_uid, calendar_id, calendar_id, receiver_uid))
+                """, (calendar_id, calendar_id, receiver_uid))
 
                 row = cursor.fetchone()
 
@@ -113,16 +113,15 @@ def _verify_calendar(calendar_id: str, uid: str) -> bool:
     - bool: True si l'utilisateur a accès au calendrier, False sinon.
     """
     try:
-        with get_connection() as conn:
+        # Idem : le claim est posé par get_connection avant l'exécution de la requête.
+        with get_connection(uid=uid) as conn:
             with conn.cursor() as cursor:
                 # On laisse le RLS filtrer. Si une ligne est retournée, c'est que l'utilisateur a accès
                 # (soit propriétaire, soit invité, soit partagé).
-                cursor.execute("""
-                    WITH set_user AS (
-                        SELECT set_config('request.jwt.claim.sub', %s, true)
-                    )
-                    SELECT 1 FROM calendars, set_user WHERE id = %s AND deleted_at IS NULL
-                """, (uid, calendar_id))
+                cursor.execute(
+                    "SELECT 1 FROM calendars WHERE id = %s AND deleted_at IS NULL",
+                    (calendar_id,)
+                )
                 return cursor.fetchone() is not None
 
     except Exception as e:
@@ -143,17 +142,19 @@ def _verify_token(token: str) -> str | bool:
     Retour:
     - str | bool: L'ID du calendrier si le token est valide, sinon False.
     """
+    if not token:
+        return False
+
     try:
-        with get_connection() as conn:
+        # Injection du token en GUC transaction-local par get_connection,
+        # pour que la policy "Public access via shared token" s'applique.
+        with get_connection(share_token=token) as conn:
             with conn.cursor() as cursor:
-                # Injection du token en session pour passer le RLS de shared_tokens
-                cursor.execute("""
-                    WITH set_session AS (
-                        SELECT set_config('app.current_token', %s, true)
-                    )
-                    SELECT * FROM shared_tokens, set_session WHERE id = %s AND deleted_at IS NULL
-                """, (token, token))
-                
+                cursor.execute(
+                    "SELECT * FROM shared_tokens WHERE id = %s AND deleted_at IS NULL",
+                    (token,)
+                )
+
                 token_data = cursor.fetchone()
                 if not token_data:
                     return False
