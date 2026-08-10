@@ -420,7 +420,7 @@ export function useSettings() {
   }, [t, userInfo?.email]);
 
   const confirmLogout = useCallback(() => {
-    Alert.alert(String(t('logout')), String(t('logout')), [
+    Alert.alert(String(t('logout')), String(t('logout_confirm_message')), [
       { text: String(t('cancel')), style: 'cancel' },
       {
         text: String(t('logout')),

@@ -83,7 +83,8 @@
       "usage_not_found": "No se encontró el uso del pastillero",
       "usages_fetch_error": "Error al recuperar el uso de Pillbox",
       "usages_retrieved": "Datos de uso de Pillbox recuperados",
-      "use_error": "Error al usar el pastillero"
+      "use_error": "Error al usar el pastillero",
+      "save_error": "error al guardar"
     },
     "calendar": {
       "calendar_generated": "calendario generado",
@@ -380,7 +381,9 @@
     "view_notice": "Vea las instrucciones",
     "export_pdf_description": "Descarga tu calendario en formato PDF para imprimir o compartir.",
     "export_pdf_title": "Exportar a PDF",
-    "include_inactive_medicines": "Incluir medicamentos inactivos"
+    "include_inactive_medicines": "Incluir medicamentos inactivos",
+    "add_manual_desc": "Crea un botiquín introduciendo la información manualmente.",
+    "add_with_qr_desc": "Escanee el código DataMatrix que aparece en el envase de su medicamento."
   },
   "calendar": {
     "add": "Agregar un calendario",
@@ -596,6 +599,7 @@
   "locale": "es-ES",
   "login": "Acceso",
   "logout": "Cerrar sesión",
+  "logout_confirm_message": "¿Estás seguro de que quieres cerrar sesión?",
   "low_stock": "Stock bajo",
   "manage_link": "Administrar el enlace",
   "medicine_review": {
@@ -1210,11 +1214,21 @@
     "back": "Retour",
     "summary": "Récapitulatif",
     "tablets": "comprimé(s)",
-    "total": "Total à réajouter"
+    "total": "Total à réajouter",
+    "criteria": "criterios",
+    "days_selected": "días seleccionados",
+    "individual": "individual",
+    "new_stock": "nuevo stock",
+    "old_stock": "existencias antiguas",
+    "range": "rango",
+    "select_mode": "seleccionar modo",
+    "tablets_added": "Se añadieron tabletas"
   },
   "unexpected_error": "unexpected error",
   "edit": "editar",
   "loading_stock_alerts": "Cargando alertas de stock",
   "tablet": "tableta",
-  "tablets": "tabletas"
+  "tablets": "tabletas",
+  "confirm": "confirmar",
+  "no_medicines_scheduled": "No hay medicamentos programados"
 }

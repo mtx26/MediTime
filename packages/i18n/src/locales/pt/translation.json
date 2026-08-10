@@ -83,7 +83,8 @@
       "usage_not_found": "Uso de porta-comprimidos não encontrado",
       "usages_fetch_error": "Erro ao recuperar o uso do Pillbox",
       "usages_retrieved": "Dados de uso do porta-comprimidos recuperados",
-      "use_error": "erro ao usar o porta-comprimidos"
+      "use_error": "erro ao usar o porta-comprimidos",
+      "save_error": "erro ao salvar"
     },
     "calendar": {
       "calendar_generated": "calendário gerado",
@@ -380,7 +381,9 @@
     "view_notice": "Veja as instruções",
     "export_pdf_description": "Baixe seu calendário em formato PDF para imprimir ou compartilhar.",
     "export_pdf_title": "Exportar para PDF",
-    "include_inactive_medicines": "Incluir medicamentos inativos"
+    "include_inactive_medicines": "Incluir medicamentos inativos",
+    "add_manual_desc": "Crie uma caixa de medicamentos inserindo as informações manualmente.",
+    "add_with_qr_desc": "Escaneie o código DataMatrix na embalagem do seu medicamento."
   },
   "calendar": {
     "add": "Adicionar um calendário",
@@ -1210,11 +1213,22 @@
     "back": "Retour",
     "summary": "Récapitulatif",
     "tablets": "comprimé(s)",
-    "total": "Total à réajouter"
+    "total": "Total à réajouter",
+    "criteria": "critérios",
+    "days_selected": "dias selecionados",
+    "individual": "individual",
+    "new_stock": "novo estoque",
+    "old_stock": "estoque antigo",
+    "range": "faixa",
+    "select_mode": "selecionar modo",
+    "tablets_added": "comprimidos adicionados"
   },
   "unexpected_error": "unexpected error",
   "edit": "editar",
   "loading_stock_alerts": "Carregando alertas de estoque",
   "tablet": "comprimido",
-  "tablets": "comprimidos"
+  "tablets": "comprimidos",
+  "confirm": "confirmar",
+  "logout_confirm_message": "Tem certeza de que deseja desconectar?",
+  "no_medicines_scheduled": "nenhum medicamento prescrito"
 }

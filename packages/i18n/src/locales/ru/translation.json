@@ -83,7 +83,8 @@
       "usage_not_found": "Использование дота не найдено.",
       "usages_fetch_error": "Ошибка при получении информации об использовании Pillbox.",
       "usages_retrieved": "Восстановлены данные об использовании дотов.",
-      "use_error": "ошибка при использовании бункера для таблеток"
+      "use_error": "ошибка при использовании бункера для таблеток",
+      "save_error": "ошибка сохранения"
     },
     "calendar": {
       "calendar_generated": "календарь сгенерирован",
@@ -380,7 +381,9 @@
     "view_notice": "См. инструкцию",
     "export_pdf_description": "Скачайте календарь в формате PDF, чтобы распечатать или поделиться им.",
     "export_pdf_title": "Экспорт в PDF",
-    "include_inactive_medicines": "Включать неактивные лекарственные средства"
+    "include_inactive_medicines": "Включать неактивные лекарственные средства",
+    "add_manual_desc": "Создайте аптечку, введя информацию вручную.",
+    "add_with_qr_desc": "Отсканируйте код DataMatrix на упаковке вашего лекарственного препарата."
   },
   "calendar": {
     "add": "Добавить календарь",
@@ -1210,11 +1213,22 @@
     "back": "Retour",
     "summary": "Récapitulatif",
     "tablets": "comprimé(s)",
-    "total": "Total à réajouter"
+    "total": "Total à réajouter",
+    "criteria": "критерии",
+    "days_selected": "выбранные дни",
+    "individual": "индивидуальный",
+    "new_stock": "новый товар",
+    "old_stock": "старые запасы",
+    "range": "диапазон",
+    "select_mode": "выбрать режим",
+    "tablets_added": "добавлены таблетки"
   },
   "unexpected_error": "unexpected error",
   "edit": "редактировать",
   "loading_stock_alerts": "Загрузка уведомлений о наличии товара",
   "tablet": "планшет",
-  "tablets": "таблетки"
+  "tablets": "таблетки",
+  "confirm": "подтверждать",
+  "logout_confirm_message": "Вы уверены, что хотите отключиться?",
+  "no_medicines_scheduled": "Лекарства не назначены"
 }

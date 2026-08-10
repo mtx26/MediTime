@@ -83,7 +83,8 @@
       "usage_not_found": "Pillbox usage not found",
       "usages_fetch_error": "Error retrieving Pillbox usage",
       "usages_retrieved": "Pillbox usage data recovered",
-      "use_error": "error when using the pillbox"
+      "use_error": "error when using the pillbox",
+      "save_error": "save error"
     },
     "calendar": {
       "calendar_generated": "calendar generated",
@@ -596,6 +597,7 @@
   "locale": "en-US",
   "login": "Login",
   "logout": "Logout",
+  "logout_confirm_message": "Are you sure you want to log out?",
   "low_stock": "Low stock",
   "manage_link": "Manage the link",
   "medicine_review": {
@@ -1205,7 +1207,15 @@
     "recap_subtitle": "Review the changes before applying them.",
     "total": "Total to re-add",
     "tablets": "tablet(s)",
-    "no_affected_meds": "No medications affected for the selected criteria."
+    "no_affected_meds": "No medications affected for the selected criteria.",
+    "criteria": "criteria",
+    "days_selected": "days selected",
+    "individual": "individual",
+    "new_stock": "new stock",
+    "old_stock": "old stock",
+    "range": "range",
+    "select_mode": "select mode",
+    "tablets_added": "tablets added"
   },
   "you_have_no_pillbox_use_history": "You have no usage history for the pill organizer.",
   "confirm_calendar_refill": "Confirm that the pillbox is full",
@@ -1216,5 +1226,7 @@
   "edit": "edit",
   "loading_stock_alerts": "loading stock alerts",
   "tablet": "tablet",
-  "tablets": "tablets"
+  "tablets": "tablets",
+  "confirm": "confirm",
+  "no_medicines_scheduled": "no medicines scheduled"
 }
