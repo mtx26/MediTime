@@ -29,7 +29,6 @@ PROTECTED_TAGS=("latest" "main")
 # `login` n'y figure pas : il partage son digest avec `latest` et ne peut pas
 # être supprimé séparément (voir plus bas).
 REMOVABLE_TAGS=(
-  "dump"
   "monorepo-v2"
   "copilot-fix-worker-process-exception"
   "copilot-fix-invalid-uuid-syntax"
