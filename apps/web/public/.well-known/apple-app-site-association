@@ -2,7 +2,9 @@
   "applinks": {
     "details": [
       {
-        "appIDs": ["VCLF9HXC5M.app.meditime.mobile"],
+        "appIDs": [
+          "VCLF9HXC5M.app.meditime.mobile"
+        ],
         "components": [
           {
             "/": "/*",

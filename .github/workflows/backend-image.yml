@@ -2,11 +2,15 @@ name: Backend Docker Image
 
 on:
   push:
+    # Publier depuis n'importe quelle branche mettait un artefact de travail
+    # derrière le tag `latest` du registre. On restreint à la branche par défaut
+    # et aux tags de version ; les autres branches restent buildables à la demande.
     branches:
-      - '**'
+      - main
+    tags:
+      - 'v*'
     paths:
       - 'apps/backend/**'
-      - 'apps/backend/Dockerfile'
       - '.github/workflows/backend-image.yml'
   workflow_dispatch:
 
@@ -37,9 +41,13 @@ jobs:
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
         with:
           images: ghcr.io/${{ github.repository_owner }}/meditime-backend
+          # `latest` est explicitement lié à main, et non à {{is_default_branch}} :
+          # la branche par défaut du dépôt est encore `login`, donc la forme
+          # implicite ne taguait jamais latest sur un push vers main.
           tags: |
-            type=raw,value=latest
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=ref,event=branch
+            type=semver,pattern={{version}}
             type=sha
 
       - name: Build and push

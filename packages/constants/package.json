@@ -4,12 +4,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@meditime/types": "file:../types",
+    "@meditime/types": "^0.0.0",
     "country-flag-icons": "^1.6.4",
     "date-fns": "^4.1.0"
-  },
-  "peerDependencies": {
-    "react": ">=18"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",

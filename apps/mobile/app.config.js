@@ -12,6 +12,25 @@ const appleTeamId = (process.env.EXPO_PUBLIC_APPLE_TEAM_ID || '').trim();
 const googleServicesJsonPath = process.env.GOOGLE_SERVICES_JSON || './google-services.json';
 const googleServicesInfoPlistPath = process.env.GOOGLE_SERVICES_INFO_PLIST || './GoogleService-Info.plist';
 
+// EAS expose le profil de build courant. Les .env ne sont pas versionnés, donc
+// une variable manquante dans EAS passait inaperçue jusqu'au test sur device.
+const easBuildProfile = process.env.EAS_BUILD_PROFILE || '';
+const isReleaseBuild = easBuildProfile === 'production' || easBuildProfile === 'preview';
+
+if (isReleaseBuild && !appleTeamId) {
+  // Sans Team ID, associatedDomains est omis et les universal links iOS sont
+  // silencieusement inertes dans le build livré. Mieux vaut casser le build.
+  throw new Error(
+    `EXPO_PUBLIC_APPLE_TEAM_ID est requis pour le profil "${easBuildProfile}" : ` +
+    'sans lui, les universal links iOS sont désactivés sans erreur. ' +
+    'Définissez-le dans les variables d\'environnement EAS.'
+  );
+}
+
+// Les builds de développement doivent utiliser l'environnement APNs sandbox :
+// forcer 'production' invalide les jetons de push sur les builds dev.
+const apsEnvironment = easBuildProfile === 'development' ? 'development' : 'production';
+
 const config = {
   ...appJson.expo,
   plugins: [
@@ -38,7 +57,7 @@ const config = {
     googleServicesFile: googleServicesInfoPlistPath,
     entitlements: {
       ...appJson.expo.ios.entitlements,
-      'aps-environment': 'production',
+      'aps-environment': apsEnvironment,
     },
     infoPlist: {
       ...appJson.expo.ios.infoPlist,

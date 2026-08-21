@@ -5,10 +5,16 @@ on:
     paths:
       - 'apps/web/**'
       - 'packages/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/frontend-ci.yml'
   pull_request:
     paths:
       - 'apps/web/**'
       - 'packages/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/frontend-ci.yml'
 
 permissions:
   contents: read
@@ -16,23 +22,26 @@ permissions:
 jobs:
   build-frontend:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
+          cache: 'npm'
 
+      # npm install (et non npm ci) pour rester aligné sur l'installCommand de
+      # Vercel. Le lockfile n'est volontairement pas régénéré sous Windows :
+      # il porte les binaires natifs Linux de Rollup (voir README, section Deployment).
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
-      - name: Lint the code
-        run: npm run lint --workspace=apps/web || echo "No linter configured"
+      # `|| echo "No linter configured"` masquait toute erreur de type :
+      # le job passait au vert quel que soit le résultat.
+      - name: Type-check
+        run: npm run type-check --workspace=apps/web
 
       - name: Build the app
         run: npm run build --workspace=apps/web

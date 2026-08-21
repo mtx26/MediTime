@@ -1,9 +1,18 @@
 services:
   - type: web
-    name: calendrier-backend
+    name: meditime-backend
     env: python
-    buildCommand: ""
-    startCommand: gunicorn app.main:app
+    rootDir: apps/backend
+    # buildCommand était vide : aucune dépendance n'était installée et le service
+    # échouait au démarrage sur l'import de flask.
+    buildCommand: pip install -r requirements.txt
+    startCommand: >-
+      gunicorn -w ${GUNICORN_WORKERS:-4} --threads ${GUNICORN_THREADS:-2}
+      -b 0.0.0.0:${PORT:-5000} --timeout ${GUNICORN_TIMEOUT:-120}
+      --access-logfile - --error-logfile - app.main:app
     envVars:
-      - key: FLASK_ENV
+      - key: ENVIRONMENT
         value: production
+      # Les secrets (SUPABASE_*, CLOUDINARY_*, TWILIO_*, RESEND_*,
+      # GOOGLE_APPLICATION_CREDENTIALS, FRONTEND_URL) sont à définir dans le
+      # dashboard Render, jamais dans ce fichier versionné.

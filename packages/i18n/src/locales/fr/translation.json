@@ -83,7 +83,8 @@
       "usage_not_found": "utilisation du pillbox non trouvée",
       "usages_fetch_error": "erreur lors de la récupération des usages du pillbox",
       "usages_retrieved": "usages du pillbox récupérés",
-      "use_error": "erreur lors de l'utilisation du pillbox"
+      "use_error": "erreur lors de l'utilisation du pillbox",
+      "save_error": "save error"
     },
     "calendar": {
       "calendar_generated": "calendrier généré",
@@ -596,6 +597,7 @@
   "locale": "fr-FR",
   "login": "Connexion",
   "logout": "Déconnexion",
+  "logout_confirm_message": "Êtes-vous sûr de vouloir vous déconnecter ?",
   "low_stock": "Stock faible",
   "manage_link": "Gérer le lien",
   "medicine_review": {
@@ -1207,7 +1209,15 @@
     "recap_subtitle": "Vérifiez les modifications avant de les appliquer.",
     "total": "Total à réajouter",
     "tablets": "comprimé(s)",
-    "no_affected_meds": "Aucun médicament concerné pour la sélection choisie."
+    "no_affected_meds": "Aucun médicament concerné pour la sélection choisie.",
+    "criteria": "criteria",
+    "days_selected": "days selected",
+    "individual": "individual",
+    "new_stock": "new stock",
+    "old_stock": "old stock",
+    "range": "range",
+    "select_mode": "select mode",
+    "tablets_added": "tablets added"
   },
   "you_have_no_pillbox_use_history": "Vous n'avez pas d'historique d'utilisation du pilulier.",
   "error": "error",
@@ -1216,5 +1226,7 @@
   "edit": "edit",
   "loading_stock_alerts": "loading stock alerts",
   "tablet": "tablet",
-  "tablets": "tablets"
+  "tablets": "tablets",
+  "confirm": "confirm",
+  "no_medicines_scheduled": "no medicines scheduled"
 }

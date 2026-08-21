@@ -83,7 +83,8 @@
       "usage_not_found": "未发现药盒使用情况",
       "usages_fetch_error": "获取药盒使用情况时出错",
       "usages_retrieved": "已恢复药盒使用数据",
-      "use_error": "使用药盒时出错"
+      "use_error": "使用药盒时出错",
+      "save_error": "保存错误"
     },
     "calendar": {
       "calendar_generated": "生成的日历",
@@ -380,7 +381,9 @@
     "view_notice": "查看说明",
     "export_pdf_description": "下载PDF格式的日历，以便打印或分享。",
     "export_pdf_title": "导出为 PDF",
-    "include_inactive_medicines": "包括非活性药物"
+    "include_inactive_medicines": "包括非活性药物",
+    "add_manual_desc": "手动输入信息创建药品箱",
+    "add_with_qr_desc": "扫描药品包装上的DataMatrix条形码"
   },
   "calendar": {
     "add": "添加日历",
@@ -1210,11 +1213,22 @@
     "back": "Retour",
     "summary": "Récapitulatif",
     "tablets": "comprimé(s)",
-    "total": "Total à réajouter"
+    "total": "Total à réajouter",
+    "criteria": "标准",
+    "days_selected": "选定的日期",
+    "individual": "个人",
+    "new_stock": "新货",
+    "old_stock": "旧库存",
+    "range": "范围",
+    "select_mode": "选择模式",
+    "tablets_added": "添加片剂"
   },
   "unexpected_error": "unexpected error",
   "edit": "编辑",
   "loading_stock_alerts": "加载库存警报",
   "tablet": "药片",
-  "tablets": "片剂"
+  "tablets": "片剂",
+  "confirm": "确认",
+  "logout_confirm_message": "您确定要断开连接吗？",
+  "no_medicines_scheduled": "无需服用任何药物"
 }

@@ -4,12 +4,14 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@meditime/constants": "file:../constants",
-    "@meditime/types": "file:../types"
+    "@meditime/constants": "^0.0.0",
+    "@meditime/types": "^0.0.0"
   },
   "exports": {
     ".": "./src/index.ts",
     "./src/files/cropImage": "./src/files/cropImage.ts",
     "./src/files/imageValidation": "./src/files/imageValidation.ts"
-  }
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts"
 }

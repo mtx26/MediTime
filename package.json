@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspace=apps/web",
+    "dev:mobile": "npm run start --workspace=apps/mobile",
     "build": "npm run build --workspace=apps/web && npm run build --workspace=apps/mobile",
     "build:web": "npm run build --workspace=apps/web",
     "build:mobile": "npm run build --workspace=apps/mobile",
@@ -19,12 +20,9 @@
     "lint": "npm run lint --workspace=apps/web && npm run lint --workspace=apps/mobile",
     "type-check": "npm run type-check --workspace=apps/web && npm run type-check --workspace=apps/mobile"
   },
-  "dependencies": {
+  "devDependencies": {
     "@google-cloud/translate": "^9.3.0",
-    "dotenv": "^17.0.1",
-    "lucide-react": "^1.8.0",
-    "react-native-svg": "15.12.1",
-    "react-native-vector-icons": "^10.3.0"
+    "dotenv": "^17.0.1"
   },
   "engines": {
     "node": ">=22.12.0",

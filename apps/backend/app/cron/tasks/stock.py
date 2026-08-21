@@ -1,14 +1,17 @@
 # app/cron/tasks/stock.py
-from app.db.connection import get_connection
+from app.db.connection import get_connection, system_context
 from app.utils.logging import log_backend
 from app.services.medication import check_low_stock_and_notify_for_calendar, process_box_decrement
 from datetime import datetime, timezone
 
+@system_context()
 def decrease_stock():
     """Diminue les stocks des boîtes de médicaments selon la méthode 'daily_midnight'.
+
+    Tâche système : elle traverse volontairement tous les comptes, donc elle s'exécute
+    en contexte admin (hors RLS) via system_context.
     """
     try:
-        # CRON TASK: S'exécute sans contexte utilisateur (g.uid est None), donc get_connection() retourne une connexion admin
         with get_connection() as conn:
             with conn.cursor() as cursor:
                 # Récupère d'un coup tous les calendars concernés + leurs boîtes

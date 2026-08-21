@@ -1,8 +1,7 @@
 import { Redirect, Stack } from 'expo-router';
 import { Pressable, RefreshControl } from 'react-native';
-import { GlassView } from 'expo-glass-effect';
 import { useTranslation } from 'react-i18next';
-import { Text, XStack, YStack } from 'tamagui';
+import { Text } from 'tamagui';
 import { Ionicons } from '@expo/vector-icons';
 import { SETTINGS_TABS } from '@meditime/constants';
 import { usePageHeaderOptions } from '../../components/common/Page';
@@ -14,16 +13,27 @@ import {
   SettingsPageShell,
 } from '../../components/settings';
 import { useSettings } from '../../hooks/settings';
-import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { useIosTheme } from '../../theme/ios';
 import { hapticImpact } from '../../utils/haptics';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
-  const { colorScheme } = useAppTheme();
   const ios = useIosTheme();
   const settings = useSettings();
   const headerOptions = usePageHeaderOptions({
     title: String(t('settings.label')),
+    headerRight: () => (
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => {
+          hapticImpact();
+          settings.confirmLogout();
+        }}
+        style={{ paddingHorizontal: 12, paddingVertical: 8 }}
+      >
+        <Ionicons name="log-out-outline" size={24} color={ios.destructive} />
+      </Pressable>
+    ),
   });
 
   if (!settings.userInfo) {
@@ -48,49 +58,7 @@ export default function SettingsScreen() {
       tabs={settings.tabs}
       activeTab={settings.activeTab}
       onTabChange={settings.setActiveTab}
-      footer={(
-        <YStack
-          style={{
-            gap: 10,
-            paddingTop: 10,
-            borderTopWidth: 1,
-            borderTopColor: ios.border,
-          }}
-        >
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => {
-              hapticImpact();
-              settings.confirmLogout();
-            }}
-          >
-            {({ pressed }) => (
-              <GlassView
-                colorScheme={colorScheme}
-                glassEffectStyle="clear"
-                style={{
-                  minHeight: 48,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 18,
-                  paddingHorizontal: 16,
-                  paddingVertical: 10,
-                  opacity: pressed ? 0.82 : 1,
-                }}
-              >
-                <XStack style={{ alignItems: 'center', gap: 8 }}>
-                  <Ionicons name="log-out-outline" size={18} color={ios.destructive} />
-                  <Text style={{ color: ios.destructive, fontWeight: '800' }}>
-                    {t('logout')}
-                  </Text>
-                </XStack>
-              </GlassView>
-            )}
-          </Pressable>
-        </YStack>
-      )}
     >
-
       {settings.activeTab === SETTINGS_TABS.SECURITY && (
         <SecuritySettingsPanel
           email={settings.userInfo.email ?? ''}

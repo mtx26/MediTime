@@ -1,8 +1,9 @@
 import { Redirect, Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Spinner, YStack } from 'tamagui';
+import { YStack } from 'tamagui';
 import { useAuth } from '../../../src/hooks/auth/useAuth';
 import { useIosTheme } from '../../../src/theme/ios';
+import { NativeLoadingSpinner } from '../../../src/components/common/NativeLoadingSpinner';
 
 export default function NotificationsLayout() {
   const { t } = useTranslation();
@@ -12,7 +13,7 @@ export default function NotificationsLayout() {
   if (isLoading) {
     return (
       <YStack style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: ios.background }}>
-        <Spinner size="large" color={ios.primary} />
+        <NativeLoadingSpinner size="large" />
       </YStack>
     );
   }

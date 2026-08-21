@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import type { BarcodeScanningResult } from 'expo-camera';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { hapticSelection } from '../../utils/haptics';
 import {
   buildBoxActions,
   extractGTIN01,
@@ -444,7 +445,36 @@ export function useBoxes(sourceType: Exclude<CalendarDetailSourceType, 'token'>)
     [boxes],
   );
 
+  const addActions = useMemo(() => toActionSheetItems(
+    [
+      [
+        {
+          id: 'add_manual',
+          icon: 'plus',
+          labelKey: 'boxes.add_manual',
+          titleKey: 'boxes.add_manual',
+          onClick: () => {
+            hapticSelection();
+            startCreate();
+          },
+        },
+        {
+          id: 'add_qr',
+          icon: 'scan-line',
+          labelKey: 'boxes.add_with_qr',
+          titleKey: 'boxes.add_with_qr',
+          onClick: () => {
+            hapticSelection();
+            openQrScanner();
+          },
+        },
+      ],
+    ],
+    translate,
+  ), [openQrScanner, startCreate, translate]);
+
   return {
+    addActions,
     backToCalendars: () => dismissToCalendars(router),
     boxes,
     cancelEdit,

@@ -2,8 +2,9 @@ import type { ReactNode } from 'react';
 import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GlassView } from 'expo-glass-effect';
-import { Spinner, Text, XStack } from 'tamagui';
+import { Text, XStack } from 'tamagui';
 import { useAppTheme, useIosTheme } from '../../theme/ios';
+import { NativeLoadingSpinner } from './NativeLoadingSpinner';
 import { hapticImpact } from '../../utils/haptics';
 
 type LiquidButtonProps = {
@@ -57,7 +58,7 @@ export function LiquidButton({
         >
           <XStack style={{ alignItems: 'center', justifyContent: 'center', gap: isSmall ? 6 : 8 }}>
             {loading ? (
-              <Spinner size="small" color={contentColor} />
+              <NativeLoadingSpinner size="small" />
             ) : iconName ? (
               <Ionicons name={iconName} size={isSmall ? 15 : 18} color={contentColor} />
             ) : null}

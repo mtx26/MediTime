@@ -7,10 +7,11 @@ import { useTranslation } from 'react-i18next';
 import { DynamicColorIOS, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Spinner, YStack } from 'tamagui';
+import { YStack } from 'tamagui';
 import { TabIcon } from '../../src/components/common/TabIcon';
 import { useAuth } from '../../src/hooks/auth/useAuth';
 import { useAppTheme, useIosTheme } from '../../src/theme/ios';
+import { NativeLoadingSpinner } from '../../src/components/common/NativeLoadingSpinner';
 import { hapticSelection } from '../../src/utils/haptics';
 
 const TAB_SEGMENTS = new Set(['calendars', 'shared-calendars', 'notifications', 'settings']);
@@ -48,7 +49,7 @@ export default function TabsLayout() {
   if (isLoading) {
     return (
       <YStack style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: ios.background }}>
-        <Spinner size="large" color={ios.primary} />
+        <NativeLoadingSpinner size="large" />
       </YStack>
     );
   }

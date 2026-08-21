@@ -114,22 +114,23 @@ def create_calendar_ics(token: str, user_agent: str) -> bytes:
     - bytes: Le contenu du fichier .ics encodé en UTF-8.
     """
     
-    with get_connection() as conn:
+    # Le token ICS est injecté en GUC transaction-local par get_connection, ce qui active
+    # les policies "Public access via ics token" pour toute la durée de la transaction.
+    with get_connection(ics_token=token) as conn:
         with conn.cursor() as cursor:
             # 1. Valider le token, mettre à jour l'accès et récupérer le calendar_id en une seule requête
-            # On injecte le token en session pour passer le RLS
             cursor.execute("""
-                WITH set_session AS (
-                    SELECT set_config('app.current_ics_token', %s, true)
-                )
                 UPDATE ics_tokens
                 SET last_accessed_at = NOW(), last_user_agent = %s
-                FROM calendars, set_session, calendar_settings
-                WHERE ics_tokens.token = %s 
+                FROM calendars, calendar_settings
+                WHERE ics_tokens.token = %s
                     AND ics_tokens.deleted_at IS NULL
                     AND ics_tokens.calendar_id = calendars.id
+                    -- Sans cette condition, calendar_settings produit un produit cartésien
+                    -- et stock_decrement_method provient d'un calendrier arbitraire.
+                    AND calendar_settings.calendar_id = calendars.id
                 RETURNING ics_tokens.calendar_id, calendars.name, calendar_settings.stock_decrement_method
-            """, (token, user_agent, token))
+            """, (user_agent, token))
             
             result = cursor.fetchone()
             

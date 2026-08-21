@@ -15,12 +15,11 @@ const AUTHOR = {
 };
 
 // Fonction pour obtenir l'URL de base
-const getBaseUrl = (): string => {
-  if (typeof window !== 'undefined') {
-    return import.meta.env?.VITE_VITE_URL || 'https://meditime-app.com';
-  }
-  return process.env.VITE_VITE_URL || 'https://meditime-app.com';
-};
+// import.meta.env est remplacé statiquement par Vite au build : la valeur est
+// disponible avec ou sans `window`. La branche process.env précédente était
+// inatteignable dans un bundle navigateur, où `process` n'existe pas.
+const getBaseUrl = (): string =>
+  import.meta.env?.VITE_VITE_URL || 'https://meditime-app.com';
 
 export const SEO_CONFIG: SeoConfig = {
   BASE_URL: getBaseUrl(),

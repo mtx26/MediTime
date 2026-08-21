@@ -83,7 +83,8 @@
       "usage_not_found": "ピルボックスの使用法が見つかりません",
       "usages_fetch_error": "ピルボックスの使用状況の取得中にエラーが発生しました",
       "usages_retrieved": "ピルボックスの使用データが回復されました",
-      "use_error": "ピルボックス使用時のエラー"
+      "use_error": "ピルボックス使用時のエラー",
+      "save_error": "保存エラー"
     },
     "calendar": {
       "calendar_generated": "カレンダー生成",
@@ -380,7 +381,9 @@
     "view_notice": "説明書をご覧ください",
     "export_pdf_description": "カレンダーを PDF 形式でダウンロードして、印刷したり共有したりできます。",
     "export_pdf_title": "PDFにエクスポート",
-    "include_inactive_medicines": "不活性薬剤を含める"
+    "include_inactive_medicines": "不活性薬剤を含める",
+    "add_manual_desc": "情報を手動で入力して薬箱を作成します",
+    "add_with_qr_desc": "お薬のパッケージに記載されているデータマトリックスコードをスキャンしてください。"
   },
   "calendar": {
     "add": "カレンダーを追加する",
@@ -1210,11 +1213,22 @@
     "back": "Retour",
     "summary": "Récapitulatif",
     "tablets": "comprimé(s)",
-    "total": "Total à réajouter"
+    "total": "Total à réajouter",
+    "criteria": "基準",
+    "days_selected": "選択された日数",
+    "individual": "個人",
+    "new_stock": "新入荷",
+    "old_stock": "旧在庫",
+    "range": "範囲",
+    "select_mode": "選択モード",
+    "tablets_added": "タブレットが追加されました"
   },
   "unexpected_error": "unexpected error",
   "edit": "編集",
   "loading_stock_alerts": "在庫アラートを読み込んでいます",
   "tablet": "錠剤",
-  "tablets": "錠剤"
+  "tablets": "錠剤",
+  "confirm": "確認する",
+  "logout_confirm_message": "本当に接続を切断しますか？",
+  "no_medicines_scheduled": "薬の服用予定はありません"
 }
