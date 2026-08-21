@@ -13,7 +13,10 @@ def verify_db_connection():
         bool: True si la connexion fonctionne, False sinon.
     """
     try:
-        with get_connection() as conn:
+        # Health check pur (SELECT 1) : aucune table utilisateur n'est lue, donc aucun
+        # cloisonnement RLS à appliquer. Le contexte admin est demandé explicitement car
+        # cette vérification tourne au démarrage, hors requête Flask et hors system_context.
+        with get_connection(skip_rls=True) as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT 1")
                 result = cursor.fetchone()
