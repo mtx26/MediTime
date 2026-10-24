@@ -1,0 +1,81 @@
+@startuml
+title MediTime — Plan de migration vers le backend Rust
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F7FAFC
+  BorderColor #315A75
+  ArrowColor #526B7A
+}
+
+start
+:Phase 0 — Décisions d'architecture;
+note right
+  Choix confirmés :
+  - Rust pour l'API
+  - Axum + SQLx
+  - PostgreSQL 18 auto-hébergé
+  - Docker Compose sur un VPS
+  - stockage objet compatible S3
+  - access JWT court + refresh tokens rotatifs hashés
+  - authentification interne + OAuth possible
+  - fournisseurs e-mail, push, analyse et catalogue conservés
+end note
+:Confirmer fournisseur S3,\ncompatibilité PostgreSQL 18 du VPS,\ndurées et règles de session;
+
+:Phase 1 — Inventaire et contrat;
+:Recenser les routes, rôles,\npermissions, événements et appels clients actuels;
+:Définir contrats OpenAPI cibles\net règles de compatibilité;
+:Écrire ADR pour les décisions techniques restantes;
+
+:Phase 2 — Infrastructure et fondations;
+:Déployer PostgreSQL 18 sur le VPS,\nsauvegardes, TLS, secrets et observabilité;
+:Créer le projet Rust, configuration,\nhealth checks et pipeline CI;
+:Ajouter migrations SQL versionnées\net compte DB à privilèges minimaux;
+
+:Phase 3 — Authentification interne;
+:Implémenter comptes, mots de passe,\nvérification e-mail et récupération;
+:Implémenter JWT d'accès courts,\nrefresh rotatifs hashés, révocation et OAuth;
+:Tester les rôles, frontières d'accès\net scénarios de migration de comptes;
+
+:Phase 4 — Modèle métier et API;
+:Migrer utilisateurs, calendriers,\nboîtes, posologies et paramètres;
+:Implémenter calendriers et traitements;
+:Implémenter stock et pilulier;
+:Implémenter partages, invitations\net jetons publics/ICS;
+:Implémenter notifications et tâches planifiées;
+:Brancher e-mail, push, analyse,\ncatalogue et stockage via des ports;
+
+:Phase 5 — Migration des données;
+:Écrire ETL idempotent avec mapping\nSupabase Auth vers utilisateurs internes;
+:Exporter, transformer et charger\nles données vers PostgreSQL cible;
+:Comparer volumes, relations, stocks,\npermissions et échantillons fonctionnels;
+if (Données cohérentes ?) then (oui)
+  :Répéter la migration à blanc\net chronométrer la bascule;
+else (non)
+  :Corriger le mapping / ETL;
+  --> :Écrire ETL idempotent avec mapping\nSupabase Auth vers utilisateurs internes;
+endif
+
+:Phase 6 — Migration des clients;
+:Adapter web et mobile à l'API Rust;
+:Remplacer Auth et accès directs Supabase\npar les endpoints backend;
+:Conserver temporairement des flags\npour déploiement progressif;
+:Exécuter tests de contrat, intégration\net parcours de bout en bout;
+
+:Phase 7 — Bascule;
+:Geler les écritures sur l'ancien système;
+:Exécuter migration finale et contrôles;
+if (Tests de fumée réussis ?) then (oui)
+  :Basculer les clients et le trafic API;
+  :Surveiller erreurs, latence,\nnotifications et cohérence des données;
+else (non)
+  :Restaurer le trafic précédent\nselon le plan de retour arrière;
+  stop
+endif
+
+:Phase 8 — Stabilisation et retrait;
+:Résoudre les écarts et confirmer\nles sauvegardes/restaurations;
+:Révoquer les accès et secrets Supabase\naprès période de stabilité validée;
+:Retirer les dépendances et services Supabase;
+stop
+@enduml

@@ -1,0 +1,50 @@
+@startuml
+title MediTime — Créer un abonnement ICS et synchroniser un calendrier
+autonumber
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor "Propriétaire ou\ncollaborateur autorisé" as User
+boundary "Application MediTime" as UI
+participant "API MediTime" as API
+participant "Supabase Auth" as Auth
+database "Base MediTime" as DB
+actor "Google Calendar, Outlook\nou autre client ICS" as Client
+
+User -> UI: Demande un lien ICS
+UI -> API: POST /calendars/{id}/ics
+API -> Auth: Vérifie l'accès au calendrier
+Auth --> API: Accès autorisé
+API -> DB: Crée un jeton ICS rattaché au calendrier et à l'utilisateur
+DB --> API: Jeton et date de création
+API --> UI: Détails du lien ICS
+UI --> User: Affiche l'URL d'abonnement
+User -> Client: Ajoute l'URL au calendrier tiers
+
+loop À chaque synchronisation du client
+  Client -> API: GET /calendar/{token}.ics\n(User-Agent)
+  API -> DB: Valide le jeton et met à jour\nlast_accessed_at et last_user_agent
+  alt Jeton absent, révoqué ou invalide
+    DB --> API: Jeton introuvable
+    API --> Client: 404 — calendrier indisponible
+  else Jeton valide
+    DB --> API: calendar_id, nom et mode de stock
+    API -> DB: Lit boîtes, traitements et utilisations du pilulier
+    DB --> API: Données de calendrier
+    API -> API: Calcule les événements de calendrier\net les prévisions sur 365 jours
+    API --> Client: Répond avec le contenu text/calendar
+    Client --> User: Met à jour les événements synchronisés
+  end
+end
+
+opt L'utilisateur révoque le lien
+  User -> UI: Supprime l'abonnement ICS
+  UI -> API: DELETE /calendars/{id}/ics/{token_id}
+  API -> Auth: Vérifie le propriétaire du jeton
+  Auth --> API: Accès autorisé
+  API -> DB: Marque le jeton supprimé
+  DB --> API: Révocation enregistrée
+  API --> UI: Confirmation
+  UI --> User: Confirme la révocation
+end
+@enduml

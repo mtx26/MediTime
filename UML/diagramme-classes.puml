@@ -1,0 +1,252 @@
+@startuml
+title MediTime — Diagramme de classes du modèle de données
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam class {
+  BackgroundColor #F7FAFC
+  BorderColor #315A75
+  ArrowColor #526B7A
+}
+
+package "Comptes" {
+  class Utilisateur {
+    +id: UUID <<PK, FK Supabase Auth>>
+    +email: text
+    +display_name: text?
+    +photo_url: text?
+    +role: text
+    +email_enabled: boolean
+    +push_enabled: boolean
+    +sms_enabled: boolean
+    +phone: text?
+    +notification_time: time
+    +created_at: timestamptz
+    +updated_at: timestamptz
+  }
+
+  class JetonPush {
+    +uid: UUID <<FK>>
+    +token: text <<PK>>
+    +provider: text
+    +platform: text?
+    +device_name: text?
+    +project_id: text?
+    +created_at: timestamptz
+    +updated_at: timestamptz
+  }
+}
+
+package "Calendriers et traitements" {
+  class Calendrier {
+    +id: UUID <<PK>>
+    +owner_uid: UUID <<FK>>
+    +name: text
+    +created_at: timestamptz
+    +updated_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+
+  class ParametresCalendrier {
+    +calendar_id: UUID <<PK, FK>>
+    +stock_decrement_method: text
+    +notifications_enabled: boolean
+    +created_at: timestamptz
+    +updated_at: timestamptz
+  }
+
+  class BoiteMedicament {
+    +id: UUID <<PK>>
+    +calendar_id: UUID <<FK>>
+    +code_fmd: text? <<FK>>
+    +name: text
+    +dose: integer?
+    +box_capacity: integer
+    +stock_quantity: float
+    +stock_alert_threshold: integer
+    +created_at: timestamptz
+    +updated_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+
+  class ConditionTraitement {
+    +id: UUID <<PK>>
+    +box_id: UUID <<FK>>
+    +time_of_day: text
+    +interval_days: integer
+    +start_date: date?
+    +max_date: timestamptz?
+    +tablet_count: float
+    +created_at: timestamptz
+    +updated_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+
+  class UtilisationPilulier {
+    +id: UUID <<PK>>
+    +calendar_id: UUID <<FK>>
+    +prepared_by: UUID? <<FK>>
+    +prepared_at: timestamptz
+    +restored_at: timestamptz?
+    +created_at: timestamptz
+    +updated_at: timestamptz
+  }
+
+  class MedicamentAFMPS {
+    +code_fmd: text <<UK>>
+    +name: text?
+    +dose: text?
+    +forme_pharmaceutique: text?
+    +voie_administration: text?
+    +conditionnement: text?
+    +substance_active: text?
+    +code_atc: text?
+    +code_cnk: text?
+    +url_notice_fr: text?
+    +url_notice_nl: text?
+    +url_notice_de: text?
+    +url_rcp: text?
+    +url_summary_rmp_fr: text?
+    +url_summary_rmp_nl: text?
+    +url_summary_rmp_de: text?
+    +date_derniere_publication_rcp_notice: date?
+    +date_derniere_approbation_rcp_notice: date?
+    +created_at: timestamptz
+    +updated_at: timestamptz
+  }
+}
+
+package "Partage et accès" {
+  class CalendrierPartage {
+    +id: UUID <<PK>>
+    +calendar_id: UUID <<FK>>
+    +receiver_uid: UUID <<FK>>
+    +access: text
+    +accepted_at: timestamptz?
+    +token: UUID? <<UK>>
+    +created_at: timestamptz
+    +updated_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+
+  class ParametresPartage {
+    +shared_calendar_id: UUID <<PK, FK>>
+    +notifications_enabled: boolean
+    +created_at: timestamptz
+    +updated_at: timestamptz
+  }
+
+  class Invitation {
+    +id: UUID <<PK>>
+    +calendar_id: UUID <<FK>>
+    +invited_email: text?
+    +role: text
+    +token: UUID <<UK>>
+    +accepted_at: timestamptz?
+    +created_at: timestamptz
+    +updated_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+
+  class JetonPartagePublic {
+    +id: UUID <<PK>>
+    +calendar_id: UUID <<FK>>
+    +owner_uid: UUID <<FK>>
+    +expires_at: timestamptz?
+    +created_at: timestamptz
+    +updated_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+
+  class JetonICS {
+    +id: UUID <<PK>>
+    +calendar_id: UUID <<FK>>
+    +owner_uid: UUID <<FK>>
+    +token: text <<UK>>
+    +last_accessed_at: timestamptz?
+    +last_user_agent: text?
+    +created_at: timestamptz
+    +updated_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+}
+
+package "Notifications" {
+  class Notification {
+    +id: UUID <<PK>>
+    +user_id: UUID <<FK>>
+    +type: text?
+    +content: jsonb?
+    +read: boolean
+    +timestamp: timestamptz
+    +sender_uid: UUID? <<FK>>
+    +calendar_id: UUID? <<FK>>
+    +shared_calendar_id: UUID? <<FK>>
+    +medication_id: UUID? <<FK>>
+    +created_at: timestamptz
+    +updated_at: timestamptz
+  }
+}
+
+Utilisateur "1" -- "0..*" Calendrier : propriétaire
+Utilisateur "1" -- "0..*" JetonPush : appareils
+Utilisateur "0..1" -- "0..*" UtilisationPilulier : préparateur
+
+Calendrier "1" *-- "0..1" ParametresCalendrier : paramètres
+Calendrier "1" *-- "0..*" BoiteMedicament : contient
+BoiteMedicament "1" *-- "0..*" ConditionTraitement : posologie
+MedicamentAFMPS "0..1" <-- "0..*" BoiteMedicament : référence catalogue
+Calendrier "1" *-- "0..*" UtilisationPilulier : historique des préparations
+
+Calendrier "1" -- "0..*" CalendrierPartage : partagé avec
+Utilisateur "1" -- "0..*" CalendrierPartage : destinataire
+CalendrierPartage "1" *-- "0..1" ParametresPartage : préférences
+Calendrier "1" -- "0..*" Invitation : invitations
+Calendrier "1" -- "0..*" JetonPartagePublic : liens publics
+Utilisateur "1" -- "0..*" JetonPartagePublic : créateur
+Calendrier "1" -- "0..*" JetonICS : abonnements
+Utilisateur "1" -- "0..*" JetonICS : créateur
+
+Utilisateur "1" -- "0..*" Notification : destinataire
+Utilisateur "0..1" -- "0..*" Notification : expéditeur
+Calendrier "0..1" -- "0..*" Notification : concerne
+CalendrierPartage "0..1" -- "0..*" Notification : partage concerné
+BoiteMedicament "0..1" -- "0..*" Notification : médicament concerné
+
+note bottom of UtilisationPilulier
+  Modélise une préparation et sa restauration,
+  pas un journal de prises unitaires.
+end note
+
+note bottom of CalendrierPartage
+  access est contrôlé par l'application.
+  Le rôle d'une Invitation et l'accès du
+  partage sont des champs distincts.
+end note
+
+note bottom of JetonPush
+  token est la clé primaire. La paire
+  (uid, token) possède aussi une contrainte UNIQUE.
+end note
+
+note bottom of MedicamentAFMPS
+  Le catalogue est relié par code_fmd,
+  unique et nullable dans le schéma.
+end note
+
+note bottom of Notification
+  Les références vers calendrier, partage,
+  expéditeur et médicament sont facultatives.
+end note
+
+legend right
+  |= Marque |= Signification |
+  | PK | clé primaire |
+  | FK | clé étrangère |
+  | UK | valeur unique |
+  | ? | valeur nullable |
+  | *-- | relation avec suppression en cascade dans le schéma |
+endlegend
+@enduml

@@ -1,0 +1,60 @@
+@startuml
+title MediTime — Créer puis consulter un calendrier par lien public
+autonumber
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor "Propriétaire" as Owner
+boundary "Application MediTime" as OwnerUI
+participant "API MediTime" as API
+participant "Supabase Auth" as Auth
+database "Base MediTime" as DB
+actor "Consultant public" as Viewer
+boundary "Page publique MediTime" as PublicUI
+
+Owner -> OwnerUI: Demande un lien public\n(expiration facultative)
+OwnerUI -> API: POST /tokens/{calendar_id}\n(expiresAt)
+API -> Auth: Valide l'utilisateur et la propriété du calendrier
+Auth --> API: Propriétaire confirmé
+API -> DB: Vérifie l'absence de lien actif
+DB --> API: Aucun lien actif
+API -> DB: INSERT shared_tokens
+DB --> API: Jeton créé
+API --> OwnerUI: Confirmation
+OwnerUI -> API: GET /tokens
+API -> Auth: Valide le propriétaire
+API -> DB: Liste les jetons actifs du propriétaire
+DB --> API: Jeton et calendrier
+API --> OwnerUI: Lien public affichable
+OwnerUI --> Owner: Affiche le lien à partager
+
+Owner -> Viewer: Transmet le lien contenant le jeton
+Viewer -> PublicUI: Ouvre le lien
+PublicUI -> API: GET /tokens/{token}
+API -> DB: Vérifie le jeton, révocation et expiration
+alt Jeton invalide, expiré ou révoqué
+  DB --> API: Aucun accès public valide
+  API --> PublicUI: Erreur d'accès
+  PublicUI --> Viewer: Affiche le lien indisponible
+else Jeton valide
+  DB --> API: calendar_id et propriétaire
+  API --> PublicUI: Métadonnées du calendrier
+  par Charger le planning
+    PublicUI -> API: GET /tokens/{token}/schedule
+    API -> DB: Lit calendrier, traitements et posologies
+    DB --> API: Planning du calendrier
+    API --> PublicUI: Planning
+  else Charger les médicaments
+    PublicUI -> API: GET /tokens/{token}/medicines
+    API -> DB: Lit les médicaments du calendrier
+    DB --> API: Médicaments et stocks publiés
+    API --> PublicUI: Liste des médicaments
+  end
+  PublicUI --> Viewer: Affiche le contenu autorisé en lecture
+end
+
+note over Viewer,API
+  La consultation publique ne demande pas de connexion ;
+  les routes publiques exigent un jeton valide.
+end note
+@enduml

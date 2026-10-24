@@ -1,0 +1,51 @@
+@startuml
+title MediTime — Prévisualiser et régulariser les prises manquées
+autonumber
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor "Utilisateur\n(propriétaire ou collaborateur autorisé)" as User
+boundary "Application MediTime" as UI
+participant "API MediTime" as API
+participant "Supabase Auth" as Auth
+participant "Service prises manquées" as Missed
+database "Base MediTime" as DB
+
+User -> UI: Sélectionne jours et prises manquées
+UI -> API: POST /calendars/{id}/missed-intakes/preview\n(mode, jours, heures ou médicaments)
+API -> Auth: Vérifie l'accès au calendrier
+Auth --> API: Accès autorisé
+API -> Missed: Valide et prévisualise les paramètres
+Missed -> DB: Lit traitements et stocks actuels
+DB --> Missed: Conditions, posologies et quantités
+Missed -> Missed: Calcule les comprimés à réintégrer\nsans modifier la base
+Missed --> API: Récapitulatif et stocks estimés
+API --> UI: Prévisualisation
+UI --> User: Affiche les changements proposés
+
+alt L'utilisateur annule
+  User -> UI: Annule la régularisation
+  UI --> User: Aucun stock modifié
+else L'utilisateur confirme
+  User -> UI: Confirme l'application
+  UI -> API: POST /calendars/{id}/missed-intakes\n(mêmes paramètres)
+  API -> Auth: Vérifie à nouveau l'accès au calendrier
+  Auth --> API: Accès autorisé
+  API -> Missed: Applique la régularisation
+  Missed -> DB: Relit les conditions actives
+  DB --> Missed: Conditions de traitement
+  Missed -> Missed: Recalcule les quantités dues
+  loop Pour chaque boîte concernée
+    Missed -> DB: Incrémente stock_quantity
+    DB --> Missed: Nouveau stock
+  end
+  Missed --> API: Boîtes mises à jour et total ajouté
+  API --> UI: Résultat de l'application
+  UI --> User: Confirme les stocks corrigés
+end
+
+note over UI,API
+  Pour un calendrier partagé, les deux routes
+  utilisent le préfixe /shared/users/calendars/{id}.
+end note
+@enduml

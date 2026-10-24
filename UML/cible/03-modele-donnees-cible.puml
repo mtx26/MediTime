@@ -1,0 +1,236 @@
+@startuml
+title MediTime — Modèle de données cible (PostgreSQL interne)
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "Identité et authentification interne" {
+  class Utilisateur {
+    +id: UUID <<PK>>
+    +email: citext <<UK>>
+    +display_name: text?
+    +photo_url: text?
+    +role: text
+    +email_verified_at: timestamptz?
+    +email_enabled: boolean
+    +push_enabled: boolean
+    +notification_time: time
+    +created_at: timestamptz
+    +updated_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+
+  class IdentifiantMotDePasse {
+    +user_id: UUID <<PK, FK>>
+    +password_hash: text
+    +password_changed_at: timestamptz
+  }
+
+  class IdentiteOAuth {
+    +id: UUID <<PK>>
+    +user_id: UUID <<FK>>
+    +provider: text
+    +provider_subject: text
+    +created_at: timestamptz
+    +last_used_at: timestamptz?
+    .. Contrainte ..
+    +UNIQUE(provider, provider_subject)
+  }
+
+  class SessionRefresh {
+    +id: UUID <<PK>>
+    +user_id: UUID <<FK>>
+    +token_hash: text <<UK>>
+    +created_at: timestamptz
+    +expires_at: timestamptz
+    +revoked_at: timestamptz?
+    +replaced_by_session_id: UUID?
+    +device_name: text?
+  }
+}
+
+package "Calendriers et traitements" {
+  class Calendrier {
+    +id: UUID <<PK>>
+    +owner_uid: UUID <<FK>>
+    +name: text
+    +created_at: timestamptz
+    +updated_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+
+  class ParametresCalendrier {
+    +calendar_id: UUID <<PK, FK>>
+    +stock_decrement_method: text
+    +notifications_enabled: boolean
+  }
+
+  class BoiteMedicament {
+    +id: UUID <<PK>>
+    +calendar_id: UUID <<FK>>
+    +catalog_medicine_id: UUID? <<FK>>
+    +name: text
+    +dose: integer?
+    +box_capacity: integer
+    +stock_quantity: double precision
+    +stock_alert_threshold: integer
+    +created_at: timestamptz
+    +updated_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+
+  class ConditionTraitement {
+    +id: UUID <<PK>>
+    +box_id: UUID <<FK>>
+    +time_of_day: text
+    +interval_days: integer
+    +start_date: date?
+    +max_date: timestamptz?
+    +tablet_count: double precision
+    +created_at: timestamptz
+    +updated_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+
+  class MedicamentCatalogue {
+    +id: UUID <<PK>>
+    +source: text
+    +source_code: text
+    +name: text?
+    +dose: text?
+    +form: text?
+    +active_substance: text?
+    +package_size: text?
+    +leaflet_url: text?
+    +updated_at: timestamptz
+    .. Contrainte ..
+    +UNIQUE(source, source_code)
+  }
+
+  class UtilisationPilulier {
+    +id: UUID <<PK>>
+    +calendar_id: UUID <<FK>>
+    +prepared_by: UUID? <<FK>>
+    +prepared_at: timestamptz
+    +restored_at: timestamptz?
+  }
+}
+
+package "Partage et notifications" {
+  class PartageCalendrier {
+    +id: UUID <<PK>>
+    +calendar_id: UUID <<FK>>
+    +receiver_uid: UUID <<FK>>
+    +access: text
+    +accepted_at: timestamptz?
+    +created_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+
+  class Invitation {
+    +id: UUID <<PK>>
+    +calendar_id: UUID <<FK>>
+    +invited_email: citext
+    +role: text
+    +token_hash: text <<UK>>
+    +expires_at: timestamptz
+    +accepted_at: timestamptz?
+    +created_at: timestamptz
+    +deleted_at: timestamptz?
+  }
+
+  class JetonPartagePublic {
+    +id: UUID <<PK>>
+    +calendar_id: UUID <<FK>>
+    +owner_uid: UUID <<FK>>
+    +token_hash: text <<UK>>
+    +expires_at: timestamptz?
+    +created_at: timestamptz
+    +revoked_at: timestamptz?
+  }
+
+  class JetonICS {
+    +id: UUID <<PK>>
+    +calendar_id: UUID <<FK>>
+    +owner_uid: UUID <<FK>>
+    +token_hash: text <<UK>>
+    +created_at: timestamptz
+    +last_accessed_at: timestamptz?
+    +revoked_at: timestamptz?
+  }
+
+  class Notification {
+    +id: UUID <<PK>>
+    +user_id: UUID <<FK>>
+    +sender_uid: UUID? <<FK>>
+    +calendar_id: UUID? <<FK>>
+    +medicine_box_id: UUID? <<FK>>
+    +type: text
+    +content: jsonb
+    +read_at: timestamptz?
+    +created_at: timestamptz
+  }
+
+  class JetonPush {
+    +id: UUID <<PK>>
+    +user_id: UUID <<FK>>
+    +token_hash: text <<UK>>
+    +provider: text
+    +platform: text?
+    +created_at: timestamptz
+    +last_used_at: timestamptz?
+    +revoked_at: timestamptz?
+  }
+}
+
+Utilisateur "1" -- "0..1" IdentifiantMotDePasse
+Utilisateur "1" -- "0..*" IdentiteOAuth
+Utilisateur "1" -- "0..*" SessionRefresh
+Utilisateur "1" -- "0..*" JetonPush
+Utilisateur "1" -- "0..*" Calendrier : propriétaire
+Calendrier "1" *-- "0..1" ParametresCalendrier
+Calendrier "1" *-- "0..*" BoiteMedicament
+BoiteMedicament "1" *-- "0..*" ConditionTraitement
+MedicamentCatalogue "0..1" <-- "0..*" BoiteMedicament
+Calendrier "1" *-- "0..*" UtilisationPilulier
+Utilisateur "0..1" -- "0..*" UtilisationPilulier : préparateur
+Calendrier "1" -- "0..*" PartageCalendrier
+Utilisateur "1" -- "0..*" PartageCalendrier : destinataire
+Calendrier "1" -- "0..*" Invitation
+Calendrier "1" -- "0..*" JetonPartagePublic
+Calendrier "1" -- "0..*" JetonICS
+Utilisateur "1" -- "0..*" JetonPartagePublic : propriétaire
+Utilisateur "1" -- "0..*" JetonICS : propriétaire
+Utilisateur "1" -- "0..*" Notification : destinataire
+Utilisateur "0..1" -- "0..*" Notification : expéditeur
+Calendrier "0..1" -- "0..*" Notification
+BoiteMedicament "0..1" -- "0..*" Notification
+
+note bottom of SessionRefresh
+  Ne stocker que le hash des jetons de
+  renouvellement. Rotation et révocation
+  sont gérées côté serveur.
+end note
+
+note bottom of Invitation
+  Le modèle cible prévoit une expiration
+  et un jeton stocké sous forme de hash.
+  À confirmer dans la politique produit.
+end note
+
+note bottom of JetonPartagePublic
+  Stocker un hash de jeton évite de conserver
+  en clair un secret d'accès public.
+end note
+
+legend right
+  |= Marque |= Signification |
+  | PK | clé primaire |
+  | FK | clé étrangère |
+  | UK | contrainte unique |
+  | ? | valeur nullable |
+  | *-- | composition métier |
+endlegend
+@enduml

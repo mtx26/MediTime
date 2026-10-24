@@ -1,0 +1,99 @@
+@startuml
+title MediTime — Modules du backend cible en Rust
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+package "Entrées" {
+  component "API HTTP REST\nAxum, routes, DTO, validation" as Http
+  component "Callback OAuth" as OAuthCallback
+  component "Endpoint ICS public" as IcsEndpoint
+  component "Worker planifié" as JobRunner
+}
+
+package "Application\n(cas d'usage)" {
+  component "Auth et comptes\ninscription, login, sessions,\nprofil et préférences" as AuthApp
+  component "Calendriers\nCRUD, planning, réglages" as CalendarApp
+  component "Traitements\nmédicaments, conditions,\nimports et notices" as MedicineApp
+  component "Stocks et pilulier\npréparations, alertes,\nprises manquées" as StockApp
+  component "Partages\ninvitations, droits,\njetons publics" as SharingApp
+  component "Notifications\nin-app, e-mail, push" as NotificationApp
+  component "Exports\nPDF et ICS" as ExportApp
+}
+
+package "Domaine" {
+  component "Modèle métier\nentités, valeurs,\nrègles invariantes" as Domain
+  component "Politique d'accès\npropriétaire, partage,\nlecture publique" as AccessPolicy
+  component "Planification et stocks\nprises dues, décréments,\nprévisions" as ScheduleRules
+}
+
+package "Ports sortants\n(interfaces Rust)" {
+  component "Repositories\nUser, Session, Calendar,\nMedicine, Sharing, Notification" as Repositories
+  component "Providers\nOAuth, e-mail, push,\nanalyse, catalogue, fichiers" as ProviderPorts
+}
+
+package "Adaptateurs" {
+  component "Adaptateurs PostgreSQL\nSQLx + migrations versionnées" as PgAdapters
+  component "Adaptateurs externes\nOAuth, Resend, FCM/Expo,\nGemini, catalogue, S3" as ExternalAdapters
+}
+
+database "PostgreSQL 18\nbase interne" as DB
+cloud "Fournisseurs externes\nGoogle/GitHub, Resend,\nFCM/Expo, Gemini, AFMPS,\nstockage objet compatible S3" as External
+
+Http --> AuthApp
+Http --> CalendarApp
+Http --> MedicineApp
+Http --> StockApp
+Http --> SharingApp
+Http --> NotificationApp
+Http --> ExportApp
+OAuthCallback --> AuthApp
+IcsEndpoint --> ExportApp
+JobRunner --> StockApp
+JobRunner --> NotificationApp
+
+AuthApp --> Domain
+CalendarApp --> Domain
+MedicineApp --> Domain
+StockApp --> Domain
+SharingApp --> Domain
+NotificationApp --> Domain
+ExportApp --> Domain
+
+CalendarApp --> AccessPolicy
+MedicineApp --> AccessPolicy
+StockApp --> AccessPolicy
+SharingApp --> AccessPolicy
+ExportApp --> AccessPolicy
+StockApp --> ScheduleRules
+ExportApp --> ScheduleRules
+
+AuthApp --> Repositories
+CalendarApp --> Repositories
+MedicineApp --> Repositories
+StockApp --> Repositories
+SharingApp --> Repositories
+NotificationApp --> Repositories
+ExportApp --> Repositories
+AuthApp --> ProviderPorts
+NotificationApp --> ProviderPorts
+MedicineApp --> ProviderPorts
+
+Repositories --> PgAdapters
+ProviderPorts --> ExternalAdapters
+PgAdapters --> DB
+ExternalAdapters --> External
+
+note bottom of Domain
+  Le domaine et les cas d'usage ne dépendent
+  ni du framework HTTP, ni de SQLx,
+  ni des fournisseurs externes.
+end note
+
+note bottom of Repositories
+  Les transactions métier traversent les ports.
+  Les adaptateurs implémentent les interfaces
+  et sont injectés au démarrage de l'application.
+end note
+@enduml

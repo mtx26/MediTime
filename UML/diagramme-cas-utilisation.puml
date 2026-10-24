@@ -1,0 +1,162 @@
+@startuml
+title MediTime — Diagramme général de cas d'utilisation
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #F7FAFC
+  BorderColor #315A75
+  ArrowColor #526B7A
+}
+
+actor "Visiteur" as Visitor
+actor "Utilisateur\n(authentifié)" as User
+actor "Propriétaire\nde calendrier" as Owner
+actor "Collaborateur\nautorisé" as Collaborator
+actor "Consultant\nd'un lien public" as PublicViewer
+actor "Fournisseur\nd'identité OAuth" as OAuth
+actor "Service d'authentification\nSupabase" as Supabase
+actor "Service d'e-mail\n(Resend)" as Email
+actor "Service de notifications\npush (FCM)" as Push
+actor "Service d'analyse\nde documents (Gemini)" as Gemini
+actor "Référentiel des notices\nmédicamenteuses (AFMPS)" as Leaflets
+actor "Application de calendrier\ntier (Google, Outlook…)" as CalendarClient
+actor "Planificateur\n(cron quotidien)" as Scheduler
+actor "Caméra du terminal" as Camera
+
+Owner --|> User
+Collaborator --|> User
+
+rectangle "Système MediTime" {
+  package "Compte et préférences" {
+    usecase "Créer un compte" as UC_Register
+    usecase "Se connecter / se déconnecter" as UC_Login
+    usecase "S'authentifier avec un fournisseur tiers" as UC_OAuth
+    usecase "Vérifier son adresse e-mail" as UC_VerifyEmail
+    usecase "Réinitialiser son mot de passe" as UC_ResetPassword
+    usecase "Gérer son profil\n(nom, photo, e-mail)" as UC_Profile
+    usecase "Configurer les préférences\n(rappels, e-mail, push)" as UC_Preferences
+  }
+
+  package "Calendriers et traitements personnels" {
+    usecase "Créer, consulter, renommer\nou supprimer un calendrier" as UC_Calendar
+    usecase "Consulter le calendrier\net le planning journalier" as UC_Schedule
+    usecase "Exporter le calendrier en PDF" as UC_PDFCalendar
+    usecase "Gérer les médicaments\n(ajouter, modifier, supprimer)" as UC_Medicines
+    usecase "Définir un traitement\n(dose, horaires, fréquence,\njours et alternance)" as UC_Regimen
+    usecase "Consulter une notice\nmédicamenteuse" as UC_Leaflet
+    usecase "Scanner le code-barres d'une boîte\net préremplir le médicament" as UC_ScanMedicine
+    usecase "Analyser un document médical\n(scanner/importer)" as UC_Analyze
+    usecase "Vérifier et enregistrer\nles médicaments extraits" as UC_SaveAnalysis
+    usecase "Déclarer une prise\n(utiliser le pilulier)" as UC_RecordIntake
+    usecase "Consulter / corriger\nl'historique du pilulier" as UC_IntakeHistory
+    usecase "Consulter les prises manquées\net leur récapitulatif" as UC_Missed
+    usecase "Prévisualiser puis régulariser\nles prises manquées" as UC_Reconcile
+    usecase "Gérer le stock\n(quantité, réapprovisionnement)" as UC_Stock
+    usecase "Consulter les alertes\net prévisions de stock" as UC_StockAlerts
+    usecase "Configurer le décrément\nautomatique du stock" as UC_StockMethod
+    usecase "Configurer les notifications\nd'un calendrier personnel" as UC_CalendarNotifications
+  }
+
+  package "Partage et collaboration" {
+    usecase "Inviter un utilisateur\npar e-mail" as UC_Invite
+    usecase "Notifier le destinataire\nde l'invitation" as UC_InviteNotice
+    usecase "Accepter ou refuser\nune invitation" as UC_RespondInvite
+    usecase "Gérer les invitations\net accès au calendrier" as UC_Access
+    usecase "Créer un lien public\navec expiration facultative" as UC_PublicLink
+    usecase "Gérer ou révoquer\nles liens publics" as UC_ManageLink
+    usecase "Consulter un calendrier\npartagé via invitation" as UC_SharedCalendar
+    usecase "Gérer les médicaments\net prises d'un calendrier partagé" as UC_SharedTreatment
+    usecase "Quitter un calendrier partagé" as UC_Leave
+    usecase "Consulter un calendrier public\net ses médicaments via un jeton" as UC_PublicConsult
+    usecase "Configurer les notifications et consulter\nle mode de stock d'un calendrier partagé" as UC_SharedSettings
+  }
+
+  package "Notifications et synchronisation externe" {
+    usecase "Consulter les notifications\net les marquer comme lues" as UC_Notifications
+    usecase "Recevoir des rappels,\ninvitations et alertes de stock" as UC_ReceiveNotifications
+    usecase "Générer un lien d'abonnement\nau calendrier (ICS)" as UC_ICSLink
+    usecase "Importer / synchroniser\nle calendrier dans une application tierce" as UC_ICSSubscribe
+    usecase "Vérifier automatiquement\nles stocks et déclencher les alertes" as UC_CronStock
+  }
+}
+
+Visitor --> UC_Register
+Visitor --> UC_Login
+Visitor --> UC_VerifyEmail
+Visitor --> UC_ResetPassword
+User --> UC_Login
+User --> UC_Profile
+User --> UC_Preferences
+User --> UC_Notifications
+User --> UC_ReceiveNotifications
+
+Owner --> UC_Calendar
+Owner --> UC_Schedule
+Owner --> UC_PDFCalendar
+Owner --> UC_Medicines
+Owner --> UC_Regimen
+Owner --> UC_Leaflet
+Owner --> UC_ScanMedicine
+Owner --> UC_Analyze
+Owner --> UC_SaveAnalysis
+Owner --> UC_RecordIntake
+Owner --> UC_IntakeHistory
+Owner --> UC_Missed
+Owner --> UC_Reconcile
+Owner --> UC_Stock
+Owner --> UC_StockAlerts
+Owner --> UC_StockMethod
+Owner --> UC_CalendarNotifications
+Owner --> UC_Invite
+Owner --> UC_Access
+Owner --> UC_PublicLink
+Owner --> UC_ManageLink
+Owner --> UC_ICSLink
+
+Collaborator --> UC_SharedCalendar
+Collaborator --> UC_SharedTreatment
+Collaborator --> UC_Leave
+Collaborator --> UC_SharedSettings
+User --> UC_RespondInvite
+Collaborator --> UC_ICSLink
+PublicViewer --> UC_PublicConsult
+PublicViewer --> UC_ICSSubscribe
+
+OAuth --> UC_OAuth
+Supabase --> UC_Login
+Supabase --> UC_Register
+Supabase --> UC_VerifyEmail
+Supabase --> UC_ResetPassword
+Email --> UC_ReceiveNotifications
+Email --> UC_InviteNotice
+Push --> UC_ReceiveNotifications
+Gemini --> UC_Analyze
+Leaflets --> UC_Leaflet
+CalendarClient --> UC_ICSSubscribe
+Scheduler --> UC_CronStock
+Camera --> UC_ScanMedicine
+UC_ReceiveNotifications ..> UC_CronStock : <<extend>>
+
+UC_OAuth ..> UC_Login : <<extend>>
+UC_SaveAnalysis ..> UC_Analyze : <<extend>>
+UC_Reconcile ..> UC_Missed : <<extend>>
+UC_Invite ..> UC_InviteNotice : <<include>>
+
+note right of UC_SharedTreatment
+  Les opérations disponibles dépendent
+  des droits accordés au collaborateur.
+end note
+
+note bottom of UC_PublicConsult
+  Le consultant accède uniquement aux données
+  exposées par le lien/jeton public valide.
+end note
+
+note bottom of UC_Analyze
+  L'analyse assiste la saisie : l'utilisateur
+  vérifie les données avant leur enregistrement.
+end note
+
+@enduml

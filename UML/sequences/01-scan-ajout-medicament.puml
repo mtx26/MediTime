@@ -1,0 +1,58 @@
+@startuml
+title MediTime — Scanner et ajouter un médicament
+autonumber
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor "Utilisateur" as User
+boundary "Interface web MediTime" as UI
+participant "Scanner de code-barres" as Scanner
+participant "Catalogue médicaments\nSupabase" as Catalog
+participant "API MediTime" as API
+participant "Supabase Auth" as Auth
+database "Base MediTime" as DB
+
+User -> UI: Ouvre le scanner
+UI -> Scanner: Demande l'accès caméra
+Scanner --> UI: Code GTIN détecté
+UI -> Catalog: Recherche par code FMD/GTIN
+Catalog --> UI: Données médicament ou aucun résultat
+UI --> User: Affiche la proposition préremplie
+User -> UI: Vérifie et confirme les informations
+
+alt Importer dans un nouveau calendrier
+  UI -> API: POST /calendars\n(nom du calendrier)
+  API -> Auth: Valide le jeton utilisateur
+  Auth --> API: Identité confirmée
+  API -> DB: INSERT calendrier
+  DB --> API: calendar_id
+  API --> UI: Calendrier créé
+  loop Pour chaque médicament confirmé
+    UI -> API: POST /calendars/{id}/boxes\n(médicament, dose, stock, conditions, code_fmd)
+    API -> Auth: Valide le jeton utilisateur
+    Auth --> API: Identité confirmée
+    API -> DB: INSERT medicine_box
+    opt Conditions de traitement fournies
+      API -> DB: INSERT medicine_box_conditions
+    end
+    DB --> API: box_id
+    API --> UI: Résultat de création
+  end
+else Ajouter à un calendrier existant
+  UI -> API: POST /calendars/{id}/boxes\n(médicament et conditions vérifiés)
+  API -> Auth: Valide le jeton utilisateur et l'accès au calendrier
+  Auth --> API: Utilisateur authentifié
+  API -> DB: INSERT medicine_box
+  opt Conditions de traitement fournies
+    API -> DB: INSERT medicine_box_conditions
+  end
+  DB --> API: box_id
+  API --> UI: Résultat de création
+end
+
+alt Toutes les créations réussissent
+  UI --> User: Ouvre la liste des médicaments du calendrier
+else Une création de boîte échoue
+  UI --> User: Signale une importation partielle\net ouvre le calendrier créé
+end
+@enduml

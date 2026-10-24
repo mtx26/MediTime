@@ -1,0 +1,71 @@
+@startuml
+title MediTime — Architecture cible (sans Supabase)
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+actor "Utilisateur" as User
+actor "Administrateur\nopérationnel" as Ops
+
+rectangle "Applications clientes" {
+  component "Application Web\nReact" as Web
+  component "Application mobile\nExpo / React Native" as Mobile
+}
+
+rectangle "VPS — Docker Compose" {
+  component "Reverse proxy\nTLS, routage, limites" as Proxy
+  component "Backend MediTime\nRust + Axum" as Backend
+  database "PostgreSQL 18\nbase interne" as DB
+  component "Tâches planifiées\nworker Rust" as Worker
+  component "Observabilité\nlogs, métriques, alertes" as Observability
+}
+
+cloud "Stockage objet\ncompatible S3\n(fournisseur à choisir)" as Storage
+cloud "Fournisseurs OAuth\nGoogle, GitHub, etc." as OAuth
+cloud "E-mail\nResend (initialement)" as Email
+cloud "Notifications push\nFCM / Expo (initialement)" as Push
+cloud "Analyse de documents\nGemini (initialement)" as Gemini
+cloud "Catalogue médicaments\nAFMPS / source actuelle" as Catalog
+cloud "Calendriers externes\nclients ICS" as IcsClients
+
+User --> Web : HTTPS
+User --> Mobile : HTTPS
+Web --> Proxy : API HTTPS\nBearer access token
+Mobile --> Proxy : API HTTPS\nBearer access token
+Proxy --> Backend : HTTP interne
+Backend --> DB : SQL / TLS\ncompte applicatif à privilèges limités
+Backend --> Storage : upload/download\nvia interface de stockage
+Backend --> OAuth : Authorization Code\n+ PKCE / callback
+Backend --> Email : API e-mail
+Backend --> Push : API push
+Backend --> Gemini : API analyse
+Backend --> Catalog : recherche catalogue
+IcsClients --> Proxy : GET abonnement ICS
+Proxy --> Backend : route ICS publique par jeton
+Worker --> DB : traitements planifiés
+Worker --> Email : alertes configurées
+Worker --> Push : alertes configurées
+Backend --> Observability : journaux et métriques
+Worker --> Observability : journaux et métriques
+Ops --> Observability : supervision
+
+note bottom of DB
+  Source de vérité pour comptes, sessions,
+  calendriers, traitements et partages.
+  Aucune dépendance à Supabase Auth,
+  Supabase Database ou Supabase Realtime.
+end note
+
+note bottom of Storage
+  Les fichiers passent par un adaptateur S3.
+  Ne pas exposer les clés d'accès au client.
+  Les métadonnées et permissions restent en PostgreSQL.
+end note
+
+note bottom of Backend
+  Le backend est l'unique frontière d'accès
+  métier à la base. Les clients n'accèdent
+  jamais directement à PostgreSQL.
+end note
+@enduml

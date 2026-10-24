@@ -1,0 +1,78 @@
+@startuml
+title MediTime — Inviter un collaborateur et accepter/refuser
+autonumber
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor "Propriétaire" as Owner
+boundary "Application MediTime" as UI
+participant "API MediTime" as API
+participant "Supabase Auth" as Auth
+database "Base MediTime" as DB
+participant "Service de notifications" as Notify
+participant "E-mail (Resend)" as Email
+actor "Destinataire" as Recipient
+
+Owner -> UI: Saisit l'adresse e-mail et envoie l'invitation
+UI -> API: POST /invitations/{calendar_id}
+API -> Auth: Valide le jeton et le droit de partager
+Auth --> API: Identité du propriétaire confirmée
+API -> DB: Recherche un compte correspondant à l'e-mail
+DB --> API: Compte trouvé ou absent
+
+alt Le destinataire possède déjà un compte
+  API -> DB: Crée le partage en attente\n(shared_calendar, token)
+  API -> Notify: Enregistre une notification d'invitation
+  Notify -> DB: INSERT notification
+  Notify -> Recipient: Envoie les notifications activées
+  API --> UI: Invitation envoyée
+  Recipient -> UI: Ouvre l'invitation et se connecte
+  UI -> API: GET /invitations/login/{token}
+  API -> Auth: Vérifie le destinataire authentifié
+  API -> DB: Charge le partage en attente et le calendrier
+  DB --> API: Détails de l'invitation ou introuvable
+  API --> UI: Détails de l'invitation
+else Aucun compte correspondant
+  API -> DB: Crée une invitation d'inscription\n(invitations, token, rôle)
+  API -> Email: Envoie le lien d'inscription et d'acceptation
+  Email --> Recipient: E-mail d'invitation
+  API --> UI: Invitation d'inscription envoyée
+  Recipient -> UI: S'inscrit puis ouvre le lien
+  UI -> API: GET /invitations/registration/{token}
+  API -> Auth: Vérifie le compte et l'adresse destinataire
+  API -> DB: Charge l'invitation et le calendrier
+  DB --> API: Détails de l'invitation ou introuvable
+  API --> UI: Détails de l'invitation
+end
+
+alt Destinataire accepte
+  alt Invitation d'un utilisateur déjà inscrit
+    UI -> API: POST /invitations/login/accept/{token}
+    API -> Auth: Vérifie le compte du destinataire
+    API -> DB: Marque le shared_calendar accepté
+    DB --> API: calendar_id et shared_calendar_id
+  else Invitation d'inscription
+    UI -> API: POST /invitations/registration/accept/{token}
+    API -> Auth: Vérifie le compte créé par le destinataire
+    API -> DB: Supprime l'invitation et crée\nle shared_calendar accepté
+    DB --> API: calendar_id et shared_calendar_id
+  end
+  API -> Notify: Notifie le propriétaire de l'acceptation
+  Notify -> DB: INSERT notification
+  Notify -> Owner: Envoie les notifications activées
+  API --> UI: Acceptation confirmée
+  UI --> Recipient: Affiche le calendrier partagé
+else Destinataire refuse
+  alt Invitation d'un utilisateur déjà inscrit
+    UI -> API: POST /invitations/login/reject/{token}
+    API -> DB: Marque le shared_calendar supprimé
+  else Invitation d'inscription
+    UI -> API: POST /invitations/registration/reject/{token}
+    API -> DB: Supprime l'invitation d'inscription
+  end
+  API -> Notify: Notifie le propriétaire du refus
+  Notify -> DB: INSERT notification
+  API --> UI: Refus confirmé
+  UI --> Recipient: Confirme le refus
+end
+@enduml

@@ -1,0 +1,91 @@
+@startuml
+title MediTime — Authentification cible (backend Rust, base interne)
+autonumber
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor "Utilisateur" as User
+boundary "Web / mobile" as Client
+participant "Backend Rust\nAPI Auth" as API
+participant "Service Auth" as Auth
+database "PostgreSQL interne" as DB
+participant "Fournisseur OAuth" as OAuth
+participant "Service e-mail" as Email
+
+alt Connexion par e-mail et mot de passe
+  User -> Client: Saisit e-mail et mot de passe
+  Client -> API: POST /auth/login
+  API -> Auth: Authentifie les identifiants
+  Auth -> DB: Recherche utilisateur et hash du mot de passe
+  DB --> Auth: Utilisateur et hash
+  Auth -> Auth: Vérifie le mot de passe\n(argon2id recommandé)
+  alt Identifiants invalides
+    Auth --> API: Authentification refusée
+    API --> Client: 401 — identifiants invalides
+    Client --> User: Affiche une erreur générique
+  else Identifiants valides
+    Auth -> DB: Crée session avec hash du refresh token
+    DB --> Auth: Session créée
+    Auth --> API: Access JWT court + refresh token
+    API --> Client: 200 — tokens et profil
+    Client --> User: Session ouverte
+  end
+else Connexion OAuth
+  User -> Client: Choisit un fournisseur OAuth
+  Client -> API: GET /auth/oauth/{provider}/start
+  API --> Client: URL d'autorisation + state + PKCE
+  Client -> OAuth: Autorisation utilisateur
+  OAuth --> Client: Redirection callback avec code
+  Client -> API: GET /auth/oauth/{provider}/callback\n(code, state)
+  API -> API: Vérifie state et échange le code
+  API -> OAuth: Échange code PKCE et récupère l'identité
+  OAuth --> API: Identité vérifiée du fournisseur
+  API -> DB: Recherche identité OAuth liée au sujet externe
+  DB --> API: Identité connue ou inconnue
+  alt Identité déjà liée
+    API -> DB: Charge l'utilisateur existant
+  else Première connexion avec consentement
+    API -> DB: Crée utilisateur et identité OAuth
+  end
+  API -> DB: Crée session avec hash du refresh token
+  DB --> API: Session créée
+  API --> Client: Access JWT court + refresh token
+  Client --> User: Session ouverte
+end
+
+opt Inscription par e-mail
+  User -> Client: Soumet e-mail et mot de passe
+  Client -> API: POST /auth/register
+  API -> DB: Vérifie unicité et crée l'utilisateur\navec hash Argon2id
+  DB --> API: Utilisateur créé
+  API -> Email: Envoie le lien de vérification
+  Email --> User: Message de vérification
+  User -> Client: Ouvre le lien de vérification
+  Client -> API: POST /auth/verify-email\n(token de vérification)
+  API -> DB: Vérifie le hash, expiration et usage unique
+  DB --> API: Adresse marquée vérifiée
+  API --> Client: Vérification confirmée
+end
+
+opt Renouvellement de session
+  Client -> API: POST /auth/refresh\n(refresh token)
+  API -> Auth: Valide et hache le refresh token
+  Auth -> DB: Recherche session active non expirée
+  DB --> Auth: Session valide ou absente
+  alt Session valide
+    Auth -> DB: Révoque l'ancien refresh token\net stocke le hash du successeur
+    DB --> Auth: Rotation enregistrée
+    Auth --> API: Nouvel access JWT + refresh token
+    API --> Client: Tokens renouvelés
+  else Session absente, expirée ou révoquée
+    Auth --> API: Renouvellement refusé
+    API --> Client: 401 — reconnectez-vous
+  end
+end
+
+note over API,DB
+  La durée du JWT d'accès et celle des sessions
+  refresh restent à définir dans la configuration
+  et la politique produit.
+end note
+@enduml

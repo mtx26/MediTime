@@ -1,0 +1,69 @@
+@startuml
+title MediTime — Préparer le pilulier et décrémenter le stock
+autonumber
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor "Utilisateur\n(propriétaire ou collaborateur autorisé)" as User
+boundary "Application MediTime" as UI
+participant "API MediTime" as API
+participant "Supabase Auth" as Auth
+participant "Service calendrier" as Calendar
+participant "Service médicaments / stock" as Medication
+database "Base MediTime" as DB
+participant "Service de notifications" as Notify
+
+User -> UI: Demande l'état du pilulier pour une semaine
+UI -> API: GET /calendars/{id}/pillbox/used?startDate=...
+API -> Auth: Vérifie l'accès au calendrier
+Auth --> API: Accès autorisé
+API -> Calendar: Recherche une préparation active cette semaine
+Calendar -> DB: SELECT pillbox_uses
+DB --> Calendar: Préparation trouvée ou absente
+Calendar --> API: État du pilulier
+API --> UI: État affiché
+
+alt Pilulier déjà préparé cette semaine
+  UI --> User: Indique que le pilulier est déjà enregistré
+else Pilulier à préparer
+  User -> UI: Confirme la préparation
+  UI -> API: POST /calendars/{id}/pillbox/used\n(startDate)
+  API -> Auth: Vérifie l'accès au calendrier
+  Auth --> API: Accès autorisé
+  API -> Calendar: Enregistre la préparation pour la semaine
+  Calendar -> DB: INSERT pillbox_uses\n(si aucune préparation active cette semaine)
+  DB --> Calendar: Inséré ou doublon
+  alt Enregistrement déjà présent
+    Calendar --> API: Préparation déjà faite
+    API --> UI: Erreur PILLBOX_ALREADY_USED
+    UI --> User: Signale le doublon
+  else Enregistrement créé
+    Calendar --> API: Préparation enregistrée
+    API -> Medication: Applique la méthode de décrément du stock
+    Medication -> DB: Lit paramètres, boîtes et conditions actives
+    DB --> Medication: Méthode de stock et posologies
+    alt Méthode weekly_pillbox
+      Medication -> Medication: Calcule les doses prévues sur la semaine
+      Medication -> DB: Met à jour stock_quantity des boîtes
+      DB --> Medication: Stocks mis à jour
+      Medication -> Notify: Vérifie les seuils de stock faible
+      opt Au moins un stock est sous le seuil
+        Notify -> DB: Enregistre les notifications activées
+        Notify --> User: Envoie les alertes configurées
+      end
+      Medication --> API: Décrément terminé
+      API --> UI: Confirmation de préparation
+      UI --> User: Affiche le pilulier préparé
+    else Méthode non prise en charge
+      Medication --> API: Méthode non prise en charge
+      API --> UI: Erreur UNSUPPORTED_DECREMENT_MODE
+      UI --> User: Signale l'échec du décrément
+    end
+  end
+end
+
+note over Calendar,Medication
+  Le journal d'utilisation et le décrément du stock sont
+  effectués par deux opérations de service distinctes.
+end note
+@enduml
