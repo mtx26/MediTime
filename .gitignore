@@ -57,3 +57,6 @@ apps/web/src/test/
 
 dist/
 .vercel
+
+# Rust build artifacts
+/apps/backend_rust/target/
